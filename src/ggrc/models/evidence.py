@@ -27,6 +27,9 @@ class Evidence(Roleable, Relatable, mixins.Titled, Base, Indexed, db.Model):
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          "Evidence")
 
+  GDRIVE_FILE_URL_TEMPLATE = ("https://drive.google.com/"
+                              "a/google.com/file/d/{}/view?usp=drivesdk")
+
   URL = "URL"
   ATTACHMENT = "EVIDENCE"
   REFERENCE_URL = "REFERENCE_URL"
@@ -83,6 +86,9 @@ class Evidence(Roleable, Relatable, mixins.Titled, Base, Indexed, db.Model):
   @orm.validates("gdrive_file_id")
   def set_link_by_gdrive_file_id(self, _, value):
     """Set self.link by filling file id into an URL template."""
+    # TODO: self.link = gdrive_file.alternate_link (should be fetched
+    # through REST instead of hardcoding a format here, and not in a
+    # validator)
     self.link = self.GDRIVE_FILE_URL_TEMPLATE.format(value)
     return value
 
