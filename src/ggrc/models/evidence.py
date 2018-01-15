@@ -22,6 +22,8 @@ class Evidence(Roleable, Relatable, mixins.Titled, Base, Indexed, db.Model):
   """Evidence (Audit-scope URLs and Attachments) model."""
   __tablename__ = "evidences"
 
+  _title_uniqueness = False
+
   link = deferred(db.Column(db.String, nullable=False), "Evidence")
   gdrive_file_id = deferred(db.Column(db.String), "Evidence")
   description = deferred(db.Column(db.Text, nullable=False, default=u""),

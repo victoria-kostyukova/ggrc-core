@@ -35,7 +35,6 @@ def upgrade():
       sa.Column('context_id', sa.Integer(), nullable=True),
       sa.ForeignKeyConstraint(['context_id'], ['contexts.id']),
       sa.PrimaryKeyConstraint('id'),
-      sa.UniqueConstraint('title', name='uq_t_evidences')
   )
   op.create_index('fk_evidences_contexts', 'evidences',
                   ['context_id'], unique=False)
