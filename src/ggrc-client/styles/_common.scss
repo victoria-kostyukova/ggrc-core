@@ -340,60 +340,6 @@ select.input-block-level {
   }
 }
 
-.widget .wysiwyg-area {
-  margin-bottom: 10px;
-  .double {
-    @extend %input-block-level;
-    height: 70px;
-  }
-  .triple {
-    @extend %input-block-level;
-    height: 120px;
-  }
-  .quadruple {
-    @extend %input-block-level;
-    height: 150px;
-  }
-  iframe {
-    width: 97.5% !important;
-    margin-bottom:0 !important;
-  }
-  .wysiwyg-action {
-    .btn {
-      @include opacity(1);
-    }
-  }
-  select {
-    float: right;
-    width: auto;
-    margin: 4px 0 0 0;
-    height: 22px;
-    line-height: 22px;
-    padding: 0;
-  }
-  // smaller buttons in wysiwyg editor
-  .btn {
-    opacity: 0.5;
-    padding: 0 5px 2px 5px;
-    font-size: $f-small;
-    &:hover {
-      opacity: 1;
-    }
-  }
-  .help-inline {
-    display:none;
-  }
-  ul.wysihtml5-toolbar > li {
-    margin-bottom:4px;
-    margin-top:4px;
-    border-bottom:none;
-    line-height:18px;
-    &:hover {
-      border-bottom:none !important;
-    }
-  }
-}
-
 // backdrop
 .modal-backdrop, .modal-backdrop.fade.in {
   @include opacity(0.6);

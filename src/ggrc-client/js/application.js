@@ -84,31 +84,6 @@
       $(this).openclose();
     });
 
-    // Tab indexing form fields in modal
-    $body.on('focus', '.modal', function () {
-      $('.wysiwyg-area').each(function () {
-        let $this = $(this);
-        let $textarea = $this.find('textarea.wysihtml5').attr('tabindex');
-        let $descriptionField = $this.find('iframe.wysihtml5-sandbox');
-
-        function addingTabindex() {
-          $descriptionField.attr('tabindex', $textarea);
-        }
-        setTimeout(addingTabindex, 100);
-      });
-    });
-
-    // Prevent link popup in code mode
-    $body.on('click', 'a[data-wysihtml5-command=popupCreateLink]',
-      function (e) {
-        let $this = $(this);
-        if ($this.hasClass('disabled')) {
-          // The button is disabled, close the modal immediately
-          $('body').find('.bootstrap-wysihtml5-insert-link-modal')
-            .modal('hide');
-          $this.closest('.wysiwyg-area').find('textarea').focus();
-        }
-      });
     // top nav dropdown position
     function dropdownPosition() {
       let $this = $(this);

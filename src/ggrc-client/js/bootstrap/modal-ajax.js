@@ -463,7 +463,6 @@ import Permission from '../permission';
       }).length < 1) {
       $el.on('keypress.preventdoublesubmit', function (ev) {
         if (ev.which === 13 &&
-          !$(document.activeElement).hasClass('wysihtml5') &&
           !$(document.activeElement).hasClass('create-form__input') &&
           !$(document.activeElement).parents('.pagination').length
         ) {

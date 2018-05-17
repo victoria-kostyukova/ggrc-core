@@ -101,9 +101,6 @@ module.exports = function (env) {
           fallback: 'style-loader',
         }),
       }, {
-        test: /wysihtml5-0\.4\.0pre\.js$/,
-        loader: 'exports-loader?wysihtml5',
-      }, {
         test: require.resolve('jquery'),
         use: [{
           loader: 'expose-loader',

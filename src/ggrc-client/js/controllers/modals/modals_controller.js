@@ -421,7 +421,6 @@ export default can.Control({
     if (customAttributes != null && (isObjectModal || isProposal)) {
       this.options.$content.append(customAttributes);
     }
-    this.setup_wysihtml5();
 
     // Update UI status array
     $form = $(this.element).find('form');
@@ -438,18 +437,6 @@ export default can.Control({
       // When we start, all the ui elements are visible
       this.options.ui_array.push(0);
     }
-  },
-
-  setup_wysihtml5: function () {
-    if (!this.element) {
-      return;
-    }
-    this.element.find('.wysihtml5').each(function () {
-      var element = this;
-      import(/* webpackChunkName: "wysiwyg" */'../../plugins/wysiwyg').then(function () {
-        $(element).cms_wysihtml5();
-      });
-    });
   },
 
   'input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change':
@@ -548,11 +535,6 @@ export default can.Control({
     var $other;
     var listPath;
     var cur;
-
-    // Don't set `_wysihtml5_mode` on the instances
-    if (item.name === '_wysihtml5_mode') {
-      return;
-    }
 
     if (!(instance instanceof this.options.model)) {
       instance = this.options.instance =
@@ -661,7 +643,6 @@ export default can.Control({
     } else if (name[0] !== 'people') {
       instance.attr(name[0], value);
     }
-    this.setup_wysihtml5(); // in case the changes in values caused a new wysi box to appear.
   },
   '[data-before], [data-after] change': function (el, ev) {
     var date;
@@ -1017,8 +998,6 @@ export default can.Control({
   new_instance: function (data) {
     var newInstance = this.prepareInstance();
 
-    this.resetCAFields(newInstance.attr('custom_attribute_definitions'));
-
     $.when(this.options.attr('instance', newInstance))
       .done(function () {
         this.reset_form(function () {
@@ -1031,36 +1010,6 @@ export default can.Control({
       .then(this.proxy('autocomplete'));
 
     this.restore_ui_status();
-  },
-
-  /**
-   * Reset custom attribute values manually
-   * @param {Array} cad - Array with custom attribute definitions
-   */
-  resetCAFields: function (cad) {
-    var wysihtml5;
-
-    can.each(cad, function (definition) {
-      var element = this.element
-        .find('[name="custom_attributes.' + definition.id + '"]');
-      if (definition.attribute_type === 'Checkbox') {
-        element.attr('checked', false);
-      } else if (definition.attribute_type === 'Rich Text') {
-        // Check that wysihtml5 is still alive, otherwise just clean textarea
-        wysihtml5 = element.data('wysihtml5');
-        if (wysihtml5) {
-          wysihtml5.editor.clear();
-        } else {
-          element.val('');
-        }
-      } else if (definition.attribute_type === 'Map:Person') {
-        element = this.element.find('[name="_custom_attribute_mappings.' +
-          definition.id + '.email"]');
-        element.val('');
-      } else {
-        element.val('');
-      }
-    }, this);
   },
 
   prepareInstance: function () {

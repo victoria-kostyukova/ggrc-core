@@ -31,8 +31,6 @@ import 'can/map/validations';
 import 'moment';
 import 'moment-timezone/builds/moment-timezone-with-data.min';
 import 'spin.js';
-
-import 'wysihtml5/bootstrap-wysihtml5-0.0.2.css';
 import 'jquery/jquery-ui.css';
 import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
