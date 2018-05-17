@@ -41,8 +41,13 @@
         <label class="ggrc-form-item__label">
           Description
         </label>
-        <div class="wysiwyg-area">
-          <textarea tabindex="2" id="evidence_description" class="triple wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
+        <div class="rich-text">
+          <rich-text
+            tabindex="2"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter description"
+            {(content)}="instance.description">
+          </rich-text>
         </div>
       </div>
     </div>

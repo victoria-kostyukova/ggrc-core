@@ -15,8 +15,13 @@
         <span class="required">*</span>
         <i class="fa fa-question-circle" rel="tooltip" title="Commentary goes here"></i>
       </label>
-      <div class="wysiwyg-area">
-        <textarea id="entries_description" class="span12 double wysihtml5" name="description" placeholder="Enter Comments" tabindex="2" autofocus>{{instance.description}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="2"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Comments"
+            {(content)}="instance.description">
+          </rich-text>
       </div>
     </div>
   </div>

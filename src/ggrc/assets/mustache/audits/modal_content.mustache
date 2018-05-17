@@ -75,9 +75,15 @@
             <i class="fa fa-question-circle" rel="tooltip" title="Describe reason and purpose of the Audit."></i>
             <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <div class="wysiwyg-area">
-            <textarea id="audit_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="10">{{{description}}}</textarea>
+          <div class="rich-text">
+              <rich-text 
+                tabindex="10"
+                {hidden-toolbar}="true"
+                {placeholder}="Enter Description"
+                {(content)}="instance.description">
+              </rich-text>
           </div>
+          
         </div>
         <div class="span6 hide-wrap hidable">
           <div class="row-fluid inner-hide">

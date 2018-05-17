@@ -57,8 +57,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Description goes here"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea id="task_group_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{instance.description}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="3"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Description"
+            {(content)}="instance.description">
+          </rich-text>
       </div>
     </div>
     <div class="span4">

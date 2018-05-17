@@ -42,8 +42,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Enter text of section"></i>
         <a data-id="hide_text_of_section_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea data-id="text_of_section_txtbx" tabindex="3" id="section-description" class="span12 triple wysihtml5" name="description" placeholder="Enter text of section">{{{description}}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="3"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter text of section"
+            {(content)}="instance.description">
+          </rich-text>
       </div>
     </div>
   </div>
@@ -66,8 +71,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or HTML notes here."></i>
         <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea data-id="note_txtbx" tabindex="6" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="6"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Notes"
+            {(content)}="instance.notes">
+          </rich-text>
       </div>
     </div>
     <div class="span6 hide-wrap hidable">

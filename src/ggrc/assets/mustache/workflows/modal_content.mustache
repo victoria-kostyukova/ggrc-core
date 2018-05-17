@@ -27,11 +27,13 @@
         <label class="ggrc-form-item__label">
           Description
         </label>
-        <div class="wysiwyg-area">
-          <textarea id="workflow_description" class="span12 double wysihtml5"
-            name="description" placeholder="Enter Description" tabindex="3">
-            {{{instance.description}}}
-          </textarea>
+        <div class="rich-text">
+            <rich-text 
+              tabindex="3"
+              {hidden-toolbar}="true"
+              {placeholder}="Enter Description"
+              {(content)}="instance.description">
+            </rich-text>
         </div>
       </div>
     </div>
@@ -116,7 +118,7 @@
           Custom "Start Workflow" email message
           <i class="fa fa-question-circle" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
         </label>
-        <rich-text tab-Index="6"
+        <rich-text tabindex="6"
               {hidden-toolbar}="true"
               {placeholder}="'Enter custom message here'"
               {(content)}="instance.notify_custom_message">

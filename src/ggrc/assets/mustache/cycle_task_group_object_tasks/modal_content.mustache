@@ -19,8 +19,13 @@
     <div class="span8">
       {{#if_helpers '\\n #if_equals' instance.task_type 'text' '\\n or #if_equals' instance.task_type '' '\\n or #if_null' instance.task_type}}
         <label class="form__label">Task Description</label>
-        <div class="wysiwyg-area bottom-no-margin">
-          <textarea id="tgt_response_options" class="span12 triple wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
+        <div class="rich-text">
+          <rich-text
+            tabindex="2"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Description"
+            {(content)}="instance.description">
+          </rich-text>
         </div>
       {{else}}
         <label class="form__label">

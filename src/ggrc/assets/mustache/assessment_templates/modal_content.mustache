@@ -91,15 +91,13 @@
                    provide context for how and when this CA might be used."></i>
           <a data-id="hide_default_test_plan_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-
-        <div class="wysiwyg-area">
-          <textarea
-            id="system_description"
-            {($value)}="instance.procedure_description"
-            class="span12 triple wysihtml5"
-            placeholder="Enter Description"
+        <div class="rich-text">
+          <rich-text 
             tabindex="2"
-            ></textarea>
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Description"
+            {(content)}="instance.procedure_description">
+          </rich-text>
         </div>
       </div>
 

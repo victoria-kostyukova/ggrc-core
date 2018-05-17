@@ -44,9 +44,15 @@
       <div class="ggrc-form-item__row">
         <label class="ggrc-form-item__label">
           Description
+          <i class="fa fa-question-circle" rel="tooltip" title="Enter Description"></i>
         </label>
-        <div class="wysiwyg-area">
-          <textarea tabindex="2" id="document_description" class="triple wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
+        <div class="rich-text">
+          <rich-text
+            tabindex="3"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter description"
+            {(content)}="instance.description">
+          </rich-text>
         </div>
       </div>
     </div>

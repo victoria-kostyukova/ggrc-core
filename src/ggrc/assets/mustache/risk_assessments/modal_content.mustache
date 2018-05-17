@@ -101,9 +101,12 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Describe the Risk Assessment."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea id="risk_assessment_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="6">{{{instance.description}}}</textarea>
-      </div>
+      <rich-text 
+        tabindex="6"
+        {hidden-toolbar}="true"
+        {placeholder}="Enter Description"
+        {(content)}="instance.description">
+      </rich-text>
     </div>
 
     <div class="span6 hidable">
@@ -112,8 +115,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Notes"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea id="risk_assessment_notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes" tabindex="7">{{{instance.notes}}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="7"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Notes"
+            {(content)}="instance.notes">
+          </rich-text>
       </div>
     </div>
   </div>

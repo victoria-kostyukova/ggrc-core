@@ -28,8 +28,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea tabindex="2" id="system_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="2"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Description"
+            {(content)}="instance.description">
+          </rich-text>
       </div>
     </div>
   </div>
@@ -52,8 +57,13 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area">
-        <textarea tabindex="4" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+      <div class="rich-text">
+          <rich-text 
+            tabindex="4"
+            {hidden-toolbar}="true"
+            {placeholder}="Enter Notes"
+            {(content)}="instance.notes">
+          </rich-text>
       </div>
     </div>
 
