@@ -4,14 +4,14 @@
 */
 
 import Pagination from '../../base-objects/pagination';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../tree_pagination';
 
-describe('GGRC.Components.treePagination', function () {
-  'use strict';
+describe('treePagination component', function () {
   let viewModel;
 
   beforeAll(function () {
-    let Component = GGRC.Components.get('treePagination');
-    viewModel = new can.Map(Component.prototype.viewModel);
+    viewModel = viewModel = getComponentVM(Component);
   });
 
   beforeEach(function () {
@@ -69,19 +69,14 @@ describe('GGRC.Components.treePagination', function () {
   });
   describe('setNextPage() method ', function () {
     it('changes current and increase it by 1', function () {
+      viewModel.paging.attr('current', 1);
+      viewModel.paging.attr('count', 3);
       viewModel.setNextPage();
       expect(viewModel.paging.current).toEqual(2);
     });
     it('doesn\'t change current value if current equal amount of pages',
       function () {
         viewModel.paging.attr('current', 3);
-        viewModel.setNextPage();
-        expect(viewModel.paging.current).toEqual(3);
-      });
-    it('doesn\'t change current value if inProgress equal true',
-      function () {
-        viewModel.paging.attr('current', 3);
-        viewModel.paging.attr('disabled', true);
         viewModel.setNextPage();
         expect(viewModel.paging.current).toEqual(3);
       });
@@ -98,13 +93,6 @@ describe('GGRC.Components.treePagination', function () {
         viewModel.setPrevPage();
         expect(viewModel.paging.current).toEqual(1);
       });
-    it('doesn\'t change current value if inProgress equal true',
-      function () {
-        viewModel.paging.attr('current', 2);
-        viewModel.paging.attr('disabled', true);
-        viewModel.setPrevPage();
-        expect(viewModel.paging.current).toEqual(2);
-      });
   });
   describe('setFirstPage() method ', function () {
     it('changes current if current more than 1', function () {
@@ -112,72 +100,55 @@ describe('GGRC.Components.treePagination', function () {
       viewModel.setFirstPage();
       expect(viewModel.paging.current).toEqual(1);
     });
-    it('doesn\'t change current value if inProgress equal true',
-      function () {
-        viewModel.paging.attr('current', 3);
-        viewModel.paging.attr('disabled', true);
-        viewModel.setFirstPage();
-        expect(viewModel.paging.current).toEqual(3);
-      });
   });
   describe('setLastPage() method ', function () {
     it('changes current if current less than amount of pages', function () {
+      viewModel.paging.attr('count', 3);
       viewModel.paging.attr('current', 2);
       viewModel.setLastPage();
       expect(viewModel.paging.current).toEqual(3);
     });
-    it('doesn\'t change current value if inProgress equal true',
+  });
+  describe('setCurrentPage() method ', function () {
+    it('changes current page',
       function () {
-        viewModel.paging.attr('current', 2);
-        viewModel.paging.attr('disabled', true);
-        viewModel.setLastPage();
+        viewModel.setCurrentPage(2);
         expect(viewModel.paging.current).toEqual(2);
       });
   });
-  describe('setCurrentPage() method ', function () {
-    let input;
-    let event;
-    beforeEach(function () {
-      input = {
-        value: null,
-        val: function () {
-          return this.value;
-        },
-        blur: jasmine.createSpy(),
-      };
-      event = {
-        stopPropagation: jasmine.createSpy(),
-      };
-    });
-    it('changes current if value more than 1 and less than amount of pages',
+  describe('setPageSize() method ', function () {
+    it('sets page size',
       function () {
-        input.value = 2;
-        viewModel.setCurrentPage({}, input, event);
-        expect(viewModel.paging.current).toEqual(2);
+        viewModel.setPageSize(50);
+        expect(viewModel.paging.pageSize).toEqual(50);
       });
-    it('changes current to 1 if value less than 1', function () {
-      input.value = -1;
-      viewModel.setCurrentPage({}, input, event);
-      expect(viewModel.paging.current).toEqual(1);
-    });
-    it('changes current to last if value more than amount of pages',
+  });
+  describe('pagesList() method ', function () {
+    it('returns array of pages',
       function () {
-        input.value = 5;
-        viewModel.setCurrentPage({}, input, event);
-        expect(viewModel.paging.current).toEqual(3);
+        viewModel.paging.attr('count', 11);
+        let result = viewModel.pagesList();
+        expect(result.length).toEqual(11);
       });
-    it('changes current to 1 if value is NaN', function () {
-      input.value = 'test word';
-      viewModel.setCurrentPage({}, input, event);
-      expect(viewModel.paging.current).toEqual(1);
-    });
-    it('doesn\'t change current value if inProgress equal true',
+    it('returns current indexes',
       function () {
-        viewModel.paging.attr('current', 2);
-        viewModel.paging.attr('disabled', true);
-        input.value = 5;
-        viewModel.setCurrentPage({}, input, event);
-        expect(viewModel.paging.current).toEqual(2);
+        viewModel.paging.attr('count', 12);
+        let result = viewModel.pagesList();
+        expect(result[0]).toEqual(1);
+        expect(result[11]).toEqual(12);
+      });
+  });
+  describe('getPageTitle() method ', function () {
+    it('returns correct title',
+      function () {
+        viewModel.paging.attr('pageSize', 15);
+        viewModel.paging.attr('total', 56);
+
+        let result = viewModel.getPageTitle(1);
+        expect(result).toEqual('Page 1: 1-15');
+
+        result = viewModel.getPageTitle(4);
+        expect(result).toEqual('Page 4: 46-56');
       });
   });
 });

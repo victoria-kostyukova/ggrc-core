@@ -5,22 +5,41 @@
 
 import template from './simple-popover.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  can.Component.extend({
-    tag: 'simple-popover',
-    template: template,
-    viewModel: {
-      extraCssClass: '@',
-      buttonText: '',
-      open: false,
-      show: function () {
-        this.attr('open', true);
-      },
-      hide: function () {
-        this.attr('open', false);
-      },
+export default can.Component.extend({
+  tag: 'simple-popover',
+  template: template,
+  init: function (el) {
+    this.viewModel.element = el;
+  },
+  viewModel: can.Map.extend({
+    extraCssClass: '@',
+    placement: '@',
+    buttonText: '',
+    open: false,
+    show: function () {
+      this.attr('open', true);
+      document.addEventListener('mousedown', this);
     },
-  });
-})(window.can, window.GGRC);
+    hide: function () {
+      this.attr('open', false);
+      document.removeEventListener('mousedown', this);
+    },
+    toggle: function () {
+      if (this.attr('open')) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    },
+    handleEvent: function (event) {
+      if (this.element && !this.element.contains(event.target)) {
+        this.hide();
+      }
+    },
+  }),
+  events: {
+    removed: function () {
+      document.removeEventListener('mousedown', this.viewModel);
+    },
+  },
+});
