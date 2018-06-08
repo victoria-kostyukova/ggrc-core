@@ -5,7 +5,7 @@
 
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
-import '../../components/access_control_list/access-control-list-roles-helper'
+import '../../components/access_control_list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
 import '../../components/assessment_attributes';
@@ -35,7 +35,7 @@ import '../../components/external-data-autocomplete/inline-autocomplete-wrapper'
 import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
-import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals'
+import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals';
 import {
   checkPreconditions,
   becameDeprecated,
@@ -51,7 +51,7 @@ export default can.Control({
     custom_attributes_view:
     GGRC.mustache_path + '/custom_attributes/modal_content.mustache',
     button_view: null,
-    model: null,    // model class to use when finding or creating new
+    model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
     mapping: false,
@@ -62,7 +62,7 @@ export default can.Control({
     extraCssClass: '',
     afterFetch: function () {},
     isProposal: false,
-    isSaving: false  // is there a save/map operation currently in progress
+    isSaving: false, // is there a save/map operation currently in progress
   },
 
   init: function () {
@@ -70,8 +70,8 @@ export default can.Control({
   },
 }, {
   init: function () {
-    var currentUser;
-    var userFetch;
+    let currentUser;
+    let userFetch;
 
     if (!(this.options instanceof can.Observe)) {
       this.options = new can.Observe(this.options);
@@ -111,7 +111,7 @@ export default can.Control({
     }.bind(this));
   },
   after_preload: function (content) {
-    var that = this;
+    let that = this;
     if (content) {
       this.element.html(content);
     }
@@ -154,9 +154,9 @@ export default can.Control({
 
   'input[data-lookup] keyup': function (el, ev) {
     // Set the transient field for validation
-    var name;
-    var instance;
-    var value;
+    let name;
+    let instance;
+    let value;
 
     // * in some cases we want to disable automapping the selected item to the
     // * modal's underlying object (e.g. we don't want to map the picked Persons
@@ -194,10 +194,10 @@ export default can.Control({
   },
 
   autocomplete_select: function (el, event, ui) {
-    var path;
-    var instance;
-    var index;
-    var cb;
+    let path;
+    let instance;
+    let index;
+    let cb;
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
 
     path = el.attr('name').split('.');
@@ -208,7 +208,7 @@ export default can.Control({
 
     if (cb) {
       cb = cb.split(' ');
-      instance[cb[0]].apply(instance, cb.slice(1).concat([ui.item]));
+      instance[cb[0]](...cb.slice(1).concat([ui.item]));
       setTimeout(function () {
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
       }, 0);
@@ -237,12 +237,12 @@ export default can.Control({
   },
 
   immediate_find_or_create: function (el, ev, data) {
-    var that = this;
-    var prop = el.data('drop');
-    var model = CMS.Models[el.data('lookup')];
-    var context = that.options.instance.context;
-    var params = {
-      context: context && context.serialize ? context.serialize() : context
+    let that = this;
+    let prop = el.data('drop');
+    let model = CMS.Models[el.data('lookup')];
+    let context = that.options.instance.context;
+    let params = {
+      context: context && context.serialize ? context.serialize() : context,
     };
 
     setTimeout(function () {
@@ -265,7 +265,7 @@ export default can.Control({
   'input[data-lookup][data-drop] paste': 'immediate_find_or_create',
   'input[data-lookup][data-drop] drop': 'immediate_find_or_create',
   fetch_templates: function (dfd) {
-    var that = this;
+    let that = this;
     dfd = dfd ? dfd.then(function () {
       return that.options;
     }) : $.when(this.options);
@@ -278,9 +278,9 @@ export default can.Control({
   },
 
   fetch_data: function (params) {
-    var that = this;
-    var dfd;
-    var instance = this.options.attr('instance');
+    let that = this;
+    let dfd;
+    let instance = this.options.attr('instance');
 
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
@@ -291,7 +291,6 @@ export default can.Control({
       dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
-
         if (this.options.extendNewInstance) {
           let extendedInstance = this.options.extendNewInstance.attr ?
             this.options.extendNewInstance.attr() :
@@ -347,7 +346,7 @@ export default can.Control({
   },
 
   reset_form: function (setFieldsCb) {
-    var preloadDfd;
+    let preloadDfd;
 
     // If the modal is closed early, the element no longer exists
     if (this.element) {
@@ -368,7 +367,7 @@ export default can.Control({
       if (preloadDfd) {
         preloadDfd.then(function () {
           this.options.instance.backup();
-        }.bind(this))
+        }.bind(this));
       }
     }
   },
@@ -378,20 +377,20 @@ export default can.Control({
   },
 
   find_params: function () {
-    var findParams = this.options.find_params;
+    let findParams = this.options.find_params;
     return findParams.serialize ? findParams.serialize() : findParams;
   },
 
   draw: function (content, header, footer, customAttributes) {
-    var modalTitle = this.options.modal_title;
-    var isProposal = this.options.isProposal;
-    var isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
+    let modalTitle = this.options.modal_title;
+    let isProposal = this.options.isProposal;
+    let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
       modalTitle.indexOf('New') === 0);
-    var $form;
-    var tabList;
-    var hidableTabs;
-    var storableUI;
-    var i;
+    let $form;
+    let tabList;
+    let hidableTabs;
+    let storableUI;
+    let i;
     // Don't draw if this has been destroyed previously
     if (!this.element) {
       return;
@@ -408,17 +407,17 @@ export default can.Control({
     if (can.isArray(customAttributes)) {
       customAttributes = customAttributes[0];
     }
-    if (header != null) {
+    if (header !== null) {
       this.options.$header.find('h2').html(header);
     }
-    if (content != null) {
+    if (content !== null) {
       this.options.$content.html(content).removeAttr('style');
     }
-    if (footer != null) {
+    if (footer !== null) {
       this.options.$footer.html(footer);
     }
 
-    if (customAttributes != null && (isObjectModal || isProposal)) {
+    if (customAttributes !== null && (isObjectModal || isProposal)) {
       this.options.$content.append(customAttributes);
     }
 
@@ -439,7 +438,8 @@ export default can.Control({
     }
   },
 
-  'input:not(isolate-form input), textarea:not(isolate-form textarea), select:not(isolate-form select) change':
+  [`input:not(isolate-form input), textarea:not(isolate-form textarea),
+    select:not(isolate-form select) change`]:
     function (el, ev) {
       this.options.instance.removeAttr('_suppress_errors');
       // Set the value if it isn't a search field
@@ -472,7 +472,7 @@ export default can.Control({
    * @param {$.Event} ev - the event object
    */
   'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
-    var instance = this.options.instance;
+    let instance = this.options.instance;
 
     if (instance.attribute_type !== 'Dropdown') {
       instance.attr('multi_choice_options', undefined);
@@ -480,17 +480,17 @@ export default can.Control({
   },
 
   serialize_form: function () {
-    var $form = this.options.$content.find('form');
-    var $elements = $form
-        .find(':input:not(isolate-form *):not([data-no-serialization])');
+    let $form = this.options.$content.find('form');
+    let $elements = $form
+      .find(':input:not(isolate-form *):not([data-no-serialization])');
 
     can.each($elements.toArray(), this.proxy('set_value_from_element'));
   },
   set_value_from_element: function (el) {
-    var name;
-    var value;
-    var cb;
-    var instance = this.options.instance;
+    let name;
+    let value;
+    let cb;
+    let instance = this.options.instance;
     el = el instanceof jQuery ? el : $(el);
     name = el.attr('name');
     value = el.val();
@@ -516,7 +516,7 @@ export default can.Control({
     }
     if (cb) {
       cb = cb.split(' ');
-      instance[cb[0]].apply(instance, cb.slice(1).concat([value]));
+      instance[cb[0]](...cb.slice(1).concat([value]));
     } else if (name) {
       this.set_value({name: name, value: value});
     }
@@ -527,14 +527,14 @@ export default can.Control({
     }
   },
   set_value: function (item) {
-    var instance = this.options.instance;
-    var name = item.name.split('.');
-    var $elem;
-    var value;
-    var model;
-    var $other;
-    var listPath;
-    var cur;
+    let instance = this.options.instance;
+    let name = item.name.split('.');
+    let $elem;
+    let value;
+    let model;
+    let $other;
+    let listPath;
+    let cur;
 
     if (!(instance instanceof this.options.model)) {
       instance = this.options.instance =
@@ -635,7 +635,7 @@ export default can.Control({
         cur = instance.attr(listPath);
       }
       value = value || [];
-      cur.splice.apply(cur, [0, cur.length].concat(value));
+      cur.splice(...[0, cur.length].concat(value));
     } else if (name[0] === 'custom_attributes') {
       const caId = Number(name[1]);
       const caValue = value[name[1]];
@@ -645,9 +645,9 @@ export default can.Control({
     }
   },
   '[data-before], [data-after] change': function (el, ev) {
-    var date;
-    var data;
-    var options;
+    let date;
+    let data;
+    let options;
     if (!el.data('datepicker')) {
       el.datepicker({changeMonth: true, changeYear: true});
     }
@@ -655,14 +655,14 @@ export default can.Control({
     data = el.data();
     options = {
       before: 'maxDate',
-      after: 'minDate'
+      after: 'minDate',
     };
 
     _.each(options, function (val, key) {
-      var targetEl;
-      var isInput;
-      var targetDate;
-      var otherKey;
+      let targetEl;
+      let isInput;
+      let targetDate;
+      let otherKey;
       if (!data[key]) {
         return;
       }
@@ -689,11 +689,11 @@ export default can.Control({
     },
 
   "{$footer} a.btn[data-toggle='modal-submit'] click": function (el, ev) {
-    var options = this.options;
-    var instance = options.attr('instance');
-    var oldData = options.attr('oldData');
-    var applyPreconditions = options.attr('applyPreconditions');
-    var saveInstance = function () {
+    let options = this.options;
+    let instance = options.attr('instance');
+    let oldData = options.attr('oldData');
+    let applyPreconditions = options.attr('applyPreconditions');
+    let saveInstance = function () {
       options.attr('add_more', false);
       this.triggerSave(el, ev);
     }.bind(this);
@@ -713,9 +713,9 @@ export default can.Control({
           becameDeprecated.bind(
             null,
             instance,
-            oldData.status
-          )
-        ]
+            oldData.status,
+          ),
+        ],
       }, saveInstance);
     } else {
       saveInstance();
@@ -723,18 +723,18 @@ export default can.Control({
   },
 
   '{$content} a.field-hide click': function (el, ev) { // field hide
-    var $el = $(el);
-    var totalInner = $el.closest('.hide-wrap.hidable')
-    .find('.inner-hide').length;
-    var totalHidden;
-    var uiUnit;
-    var i;
-    var tabValue;
-    var $hidable = [
+    let $el = $(el);
+    let totalInner = $el.closest('.hide-wrap.hidable')
+      .find('.inner-hide').length;
+    let totalHidden;
+    let uiUnit;
+    let i;
+    let tabValue;
+    let $hidable = [
       'span',
-      'ggrc-form-item'
+      'ggrc-form-item',
     ].map((className) => $el.closest(`[class*="${className}"].hidable`))
-    .find((item) => item.length > 0);
+      .find((item) => item.length > 0);
 
     $el.closest('.inner-hide').addClass('inner-hidable');
     totalHidden = $el.closest('.hide-wrap.hidable')
@@ -761,12 +761,12 @@ export default can.Control({
   },
 
   '{$content} #formHide click': function () {
-    var i;
-    var uiArrLength = this.options.ui_array.length;
-    var $hidables = this.element.find('.hidable');
-    var hiddenElements = $hidables.find('[tabindex]');
-    var $hiddenElement;
-    var tabValue;
+    let i;
+    let uiArrLength = this.options.ui_array.length;
+    let $hidables = this.element.find('.hidable');
+    let hiddenElements = $hidables.find('[tabindex]');
+    let $hiddenElement;
+    let tabValue;
     for (i = 0; i < uiArrLength; i++) {
       this.options.ui_array[i] = 0;
     }
@@ -785,7 +785,7 @@ export default can.Control({
         this.options.ui_array[tabValue - 1] = 1;
         $hiddenElement.attr({
           tabindex: '-1',
-          uiindex: tabValue
+          uiindex: tabValue,
         });
       }
     }
@@ -795,13 +795,13 @@ export default can.Control({
 
   '{$content} #formRestore click': function () {
     // Update UI status array to initial state
-    var i;
-    var uiArrLength = this.options.ui_array.length;
-    var $form = this.element.find('form');
-    var $body = $form.closest('.modal-body');
-    var uiElements = $body.find('[uiindex]');
-    var $el;
-    var tabVal;
+    let i;
+    let uiArrLength = this.options.ui_array.length;
+    let $form = this.element.find('form');
+    let $body = $form.closest('.modal-body');
+    let uiElements = $body.find('[uiindex]');
+    let $el;
+    let tabVal;
 
     for (i = 0; i < uiArrLength; i++) {
       this.options.ui_array[i] = 0;
@@ -824,10 +824,10 @@ export default can.Control({
   },
 
   save_ui_status: function () {
-    var modelName;
-    var resetVisible;
-    var uiArray;
-    var displayState;
+    let modelName;
+    let resetVisible;
+    let uiArray;
+    let displayState;
     if (!this.options.model) {
       return;
     }
@@ -837,7 +837,7 @@ export default can.Control({
     uiArray = this.options.ui_array ? this.options.ui_array : [];
     displayState = {
       reset_visible: resetVisible,
-      ui_array: uiArray
+      ui_array: uiArray,
     };
 
     this.display_prefs.setModalState(modelName, displayState);
@@ -845,8 +845,8 @@ export default can.Control({
   },
 
   restore_ui_status_from_storage: function () {
-    var modelName;
-    var displayState;
+    let modelName;
+    let displayState;
     if (!this.options.model) {
       return;
     }
@@ -866,12 +866,12 @@ export default can.Control({
   },
 
   restore_ui_status: function () {
-    var $selected;
-    var str;
-    var tabindex;
-    var i;
-    var $form;
-    var $body;
+    let $selected;
+    let str;
+    let tabindex;
+    let i;
+    let $form;
+    let $body;
 
     // walk through the ui_array, for the one values,
     // select the element with tab index and hide it
@@ -881,7 +881,7 @@ export default can.Control({
       $body = $form.closest('.modal-body');
 
       for (i = 0; i < this.options.ui_array.length; i++) {
-        if (this.options.ui_array[i] == 1) {
+        if (this.options.ui_array[i] === 1) {
           tabindex = i + 1;
           str = '[tabindex=' + tabindex + ']';
           $selected = $body.find(str);
@@ -890,7 +890,7 @@ export default can.Control({
             $selected.closest('.hidable').addClass('hidden');
             $selected.attr({
               uiindex: tabindex,
-              tabindex: '-1'
+              tabindex: '-1',
             });
           }
         }
@@ -903,8 +903,8 @@ export default can.Control({
   // make buttons non-clickable when saving, make it disable afterwards
   bindXHRToButton_disable: function (xhr, el, newtext, disable) {
     // binding of an ajax to a click is something we do manually
-    var $el = $(el);
-    var oldtext = $el.text();
+    let $el = $(el);
+    let oldtext = $el.text();
 
     if (newtext) {
       $el[0].innerHTML = newtext;
@@ -996,12 +996,12 @@ export default can.Control({
   },
 
   new_instance: function (data) {
-    var newInstance = this.prepareInstance();
+    let newInstance = this.prepareInstance();
 
     $.when(this.options.attr('instance', newInstance))
       .done(function () {
         this.reset_form(function () {
-          var $form = $(this.element).find('form');
+          let $form = $(this.element).find('form');
           $form.trigger('reset');
         }.bind(this));
       }.bind(this))
@@ -1013,9 +1013,9 @@ export default can.Control({
   },
 
   prepareInstance: function () {
-    var params = this.find_params();
-    var instance = new this.options.model(params);
-    var saveContactModels = ['TaskGroup', 'TaskGroupTask'];
+    let params = this.find_params();
+    let instance = new this.options.model(params);
+    let saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
     instance.attr('_suppress_errors', true)
       .attr('custom_attribute_definitions',
@@ -1031,13 +1031,11 @@ export default can.Control({
   },
 
   save_instance: function (el, ev) {
-    var that = this;
-    var instance = this.options.instance;
-    var ajd;
-    var instanceId = instance.id;
-    var params;
-    var type;
-    var name;
+    let that = this;
+    let instance = this.options.instance;
+    let ajd;
+    let instanceId = instance.id;
+    let params;
 
     if (instance.errors()) {
       instance.removeAttr('_suppress_errors');
@@ -1071,8 +1069,8 @@ export default can.Control({
             that.element.trigger('modal:success', [
               obj,
               {
-                map_and_save: $('#map-and-save').is(':checked')
-              }
+                map_and_save: $('#map-and-save').is(':checked'),
+              },
             ]).modal_form('hide');
             that.update_hash_fragment();
           }
@@ -1086,7 +1084,7 @@ export default can.Control({
             source: obj,
             destination: CMS.Models.Section
               .findInCacheById(params.section.id),
-            context: {id: null}
+            context: {id: null},
           }).save()
             .fail(that.save_error.bind(that))
             .done(function () {
@@ -1095,14 +1093,11 @@ export default can.Control({
               finish();
             });
         } else {
-          type = obj.type ? can.spaceCamelCase(obj.type) : '';
-          name = obj.title ? obj.title : '';
-
           if (instanceId === undefined &&
             obj.is_declining_review &&
-            obj.is_declining_review == '1') { // new element
+            obj.is_declining_review === '1') { // new element
             $(document.body).trigger('ajax:flash', {
-              success: 'Review declined'
+              success: 'Review declined',
             });
           }
           finish();
@@ -1125,12 +1120,12 @@ export default can.Control({
     this.disableEnableContentUI(false);
 
     $('html, body').animate({
-      scrollTop: '0px'
+      scrollTop: '0px',
     }, {
       duration: 200,
       complete: function () {
         delete this.disable_hide;
-      }.bind(this)
+      }.bind(this),
     });
   },
 
@@ -1166,7 +1161,7 @@ export default can.Control({
       delete this.options.model.cache[undefined];
     }
     if (this._super) {
-      this._super.apply(this, arguments);
+      this._super(...arguments);
     }
     if (this.options.instance && this.options.instance._transient) {
       this.options.instance.removeAttr('_transient');
@@ -1174,7 +1169,7 @@ export default can.Control({
   },
 
   should_update_hash_fragment: function () {
-    var $trigger = this.options.$trigger;
+    let $trigger = this.options.$trigger;
 
     if (!$trigger) {
       return false;
@@ -1204,10 +1199,11 @@ export default can.Control({
     window.location.hash = hash;
   },
 
-/**
- * disable/enable ui to disallow/allow user to edit input elements
- * after clicking on the save button
- */
+  /**
+   * disable/enable ui to disallow/allow user to edit input elements
+   * after clicking on the save button
+   *  @param {boolean} isDisabled
+   */
   disableEnableContentUI(isDisabled = false) {
     const content = this.options.attr('$content');
 
@@ -1220,5 +1216,5 @@ export default can.Control({
     } else {
       content.removeClass('ui-disabled');
     }
-  }
+  },
 });
