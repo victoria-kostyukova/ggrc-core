@@ -520,11 +520,6 @@ export default can.Control({
     } else if (name) {
       this.set_value({name: name, value: value});
     }
-    if (el.is('[data-also-set]')) {
-      can.each(el.data('also-set').split(','), function (oname) {
-        this.set_value({name: oname, value: value});
-      }, this);
-    }
   },
   set_value: function (item) {
     let instance = this.options.instance;
@@ -533,8 +528,6 @@ export default can.Control({
     let value;
     let model;
     let $other;
-    let listPath;
-    let cur;
 
     if (!(instance instanceof this.options.model)) {
       instance = this.options.instance =
@@ -563,34 +556,6 @@ export default can.Control({
 
     if ($elem.is('[null-if-empty]') && (!value || !value.length)) {
       value = null;
-    }
-
-    if ($elem.is('[data-binding]') && $elem.is('[type=checkbox]')) {
-      can.map($elem, function (el) {
-        if (el.value !== value.id) {
-          return;
-        }
-        if ($(el).is(':checked')) {
-          instance.mark_for_addition($elem.data('binding'), value);
-        } else {
-          instance.mark_for_deletion($elem.data('binding'), value);
-        }
-      });
-      return;
-    } else if ($elem.is('[data-binding]')) {
-      can.each(can.makeArray($elem[0].options), function (opt) {
-        instance.mark_for_deletion(
-          $elem.data('binding'),
-          CMS.Models.get_instance(model, opt.value));
-      });
-      if (value.push) {
-        can.each(value, $.proxy(
-          instance,
-          'mark_for_addition',
-          $elem.data('binding')));
-      } else {
-        instance.mark_for_addition($elem.data('binding'), value);
-      }
     }
 
     if (name.length > 1) {
@@ -627,16 +592,7 @@ export default can.Control({
     }
 
     value = value && value.serialize ? value.serialize() : value;
-    if ($elem.is('[data-list]')) {
-      listPath = name.slice(0, name.length - 1).join('.');
-      cur = instance.attr(listPath);
-      if (!cur || !(cur instanceof can.Observe.List)) {
-        instance.attr(listPath, []);
-        cur = instance.attr(listPath);
-      }
-      value = value || [];
-      cur.splice(...[0, cur.length].concat(value));
-    } else if (name[0] === 'custom_attributes') {
+    if (name[0] === 'custom_attributes') {
       const caId = Number(name[1]);
       const caValue = value[name[1]];
       instance.customAttr(caId, caValue);
@@ -979,19 +935,6 @@ export default can.Control({
       this.bindXHRToDisableElement(ajd, deleteBtn);
       this.bindXHRToDisableElement(ajd, modalBackdrop);
       this.bindXHRToDisableElement(ajd, modalCloseBtn);
-    } else if (this._email_check) {
-      // Queue a save if clicked after verifying the email address
-      this._email_check.done((data) => {
-        if (!_.isNull(data.length) && !_.isUndefined(data.length)) {
-          data = data[0];
-        }
-        if (data) {
-          setTimeout(() => {
-            delete this._email_check;
-            el.trigger('click');
-          }, 0);
-        }
-      });
     }
   },
 
