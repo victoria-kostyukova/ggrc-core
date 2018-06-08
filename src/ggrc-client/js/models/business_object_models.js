@@ -9,7 +9,7 @@ import {hasQuestions} from '../plugins/utils/ggrcq-utils';
   can.Model.Cacheable('CMS.Models.OrgGroup', {
     root_object: 'org_group',
     root_collection: 'org_groups',
-    category: 'entities',
+    category: 'business',
     findAll: 'GET /api/org_groups',
     findOne: 'GET /api/org_groups/{id}',
     create: 'POST /api/org_groups',
