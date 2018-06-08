@@ -22,6 +22,7 @@ import template from './page-header.mustache';
 (function (GGRC, can) {
   'use strict';
   let colorsMap = {
+    OrgGroup: 'header-style-1',
     System: 'header-style-1',
     Process: 'header-style-1',
     DataAsset: 'header-style-1',
