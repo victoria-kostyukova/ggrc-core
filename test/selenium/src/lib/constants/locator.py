@@ -333,10 +333,10 @@ class ModalCreateNewProgram(BaseModalCreateNew):
   # user input elements
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"] '
-                    '>iframe.wysihtml5-sandbox')
+                    '.ql-editor')
   UI_NOTES = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_notes_75b8bc05"]'
-              '>iframe.wysihtml5-sandbox')
+              '[data-test-id="new_program_field_notes_75b8bc05"] '
+              '.ql-editor')
   UI_STATE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
@@ -362,7 +362,7 @@ class ModalCreateNewOrgGroup(BaseModalCreateNew):
 class ModalCreateNewRisk(BaseModalCreateNew):
   """Locators for Create new Risk modals."""
   UI_DESCRIPTION = (
-      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+      By.CSS_SELECTOR, '[tabindex="2"] .ql-editor')
 
 
 class ModalCreateNewDataAsset(BaseModalCreateNew):

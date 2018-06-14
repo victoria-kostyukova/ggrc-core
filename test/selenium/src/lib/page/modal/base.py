@@ -57,10 +57,10 @@ class ProgramsModal(BaseModal):
   def __init__(self, driver):
     super(ProgramsModal, self).__init__(driver)
     # user input elements
-    self.ui_description = base.Iframe(
-        self.modal_elem.parent, self._locators.UI_DESCRIPTION)
-    self.ui_notes = base.Iframe(
-        self.modal_elem.parent, self._locators.UI_NOTES)
+    self.ui_description = base.TextInputField(
+        self.modal_elem, self._locators.UI_DESCRIPTION)
+    self.ui_notes = base.TextInputField(
+        self.modal_elem, self._locators.UI_NOTES)
     self.ui_state = base.Dropdown(
         self.modal_elem, self._locators.UI_STATE)
     self.ui_show_optional_fields = base.Toggle(
@@ -79,13 +79,13 @@ class ProgramsModal(BaseModal):
     """Enter text into description element.
     Args: description (basestring)
     """
-    self.ui_description.find_iframe_and_enter_data(description)
+    self.ui_description.enter_text(description)
 
   def enter_notes(self, notes):
     """Enter text into notes element.
     Args: notes basestring)
     """
-    self.ui_notes.find_iframe_and_enter_data(notes)
+    self.ui_notes.enter_text(notes)
 
   def select_state(self, state):
     """Selects state from dropdown."""
@@ -206,11 +206,11 @@ class RisksModal(BaseModal):
 
   def __init__(self, driver):
     super(RisksModal, self).__init__(driver)
-    self.ui_description = base.Iframe(
+    self.ui_description = base.TextInputField(
         self.modal_elem.parent, self._locators.UI_DESCRIPTION)
 
   def enter_description(self, text):
-    self.ui_description.find_iframe_and_enter_data(text)
+    self.ui_description.enter_text(text)
 
 
 class OrgGroupsModal(BaseModal):
