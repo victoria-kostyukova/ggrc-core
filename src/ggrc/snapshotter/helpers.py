@@ -6,7 +6,7 @@
 import collections
 from logging import getLogger
 
-from sqlalchemy.sql.expression import tuple_
+from sqlalchemy.sql.expression import tuple_, func
 
 from ggrc import db
 from ggrc import models
@@ -15,6 +15,45 @@ from ggrc.snapshotter.datastructures import Pair
 from ggrc.utils import benchmark
 
 logger = getLogger(__name__)
+
+
+def get_revision_query_for(statement, filters):
+  return db.session.query(
+      func.max(models.Revision.id),
+      models.Revision.resource_type,
+      models.Revision.resource_id,
+  ).filter(
+      statement,
+      *(filters or [])
+  ).group_by(
+      models.Revision.resource_type,
+      models.Revision.resource_id
+  )
+
+
+def get_revisions_query(child_stubs, revisions, filters=None):
+  """Return revisions query for sent params."""
+  queries = []
+  if revisions:
+    queries.append(get_revision_query_for(
+        models.Revision.id.in_(revisions.values()),
+        filters,
+    ))
+  if child_stubs:
+    queries.append(get_revision_query_for(
+        tuple_(
+            models.Revision.resource_type,
+            models.Revision.resource_id,
+        ).in_(
+            child_stubs
+        ),
+        filters,
+    ))
+  if not queries:
+    queries.append(get_revision_query_for(True, filters))
+  if len(queries) == 1:
+    return queries[0]
+  return queries[0].union_all(*queries[1:])
 
 
 def get_revisions(pairs, revisions, filters=None):
@@ -29,45 +68,32 @@ def get_revisions(pairs, revisions, filters=None):
     filters: predicate
   """
   with benchmark("snapshotter.helpers.get_revisions"):
-    revision_id_cache = dict()
+    if not pairs:
+      return {}
 
-    if pairs:
-      with benchmark("get_revisions.create caches"):
-        child_stubs = {pair.child for pair in pairs}
+    with benchmark("get_revisions.create child -> parents cache"):
+      parents_cache = collections.defaultdict(set)
+      child_stubs = set()
+      for parent, child in pairs:
+        parents_cache[child].add(parent)
+        child_stubs.add(child)
 
-        with benchmark("get_revisions.create child -> parents cache"):
-          parents_cache = collections.defaultdict(set)
-          for parent, child in pairs:
-            parents_cache[child].add(parent)
+    with benchmark("get_revisions.retrieve revisions"):
+      query = get_revisions_query(child_stubs, revisions, filters)
 
-      with benchmark("get_revisions.retrieve revisions"):
-        query = db.session.query(
-            models.Revision.id,
-            models.Revision.resource_type,
-            models.Revision.resource_id).filter(
-            tuple_(
-                models.Revision.resource_type,
-                models.Revision.resource_id).in_(child_stubs)
-        ).order_by(models.Revision.id.desc())
-        if filters:
-          for _filter in filters:
-            query = query.filter(_filter)
-
-      with benchmark("get_revisions.create revision_id cache"):
-        for revid, restype, resid in query:
-          child = Stub(restype, resid)
-          for parent in parents_cache[child]:
-            key = Pair(parent, child)
-            if key in revisions:
-              if revid == revisions[key]:
-                revision_id_cache[key] = revid
-              else:
-                logger.warning(
-                    "Specified revision for object %s but couldn't find the"
-                    "revision '%s' in object history", key, revisions[key])
-            else:
-              if key not in revision_id_cache:
-                revision_id_cache[key] = revid
+    revision_id_cache = {}
+    with benchmark("get_revisions.create revision_id cache"):
+      for revid, restype, resid in query:
+        child = Stub(restype, resid)
+        for parent in parents_cache[child]:
+          key = Pair(parent, child)
+          if key in revisions and revisions[key] != revid:
+            logger.warning(
+                "Specified revision for object %s but couldn't find the"
+                "revision '%s' in object history", key, revisions[key],
+            )
+          else:
+            revision_id_cache[key] = revid
     return revision_id_cache
 
 
