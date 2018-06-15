@@ -7,7 +7,7 @@
   <content/>
 
   <div class="people-list">
-    <object-list ({items})="people" {empty-message}="emptyListMessage" {is-disabled}="isLoading">
+    <people-list {people}="people" {empty-message}="emptyListMessage" {is-disabled}="isLoading">
       <div class="action-toolbar {{#unless canUnmap}}people-group__readonly-person{{/unless}}">
         <person-data {is-disabled}="isDisabled" person="{.}">
           {{#unless isDisabled}}
@@ -23,6 +23,6 @@
           {{/unless}}
         </person-data>
       </div>
-    </object-list>
+    </people-list>
   </div>
 </div>
