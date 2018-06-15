@@ -15,6 +15,10 @@
     max-width: 200px;
     margin-right: 40px;
 
+    people-list {
+      line-height: 28px;
+    }
+
     input {
       width: 100%;
     }
@@ -23,6 +27,11 @@
       display: flex;
       font-weight: bold;
       margin-bottom: 0px;
+    }
+
+    .people-group__empty-list {
+      color: #999;
+      font-style: italic;
     }
 
     .people-group__title {
