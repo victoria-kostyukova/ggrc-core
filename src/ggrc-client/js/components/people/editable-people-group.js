@@ -8,6 +8,7 @@ import './editable-people-group-header';
 import '../autocomplete/autocomplete';
 import '../external-data-autocomplete/external-data-autocomplete';
 import '../person/person-data';
+import './people-list';
 import peopleGroupVM from '../view-models/people-group-vm';
 import {isInnerClick} from '../../plugins/ggrc_utils';
 import template from './editable-people-group.mustache';
@@ -19,6 +20,7 @@ let viewModel = peopleGroupVM.extend({
   canEdit: {},
   showPeopleGroupModal: false,
   updatableGroupId: null,
+  emptyListMessage: 'None',
   define: {
     editableMode: {
       set: function (newValue, setValue) {

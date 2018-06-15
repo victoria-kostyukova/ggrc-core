@@ -8,11 +8,9 @@
   <content></content>
 
   {{#unless editableMode}}
-    <object-list ({items})="showPeople" {empty-message}="emptyListMessage">
-      <person-data class="people-group__readonly-person"
-        person="{.}">
-      </person-data>
-    </object-list>
+    <people-list {people}="showPeople" {empty-message}="emptyListMessage">
+      <person-data class="people-group__readonly-person" person="{.}"></person-data>
+    </people-list>
 
     {{#if showSeeMoreLink}}
       <div class="editable-people-group__see-more">
@@ -33,11 +31,9 @@
       <div class="inline-edit inline-edit--active">
         <div class="inline-edit__content editable-people-group__inline">
           <div class="editable-people-group__inline-content">
-            <object-list
-              ({items})="people"
-              {is-disabled}="isLoading"
-              {empty-message}="emptyListMessage">
-              <person-data person="{.}">
+
+            <people-list {is-disabled}="isLoading" {people}="people" {empty-message}="emptyListMessage">
+              <person-data person="{.}" class="editable-people-group__inline-item">
                 {{#unmapablePerson}}
                   <a href="javascript://"
                     class="info-action editable-people-group__unmap {{#if isDisabled}}disabled{{/if}}"
@@ -46,7 +42,8 @@
                   </a>
                 {{/unmapablePerson}}
               </person-data>
-            </object-list>
+            </people-list>
+
             <div>
             {{#if isLoading}}
               <spinner {toggle}="isLoading"></spinner>
