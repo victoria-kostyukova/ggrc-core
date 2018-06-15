@@ -32,16 +32,19 @@
         <div class="inline-edit__content editable-people-group__inline">
           <div class="editable-people-group__inline-content">
 
-            <people-list {is-disabled}="isLoading" {people}="people" {empty-message}="emptyListMessage">
-              <person-data person="{.}" class="editable-people-group__inline-item">
-                {{#unmapablePerson}}
-                  <a href="javascript://"
-                    class="info-action editable-people-group__unmap {{#if isDisabled}}disabled{{/if}}"
-                    ($click)="unmap(person)">
-                    <i class="fa fa-trash"></i>
-                  </a>
-                {{/unmapablePerson}}
-              </person-data>
+            <people-list
+              (person-data-click)="unmapPerson(%event)"
+              {is-disabled}="isLoading"
+              {people}="people"
+              {empty-message}="emptyListMessage">
+                <person-data person="{.}" class="editable-people-group__inline-item">
+                  {{#unmapablePerson}}
+                    <a href="javascript://"
+                      class="info-action editable-people-group__unmap {{#if isDisabled}}disabled{{/if}}">
+                      <i class="fa fa-trash unmap-person-icon"></i>
+                    </a>
+                  {{/unmapablePerson}}
+                </person-data>
             </people-list>
 
             <div>

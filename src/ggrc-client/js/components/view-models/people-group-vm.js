@@ -44,4 +44,13 @@ export default can.Map.extend({
       groupId: this.attr('groupId'),
     });
   },
+  unmapPerson(event) {
+    if (!event.person || !event.target) {
+      return;
+    }
+
+    if (event.target.hasClass('unmap-person-icon')) {
+      this.unmap(event.person);
+    }
+  },
 });

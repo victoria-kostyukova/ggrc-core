@@ -23,4 +23,16 @@ export default can.Component.extend({
     emptyMessage: '',
     isDisabled: false,
   },
+  events: {
+    'person-data click'(el, ev) {
+      const person = el.viewModel && el.viewModel().attr('person');
+      const target = $(ev.target);
+
+      this.viewModel.dispatch({
+        type: 'personDataClick',
+        person,
+        target,
+      });
+    },
+  },
 });
