@@ -271,12 +271,12 @@ class _AccessGroups(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_ACCESS_GROUPS
 
 
-class _AssetsOrBusiness(lhn.DropdownStatic):
-  """Assets or business dropdown in LHN."""
-  _locator_element = locator.LhnMenu.TOGGLE_ASSETS_OR_BUSINESS
+class _Scope(lhn.DropdownStatic):
+  """Scope dropdown in LHN."""
+  _locator_element = locator.LhnMenu.TOGGLE_SCOPE
 
   def __init__(self, driver):
-    super(_AssetsOrBusiness, self).__init__(driver)
+    super(_Scope, self).__init__(driver)
     self.toggle_systems = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_SYSTEMS,
         locator.LhnMenu.COUNT_SYSTEMS)
@@ -462,7 +462,7 @@ class Menu(base.AnimatedComponent):
     self.toggle_directives = None
     self.toggle_controls_or_objectives = None
     self.toggle_people_or_groups = None
-    self.toggle_assets_or_business = None
+    self.toggle_scope = None
     self.toggle_risks_or_threats = None
     self.reload_elements()
 
@@ -495,8 +495,8 @@ class Menu(base.AnimatedComponent):
         self._driver, locator.LhnMenu.TOGGLE_CONTROLS_OR_OBJECTIVES)
     self.toggle_people_or_groups = base.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_PEOPLE_OR_GROUPS)
-    self.toggle_assets_or_business = base.Toggle(
-        self._driver, locator.LhnMenu.TOGGLE_ASSETS_OR_BUSINESS)
+    self.toggle_scope = base.Toggle(
+        self._driver, locator.LhnMenu.TOGGLE_SCOPE)
     self.toggle_risks_or_threats = base.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_RISK_OR_THREATS)
 
@@ -565,12 +565,12 @@ class Menu(base.AnimatedComponent):
     self.toggle_people_or_groups.toggle()
     return _PeopleOrGroups(self._driver)
 
-  def select_assets_or_business(self):
+  def select_scope(self):
     """
-    Return: _AssetsOrBusiness
+    Return: _Scope
     """
-    self.toggle_assets_or_business.toggle()
-    return _AssetsOrBusiness(self._driver)
+    self.toggle_scope.toggle()
+    return _Scope(self._driver)
 
   def select_risks_or_threats(self):
     """

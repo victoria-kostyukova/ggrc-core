@@ -18,7 +18,7 @@ def _get_lhn_section_map():
       (element.Lhn.CONTROLS_OR_OBJECTIVES,
        element.Lhn.CONTROLS_OR_OBJECTIVES_MEMBERS),
       (element.Lhn.PEOPLE_OR_GROUPS, element.Lhn.PEOPLE_OR_GROUPS_MEMBERS),
-      (element.Lhn.ASSETS_OR_BUSINESS, element.Lhn.ASSETS_OR_BUSINESS_MEMBERS),
+      (element.Lhn.SCOPE, element.Lhn.SCOPE_MEMBERS),
       (element.Lhn.RISKS_OR_THREATS, element.Lhn.RISKS_OR_THREATS_MEMBERS))
 
   for section, members in member_tpls:

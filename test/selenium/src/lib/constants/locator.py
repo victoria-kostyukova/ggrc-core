@@ -204,8 +204,8 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-test-id="controls/objectives_66116337"]')
   TOGGLE_PEOPLE_OR_GROUPS = (
       By.CSS_SELECTOR, '[data-test-id="people/groups_66116337"]')
-  TOGGLE_ASSETS_OR_BUSINESS = (
-      By.CSS_SELECTOR, '[data-test-id="assets/business_66116337"]')
+  TOGGLE_SCOPE = (
+      By.CSS_SELECTOR, '[data-test-id="scope_66116337"]')
   TOGGLE_RISK_OR_THREATS = (
       By.CSS_SELECTOR, '[data-test-id="risk/threats_66116337"]')
   # workflows labels

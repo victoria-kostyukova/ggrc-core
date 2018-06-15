@@ -30,7 +30,7 @@ class Lhn(object):
           cls.ORG_GROUPS,
           cls.VENDORS,
           cls.ACCESS_GROUPS)
-      cls.ASSETS_OR_BUSINESS_MEMBERS = (
+      cls.SCOPE_MEMBERS = (
           cls.SYSTEMS,
           cls.PROCESSES,
           cls.DATA_ASSETS,
@@ -43,7 +43,7 @@ class Lhn(object):
           cls.THREATS)
   CONTROLS_OR_OBJECTIVES = "controls_or_objectives"
   PEOPLE_OR_GROUPS = "people_or_groups"
-  ASSETS_OR_BUSINESS = "assets_or_business"
+  SCOPE = "scope"
   RISKS_OR_THREATS = "risks_or_threats"
   MY_OBJS = "My objects"
   ALL_OBJS = "All objects"
