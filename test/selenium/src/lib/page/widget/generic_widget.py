@@ -91,7 +91,7 @@ class Widget(base.Widget):
   def get_items_count(self):
     """Get elements' count from pagination controller on filter panel."""
     selenium_utils.wait_for_js_to_load(self._driver)
-    return self.wait_and_get_pagination_controllers()[0].text.split()[2]
+    return self.wait_and_get_pagination_controllers()[0].text.split("of ")[1]
 
   def wait_member_deleted(self, count):
     """Wait until elements' counter on filter panel refreshed with new value.
