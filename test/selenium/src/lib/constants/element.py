@@ -27,10 +27,10 @@ class Lhn(object):
           cls.OBJECTIVES)
       cls.PEOPLE_OR_GROUPS_MEMBERS = (
           cls.PEOPLE,
-          cls.ORG_GROUPS,
           cls.VENDORS,
           cls.ACCESS_GROUPS)
       cls.SCOPE_MEMBERS = (
+          cls.ORG_GROUPS,
           cls.SYSTEMS,
           cls.PROCESSES,
           cls.DATA_ASSETS,

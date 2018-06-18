@@ -206,9 +206,6 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     self.toggle_people = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_PEOPLE,
         locator.LhnMenu.COUNT_PEOPLE)
-    self.toggle_org_groups = lhn.Toggle(
-        self._driver, locator.LhnMenu.TOGGLE_ORG_GROUPS,
-        locator.LhnMenu.COUNT_ORG_GROUPS)
     self.toggle_vendors = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_VENDORS,
         locator.LhnMenu.COUNT_VENDORS)
@@ -222,13 +219,6 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     """
     self.toggle_people.toggle()
     return _People(self._driver)
-
-  def select_org_groups(self):
-    """
-    Return: _OrgGroups
-    """
-    self.toggle_org_groups.toggle()
-    return _OrgGroups(self._driver)
 
   def select_vendors(self):
     """
@@ -273,10 +263,14 @@ class _AccessGroups(lhn.AccordionGroup):
 
 class _Scope(lhn.DropdownStatic):
   """Scope dropdown in LHN."""
+  # pylint: disable=too-many-instance-attributes
   _locator_element = locator.LhnMenu.TOGGLE_SCOPE
 
   def __init__(self, driver):
     super(_Scope, self).__init__(driver)
+    self.toggle_org_groups = lhn.Toggle(
+        self._driver, locator.LhnMenu.TOGGLE_ORG_GROUPS,
+        locator.LhnMenu.COUNT_ORG_GROUPS)
     self.toggle_systems = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_SYSTEMS,
         locator.LhnMenu.COUNT_SYSTEMS)
@@ -298,6 +292,13 @@ class _Scope(lhn.DropdownStatic):
     self.toggle_markets = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_MARKETS,
         locator.LhnMenu.COUNT_MARKETS)
+
+  def select_org_groups(self):
+    """
+    Return: _OrgGroups
+    """
+    self.toggle_org_groups.toggle()
+    return _OrgGroups(self._driver)
 
   def select_systems(self):
     """
@@ -445,6 +446,7 @@ class _Threats(lhn.AccordionGroup):
 
 class Menu(base.AnimatedComponent):
   """Model of LHN menu."""
+  # pylint: disable=too-many-instance-attributes
   def __init__(self, driver):
     super(Menu, self).__init__(
         driver,
