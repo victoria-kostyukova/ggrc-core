@@ -57,7 +57,7 @@ class TestAdminDashboardPage(base.Test):
       # A line with incorrect format is created during DB migration.
       # We decided it's OK.
       assert items_with_incorrect_format[0].startswith(
-          "by {}".format(users.MIGRATOR_USER_EMAIL))
+          "by\n{}".format(users.MIGRATOR_USER_EMAIL))
     expected_header_text = self._event_el.WIDGET_HEADER
     actual_header_text = admin_events_tab.widget_header.text
     assert expected_header_text == actual_header_text
