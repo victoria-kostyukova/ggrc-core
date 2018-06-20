@@ -460,11 +460,11 @@ class ModalCreateNewControl(BaseModalCreateNew):
   DROPDOWN_STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
   UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
-  EFFECTIVE_DATE = (
+  UI_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
       '[data-id="effective_date_hidden"] .datepicker__input')
-  DATEPICKER_EFFECTIVE_DATE = (
+  EFFECTIVE_DATE_DATEPICKER = (
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
       '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
