@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{^if isAuditInaccessibleAssessment}}
-{{#is_allowed 'update' instance}}
-{{^if instance.archived}}
+{{#if shouldShow}}
   <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
     <a
       href="{{urlPath}}#dropdown-widgets"
@@ -18,7 +16,7 @@
       {{addTabTitle}}
     </a>
     <div class="dropdown-menu" role="menu">
-      {{#widget_list}}
+      {{#widgetList}}
         <div class="inner-nav-item">
           {{#filterWidgets .}}
             {{#shouldCreateObject instance model.shortName}}
@@ -53,7 +51,6 @@
             {{else}}
               <a
                 href="{{urlPath}}{{ internav_href }}"
-                {{^is_dashboard_or_all}}
                 {{#is_mappable_type instance.type model.shortName}}
                 {{#is_allowed_to_map instance model.shortName}}
                 {{^if_equals model.shortName 'Assessment'}}
@@ -65,7 +62,6 @@
                 {{/if_equals}}
                 {{/is_allowed_to_map}}
                 {{/is_mappable_type}}
-                {{/is_dashboard_or_all}}
                 >
                 <div class="oneline">
                   <i class="fa fa-{{ internav_icon }} color"></i>
@@ -75,9 +71,7 @@
             {{/shouldCreateObject}}
           {{/filterWidgets}}
         </div>
-      {{/widget_list}}
+      {{/widgetList}}
     </div>
   </li>
-{{/if}}
-{{/is_allowed}}
 {{/if}}

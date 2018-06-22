@@ -32,15 +32,16 @@
     {{/priorityTabs}}
 
 
-    {{#if showAddTabButton}}
-      {{#hasHiddenWidgets}}
-        <add-tab-button
-          {instance}="instance"
-          {widget-list}="widget_list"
-          {url-path}="urlPath"
-          {add-tab-title}="'Add Tab'"></add-tab-button>
-      {{/hasHiddenWidgets}}
-    {{/if}}
+    {{^if_equals instance.type 'Audit'}}
+      <add-tab-button
+        {instance}="instance"
+        {widget-list}="widget_list"
+        {url-path}="urlPath"
+        {add-tab-title}="'Add Tab'"
+        {has-hidden-widgets}="hasHiddenWidgets">
+      </add-tab-button>
+    {{/if_equals}}
+
     {{/if_helpers}}
 
     {{#if_equals instance.type 'Workflow'}}
@@ -84,13 +85,13 @@
         </li>
       {{/notPriorityTabs}}
 
-      {{#hasHiddenWidgets}}
-        <add-tab-button
-          {instance}="instance"
-          {widget-list}="widget_list"
-          {url-path}="urlPath"
-          {add-tab-title}="'Add Scope'"></add-tab-button>
-      {{/hasHiddenWidgets}}
+      <add-tab-button
+        {instance}="instance"
+        {widget-list}="widget_list"
+        {url-path}="urlPath"
+        {add-tab-title}="'Add Scope'"
+        {has-hidden-widgets}="hasHiddenWidgets">
+      </add-tab-button>
     </ul>
   {{/isMenuVisible}}
 </div>

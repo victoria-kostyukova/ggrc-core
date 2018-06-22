@@ -4,6 +4,11 @@
 */
 
 import template from './add-tab-button.mustache';
+import {
+  getPageType,
+  isMyWork,
+  isAllObjects,
+} from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
 
 const viewModel = can.Map.extend({
@@ -18,11 +23,25 @@ const viewModel = can.Map.extend({
         return result;
       },
     },
+    shouldShow: {
+      get() {
+        let instance = this.attr('instance');
+
+        return !this.attr('isAuditInaccessibleAssessment')
+          && Permission.is_allowed_for('update', instance)
+          && !instance.attr('archived')
+          && !isMyWork()
+          && !isAllObjects()
+          && !['Person', 'Evidence'].includes(getPageType())
+          && this.attr('hasHiddenWidgets');
+      },
+    },
   },
   instance: null,
   widgetList: null,
   urlPath: '',
   addTabTitle: '',
+  hasHiddenWidgets: true,
   isNotObjectVersion(internavDisplay) {
     return internavDisplay.indexOf('Versions') === -1;
   },
