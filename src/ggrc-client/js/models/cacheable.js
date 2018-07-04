@@ -13,7 +13,7 @@ import {
 import {
   resolveDeferredBindings,
 } from '../plugins/utils/models-utils';
-import resolveConflict from './cacheable_conflict_resolution.js';
+import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent_notifier';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
