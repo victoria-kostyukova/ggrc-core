@@ -3,33 +3,42 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
-  let conflict = false;
-  can.each(baseAttrs, function (val, key) {
-    // We skip the updated_at key because we know it has changed
-    if (key === 'updated_at') {
-      return;
+import {
+  simpleFieldResolver,
+  customAttributeResolver,
+} from './conflict-resolvers';
+
+export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
+  let hasConflict = false;
+
+  Object.keys(baseAttrs).forEach((key) => {
+    let unableToResolve = false;
+
+    switch (key) {
+      // We skip the updated_at key because we know it has changed
+      case 'updated_at':
+        break;
+      // We have a special way for customAttributes because it is nested field
+      case 'custom_attribute_values':
+        unableToResolve = customAttributeResolver(
+          baseAttrs[key],
+          attrs[key],
+          remoteAttrs[key],
+          obj.attr(key));
+        break;
+      default:
+        unableToResolve = simpleFieldResolver(
+          baseAttrs,
+          attrs,
+          remoteAttrs,
+          obj,
+          key);
     }
 
-    // The object attribute was changed on the server
-    if (!can.Object.same(val, remoteAttrs[key]) &&
-        // The object attribute was also changed on the client
-        !can.Object.same(val, attrs[key]) &&
-        // The change on the server was not the same as the change on the client
-        !can.Object.same(attrs[key], remoteAttrs[key])) {
-      conflict = true;
-      // Restore the version that user wrote changes
-      obj.attr(key, attrs[key]);
-      console.warn('Conflict', key, 'User wrote:', attrs[key],
-        'Server has:', remoteAttrs[key], 'User saw', baseAttrs[key]);
-      // The attribute hasn't changed on the server
-    } else if (can.Object.same(val, remoteAttrs[key]) &&
-    // The attribute was changed on the client
-               !can.Object.same(val, attrs[key])) {
-      obj.attr(key, attrs[key]);
-    }
+    hasConflict = hasConflict || unableToResolve;
   });
-  return conflict;
+
+  return hasConflict;
 }
 
 export default function resolveConflict(xhr, obj) {
