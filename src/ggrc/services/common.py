@@ -599,6 +599,9 @@ class Resource(ModelView):
     with benchmark("Validate custom attributes"):
       if hasattr(obj, "validate_custom_attributes"):
         obj.validate_custom_attributes()
+    with benchmark("Validate access_control_list"):
+      if hasattr(obj, "validate_acl"):
+        obj.validate_acl()
     with benchmark("Send PUT event"):
       signals.Restful.model_put.send(
           obj.__class__, obj=obj, src=src, service=self)
@@ -1024,6 +1027,10 @@ class Resource(ModelView):
       for obj in objects:
         if hasattr(obj, "validate_custom_attributes"):
           obj.validate_custom_attributes()
+    with benchmark("Validate access_control_list"):
+      for obj in objects:
+        if hasattr(obj, "validate_acl"):
+          obj.validate_acl()
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event for all objects"):
