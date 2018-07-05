@@ -32,8 +32,6 @@ class _ObjectWidgetBar(_WidgetBar):
 
   def __init__(self, driver):
     super(_ObjectWidgetBar, self).__init__(driver)
-    self.button_add_widget = base.Dropdown(
-        driver, locator.WidgetBar.BUTTON_ADD)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
 
   def _get_widget(self, widget_name):
@@ -45,11 +43,14 @@ class _ObjectWidgetBar(_WidgetBar):
     getattr(self, attr_name).click()
     return factory.get_cls_widget(widget_name)(self._driver, widget_name)
 
+  def _click_button_add_widget(self):
+    base.Dropdown(self._driver, locator.WidgetBar.BUTTON_ADD).click()
+
   def add_widget(self):
     """
     Return: lib.element.widget_bar.AddWidget
     """
-    self.button_add_widget.click()
+    self._click_button_add_widget()
     return widget_bar.AddWidget(self._driver)
 
   def get_mappable_via_add_widgets_objs_aliases(self):
@@ -58,7 +59,7 @@ class _ObjectWidgetBar(_WidgetBar):
     Return: list of str
     """
     # pylint: disable=invalid-name
-    self.button_add_widget.click()
+    self._click_button_add_widget()
     add_elements = selenium_utils.get_when_all_visible(
         self._driver,
         locator.WidgetBarButtonAddDropdown.ALL_MAPPABLE_WIDGETS_OBJS)
