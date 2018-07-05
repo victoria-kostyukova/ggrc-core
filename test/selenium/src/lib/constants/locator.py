@@ -708,7 +708,7 @@ class CommonWidgetInfo(object):
   PEOPLE_HEADERS_AND_VALUES_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM)
   PEOPLE_HEADER_CSS = (
       By.CSS_SELECTOR, _PEOPLE_ITEM + " editable-people-group-header")
-  PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
+  PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " people-list")
   # user input elements
   BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
   # controllers
