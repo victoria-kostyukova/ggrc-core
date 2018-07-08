@@ -8,6 +8,8 @@ from collections import OrderedDict
 import mock
 import ddt
 
+import sqlalchemy as sa
+
 from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
@@ -314,17 +316,37 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
   """Test people used in IssueTracker Issues."""
 
   EMAILS = {
-      'Audit Captains': {'audit_captain_1@example.com',
-                         'audit_captain_2@example.com'},
-      'Auditors': {'auditor_1@example.com', 'auditor_2@example.com'},
-      'Creators': {'creator_1@example.com', 'creator_2@example.com'},
-      'Assignees': {'assignee_1@example.com', 'assignee_2@example.com'},
-      'Verifiers': {'verifier_1@example.com', 'verifier_2@example.com'},
-      'Primary Contacts': {'primary_contact_1@example.com',
-                           'primary_contact_2@example.com'},
-      'Secondary Contacts': {'secondary_contact_1@example.com',
-                             'secondary_contact_2@example.com'},
-      'Custom Role': {'curom_role_1@example.com'},
+      ("Audit", "Audit Captains"): {
+          "audit_captain_1@example.com",
+          "audit_captain_2@example.com"
+      },
+      ("Audit", "Auditors"): {
+          "auditor_1@example.com",
+          "auditor_2@example.com"
+      },
+      ("Assessment", "Creators"): {
+          "creator_1@example.com",
+          "creator_2@example.com"
+      },
+      ("Assessment", "Assignees"): {
+          "assignee_1@example.com",
+          "assignee_2@example.com"
+      },
+      ("Assessment", "Verifiers"): {
+          "verifier_1@example.com",
+          "verifier_2@example.com"
+      },
+      ("Assessment", "Custom Role"): {
+          "curom_role_1@example.com"
+      },
+      ("Assessment", "Primary Contacts"): {
+          "primary_contact_1@example.com",
+          "primary_contact_2@example.com"
+      },
+      ("Assessment", "Secondary Contacts"): {
+          "secondary_contact_1@example.com",
+          "secondary_contact_2@example.com"
+      },
   }
 
   ROLE_NAMES = (
@@ -350,7 +372,10 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     self.roles = {
         role.name: role
         for role in all_models.AccessControlRole.query.filter(
-            all_models.AccessControlRole.name.in_(
+            sa.tuple_(
+                all_models.AccessControlRole.object_type,
+                all_models.AccessControlRole.name,
+            ).in_(
                 self.EMAILS.keys(),
             ),
         )
@@ -362,7 +387,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
       self.people = {
           role_name: [factories.PersonFactory(email=email)
                       for email in emails]
-          for role_name, emails in self.EMAILS.iteritems()
+          for (_, role_name), emails in self.EMAILS.iteritems()
       }
 
   def setup_audit_people(self, role_name_to_people):
@@ -435,7 +460,8 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     )
 
     expected_cc_list = list(
-        self.EMAILS['Assignees'] - {min(self.EMAILS['Assignees'])}
+        self.EMAILS["Assessment", "Assignees"] -
+        {min(self.EMAILS["Assessment", "Assignees"])}
     )
 
     # pylint: disable=protected-access; we assert by non-exported constants
@@ -452,9 +478,9 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         'type': issue_type,
 
         # person-related fields
-        'reporter': min(self.EMAILS['Audit Captains']),
-        'assignee': min(self.EMAILS['Assignees']),
-        'verifier': min(self.EMAILS['Assignees']),
+        'reporter': min(self.EMAILS["Audit", "Audit Captains"]),
+        'assignee': min(self.EMAILS["Assessment", "Assignees"]),
+        'verifier': min(self.EMAILS["Assessment", "Assignees"]),
         'ccs': expected_cc_list,
     })
 
