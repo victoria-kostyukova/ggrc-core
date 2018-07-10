@@ -419,6 +419,25 @@ class BaseWebUiService(object):
     related_asmts_table = obj_page.show_related_assessments()
     return related_asmts_table.get_related_titles(asmt_type=obj.type)
 
+  def open_info_page_of_obj_fill_lca(self, obj):
+    """Open obj Info Page. Populate local custom attributes with random values.
+    Only Date population implemented.
+    """
+    ca_values = self.open_info_page_of_obj(obj).fill_lcas_attr_values()
+    updated_attrs = self.set_custom_attr_values(obj, ca_values)
+    obj.update_attrs(custom_attribute_values=updated_attrs)
+    return obj
+
+  def set_custom_attr_values(self, obj, cas):
+    """Update custom attribute values in custom_attribute_definitions"""
+    attrs = []
+    for attr_name, attr_value in cas.iteritems():
+      for attr in obj.custom_attribute_definitions:
+        if attr['title'].upper() == attr_name.upper():
+          attrs.append({'custom_attribute_id': attr['id'],
+                        'attribute_value': attr_value})
+    return attrs
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -634,12 +653,16 @@ class AssessmentsService(BaseWebUiService):
     modal_edit.save_and_close()
     return mapped_titles
 
-  def choose_and_fill_dropdown_lca(
-      self, asmt, dropdown_id, option_title, **kwargs
-  ):
+  def choose_and_fill_dropdown_lca(self, asmt, dropdown, **kwargs):
     """Fill dropdown LCA for Assessment."""
     asmt_info = self.open_info_page_of_obj(asmt)
-    asmt_info.choose_and_fill_dropdown_lca(dropdown_id, option_title, **kwargs)
+    asmt_info.choose_and_fill_dropdown_lca(
+        dropdown.id, dropdown.multi_choice_options, **kwargs)
+
+    updated_attrs = self.set_custom_attr_values(
+        asmt, {dropdown.title: dropdown.multi_choice_options})
+    asmt.update_attrs(custom_attribute_values=updated_attrs)
+    return asmt
 
 
 class ControlsService(SnapshotsWebUiService):

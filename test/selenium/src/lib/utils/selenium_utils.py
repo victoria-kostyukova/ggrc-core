@@ -238,6 +238,14 @@ def is_element_checked(driver, element):
   return driver.execute_script("return arguments[0].checked", element)
 
 
+def get_element_value_js(driver, element):
+  """Check DOM input element checked property using JS.
+  Args: driver (base.CustomDriver), locator (tuple)
+  Return: value attribute of element.
+  """
+  return driver.execute_script("return arguments[0].value;", element)
+
+
 def get_nested_elements(element, all_nested=False):
   """Get nested elements of current element by Xpath. If all_nested=True,
   return all-levels nested elements

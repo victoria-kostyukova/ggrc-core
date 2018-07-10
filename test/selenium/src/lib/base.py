@@ -4,12 +4,14 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
 
+import random
+
 import pytest
 from selenium import webdriver
+from selenium.common import exceptions
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
-from selenium.common import exceptions
 
 from lib import constants, exception, mixin, url
 from lib.constants import messages, objects
@@ -221,7 +223,7 @@ class DatePicker(Element):
     activate date picker
     """
     super(DatePicker, self).__init__(driver, field_locator)
-    self._locator_datepcker = date_picker_locator
+    self._locator_datepicker = date_picker_locator
     self._element_datepicker = None
 
   def get_day_els_current_month(self):
@@ -229,7 +231,7 @@ class DatePicker(Element):
     Return: list of selenium.webdriver.remote.webelement.WebElement
     """
     self.element.click()
-    elements = self._driver.find_elements(*self._locator_datepcker)
+    elements = self._driver.find_elements(*self._locator_datepicker)
     return elements
 
   def select_day_in_current_month(self, day):
@@ -241,24 +243,23 @@ class DatePicker(Element):
     elements = self.get_day_els_current_month()
     elements[day].click()
     # wait for fadeout in case we're above some other element
-    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
+    selenium_utils.get_when_invisible(self._driver, self._locator_datepicker)
+    self.text = self.element.get_attribute("value")
+
+  def select_rand_day_in_curr_month(self):
+    """Select random day in current month."""
+    random.choice(self.get_day_els_current_month()).click()
+    # wait for fadeout in case we're above some other element
+    selenium_utils.get_when_invisible(self._driver, self._locator_datepicker)
     self.text = self.element.get_attribute("value")
 
   def select_month_end(self):
     """Select last day of current month."""
-    elements = self.get_day_els_current_month()
-    elements[-1].click()
-    # wait for fadeout in case we're above some other element
-    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self.element.get_attribute("value")
+    self.select_day_in_current_month(-1)
 
   def select_month_start(self):
     """Select first day of current month."""
-    elements = self.get_day_els_current_month()
-    elements[0].click()
-    # wait for fadeout in case we're above some other element
-    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self.element.get_attribute("value")
+    self.select_day_in_current_month(0)
 
 
 class Button(Element):
@@ -1087,3 +1088,33 @@ class AbstractTable(Component):
     """Abstract method. Should return list of dicts for header and cell value.
     """
     raise NotImplementedError
+
+
+class AbstractCustomAttribute(Element):
+  """Abstract class for custom attribute element."""
+
+  def set_value(self):
+    """"Abstract method. Should set custom attribute value."""
+    raise NotImplementedError
+
+  def get_value(self):
+    """Abstract method. Should get custom attribute value."""
+    raise NotImplementedError
+
+
+class DateCustomAttribute(DatePicker, AbstractCustomAttribute):
+  """Implementation of abstarct class AbstractCustomAttribute
+  for date custom attribute."""
+
+  def __init__(self, driver, date_picker_locator, field_locator):
+    super(DateCustomAttribute, self).__init__(driver, date_picker_locator,
+                                              field_locator)
+
+  def set_value(self):
+    """Set value of Date custom attribute."""
+    self.select_rand_day_in_curr_month()
+
+  def get_value(self):
+    """Get value of Date custom attribute."""
+    _date = self.text.split("/")
+    return unicode("{y}-{m}-{d}".format(y=_date[2], m=_date[0], d=_date[1]))

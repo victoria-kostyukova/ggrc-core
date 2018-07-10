@@ -229,6 +229,9 @@ class InfoWidget(base.Widget):
                  ])
           else:
             list_text_cas_scopes.append([ca_header_text, None])
+        if not is_gcas_not_lcas:
+          self.collect_lcas_attr_name_value(
+              ca_header_text, list_text_cas_scopes, scope)
       cas_headers, _cas_values = [list(text_cas_scope) for text_cas_scope
                                   in zip(*list_text_cas_scopes)]
       # conversion
@@ -249,6 +252,57 @@ class InfoWidget(base.Widget):
           # Other
           cas_values.append(ca_val)
       dict_cas_scopes = dict(zip(cas_headers, cas_values))
+    return dict_cas_scopes
+
+  def collect_lcas_attr_name_value(self, ca_header_text, list_text_cas_scopes,
+                                   scope):
+    """Collect all local attribute with values"""
+    ca_type = scope.get_attribute("class")
+    if "custom-attribute-checkbox" in ca_type:
+      ca_value = unicode(int(base.Checkbox(self._driver, scope.find_element(
+          *self._locators.CAS_CHECKBOXES)).is_checked_via_js()))
+    elif "custom-attribute-date" in ca_type:
+      ca_value = scope.find_element(
+          *locator.WidgetInfoPanel.
+          DATE_CA_INPUT).get_attribute("value")
+    elif "custom-attribute-text" in ca_type:
+      ca_value = scope.find_element(
+          *locator.WidgetInfoPanel.RICH_TEXT_CA_INPUT).text
+    elif "custom-attribute-input" in ca_type:
+      ca_value = scope.find_element(
+          *locator.WidgetInfoPanel.TEXT_CA_INPUT).text
+    elif "custom-attribute-dropdown" in ca_type:
+      ca_value = (
+          selenium_utils.get_element_value_js(
+              self._driver, scope.find_element(
+                  *locator.WidgetInfoPanel.DROPDOWN_CA_ITEM)))
+    elif "custom-attribute-person" in ca_type:
+      ca_value = scope.find_element(
+          *locator.WidgetInfoPanel.PERSON_CA).text
+    else:
+      raise NotImplementedError()
+    list_text_cas_scopes.append([ca_header_text, ca_value])
+
+  def fill_lcas_attr_values(self):
+    """Fill all local custom attribute with values."""
+    selenium_utils.wait_for_js_to_load(self._driver)
+    cas_headers_and_values = self.info_widget_elem.find_elements(
+        *locator.WidgetInfoAssessment.LCAS_HEADERS_AND_VALUES)
+    dict_cas_scopes = {}
+    if len(cas_headers_and_values) >= 1:
+      for scope in cas_headers_and_values:
+        ca_type = scope.get_attribute("class")
+        if "custom-attribute-date" in ca_type:
+          ca_elem = base.DateCustomAttribute(
+              scope, locator.WidgetInfoPanel.DATE_CA_FIELDS,
+              locator.WidgetInfoPanel.DATE_CA_INPUT)
+          ca_elem.set_value()
+          dict_cas_scopes.update({scope.text: ca_elem.get_value()})
+
+    selenium_utils.wait_for_element_text(
+        self._driver,
+        locator.WidgetInfoPanel.CA_SAVED_STATUS,
+        element.GenericWidget.ALL_CHANGES_SAVED)
     return dict_cas_scopes
 
   def get_info_widget_obj_scope(self):

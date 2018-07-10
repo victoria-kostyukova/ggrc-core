@@ -95,6 +95,19 @@ def create_assessment(audit, **attrs):
       count=1, **attrs)[0]
 
 
+def create_assessment_template(audit, **attrs):
+  """Create an assessment template"""
+  attrs["audit"] = audit.__dict__
+  return rest_service.AssessmentTemplatesService().create_objs(
+      count=1, **attrs)[0]
+
+
+def create_assessment_from_template(audit, template, **attrs):
+  """Create an assessment from template"""
+  return rest_service.AssessmentsFromTemplateService().create_assessments(
+      audit=audit, template=template, **attrs)[0]
+
+
 def create_issue(program=None):
   """Create a issue (optionally map to a `program`)"""
   issue = rest_service.IssuesService().create_objs(count=1)[0]

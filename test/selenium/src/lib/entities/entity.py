@@ -90,6 +90,7 @@ class Representation(object):
         els.COMMENTS_HEADER: "comments", els.CREATED_AT: "created_at",
         els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
         els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
+        els.LCAS: "custom_attribute_definitions",
         "EVIDENCE_URLS": "evidence_urls"
     }
     csv_remap_items = {
@@ -333,7 +334,7 @@ class Representation(object):
       """Update object's attributes values."""
       for obj_attr_name in attrs:
         obj_attr_value = None
-        if (obj_attr_name in Representation.all_attrs_names()):
+        if obj_attr_name in Representation.all_attrs_names():
           _obj_attr_value = attrs.get(obj_attr_name)
           if not is_replace_values_of_dicts:
             # convert repr from objects to dicts exclude datetime objects

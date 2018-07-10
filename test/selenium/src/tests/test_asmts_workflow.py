@@ -12,7 +12,7 @@ import pytest
 
 from lib import base, factory
 from lib.constants import messages, element, value_aliases as alias, objects
-from lib.constants.element import AssessmentStates
+from lib.constants.element import AssessmentStates, AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
@@ -81,14 +81,29 @@ def _create_mapped_asmt(audit, assessment_type, objs_to_map):
   return assessment
 
 
-def _assert_asmt(asmts_ui_service, exp_asmt):
+def _create_asmt_template(audit, assessment_type, custom_attributes):
+  """Create assessment with assessment type=`assessment_type` and
+  map it to snapshots of `objs_to_map`"""
+  custom_attr_rest = (
+      CustomAttributeDefinitionsFactory.
+      generate_ca_defenitions_for_asmt_tmpls(custom_attributes))
+  assessment_template = rest_facade.create_assessment_template(
+      audit, assessment_type=assessment_type,
+      custom_attribute_definitions=custom_attr_rest)
+  return assessment_template
+
+
+def _assert_asmt(asmts_ui_service, exp_asmt, is_cas_check_required=False):
   """Assert that assessment `exp_asmt` on UI is the same as in
   `exp_asmt`."""
+  # "audit" not shown in UI
+  # "custom_attributes" not returned on POST /api/assessments
   actual_asmt = asmts_ui_service.get_obj_from_info_page(exp_asmt)
-  base.Test().general_equal_assert(
-      exp_asmt.repr_ui(), actual_asmt,
-      "audit",  # not shown in UI
-      "custom_attributes")  # not returned on POST /api/assessments)
+  if is_cas_check_required:
+    base.Test().general_equal_assert(exp_asmt.repr_ui(), actual_asmt, "audit")
+  else:
+    base.Test().general_equal_assert(
+        exp_asmt.repr_ui(), actual_asmt, "audit", "custom_attributes")
 
 
 class TestAssessmentsWorkflow(base.Test):
@@ -425,8 +440,8 @@ class TestAssessmentsWorkflow(base.Test):
     asmt_service = webui_service.AssessmentsService(selenium)
     exp_url = StringMethods.random_string(
         size=StringMethods.RANDOM_STR_LENGTH)
-    asmt_service.choose_and_fill_dropdown_lca(
-        expected_asmt, dropdown.id, dropdown.multi_choice_options, url=exp_url)
+    expected_asmt = asmt_service.choose_and_fill_dropdown_lca(
+        expected_asmt, dropdown, url=exp_url)
     expected_asmt_urls = [exp_url]
     expected_asmt.update_attrs(
         updated_at=self.info_service().get_obj(obj=expected_asmt).updated_at,
@@ -457,8 +472,8 @@ class TestAssessmentsWorkflow(base.Test):
         **expected_asmt.cads_from_template()[0])
     asmt_service = webui_service.AssessmentsService(selenium)
     expected_asmt_comments = [entities_factory.CommentsFactory().create()]
-    asmt_service.choose_and_fill_dropdown_lca(
-        expected_asmt, dropdown.id, dropdown.multi_choice_options,
+    expected_asmt = asmt_service.choose_and_fill_dropdown_lca(
+        expected_asmt, dropdown,
         comment=expected_asmt_comments[0].description)
     expected_asmt_comments = [expected_comment.update_attrs(
         created_at=self.info_service().get_comment_obj(
@@ -478,6 +493,37 @@ class TestAssessmentsWorkflow(base.Test):
     self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments")
     assert expected_asmt_comments_descriptions \
         == actual_asmt_comments_descriptions
+
+  @pytest.mark.smoke_tests
+  def test_asmt_from_template_w_date(self, control_mapped_to_program, audit,
+                                     selenium):
+    """
+    1. Create a program via REST
+    2. Create a control within a program via REST
+    3. Create an audit within a program via REST
+    4. Create an assessment template with Date local custom attribute
+     within audit via REST
+    5. Generate an assessment from assessment template and control
+     snapshot via REST
+    6. Open this assessment in UI
+    7. Fill Date local custom attribute
+    8. Reload page and check that object built from the page looks as expected
+    """
+    cad = CustomAttributeDefinitionsFactory().create(
+        is_add_rest_attrs=True,
+        attribute_type=AdminWidgetCustomAttributes.DATE)
+    assessment_template = _create_asmt_template(
+        audit=audit, assessment_type="Control", custom_attributes=[cad])
+    exp_asmt = rest_facade.create_assessment_from_template(
+        audit=audit, template=assessment_template,
+        control_snapshots=[control_mapped_to_program])
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    asmts_ui_service.open_info_page_of_obj_fill_lca(exp_asmt)
+
+    act_asmt = self.info_service().get_obj(obj=exp_asmt)
+    exp_asmt.update_attrs(updated_at=act_asmt.updated_at,
+                          status=act_asmt.status)
+    _assert_asmt(asmts_ui_service, exp_asmt, True)
 
 
 class TestRelatedAssessments(base.Test):

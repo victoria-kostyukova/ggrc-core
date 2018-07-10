@@ -126,6 +126,7 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
+  LCAS = "LCAs"
   MODIFIED_BY = "Last updated by"
   CREATED_AT = "Created date"
   UPDATED_AT = "Updated at"
@@ -516,6 +517,7 @@ class UnifiedMapperModal(object):
 class GenericWidget(object):
   """Elements' labels and properties for Generic Widget."""
   NO_FILTER_RESULTS = "No results, please check your filter criteria"
+  ALL_CHANGES_SAVED = "All changes saved"
 
 
 class ExportPage(object):
