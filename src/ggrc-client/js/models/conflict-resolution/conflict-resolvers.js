@@ -27,10 +27,11 @@ export function simpleFieldResolver(
   attrs = {},
   remoteAttrs = {},
   container,
-  key) {
-  let previousValue = baseAttrs[key];
-  let currentValue = attrs[key];
-  let remoteValue = remoteAttrs[key];
+  key,
+  rootKey) {
+  let previousValue = _.get(baseAttrs, key);
+  let currentValue = _.get(attrs, key);
+  let remoteValue = _.get(remoteAttrs, key);
 
   let {hasConflict, isChangedLocally} = buildChangeDescriptor(
     previousValue,
@@ -38,7 +39,9 @@ export function simpleFieldResolver(
     remoteValue);
 
   if (isChangedLocally) {
-    container.attr(key, currentValue);
+    let path = rootKey || key;
+    let currentRoot = _.get(attrs, path);
+    container.attr(path, currentRoot);
   }
 
   return hasConflict;
@@ -61,14 +64,22 @@ export function customAttributeResolver(
     let remoteValueItem = remoteValuesById[definitionId];
     let containerValueItem = containerValuesById[definitionId];
 
-    let hasConflict = simpleFieldResolver(
+    let hasValueConflict = simpleFieldResolver(
       previousValueItem,
       currentValueItem,
       remoteValueItem,
       containerValueItem,
       'attribute_value');
 
-    conflict = conflict || hasConflict;
+    let hasObjectConflict = simpleFieldResolver(
+      previousValueItem,
+      currentValueItem,
+      remoteValueItem,
+      containerValueItem,
+      'attribute_object.id',
+      'attribute_object');
+
+    conflict = conflict || hasValueConflict || hasObjectConflict;
   });
 
   return conflict;

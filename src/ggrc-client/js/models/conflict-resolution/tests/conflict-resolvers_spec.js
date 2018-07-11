@@ -183,138 +183,276 @@ describe('conflict resolvers', () => {
       remoteValue = [];
     });
 
-    it('resolves change of different fields', () => {
-      previousValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1-1',
-      }, {
-        custom_attribute_id: 2,
-        attribute_value: '2-1',
-      }];
-      currentValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1-2',
-      }, {
-        custom_attribute_id: 2,
-        attribute_value: '2-1',
-      }];
-      remoteValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1-1',
-      }, {
-        custom_attribute_id: 2,
-        attribute_value: '2-2',
-      }];
-      container = new can.List(remoteValue);
+    describe('checks attribute value and', () => {
+      it('resolves change of different fields', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1-1',
+        }, {
+          custom_attribute_id: 2,
+          attribute_value: '2-1',
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1-2',
+        }, {
+          custom_attribute_id: 2,
+          attribute_value: '2-1',
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1-1',
+        }, {
+          custom_attribute_id: 2,
+          attribute_value: '2-2',
+        }];
+        container = new can.List(remoteValue);
 
-      let hasConflict = customAttributeResolver(
-        previousValue,
-        currentValue,
-        remoteValue,
-        container);
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
 
-      expect(hasConflict).toBe(false);
-      expect(container.attr('0.attribute_value')).toBe('1-2');
-      expect(container.attr('1.attribute_value')).toBe('2-2');
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_value')).toBe('1-2');
+        expect(container.attr('1.attribute_value')).toBe('2-2');
+      });
+
+      it('resolves server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '2',
+        }];
+        container = new can.List(remoteValue);
+
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
+
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_value')).toBe('2');
+      });
+
+      it('resolves local change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '2',
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        container = new can.List(remoteValue);
+
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
+
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_value')).toBe('2');
+      });
+
+      it('resolves the same local and server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '2',
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '2',
+        }];
+        container = new can.List(remoteValue);
+
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
+
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_value')).toBe('2');
+      });
+
+      it('does not resolve different local and server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '1',
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '2',
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_value: '3',
+        }];
+        container = new can.List(remoteValue);
+
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
+
+        expect(hasConflict).toBe(true);
+      });
     });
 
-    it('resolves server change', () => {
-      previousValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      currentValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      remoteValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '2',
-      }];
-      container = new can.List(remoteValue);
+    describe('checks attribute object and', () => {
+      it('resolves change of different fields', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }, {
+          custom_attribute_id: 2,
+          attribute_object: {id: 1},
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }, {
+          custom_attribute_id: 2,
+          attribute_object: {id: 1},
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }, {
+          custom_attribute_id: 2,
+          attribute_object: {id: 2},
+        }];
+        container = new can.List(remoteValue);
 
-      let hasConflict = customAttributeResolver(
-        previousValue,
-        currentValue,
-        remoteValue,
-        container);
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
 
-      expect(hasConflict).toBe(false);
-      expect(container.attr('0.attribute_value')).toBe('2');
-    });
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_object').attr()).toEqual({id: 2});
+        expect(container.attr('1.attribute_object').attr()).toEqual({id: 2});
+      });
 
-    it('resolves local change', () => {
-      previousValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      currentValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '2',
-      }];
-      remoteValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      container = new can.List(remoteValue);
+      it('resolves server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }];
+        container = new can.List(remoteValue);
 
-      let hasConflict = customAttributeResolver(
-        previousValue,
-        currentValue,
-        remoteValue,
-        container);
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
 
-      expect(hasConflict).toBe(false);
-      expect(container.attr('0.attribute_value')).toBe('2');
-    });
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_object').attr()).toEqual({id: 2});
+      });
 
-    it('resolves the same local and server change', () => {
-      previousValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      currentValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '2',
-      }];
-      remoteValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '2',
-      }];
-      container = new can.List(remoteValue);
+      it('resolves local change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        container = new can.List(remoteValue);
 
-      let hasConflict = customAttributeResolver(
-        previousValue,
-        currentValue,
-        remoteValue,
-        container);
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
 
-      expect(hasConflict).toBe(false);
-      expect(container.attr('0.attribute_value')).toBe('2');
-    });
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_object').attr()).toEqual({id: 2});
+      });
 
-    it('does not resolve different local and server change', () => {
-      previousValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '1',
-      }];
-      currentValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '2',
-      }];
-      remoteValue = [{
-        custom_attribute_id: 1,
-        attribute_value: '3',
-      }];
-      container = new can.List(remoteValue);
+      it('resolves the same local and server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }];
+        container = new can.List(remoteValue);
 
-      let hasConflict = customAttributeResolver(
-        previousValue,
-        currentValue,
-        remoteValue,
-        container);
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
 
-      expect(hasConflict).toBe(true);
+        expect(hasConflict).toBe(false);
+        expect(container.attr('0.attribute_object').attr()).toEqual({id: 2});
+      });
+
+      it('does not resolve different local and server change', () => {
+        previousValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 1},
+        }];
+        currentValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 2},
+        }];
+        remoteValue = [{
+          custom_attribute_id: 1,
+          attribute_object: {id: 3},
+        }];
+        container = new can.List(remoteValue);
+
+        let hasConflict = customAttributeResolver(
+          previousValue,
+          currentValue,
+          remoteValue,
+          container);
+
+        expect(hasConflict).toBe(true);
+      });
     });
   });
 });
