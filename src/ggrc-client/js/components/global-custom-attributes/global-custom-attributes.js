@@ -70,10 +70,8 @@ import Permission from '../../permission';
               success: 'Saved',
             });
           })
-          .fail(function () {
-            $(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving',
-            });
+          .fail(function (instance, xhr) {
+            GGRC.Errors.notifierXHR('error')(xhr);
           })
           .always(function () {
             this.attr('isSaving', false);
