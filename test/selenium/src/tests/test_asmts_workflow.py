@@ -403,7 +403,6 @@ class TestAssessmentsWorkflow(base.Test):
     # 'actual_asmts': audit (None)
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
-  @pytest.mark.xfail(reason="Issue GGRC-5494", strict=True)
   @pytest.mark.smoke_tests
   def test_asmt_from_template_w_dropdown_url(
       self, program, control_mapped_to_program, audit, selenium
