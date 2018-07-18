@@ -270,7 +270,7 @@ function isUrlRequired(field) {
  */
 function convertToCaValue(type, value) {
   if (type === 'checkbox') {
-    return value ? 1 : 0;
+    return value ? '1' : '0';
   }
 
   if (type === 'person') {
