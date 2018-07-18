@@ -227,6 +227,10 @@
     box-sizing: border-box;
   }
 
+  &__state {
+    margin-right: 6px;
+  }
+
   &__attributes {
     display: flex;
     flex-wrap: wrap;
