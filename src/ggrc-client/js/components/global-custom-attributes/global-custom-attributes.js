@@ -69,6 +69,7 @@ import Permission from '../../permission';
             $(document.body).trigger('ajax:flash', {
               success: 'Saved',
             });
+            instance.backup();
           })
           .fail(function (instance, xhr) {
             GGRC.Errors.notifierXHR('error')(xhr);

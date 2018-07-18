@@ -1842,6 +1842,7 @@ describe('assessment-info-pane component', () => {
   describe('"instance updated" event', () => {
     let handler;
     let viewModel;
+    let instance;
 
     beforeEach(() => {
       const {'default': DeferredTransaction} = DeferredTransactionUtil;
@@ -1854,6 +1855,8 @@ describe('assessment-info-pane component', () => {
         viewModel,
       };
 
+      instance = jasmine.createSpyObj(['backup']);
+
       let events = Component.prototype.events;
       handler = events['{viewModel.instance} updated'].bind(eventContext);
     });
@@ -1863,7 +1866,7 @@ describe('assessment-info-pane component', () => {
       spyOn(viewModel.attr('deferredSave'), 'isPending')
         .and.returnValue(true);
 
-      handler();
+      handler(instance);
       expect(viewModel.reinitFormFields.calls.count()).toBe(0);
     });
 
@@ -1872,8 +1875,14 @@ describe('assessment-info-pane component', () => {
       spyOn(viewModel.attr('deferredSave'), 'isPending')
         .and.returnValue(false);
 
-      handler();
+      handler(instance);
       expect(viewModel.reinitFormFields.calls.count()).toBe(1);
+    });
+
+    it('should make a backup of instance', () => {
+      handler(instance);
+
+      expect(instance.backup).toHaveBeenCalled();
     });
   });
 

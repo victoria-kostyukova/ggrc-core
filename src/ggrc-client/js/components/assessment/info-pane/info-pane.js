@@ -610,9 +610,10 @@ export default can.Component.extend({
         model: event.destinationType,
       });
     },
-    '{viewModel.instance} updated'() {
+    '{viewModel.instance} updated'(instance) {
       const vm = this.viewModel;
       const isPending = vm.attr('deferredSave').isPending();
+      instance.backup();
       if (!isPending) {
         // reinit LCA when queue is empty
         // to avoid rewriting of changed values
