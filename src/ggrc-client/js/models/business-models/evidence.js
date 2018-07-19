@@ -59,7 +59,7 @@ export default can.Model.Cacheable('CMS.Models.Evidence', {
       {attr_title: 'State', attr_name: 'status'},
       {attr_title: 'Type', attr_name: 'kind'},
       {attr_title: 'Last Updated By', attr_name: 'modified_by'},
-      {attr_title: 'Last Updated', attr_name: 'updated_at'},
+      {attr_title: 'Last Updated Date', attr_name: 'updated_at'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
       {attr_title: 'Archived', attr_name: 'archived'},
       {
