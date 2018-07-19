@@ -84,7 +84,6 @@
             <div class="content">
               <ul class="mid-level">
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Person" li_class="entities" template_view='/static/mustache/people/search_result.mustache'}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="AccessGroup" li_class="entities"}}}
               </ul>
             </div>
           </li>
@@ -96,6 +95,7 @@
             </a>
             <div class="content">
               <ul class="mid-level">
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="AccessGroup" li_class="business"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="OrgGroup" li_class="business"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="System" li_class="business"}}}
                 {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Process" li_class="business"}}}
