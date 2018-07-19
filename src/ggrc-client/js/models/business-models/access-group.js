@@ -6,7 +6,7 @@
 export default can.Model.Cacheable('CMS.Models.AccessGroup', {
   root_object: 'access_group',
   root_collection: 'access_groups',
-  category: 'entities',
+  category: 'business',
   findAll: 'GET /api/access_groups',
   findOne: 'GET /api/access_groups/{id}',
   create: 'POST /api/access_groups',
