@@ -6,7 +6,7 @@
 export default can.Model.Cacheable('CMS.Models.Vendor', {
   root_object: 'vendor',
   root_collection: 'vendors',
-  category: 'entities',
+  category: 'business',
   findAll: 'GET /api/vendors',
   findOne: 'GET /api/vendors/{id}',
   create: 'POST /api/vendors',
