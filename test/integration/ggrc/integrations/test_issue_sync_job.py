@@ -25,8 +25,14 @@ class TestIssueIntegration(ggrc.TestCase):
 
   def setUp(self):
     super(TestIssueIntegration, self).setUp()
-    self.verifier = factories.PersonFactory()
-    self.assignee = factories.PersonFactory()
+    self.verifier = create_rand_person()
+    self.assignee = create_rand_person()
+    self.admin_role = all_models.AccessControlRole.query.filter_by(
+        object_type=all_models.Issue.__name__, name="Admin"
+    ).first()
+    self.primary_contact_role = all_models.AccessControlRole.query.filter_by(
+        object_type=all_models.Issue.__name__, name="Primary Contacts"
+    ).first()
 
   @ddt.data(
       ("new", "Draft"),
@@ -80,23 +86,16 @@ class TestIssueIntegration(ggrc.TestCase):
     )
 
     # Add Admin into issue.
-    admin_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Issue.__name__, name="Admin"
-    ).first()
     factories.AccessControlListFactory(
-        ac_role=admin_role,
+        ac_role=self.admin_role,
         object=iti.issue_tracked_obj,
         person=self.verifier
     )
 
     # Add primary contact into issue.
-    primary_contact_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Issue.__name__, name="Primary Contacts"
-    ).first()
     factories.AccessControlListFactory(
-        ac_role=primary_contact_role,
+        ac_role=self.primary_contact_role,
         object=iti.issue_tracked_obj,
-        object_id=iti.issue_tracked_obj.id,
         person=self.assignee,
     )
 
@@ -122,7 +121,7 @@ class TestIssueIntegration(ggrc.TestCase):
     ]
 
     # Perform action.
-    with mock.patch.object(flask, "g"):
+    with mock.patch.object(flask.g, "global_role_names", None):
       with mock.patch.object(sync_utils, "iter_issue_batches",
                              return_value=batches):
         issue_sync_job.sync_issue_attributes()
@@ -134,7 +133,7 @@ class TestIssueIntegration(ggrc.TestCase):
       ]
       self.assertListEqual(
           admin_emails,
-          [self.verifier.email, new_verifier.email]
+          [new_verifier.email, ]
       )
 
       primary_contacts_emails = [
@@ -163,7 +162,7 @@ class TestIssueIntegration(ggrc.TestCase):
     ]
 
     # Perform action.
-    with mock.patch.object(flask, "g"):
+    with mock.patch.object(flask.g, "global_role_names", None):
       with mock.patch.object(sync_utils, "iter_issue_batches",
                              return_value=batches):
         issue_sync_job.sync_issue_attributes()
@@ -183,5 +182,83 @@ class TestIssueIntegration(ggrc.TestCase):
       ]
       self.assertListEqual(
           primary_contacts_emails,
-          [self.assignee.email, new_assignee.email]
+          [new_assignee.email, ]
+      )
+
+  def test_sync_issue_tracker_emails(self):
+    """Test sync issue tracker emails.
+
+    Current verifier should be replaced by new verifier from Issue Tracker.
+    Current assignee should be replaced by new assignee from Issue Tracker.
+    CCs list shouldn't be changed.
+
+    Other Admins and Primary Contacts shouldn't be removed.
+    """
+    # Arrange test data.
+    new_assignee = create_rand_person()
+    new_verifier = create_rand_person()
+    iti = self.initialize_test_issuetracker_info()
+
+    # Add more admins into issue.
+    second_verifier = create_rand_person()
+    # Change names to be sure that names in alphabetical order.
+    self.verifier.name = "A" + self.verifier.name
+    second_verifier.name = "B" + second_verifier.name
+
+    factories.AccessControlListFactory(
+        ac_role=self.admin_role,
+        object=iti.issue_tracked_obj,
+        person=second_verifier
+    )
+
+    # Add more primary contacts into issue.
+    second_assignee = create_rand_person()
+    # Change names to be sure that names in alphabetical order.
+    self.assignee.name = "A" + self.assignee.name
+    second_assignee.name = "B" + second_assignee.name
+
+    factories.AccessControlListFactory(
+        ac_role=self.primary_contact_role,
+        object=iti.issue_tracked_obj,
+        person=second_assignee
+    )
+
+    batches = [
+        {
+            "1": {
+                "status": "NEW",
+                "type": "BUG",
+                "priority": "P2",
+                "severity": "S2",
+                "verifier": new_verifier.email,
+                "assignee": new_assignee.email,
+            }
+        }
+    ]
+
+    # Perform action.
+    with mock.patch.object(flask.g, "global_role_names", None):
+      with mock.patch.object(sync_utils, "iter_issue_batches",
+                             return_value=batches):
+        issue_sync_job.sync_issue_attributes()
+
+      issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
+
+      # Check changed admins.
+      admin_emails = [
+          person.email for person in issue.get_persons_for_rolename("Admin")
+      ]
+      self.assertListEqual(
+          admin_emails,
+          [second_verifier.email, new_verifier.email, ]
+      )
+
+      # Check changed primary contacts.
+      primary_contacts_emails = [
+          person.email
+          for person in issue.get_persons_for_rolename("Primary Contacts")
+      ]
+      self.assertListEqual(
+          primary_contacts_emails,
+          [second_assignee.email, new_assignee.email, ]
       )

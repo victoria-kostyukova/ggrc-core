@@ -3,6 +3,8 @@
 
 """Issue object integration functionality via cron job."""
 
+# pylint: disable=invalid-name
+
 import logging
 
 from ggrc import db
@@ -30,6 +32,15 @@ ISSUE_STATUS_MAPPING = {
 }
 
 
+def get_current_issue_tracker_person_acl(sync_object, role_name):
+  """Returns acl which used for sending emails to Issue Tracker."""
+  # TODO: Reduce number of queries to DB.
+  acls = [acl for acl in sync_object.access_control_list
+          if acl.ac_role.name == role_name]
+  acls = sorted(acls, key=lambda acl: acl.person.name)
+  return acls[0] if acls else None
+
+
 def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
   """Sync issue assignee email."""
   issue_tracker_assignee = issuetracker_state.get("assignee")
@@ -40,7 +51,15 @@ def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
     issue_primary_contacts = sync_object.get_persons_for_rolename(
         "Primary Contacts"
     )
-    if issue_tracker_assignee not in issue_primary_contacts:
+    primary_contact_emails = [person.email
+                              for person in issue_primary_contacts]
+    if issue_tracker_assignee not in primary_contact_emails:
+      current_assignee_acl = get_current_issue_tracker_person_acl(
+          sync_object,
+          "Primary Contacts"
+      )
+      if current_assignee_acl:
+        sync_object.access_control_list.remove(current_assignee_acl)
       sync_object.extend_access_control_list([{
           "ac_role": assignees_role,
           "person": new_assignee
@@ -55,7 +74,12 @@ def sync_verifier_email(issuetracker_state, sync_object, admin_role):
   ).first()
   if new_verifier:
     issue_admins = sync_object.get_persons_for_rolename("Admin")
-    if issue_tracker_verifier not in issue_admins:
+    admin_emails = [admin.email for admin in issue_admins]
+    if issue_tracker_verifier not in admin_emails:
+      current_verifier_acl = get_current_issue_tracker_person_acl(sync_object,
+                                                                  "Admin")
+      if current_verifier_acl:
+        sync_object.access_control_list.remove(current_verifier_acl)
       sync_object.extend_access_control_list([{
           "ac_role": admin_role,
           "person": new_verifier
