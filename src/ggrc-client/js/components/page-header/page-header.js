@@ -49,6 +49,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
     Control: 'header-style-4',
     Objective: 'header-style-4',
     Program: 'header-style-5',
+    Vendor: 'header-style-1',
   };
 
   let viewModel = can.Map.extend({
