@@ -12,6 +12,8 @@ from ggrc import models
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
+    as params_builder
 from ggrc.integrations import integrations_errors
 
 from integration.ggrc.models import factories
@@ -145,6 +147,36 @@ class TestIssueIntegration(ggrc.TestCase):
       self.api.delete(iti.issue_tracked_obj)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
 
+  @mock.patch.object(params_builder.BaseIssueTrackerParamsBuilder,
+                     "get_ggrc_object_url",
+                     return_value="http://issue_url.com")
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_adding_comment_to_issue(self, update_issue_mock, url_builder_mock):
+    """Test adding comment to issue."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    comment = factories.CommentFactory(description="test comment")
+
+    expected_result = {
+        "comment": u"A new comment is added by 'Example User' to the 'Issue': "
+                   u"'test comment'.\nUse the following to link to get more "
+                   u"information from the GGRC 'Issue'. Link - "
+                   u"http://issue_url.com"
+    }
+
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      self.api.post(all_models.Relationship, {
+          "relationship": {
+              "source": {"id": iti.issue_tracked_obj.id, "type": "Issue"},
+              "destination": {"id": comment.id, "type": "comment"},
+              "context": None
+          },
+      })
+    url_builder_mock.assert_called_once()
+    update_issue_mock.assert_called_with(iti.issue_id, expected_result)
+
 
 @ddt.ddt
 class TestDisabledIssueIntegration(ggrc.TestCase):
@@ -258,3 +290,22 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
       issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
                                                                issue_id)
       self.assertEqual(issue_tracker_issue.issue_url, "http://issue/issueId")
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_adding_comment_to_issue(self, update_issue_mock):
+    """Test not adding comment to issue when issue tracker disabled."""
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=False,
+        issue_tracked_obj=factories.IssueFactory()
+    )
+    comment = factories.CommentFactory(description="test comment")
+
+    with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
+      self.api.post(all_models.Relationship, {
+          "relationship": {
+              "source": {"id": iti.issue_tracked_obj.id, "type": "Issue"},
+              "destination": {"id": comment.id, "type": "comment"},
+              "context": None
+          },
+      })
+    update_issue_mock.assert_not_called()

@@ -8,11 +8,12 @@
 import itertools
 
 from ggrc import settings
+from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import handlers_mapping
 from ggrc.services import signals
 
 
-def create_object_handler(sender, objects=None, **kwargs):
+def handle_object_creation_event(sender, objects=None, **kwargs):
   """Common handler for 'collection_posted' event.
   Args:
       sender: A class of Resource handling the POST request.
@@ -30,7 +31,7 @@ def create_object_handler(sender, objects=None, **kwargs):
                                                           issue_tracker_info)
 
 
-def delete_object_handler(sender, obj=None, **kwargs):
+def handle_object_deletion_event(sender, obj=None, **kwargs):
   """Common handler for 'model_deleted' event.
   Args:
       sender: A class of Resource handling the DELETE request.
@@ -43,7 +44,8 @@ def delete_object_handler(sender, obj=None, **kwargs):
   object_handlers[handlers_mapping.DELETE_HANDLER_NAME](obj)
 
 
-def update_object_handler(sender, obj=None, initial_state=None, **kwargs):
+def handle_object_updating_event(sender, obj=None, initial_state=None,
+                                 **kwargs):
   """Common handler for 'model_put' event.
   Args:
       sender: A class of Resource handling the PUT request.
@@ -59,24 +61,48 @@ def update_object_handler(sender, obj=None, initial_state=None, **kwargs):
                                                         issue_tracker)
 
 
+def handle_comment_creation_event(sender, objects=None, **kwargs):
+  """Common handler for adding comment."""
+  if not settings.ISSUE_TRACKER_ENABLED:
+    return
+
+  for obj in objects:
+    comment, other = obj.source, obj.destination
+    if comment.type != u"Comment":
+      comment, other = other, comment
+
+    for model, handlers in handlers_mapping.ISSUE_TRACKER_HANDLERS.items():
+      if model.__name__ == other.type:
+        if handlers_mapping.CREATE_COMMENT_HANDLER_NAME in handlers:
+          handlers[handlers_mapping.CREATE_COMMENT_HANDLER_NAME](
+              other, comment, obj.modified_by.name
+          )
+
+
 def init_hook():
   """Initialize common handlers for all models from handlers dict."""
   issue_tracker_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS
   for model, model_handlers in issue_tracker_handlers.iteritems():
     if handlers_mapping.CREATE_HANDLER_NAME in model_handlers:
       signals.Restful.collection_posted.connect(
-          create_object_handler,
+          handle_object_creation_event,
           sender=model
       )
 
     if handlers_mapping.DELETE_HANDLER_NAME in model_handlers:
       signals.Restful.model_deleted.connect(
-          delete_object_handler,
+          handle_object_deletion_event,
           sender=model
       )
 
     if handlers_mapping.UPDATE_HANDLER_NAME in model_handlers:
       signals.Restful.model_put_before_commit.connect(
-          update_object_handler,
+          handle_object_updating_event,
           sender=model
+      )
+
+    if handlers_mapping.CREATE_COMMENT_HANDLER_NAME in model_handlers:
+      signals.Restful.collection_posted.connect(
+          handle_comment_creation_event,
+          sender=all_models.Relationship
       )

@@ -158,3 +158,27 @@ def update_issue_handler(obj, initial_state, new_issue_tracker_info=None):
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issuetracker_issue_params
     )
+
+
+def create_comment_handler(sync_object, comment, author):
+  """Event handler for adding comment to Issue object."""
+  issue_tracker_object = all_models.IssuetrackerIssue.get_issue("Issue",
+                                                                sync_object.id)
+
+  if not issue_tracker_object or not issue_tracker_object.enabled:
+    return
+
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  params = builder.build_params_for_comment(
+      sync_object,
+      comment.description,
+      author
+  )
+  query = params.get_issue_tracker_params()
+
+  try:
+    issues.Client().update_issue(issue_tracker_object.issue_id, query)
+  except integrations_errors.Error as error:
+    logger.error("Unable to add comment to ticket issue ID=%d: %s",
+                 issue_tracker_object.issue_id, error)
+    sync_object.add_warning("Unable to update a ticket in issue tracker.")

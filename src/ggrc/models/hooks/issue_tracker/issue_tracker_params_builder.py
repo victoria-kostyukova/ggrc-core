@@ -25,23 +25,23 @@ class BaseIssueTrackerParamsBuilder(object):
   """
 
   INITIAL_COMMENT_TMPL = (
-      "This bug was auto-generated to track a GGRC {model}. "
+      u"This bug was auto-generated to track a GGRC {model}. "
       "Use the following link to find the {model} - {link}."
   )
 
   DISABLE_TMPL = (
-      "GGRC object has been deleted. GGRC changes will "
+      u"GGRC object has been deleted. GGRC changes will "
       "no longer be tracked within this bug."
   )
 
   ENABLE_TMPL = (
-      "Changes to this GGRC object will be tracked within this bug."
+      u"Changes to this GGRC object will be tracked within this bug."
   )
 
   COMMENT_TMPL = (
-      "A new comment is added by {author} to the {model}: {comment}. "
+      u"A new comment is added by '{author}' to the '{model}': '{comment}'.\n"
       "Use the following to link to get more information from the "
-      "GGRC {model}. Link - {link}"
+      "GGRC '{model}'. Link - {link}"
   )
 
   ISSUE_TRACKER_INFO_FIELDS_TO_CHECK = (
@@ -160,6 +160,17 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     """Build delete issue query for issue tracker."""
     self.params.add_comment(self.DISABLE_TMPL.format(model="Issue"))
 
+    return self.params
+
+  def build_params_for_comment(self, sync_obj, comment, author):
+    """Build query to Issue tracker for adding comment to issue."""
+    comment = html2text.HTML2Text().handle(comment).strip("\n")
+    self.params.add_comment(self.COMMENT_TMPL.format(
+        author=author,
+        comment=comment,
+        model=sync_obj.__class__.__name__,
+        link=self.get_ggrc_object_url(sync_obj),
+    ))
     return self.params
 
   def _handle_people_emails(self, obj, allowed_emails):

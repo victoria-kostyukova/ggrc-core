@@ -10,6 +10,7 @@ from ggrc.models.hooks.issue_tracker import issue_integration
 CREATE_HANDLER_NAME = "create"
 DELETE_HANDLER_NAME = "delete"
 UPDATE_HANDLER_NAME = "update"
+CREATE_COMMENT_HANDLER_NAME = "create_comment"
 
 
 ISSUE_TRACKER_HANDLERS = {
@@ -17,5 +18,6 @@ ISSUE_TRACKER_HANDLERS = {
         CREATE_HANDLER_NAME: issue_integration.create_issue_handler,
         DELETE_HANDLER_NAME: issue_integration.delete_issue_handler,
         UPDATE_HANDLER_NAME: issue_integration.update_issue_handler,
+        CREATE_COMMENT_HANDLER_NAME: issue_integration.create_comment_handler,
     }
 }
