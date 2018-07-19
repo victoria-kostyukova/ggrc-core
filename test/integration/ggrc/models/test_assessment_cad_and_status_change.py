@@ -3,6 +3,8 @@
 
 """Integration tests for Assessment cad and status change."""
 
+from collections import OrderedDict
+
 from ggrc.models import all_models
 
 from integration import ggrc
@@ -71,3 +73,17 @@ class TestAssessmentComplete(ggrc.TestCase):
     asmt = all_models.Assessment.query.get(asmt_id)
     self.assertEqual(asmt.status, "In Progress")
     self.assertEqual(len(asmt.custom_attribute_values), 0)
+
+  def test_cad_service_import(self):
+    """Test double insert by /_service/import_csv"""
+    cav = factories.CustomAttributeValueFactory(
+        custom_attribute=self.cad,
+        attributable=self.asmt,
+        attribute_value="Text",
+    )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", self.asmt.slug),
+        (self.cad.title, cav.attribute_value)
+    ]))
+    self.assertItemsEqual(response[0]['row_errors'], [])
