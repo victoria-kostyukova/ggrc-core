@@ -53,7 +53,7 @@ export default can.Model.Cacheable('CMS.Models.Issue', {
     display_attr_names: ['title', 'Admin', 'status', 'updated_at'],
   },
   sub_tree_view_options: {
-    default_filter: ['Control', 'Control_versions'],
+    default_filter: ['Control', 'Control_version'],
   },
   defaults: {
     status: 'Draft',

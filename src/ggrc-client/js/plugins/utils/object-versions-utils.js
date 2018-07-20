@@ -52,7 +52,7 @@ function _getObjectVersionConfig(modelName, forceBuildFromOriginal) {
 
   return {
     originalModelName: modelName,
-    widgetId: modelName + '_versions',
+    widgetId: modelName + '_version',
     widgetName: CMS.Models[modelName].title_plural +
       ' Versions',
   };

@@ -61,7 +61,7 @@
   // Items allowed for mapping via snapshot.
   let snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
   let objectVersions = _.map(snapshotWidgetsConfig, function (obj) {
-    return obj + '_versions';
+    return obj + '_version';
   });
 
   // Items allowed for relationship mapping
@@ -84,7 +84,7 @@
 
   let objectVersionWidgets = {};
   snapshotWidgetsConfig.forEach(function (model) {
-    objectVersionWidgets[model + '_versions'] = [model];
+    objectVersionWidgets[model + '_version'] = [model];
   });
 
   baseWidgetsByType = {

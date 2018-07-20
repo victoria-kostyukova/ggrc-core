@@ -105,6 +105,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
     */
     make_tree_view: function (instance, farModel, extenders, id) {
       let descriptor;
+      let widgetId;
       let objectVersionConfig = getWidgetConfig(id);
       // Should not even try to create descriptor if configuration options are missing
       if (!instance || !farModel) {
@@ -112,9 +113,12 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
           .debug('Arguments are missing or have incorrect format', arguments);
         return null;
       }
-      let widgetId = objectVersionConfig.isObjectVersion ?
-        objectVersionConfig.widgetId :
-        farModel.table_singular;
+      if (objectVersionConfig.isObjectVersion) {
+        let originalModelName = objectVersionConfig.widgetId.split('_')[0];
+        widgetId = CMS.Models[originalModelName].table_singular + '_version';
+      } else {
+        widgetId = farModel.table_singular;
+      }
       descriptor = {
         widgetType: 'treeview',
         treeViewDepth: 2,
