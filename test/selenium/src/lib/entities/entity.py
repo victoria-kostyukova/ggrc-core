@@ -167,7 +167,7 @@ class Representation(object):
                 unicode(attr_value.get("title")) if
                 attr_name != "custom_attribute_definitions" else
                 {attr_value.get("id"): attr_value.get("title")} if
-                attr_value.get("title") != "Type" else
+                attr_value.get("definition_id") else
                 {attr_value.get("id"): attr_value.get("title").upper()}
             )
           if attr_name in ["custom_attribute_values"]:
