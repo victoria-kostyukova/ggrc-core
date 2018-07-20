@@ -336,3 +336,30 @@ class TestACLImportExport(TestCase):
         resource_type="AccessControlList"
     ).count()
     self.assertEqual(acl_revisions, 4)
+
+  def test_acl_roles_clear(self):
+    """Test clearing ACL roles for Program with '--' value"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      for role in ["Program Editors", "Program Editors", "Program Readers"]:
+        person = factories.PersonFactory()
+        ac_role = models.all_models.AccessControlRole.query.filter_by(
+            object_type=program.type,
+            name=role,
+        ).first()
+        factories.AccessControlListFactory(
+            ac_role=ac_role,
+            object=program,
+            person=person,
+        )
+
+    for role in {"Program Editors", "Program Readers"}:
+      response = self.import_data(OrderedDict([
+          ("object_type", program.type),
+          ("code", program.slug),
+          (role, "--"),
+      ]))
+      self._check_csv_response(response, {})
+      program = models.all_models.Program.query.first()
+      for acl in program.access_control_list:
+        self.assertNotEqual(acl.ac_role.name, role)
