@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '26488ecb342a'
-down_revision = '0e40a37a05f4'
+down_revision = '0e385718442a'
 
 
 def create_acl_temporary_table():
