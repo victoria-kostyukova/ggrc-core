@@ -11,7 +11,8 @@ from lib.constants import (
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
-from lib.page.widget.page_mixins import WithAssignFolder, WithObjectReview, WithPageElements
+from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
+                                         WithPageElements)
 from lib.utils import selenium_utils, string_utils, help_utils
 
 
@@ -49,7 +50,8 @@ class InfoWidget(WithPageElements, base.Widget):
     self._extend_list_all_scopes(
         ["TITLE", self.state_lbl_txt],
         [self.title.text, self.state_txt])
-    self.info_3bbs_btn = self._browser.element(class_name="btn-3bbps")
+    self.info_3bbs_btn = self._browser.element(
+        xpath=self._locators.BUTTON_3BBS_XPATH)
     self.inline_edit_controls = self._browser.elements(
         class_name="set-editable-group")
     # for Info Page

@@ -417,11 +417,12 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_description-label_9cc51ca3"]')
   UI_DESCRIPTION = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_description-text_9cc51ca3"] iframe')
+      '[data-test-id="control_description-text_9cc51ca3"] .ql-editor')
   TEST_PLAN = (
       By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] label')
   UI_TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] iframe')
+      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] '
+                       '.ql-editor')
   NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
   KIND_OR_NATURE = (
       By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
@@ -459,7 +460,7 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] label')
   DROPDOWN_STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
-  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
+  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] .ql-editor')
   UI_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
@@ -710,7 +711,8 @@ class CommonWidgetInfo(object):
       By.CSS_SELECTOR, _PEOPLE_ITEM + " editable-people-group-header")
   PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
   # user input elements
-  BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
+  BUTTON_3BBS_XPATH = _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']"
+  BUTTON_3BBS = (By.XPATH, BUTTON_3BBS_XPATH)
   # controllers
   TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
 

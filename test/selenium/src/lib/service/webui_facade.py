@@ -32,7 +32,7 @@ def assert_can_view(selenium, obj):
   obj_copy = copy.deepcopy(obj)
   # Code for working with custom attributes appeares to be buggy
   base.Test.general_equal_assert(
-      obj_copy.repr_ui(), actual_obj, "custom_attributes")
+      obj_copy.repr_ui(), actual_obj, "custom_attributes", "program")
 
 
 def assert_cannot_view(selenium, obj):
