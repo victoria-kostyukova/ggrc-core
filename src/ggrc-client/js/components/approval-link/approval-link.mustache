@@ -22,13 +22,14 @@
         {{/if_equals}}
 
         <div {{#reviewTask}}{{data 'model'}}{{/reviewTask}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model")}) }}>
-          <button class="btn btn-mini btn-green change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
+          <button class="btn btn-mini btn-green change-task-status"
             ($click)="onApprove()"
+            {{#if disabled}}disabled{{/if}}
           >
             Approve
           </button>
-          <a href="javascript://"
-            class="undoable btn btn-mini btn-red change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
+          <button href="javascript://"
+            class="undoable btn btn-mini btn-red change-task-status"
             data-toggle="modal-ajax-form"
             data-object-singular="CycleTaskEntry"
             data-object-params='{
@@ -41,17 +42,19 @@
             data-modal-reset="reset"
             data-modal-class="modal-wide"
             data-modal-title-override="Decline Review"
-            data-original-title="Decline Review">
+            data-original-title="Decline Review"
+            {{#if disabled}}disabled{{/if}}
+          >
             Decline
-          </a>
+          </button>
           <small><em>Approval applies only to this object and not to mapped objects.</em></small>
           {{#current_user_is_admin}}
             <p>
               If you wish to change the current reviewer, please click
               <a href="{{instance.viewLink}}#!task"
-                  class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">
-                    here
-                </a>
+                {{#if disabled}}class="disabled"{{/if}}>
+                here
+              </a>
               and change the assignee.
             </p>
           {{/current_user_is_admin}}

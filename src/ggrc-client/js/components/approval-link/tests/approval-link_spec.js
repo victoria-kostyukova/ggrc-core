@@ -95,6 +95,35 @@ describe('approval-link component', ()=> {
       });
     });
 
+    describe('disabled get()', () => {
+      describe('returns true', () => {
+        beforeEach(function () {
+          viewModel.attr({
+            isSaving: false,
+            instance: {
+              snapshot: null,
+              isRevision: false,
+            },
+          });
+        });
+
+        it('if isSaving flag is true', function () {
+          viewModel.attr('isSaving', true);
+          expect(viewModel.attr('disabled')).toBe(true);
+        });
+
+        it('if instance contains snapshot object', function () {
+          viewModel.attr('instance.snapshot', {});
+          expect(viewModel.attr('disabled')).toBe(true);
+        });
+
+        it('if instance has isRevision equal to true', function () {
+          viewModel.attr('instance.isRevision', true);
+          expect(viewModel.attr('disabled')).toBe(true);
+        });
+      });
+    });
+
     describe('loadReviewTask() method', () => {
       let requestDfd;
       let response;
