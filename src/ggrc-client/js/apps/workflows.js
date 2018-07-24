@@ -290,7 +290,6 @@ import Person from '../models/business-models/person';
     let pageInstance = getPageInstance();
     let treeWidgets = GGRC.tree_view.base_widgets_by_type;
     let subTrees = GGRC.tree_view.sub_tree_for;
-    let subTreeItems = ['Cycle'];
     let models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.forEach(_workflowObjectTypes, function (type) {
@@ -315,19 +314,15 @@ import Person from '../models/business-models/person';
         });
       }
     });
-    subTreeItems.concat(models).forEach(function (item) {
-      let defaults = {
-        model_list: GGRC.tree_view.basic_model_list,
-        display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type),
-      };
-      defaults.display_list.concat(models);
 
-      treeWidgets.attr(item,
-        can.Map.keys(GGRC.tree_view.base_widgets_by_type).concat(models));
+    const subTreeItems = ['Cycle'].concat(models);
+    const updatedTreeWidgets = can.Map.keys(treeWidgets).concat(models);
+
+    subTreeItems.forEach((item) => {
+      treeWidgets.attr(item, updatedTreeWidgets);
       subTrees.attr(item, {
-        display_list: defaults.display_list
-          .concat(models),
-        model_list: defaults.model_list,
+        display_list: updatedTreeWidgets,
+        model_list: GGRC.tree_view.basic_model_list,
       });
     });
 
