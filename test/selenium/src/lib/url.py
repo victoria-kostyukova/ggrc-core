@@ -86,7 +86,7 @@ class Utils(object):
     widget will be snapshots' versions.
     """
     middle_part = (get_singular(obj_name) if not is_versions_widget else
-                   get_singular(obj_name, title=True) + "_versions")
+                   get_singular(obj_name) + "_version")
     return "#!" + middle_part
 
   @staticmethod
