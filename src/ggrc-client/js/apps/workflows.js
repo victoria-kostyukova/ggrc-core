@@ -147,13 +147,12 @@ import Person from '../models/business-models/person';
 
       CycleTaskGroupObjectTask: {
         _canonical: {
-          related_objects_as_source: [
-            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-            'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
-            'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-            'Requirement', 'Clause', 'Objective', 'Audit', 'AccessGroup',
-            'Metric', 'Risk', 'TechnologyEnvironment', 'Threat',
-          ],
+          // It is needed for an object list generation. This object list
+          // describes which objects can be mapped to CycleTaskGroupObjectTask.
+          // Types placed within this collection will be intersected
+          // with GGRC.tree_view.base_widgets_by_type["CycleTaskGroupObjectTask"]
+          // collection. The result of the operation is the total list.
+          related_objects_as_source: _workflowObjectTypes.concat('Audit'),
         },
         related_objects_as_source: Proxy(
           null,
