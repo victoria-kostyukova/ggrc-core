@@ -38,8 +38,6 @@ import Person from '../models/business-models/person';
     'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
   );
 
-  let draftOnUpdateMixin;
-
   let historyWidgetCountsName = 'cycles:history';
   let currentWidgetCountsName = 'cycles:active';
 
@@ -527,20 +525,4 @@ import Person from '../models/business-models/person';
     'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   WorkflowExtension.init_mappings();
-
-  draftOnUpdateMixin = can.Model.Mixin({
-  }, {
-    before_update: function () {
-      if (this.status && this.os_state === 'Approved') {
-        this.attr('status', 'Draft');
-      }
-    },
-  });
-  can.each(_workflowObjectTypes, function (modelName) {
-    let model = CMS.Models[modelName];
-    if (model === undefined || model === null) {
-      return;
-    }
-    draftOnUpdateMixin.add_to(model);
-  });
 })(window.can.$, window.CMS, window.GGRC);

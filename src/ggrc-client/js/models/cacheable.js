@@ -1075,10 +1075,6 @@ export default can.Model('can.Model.Cacheable', {
       if (this.before_create) {
         this.before_create(preSaveNotifier);
       }
-    } else {
-      if (this.before_update) {
-        this.before_update(preSaveNotifier);
-      }
     }
 
     preSaveNotifier.on_empty(function () {
