@@ -33,7 +33,7 @@ import Person from '../models/business-models/person';
   let _workflowObjectTypes = Array.prototype.concat.call(
     [],
     'Program Regulation Policy Standard Contract Clause Requirement'.split(' '),
-    'Request Control Objective OrgGroup Vendor AccessGroup'.split(' '),
+    'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
   );
