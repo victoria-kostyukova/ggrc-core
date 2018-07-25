@@ -23,11 +23,8 @@ export default can.Construct.extend('can.Model.Mixin', {
       parts = tempname.split('.');
       shortName = parts.pop();
       Constructor.fullName = tempname;
-    } else {
-      Constructor.fullName = shortName =
-        'Mixin_' + Math.floor(Math.random() * Math.pow(36, 8)).toString(36);
-      parts = [];
     }
+
     mixinName = 'CMS.Models.Mixins' + (parts.length ?
       '.' + parts.join('.') :
       '');
