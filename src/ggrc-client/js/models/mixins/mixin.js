@@ -4,31 +4,13 @@
 */
 
 export default can.Construct.extend('can.Model.Mixin', {
-  extend: function (fullName, klass, proto) {
-    let tempname;
-    let mixinName;
-    let parts;
-    let shortName;
-    let Constructor;
-
-    if (typeof fullName === 'string') {
-      // Mixins do not go into the global namespace.
-      tempname = fullName;
-      fullName = '';
-    }
-    Constructor = this._super(fullName, klass, proto);
+  extend(fullName, staticProps, proto) {
+    const Constructor = this._super(staticProps, proto);
 
     // instead mixins sit under CMS.Models.Mixins
-    if (tempname) {
-      parts = tempname.split('.');
-      shortName = parts.pop();
-      Constructor.fullName = tempname;
-    }
+    Constructor.fullName = fullName;
+    can.getObject('CMS.Models.Mixins', window, true)[fullName] = Constructor;
 
-    mixinName = 'CMS.Models.Mixins' + (parts.length ?
-      '.' + parts.join('.') :
-      '');
-    can.getObject(mixinName, window, true)[shortName] = Constructor;
     return Constructor;
   },
   newInstance: function () {
