@@ -5,15 +5,17 @@
 
 import Component from '../export';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import router from '../../../router';
+import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('export component', () => {
+  let viewModel;
+
+  beforeEach(function () {
+    viewModel = getComponentVM(Component);
+  });
+
   describe('getObjectsForExport() method', () => {
-    let viewModel;
-
-    beforeEach(function () {
-      viewModel = getComponentVM(Component);
-    });
-
     describe('if object type is not Snapshots', () => {
       it('returns object with empty expression if filters are empty', () => {
         const panelModel = new can.Map({
@@ -161,6 +163,59 @@ describe('export component', () => {
         viewModel.panels.push(panelModel);
 
         expect(viewModel.getObjectsForExport()).toEqual(expectedObjects);
+      });
+    });
+  });
+
+  describe('verifyTargetJob() method', () => {
+    beforeEach(() => {
+      let exportsMock = [
+        {
+          id: 101,
+          status: 'Finished',
+          title: 'Finished export',
+        },
+      ];
+      viewModel.attr('currentExports', exportsMock);
+      spyOn(ModalsUtils, 'confirm');
+    });
+
+    it('does not call confirm util if export exists', () => {
+      spyOn(router, 'attr').and.returnValue('101');
+
+      viewModel.verifyTargetJob();
+
+      expect(ModalsUtils.confirm).not.toHaveBeenCalled();
+    });
+
+    it('calls confirm util if export exists', () => {
+      spyOn(router, 'attr').and.returnValue('102');
+      viewModel.verifyTargetJob();
+
+      expect(ModalsUtils.confirm).toHaveBeenCalled();
+    });
+  });
+
+  describe('events', () => {
+    describe('"inserted" event', () => {
+      let event;
+      let exportsDfd;
+
+      beforeEach(() => {
+        event = Component.prototype.events['inserted'].bind({viewModel});
+
+        exportsDfd = can.Deferred();
+        spyOn(viewModel, 'getExports').and.returnValue(exportsDfd);
+      });
+
+      it('calls verifyTargetJob()', (done) => {
+        spyOn(viewModel, 'verifyTargetJob');
+
+        event();
+        exportsDfd.resolve();
+
+        expect(viewModel.verifyTargetJob).toHaveBeenCalled();
+        done();
       });
     });
   });
