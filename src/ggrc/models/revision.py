@@ -37,7 +37,10 @@ class Revision(base.ContextRBAC, Base, db.Model):
   def _extra_table_args(_):
     return (
         db.Index("revisions_modified_by", "modified_by_id"),
-        db.Index("fk_revisions_resource", "resource_type", "resource_id"),
+        db.Index("ix_revisions_resource_action",
+                 "resource_type",
+                 "resource_id",
+                 "action"),
         db.Index("fk_revisions_source", "source_type", "source_id"),
         db.Index("fk_revisions_destination",
                  "destination_type", "destination_id"),
