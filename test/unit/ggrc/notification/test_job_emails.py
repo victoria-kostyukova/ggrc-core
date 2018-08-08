@@ -29,8 +29,8 @@ class TestJobEmails(unittest.TestCase):
     cls.subject = "title"
 
   @ddt.data(
-      (42, "export#!job_id=42"),
-      (561, "export#!job_id=561"),
+      (42, "export#!&job_id=42"),
+      (561, "export#!&job_id=561"),
       (None, "export")
   )
   @ddt.unpack
