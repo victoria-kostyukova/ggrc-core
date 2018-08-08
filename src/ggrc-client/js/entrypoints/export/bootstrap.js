@@ -5,8 +5,11 @@
 
 import {initWidgets} from '../../plugins/utils/current-page-utils';
 import {gapiClient} from '../../plugins/ggrc-gapi-client';
+import {RouterConfig} from '../../router';
 
 gapiClient.loadGapiClient();
+
+RouterConfig.setupRoutes([]);
 
 $('#csv_export')
   .html(can.view.mustache('<csv-export filename="Export Objects"/>'));
