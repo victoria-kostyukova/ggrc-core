@@ -22,7 +22,7 @@ class OrgGroup(Roleable,
                mixins.TestPlanned,
                PublicDocumentable,
                mixins.base.ContextRBAC,
-               mixins.BusinessObject,
+               mixins.ScopeObject,
                mixins.Folderable,
                Indexed,
                db.Model):

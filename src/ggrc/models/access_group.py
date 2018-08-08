@@ -25,7 +25,7 @@ class AccessGroup(Roleable,
                   mixins.TestPlanned,
                   mixins.LastDeprecatedTimeboxed,
                   base.ContextRBAC,
-                  mixins.BusinessObject,
+                  mixins.ScopeObject,
                   mixins.Folderable,
                   Indexed,
                   db.Model):

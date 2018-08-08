@@ -30,7 +30,7 @@ class SystemOrProcess(track_object_state.HasObjectState,
                       mixins.TestPlanned,
                       mixins.LastDeprecatedTimeboxed,
                       mixins.base.ContextRBAC,
-                      mixins.BusinessObject,
+                      mixins.ScopeObject,
                       mixins.Folderable,
                       db.Model):
   # Override model_inflector

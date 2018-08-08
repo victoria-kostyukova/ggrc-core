@@ -63,7 +63,7 @@ Person,Name,Email*,Company,Role,map:clause,map:contract,map:control,map:objectiv
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,
-Access Group,code*,title*,description,admin,verifier,assignee,state,map:program,,,,,,,
+Access Group,code*,title*,description,admin,verifier,assignee,Launch Status,map:program,,,,,,,
 ,ag-1,ag-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,PMRBACPROGRAM-1,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -92,7 +92,7 @@ Contract,code*,title*,description,admin,state,map:program,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,
-Data Asset,code*,title*,description,admin,verifier,assignee,state,map:program,,,,,,,
+Data Asset,code*,title*,description,admin,verifier,assignee,Launch Status,map:program,,,,,,,
 ,da-1,da-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,PMRBACPROGRAM-1,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -108,7 +108,7 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,,,MM/DD/YYYY,,,,
-Facility,code*,title*,description,admin,verifier,assignee,state,notes,reference url,effective date,map:program,,,,
+Facility,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,effective date,map:program,,,,
 ,fac-1,fac-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,google.com,7/1/2015,PMRBACPROGRAM-1,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -124,7 +124,7 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,,,MM/DD/YYYY,,,,
-Market,code*,title*,description,admin,verifier,assignee,state,notes,reference url,effective date,map:program,,,,
+Market,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,effective date,map:program,,,,
 ,mkt-1,mkt-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,google.com,7/1/2015,PMRBACPROGRAM-1,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -156,7 +156,7 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,,,,,,,
-OrgGroup,code*,title*,description,admin,verifier,assignee,state,notes,reference url,map:program,,,,,
+OrgGroup,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,map:program,,,,,
 ,orggroup-1,orggroup-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,ggrc.com,PMRBACPROGRAM-1,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -199,7 +199,7 @@ Corp
 Service
 Core
 3rd Party",,,
-Process,code*,title*,description,admin,verifier,assignee,state,notes,reference url,effective date,network zone,map:program,,,
+Process,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,effective date,network zone,map:program,,,
 ,proc-1,proc-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,google.com,7/1/2015,prod,PMRBACPROGRAM-1,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -217,7 +217,7 @@ Deprecated",,,,MM/DD/YYYY,"Options are:
 Saas
 Desktop Software
 Appliance",,,
-Product,code*,title*,description,admin,verifier,assignee,state,notes,reference url,effective date,Kind/Type,map:program,,,
+Product,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,effective date,Kind/Type,map:program,,,
 ,prod-1,prod-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,google.com,7/1/2015,Saas,PMRBACPROGRAM-1,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -285,7 +285,7 @@ Corp
 Service
 Core
 3rd Party",,,
-System,code*,title*,description,admin,verifier,assignee,state,notes,reference url,effective date,network zone,map:program,,,
+System,code*,title*,description,admin,verifier,assignee,Launch Status,notes,reference url,effective date,network zone,map:program,,,
 ,sys-1,sys-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,google.com,7/1/2015,prod,PMRBACPROGRAM-1,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
@@ -301,7 +301,7 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",,MM/DD/YYYY,,,,,,
-Vendor,code*,title*,description,admin,verifier,assignee,state,notes,effective date,reference url,map:program,,,,
+Vendor,code*,title*,description,admin,verifier,assignee,Launch Status,notes,effective date,reference url,map:program,,,,
 ,ven-1,ven-1 EDIT,test,user@example.com,user@example.com,user@example.com,Draft,this is a note,7/1/2015,google.com,PMRBACPROGRAM-1,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,

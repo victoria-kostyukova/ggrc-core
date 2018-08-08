@@ -30,7 +30,7 @@ class Product(Roleable,
               ScopedCommentable,
               mixins.TestPlanned,
               mixins.base.ContextRBAC,
-              mixins.BusinessObject,
+              mixins.ScopeObject,
               mixins.Folderable,
               Indexed,
               db.Model):

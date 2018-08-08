@@ -24,7 +24,7 @@ class DataAsset(Roleable,
                 mixins.LastDeprecatedTimeboxed,
                 mixins.base.ContextRBAC,
                 mixins.Folderable,
-                mixins.BusinessObject,
+                mixins.ScopeObject,
                 Indexed,
                 db.Model):
   """Class representing DataAsset."""

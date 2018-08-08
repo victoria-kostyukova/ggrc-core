@@ -671,6 +671,22 @@ class BusinessObject(Stateful, Noted, Described, Titled, Slugged):
   }
 
 
+class ScopeObject(BusinessObject):
+  """Mixin that re-name status attribute"""
+
+  _fulltext_attrs = [
+      attributes.FullTextAttr("Launch Status", "status")
+  ]
+  _aliases = {
+      "status": {
+          "display_name": "Launch Status",
+          "mandatory": False,
+          "description": "Options are:\n{}".format(
+              "\n".join(BusinessObject.VALID_STATES)
+          )
+      }
+  }
+
 # This class is just a marker interface/mixin to indicate that a model type
 # supports custom attributes.
 

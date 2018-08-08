@@ -24,7 +24,7 @@ class TechnologyEnvironment(mixins.CustomAttributable,
                             mixins.TestPlanned,
                             mixins.LastDeprecatedTimeboxed,
                             mixins.base.ContextRBAC,
-                            mixins.BusinessObject,
+                            mixins.ScopeObject,
                             mixins.Folderable,
                             db.Model,
                             Indexed):

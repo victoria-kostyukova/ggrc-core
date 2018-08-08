@@ -7,6 +7,7 @@ from copy import deepcopy
 import ddt
 
 from ggrc import converters
+from ggrc.models import mixins
 from ggrc.models import all_models
 from ggrc.access_control import roleable
 from ggrc.converters import column_handlers
@@ -719,7 +720,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Network Zone",
         "Effective Date",
         "Last Deprecated Date",
-        "State",
+        "Launch Status",
         "Review State",
         "Delete",
         "Compliance Contacts",
@@ -752,7 +753,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Network Zone",
         "Effective Date",
         "Last Deprecated Date",
-        "State",
+        "Launch Status",
         "Review State",
         "Delete",
         "Compliance Contacts",
@@ -785,7 +786,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Kind/Type",
         "Effective Date",
         "Last Deprecated Date",
-        "State",
+        "Launch Status",
         "Review State",
         "Delete",
         "Compliance Contacts",
@@ -862,7 +863,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Effective Date",
         "Last Deprecated Date",
-        "State",
+        "Launch Status",
         "Review State",
         "Delete",
         "Compliance Contacts",
@@ -936,7 +937,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Effective Date",
         "Last Deprecated Date",
-        "State",
+        ("Launch Status" if issubclass(model, mixins.ScopeObject)
+         else "State"),
         "Review State",
         "Delete",
         "Compliance Contacts",

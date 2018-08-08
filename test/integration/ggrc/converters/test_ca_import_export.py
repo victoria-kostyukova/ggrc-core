@@ -173,27 +173,35 @@ class TestCustomAttributeImportExport(TestCase):
     This tests relys on the import tests to work. If those fail they need to be
     fixied before this one.
     """
-    # TODO: check response data explicitly
     self.import_file("custom_attribute_tests.csv", safe=False)
 
-    data = {
-        "export_to": "csv",
-        "objects": [{
-            "object_name": "Product",
-            "filters": {
-                "expression": {},
-            },
-            "fields": "all",
-        }]
+    data = [{
+        "object_name": "Product",
+        "fields": "all",
+        "filters": {
+            "expression": {}
+        }
+    }]
+    expected_custom_attributes = {
+        "normal text",
+        "man text*",
+        "normal RT",
+        "man RT*",
+        "normal Date",
+        "man Date*",
+        "normal CH",
+        "man CH*",
+        "normal select",
+        "man select*",
+        "normal person",
+        "man person*",
     }
-    response = self.client.post("/_service/export_csv", data=dumps(data),
-                                headers=self.headers)
-
-    self.assert200(response)
-    self.assertEqual(len(response.data.splitlines()), 33)
-    self.assertIn("\"Accepted values are", response.data)
-    self.assertIn("number.\n\nAccepted values are", response.data)
-    self.assertIn("Birthday", response.data)
+    result = self.export_parsed_csv(data)["Product"]
+    self.assertEqual(len(result), 17)
+    for res in result:
+      self.assertTrue(
+          expected_custom_attributes.issubset(set(res.iterkeys()))
+      )
 
   def tests_ca_export_filters(self):
     """Test filtering on custom attribute values."""

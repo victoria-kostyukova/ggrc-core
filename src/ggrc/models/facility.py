@@ -22,7 +22,7 @@ class Facility(Roleable,
                mixins.TestPlanned,
                mixins.LastDeprecatedTimeboxed,
                mixins.base.ContextRBAC,
-               mixins.BusinessObject,
+               mixins.ScopeObject,
                mixins.Folderable,
                Indexed,
                db.Model):
