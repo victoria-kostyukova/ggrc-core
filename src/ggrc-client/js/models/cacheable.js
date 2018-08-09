@@ -110,11 +110,6 @@ export default can.Model('can.Model.Cacheable', {
       order: 30,
     },
     {
-      attr_title: 'State',
-      attr_name: 'status',
-      order: 40,
-    },
-    {
       attr_title: 'Last Updated Date',
       attr_name: 'updated_at',
       order: 70,
