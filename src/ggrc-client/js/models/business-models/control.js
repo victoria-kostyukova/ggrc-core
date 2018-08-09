@@ -63,6 +63,10 @@ export default Cacheable('CMS.Models.Control', {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
+        attr_title: 'State',
+        attr_name: 'status',
+        order: 40,
+      }, {
         attr_title: 'Kind/Nature',
         attr_name: 'kind',
         attr_sort_field: 'kind',

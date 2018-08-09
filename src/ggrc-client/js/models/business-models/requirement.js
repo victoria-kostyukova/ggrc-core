@@ -45,6 +45,10 @@ export default Cacheable('CMS.Models.Requirement', {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'last_deprecated_date'},
       {
+        attr_title: 'State',
+        attr_name: 'status',
+        order: 40,
+      }, {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,

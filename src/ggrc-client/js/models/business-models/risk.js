@@ -41,6 +41,10 @@ export default Cacheable('CMS.Models.Risk', {
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
+        attr_title: 'State',
+        attr_name: 'status',
+        order: 40,
+      }, {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,
@@ -71,4 +75,3 @@ export default Cacheable('CMS.Models.Risk', {
     }.bind(this));
   },
 }, {});
-
