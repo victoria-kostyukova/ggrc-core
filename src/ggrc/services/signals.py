@@ -3,32 +3,10 @@
 
 """Module for general purpose signaling"""
 
-
 from blinker import Namespace
 
 
 # pylint: disable=too-few-public-methods
-class Signals(object):
-  """Class storing various general purpose signals
-
-  Class storing various general purpose non-RESTful signals.
-  """
-  # pylint: disable=too-few-public-methods
-  signals = Namespace()
-
-  custom_attribute_changed = signals.signal(
-      "Custom Attribute updated",
-      """
-      Indicates that a custom attribute was successfully saved to database.
-
-        :obj: The model instance
-        :value: New custom attribute value
-        :service: The instance of model handling the Custom Attribute update
-          operation
-      """,
-  )
-
-
 class Restful(object):
   """Class storing REST-related signals."""
 

@@ -311,7 +311,6 @@ class CustomAttributable(object):
     """
     # pylint: disable=too-many-locals
     from ggrc.models.custom_attribute_value import CustomAttributeValue
-    from ggrc.services import signals
 
     ca_values = src.get("custom_attribute_values")
     if ca_values and "attribute_value" in ca_values[0]:
@@ -330,7 +329,6 @@ class CustomAttributable(object):
       return
 
     old_values = collections.defaultdict(list)
-    last_values = dict()
 
     # attributes looks like this:
     #    [ {<id of attribute definition> : attribute value, ... }, ... ]
@@ -347,10 +345,6 @@ class CustomAttributable(object):
     for value in attr_values:
       old_values[value.custom_attribute_id].append(
           (value.created_at, value.attribute_value))
-
-    last_values = {str(key): max(old_vals,
-                                 key=lambda (created_at, _): created_at)
-                   for key, old_vals in old_values.iteritems()}
 
     self._remove_existing_items(attr_values)
 
@@ -382,29 +376,6 @@ class CustomAttributable(object):
 
       # new value is appended to self.custom_attribute_values by the ORM
       # self.custom_attribute_values.append(new_value)
-      if ad_id in last_values:
-        _, previous_value = last_values[ad_id]
-        if previous_value != attributes[ad_id]:
-          signals.Signals.custom_attribute_changed.send(
-              self.__class__,
-              obj=self,
-              src={
-                  "type": obj_type,
-                  "id": obj_id,
-                  "operation": "UPDATE",
-                  "value": new_value,
-                  "old": previous_value
-              }, service=self.__class__.__name__)
-      else:
-        signals.Signals.custom_attribute_changed.send(
-            self.__class__,
-            obj=self,
-            src={
-                "type": obj_type,
-                "id": obj_id,
-                "operation": "INSERT",
-                "value": new_value,
-            }, service=self.__class__.__name__)
 
   @classmethod
   def get_custom_attribute_definitions(cls, field_names=None):
