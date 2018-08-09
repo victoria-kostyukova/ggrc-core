@@ -15,7 +15,6 @@ def get_shared_unique_rules():
 
   shared_tables = [
       (all_models.System, all_models.Process),
-      (all_models.Requirement, all_models.Clause),
       (all_models.Policy, all_models.Regulation,
        all_models.Standard, all_models.Contract),
   ]
@@ -35,7 +34,6 @@ GGRC_IMPORTABLE = {
     "assessment": all_models.Assessment,
     "assessment_template": all_models.AssessmentTemplate,
     "audit": all_models.Audit,
-    "clause": all_models.Clause,
     "contract": all_models.Contract,
     "control assessment": all_models.Assessment,
     "control": all_models.Control,

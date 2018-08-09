@@ -170,7 +170,6 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.Policy.__name__,
       all_models.Standard.__name__,
       all_models.Contract.__name__,
-      all_models.Clause.__name__,
       all_models.Requirement.__name__,
       all_models.Control.__name__,
       all_models.Objective.__name__,

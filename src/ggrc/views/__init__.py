@@ -603,7 +603,6 @@ def contributed_object_views():
       object_view(models.Assessment),
       object_view(models.AssessmentTemplate),
       object_view(models.Audit),
-      object_view(models.Clause),
       object_view(models.Contract),
       object_view(models.Control),
       object_view(models.DataAsset),

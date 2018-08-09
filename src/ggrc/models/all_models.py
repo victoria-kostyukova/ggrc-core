@@ -23,7 +23,6 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.background_task import BackgroundTask
 from ggrc.models.categorization import Categorization
 from ggrc.models.category import CategoryBase
-from ggrc.models.clause import Clause
 from ggrc.models.comment import Comment
 from ggrc.models.context import Context
 from ggrc.models.control import Control
@@ -126,7 +125,6 @@ all_models = [  # pylint: disable=invalid-name
     Proposal,
     Relationship,
     Requirement,
-    Clause,
     SystemOrProcess,
     System,
     Process,

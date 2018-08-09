@@ -317,7 +317,6 @@ class Revision(base.ContextRBAC, Base, db.Model):
     pop_models = {
         # ggrc
         "AccessGroup",
-        "Clause",
         "Control",
         "DataAsset",
         "Directive",
@@ -461,7 +460,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
     updated where necessary
     """
     # change to add Requirement old names
-    requirement_type = ["Section", ]
+    requirement_type = ["Section", "Clause"]
     # change to add models and fields that can contain Requirement old names
     affected_models = {
         "AccessControlList": ["object_type", ],
@@ -487,7 +486,7 @@ class Revision(base.ContextRBAC, Base, db.Model):
     special_cases = {
         "CustomAttributeDefinition": {
             "fields": ["definition_type", ],
-            "old_values": ["section", ],
+            "old_values": ["section", "clause"],
             "new_value": "requirement",
         }
     }

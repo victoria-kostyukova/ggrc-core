@@ -52,7 +52,6 @@ def all_cache_entries():
       resource('programs', 'Program'),
       resource('relationships', 'Relationship'),
       resource('requirements', 'Requirement'),
-      resource('clauses', 'Clause'),
       resource('systems_or_processes', 'SystemOrProcess'),
       resource('systems', 'System'),
       resource('processes', 'Process'),

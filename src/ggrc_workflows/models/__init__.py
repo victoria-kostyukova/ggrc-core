@@ -29,7 +29,7 @@ WORKFLOW_OBJECT_TYPES = {
     "Program", "Vendor", "OrgGroup",
     "Assessment",
     "Regulation", "Standard", "Policy", "Contract",
-    "Objective", "Control", "Requirement", "Clause",
+    "Objective", "Control", "Requirement",
     "System", "Process",
     "DataAsset", "Facility", "Market", "Product", "Project", "Issue",
     "AccessGroup", "Risk", "Threat",
