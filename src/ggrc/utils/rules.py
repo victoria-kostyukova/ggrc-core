@@ -147,7 +147,7 @@ def _all_rules():
   """
   from ggrc import snapshotter
 
-  all_models = {'AccessGroup', 'Clause', 'Contract', 'Control',
+  all_models = {'AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                 'Market', 'Objective', 'OrgGroup', 'Person',
                 'Policy', 'Process', 'Product', 'Program', 'Project',
@@ -159,7 +159,6 @@ def _all_rules():
 
   all_rules = {
       "AccessGroup": all_models - {'AccessGroup'},
-      "Clause": all_models - {'Clause'},
       "Contract": all_models - {'Policy', 'Regulation',
                                 'Contract', 'Standard'},
       "Control": all_models,

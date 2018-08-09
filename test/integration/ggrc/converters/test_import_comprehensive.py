@@ -96,7 +96,7 @@ class TestComprehensiveSheets(TestCase):
             "row_warnings": 4,
             "rows": 16,
         },
-        "Clause": {
+        "Requirement": {
             "created": 14,
             "ignored": 2,
             "row_errors": 3,

@@ -21,7 +21,6 @@ class TestSlugPrefix(unittest.TestCase):
       'Assessment': 'ASSESSMENT',
       'AssessmentTemplate': 'TEMPLATE',
       'Audit': 'AUDIT',
-      'Clause': 'CLAUSE',
       'Contract': 'CONTRACT',
       'Control': 'CONTROL',
       'Cycle': 'CYCLE',

@@ -24,7 +24,6 @@ class TestStatefulMixin(WithQueryApi, TestCase):
   @ddt.data(
       "AccessGroup",
       "Audit",
-      "Clause",
       "DataAsset",
       "Requirement",
       "Facility",
@@ -61,7 +60,6 @@ class TestStatefulMixin(WithQueryApi, TestCase):
   @ddt.data(
       "AccessGroup",
       "Audit",
-      "Clause",
       "DataAsset",
       "Requirement",
       "Facility",

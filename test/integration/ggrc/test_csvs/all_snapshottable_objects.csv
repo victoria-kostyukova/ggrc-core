@@ -11,11 +11,6 @@ user1@example.com",20/2/2020,Draft,http://url.example.zzz,22/2/2022,thREE,Access
 rich text",yes,user4@example.com,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,,,,,,
-Clause,Code*,Title*,Text of Clause,Notes,Admin*,Effective Date,State,Reference URL,,,,,,,,,,,,,,
-,Clause code,Clause title,Clause description,Clause notes,"user@example.com
-user1@example.com",20/2/2020,Draft,http://url.example.zzz,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,
-Object type,,,,,,,,,,,,,,,,,,,,,,
 Contract,Code*,Title*,Description,Notes,Admin*,Effective Date,State,Reference URL,,,,,,,,,,,,,,
 ,Contract code,Contract title,Contract description,Contract notes,"user@example.com
 user1@example.com",20/2/2020,Draft,http://url.example.zzz,,,,,,,,,,,,,,

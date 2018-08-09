@@ -335,7 +335,7 @@ contract,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,
-clause,Title,Text of Clause,Notes,Admin,Code,Effective Date,State,,,,,,,,,
+requirement,Title,Text of Requirement,Notes,Admin,Code,Effective Date,State,,,,,,,,,
 ,Startupsum 5,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,clause-1,3/4/2016,active,,,,,,,,,
 ,Startupsum 6,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,smotko@example.com,clause-2,3/5/2016,active,,,,,,,,,
 ,Startupsum 7,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,smotko@example.com,clause-3,3/6/2016,active,,,,,,,,,
@@ -381,7 +381,7 @@ Workflow,code*,title*,description,admin,repeat every,unit,force real-time email 
 ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,
-control,Title,Description,Assessment Procedure,Admin,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Frequency,Assertions,Categories,State,map:standard,map:clause
+control,Title,Description,Assessment Procedure,Admin,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Frequency,Assertions,Categories,State,map:standard,map:requirement
 ,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-1,Preventative,yes,,Technical,Monthly,Confidentiality,,Draft,"standard-1
 standard-5","clause-1
 clause-2"

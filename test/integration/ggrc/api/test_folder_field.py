@@ -18,7 +18,6 @@ class TestFolderField(TestCase):
 
   FOLDERABLE_FACTORIES = [
       factories.AccessGroupFactory,
-      factories.ClauseFactory,
       factories.ContractFactory,
       factories.ControlFactory,
       factories.DataAssetFactory,

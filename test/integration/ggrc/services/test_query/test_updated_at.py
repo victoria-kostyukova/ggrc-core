@@ -17,7 +17,6 @@ CHANGETRACKED_MODELS = (
     'Assessment',
     'AssessmentTemplate',
     'Audit',
-    'Clause',
     'Contract',
     'Control',
     'DataAsset',

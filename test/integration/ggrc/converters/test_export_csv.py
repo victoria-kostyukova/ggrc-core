@@ -44,7 +44,7 @@ class TestExportEmptyTemplate(TestCase):
         "objects": [
             {"object_name": "Policy", "fields": "all"},
             {"object_name": "Regulation", "fields": "all"},
-            {"object_name": "Clause", "fields": "all"},
+            {"object_name": "Requirement", "fields": "all"},
             {"object_name": "OrgGroup", "fields": "all"},
             {"object_name": "Contract", "fields": "all"},
         ],
@@ -57,7 +57,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Policy", response.data)
     self.assertIn("Regulation", response.data)
     self.assertIn("Contract", response.data)
-    self.assertIn("Clause", response.data)
+    self.assertIn("Requirement", response.data)
     self.assertIn("Org Group", response.data)
 
 
@@ -526,7 +526,6 @@ class TestExportMultipleObjects(TestCase):
       "System",
       "Process",
       "Access Group",
-      "Clause",
       "Data Asset",
       "Facility",
       "Market",

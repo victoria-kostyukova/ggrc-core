@@ -17,7 +17,7 @@ class TestStates(unittest.TestCase):
   """Test Object State main Test Case class"""
 
   BASIC_STATE_OBJECTS = (
-      'AccessGroup', 'Clause', 'Contract',
+      'AccessGroup', 'Contract',
       'Control', 'DataAsset', 'Directive', 'Facility', 'Market',
       'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
       'Project', 'Regulation', 'Risk', 'Requirement', 'Standard', 'System',

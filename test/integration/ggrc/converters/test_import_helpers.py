@@ -548,33 +548,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
 
-  def test_clause_definitions(self):
-    """Test default headers for Clause."""
-    names = {
-        "Title",
-        "Text of Clause",
-        "Notes",
-        "Admin",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-        "Primary Contacts",
-        "Secondary Contacts",
-        "Recipients",
-        "Send by default",
-        "Comments",
-        "Created Date",
-        "Last Updated Date",
-        "Last Updated By",
-        "Assessment Procedure",
-        "Folder",
-    }
-    self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
-
   def test_requirement_definitions(self):
     """Test default headers for Requirement."""
     names = {

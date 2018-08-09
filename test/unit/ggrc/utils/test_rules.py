@@ -26,7 +26,7 @@ class TestMappingRules(BaseTestMappingRules):
 
   rules = ggrc.utils.rules.get_mapping_rules()
 
-  all_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  all_rules = ['AccessGroup', 'Contract', 'Control',
                'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                'Process', 'Product', 'Program', 'Project', 'Regulation',
@@ -34,20 +34,20 @@ class TestMappingRules(BaseTestMappingRules):
                'Metric', 'ProductGroup', 'TechnologyEnvironment']
   assessment_rules = ['Issue']
   audit_rules = ['Assessment', 'Issue']
-  accessgroup_rules = ['Clause', 'Contract', 'Control',
+  accessgroup_rules = ['Contract', 'Control',
                        'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                        'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                        'Policy', 'Process', 'Product', 'Program', 'Project',
                        'Regulation', 'Risk', 'Requirement', 'Standard',
                        'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
                        'TechnologyEnvironment']
-  contract_rules = ['AccessGroup', 'Clause', 'Control',
+  contract_rules = ['AccessGroup', 'Control',
                     'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment']
-  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Clause', 'Contract',
+  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
                                     'Person', 'Policy', 'Process', 'Product',
@@ -55,13 +55,7 @@ class TestMappingRules(BaseTestMappingRules):
                                     'Requirement', 'Standard', 'System',
                                     'Threat', 'Vendor', 'Metric',
                                     'ProductGroup', 'TechnologyEnvironment']
-  clause_rules = ['AccessGroup', 'Contract', 'Control',
-                  'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
-                  'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
-                  'Process', 'Product', 'Program', 'Project', 'Regulation',
-                  'Risk', 'Requirement', 'Standard', 'System', 'Threat',
-                  'Vendor', 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  issue_rules = ['AccessGroup', 'Assessment', 'Audit', 'Clause',
+  issue_rules = ['AccessGroup', 'Assessment', 'Audit',
                  'Contract', 'Control', 'CycleTaskGroupObjectTask',
                  'DataAsset', 'Facility', 'Issue', 'Market',
                  'Objective', 'OrgGroup', 'Person', 'Policy',
@@ -69,43 +63,43 @@ class TestMappingRules(BaseTestMappingRules):
                  'Regulation', 'Risk', 'RiskAssessment', 'Requirement',
                  'Standard', 'System', 'Threat', 'Vendor', 'Metric',
                  'ProductGroup', 'TechnologyEnvironment']
-  person_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  person_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Policy', 'Process',
                   'Product', 'Program', 'Project', 'Regulation', 'Risk',
                   'Requirement', 'Standard', 'System', 'Threat', 'Vendor',
                   'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  policy_rules = ['AccessGroup', 'Clause', 'Control',
+  policy_rules = ['AccessGroup', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Process',
                   'Product', 'Program', 'Project', 'Risk', 'Requirement',
                   'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
                   'TechnologyEnvironment']
-  program_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  program_rules = ['AccessGroup', 'Contract', 'Control',
                    'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                    'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                    'Policy', 'Process', 'Product', 'Project', 'Regulation',
                    'Risk', 'Requirement', 'Standard', 'System', 'Threat',
                    'Vendor', 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  regulation_rules = ['AccessGroup', 'Clause', 'Control',
+  regulation_rules = ['AccessGroup', 'Control',
                       'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                       'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                       'Process', 'Product', 'Program', 'Project', 'Risk',
                       'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                       'ProductGroup', 'TechnologyEnvironment']
-  risk_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  risk_rules = ['AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                 'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                 'Process', 'Product', 'Program', 'Project', 'Regulation',
                 'Requirement', 'Standard', 'System', 'Threat', 'Vendor',
                 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  standard_rules = ['AccessGroup', 'Clause', 'Control',
+  standard_rules = ['AccessGroup', 'Control',
                     'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment']
-  threat_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  threat_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                   'Process', 'Product', 'Program', 'Project', 'Regulation',
@@ -115,7 +109,6 @@ class TestMappingRules(BaseTestMappingRules):
   @data(("AccessGroup", accessgroup_rules),
         ("Assessment", assessment_rules),
         ("Audit", audit_rules),
-        ("Clause", clause_rules),
         ("Contract", contract_rules),
         ("Control", all_rules),
         ("CycleTaskGroupObjectTask", cycletaskgroupobjecttask_rules),
@@ -153,7 +146,7 @@ class TestUnMappingRules(BaseTestMappingRules):
 
   rules = ggrc.utils.rules.get_unmapping_rules()
 
-  all_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  all_rules = ['AccessGroup', 'Contract', 'Control',
                'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                'Process', 'Product', 'Program', 'Project', 'Regulation',
@@ -161,20 +154,20 @@ class TestUnMappingRules(BaseTestMappingRules):
                'Metric', 'ProductGroup', 'TechnologyEnvironment']
   assessment_rules = ['Issue']
   audit_rules = ['Issue']
-  accessgroup_rules = ['Clause', 'Contract', 'Control',
+  accessgroup_rules = ['Contract', 'Control',
                        'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                        'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                        'Policy', 'Process', 'Product', 'Program', 'Project',
                        'Regulation', 'Risk', 'Requirement', 'Standard',
                        'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
                        'TechnologyEnvironment']
-  contract_rules = ['AccessGroup', 'Clause', 'Control',
+  contract_rules = ['AccessGroup', 'Control',
                     'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment']
-  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Clause', 'Contract',
+  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
                                     'Person', 'Policy', 'Process', 'Product',
@@ -182,13 +175,7 @@ class TestUnMappingRules(BaseTestMappingRules):
                                     'Requirement', 'Standard', 'System',
                                     'Threat', 'Vendor', 'Metric',
                                     'ProductGroup', 'TechnologyEnvironment']
-  clause_rules = ['AccessGroup', 'Contract', 'Control',
-                  'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
-                  'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
-                  'Process', 'Product', 'Program', 'Project', 'Regulation',
-                  'Risk', 'Requirement', 'Standard', 'System', 'Threat',
-                  'Vendor', 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  issue_rules = ['AccessGroup', 'Assessment', 'Audit', 'Clause',
+  issue_rules = ['AccessGroup', 'Assessment', 'Audit',
                  'Contract', 'Control', 'CycleTaskGroupObjectTask',
                  'DataAsset', 'Facility', 'Issue', 'Market',
                  'Objective', 'OrgGroup', 'Person', 'Policy',
@@ -196,43 +183,43 @@ class TestUnMappingRules(BaseTestMappingRules):
                  'Regulation', 'Risk', 'RiskAssessment', 'Requirement',
                  'Standard', 'System', 'Threat', 'Vendor', 'Metric',
                  'ProductGroup', 'TechnologyEnvironment']
-  person_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  person_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Policy', 'Process',
                   'Product', 'Program', 'Project', 'Regulation', 'Risk',
                   'Requirement', 'Standard', 'System', 'Threat', 'Vendor',
                   'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  policy_rules = ['AccessGroup', 'Clause', 'Control',
+  policy_rules = ['AccessGroup', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Process',
                   'Product', 'Program', 'Project', 'Risk', 'Requirement',
                   'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
                   'TechnologyEnvironment']
-  program_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  program_rules = ['AccessGroup', 'Contract', 'Control',
                    'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                    'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                    'Policy', 'Process', 'Product', 'Project', 'Regulation',
                    'Risk', 'Requirement', 'Standard', 'System', 'Threat',
                    'Vendor', 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  regulation_rules = ['AccessGroup', 'Clause', 'Control',
+  regulation_rules = ['AccessGroup', 'Control',
                       'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                       'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                       'Process', 'Product', 'Program', 'Project', 'Risk',
                       'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                       'ProductGroup', 'TechnologyEnvironment']
-  risk_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  risk_rules = ['AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                 'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                 'Process', 'Product', 'Program', 'Project', 'Regulation',
                 'Requirement', 'Standard', 'System', 'Threat', 'Vendor',
                 'Metric', 'ProductGroup', 'TechnologyEnvironment']
-  standard_rules = ['AccessGroup', 'Clause', 'Control',
+  standard_rules = ['AccessGroup', 'Control',
                     'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment']
-  threat_rules = ['AccessGroup', 'Clause', 'Contract', 'Control',
+  threat_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
                   'Process', 'Product', 'Program', 'Project', 'Regulation',
@@ -242,7 +229,6 @@ class TestUnMappingRules(BaseTestMappingRules):
   @data(("AccessGroup", accessgroup_rules),
         ("Assessment", assessment_rules),
         ("Audit", audit_rules),
-        ("Clause", clause_rules),
         ("Contract", contract_rules),
         ("Control", all_rules),
         ("CycleTaskGroupObjectTask", cycletaskgroupobjecttask_rules),
@@ -282,19 +268,19 @@ class TestSnapshotMappingRules(BaseTestMappingRules):
   rules = ggrc.utils.rules.get_snapshot_mapping_rules()
 
   all_rules = []
-  assessment_rules = ["AccessGroup", "Clause", "Contract", "Control",
+  assessment_rules = ["AccessGroup", "Contract", "Control",
                       "DataAsset", "Facility", "Market", "Objective",
                       "OrgGroup", "Policy", "Process", "Product",
                       "Regulation", "Requirement", "Standard", "System",
                       "Vendor", "Risk", "Threat", "Metric", "ProductGroup",
                       "TechnologyEnvironment"]
-  audit_rules = ["AccessGroup", "Clause", "Contract", "Control",
+  audit_rules = ["AccessGroup", "Contract", "Control",
                  "DataAsset", "Facility", "Market", "Objective",
                  "OrgGroup", "Policy", "Process", "Product",
                  "Regulation", "Requirement", "Standard", "System",
                  "Vendor", "Risk", "Threat", "Metric", "ProductGroup",
                  "TechnologyEnvironment"]
-  issue_rules = ["AccessGroup", "Clause", "Contract", "Control",
+  issue_rules = ["AccessGroup", "Contract", "Control",
                  "DataAsset", "Facility", "Market", "Objective",
                  "OrgGroup", "Policy", "Process", "Product",
                  "Regulation", "Requirement", "Standard", "System",
@@ -304,7 +290,6 @@ class TestSnapshotMappingRules(BaseTestMappingRules):
   @data(("AccessGroup", all_rules),
         ("Assessment", assessment_rules),
         ("Audit", audit_rules),
-        ("Clause", all_rules),
         ("Contract", all_rules),
         ("Control", all_rules),
         ("CycleTaskGroupObjectTask", all_rules),

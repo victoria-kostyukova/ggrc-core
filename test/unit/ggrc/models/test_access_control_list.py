@@ -15,7 +15,7 @@ class TestAccessControlList(unittest.TestCase):
   """Test Access Control List"""
 
   ACL_OBJECTS = (
-      'AccessGroup', 'Assessment', 'Clause', 'Contract',
+      'AccessGroup', 'Assessment', 'Contract',
       'Control', 'DataAsset', 'Facility', 'Issue', 'Market',
       'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Project',
       'Program', 'Regulation', 'Risk', 'Requirement', 'Standard', 'System',

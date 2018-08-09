@@ -37,7 +37,6 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
       (all_models.Policy.__name__, True),
       (all_models.Standard.__name__, True),
       (all_models.Contract.__name__, True),
-      (all_models.Clause.__name__, True),
       (all_models.Requirement.__name__, True),
       (all_models.Control.__name__, True),
       (all_models.Objective.__name__, True),

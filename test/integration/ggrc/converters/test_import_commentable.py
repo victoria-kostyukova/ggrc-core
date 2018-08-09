@@ -13,7 +13,6 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 COMMENTABLE_MODELS = [
-    "Clause",
     "Control",
     "Objective",
     "Requirement",

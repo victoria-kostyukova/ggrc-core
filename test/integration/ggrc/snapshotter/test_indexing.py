@@ -332,7 +332,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     records = get_records(audit, snapshots)
 
-    self.assertEqual(records.count(), 66)
+    self.assertEqual(records.count(), 63)
 
     delete_records({s.id for s in snapshots})
 
@@ -343,7 +343,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     records = get_records(audit, snapshots)
 
-    self.assertEqual(records.count(), 66)
+    self.assertEqual(records.count(), 63)
 
   def assert_indexed_fields(self, obj, search_property, values):
     """Assert index content in full text search table."""

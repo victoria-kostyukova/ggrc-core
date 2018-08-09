@@ -398,13 +398,6 @@ class AccessGroupFactory(TitledFactory):
     model = all_models.AccessGroup
 
 
-class ClauseFactory(TitledFactory):
-  """Clause factory class"""
-
-  class Meta:
-    model = all_models.Clause
-
-
 class DataAssetFactory(TitledFactory):
   """DataAsset factory class"""
 
@@ -551,7 +544,6 @@ def get_model_factory(model_name):
       "Assessment": AssessmentFactory,
       "AssessmentTemplate": AssessmentTemplateFactory,
       "Audit": AuditFactory,
-      "Clause": ClauseFactory,
       "Contract": ContractFactory,
       "Control": ControlFactory,
       "Cycle": wf_factories.CycleFactory,
