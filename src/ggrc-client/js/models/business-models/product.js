@@ -43,6 +43,10 @@ export default Cacheable('CMS.Models.Product', {
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
+        attr_title: 'Launch Status',
+        attr_name: 'status',
+        order: 40,
+      }, {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,

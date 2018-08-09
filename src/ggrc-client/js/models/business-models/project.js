@@ -42,6 +42,10 @@ export default Cacheable('CMS.Models.Project', {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
+        attr_title: 'Launch Status',
+        attr_name: 'status',
+        order: 40,
+      }, {
         attr_title: 'Description',
         attr_name: 'description',
         disable_sorting: true,
