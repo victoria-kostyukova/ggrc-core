@@ -50,6 +50,11 @@ export default can.Component.extend({
           return Permission.is_allowed_for('update', instance);
         },
       },
+      hasReviewers: {
+        get() {
+          return this.attr('review.access_control_list.length');
+        },
+      },
     },
     instance: {},
     review: null,
