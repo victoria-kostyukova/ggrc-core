@@ -33,7 +33,7 @@ import Stub from '../models/stub';
   let WorkflowExtension = {};
   let _workflowObjectTypes = Array.prototype.concat.call(
     [],
-    'Program Regulation Policy Standard Contract Clause Requirement'.split(' '),
+    'Program Regulation Policy Standard Contract Requirement'.split(' '),
     'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
     'System Process DataAsset Product Project Facility Market'.split(' '),
     'Issue Risk Threat Metric TechnologyEnvironment ProductGroup'.split(' ')
@@ -193,7 +193,6 @@ import Stub from '../models/stub';
         programs: TypeFilter('related_objects', 'Program'),
         controls: TypeFilter('related_objects', 'Control'),
         requirements: TypeFilter('related_objects', 'Requirement'),
-        clauses: TypeFilter('related_objects', 'Clause'),
         objectives: TypeFilter('related_objects', 'Objective'),
         cycle: Direct(
           'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
