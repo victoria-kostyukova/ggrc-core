@@ -68,6 +68,31 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   tree_view_options: {
+    attr_list: [{
+      attr_title: 'Title',
+      attr_name: 'title',
+      order: 10,
+    }, {
+      attr_title: 'State',
+      attr_name: 'status',
+      order: 20,
+    }, {
+      attr_title: 'Code',
+      attr_name: 'slug',
+      order: 30,
+    }, {
+      attr_title: 'Last Updated Date',
+      attr_name: 'updated_at',
+      order: 70,
+    }, {
+      attr_title: 'Last Updated By',
+      attr_name: 'modified_by',
+      order: 71,
+    }, {
+      attr_title: 'Review State',
+      attr_name: 'os_state',
+      order: 80,
+    }],
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
   },
 
