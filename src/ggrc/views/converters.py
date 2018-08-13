@@ -7,6 +7,8 @@ This module handles all view related function to import and export pages
 including the import/export api endponts.
 """
 
+import re
+
 from logging import getLogger
 from StringIO import StringIO
 from datetime import datetime
@@ -390,12 +392,23 @@ def handle_get(id2, command, job_type):
   return make_import_export_response(res)
 
 
+def check_import_filename(filename):
+  """Check filename has no special symbols"""
+  spec_symbols = r'\\#?'
+  if re.search('[{}]+'.format(spec_symbols), filename):
+    raise BadRequest(r"""
+        The file name should not contain special symbols \#?. Please correct
+        the file name and import a Google sheet or a file again.
+    """)
+
+
 def handle_import_post(**kwargs):
   """ Handle import post """
   check_import_export_headers()
   import_export.delete_previous_imports()
   file_meta = request.json
   csv_data, csv_content, filename = fa.get_gdrive_file_data(file_meta)
+  check_import_filename(filename)
   try:
     objects, results, failed = count_objects(csv_data)
     ie = import_export.create_import_export_entry(
