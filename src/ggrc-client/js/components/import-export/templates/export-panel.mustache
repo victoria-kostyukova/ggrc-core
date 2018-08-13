@@ -3,12 +3,22 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="flex-box flex-col">
-  <h4> Object {{panelNumber}}
-    {{#if removable}}
-      <i class="fa fa-trash-o" ($click)="removeFilterGroup(%element)"></i>
+<div class="flex-box flex-col export-panel">
+  
+  <div class="export-panel__header">
+    <h4> Object {{panelNumber}}
+      {{#if removable}}
+        <i class="fa fa-trash-o" ($click)="removeFilterGroup(%element)"></i>
+      {{/if}}
+    </h4>
+
+    {{^if item.isValidConfiguration}}
+      <span class="status-failed">
+        Exports are currently limited to maximum of {{maxAttributesCount}} columns per file.
+      </span>
     {{/if}}
-  </h4>
+  </div>
+
   <h6>
     Object type
   </h6>

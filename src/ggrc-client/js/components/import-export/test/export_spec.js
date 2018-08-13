@@ -15,6 +15,27 @@ describe('export component', () => {
     viewModel = getComponentVM(Component);
   });
 
+  describe('exportAllowed prop', () => {
+    it('returns FALSE when some panel has invalid configuration', () => {
+      viewModel.attr('panels', [
+        {type: 'type1', isValidConfiguration: true},
+        {type: 'type2', isValidConfiguration: false},
+        {type: 'type3', isValidConfiguration: true},
+      ]);
+
+      expect(viewModel.attr('exportAllowed')).toBeFalsy();
+    });
+
+    it('returns TRUE when there is no panel with invalid configuration', () => {
+      viewModel.attr('panels', [
+        {type: 'type1', isValidConfiguration: true},
+        {type: 'type2', isValidConfiguration: true},
+      ]);
+
+      expect(viewModel.attr('exportAllowed')).toBeTruthy();
+    });
+  });
+
   describe('getObjectsForExport() method', () => {
     describe('if object type is not Snapshots', () => {
       it('returns object with empty expression if filters are empty', () => {

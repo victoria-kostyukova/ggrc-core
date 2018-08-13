@@ -5,18 +5,9 @@
 
 import './export-panel';
 import template from './templates/export-group.mustache';
+import panelModel from './panel';
 
 let url = can.route.deparam(window.location.search.substr(1));
-let panelModel = can.Map({
-  type: 'Program',
-  filter: '',
-  relevant: can.compute(function () {
-    return new can.List();
-  }),
-  attributes: new can.List(),
-  localAttributes: new can.List(),
-  mappings: new can.List(),
-});
 
 export default can.Component.extend('exportGroup', {
   tag: 'export-group',

@@ -3,13 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="export-panel">
-    <div class="export-panel__group">
-      <div class="export-panel__header">
-        <div class="export-panel__checkbox">
+<div class="attribute-selector">
+    <div class="attribute-selector__group">
+      <div class="attribute-selector__header">
+        <div class="attribute-selector__checkbox">
           <input can-value="showAttributes" type="checkbox" checked/>
         </div>
-        <div class="export-panel__title">
+        <div class="attribute-selector__title">
           Attributes
         </div>
         {{#if showAttributes}}
@@ -42,12 +42,12 @@
       {{/if}}
     </div>
 
-    <div class="export-panel__group">
-      <div class="export-panel__header">
-        <div class="export-panel__checkbox">
+    <div class="attribute-selector__group">
+      <div class="attribute-selector__header">
+        <div class="attribute-selector__checkbox">
           <input can-value="showMappings" type="checkbox" checked/>
         </div>
-        <div class="export-panel__title">
+        <div class="attribute-selector__title">
           Mappings
         </div>
         {{#if showMappings}}
@@ -81,12 +81,12 @@
     </div>
 
     {{#is type 'Assessment'}}
-      <div class="export-panel__group">
-        <div class="export-panel__header">
-          <div class="export-panel__checkbox">
+      <div class="attribute-selector__group">
+        <div class="attribute-selector__header">
+          <div class="attribute-selector__checkbox">
             <input can-value="showLocalAttributes" type="checkbox" checked/>
           </div>
-          <div class="export-panel__title">
+          <div class="attribute-selector__title">
             Assessment Specific Custom Attributes
           </div>
           {{#if showLocalAttributes}}

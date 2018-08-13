@@ -34,6 +34,19 @@ export default can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
   viewModel: {
+    define: {
+      exportAllowed: {
+        get() {
+          if (!this.attr('panels.length')) {
+            return false;
+          }
+
+          return _.reduce(this.attr('panels'), (allowed, panel) => {
+            return allowed && panel.attr('isValidConfiguration');
+          }, true);
+        },
+      },
+    },
     isInProgress: false,
     loading: false,
     fileName: 'export_objects.csv',

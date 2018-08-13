@@ -230,7 +230,7 @@ $historyBlockWidth: 350px;
       padding-top: 0;
     }
     padding: 20px 30px;
-    border-top: 1px solid $itemBorder;;
+    border-top: 1px solid $itemBorder;
   }
 }
 
@@ -381,54 +381,47 @@ $historyBlockWidth: 350px;
   }
 }
 
+.export-panel {
+  &__header {
+    display: flex;
+
+    .status-failed {
+      display: flex;
+      margin-left: 20px;
+      &:before {
+        @include icon(red);
+      }
+    }
+  }
+}
+
 .export-add-filter-button {
   margin: 20px 0 0 30px;
 }
 
 .export-group__actions-wrap {
   display: flex;
-  align-items: flex-end;
-  margin: 30px 0;
-  & > .btn-success {
-    background-color: $btnGreen;
-  }
-
-  .export-format-wrap {
-    width: 25%;
-
-    h6 {
-      padding-bottom: 6px;
-    }
-
-    select {
-      width: 100%;
-      margin: 0;
-    }
-  }
-
-  .export-buttons-wrap {
-    margin-left: 20px;
-  }
+  margin: 30px 20px;
 }
 
-.export-panel {
-  .export-panel__group {
+.attribute-selector {
+  .attribute-selector__group {
     margin-bottom: 20px;
   }
 
-  .export-panel__header {
+  .attribute-selector__header {
     display: flex;
     margin-bottom: 10px;
   }
 
-  .export-panel__title {
+  .attribute-selector__title {
     font-weight: bold;
     font-size: 12px;
     text-transform: uppercase;
     margin-right: 10px;
   }
 
-  .export-panel__checkbox {
+  .attribute-selector__checkbox {
     line-height: 10px;
     margin-right: 5px;
   }

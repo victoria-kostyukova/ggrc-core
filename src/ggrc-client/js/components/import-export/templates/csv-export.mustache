@@ -16,12 +16,10 @@
 <export-group ({panels})="panels"></export-group>
 
 <div class="export-group__actions-wrap">
-  <div class="export-buttons-wrap">
-      <button id="export-csv-button"
-              class="btn btn-green btn-small"
-              ($click)="exportObjects()"
-      >
-        Start Export
-      </button>
-  </div>
+    <button id="export-csv-button"
+            {{^if exportAllowed}} disabled {{/if}}
+            class="btn btn-green btn-small"
+            ($click)="exportObjects()">
+      Start Export
+    </button>
 </div>
