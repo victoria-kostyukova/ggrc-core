@@ -73,7 +73,7 @@ class TestImportExports(TestCase):
     task_thread.join()
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_failed_imports_post(self):
     """Test imports post"""
     user = all_models.Person.query.first()
@@ -110,7 +110,7 @@ class TestImportExports(TestCase):
         self.assertFalse(block["block_errors"])
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_imports_post(self):
     """Test imports post"""
     user = all_models.Person.query.first()
@@ -333,7 +333,7 @@ class TestImportExports(TestCase):
             ("Finished", False))
   @ddt.unpack
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
-              new=lambda x: (x, None, None))
+              new=lambda x: (x, None, ''))
   def test_delete_previous_imports(self, status, should_be_none):
     """Test deletion of previous imports"""
     user = all_models.Person.query.first()
@@ -369,7 +369,7 @@ class TestImportExports(TestCase):
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
-      new=lambda x: (x, None, None)
+      new=lambda x: (x, None, '')
   )
   def test_import_control_revisions(self):
     """Test if new revisions created during import."""
@@ -400,7 +400,7 @@ class TestImportExports(TestCase):
 
   @mock.patch(
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
-      new=lambda x: (x, None, None)
+      new=lambda x: (x, None, '')
   )
   def test_import_snapshot(self):
     """Test if snapshots can be created from imported objects."""
