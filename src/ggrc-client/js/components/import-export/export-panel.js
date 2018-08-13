@@ -101,9 +101,13 @@ export default can.Component.extend({
       }
     },
     updateIsSelected: function (items, isSelected) {
+      can.batch.start();
+
       items.forEach(function (item) {
         item.attr('isSelected', isSelected);
       });
+
+      can.batch.stop();
     },
     setSelected: function () {
       this.attr('showMappings', true);
