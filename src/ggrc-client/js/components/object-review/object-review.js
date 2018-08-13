@@ -4,12 +4,14 @@
  */
 
 import template from './templates/object-review.mustache';
+import notificationTemplate from './templates/complete-review-notification.mustache';
 import Review from '../../models/service-models/review';
 import Permission from '../../permission';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 import {createReviewInstance, saveReview} from '../../plugins/utils/object-review-utils';
 import {REFRESH_MAPPING, DESTINATION_UNMAPPED} from '../../events/eventTypes';
 import {getRole} from '../../plugins/utils/acl-utils';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 const tag = 'object-review';
 
@@ -82,7 +84,15 @@ export default can.Component.extend({
       const review = this.getReviewInstance();
 
       this.updateAccessControlList(review);
-      this.changeReviewState(review, 'Reviewed');
+      this.changeReviewState(review, 'Reviewed')
+        .then(() => {
+          this.showNotification();
+        });
+    },
+    markUnreviewed() {
+      const review = this.attr('review');
+
+      this.changeReviewState(review, 'Unreviewed');
     },
     changeReviewState(review, status) {
       review.attr('status', status);
@@ -90,6 +100,11 @@ export default can.Component.extend({
 
       return this.updateReview(review).then(() => {
         this.attr('loading', false);
+      });
+    },
+    showNotification() {
+      notifier('info', notificationTemplate, {
+        revertState: this.markUnreviewed.bind(this),
       });
     },
     updateReview(review) {
