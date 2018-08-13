@@ -289,6 +289,24 @@ class TestImportExports(TestCase):
     self.assert200(response)
     self.assertEqual(response.data, "Test content")
 
+  @ddt.data(r"\\\\test.csv",
+            "test###.csv",
+            '??test##.csv',
+            '?test#.csv',
+            r'\\filename?.csv',
+            '??somenamea??.csv',
+            r'!@##??\\.csv')
+  def test_imports_with_spec_symbols(self, filename):
+    """Test import with special symbols in file name"""
+    with mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
+                    new=lambda x: (x, None, filename)):
+      user = all_models.Person.query.first()
+      response = self.client.post(
+          "/api/people/{}/imports".format(user.id),
+          data=json.dumps([]),
+          headers=self.headers)
+      self.assert400(response)
+
   @ddt.data(("Import", "Analysis"),
             ("Export", "In Progress"))
   @ddt.unpack
