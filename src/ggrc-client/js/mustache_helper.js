@@ -33,6 +33,7 @@ import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
+import {isScopeModel} from './plugins/utils/models-utils';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -1877,4 +1878,10 @@ Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
     rolesStr: allRoleNames.join(', '),
     rolesList: allRoleNames.join('\n'),
   });
+});
+
+Mustache.registerHelper('isScopeModel', function (instance, options) {
+  const modelName = Mustache.resolve(instance).type;
+
+  return isScopeModel(modelName) ? options.fn(this) : options.inverse(this);
 });

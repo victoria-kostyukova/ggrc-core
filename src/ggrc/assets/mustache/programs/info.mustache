@@ -12,7 +12,7 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content info-pane__main-content-with-sidebar">
-              {{>'/static/mustache/base_objects/object-review.mustache'}}
+              <object-review {instance}="instance"></object-review>
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/base_objects/notes.mustache'}}
               <div class="row-fluid wrap-row">
