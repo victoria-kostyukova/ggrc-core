@@ -6,6 +6,7 @@
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import template from './advanced-search-filter-state.mustache';
+import {isScopeModel} from '../../plugins/utils/models-utils';
 
 /**
  * Filter State view model.
@@ -31,6 +32,10 @@ let viewModel = can.Map.extend({
           state.attr('operator', 'ANY');
         }
         state.attr('modelName', this.attr('modelName'));
+
+        let stateLabel = isScopeModel(this.attr('modelName')) ?
+          'Launch Status' : 'State';
+        state.attr('label', stateLabel);
 
         let allStates =
           StateUtils.getStatesForModel(this.attr('modelName'));
