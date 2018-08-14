@@ -31,6 +31,11 @@ export default can.Component.extend({
           return this.attr('reviewStatus') === 'reviewed';
         },
       },
+      wasReviewed: {
+        get() {
+          return !!this.attr('review.last_reviewed_by');
+        },
+      },
       showButtons: {
         get() {
           return !this.attr('isReviewed') &&

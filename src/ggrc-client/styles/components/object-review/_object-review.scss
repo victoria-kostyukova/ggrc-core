@@ -25,6 +25,16 @@
     }
   }
 
+  &__body {
+    display: flex;
+    margin-bottom: 10px;
+
+    &-description {
+      font-style: italic;
+      color: $gray;
+    }
+  }
+
   &__buttons {
     display: flex;
 

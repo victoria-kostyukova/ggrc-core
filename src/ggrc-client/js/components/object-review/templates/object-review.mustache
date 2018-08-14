@@ -17,6 +17,15 @@
       <spinner {toggle}="loading"></spinner>
     </div>
   </div>
+  {{#if wasReviewed}}
+    <div class="object-review__body">
+      <div class="object-review__body-description">
+        Last reviewed by
+        <person-data class="inline-block" {person}="review.last_reviewed_by"></person-data>
+        on {{date review.last_reviewed_at}}
+      </div>
+    </div>
+  {{/if}}
   {{#if showButtons}}
     <div class="object-review__buttons">
       <button
