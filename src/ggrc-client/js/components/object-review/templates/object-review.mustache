@@ -17,4 +17,14 @@
       <spinner {toggle}="loading"></spinner>
     </div>
   </div>
+  {{#if showButtons}}
+    <div class="object-review__buttons">
+      <button
+          {{#if loading}}disabled{{/if}}
+          ($click)="markReviewed()"
+          class="btn btn-green btn-small">
+        Mark Reviewed
+      </button>
+    </div>
+  {{/if}}
 </div>

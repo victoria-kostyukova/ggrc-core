@@ -9,6 +9,7 @@
   &__header {
     display: flex;
     line-height: 17px;
+    margin-bottom: 10px;
 
     &-title {
       font-size: 11px;
@@ -21,6 +22,14 @@
     }
     &-spinner {
       margin-left: 6px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+
+    .btn {
+      margin-right: 10px;
     }
   }
 }
