@@ -159,6 +159,12 @@ const getInstance = (objectType, objectId, paramsOrObject) => {
   return instance;
 };
 
+function isScopeModel(type) {
+  const model = CMS.Models[type];
+
+  return model && model.category === 'business';
+}
+
 export {
   getModelInstance,
   hasRelatedAssessments,
@@ -166,4 +172,5 @@ export {
   makeModelInstance,
   inferObjectType,
   getInstance,
+  isScopeModel,
 };
