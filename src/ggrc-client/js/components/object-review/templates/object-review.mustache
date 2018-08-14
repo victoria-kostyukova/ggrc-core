@@ -1,0 +1,20 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="object-review">
+  <div class="object-review__header">
+    <div class="object-review__header-title">
+      Object Review
+    </div>
+    <div class="object-review__header-status">
+      <div class="state-value state-{{reviewStatus}}">
+        {{reviewStatus}}
+      </div>
+    </div>
+    <div class="object-review__header-spinner">
+      <spinner {toggle}="loading"></spinner>
+    </div>
+  </div>
+</div>

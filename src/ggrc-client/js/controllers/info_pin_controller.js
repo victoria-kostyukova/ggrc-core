@@ -25,6 +25,7 @@ import '../components/snapshotter/snapshot-comparer-config';
 import '../components/revision-history/restore-revision';
 import '../components/unarchive_link';
 import '../components/sort/sort-by';
+import '../components/object-review/object-review';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 import {getInstanceView} from '../plugins/utils/object-history-utils';
