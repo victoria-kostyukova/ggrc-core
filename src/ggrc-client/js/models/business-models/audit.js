@@ -140,13 +140,16 @@ export default Cacheable('CMS.Models.Audit', {
     return CMS.Models[this.attr('object_type')];
   },
   clone: function (options) {
-    let model = CMS.Models.Audit;
-    return new model({
+    let cloneModel = new CMS.Models.Audit({
       operation: 'clone',
       cloneOptions: options.cloneOptions,
       program: this.program,
       title: this.title + new Date(),
     });
+
+    delete cloneModel.custom_attribute_values;
+
+    return cloneModel;
   },
   save: function () {
     // Make sure the context is always set to the parent program
