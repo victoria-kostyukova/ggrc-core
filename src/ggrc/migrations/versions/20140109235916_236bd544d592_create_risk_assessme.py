@@ -12,7 +12,7 @@ Create Date: 2014-01-09 23:59:16.449353
 
 # revision identifiers, used by Alembic.
 revision = '236bd544d592'
-down_revision = None
+down_revision = '6c41e3ad0a43'  # Last migration from basic permissions
 
 
 from alembic import op

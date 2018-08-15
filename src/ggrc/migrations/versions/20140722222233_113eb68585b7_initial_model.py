@@ -11,7 +11,7 @@ Create Date: 2014-07-22 22:22:33.632831
 
 # revision identifiers, used by Alembic.
 revision = '113eb68585b7'
-down_revision = None
+down_revision = '4b3a070f5f00'  # last migration from risk assessments
 
 from alembic import op
 import sqlalchemy as sa

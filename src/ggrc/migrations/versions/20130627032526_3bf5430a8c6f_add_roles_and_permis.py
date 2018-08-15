@@ -11,7 +11,7 @@ Create Date: 2013-06-27 03:25:26.571232
 
 # revision identifiers, used by Alembic.
 revision = '3bf5430a8c6f'
-down_revision = None
+down_revision = '53499d8bea75'  # Last deployed migration on ggrc
 
 from alembic import op
 import sqlalchemy as sa

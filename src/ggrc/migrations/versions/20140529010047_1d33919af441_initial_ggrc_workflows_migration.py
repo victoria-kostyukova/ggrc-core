@@ -15,7 +15,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '1d33919af441'
-down_revision = None
+down_revision = '610cf459b347'  # Last migration from ggrc risks
 
 
 def upgrade():

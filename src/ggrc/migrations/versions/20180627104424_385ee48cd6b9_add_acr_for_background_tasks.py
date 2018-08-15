@@ -18,7 +18,7 @@ from ggrc.migrations.utils import acr_propagation
 
 # revision identifiers, used by Alembic.
 revision = '385ee48cd6b9'
-down_revision = '53499d8bea75'
+down_revision = '6bc56d6072a2'  # Last migration from ggrc workflows
 
 ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
