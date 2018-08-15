@@ -17,7 +17,7 @@ from ggrc.migrations.utils import acr_propagation
 # revision identifiers, used by Alembic.
 
 revision = 'a90bda8e08ca'
-down_revision = '3db5f2027c92'
+down_revision = '3db5f2027c94'
 
 
 def remove_old_rule_tree():

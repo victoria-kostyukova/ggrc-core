@@ -15,7 +15,7 @@ from ggrc.migrations.utils import acr_propagation
 from ggrc.migrations.utils import acr_propagation_constants as const
 
 # revision identifiers, used by Alembic.
-revision = '3db5f2027c92'
+revision = '3db5f2027c94'
 down_revision = '242b8dc8493b'
 
 
