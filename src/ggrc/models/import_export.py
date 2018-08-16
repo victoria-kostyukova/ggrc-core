@@ -158,6 +158,9 @@ def clear_overtimed_tasks():
   )
   for ie_job in active_jobs:
     now = datetime.utcnow()
+    if not ie_job.start_at:
+      ie_job.start_at = datetime.utcnow()
+      continue
     deadline = ie_job.start_at + timedelta(hours=24)
     if now > deadline:
       ie_job.status = 'Failed'
