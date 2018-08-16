@@ -4,6 +4,7 @@
 """Lists of ggrc contributions."""
 
 from ggrc.integrations import synchronization_jobs
+from ggrc.models import import_export
 from ggrc.notifications import common
 from ggrc.notifications import notification_handlers
 from ggrc.notifications import data_handlers
@@ -12,6 +13,7 @@ from ggrc.utils import proposal
 
 NIGHTLY_CRON_JOBS = [
     common.send_daily_digest_notifications,
+    import_export.clear_overtimed_tasks,
 ]
 
 HOURLY_CRON_JOBS = [

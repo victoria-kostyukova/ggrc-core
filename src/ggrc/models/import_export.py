@@ -4,7 +4,8 @@
 """ ImportExport model."""
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from logging import getLogger
 
 from sqlalchemy.dialects import mysql
 
@@ -12,6 +13,9 @@ from ggrc import db
 from ggrc.models.mixins.base import Identifiable
 from ggrc.login import get_current_user
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+
+
+logger = getLogger(__name__)
 
 
 class ImportExport(Identifiable, db.Model):
@@ -91,7 +95,8 @@ def create_import_export_entry(**kwargs):
                         title=kwargs.get('title'),
                         content=kwargs.get('content'),
                         gdrive_metadata=meta,
-                        results=results)
+                        results=results,
+                        start_at=kwargs.get('start_at', None))
 
   db.session.add(ie_job)
   db.session.commit()
@@ -137,3 +142,29 @@ def get(ie_id):
   if ie_job.created_by == get_current_user():
     return ie_job
   raise Forbidden()
+
+
+def clear_overtimed_tasks():
+  """
+  Clear ImportExport jobs not finished normally
+
+  TaskQueue task can run in background no more than 24 hours,
+  if ImportExport task did not change status to Finished or Failed
+  during this time, task considered as dead.
+  """
+  active_jobs = ImportExport.query.filter(
+      ImportExport.status.in_([ImportExport.ANALYSIS_STATUS,
+                               ImportExport.IN_PROGRESS_STATUS])
+  )
+  for ie_job in active_jobs:
+    now = datetime.utcnow()
+    deadline = ie_job.start_at + timedelta(hours=24)
+    if now > deadline:
+      ie_job.status = 'Failed'
+      ie_job.end_at = datetime.utcnow()
+      logger.warning("%s job ID:%d working >24 hours. "
+                     "Background task is dead. "
+                     "Status changed to Failed",
+                     ie_job.job_type,
+                     ie_job.id)
+  db.session.commit()
