@@ -33,7 +33,7 @@ function getUrl(slug, model) {
     url += '/';
   }
   slug = slug.toLowerCase();
-  model = model.toLowerCase().replace(/ /g, '-');
+  model = model.toLowerCase().replace(/ /g, '_');
 
   return `${url}questionnaires/${model}=${slug}`;
 }
