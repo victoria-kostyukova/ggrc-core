@@ -1,8 +1,10 @@
-[//]: <> (updated 8/15/2018)
+[//]: <> (updated 8/21/2018)
 
 Our Product Team worked hard to make your day-to-day life easier. Here is a list of improvements.
 
-[Due Date for Issue object (v1.18.0, 08/14/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fyf2uuebswgz)
+[New roles for scoping objects (v1.19.0, 08/21/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.1i914vrt92ys)
+
+[Due Date for Issue object (v1.18.0, 08/14/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.is6tlxqjgft)
 
 [Requirement object type (v1.17.0, 08/07/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.uzxzuedlpa22)
 
@@ -51,6 +53,16 @@ Our Product Team worked hard to make your day-to-day life easier. Here is a list
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### New roles for scoping objects (v1.19.0, 08/21/2018)
+
+All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.  
+
+- Product Managers;
+- Technical Leads;
+- Technical / Program Managers;
+- Legal Counsels;
+- System Owners.
 
 ### Due Date for Issue object (v1.18.0, 08/14/2018)
 
