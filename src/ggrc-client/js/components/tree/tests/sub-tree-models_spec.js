@@ -139,7 +139,7 @@ describe('sub-tree-models component', function () {
           display: selectedModels.indexOf(model) !== -1,
         };
       });
-    };
+    }
 
     beforeEach(function () {
       defaultModels = {

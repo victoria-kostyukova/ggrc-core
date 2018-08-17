@@ -12,8 +12,8 @@ class RouterConfig {
     });
     can.route.map(router);
     can.route.ready();
-  };
-};
+  }
+}
 
 const buildUrl = (data) => {
   let url = can.route.url(data);

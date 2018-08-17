@@ -5,7 +5,7 @@
 
 import TaskGroup from '../models/business-models/task-group';
 
-;(function (CMS, GGRC, can, $) {
+(function (CMS, GGRC, can, $) {
   can.Control('GGRC.Controllers.WorkflowPage', {
     defaults: {
     },
