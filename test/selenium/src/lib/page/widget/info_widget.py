@@ -14,12 +14,13 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
+from lib.page.widget import page_tab
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, string_utils, help_utils
 
 
-class InfoWidget(WithPageElements, base.Widget):
+class InfoWidget(page_tab.WithPageTab, WithPageElements, base.Widget):
   """Abstract class of common info for Info pages and Info panels.
   For labels (headers) Will be used actual unicode elements from UI or pseudo
   string elements from 'lib.element' module in upper case.
@@ -519,7 +520,6 @@ class Assessments(InfoWidget):
     self.asmt_type_txt = objects.get_obj_type(self.asmt_type.text)
     self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
     self.mapped_objects_titles_txt = self._get_mapped_objs_titles_txt()
-    self.evidence_urls = self._assessment_evidence_urls()
     self.lcas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes(
         is_gcas_not_lcas=False)
     self.creators_lbl_txt, self.creators_txt = (
@@ -535,6 +535,8 @@ class Assessments(InfoWidget):
         self.info_widget_elem, self._locators.COMMENTS_CSS)
     self.comments_lbl_txt = self.comments_panel.header_lbl.text
     self.comments_scopes_txt = self.comments_panel.scopes
+    self._assessment_tab_name = "Assessment"
+    self._other_attributes_tab_name = "Other Attributes"
     # todo: implement separate add lcas and gcas
     # todo: implement separate add mapped ctrls and mapped other objs
     self._extend_list_all_scopes(
@@ -545,8 +547,18 @@ class Assessments(InfoWidget):
         [self.is_verified, self.creators_txt, self.assignees_txt,
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt, self.asmt_type_txt])
-    self._extend_list_all_scopes(["evidence_urls"],
-                                 [self.evidence_urls.get_urls()])
+
+  @property
+  def evidence_urls(self):
+    """Switch to tab with evidence urls and return a page element"""
+    self.ensure_tab(self._assessment_tab_name)
+    return self._assessment_evidence_urls()
+
+  @property
+  def primary_contacts(self):
+    """Switch to tab with primary contacts and return a page element"""
+    self.ensure_tab(self._other_attributes_tab_name)
+    return self._related_people_list("Primary Contacts")
 
   def _get_mapped_objs_titles_txt(self):
     """Return lists of str for mapped snapshots titles text from current tab.
@@ -567,7 +579,12 @@ class Assessments(InfoWidget):
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
     self._extend_list_all_scopes_by_code()
     self._extend_list_all_scopes_by_cas()
-    return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
+    obj_scope = {
+        "evidence_urls": self.evidence_urls.get_urls(),
+        "primary_contacts": self.primary_contacts.get_people_emails()
+    }
+    obj_scope.update(zip(self.list_all_headers_txt, self.list_all_values_txt))
+    return obj_scope
 
   def _extend_list_all_scopes_by_cas(self):
     """Extend attributes related to 'local and global custom attributes' and

@@ -10,6 +10,10 @@ from lib.page.widget import page_elements
 class WithPageElements(base.WithBrowser):
   """A mixin for page elements"""
 
+  def _related_people_list(self, label):
+    """Return RelatedPeopleList page element with label `label`"""
+    return page_elements.RelatedPeopleList(self._browser, label)
+
   def _related_urls(self, label):
     """Return RelatedUrls page element with label `label`"""
     return page_elements.RelatedUrls(self._browser, label)
