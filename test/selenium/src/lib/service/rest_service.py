@@ -4,7 +4,6 @@
 # pylint: disable=too-few-public-methods
 
 import json
-import time
 
 import requests
 
@@ -37,18 +36,7 @@ class BaseRestService(object):
     """
     list_factory_objs = []
     list_attrs = []
-    for num in xrange(count):
-      if num > 0:
-        # FIXME: GGRC-4849
-        # A record is created in
-        # "fulltext_record_properties" table after object creation.
-        # This table is used for indexing.
-        # If two objects are created without delay, the record for second
-        # object in "fulltext_record_properties" is not created.
-        # We filed an issue GGRC-4849 to fix back-end.
-        # Absence of this "sleep" causes a failure in test
-        # "test_mapping_controls_to_program_via_unified_mapper".
-        time.sleep(0.5)
+    for _ in xrange(count):
       factory_obj = entity_factory().create(
           is_add_rest_attrs=True,
           **(attrs_to_factory if attrs_to_factory else {}))
