@@ -36,6 +36,11 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       nullable=False,
       default="0",
   )
+  base_id = db.Column(
+      db.Integer,
+      db.ForeignKey('access_control_list.id', ondelete='CASCADE'),
+      nullable=True,
+  )
   parent_id = db.Column(
       db.Integer,
       db.ForeignKey('access_control_list.id', ondelete='CASCADE'),
