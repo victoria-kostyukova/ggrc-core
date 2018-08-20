@@ -77,7 +77,7 @@
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
-        Issue Type
+        Ticket Type
       </label>
       <div>
         {{instance.issue_tracker.issue_type}}
@@ -88,7 +88,7 @@
   <div class="ggrc-form-item">
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
-        Issue Priority
+        Ticket Priority
       </label>
       <dropdown
         options-list="instance.class.issue_tracker_priorities"
@@ -97,7 +97,7 @@
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
-        Issue Severity
+        Ticket Severity
       </label>
       <dropdown
         instance="instance"
@@ -109,12 +109,12 @@
     {{#if setIssueTitle}}
       <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_title}}field-failure{{/instance.computed_errors.issue_tracker_title}}">
         <label class="form-label required-label ggrc-form-item__label">
-          Issue Title
+          Ticket Title
           <i class="fa fa-asterisk"></i>
         </label>
         <input data-id="code_txtbx"
           class="input-block-level"
-          placeholder="Enter Issue Title"
+          placeholder="Enter Ticket Title"
           type="text"
           {($value)}="instance.issue_tracker.title"
         />
