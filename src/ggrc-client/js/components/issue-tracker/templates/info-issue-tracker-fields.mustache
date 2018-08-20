@@ -24,6 +24,20 @@
   
   <content></content>
   
+  {{#if showId}}
+  <div class="row-fluid wrap-row">
+    <div class="span8">
+      <h6>Ticket ID</h6>
+      <div class="small-text">
+        <small>
+          <em>{{linkingNote}}</em>
+        </small>
+      </div>
+      {{instance.issue_tracker.issue_id}}
+    </div>
+  </div>
+  {{/if}}
+
   <div class="row-fluid wrap-row">
     <div class="span4">
       <h6>Hotlist ID</h6>

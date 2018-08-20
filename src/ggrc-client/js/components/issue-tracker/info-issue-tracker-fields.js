@@ -14,5 +14,6 @@ export default can.Component.extend({
     instance: {},
     showTitle: false,
     note: '',
+    linkingNote: '',
   },
 });
