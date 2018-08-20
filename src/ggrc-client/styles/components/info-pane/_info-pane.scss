@@ -117,6 +117,14 @@
     }
   }
 
+  &__section-ticket-tracker {
+    .ticket-info-header {
+      >* {
+        margin-right: 20px;
+      }
+    }
+  }
+
   .pane-header {
     &__title {
       padding-right: 24px;

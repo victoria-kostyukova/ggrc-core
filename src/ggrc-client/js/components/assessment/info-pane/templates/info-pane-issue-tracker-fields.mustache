@@ -3,18 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if instance.issueCreated}}
-    <div class="ggrc-form-item">
-        <div class="ggrc-form-item__row">
-            <div class="issue-tracker-url">
-                <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                    Open Ticket
-                </a>
-            </div>
-        </div>
-    </div>
-{{/if}}
-
 <div class="ggrc-form-item">
   <div class="ggrc-form-item__multiple-row">
     <issue-tracker-switcher
@@ -42,8 +30,13 @@
                   {edit-mode}="editMode"
                   {is-edit-icon-denied}="isEditIconDenied"
                   (set-edit-mode-inline)="confirmEdit()">
-                    <div>
-                      <div class="ggrc-form__title">Ticket Tracker</div>
+                    <div class="ticket-info-header">
+                      <span class="ggrc-form__title">Ticket Tracker</span>
+                      {{#if instance.issueCreated}}
+                          <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                              Open Ticket
+                          </a>
+                      {{/if}}
                         <div class="ggrc-form-item__small-text">
                           <small>
                             <em>If turned on, one bug will be created for each assessment.</em>
