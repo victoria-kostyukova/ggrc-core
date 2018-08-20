@@ -13,4 +13,9 @@ export default can.Component.extend({
   template,
   tag,
   viewModel: TEXT_FORM_FIELD_VM,
+  events: {
+    inserted() {
+      this.viewModel.attr('textField', this.element.find('.text-field'));
+    },
+  },
 });
