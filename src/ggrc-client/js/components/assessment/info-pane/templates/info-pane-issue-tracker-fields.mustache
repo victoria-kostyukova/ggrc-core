@@ -52,6 +52,28 @@
 
 {{#if instance.issue_tracker.enabled}}
 <div class="ggrc-form-item">
+  <div class="ggrc-form-item__multiple-row--double">
+    <assessment-inline-item
+      type="number"
+      prop-name="issue_tracker.issue_id"
+      is-confirmation-needed="false"
+      {set-in-progress}="@setInProgressState"
+      {on-state-change-dfd}="onStateChangeDfd"
+      {is-edit-icon-denied}="isEditDenied"
+      {value}="instance.issue_tracker.issue_id"
+      {instance}="instance">
+        <div>
+          <div class="ggrc-form__title">Ticket ID</div>
+          <div class="ggrc-form-item__small-text">
+            <small>
+              <em>If you would like to keep the existing bug linked to this assessment do not edit this attribute. If you would like to link to a different ticket, either clear this attribute to generate new or provide an existing ticket number.</em>
+            </small>
+          </div>
+        <div>
+    </assessment-inline-item>
+  </div>
+</div>
+<div class="ggrc-form-item">
   <div class="ggrc-form-item__multiple-row">
     <assessment-inline-item
       type="number"
