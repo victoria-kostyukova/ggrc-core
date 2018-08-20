@@ -195,6 +195,8 @@
           {default-title}="instance.title">
             <modal-issue-tracker-fields
               {instance}="instance"
+              {allow-to-change-id}="true"
+              {linking-note}="'Please leave this empty for a new ticket to be generated and linked to this issue. If you would like to link to an existing ticket please provide the ticket number.''"
               {set-issue-title}="setIssueTitle"
               {note}="'If turned on, a bug will be generated for this issue. Any subsequent updates to admins, primary contacts, secondary contacts and state fields should be made through tracking system and will be synced automatically to GGRC.'">
             </modal-issue-tracker-fields>

@@ -17,7 +17,9 @@ export default can.Component.extend({
   viewModel: {
     instance: {},
     note: '',
+    linkingNote: '',
     setIssueTitle: false,
+    allowToChangeId: false,
   },
   events: {
     '{viewModel.instance.issue_tracker} hotlist_id'() {
