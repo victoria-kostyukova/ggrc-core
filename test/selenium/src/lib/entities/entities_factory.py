@@ -14,7 +14,8 @@ from lib.constants import (
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.decorator import lazy_property
 from lib.entities.entity import (
-    PersonEntity, CustomAttributeDefinitionEntity, CommentEntity)
+    PersonEntity, CustomAttributeDefinitionEntity, CommentEntity,
+    ControlEntity)
 from lib.utils import help_utils, string_utils
 from lib.utils.string_utils import StringMethods
 
@@ -46,11 +47,10 @@ class EntitiesFactory(object):
 
   def create(self, is_add_rest_attrs=False, **attrs):
     """Create random object's instance, if 'is_add_rest_attrs' then add
-    attributes for REST, if 'attrs' then update attributes accordingly.
+    attributes for REST, if 'attrs' then update attributes accordingly and
+    update acl roles.
     """
-    obj = self._create_random_obj(
-        is_add_rest_attrs=is_add_rest_attrs).update_attrs(
-        is_allow_none=False, **attrs)
+    obj = self._set_attrs(is_add_rest_attrs, **attrs)
     for acr_name, role_id, default_list in self._acl_roles:
       if acr_name in attrs:
         people_list = attrs[acr_name]
@@ -58,6 +58,12 @@ class EntitiesFactory(object):
         people_list = default_list
       self._set_acl(obj, acr_name, people_list, role_id, is_add_rest_attrs)
     return obj
+
+  def _set_attrs(self, is_add_rest_attrs=False, **attrs):
+    """Create obj and update attrs."""
+    return self._create_random_obj(
+        is_add_rest_attrs=is_add_rest_attrs).update_attrs(
+        is_allow_none=False, **attrs)
 
   @classmethod
   def generate_string(cls, first_part,
@@ -81,7 +87,8 @@ class EntitiesFactory(object):
     return unicode("{mail_name}@{domain}".format(
         mail_name=StringMethods.random_uuid(), domain=domain))
 
-  def _set_acl(self, obj, acr_name, person_list, role_id, is_add_rest_attrs):
+  @staticmethod
+  def _set_acl(obj, acr_name, person_list, role_id, is_add_rest_attrs):
     """To be invoked in `create` method to set `access_control_list`
     and `acr_name` attributes.
     """
@@ -355,19 +362,36 @@ class ControlsFactory(EntitiesFactory):
         ("admins", roles.ACLRolesIDs.CONTROL_ADMINS, [users.current_user()])
     ]
 
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create Control entity with randomly and predictably filled fields, if
-    'is_add_rest_attrs' then add attributes for REST."""
-    control_obj = self.obj_inst().update_attrs(
+  def _set_attrs(self, is_add_rest_attrs=False, **attrs):
+    """Create random object's instance, if 'is_add_rest_attrs' then add
+    attributes for REST, if 'attrs' then update attributes accordingly.
+    """
+    assertions = attrs.get("assertions", ["Security"])
+    obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
+        assertions=self._generate_assertions(assertions),
         status=unicode(object_states.DRAFT),
-        os_state=unicode(element.ReviewStates.UNREVIEWED))
+        os_state=unicode(element.ReviewStates.UNREVIEWED), **attrs)
     if is_add_rest_attrs:
-      control_obj.update_attrs(
-          recipients=",".join((
-              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))))
-    return control_obj
+      obj.update_attrs(recipients=",".join((
+          unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
+          unicode(roles.SECONDARY_CONTACTS))))
+    return obj
+
+  @classmethod
+  def _generate_assertions(cls, assertion_names):
+    """Generate assertions for control obj."""
+    assertion_dict_pattern = {"context_id": None,
+                              "href": "", "id": "",
+                              "type": "ControlAssertion"}
+    assertion_list = []
+    for name in assertion_names:
+      assertion_dict = copy.deepcopy(assertion_dict_pattern)
+      assertion_dict["id"] = ControlEntity.ASSERTIONS[name]
+      assertion_dict["href"] = (
+          "/api/control_assertions/" + str(assertion_dict["id"]))
+      assertion_list.append(assertion_dict)
+    return assertion_list
 
 
 class ObjectivesFactory(EntitiesFactory):

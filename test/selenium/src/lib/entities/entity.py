@@ -18,7 +18,7 @@ class Representation(object):
   # pylint: disable=too-many-public-methods
   diff_info = None  # {"equal": {"atr7": val7, ...}, "diff": {"atr3": val3}}
   tree_view_attrs_to_exclude = (
-      "created_at", "updated_at", "custom_attributes")
+      "created_at", "updated_at", "custom_attributes", "assertions")
   people_attrs_names = [
       "creators", "assignees", "verifiers", "admins", "primary_contacts",
       "secondary_contacts", "audit_captains", "auditors",
@@ -94,7 +94,8 @@ class Representation(object):
         els.UPDATED_AT: "updated_at", els.ASMT_TYPE: "assessment_type",
         els.LCAS: "custom_attribute_definitions",
         "EVIDENCE_URLS": "evidence_urls",
-        "PRIMARY_CONTACTS": "primary_contacts"
+        "PRIMARY_CONTACTS": "primary_contacts",
+        "ASSERTIONS": "assertions"
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -182,6 +183,10 @@ class Representation(object):
                     k == "created_at" and isinstance(v, unicode) else v)
                 for k, v in attr_value.iteritems()
                 if k in ["modified_by", "created_at", "description"]}
+          if attr_name == "assertions":
+            for name, assertion_id in ControlEntity.ASSERTIONS.iteritems():
+              if assertion_id == attr_value["id"]:
+                converted_attr_value = name
           return converted_attr_value
       origin_obj = copy.deepcopy(obj)
       for obj_attr_name in obj.__dict__.keys():
@@ -696,12 +701,15 @@ class ProgramEntity(Entity):
 
 class ControlEntity(Entity):
   """Class that represent model for Control entity."""
+  ASSERTIONS = {"Confidentiality": 37, "Integrity": 38,
+                "Availability": 39, "Security": 40, "Privacy": 41}
   __hash__ = None
 
   def __init__(self, **attrs):
     super(ControlEntity, self).__init__()
     self.set_attrs(
-        "principal_assignees", "secondary_assignees", "program", **attrs)
+        "principal_assignees", "secondary_assignees", "program",
+        "assertions", **attrs)
 
 
 class ObjectiveEntity(Entity):

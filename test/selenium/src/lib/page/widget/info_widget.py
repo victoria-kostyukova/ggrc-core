@@ -740,10 +740,16 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
     self.primary_contact_text, self.primary_contact_entered_text = (
         self.get_header_and_value_txt_from_people_scopes(
             self._elements.PRIMARY_CONTACTS.upper()))
+    self._assertions = self._browser.element(
+        class_name="custom-attr-wrap").element(
+        text="Assertions").parent().text.splitlines()
+    self.assertions_text = self._assertions[0]
+    self.assertions_entered_text = self._assertions[1:]
     self.reference_urls = self._related_urls(self._reference_url_label)
     self._extend_list_all_scopes(
-        [self.admin_text, self.primary_contact_text],
-        [self.admin_entered_text, self.primary_contact_entered_text])
+        [self.admin_text, self.primary_contact_text, self.assertions_text],
+        [self.admin_entered_text, self.primary_contact_entered_text,
+         self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
 
   def _add_obj_review_to_lsopes(self):
