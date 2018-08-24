@@ -269,7 +269,6 @@ import Stub from '../models/stub';
         }),
         current_approval_cycles: Cross('approval_workflows', 'current_cycle'),
         _canonical: {
-          workflows: 'Workflow',
           task_groups: 'TaskGroup',
         },
       };
