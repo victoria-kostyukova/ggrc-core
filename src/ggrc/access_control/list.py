@@ -48,7 +48,8 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   )
   parent = db.relationship(
       lambda: AccessControlList,  # pylint: disable=undefined-variable
-      remote_side=lambda: AccessControlList.id
+      foreign_keys=lambda: AccessControlList.parent_id,
+      remote_side=lambda: AccessControlList.id,
   )
 
   @simple_property
