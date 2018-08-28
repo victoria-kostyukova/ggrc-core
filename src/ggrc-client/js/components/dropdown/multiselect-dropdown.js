@@ -12,7 +12,6 @@ export default can.Component.extend({
     disabled: false,
     _stateWasUpdated: '',
     selected: [],
-    plural: '@',
     placeholder: '@',
     element: '',
     define: {
