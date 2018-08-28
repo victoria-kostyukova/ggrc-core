@@ -4,7 +4,6 @@
 """Access Control List model"""
 
 from ggrc import db
-from ggrc.builder import simple_property
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.mixins import base
@@ -13,19 +12,14 @@ from ggrc.models.mixins import base
 class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   """Access Control List
 
-  Model is a mapping between a role a person and an object. It gives the
-  permission of the role to the person from that object.
+  Model is a mapping between a role and an object. It creates a base for
+  permissions of the role for mapping a person to this permission.
   """
   __tablename__ = 'access_control_list'
   _api_attrs = reflection.ApiAttributes(
-      "person",
-      reflection.Attribute("person_id", create=False, update=False),
-      reflection.Attribute("person_email", create=False, update=False),
-      reflection.Attribute("person_name", create=False, update=False),
       "ac_role_id"
   )
 
-  person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
   ac_role_id = db.Column(db.Integer, db.ForeignKey(
       'access_control_roles.id'), nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
@@ -52,14 +46,6 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       remote_side=lambda: AccessControlList.id,
   )
 
-  @simple_property
-  def person_email(self):
-    return self.person.email if self.person else None
-
-  @simple_property
-  def person_name(self):
-    return self.person.name if self.person else None
-
   @property
   def object_attr(self):
     return '{0}_object'.format(self.object_type)
@@ -78,14 +64,13 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   def _extra_table_args(_):
     return (
         db.UniqueConstraint(
-            'person_id',
             'ac_role_id',
             'object_id',
             'object_type',
             'parent_id_nn',
         ),
         db.Index('idx_object_type_object_idx', 'object_type', 'object_id'),
-        db.Index('ix_person_object', 'person_id', 'object_type', 'object_id'),
+        db.Index('ix_role_object', 'ac_role_id', 'object_type', 'object_id'),
         db.Index(
             'idx_object_type_object_id_parent_id_nn',
             'object_type',
