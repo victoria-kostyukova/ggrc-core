@@ -32,7 +32,8 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     if isinstance(self.row_converter.obj, models.Audit):
       audit_id = self.row_converter.obj.id
     elif hasattr(self.row_converter.obj, "audit_id"):
-      audit_id = getattr(self.row_converter.obj, "audit_id")
+      audit_id = (getattr(self.row_converter.obj, "audit_id") or
+                  getattr(self.row_converter.obj, "audit").id)
     elif self.row_converter.is_new and self.related_audit:
       audit_id = self.related_audit.id
     else:
@@ -177,10 +178,6 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     items = super(SnapshotInstanceColumnHandler, self).parse_item(
         *args, **kwargs
     )
-    if self.dry_run:
-      # TODO: is_valid_creation should work with codes instead of ids and it
-      # should also be checked on dry runs.
-      return items
     exists_ids = {
         row.id for row in
         self.snapshoted_instances_query.values(self.mapping_object.id)
