@@ -431,3 +431,77 @@ class TestImportExports(TestCase):
     audit = all_models.Audit.query.get(audit_id)
     snapshots = self._create_snapshots(audit, controls.all())
     self.assertEqual(3, len(snapshots))
+
+  def test_import_map_objectives(self):
+    """Test import can't map assessments with objectives"""
+    audit = factories.AuditFactory(slug='AUDIT-9999')
+    audit_id = audit.id
+    objectives = [
+        factories.ObjectiveFactory(
+            title='obj_999{}'.format(i),
+            slug='OBJECTIVE-999{}'.format(i)
+        ) for i in range(10)
+    ]
+    for objective in objectives:
+      factories.RelationshipFactory(source=audit.program,
+                                    destination=objective)
+
+    response = self._import_file(
+        'assessments_map_with_objectives_in_scope_of_program.csv', True
+    )
+
+    row_errors = {
+        'Line 10: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 11: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 12: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 3: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 4: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 5: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 6: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 7: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 8: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.',
+        'Line 9: You can not map Objective to Assessment, because '
+        'this Objective is not mapped to the related audit.'
+    }
+
+    expected_messages = {
+        'Assessment': {
+            'created': 0,
+            'row_errors': row_errors
+        }
+    }
+
+    assessments = db.session.query(all_models.Assessment).filter_by(
+        audit_id=audit_id).all()
+
+    self.assertEqual(len(assessments), 0)
+    self._check_csv_response(response, expected_messages)
+
+    # update the audit to the latest version
+    self.api.put(all_models.Audit.query.get(audit_id),
+                 {'snapshots': {'operation': 'upsert'}}
+                 )
+
+    response = self._import_file('assessments_map_to_obj_snapshots.csv')
+
+    expected_messages = {
+        'Assessment': {
+            'created': 10,
+            'row_errors': set()
+        }
+    }
+
+    assessments = db.session.query(all_models.Assessment).filter_by(
+        audit_id=audit_id).all()
+
+    self.assertEqual(len(assessments), 10)
+    self._check_csv_response(response, expected_messages)

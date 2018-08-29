@@ -1,0 +1,22 @@
+Object type,"Must be unique. Can be left empty for auto generation. If updating or deleting, code is required",,,,,,,,,,,,"Options are:
+Rework Needed
+Completed
+In Progress
+Verified
+Deprecated
+In Review
+Not Started",,,,,,,"New line separated list of evidence links and titles.
+Example:
+
+http://my.gdrive.link/file Title of the evidence link",New line separated list of URLs.,,,,,,List of people with 'Assignees' role,List of people with 'Creators' role,List of people with 'Primary Contacts' role,List of people with 'Secondary Contacts' role,List of people with 'Verifiers' role,"DELIMITER="";;"" double semi-colon separated values",,,,,,,,,,,,,,,,,,,,,,,
+Assessment,Code*,Template,Audit*,Title*,Description,Notes,Assessment Procedure,Due Date,Last Deprecated Date,Archived,Finished Date,Verified Date,State,Labels,Conclusion: Design,Conclusion: Operation,Assessment Type,Recipients,Send by default,Evidence File,Evidence URL,Last Updated Date,Last Updated By,Created Date,Delete,Ticket Tracker,Assignees*,Creators*,Primary Contacts,Secondary Contacts,Verifiers,Comments,Last Comment,map:issue,map:access group versions,map:contract versions,map:control versions,map:data asset versions,map:facility versions,map:market versions,map:metric versions,map:objective versions,map:org group versions,map:policy versions,map:process versions,map:product versions,map:product group versions,map:regulation versions,map:requirement versions,map:risk versions,map:standard versions,map:system versions,map:technology environment versions,map:threat versions,map:vendor versions
+,ASSESSMENT-9991,,AUDIT-9999,Import_08/20-1.1,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9991,,,,,,,,,,,,,
+,ASSESSMENT-9992,,AUDIT-9999,Import_08/20-1.2,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9992,,,,,,,,,,,,,
+,ASSESSMENT-9993,,AUDIT-9999,Import_08/20-1.3,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9993,,,,,,,,,,,,,
+,ASSESSMENT-9994,,AUDIT-9999,Import_08/20-1.4,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9994,,,,,,,,,,,,,
+,ASSESSMENT-9995,,AUDIT-9999,Import_08/20-1.5,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9995,,,,,,,,,,,,,
+,ASSESSMENT-9996,,AUDIT-9999,Import_08/20-1.6,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9996,,,,,,,,,,,,,
+,ASSESSMENT-9997,,AUDIT-9999,Import_08/20-1.7,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9997,,,,,,,,,,,,,
+,ASSESSMENT-9998,,AUDIT-9999,Import_08/20-1.8,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9998,,,,,,,,,,,,,
+,ASSESSMENT-9999,,AUDIT-9999,Import_08/20-1.9,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9999,,,,,,,,,,,,,
+,ASSESSMENT-9990,,AUDIT-9999,Import_08/20-1.10,,,,,,no,--,--,Not Started,,,,Control,"Assignees,Creators,Verifiers",yes,,,08/27/2018,user@example.com,08/27/2018,,,user@example.com,user@example.com,,,,,,,,,,,,,,OBJECTIVE-9990,,,,,,,,,,,,,
