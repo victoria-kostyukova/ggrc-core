@@ -10,10 +10,11 @@ export default can.Component.extend({
   template,
   viewModel: {
     disabled: false,
-    _stateWasUpdated: '',
+    _stateWasUpdated: false,
     selected: [],
-    placeholder: '@',
-    element: '',
+    options: [],
+    placeholder: '',
+    element: null,
     define: {
       _displayValue: {
         get: function () {
@@ -32,14 +33,14 @@ export default can.Component.extend({
         type: 'boolean',
         value: false,
         get: function () {
-          let options = this.attr('options') || [];
+          let options = this.attr('options');
 
           return Array.prototype.every.call(options, function (item) {
             return item.attr('checked');
           });
         },
         set: function (value) {
-          let options = this.attr('options') || [];
+          let options = this.attr('options');
 
           options.forEach(function (option) {
             option.attr('checked', value);
@@ -141,8 +142,7 @@ export default can.Component.extend({
       ev.stopPropagation();
     },
   },
-  events:
-  {
+  events: {
     '{options} change': function (scope, ev, propertyName) {
       let target = ev.target;
 
