@@ -76,13 +76,18 @@ def _remove_person_id():
 
 
 def _add_person_id():
+  """Add person id column for downgrade migration.
+
+  The nullable flag here is set to true so we can do the data migration,
+  but after data is migrated and cleaned up, we set it back to false.
+  """
   op.add_column(
       'access_control_list',
       sa.Column(
           'person_id',
           mysql.INTEGER(display_width=11),
           autoincrement=False,
-          nullable=False,
+          nullable=True,
       )
   )
 
@@ -155,16 +160,54 @@ def _migrate_data_to_acp():
 
 
 def _migrate_data_from_acp():
-  pass
+  op.execute("""
+      insert into access_control_list (
+          ac_role_id,
+          person_id,
+          object_id,
+          object_type,
+          created_at,
+          modified_by_id,
+          updated_at,
+          context_id,
+          parent_id,
+          parent_id_nn,
+          base_id
+      )
+      select
+          acl.ac_role_id,
+          acp.person_id,
+          acl.object_id,
+          acl.object_type,
+          acl.created_at,
+          acl.modified_by_id,
+          acl.updated_at,
+          acl.context_id,
+          acl.parent_id,
+          acl.parent_id_nn,
+          acl.base_id
+      from access_control_list as acl
+      join access_control_people as acp on
+          acl.id = acp.ac_list_id
+  """)
+  op.execute("truncate table access_control_people")
+  op.execute("update access_control_list set base_id = id")
+  op.execute("delete from access_control_list where person_id is null")
 
 
-def _downgrade_indexes():
+def _drop_new_indexes():
   """Downgrade table indexes back to old schema."""
+  op.drop_constraint('uq_access_control_list', 'access_control_list',
+                     type_='unique')
+  op.drop_index('ix_role_object', table_name='access_control_list')
+
+
+def _create_old_indexes():
+  """Create indexes for the downgrade migration."""
   op.create_foreign_key(
       u'access_control_list_ibfk_3', 'access_control_list', 'people',
       ['person_id'], ['id']
   )
-  op.drop_constraint(None, 'access_control_list', type_='unique')
   op.create_index(
       'uq_access_control_list',
       'access_control_list',
@@ -176,7 +219,16 @@ def _downgrade_indexes():
       'access_control_list', ['person_id', 'object_type', 'object_id'],
       unique=False,
   )
-  op.drop_index('ix_role_object', table_name='access_control_list')
+
+
+def _set_person_id_non_null():
+  """Set person column to not nullable."""
+  op.alter_column(
+      'access_control_list',
+      'person_id',
+      type_=sa.Integer,
+      nullable=True,
+  )
 
 
 def upgrade():
@@ -190,5 +242,7 @@ def upgrade():
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   _add_person_id()
+  _drop_new_indexes()
   _migrate_data_from_acp()
-  _downgrade_indexes()
+  _set_person_id_non_null()
+  _create_old_indexes()
