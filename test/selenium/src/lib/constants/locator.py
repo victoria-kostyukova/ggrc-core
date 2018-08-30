@@ -893,10 +893,6 @@ class WidgetInfoContract(WidgetSnapshotsInfoPanel):
   """Locators for Contract Info widgets."""
 
 
-class WidgetInfoClause(WidgetSnapshotsInfoPanel):
-  """Locators for Clause Info widgets."""
-
-
 class WidgetInfoRequirement(WidgetSnapshotsInfoPanel):
   """Locators for Requirement Info widgets."""
 
@@ -1140,7 +1136,7 @@ class AdminCustomAttributes(object):
           objects.OBJECTIVES, objects.REQUIREMENTS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
           objects.REGULATIONS, objects.POLICIES, objects.CONTRACTS,
-          objects.CLAUSES, objects.VENDORS, objects.PEOPLE,
+          objects.VENDORS, objects.PEOPLE,
           objects.ACCESS_GROUPS, objects.ORG_GROUPS, objects.PRODUCTS,
           objects.MARKETS, objects.PROCESSES, objects.FACILITIES,
           objects.PROJECTS, objects.DATA_ASSETS, objects.SYSTEMS)

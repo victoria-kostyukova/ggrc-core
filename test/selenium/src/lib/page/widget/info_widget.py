@@ -715,14 +715,6 @@ class Contracts(InfoWidget):
     super(Contracts, self).__init__(driver)
 
 
-class Clauses(InfoWidget):
-  """Model for Clause object Info pages and Info panels."""
-  _locators = locator.WidgetInfoClause
-
-  def __init__(self, driver):
-    super(Clauses, self).__init__(driver)
-
-
 class Requirements(InfoWidget):
   """Model for Requirement object Info pages and Info panels."""
   _locators = locator.WidgetInfoRequirement

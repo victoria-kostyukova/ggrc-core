@@ -20,7 +20,6 @@ class Lhn(object):
           cls.POLICIES,
           cls.STANDARDS,
           cls.CONTRACTS,
-          cls.CLAUSES,
           cls.REQUIREMENTS)
       cls.CONTROLS_OR_OBJECTIVES_MEMBERS = (
           cls.CONTROLS,

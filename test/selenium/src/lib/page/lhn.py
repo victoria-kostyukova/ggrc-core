@@ -69,9 +69,6 @@ class _Directives(lhn.DropdownStatic):
     self.toggle_contracts = lhn.Toggle(
         self._driver, locator.LhnMenu.CONTRACTS,
         locator.LhnMenu.CONTRACTS_COUNT)
-    self.toggle_clauses = lhn.Toggle(
-        self._driver, locator.LhnMenu.CLAUSES,
-        locator.LhnMenu.CLAUSES_COUNT)
     self.toggle_requirements = lhn.Toggle(
         self._driver, locator.LhnMenu.REQUIREMENTS,
         locator.LhnMenu.REQUIREMENTS_COUNT)
@@ -104,13 +101,6 @@ class _Directives(lhn.DropdownStatic):
     self.toggle_contracts.toggle()
     return _Contracts(self._driver)
 
-  def select_clauses(self):
-    """
-    Return: _Clauses
-    """
-    self.toggle_clauses.toggle()
-    return _Clauses(self._driver)
-
   def select_requirements(self):
     """
     Return: _Requirements
@@ -141,12 +131,6 @@ class _Contracts(lhn.AccordionGroup):
   """Contracts dropdown in LHN."""
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CONTRACTS
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
-
-
-class _Clauses(lhn.AccordionGroup):
-  """Clauses dropdown in LHN."""
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CLAUSES
-  _locator_spinny = locator.LhnMenu.SPINNY_CLAUSES
 
 
 class _Requirements(lhn.AccordionGroup):

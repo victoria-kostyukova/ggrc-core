@@ -220,10 +220,6 @@ class Contracts(_ObjectWidgetBar):
   """Widget bar of Contract objects."""
 
 
-class Clauses(_ObjectWidgetBar):
-  """Widget bar of Clause objects."""
-
-
 class Reuirements(_ObjectWidgetBar):
   """Widget bar of Requirements objects."""
 
