@@ -130,7 +130,6 @@ class Representation(object):
     # pylint: disable=expression-not-assigned
     # pylint: disable=consider-iterating-dictionary
     entity = Entity()
-    [delattr(entity, k) for k in entity.__dict__.keys()]
     [setattr(entity, k, v) for k, v in dic.iteritems()]
     return entity
 
@@ -760,7 +759,7 @@ class AssessmentEntity(Entity):
     self.set_attrs(
         "creators", "assignees", "verifiers", "assessment_type", "verified",
         "mapped_objects", "audit", "template", "object", "evidence_urls",
-        **attrs)
+        "secondary_contacts", **attrs)
 
   def cads_from_template(self):
     return [definition

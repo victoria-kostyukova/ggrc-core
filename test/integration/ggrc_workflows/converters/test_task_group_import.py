@@ -10,7 +10,6 @@ import ddt
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.models import all_models
-from ggrc_risks.models import risk, threat
 from ggrc_workflows import models
 from integration.ggrc.models import factories
 from integration.ggrc_workflows.helpers import workflow_test_case
@@ -41,8 +40,8 @@ class TestTaskGroupImport(workflow_test_case.WorkflowTestCase):
       (all_models.Control.__name__, True),
       (all_models.Objective.__name__, True),
       (all_models.Issue.__name__, True),
-      (risk.Risk.__name__, True),
-      (threat.Threat.__name__, True),
+      (all_models.Risk.__name__, True),
+      (all_models.Threat.__name__, True),
       (all_models.Assessment.__name__, False),
       (all_models.Audit.__name__, False),
       (all_models.Metric.__name__, True),

@@ -5,8 +5,8 @@
 
 import sys
 
-from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.role import AccessControlRole
 from ggrc.data_platform.attribute_definitions import AttributeDefinitions
 from ggrc.data_platform.attribute_templates import AttributeTemplates
 from ggrc.data_platform.attribute_types import AttributeTypes
@@ -43,35 +43,38 @@ from ggrc.models.facility import Facility
 from ggrc.models.import_export import ImportExport
 from ggrc.models.issue import Issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
+from ggrc.models.label import Label
+from ggrc.models.maintenance import Maintenance
 from ggrc.models.market import Market
+from ggrc.models.metric import Metric
 from ggrc.models.notification import Notification
-from ggrc.models.notification import NotificationHistory
 from ggrc.models.notification import NotificationConfig
+from ggrc.models.notification import NotificationHistory
 from ggrc.models.notification import NotificationType
+from ggrc.models.object_label import ObjectLabel
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.objective import Objective
 from ggrc.models.option import Option
 from ggrc.models.org_group import OrgGroup
 from ggrc.models.person import Person
+from ggrc.models.person_profile import PersonProfile
 from ggrc.models.product import Product
+from ggrc.models.product_group import ProductGroup
 from ggrc.models.program import Program
 from ggrc.models.project import Project
 from ggrc.models.proposal import Proposal
 from ggrc.models.relationship import Relationship
-from ggrc.models.revision import Revision
 from ggrc.models.requirement import Requirement
+from ggrc.models.revision import Revision
+from ggrc.models.risk import Risk
+from ggrc.models.risk_assessment import RiskAssessment
 from ggrc.models.snapshot import Snapshot
 from ggrc.models.system import Process
 from ggrc.models.system import System
 from ggrc.models.system import SystemOrProcess
-from ggrc.models.vendor import Vendor
-from ggrc.models.maintenance import Maintenance
-from ggrc.models.label import Label
-from ggrc.models.object_label import ObjectLabel
-from ggrc.models.person_profile import PersonProfile
-from ggrc.models.metric import Metric
-from ggrc.models.product_group import ProductGroup
 from ggrc.models.technology_environment import TechnologyEnvironment
+from ggrc.models.threat import Threat
+from ggrc.models.vendor import Vendor
 
 all_models = [  # pylint: disable=invalid-name
     # data platform models
@@ -85,64 +88,67 @@ all_models = [  # pylint: disable=invalid-name
     PersonProfile,
 
     # ggrc models
-    AccessControlRole,
     AccessControlList,
+    AccessControlRole,
     AccessGroup,
     Assessment,
     AssessmentTemplate,
     Audit,
     Automapping,
+    BackgroundTask,
     Categorization,
     CategoryBase,
-    ControlCategory,
-    ControlAssertion,
-    Context,
-    Control,
     Comment,
+    Context,
+    Contract,
+    Control,
+    ControlAssertion,
+    ControlCategory,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,
     Directive,
-    Contract,
-    Evidence,
-    Policy,
-    Regulation,
-    Standard,
     Document,
+    Event,
+    Evidence,
     Facility,
+    ImportExport,
+    Issue,
+    IssuetrackerIssue,
     Label,
+    Maintenance,
     Market,
-    Objective,
+    Metric,
+    Notification,
+    NotificationConfig,
+    NotificationHistory,
+    NotificationType,
     ObjectLabel,
     ObjectPerson,
+    Objective,
     Option,
     OrgGroup,
-    Vendor,
     Person,
+    Policy,
+    Process,
     Product,
+    ProductGroup,
     Program,
     Project,
     Proposal,
+    Regulation,
     Relationship,
     Requirement,
-    SystemOrProcess,
-    System,
-    Process,
-    Metric,
     Revision,
-    Event,
-    BackgroundTask,
-    NotificationConfig,
-    NotificationType,
-    Notification,
-    NotificationHistory,
-    Issue,
-    IssuetrackerIssue,
+    Risk,
+    RiskAssessment,
     Snapshot,
-    Maintenance,
-    ImportExport,
+    Standard,
+    System,
+    SystemOrProcess,
     TechnologyEnvironment,
-    ProductGroup,
+    Threat,
+    Vendor,
 ]
 
 __all__ = [m.__name__ for m in all_models]
@@ -152,7 +158,7 @@ def register_model(model):
   """Add model to all models.
 
   This function is used for adding models from different ggrc modules, such as
-  ggrc_workflows or ggrc_risks, to the list of all models in the ggrc module.
+  ggrc_workflows, to the list of all models in the ggrc module.
 
   Args:
     model: sqlalchemy model to be added to the list of all models.

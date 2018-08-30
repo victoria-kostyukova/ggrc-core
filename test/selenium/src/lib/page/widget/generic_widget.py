@@ -198,6 +198,19 @@ class TreeView(base.TreeView):
                     if title in item)
     return item_num
 
+  def find_row(self, obj_str):
+    """Find row. Raise exception if more than 1 row were found.
+
+    Return: lib.base.TreeViewItem
+    """
+    search_field = self._browser.element(class_name="tree-filter__input")
+    search_field.send_keys(obj_str)
+    search_button = self._browser.element(text="Search")
+    search_button.click()
+    if len(self.tree_view_items()) > 1:
+      raise ValueError("More than 1 row were found.")
+    return self.tree_view_items()[0]
+
   def open_tree_actions_dropdown_by_title(self, title):
     """Open dropdown of obj on Tree View by title. Hover mouse on dropdown
     button.
@@ -205,10 +218,10 @@ class TreeView(base.TreeView):
     Return: lib.element.tree_view."dropdown_obj"
     """
     # pylint: disable=invalid-name
-    button_num = self._get_item_num_by_title(title)
-    item_dropdown_button = self.tree_view_items()[button_num].item_btn
+    obj = self.find_row(title)
+    item_dropdown_button = obj.item_btn
     selenium_utils.hover_over_element(
-        self._driver, self.tree_view_items()[button_num].element)
+        self._driver, obj.element)
     selenium_utils.hover_over_element(
         self._driver, item_dropdown_button)
     item_dropdown_button.click()
@@ -216,6 +229,13 @@ class TreeView(base.TreeView):
         *self._locators.ITEM_DD_MENU_CSS)
     return self.dropdown_tree_view_item_cls(self._driver, self.obj_name,
                                             dropdown_menu_element)
+
+  def get_obj_url_from_tree_view_by_title(self, obj_title):
+    """Get url of obj from Tree View by title."""
+    # pylint: disable=invalid-name
+    self.open_tree_actions_dropdown_by_title(obj_title)
+    link = self._browser.link(text="Open in a new tab")
+    return link.attribute_value("href")
 
 
 class Audits(Widget):

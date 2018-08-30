@@ -560,6 +560,12 @@ class Assessments(InfoWidget):
     self.ensure_tab(self._other_attributes_tab_name)
     return self._related_people_list("Primary Contacts")
 
+  @property
+  def assignees(self):
+    """Switch to tab with assignees and return a page element."""
+    self.ensure_tab(self._assessment_tab_name)
+    return self._related_people_list("Assignees")
+
   def _get_mapped_objs_titles_txt(self):
     """Return lists of str for mapped snapshots titles text from current tab.
     """

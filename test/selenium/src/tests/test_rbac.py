@@ -157,7 +157,64 @@ class TestAuditorRole(base.Test):
       self, selenium, test_data
   ):
     """Test that Auditor cannot view control"""
+    # pylint: disable=invalid-name
     creator = test_data["creator"]
     users.set_current_user(creator)
     control = test_data["control"]
     webui_facade.assert_cannot_view(selenium, control)
+
+  @pytest.mark.smoke_tests
+  def test_auditor_can_create_asmt(
+      self, selenium, test_data
+  ):
+    """Preconditions:
+    Global editor creates program with mapped control.
+    Global editor creates audit and assigns Global Creator user as an auditor
+    - log in as GC
+    - navigate to audit page => Assessments tab
+    Test that GC can create new asmt in audit."""
+    creator = test_data["creator"]
+    users.set_current_user(creator)
+    audit = test_data["audit"]
+    expected_asmt = webui_facade.create_asmt(selenium, audit)
+    webui_facade.assert_can_view(selenium, expected_asmt)
+
+  @pytest.mark.smoke_tests
+  def test_auditor_can_edit_asmt(
+      self, selenium, test_data
+  ):
+    """Preconditions:
+    Global editor creates program with mapped control.
+    Global editor creates audit and assigns Global Creator user as an auditor
+    - log in as GC
+    - navigate to audit page => Assessments tab
+    Test that GC can edit new asmt in audit."""
+    creator = test_data["creator"]
+    users.set_current_user(creator)
+    audit = test_data["audit"]
+    expected_asmt = rest_facade.create_assessment(audit)
+    webui_facade.assert_can_edit_asmt(
+        selenium, expected_asmt)
+
+  @pytest.mark.smoke_tests
+  def test_auditor_can_assign_user_to_asmt(
+      self, selenium, test_data
+  ):
+    """Preconditions:
+    Global editor creates program with mapped control.
+    Global editor creates audit and assigns Global Creator user as an auditor
+    - log in as GC
+    - navigate to audit page => Assessments tab
+    Test that GC can assign user to new asmt in audit."""
+    # pylint: disable=invalid-name
+    creator = test_data["creator"]
+    users.set_current_user(creator)
+    audit = test_data["audit"]
+    expected_asmt = rest_facade.create_assessment(audit)
+    asmt_service = webui_service.AssessmentsService(selenium)
+    asmt_service.add_asignee(expected_asmt, test_data["editor"])
+    expected_asmt.update_attrs(
+        updated_at=rest_facade.get_obj(expected_asmt).updated_at,
+        assignees=[creator.email, test_data["editor"].email],
+        modified_by=users.current_user().email)
+    webui_facade.assert_can_view(selenium, expected_asmt)

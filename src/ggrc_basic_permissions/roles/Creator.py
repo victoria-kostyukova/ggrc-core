@@ -143,6 +143,8 @@ permissions = {
         "ObjectPerson",
         "Option",
         "OrgGroup",
+        "Risk",
+        "Threat",
         "Vendor",
         "PopulationSample",
         "Product",

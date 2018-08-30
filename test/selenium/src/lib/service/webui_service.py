@@ -673,6 +673,12 @@ class AssessmentsService(BaseWebUiService):
     page.primary_contacts.add_person(person)
     page.wait_save()
 
+  def add_asignee(self, obj, person):
+    """Add an assignee to 'obj'."""
+    page = self.open_info_page_of_obj(obj)
+    page.assignees.add_person(person)
+    page.wait_save()
+
   def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from
     Tree View, fill data according to object attributes and create new object.

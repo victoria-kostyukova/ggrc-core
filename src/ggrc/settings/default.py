@@ -23,8 +23,6 @@ USER_PERMISSIONS_PROVIDER = \
     'ggrc_basic_permissions.CompletePermissionsProvider'
 EXTENSIONS = [
     'ggrc_basic_permissions',
-    'ggrc_risk_assessments',
-    'ggrc_risks',
     'ggrc_workflows',
 ]
 exports = [
@@ -56,7 +54,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.21.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.22.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

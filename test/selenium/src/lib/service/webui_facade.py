@@ -8,18 +8,50 @@ import nerodia
 
 from lib import users, base
 from lib.constants import objects
-from lib.service import webui_service, rest_service
+from lib.page.widget import generic_widget
+from lib.service import webui_service, rest_service, rest_facade
 from lib.utils import selenium_utils
+
+from lib.entities import entities_factory
 
 
 def create_program(selenium):
-  """Create program via UI"""
+  """Create program via UI."""
   return webui_service.ProgramsService(selenium).create_obj()
 
 
 def create_control(selenium):
-  """Create control via UI"""
+  """Create control via UI."""
   return webui_service.ControlsService(selenium).create_obj()
+
+
+def create_asmt(selenium, audit):
+  """Create audit via UI."""
+  expected_asmt = entities_factory.AssessmentsFactory().create()
+  asmts_ui_service = webui_service.AssessmentsService(selenium)
+  asmts_ui_service.create_obj_via_tree_view(
+      src_obj=audit, obj=expected_asmt)
+  asmt_tree_view = generic_widget.TreeView(
+      selenium, None, objects.ASSESSMENTS)
+  expected_asmt_url = (
+      asmt_tree_view.get_obj_url_from_tree_view_by_title(expected_asmt.title))
+  expected_asmt.id = expected_asmt_url.split('/')[-1]
+  expected_asmt_rest = rest_facade.get_obj(expected_asmt)
+  expected_asmt.url = expected_asmt_url
+  expected_asmt.assignees = audit.audit_captains
+  expected_asmt.creators = [users.current_user().email]
+  expected_asmt.verifiers = audit.auditors
+  expected_asmt.created_at = expected_asmt_rest.created_at
+  expected_asmt.modified_by = users.current_user().email
+  expected_asmt.updated_at = expected_asmt_rest.updated_at
+  return expected_asmt
+
+
+def assert_can_edit_asmt(selenium, asmt):
+  """Assert that current user can edit asmt via UI."""
+  asmts_ui_service = webui_service.AssessmentsService(selenium)
+  info_page = asmts_ui_service.open_info_page_of_obj(asmt)
+  _assert_title_editable(asmt, asmts_ui_service, info_page)
 
 
 def assert_can_view(selenium, obj):
@@ -27,12 +59,11 @@ def assert_can_view(selenium, obj):
   We go through all elements of the page in order to check that user
   has access to them.
   """
-  _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
   actual_obj = _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
   obj_copy = copy.deepcopy(obj)
   # Code for working with custom attributes appears to be buggy
   base.Test.general_equal_assert(
-      obj_copy.repr_ui(), actual_obj, "custom_attributes", "program")
+      obj_copy.repr_ui(), actual_obj, "audit", "custom_attributes", "program")
 
 
 def assert_cannot_view(selenium, obj):
@@ -83,7 +114,7 @@ def _assert_title_editable(obj, ui_service, info_page):
           obj=obj).updated_at)
   new_ui_obj = ui_service.get_obj_from_info_page(obj)
   base.Test.general_equal_assert(
-      obj.repr_ui(), new_ui_obj, "custom_attributes")
+      obj.repr_ui(), new_ui_obj, "audit", "custom_attributes")
 
 
 def is_error_403(selenium):

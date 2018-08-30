@@ -12,7 +12,6 @@ from ggrc.converters.handlers import boolean
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import multi_object
 from ggrc.models import all_models
-from ggrc_risks.models import risk, threat
 from ggrc_workflows import models as wf_models
 
 
@@ -177,8 +176,8 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.Metric.__name__,
       all_models.TechnologyEnvironment.__name__,
       all_models.ProductGroup.__name__,
-      risk.Risk.__name__,
-      threat.Threat.__name__,
+      all_models.Risk.__name__,
+      all_models.Threat.__name__,
   )
 
   def get_value(self):

@@ -63,6 +63,26 @@ def custom_attribute_mapping(object_type, related_type, related_ids):
   )
 
 
+def risk_assessment_person(object_type, related_type, related_ids):
+  if {object_type, related_type} != {"RiskAssessment", "Person"}:
+    return None
+  if object_type == "Person":
+    return db.session \
+        .query(all_models.RiskAssessment.ra_manager_id) \
+        .filter(all_models.RiskAssessment.id.in_(related_ids)) \
+        .union(
+            db.session.query(all_models.RiskAssessment.ra_counsel_id)
+                      .filter(all_models.RiskAssessment.id.in_(related_ids))
+        )
+  else:
+    return db.session \
+        .query(all_models.RiskAssessment.id) \
+        .filter(
+            (all_models.RiskAssessment.ra_manager_id.in_(related_ids)) |
+            (all_models.RiskAssessment.ra_counsel_id.in_(related_ids))
+        )
+
+
 def program_risk_assessment(object_type, related_type, related_ids):
   if {object_type, related_type} != {"Program", "RiskAssessment"} or \
           not related_ids:
@@ -110,6 +130,7 @@ def get_special_mappings(object_type, related_type, related_ids):
       program_risk_assessment(object_type, related_type, related_ids),
       task_group_object(object_type, related_type, related_ids),
       custom_attribute_mapping(object_type, related_type, related_ids),
+      risk_assessment_person(object_type, related_type, related_ids),
   ]
 
 

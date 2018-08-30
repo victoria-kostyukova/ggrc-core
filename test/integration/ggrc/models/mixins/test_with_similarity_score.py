@@ -10,7 +10,6 @@ import ddt
 from ggrc import db
 from ggrc import models
 from ggrc.snapshotter.rules import Types
-from ggrc_risks import models as risk_models
 
 from integration.ggrc import TestCase
 import integration.ggrc.generator
@@ -124,7 +123,7 @@ class TestWithSimilarityScore(TestCase):
     program_1 = models.Program.query.filter_by(title="Program 1").one()
     program_2 = models.Program.query.filter_by(title="Program 2").one()
     program_3 = models.Program.query.filter_by(title="Program 3").one()
-    risk_program_1 = risk_models.Risk.query.get(risk_program_1.id)
+    risk_program_1 = models.Risk.query.get(risk_program_1.id)
 
     audit_1 = self.obj_gen.generate_object(models.Audit, {
         "title": "Audit 1",

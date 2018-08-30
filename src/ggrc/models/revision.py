@@ -331,8 +331,6 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "Requirement",
         "System",
         "Vendor",
-
-        # ggrc_risks
         "Risk",
         "Threat",
     }

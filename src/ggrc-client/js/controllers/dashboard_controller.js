@@ -236,11 +236,11 @@ Dashboard({
   },
 
   init_page_title: function () {
-    // Reset title when page object is modified
+    // Reset page title only when title of object is modified
     let that = this;
     let thatSuper = this._super;
 
-    this.options.instance.bind('change', function () {
+    this.options.instance.bind('title', function () {
       thatSuper.apply(that);
     });
     this._super();
