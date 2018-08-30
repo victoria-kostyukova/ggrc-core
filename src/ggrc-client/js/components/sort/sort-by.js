@@ -11,9 +11,16 @@ export default can.Component.extend({
   viewModel: {
     sortedItems: [],
     isSnapshot: false,
-    items: [],
     sortByProperty: 'name',
     _debounceInterval: null,
+    define: {
+      items: {
+        value: [],
+        set: function () {
+          this.sortDebounce();
+        },
+      },
+    },
     getModels(items, propertyName) {
       const promises = items.attr().map((item) =>
         getModelInstance(item.id, item.type, propertyName));
