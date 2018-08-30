@@ -17,79 +17,49 @@ describe('multiselect-dropdown component', function () {
       viewModel = getComponentVM(Component);
 
       options = [
-        {
-          value: 'Draft',
-        },
-        {
-          value: 'Active',
-        },
-        {
-          value: 'Open',
-        },
-        {
-          value: 'Deprecated',
-        },
+        {value: 1, checked: true},
+        {value: 2, checked: false},
+        {value: 3, checked: true}
       ];
-
       viewModel.attr('options', options);
     });
 
-    it('updateSelected() should add new item in "selected"',
-      function () {
-        let selected;
-        let item = viewModel.attr('options')[1];
-        item.checked = true;
+    it('sets _stateWasUpdated attr to true', () => {
+      viewModel.attr('_stateWasUpdated', false);
 
-        viewModel.updateSelected(item);
-        selected = viewModel.attr('selected');
+      viewModel.updateSelected();
 
-        expect(selected.length).toEqual(1);
-        expect(selected[0].value).toEqual(item.value);
-      }
-    );
+      expect(viewModel.attr('_stateWasUpdated')).toBe(true);
+    });
 
-    it('updateSelected() should remove item from "selected"',
-      function () {
-        let selected = viewModel.attr('selected');
-        let options = viewModel.attr('options');
-        let item;
+    it('assigns new list into selected from options', () => {
+      const expectedSelected = _.filter(options, (item) => {
+        return item.checked;
+      });
 
-        expect(selected.length).toEqual(0);
+      viewModel.attr('options', options);
+      viewModel.attr('selected', []);
 
-        options.forEach(function (option) {
-          option.checked = true;
-          viewModel.updateSelected(option);
-        });
+      viewModel.updateSelected();
 
-        // we added all options in selected
-        expect(selected.length).toEqual(options.length);
+      expect(viewModel.attr('selected').serialize()).toEqual(expectedSelected);
+    });
 
-        item = viewModel.attr('options')[1];
-        item.checked = false;
+    it('triggers "multiselect:changed" event if element attr is defined',
+      () => {
+        viewModel.attr('element', {});
+        viewModel.attr('options', options);
+        viewModel.attr('selected', []);
+        spyOn(can, 'trigger');
 
-        // pass uchecked item
-        viewModel.updateSelected(item);
+        viewModel.updateSelected();
 
-        expect(selected.length).toEqual(options.length - 1);
-      }
-    );
-
-    it('updateSelected() should not add duplicates in "selected"',
-      function () {
-        let selected;
-        let item = viewModel.attr('options')[1];
-        item.checked = true;
-
-        // double call
-        viewModel.updateSelected(item);
-        viewModel.updateSelected(item);
-
-        selected = viewModel.attr('selected');
-
-        expect(selected.length).toEqual(1);
-        expect(selected[0].value).toEqual(item.value);
-      }
-    );
+        expect(can.trigger).toHaveBeenCalledWith(
+          viewModel.element,
+          'multiselect:changed',
+          [viewModel.attr('selected')],
+        );
+      });
   });
 
   describe('_displayValue attribute', function () {
@@ -102,7 +72,7 @@ describe('multiselect-dropdown component', function () {
     beforeEach(function () {
       viewModel = getComponentVM(Component);
 
-      options = [
+      options = new can.Map([
         {
           value: 'Draft',
         },
@@ -115,7 +85,7 @@ describe('multiselect-dropdown component', function () {
         {
           value: 'Deprecated',
         },
-      ];
+      ]);
 
       viewModel.attr('options', options);
 
@@ -124,14 +94,13 @@ describe('multiselect-dropdown component', function () {
       openItem = options[2];
     });
 
-    it('check "_displayValue" after add new "seleted"',
+    it('check "_displayValue" after updateSelected()',
       function () {
-        draftItem.checked = true;
-        activeItem.checked = true;
+        draftItem.attr('checked', true);
+        activeItem.attr('checked', true);
 
         // select items
         viewModel.updateSelected(draftItem);
-        viewModel.updateSelected(activeItem);
 
         expect(viewModel.attr('_displayValue'))
           .toEqual(draftItem.value + ', ' + activeItem.value);
@@ -140,18 +109,16 @@ describe('multiselect-dropdown component', function () {
 
     it('check "_displayValue" after remove item from "seleted"',
       function () {
-        draftItem.checked = true;
-        activeItem.checked = true;
-        openItem.checked = true;
+        draftItem.attr('checked', true);
+        activeItem.attr('checked', true);
+        openItem.attr('checked', true);
 
         // select items
-        viewModel.updateSelected(draftItem);
-        viewModel.updateSelected(activeItem);
-        viewModel.updateSelected(openItem);
+        viewModel.updateSelected();
 
         // remove activeItem from 'selected' array
-        activeItem.checked = false;
-        viewModel.updateSelected(activeItem);
+        activeItem.attr('checked', false);
+        viewModel.updateSelected();
 
         // '_displayValue' should contain values of 'draftItem' and 'openItem' items
         expect(viewModel.attr('_displayValue'))
@@ -197,14 +164,11 @@ describe('multiselect-dropdown component', function () {
 
     it('close dropdown with changing of options',
       function () {
-        let item = viewModel.attr('options')[0];
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
         viewModel.attr('_stateWasUpdated', false);
 
-        // change state of item
-        item.checked = true;
-        viewModel.updateSelected(item);
+        viewModel.updateSelected();
 
         // simulate "window.click" event
         viewModel.changeOpenCloseState();
