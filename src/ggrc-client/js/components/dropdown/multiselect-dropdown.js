@@ -35,7 +35,7 @@ export default can.Component.extend({
         get: function () {
           let options = this.attr('options');
 
-          return Array.prototype.every.call(options, function (item) {
+          return _.every(options, function (item) {
             return item.attr('checked');
           });
         },
@@ -46,6 +46,8 @@ export default can.Component.extend({
             option.attr('checked', value);
           });
 
+          this.updateSelected();
+
           return value;
         },
       },
@@ -54,48 +56,24 @@ export default can.Component.extend({
         value: false,
       },
       options: {
-        type: '*',
-        set: function (value) {
-          let self = this;
-          this.attr('selected', []);
-          if (value) {
-            value.forEach(function (item) {
-              self.updateSelected(item);
-            });
+        value: [],
+        set: function (value, setValue) {
+          setValue(value);
 
-            return value;
-          }
-
-          return [];
+          this.attr('selected', _.filter(value,
+            (item) => item.checked));
         },
       },
     },
-    updateSelected: function (item) {
-      let selected = this.attr('selected');
-      let index = -1;
-      let duplicates;
-
+    updateSelected: function () {
       this.attr('_stateWasUpdated', true);
 
-      if (item.checked) {
-        duplicates = selected.filter(function (selectedItem) {
-          return selectedItem.attr('value') === item.value;
-        });
+      this.attr('selected', _.filter(this.attr('options'),
+        (item) => item.checked));
 
-        if (duplicates.length > 0) {
-          return;
-        }
-
-        selected.push(item);
-        return;
-      }
-
-      index = selected.map(function (selectedItem) {
-        return selectedItem.value;
-      }).indexOf(item.value);
-
-      if (index > -1) {
-        selected.splice(index, 1);
+      if (this.element) {
+        can.trigger(this.element, 'multiselect:changed',
+          [this.attr('selected')]);
       }
     },
     dropdownClosed: function (el, ev, scope) {
@@ -138,24 +116,17 @@ export default can.Component.extend({
       // this attr needed when page has any components
       this.attr('canBeOpen', true);
     },
+    optionChange: function (item) {
+      // click event triggered before new value of input is saved
+      item.attr('checked', !item.checked);
+
+      this.updateSelected();
+    },
     dropdownBodyClick: function (ev) {
       ev.stopPropagation();
     },
   },
   events: {
-    '{options} change': function (scope, ev, propertyName) {
-      let target = ev.target;
-
-      // igore all propetries except 'checked'
-      if (propertyName.indexOf('checked') === -1) {
-        return;
-      }
-
-      this.viewModel.updateSelected(target);
-
-      can.trigger(this.element, 'multiselect:changed',
-        [this.viewModel.attr('selected')]);
-    },
     '{window} click': function () {
       if (this.viewModel.attr('disabled')) {
         return;

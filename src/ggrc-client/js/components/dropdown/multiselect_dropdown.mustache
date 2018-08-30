@@ -33,8 +33,8 @@
           <label class="multiselect-dropdown__label">
             <input type="checkbox"
               {($checked)}="checked"
+              ($click)="optionChange(.)"
               value="{{value}}"
-              name="{{name}}"
               id="{{id}}"
               class="multiselect-dropdown__checkbox {{cssClass}}"
               />
@@ -47,4 +47,3 @@
   </div>
   {{/if}}
 </div>
-
