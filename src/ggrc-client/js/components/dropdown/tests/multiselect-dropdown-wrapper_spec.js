@@ -179,11 +179,5 @@ describe('multiselect-dropdown-wrapper component', function () {
       expect(viewModel.selected[0].name).toEqual('testName');
       expect(viewModel.selected[0].extra).toEqual('extra');
     });
-
-    it('should keep an object', () => {
-      let initialObj = viewModel.selected;
-      handler({}, {}, newSelected);
-      expect(viewModel.selected).toEqual(initialObj);
-    });
   });
 });
