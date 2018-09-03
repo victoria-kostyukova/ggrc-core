@@ -281,7 +281,7 @@ describe('display prefs model', function () {
     beforeEach(function () {
       dp_noversion = new DisplayPrefs({});
       dp2_outdated = new DisplayPrefs({version: 1});
-      dp3_current = new DisplayPrefs({version: DisplayPrefs.version });
+      dp3_current = new DisplayPrefs({version: DisplayPrefs.version});
     });
     it('404s if the display pref does not have a version set', function (done) {
       spyOn(LocalStorage, 'findOne').and.returnValue(new $.Deferred().resolve(dp_noversion));
