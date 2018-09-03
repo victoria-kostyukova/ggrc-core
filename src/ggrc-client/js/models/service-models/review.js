@@ -20,6 +20,5 @@ export default Cacheable('CMS.Models.Review', {
   create: 'POST /api/reviews',
   attributes: {
     reviewable: Stub,
-    last_reviewed_at: 'datetime',
   },
 }, {});

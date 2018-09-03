@@ -57,6 +57,13 @@ export default can.Component.extend({
           return this.attr('review.access_control_list.length');
         },
       },
+      getDate: {
+        get() {
+          const date = this.attr('review.last_reviewed_at');
+
+          return moment.utc(date).local().format('MM/DD/YYYY hh:mm:ss A Z');
+        },
+      },
     },
     instance: {},
     review: null,
