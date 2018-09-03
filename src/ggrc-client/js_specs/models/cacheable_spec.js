@@ -206,7 +206,7 @@ describe('Cacheable model', function () {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
-        let ids = can.map(items, function (item) { return item.id; });
+        let ids = can.map(items, function (item) {return item.id; });
         return can.map(dummy_insts, function (inst) {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });

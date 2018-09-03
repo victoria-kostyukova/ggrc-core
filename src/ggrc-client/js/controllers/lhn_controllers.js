@@ -391,7 +391,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       //  search box and the display prefs to save the search value between page loads.
       //  We also listen for this value in the controller
       //  to trigger the search.
-    return can.view(template_path, prefs_dfd.then(function (prefs) { return prefs.getLHNState(); })).then(function (frag, xhr) {
+    return can.view(template_path, prefs_dfd.then(function (prefs) {return prefs.getLHNState(); })).then(function (frag, xhr) {
       let lhn_prefs = prefs.getLHNState();
       let initial_term;
       let initial_params = {};
