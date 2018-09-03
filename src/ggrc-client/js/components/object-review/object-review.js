@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './request-review-modal';
 import template from './templates/object-review.mustache';
 import notificationTemplate from './templates/complete-review-notification.mustache';
 import Review from '../../models/service-models/review';
@@ -68,6 +69,9 @@ export default can.Component.extend({
     instance: {},
     review: null,
     loading: false,
+    reviewersModalState: {
+      open: false,
+    },
     loadReview() {
       const review = this.attr('instance.review');
 
@@ -137,6 +141,12 @@ export default can.Component.extend({
           person: {type: 'Person', id: GGRC.current_user.id},
         });
       }
+    },
+    changeReviewers() {
+      this.attr('reviewersModalState.open', true);
+    },
+    reviewersUpdated(event) {
+      this.attr('review', event.review);
     },
   },
   events: {

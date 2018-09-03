@@ -34,6 +34,12 @@
           class="btn btn-green btn-small">
         Mark Reviewed
       </button>
+      <button
+          {{#if loading}}disabled{{/if}}
+          ($click)="changeReviewers($element)"
+          class="btn btn-white btn-small">
+        Request Review
+      </button>
     </div>
   {{/if}}
 </div>
@@ -43,3 +49,10 @@
     {instance}="review">
   </custom-roles>
 {{/if}}
+
+<request-review-modal
+  {review}="review"
+  {parent-instance}="instance"
+  {(modal-state)}="reviewersModalState"
+  (reviewers-updated)="reviewersUpdated(%event)">
+</request-review-modal>

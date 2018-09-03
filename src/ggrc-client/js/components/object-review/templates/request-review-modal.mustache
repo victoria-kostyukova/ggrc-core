@@ -1,0 +1,53 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<simple-modal
+  {state}="modalState"
+  {replace-content}="true"
+  {extra-css-class}="'request-review-modal'"
+>
+  <div class="simple-modal__header">
+    <div class="simple-modal__header-text">Request Review</div>
+    <button class="btn btn-small btn-icon" ($click)="cancel()">
+      <i class="fa fa-times black"></i>
+    </button>
+  </div>
+  <div class="request-review-modal__note">An email notification will be sent to each reviewer.</div>
+  <div class="simple-modal__body">
+    <div class="simple-modal__section">
+      <custom-roles-modal
+        {instance}="review"
+        {is-new-instance}="isNewReviewObject">
+      </custom-roles-modal>
+    </div>
+    <div class="simple-modal__section">
+      <div class="ggrc-form">
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row">
+            <label class="ggrc-form-item__label">
+              Comment
+            </label>
+            <rich-text
+              {hidden-toolbar}="true"
+              {placeholder}="'Enter comment'"
+              {(content)}="review.email_message">
+            </rich-text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="simple-modal__footer">
+    <div class="simple-modal__toolbar">
+      <button
+        {{#if disabled}}disabled{{/if}}
+        class="btn btn-green btn-small"
+        ($click)="save()">
+          Request
+      </button>
+    </div>
+  </div>
+</simple-modal>
