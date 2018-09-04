@@ -11,6 +11,7 @@ import {
   isCommentRequired,
   isEvidenceRequired,
   isUrlRequired,
+  updateCustomAttributeValue,
 } from '../utils/ca-utils';
 
 describe('ca-utils', function () {
@@ -258,6 +259,56 @@ describe('ca-utils', function () {
         ].forEach((value) => {
           dropdownField.attr('value', value);
           expect(isUrlRequired(dropdownField)).toEqual(false);
+        });
+      });
+    });
+  });
+
+  describe('updateCustomAttributeValue() method', function () {
+    let ca;
+
+    beforeEach(function () {
+      ca = new can.Map();
+    });
+
+    describe('if attributeType is "person"', function () {
+      beforeEach(function () {
+        ca.attr('attributeType', 'person');
+      });
+
+      it('assigns "Person" to "attribute_value" attr', function () {
+        updateCustomAttributeValue(ca);
+
+        expect(ca.attr('attribute_value')).toBe('Person');
+      });
+
+      it('assigns object with specified id to "attribute_object" attr',
+        function () {
+          let value = 'mockValue';
+          updateCustomAttributeValue(ca, value);
+
+          expect(ca.attr('attribute_object').serialize()).toEqual({
+            type: 'Person',
+            id: value,
+          });
+        });
+
+      it('assigns value to "attribute_object_id" attr', function () {
+        let value = 'mockValue';
+        updateCustomAttributeValue(ca, value);
+
+        expect(ca.attr('attribute_object_id')).toBe(value);
+      });
+
+      it('assigns null to attribute_object_id and attribute_object attrs' +
+      'if value is falsy', function () {
+        const falsyValues = ['', null, undefined, false, 0, NaN];
+
+        falsyValues.forEach((falsy) => {
+          updateCustomAttributeValue(ca, falsy);
+
+          expect(ca.attr('attribute_object_id')).toBeNull();
+          expect(ca.attr('attribute_object')).toBeNull();
         });
       });
     });

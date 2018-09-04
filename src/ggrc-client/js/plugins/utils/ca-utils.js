@@ -391,8 +391,11 @@ function getCustomAttributes(instance, type) {
 function updateCustomAttributeValue(ca, value) {
   if (ca.attr('attributeType') === 'person') {
     let attributeObject = value ? {id: value, type: 'Person'} : null;
+    let attributeObjectId = value || null;
+
     ca.attr('attribute_value', 'Person');
     ca.attr('attribute_object', attributeObject);
+    ca.attr('attribute_object_id', attributeObjectId);
   } else {
     let convertedValue = convertToCaValue(ca.attr('attributeType'), value);
     ca.attr('attribute_value', convertedValue || ca.def.default_value);
@@ -478,4 +481,5 @@ export {
   ddValidationValueToMap,
   ddValidationMapToValue,
   getLCAPopupTitle,
+  updateCustomAttributeValue,
 };
