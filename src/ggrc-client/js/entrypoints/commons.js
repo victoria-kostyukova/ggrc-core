@@ -12,7 +12,6 @@ import '../bootstrap/modal-form';
 import '../plugins/lodash_helpers';
 import '../application';
 import '../plugins/ggrc_utils';
-import '../plugins/datepicker';
 import '../plugins/can_control';
 import '../plugins/autocomplete';
 import '../plugins/ajax_extensions';
