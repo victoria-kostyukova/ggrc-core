@@ -68,30 +68,6 @@
   top: 0;
 }
 
-// action-bar link behave
-%action-link {
-  text-transform: uppercase;
-  font-weight: normal;
-  background: #fafafa;
-  color: darken($link,20%);
-  display: block;
-  padding: 0 6px;
-  @include border-radius(4px);
-  @include transition(background 0.2s ease, color 0.2s ease);
-  i {
-    @include opacity(0.6);
-    @include transition(opacity 0.2s ease);
-  }
-  &:hover {
-    text-decoration: none;
-    color: $link;
-    background: $lightGray;
-    i {
-      @include opacity(1);
-    }
-  }
-}
-
 // progress bar placeholder colors
 %bar-finish {
   background: $status-completed;

@@ -9,7 +9,6 @@ dashboard-js-template-files:
   - base_objects/confirm_warning.mustache
   - base_objects/contacts.mustache
   - base_objects/general-page-header.mustache
-  - base_objects/object-review.mustache
   - base_objects/description.mustache
   - base_objects/test_plan.mustache
   - base_objects/extended_info.mustache

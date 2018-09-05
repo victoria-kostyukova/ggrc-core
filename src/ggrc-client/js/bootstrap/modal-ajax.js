@@ -113,7 +113,6 @@ import modalModels from '../models/modal-models';
       let isProposal = $trigger.data('is-proposal');
       let instance;
       let modalTitle;
-      let titleOverride;
       let contentView;
 
       if ($trigger.attr('data-object-id') === 'page') {
@@ -133,10 +132,6 @@ import modalModels from '../models/modal-models';
         model.title_singular ||
         $trigger.attr('data-object-singular'));
 
-      titleOverride = $trigger.attr('data-modal-title-override');
-      if (titleOverride) {
-        modalTitle = titleOverride;
-      }
       if (isProposal) {
         modalTitle = `Proposal for ${model.title_singular}`;
       }
