@@ -16,7 +16,6 @@ import '../apps/workflows';
 import '../controllers/dashboard_page';
 import '../controllers/workflow_page';
 import '../workflow_mustache_helpers';
-import '../controllers/approval_workflow_controller';
 import '../components/workflow/workflow_clone';
 import '../components/workflow/taskgroup_clone';
 import '../components/workflow/end_cycle';
