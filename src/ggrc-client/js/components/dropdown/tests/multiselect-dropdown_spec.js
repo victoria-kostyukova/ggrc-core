@@ -190,6 +190,7 @@ describe('multiselect-dropdown component', function () {
   describe('"open/close" state of component', function () {
     beforeEach(function () {
       viewModel.attr('options', [{value: 'someOption'}]);
+      spyOn(viewModel, 'dispatch');
     });
 
     it('open dropdown',
@@ -215,7 +216,7 @@ describe('multiselect-dropdown component', function () {
 
         expect(viewModel.attr('isOpen')).toEqual(false);
         expect(viewModel.attr('canBeOpen')).toEqual(false);
-        expect(can.trigger.calls.count()).toEqual(0);
+        expect(viewModel.dispatch.calls.count()).toEqual(0);
       }
     );
 
@@ -232,7 +233,10 @@ describe('multiselect-dropdown component', function () {
 
         expect(viewModel.attr('isOpen')).toEqual(false);
         expect(viewModel.attr('canBeOpen')).toEqual(false);
-        expect(can.trigger.calls.count()).toEqual(1);
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'dropdownClose',
+          selected: viewModel.attr('selected'),
+        });
       }
     );
   });

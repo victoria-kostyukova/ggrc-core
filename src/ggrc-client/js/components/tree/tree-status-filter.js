@@ -81,6 +81,14 @@ let viewModel = can.Map.extend({
       null;
     this.attr('options.query', query);
   },
+  selectItems(event) {
+    let selectedStates = event.selected.map((state) => state.value);
+
+    this.buildSearchQuery(selectedStates);
+    this.saveTreeStates(selectedStates);
+    this.setStatesRoute(selectedStates);
+    this.dispatch('filter');
+  },
 });
 
 export default can.Component.extend({
@@ -113,15 +121,6 @@ export default can.Component.extend({
         vm.setStatesDropdown(defaultStates);
         vm.setStatesRoute(defaultStates);
       });
-    },
-    'multiselect-dropdown multiselect:closed'(el, ev, selected) {
-      ev.stopPropagation();
-      let selectedStates = selected.map((state) => state.value);
-
-      this.viewModel.buildSearchQuery(selectedStates);
-      this.viewModel.saveTreeStates(selectedStates);
-      this.viewModel.setStatesRoute(selectedStates);
-      this.viewModel.dispatch('filter');
     },
     '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {

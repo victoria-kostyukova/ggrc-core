@@ -85,7 +85,7 @@ export default can.Component.extend({
       let selected = this.attr('selected');
 
       this.attr('_stateWasUpdated', false);
-      can.trigger(el, 'multiselect:closed', [selected]);
+
       this.dispatch({
         type: 'dropdownClose',
         selected: selected,

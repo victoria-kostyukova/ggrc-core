@@ -27,7 +27,8 @@
           <multiselect-dropdown
             {options}="filterStates"
             {placeholder}="'Filter by State'"
-            {disabled}="advancedSearch.filter">
+            {disabled}="advancedSearch.filter"
+            (dropdown-close)="selectItems(%event)">
           </multiselect-dropdown>
           {{#if statusTooltipVisible}}
             <i class="fa fa-question-circle" rel="tooltip"
