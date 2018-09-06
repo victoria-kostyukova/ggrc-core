@@ -101,6 +101,13 @@ let viewModel = can.Map.extend({
 
     this.attr('stateModel.items', states);
   },
+  /**
+   * handler is passed to child component, which is dispatched when items changed
+   * @param {Object} event - event which contains array of selected items.
+   */
+  statesChanged(event) {
+    this.saveTreeStates(event.selected);
+  },
 });
 
 /**
@@ -110,16 +117,4 @@ export default can.Component.extend({
   tag: 'advanced-search-filter-state',
   template: template,
   viewModel: viewModel,
-  events: {
-    /**
-     * Saves selected states.
-     * @param {object} el - clicked element.
-     * @param {object} ev - event object.
-     * @param {Array} selected - selected items.
-     */
-    'multiselect-dropdown multiselect:changed': function (el, ev, selected) {
-      ev.stopPropagation();
-      this.viewModel.saveTreeStates(selected);
-    },
-  },
 });
