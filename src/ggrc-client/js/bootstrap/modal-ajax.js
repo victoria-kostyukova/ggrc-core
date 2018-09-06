@@ -20,6 +20,7 @@ import {
 } from '../plugins/utils/current-page-utils';
 import modalModels from '../models/modal-models';
 import Mappings from '../models/mappers/mappings';
+import {changeUrl} from '../router';
 
 (function (can, $, GGRC) {
   'use strict';
@@ -92,7 +93,7 @@ import Mappings from '../models/mappers/mappings';
           (instance === getPageInstance())) {
           navigate('/dashboard');
         } else if (modelName === 'people' || modelName === 'roles') {
-          window.location.assign('/admin#' + modelName + '_list');
+          changeUrl('/admin#' + modelName + '_list');
           navigate();
         } else {
           $trigger.trigger('modal:success', data);
