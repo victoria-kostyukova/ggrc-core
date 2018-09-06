@@ -324,57 +324,6 @@ import TreeViewOptions from './tree-view-options';
       }
     },
 
-    '.select:not(.disabled) click': function (el, ev) {
-      let tree = el.closest('.cms_controllers_tree_view_node');
-      let node = tree.control();
-      if (node) {
-        node.select();
-      }
-    },
-
-    /**
-     * Mark the tree node as active (and all other tree nodes as inactive).
-     * @param {Boolean} maximizeInfoPane - Info pane maximized state
-     */
-    select: function (maximizeInfoPane) {
-      const $tree = this.element;
-      const treeHasMaximizedClass = $tree.hasClass('maximized-info-pane');
-      let control;
-      if (typeof maximizeInfoPane === 'undefined') {
-        if (treeHasMaximizedClass) {
-          maximizeInfoPane = true;
-        } else {
-          maximizeInfoPane = false;
-        }
-      }
-
-      if ($tree.hasClass('active') &&
-        ((maximizeInfoPane && treeHasMaximizedClass) ||
-        (!maximizeInfoPane && !treeHasMaximizedClass))) {
-        return; // tree node already selected, no need to activate it again
-      }
-
-      $tree.closest('section')
-        .find('.cms_controllers_tree_view_node')
-        .removeClass('active');
-
-      $tree
-        .addClass('active');
-
-      if (maximizeInfoPane) {
-        $tree
-          .addClass('maximized-info-pane');
-      } else {
-        $tree
-          .removeClass('maximized-info-pane');
-      }
-
-      control = $('.pin-content').control();
-      if (control) {
-        control.setInstance(this.options, $tree, maximizeInfoPane);
-      }
-    },
-
     'input,select click': function (el, ev) {
       // Don't toggle accordion when clicking on input/select fields
       ev.stopPropagation();
