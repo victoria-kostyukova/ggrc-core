@@ -440,26 +440,22 @@ function deferRender(tagPrefix, funcs, deferred) {
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 };
 
-can.each(['with_page_object_as', 'with_current_user_as'], function (fname) {
-  Mustache.registerHelper(fname, function (name, options) {
-    if (!options) {
-      options = name;
-      name = fname.replace(/with_(.*)_as/, '$1');
-    }
-    let pageObject = (fname === 'with_current_user_as'
-      ? (Person.findInCacheById(GGRC.current_user.id)
-                          || Person.model(GGRC.current_user))
-      : getPageInstance()
-    );
-    if (pageObject) {
-      let po = {};
-      po[name] = pageObject;
-      options.contexts = options.contexts.add(po);
-      return options.fn(options.contexts);
-    } else {
-      return options.inverse(options.contexts);
-    }
-  });
+Mustache.registerHelper('with_current_user_as', function (name, options) {
+  if (!options) {
+    options = name;
+    name = 'current_user';
+  }
+  let pageObject = Person.findInCacheById(GGRC.current_user.id) ||
+    Person.model(GGRC.current_user);
+
+  if (pageObject) {
+    let po = {};
+    po[name] = pageObject;
+    options.contexts = options.contexts.add(po);
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper('option_select',
