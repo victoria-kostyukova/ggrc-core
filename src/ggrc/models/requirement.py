@@ -39,7 +39,7 @@ class Requirement(Roleable,
   _table_plural = 'requirements'
   _aliases = {
       "documents_file": None,
-      "description": "Text of Requirement",
+      "description": "Description",
       "directive": {
           "display_name": "Policy / Regulation / Standard / Contract",
           "type": reflection.AttributeInfo.Type.MAPPING,
