@@ -40,7 +40,6 @@ export default Cacheable('CMS.Models.Cycle', {
   mixins: ['isOverdue'],
   attributes: {
     workflow: Stub,
-    cycle_task_groups: Stub.List,
     modified_by: Stub,
     context: Stub,
   },
@@ -66,19 +65,6 @@ export default Cacheable('CMS.Models.Cycle', {
     let that = this;
     this._super(...arguments);
     this.bind('created', refreshAttrWrap('workflow').bind(this));
-    this.bind('destroyed', function (ev, inst) {
-      if (inst instanceof that) {
-        can.each(inst.cycle_task_groups, function (cycleTaskGroup) {
-          if (!cycleTaskGroup) {
-            return;
-          }
-          cycleTaskGroup = cycleTaskGroup.reify();
-          can.trigger(cycleTaskGroup, 'destroyed');
-          can.trigger(
-            cycleTaskGroup.constructor, 'destroyed', cycleTaskGroup);
-        });
-      }
-    });
   },
 }, {
   init: function () {

@@ -80,21 +80,6 @@ import * as businessModels from '../models/business-models';
         objects: Proxy(
           null, 'object', 'TaskGroupObject', 'task_group',
           'task_group_objects'),
-        /**
-         * "workflow" property is used for Object Review functionality (when
-         * review-link is loaded)
-         */
-        workflow: Direct(
-          'Workflow', 'task_groups', 'workflow'),
-      },
-      Workflow: {
-        // "cycles" and "current_cycle" are needed for Object Review
-        // functionality
-        cycles: Direct(
-          'Cycle', 'workflow', 'cycles'),
-        current_cycle: CustomFilter('cycles', function (result) {
-          return result.instance.attr('is_current');
-        }),
       },
       CycleTaskGroupObjectTask: {
         _canonical: {
@@ -196,10 +181,6 @@ import * as businessModels from '../models/business-models';
           null
         ),
         workflows: workflowsMapper,
-        approval_workflows: CustomFilter('workflows', function (binding) {
-          return binding.instance.attr('object_approval');
-        }),
-        current_approval_cycles: Cross('approval_workflows', 'current_cycle'),
         _canonical: {
           task_groups: 'TaskGroup',
         },
