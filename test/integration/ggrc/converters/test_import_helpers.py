@@ -591,7 +591,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     """Test default headers for Requirement."""
     names = {
         "Title",
-        "Text of Requirement",
+        "Description",
         "Notes",
         "Policy / Regulation / Standard / Contract",
         "Admin",
