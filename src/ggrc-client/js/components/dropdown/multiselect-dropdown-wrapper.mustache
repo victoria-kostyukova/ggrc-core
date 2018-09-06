@@ -6,5 +6,6 @@
 <multiselect-dropdown
     {options}="preparedOptions"
     {selected}="selectedInternal"
+    (selected-changed)="selectedChanged(%event)"
     {placeholder}="placeholder">
 </multiselect-dropdown>

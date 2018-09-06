@@ -71,10 +71,10 @@ export default can.Component.extend({
       this.attr('selected', _.filter(this.attr('options'),
         (item) => item.checked));
 
-      if (this.element) {
-        can.trigger(this.element, 'multiselect:changed',
-          [this.attr('selected')]);
-      }
+      this.dispatch({
+        type: 'selectedChanged',
+        selected: this.attr('selected'),
+      });
     },
     dropdownClosed: function (el, ev, scope) {
       // don't trigger event if state didn't change

@@ -60,23 +60,17 @@ export default can.Component.extend({
       // converted into multiselect-dropdown format
       this.attr('selectedInternal', selectedInternal);
     },
-  },
-  events: {
-    /*
-      Update received from multiselect-dropdown
-      Retrieved from Model.cache by Id and sent up to parent`s 'selected'
-    */
-    'multiselect-dropdown multiselect:changed':
-      function (element, event, newSelected) {
-        let selected = [];
-        let model = this.viewModel.modelConstructor;
+    selectedChanged(event) {
+      let newSelected = event.selected;
+      let selected = [];
+      let model = this.attr('modelConstructor');
 
-        // add all new items from Cache
-        newSelected.forEach((item) => {
-          selected.push(model.findInCacheById(item.id));
-        });
+      // add all new items from Cache
+      newSelected.forEach((item) => {
+        selected.push(model.findInCacheById(item.id));
+      });
 
-        this.viewModel.attr('selected', selected);
-      },
+      this.attr('selected', selected);
+    },
   },
 });

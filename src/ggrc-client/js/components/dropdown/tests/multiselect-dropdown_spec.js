@@ -86,6 +86,7 @@ describe('multiselect-dropdown component', function () {
         {value: 3, checked: true},
       ];
       viewModel.attr('options', options);
+      spyOn(viewModel, 'dispatch');
     });
 
     it('sets _stateWasUpdated attr to true', () => {
@@ -108,7 +109,7 @@ describe('multiselect-dropdown component', function () {
       expect(viewModel.attr('selected').serialize()).toEqual(expectedSelected);
     });
 
-    it('triggers "multiselect:changed" event if element attr is defined',
+    it('dispatches event with "selectedChanged" type and selected items',
       () => {
         viewModel.attr('element', {});
         viewModel.attr('options', options);
@@ -117,11 +118,10 @@ describe('multiselect-dropdown component', function () {
 
         viewModel.updateSelected();
 
-        expect(can.trigger).toHaveBeenCalledWith(
-          viewModel.element,
-          'multiselect:changed',
-          [viewModel.attr('selected')],
-        );
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'selectedChanged',
+          selected: viewModel.attr('selected'),
+        });
       });
   });
 
