@@ -73,12 +73,6 @@ import Mappings from '../../models/mappers/mappings';
         this.options = can.extend(this.options, opts);
       }
     },
-    deselect: function () {
-      let active = this.element.find('.cms_controllers_tree_view_node.active');
-      active
-        .removeClass('active')
-        .removeClass('maximized-info-pane');
-    },
 
     init: function (el, opts) {
       let setAllowMapping;
