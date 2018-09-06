@@ -59,10 +59,14 @@ let viewModel = can.Map.extend({
     this.attr('displayPrefs').setTreeViewStates(widgetId, selectedStates);
   },
   setStatesDropdown(states) {
-    let statuses = this.attr('filterStates');
-    statuses.forEach((item) => {
+    let statuses = this.attr('filterStates').map((item) => {
       item.attr('checked', (states.indexOf(item.value) > -1));
+
+      return item;
     });
+
+    // need to trigget change event for 'filterStates' attr
+    this.attr('filterStates', statuses);
   },
   setStatesRoute(states) {
     let allStates = this.attr('allStates');
