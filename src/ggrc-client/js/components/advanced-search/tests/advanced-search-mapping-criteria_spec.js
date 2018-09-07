@@ -9,7 +9,6 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-mapping-criteria';
 import Mappings from '../../../models/mappers/mappings';
 import Audit from '../../../models/business-models/audit';
-import * as businessModels from '../../../models/business-models';
 
 describe('advanced-search-mapping-criteria component', function () {
   'use strict';
@@ -102,38 +101,17 @@ describe('advanced-search-mapping-criteria component', function () {
 
   describe('mappingTypes() method', function () {
     beforeEach(function () {
-      spyOn(Mappings, 'get_canonical_mappings_for').and.returnValue({
-        type1: {},
-        type2: {},
-        type3: {},
-        type4: {},
-        type5: {},
+      spyOn(Mappings, 'getAvailableMappings').and.returnValue({
+        type1: {
+          model_singular: '3',
+        },
+        type2: {
+          model_singular: '1',
+        },
+        type3: {
+          model_singular: '2',
+        },
       });
-
-      businessModels.type1 = {
-        model_singular: '3',
-        title_singular: '3',
-      };
-      businessModels.type2 = {
-        model_singular: '1',
-        title_singular: '1',
-      };
-      businessModels.type3 = {
-        model_singular: '2',
-        title_singular: null,
-      };
-      businessModels.type4 = null,
-      businessModels.type5 = {
-        model_singular: null,
-        title_singular: '4',
-      };
-    });
-    afterEach(function () {
-      businessModels.type1 = undefined;
-      businessModels.type2 = undefined;
-      businessModels.type3 = undefined;
-      businessModels.type4 = undefined;
-      businessModels.type5 = undefined;
     });
 
     describe('if it is in clone modal', () => {
@@ -160,12 +138,12 @@ describe('advanced-search-mapping-criteria component', function () {
       });
     });
 
-    it('retrieves canonical mappings for correct model', function () {
+    it('retrieves available mappings for correct model', function () {
       viewModel.attr('modelName', 'testModel');
 
       viewModel.mappingTypes();
 
-      expect(Mappings.get_canonical_mappings_for)
+      expect(Mappings.getAvailableMappings)
         .toHaveBeenCalledWith('testModel');
     });
 
@@ -175,11 +153,12 @@ describe('advanced-search-mapping-criteria component', function () {
       expect(result).toEqual([
         {
           model_singular: '1',
-          title_singular: '1',
+        },
+        {
+          model_singular: '2',
         },
         {
           model_singular: '3',
-          title_singular: '3',
         },
       ]);
     });

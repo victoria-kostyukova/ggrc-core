@@ -120,8 +120,7 @@ let viewModel = can.Map.extend({
       return [businessModels[modelName]];
     }
 
-    let mappings = Mappings
-      .get_canonical_mappings_for(this.attr('modelName'));
+    let mappings = Mappings.getAvailableMappings(this.attr('modelName'));
     let types = _.sortBy(mappings, 'model_singular');
 
     if (!this.attr('criteria.objectName')) {

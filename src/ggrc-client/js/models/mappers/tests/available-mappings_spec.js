@@ -3,13 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../advanced-search-mapping-criteria';
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Mappings from '../../../models/mappers/mappings';
+import Mappings from '../mappings';
 
-describe('advanced-search-mapping-criteria component', () => {
-  let viewModel;
-
+describe('Mappings', () => {
   const types = Mappings.get_canonical_mappings_for('MultitypeSearch');
 
   let modules = {
@@ -95,18 +91,12 @@ describe('advanced-search-mapping-criteria component', () => {
     Workflow: ['TaskGroup'],
   };
 
-  beforeEach(() => {
-    viewModel = getComponentVM(Component);
-  });
-
-  describe('mappingTypes() method', () => {
+  describe('getAvailableMappings() method', () => {
     Object.keys(types).forEach(function (type) {
-      it('returns related types for ' + type, function () {
-        viewModel.attr('modelName', type);
+      it('returns available types for ' + type, function () {
         let expectedModels = mappingRules[type];
-        let result = viewModel.mappingTypes();
-        let resultModels = result.length ? 
-          result.map((model) => model.model_singular) : [];
+        let result = Mappings.getAvailableMappings(type);
+        let resultModels = Object.keys(result);
 
         expect(expectedModels.sort()).toEqual(resultModels.sort());
       });
