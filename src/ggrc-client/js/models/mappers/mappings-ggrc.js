@@ -36,18 +36,20 @@ const scopingObjects = [
 (function (GGRC, can) {
   new Mappings('ggrc_core', {
     base: {},
-
+    relatedMappings: {
+      _related: ['Person', 'Workflow'],
+    },
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'assignable',
+        'related_object', 'assignable', 'relatedMappings',
       ],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'programs', 'objectives',
       ]),
     },
     Objective: {
-      _mixins: ['related_object'],
+      _mixins: ['related_object', 'relatedMappings'],
       orphaned_objects: Multi([
         'related_objects', 'contracts', 'controls',
         'objectives', 'policies', 'programs', 'regulations',
@@ -55,10 +57,11 @@ const scopingObjects = [
       ]),
     },
     Requirement: {
-      _mixins: ['related_object'],
+      _mixins: ['related_object', 'relatedMappings'],
     },
     Document: {
       _mixins: ['related_object'],
+      _related: ['Person'],
     },
     assignable: {
       info_related_objects: CustomFilter('related_objects',
@@ -114,11 +117,10 @@ const scopingObjects = [
     // Program
     Program: {
       _mixins: [
-        'related_object',
+        'related_object', 'relatedMappings',
       ],
       _canonical: {
         audits: 'Audit',
-        context: 'Context',
       },
       related_issues: TypeFilter('related_objects', 'Issue'),
       audits: Direct('Audit', 'program', 'audits'),
@@ -150,7 +152,7 @@ const scopingObjects = [
     },
     directive_object: {
       _mixins: [
-        'related_object',
+        'related_object', 'relatedMappings',
       ],
       orphaned_objects: Multi([
         'controls', 'objectives', 'related_objects',
@@ -164,6 +166,7 @@ const scopingObjects = [
         related_objects_as_source: _.difference(
           businessObjects, scopingObjects),
       },
+      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
     },
     Contract: {
       _mixins: ['directive_object'],
@@ -174,6 +177,7 @@ const scopingObjects = [
         related_objects_as_source: _.difference(
           businessObjects, scopingObjects),
       },
+      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
     },
     Policy: {
       _mixins: ['directive_object'],
@@ -188,6 +192,7 @@ const scopingObjects = [
         related_objects_as_source: _.difference(businessObjects,
           ['Standard', 'Regulation']),
       },
+      _related: ['Workflow', 'Person', 'Standard', 'Regulation'],
       orphaned_objects: Multi([
         'related_objects', 'controls', 'objectives', 'requirements',
       ]),
@@ -250,7 +255,6 @@ const scopingObjects = [
     Audit: {
       _canonical: {
         _program: 'Program',
-        context: 'Context',
         evidence: 'Evidence',
       },
       _mixins: [
@@ -279,6 +283,7 @@ const scopingObjects = [
       _canonical: {
         evidence: 'Evidence',
       },
+      _related: ['Person'],
       _mixins: [
         'related_object', 'assignable',
       ],
@@ -297,7 +302,7 @@ const scopingObjects = [
     AssessmentTemplate: {},
     Issue: {
       _mixins: [
-        'related_object', 'assignable',
+        'related_object', 'assignable', 'relatedMappings',
       ],
       audits: TypeFilter('related_objects', 'Audit'),
     },

@@ -81,6 +81,9 @@ import * as businessModels from '../models/business-models';
           null, 'object', 'TaskGroupObject', 'task_group',
           'task_group_objects'),
       },
+      Workflow: {
+        _related: ['TaskGroup'],
+      },
       CycleTaskGroupObjectTask: {
         _canonical: {
           // It is needed for an object list generation. This object list
