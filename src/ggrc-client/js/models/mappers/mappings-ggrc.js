@@ -299,7 +299,9 @@ const scopingObjects = [
         null, 'destination', 'Relationship', 'source', 'related_destinations',
       ),
     },
-    AssessmentTemplate: {},
+    AssessmentTemplate: {
+      _related: ['Audit'],
+    },
     Issue: {
       _mixins: [
         'related_object', 'assignable', 'relatedMappings',

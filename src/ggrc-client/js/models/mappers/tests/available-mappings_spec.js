@@ -55,8 +55,7 @@ describe('Mappings', () => {
   const mappingRules = {
     AccessGroup: common,
     Assessment: modules.core.concat(modules.audit),
-    AssessmentTemplate: _.difference(modules.core.concat(modules.audit),
-      ['Evidence', 'Person']),
+    AssessmentTemplate: ['Audit'],
     Audit: _.difference(modules.core, ['Person']).concat(modules.audit),
     Contract: common,
     Control: common,
