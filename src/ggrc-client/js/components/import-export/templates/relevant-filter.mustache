@@ -49,7 +49,7 @@
                 value="{{firstnonempty filter.name filter.email filter.title}}"
                 data-lookup="{{this}}"
                 data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
-              {{ autocomplete_select disableCreate }}
+              {{ autocomplete_select true }}
             >
           </div>
         {{/model_name}}
