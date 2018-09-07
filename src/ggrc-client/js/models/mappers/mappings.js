@@ -6,6 +6,7 @@
 import {getMappableTypes} from '../../plugins/ggrc_utils';
 import {getModelByType} from '../../plugins/utils/models-utils';
 import Join from '../join-models/join';
+import * as businessModels from '../business-models';
 
 /*
   class Mappings
@@ -206,17 +207,16 @@ export default can.Construct.extend({
     return all canonical mappings (suitable for joining) from all modules for an object type.
     object - a string representing the object type's shortName
 
-    return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by option type
+    return: a keyed object of all mappings (instances of CMS.Models)
   */
   get_canonical_mappings_for: function (object) {
     let mappings = {};
     can.each(this.modules, (mod, name) => {
       if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        can.each(mod._canonical_mappings[object], (mappingName, option) => {
-          mappings[option] = this.get_mapper(
-            mappingName,
-            object);
-        });
+        can.each(mod._canonical_mappings[object],
+          (mappingName, model) => {
+            mappings[model] = businessModels[model];
+          });
       }
     });
     return mappings;

@@ -122,17 +122,7 @@ let viewModel = can.Map.extend({
 
     let mappings = Mappings
       .get_canonical_mappings_for(this.attr('modelName'));
-    let types = _.chain(mappings)
-      .keys()
-      .map(function (mapping) {
-        return businessModels[mapping];
-      })
-      .compact()
-      .sortBy('model_singular')
-      .filter(function (mapping) {
-        return mapping.model_singular && mapping.title_singular;
-      })
-      .value();
+    let types = _.sortBy(mappings, 'model_singular');
 
     if (!this.attr('criteria.objectName')) {
       this.attr('criteria.objectName', _.head(types).model_singular);
