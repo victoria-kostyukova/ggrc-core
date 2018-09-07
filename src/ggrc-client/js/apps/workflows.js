@@ -81,8 +81,11 @@ import * as businessModels from '../models/business-models';
           null, 'object', 'TaskGroupObject', 'task_group',
           'task_group_objects'),
       },
+      TaskGroupTask: {
+        _related: ['Workflow'],
+      },
       Workflow: {
-        _related: ['TaskGroup'],
+        _related: ['TaskGroup', 'TaskGroupTask'],
       },
       CycleTaskGroupObjectTask: {
         _canonical: {

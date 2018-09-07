@@ -83,11 +83,11 @@ describe('Mappings', () => {
     Standard: common,
     System: common,
     TaskGroup: _.difference(modules.core, ['Document', 'Person']),
-    TaskGroupTask: [],
+    TaskGroupTask: ['Workflow'],
     TechnologyEnvironment: common,
     Threat: common,
     Vendor: common,
-    Workflow: ['TaskGroup'],
+    Workflow: ['TaskGroup', 'TaskGroupTask'],
   };
 
   describe('getAvailableMappings() method', () => {
