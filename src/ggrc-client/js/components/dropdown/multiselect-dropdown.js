@@ -14,7 +14,6 @@ export default can.Component.extend({
     selected: [],
     options: [],
     placeholder: '',
-    element: null,
     define: {
       _displayValue: {
         get: function () {
@@ -76,7 +75,7 @@ export default can.Component.extend({
         selected: this.attr('selected'),
       });
     },
-    dropdownClosed: function (el, ev, scope) {
+    dropdownClosed: function () {
       // don't trigger event if state didn't change
       if (!this.attr('_stateWasUpdated')) {
         return;
@@ -100,17 +99,12 @@ export default can.Component.extend({
       } else {
         this.attr('isOpen', false);
         this.attr('canBeOpen', false);
-        this.dropdownClosed(this.element);
+        this.dropdownClosed();
       }
     },
-    openDropdown: function (el) {
+    openDropdown: function () {
       if (this.attr('disabled')) {
         return;
-      }
-      // we should save element of component.
-      // it necessary for 'can.trigger'
-      if (el && !this.element) {
-        this.element = el;
       }
 
       // this attr needed when page has any components

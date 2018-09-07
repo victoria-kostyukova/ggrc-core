@@ -5,7 +5,7 @@
 
 <div class="multiselect-dropdown flex-box flex-col">
   <!-- HACK: using of tabindex can set styles on focus -->
-  <div tabindex="-1" class="multiselect-dropdown__input-container {{#disabled}}disabled{{/disabled}}" ($click)="openDropdown($element, %event)">
+  <div tabindex="-1" class="multiselect-dropdown__input-container {{#disabled}}disabled{{/disabled}}" ($click)="openDropdown()">
     <input
       type="text"
       readonly="readonly"
