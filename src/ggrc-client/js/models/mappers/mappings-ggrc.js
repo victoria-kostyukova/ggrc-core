@@ -39,6 +39,10 @@ const scopingObjects = [
     relatedMappings: {
       _related: ['Person', 'Workflow'],
     },
+    Person: {
+      _related: ['TaskGroupTask', 'Workflow',
+        ...GGRC.roleableTypes.map((model) => model.model_singular)],
+    },
     // Governance
     Control: {
       _mixins: [

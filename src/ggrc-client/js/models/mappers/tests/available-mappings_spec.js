@@ -70,7 +70,9 @@ describe('Mappings', () => {
     Metric: common,
     Objective: common,
     OrgGroup: common,
-    Person: _.difference(modules.core, ['Person']).concat(['Assessment']),
+    Person: _.difference(allTypes,
+      ['AssessmentTemplate', 'TaskGroup', 'Person'])
+      .concat('TaskGroupTask'),
     Policy: common,
     Process: common,
     Product: common,
