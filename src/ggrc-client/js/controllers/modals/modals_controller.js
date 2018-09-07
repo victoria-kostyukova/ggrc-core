@@ -1130,12 +1130,6 @@ export default can.Control({
         return;
       }
     }
-
-    let locationHash = window.location.hash.split('/')[0];
-    let instanceHashFragment = this.options.instance.hash_fragment();
-
-    hash = `${locationHash}/${instanceHashFragment}`;
-    window.location.hash = hash;
   },
 
   /**

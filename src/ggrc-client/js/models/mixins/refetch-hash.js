@@ -17,8 +17,6 @@ export default Mixin('refetchHash', {
     }
 
     return [widgetName,
-      '/',
-      this.hash_fragment(),
       '&refetch=true'].join('');
   },
 });

@@ -77,16 +77,6 @@ import TreeViewOptions from './tree-view-options';
       active
         .removeClass('active')
         .removeClass('maximized-info-pane');
-      this.update_hash_fragment(active.length);
-    },
-    update_hash_fragment: function (status) {
-      let hash;
-      if (!status) {
-        return;
-      }
-      hash = window.location.hash.split('/');
-      hash.pop();
-      window.location.hash = hash.join('/');
     },
 
     init: function (el, opts) {

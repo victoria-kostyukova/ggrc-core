@@ -1086,13 +1086,6 @@ export default can.Model('can.Model.Cacheable', {
 
     return RefreshQueue.refresh_all(this, props, true);
   },
-  hash_fragment: function () {
-    let type = can.spaceCamelCase(this.type || '')
-      .toLowerCase()
-      .replace(/ /g, '_');
-
-    return [type, this.id].join('/');
-  },
 });
 
 /* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */

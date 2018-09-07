@@ -369,8 +369,6 @@ import TreeViewOptions from './tree-view-options';
           .removeClass('maximized-info-pane');
       }
 
-      this.update_hash_fragment();
-
       control = $('.pin-content').control();
       if (control) {
         control.setInstance(this.options, $tree, maximizeInfoPane);
@@ -388,24 +386,6 @@ import TreeViewOptions from './tree-view-options';
         $expandEl.trigger('click');
       }
       return this.expand();
-    },
-
-    hash_fragment: function () {
-      let parentFragment = '';
-
-      if (this.options.parent) {
-        parentFragment = this.options.parent.hash_fragment();
-      }
-
-      return [parentFragment,
-        this.options.instance.hash_fragment()].join('/');
-    },
-
-    update_hash_fragment: function () {
-      let hash = window.location.hash.split('/')[0];
-
-      window.location.hash = [hash,
-        this.hash_fragment()].join('');
     },
   });
 })(window.can, window.$);
