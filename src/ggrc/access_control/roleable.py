@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
 
@@ -28,6 +29,15 @@ class Roleable(object):
       reflection.Attribute('access_control_list', True, True, True))
   MAX_ASSIGNEE_NUM = 1
   MAX_VERIFIER_NUM = 1
+
+  def __init__(self, *args, **kwargs):
+    super(Roleable, self).__init__(*args, **kwargs)
+    for ac_role in role.get_ac_roles_for(self.type).values():
+      print ac_role
+      AccessControlList(
+          object=self,
+          ac_role=ac_role,
+      )
 
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
@@ -55,7 +65,7 @@ class Roleable(object):
         values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
-    pass
+    pass  # TODO: acp
 
   def extend_access_control_list(self, values):
     """Extend access control list.
@@ -64,7 +74,7 @@ class Roleable(object):
         values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
-    pass
+    pass  # TODO: acp
 
   @classmethod
   def eager_query(cls):

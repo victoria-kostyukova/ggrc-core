@@ -3,8 +3,10 @@
 
 """Test Access Control Roleable mixin"""
 import ddt
+from ggrc import app
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.access_control import roleable
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -18,6 +20,24 @@ class TestAccessControlRoleable(TestCase):
     with factories.single_commit():
       self.role = factories.AccessControlRoleFactory()
       self.person = factories.PersonFactory()
+
+  @ddt.data(*[
+      model for model in all_models.all_models
+      if issubclass(model, roleable.Roleable)
+  ])
+  def test_inital_role_setup(self, model):
+    """Check generating acl entries for {0.__name__}."""
+    with app.app.app_context():
+      obj = model()
+      generated_roles = [acl.ac_role for acl in obj._access_control_list]
+      control_visible_roles = all_models.AccessControlRole.query.filter(
+          all_models.AccessControlRole.object_type == obj.type,
+          all_models.AccessControlRole.internal == 0,
+      ).all()
+      self.assertItemsEqual(
+          generated_roles,
+          control_visible_roles,
+      )
 
   @ddt.data(lambda self: [{
       "ac_role_id": self.role.id,
