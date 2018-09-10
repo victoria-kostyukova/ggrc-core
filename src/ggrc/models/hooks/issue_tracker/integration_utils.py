@@ -26,6 +26,14 @@ def validate_issue_tracker_info(info):
       raise exceptions.ValidationError('Hotlist ID must be a number.')
 
 
+def is_already_linked(ticket_id):
+  """Checks if ticket with ticket_id is already linked to GGRC object"""
+  exists_query = db.session.query(
+      all_models.IssuetrackerIssue.issue_id
+  ).filter_by(issue_id=ticket_id).exists()
+  return db.session.query(exists_query).scalar()
+
+
 def normalize_issue_tracker_info(info):
   """Insures that component ID and hotlist ID are integers."""
   # TODO(anushovan): remove data type casting once integration service
