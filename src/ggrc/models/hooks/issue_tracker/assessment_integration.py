@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A collection of hooks to process IssueTracker related events."""
+# pylint: disable=too-many-lines
+# this module will be refactored in the future when we will merge two sync
+# mechanisms into generic one
 
 import collections
 import itertools
@@ -53,6 +56,11 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
 _INITIAL_COMMENT_TMPL = (
     'This bug was auto-generated to track a GGRC assessment (a.k.a PBC Item). '
     'Use the following link to find the assessment - %s.'
+)
+
+_LINK_COMMENT_TMPL = (
+    'This bug was linked to a GGRC assessment (a.k.a PBC Item). Use the '
+    'following link to find the assessment - %s'
 )
 
 _STATUS_CHANGE_COMMENT_TMPL = (
@@ -731,16 +739,17 @@ def get_reporter_email(assessment):
   return reporter_email
 
 
-def create_asmnt_comment(assessment):
+def create_asmnt_comment(assessment, issue_id):
   """Create comment for generated IssueTracker issue related to assessment.
 
   Args:
       assessment: Instance of Assessment for which comment should be created.
-
+      issue_id: Issue Tracker ticket ID
   Returns:
       String with created comments separated with '\n'.
   """
-  comments = [_INITIAL_COMMENT_TMPL % _get_assessment_url(assessment)]
+  comment_tmpl = _LINK_COMMENT_TMPL if issue_id else _INITIAL_COMMENT_TMPL
+  comments = [comment_tmpl % _get_assessment_url(assessment)]
   test_plan = assessment.test_plan
   if test_plan:
     comments.extend([
@@ -777,7 +786,7 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_tracker_info['cc_list'] = cc_list
 
   hotlist_id = issue_tracker_info.get('hotlist_id')
-
+  issue_id = issue_tracker_info.get('issue_id') if issue_tracker_info else None
   issue_params = {
       'component_id': issue_tracker_info['component_id'],
       'hotlist_ids': [hotlist_id] if hotlist_id else [],
@@ -790,7 +799,7 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
       'verifier': '',
       'status': issue_tracker_info['status'],
       'ccs': [],
-      'comment': create_asmnt_comment(assessment),
+      'comment': create_asmnt_comment(assessment, issue_id),
   }
   custom_fields = []
 
@@ -821,6 +830,54 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_params['ccs'] = grouped_ccs
 
   return issue_params
+
+
+def _link_assessment(assessment, issue_tracker_info):
+  """Link Assessment to existing IssueTracker ticket"""
+  ticket_id = issue_tracker_info['issue_id']
+  if integration_utils.is_already_linked(ticket_id):
+    logger.error(
+      "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
+      "already linked to another GGRC object",
+      assessment.id,
+      ticket_id,
+    )
+    assessment.add_warning(
+      "Unable to link to issue tracker. Ticket is already linked to another"
+      "GGRC object"
+    )
+    issue_tracker_info['enabled'] = False
+    return
+
+  try:
+    issues.Client().get_issue(ticket_id)
+  except integrations_errors.Error as error:
+    logger.error(
+      "Unable to link a ticket while creating object ID=%d: %s",
+      assessment.id,
+      error,
+    )
+    assessment.add_warning(
+      "Ticket tracker ID does not exist or you do not have access to it."
+    )
+    issue_tracker_info['enabled'] = False
+    return
+
+  issue_tracker_request = _build_issuetracker_request(assessment,
+                                                      issue_tracker_info)
+
+  try:
+    issues.Client().update_issue(ticket_id, issue_tracker_request)
+  except integrations_errors.Error as error:
+    logger.error(
+      'Unable to link a ticket while creating assessment ID=%d: %s',
+      assessment.id, error)
+    issue_tracker_info['enabled'] = False
+    assessment.add_warning('Unable to link a ticket.')
+  else:
+    issue_url = integration_utils.build_issue_tracker_url(ticket_id)
+    issue_tracker_info['issue_id'] = ticket_id
+    issue_tracker_info['issue_url'] = issue_url
 
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
