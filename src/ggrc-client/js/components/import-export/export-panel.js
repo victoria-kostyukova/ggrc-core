@@ -5,8 +5,8 @@
 
 import * as businessModels from '../../models/business-models';
 import template from './templates/export-panel.mustache';
+import router from '../../router';
 
-let url = can.route.deparam(window.location.search.substr(1));
 let filterModel = can.Map({
   model_name: 'Program',
   value: '',
@@ -61,8 +61,8 @@ export default can.Component.extend({
       let dfd = businessModels[type].findOne({id: id});
       dfd.then(function (result) {
         this.attr('item.relevant').push(new filterModel({
-          model_name: url.relevant_type,
-          value: url.relevant_id,
+          model_name: router.attr('relevant_type'),
+          value: router.attr('relevant_id'),
           filter: result,
         }));
       }.bind(this));
@@ -88,8 +88,10 @@ export default can.Component.extend({
     inserted: function () {
       let panelNumber = this.viewModel.attr('panelNumber');
 
-      if (panelNumber === 1 && url.relevant_id && url.relevant_type) {
-        this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
+      if (panelNumber === 1 && router.attr('relevant_id')
+        && router.attr('relevant_type')) {
+        this.viewModel.fetch_relevant_data(router.attr('relevant_id'),
+          router.attr('relevant_type'));
       }
     },
     '[data-action=select_toggle] click': function (el, ev) {
