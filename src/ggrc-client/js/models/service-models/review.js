@@ -21,4 +21,11 @@ export default Cacheable('CMS.Models.Review', {
   attributes: {
     reviewable: Stub,
   },
-}, {});
+}, {
+  setShowLastReviewUpdates(value) {
+    this._showLastReviewUpdates = value;
+  },
+  getShowLastReviewUpdates() {
+    return this._showLastReviewUpdates;
+  },
+});

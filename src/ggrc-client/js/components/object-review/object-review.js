@@ -10,7 +10,11 @@ import Review from '../../models/service-models/review';
 import Permission from '../../permission';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 import {createReviewInstance, saveReview} from '../../plugins/utils/object-review-utils';
-import {REFRESH_MAPPING, DESTINATION_UNMAPPED} from '../../events/eventTypes';
+import {
+  REFRESH_MAPPING,
+  DESTINATION_UNMAPPED,
+  NAVIGATE_TO_TAB,
+} from '../../events/eventTypes';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
@@ -147,6 +151,13 @@ export default can.Component.extend({
     },
     reviewersUpdated(event) {
       this.attr('review', event.review);
+    },
+    showLastChanges() {
+      this.attr('review').setShowLastReviewUpdates(true);
+      this.attr('instance').dispatch({
+        ...NAVIGATE_TO_TAB,
+        tabId: 'change-log',
+      });
     },
   },
   events: {
