@@ -5,7 +5,18 @@
 
 {{#revisions_diff instance}}
   <div class="revision-log">
-    <paginate list="changeHistory" per-page="10">
+    {{#if showFilter}}
+      <div class="revision-log__last-updates">
+        <label class="flex-box">
+          <input type="checkbox"
+                 ($change)="changeLastUpdatesFilter(%element)"
+                 {($checked)}="showLastReviewUpdates"
+          />
+          Show updates after last review
+        </label>
+      </div>
+    {{/if}}
+    <paginate list="changeHistory" per-page="10" current="currentPage">
       <ul class="entry-list">
         {{#entries}}
           <li>

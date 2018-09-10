@@ -5,9 +5,21 @@
 
 revision-log {
   .revision-log {
+    position: relative;
+
     &__field-name {
       li, p {
         margin: auto;
+      }
+    }
+
+    &__last-updates {
+      position: absolute;
+      right: 0;
+      top: -50px;
+
+      input {
+        margin-right: 5px;
       }
     }
   }
