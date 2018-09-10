@@ -33,7 +33,6 @@ class CreateNewPersonModal(base.Modal):
     """Enter email to modal."""
     self.email_tf.enter_text(text)
 
-  @decorator.wait_for_redirect
   @decorator.handle_alert
   def save_and_close(self):
     """Create person and close Creation modal."""

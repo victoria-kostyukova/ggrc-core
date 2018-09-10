@@ -23,7 +23,6 @@ class CreateNewObjectModal(modal_base.BaseModal):
         self._driver, self._locators.BUTTON_SAVE_AND_ADD_ANOTHER)
     return self.__class__(self._driver)
 
-  @decorator.wait_for_redirect
   @decorator.handle_alert
   def save_and_close(self):
     """Create object and close Creation modal."""
