@@ -25,6 +25,7 @@ from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.rbac import permissions
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
@@ -299,7 +300,8 @@ def _handle_audit_put_after_commit(sender, obj=None, **kwargs):
       _ARCHIVED_TMPL if obj.archived else _UNARCHIVED_TMPL)
 
 
-def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
+# pylint: disable=too-many-locals
+def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
   """Handles IssueTracker information during assessment update event."""
   del sender  # Unused
 
@@ -313,14 +315,26 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
   initial_info = issue_obj.to_dict(
       include_issue=True,
       include_private=True) if issue_obj is not None else {}
-  issue_tracker_info = dict(initial_info, **(src.get('issue_tracker') or {}))
+  new_info = src.get('issue_tracker') or {}
 
-  issue_id = issue_tracker_info.get('issue_id')
+  issue_tracker_info = dict(initial_info, **new_info)
+
+  old_ticket_id = int(initial_info.get('issue_id')) if initial_info else None
+  get_ticket_id = issue_tracker_info.get('issue_id', None)
+  ticket_id = int(get_ticket_id) if get_ticket_id else None
+
+  needs_creation = (not issue_obj) or (not old_ticket_id) or (not ticket_id)
 
   if issue_tracker_info.get('enabled'):
-    if not issue_id:
-      # If assessment initially was created with disabled IssueTracker.
+    if needs_creation:
       _create_issuetracker_info(obj, issue_tracker_info)
+      if not obj.warnings:
+        it_issue = all_models.IssuetrackerIssue.get_issue(
+            obj.__class__.__name__, obj.id
+        )
+        new_ticket_id = it_issue.issue_id if it_issue else None
+        if old_ticket_id and new_ticket_id and old_ticket_id != new_ticket_id:
+          _detach_assessment(ticket_id, old_ticket_id)
       return
 
     _, issue_tracker_info['cc_list'] = _collect_assessment_emails(obj)
@@ -334,6 +348,12 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
   if not issue_tracker_info.get('due_date'):
     issue_tracker_info['due_date'] = obj.start_date
 
+  if ticket_id != old_ticket_id and issue_tracker_info['enabled']:
+    _link_assessment(obj, issue_tracker_info)
+    if not obj.warnings:
+      _detach_assessment(ticket_id, old_ticket_id)
+      return
+
   try:
     _update_issuetracker_issue(
         obj, issue_tracker_info, initial_assessment, initial_info, src)
@@ -341,14 +361,26 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
     if error.status == 429:
       logger.error(
           'The request updating ticket ID=%s for assessment ID=%d was '
-          'rate limited: %s', issue_id, obj.id, error)
+          'rate limited: %s', ticket_id, obj.id, error)
     else:
       logger.error(
           'Unable to update a ticket ID=%s while updating '
-          'assessment ID=%d: %s', issue_id, obj.id, error)
+          'assessment ID=%d: %s', ticket_id, obj.id, error)
     obj.add_warning('Unable to update a ticket.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
+
+
+def _detach_assessment(new_ticket_id, old_ticket_id):
+  """Send to old IssueTracker ticket detachment comment."""
+  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
+  params = builder.build_detach_comment(new_ticket_id)
+  query = params.get_issue_tracker_params()
+  try:
+    issues.Client().update_issue(old_ticket_id, query)
+  except integrations_errors.Error as error:
+    logger.error("Unable to add detach comment to ticket issue ID=%d: %s",
+                 old_ticket_id, error)
 
 
 def _handle_assessment_deleted(sender, obj=None, service=None):
@@ -843,8 +875,9 @@ def _link_assessment(assessment, issue_tracker_info):
         ticket_id,
     )
     assessment.add_warning(
-        "Unable to link to issue tracker. Ticket is already linked to another"
-        "GGRC object"
+        "This ticket was already linked to another GGRC issue, assessment or "
+        "review object. Linking the same ticket to multiple objects is not "
+        "allowed due to potential for conflicting updates."
     )
     issue_tracker_info['enabled'] = False
     return
@@ -877,6 +910,8 @@ def _link_assessment(assessment, issue_tracker_info):
     issue_url = integration_utils.build_issue_tracker_url(ticket_id)
     issue_tracker_info['issue_id'] = ticket_id
     issue_tracker_info['issue_url'] = issue_url
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        assessment, issue_tracker_info)
 
 
 def _create_new_issuetracker_ticket(assessment, issue_tracker_info):
@@ -913,11 +948,8 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       _link_assessment(assessment, issue_tracker_info)
     else:
       _create_new_issuetracker_ticket(assessment, issue_tracker_info)
-  else:
-    issue_tracker_info = {'enabled': False}
-
-  all_models.IssuetrackerIssue.create_or_update_from_dict(
-      assessment, issue_tracker_info)
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          assessment, issue_tracker_info)
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
