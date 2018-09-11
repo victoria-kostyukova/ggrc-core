@@ -10,14 +10,19 @@ from ggrc import db
 from ggrc import builder
 from ggrc.access_control import roleable
 from ggrc.login import get_current_user
-from ggrc.models import mixins
+from ggrc.models import mixins, exceptions
 from ggrc.models import utils as model_utils
 from ggrc.models import reflection
 from ggrc.models.mixins import issue_tracker
 from ggrc.models.mixins import rest_handable
 from ggrc.models.mixins import with_proposal_handable
+from ggrc.models.mixins import with_mappimg_via_import_Handable
+
+from ggrc.access_control.role import get_ac_roles_for
 from ggrc.models.relationship import Relatable
 from ggrc.fulltext import mixin as ft_mixin
+
+from ggrc.notifications import add_notification
 
 
 class Reviewable(rest_handable.WithPutHandable,
@@ -99,6 +104,14 @@ class Reviewable(rest_handable.WithPutHandable,
 
       if changed - self.ATTRS_TO_IGNORE:
         self.review.status = all_models.Review.STATES.UNREVIEWED
+        self.add_email_notification()
+
+  def add_email_notification(self):
+    """Add email notification of type STATUS_UNREVIEWED"""
+    review_notif_type = self.review.notification_type
+    if review_notif_type == Review.NotificationTypes.EMAIL_TYPE:
+      add_notification(self.review,
+                       Review.NotificationObjectTypes.STATUS_UNREVIEWED)
 
   def _update_status_on_mapping(self, counterparty):
     """Update review status on mapping to reviewable"""
@@ -107,6 +120,7 @@ class Reviewable(rest_handable.WithPutHandable,
     if self.review_status != all_models.Review.STATES.UNREVIEWED:
       if counterparty.type in Types.all:
         self.review.status = all_models.Review.STATES.UNREVIEWED
+        self.add_email_notification()
 
   def handle_put(self):
     self._update_status_on_attr()
@@ -121,6 +135,7 @@ class Reviewable(rest_handable.WithPutHandable,
     from ggrc.models import all_models
     if self.review:
       self.review.status = all_models.Review.STATES.UNREVIEWED
+      self.add_email_notification()
 
 
 class Review(mixins.person_relation_factory("last_reviewed_by"),
@@ -140,10 +155,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
   # pylint: disable=too-few-public-methods
   __tablename__ = "reviews"
 
-  def __init__(self, *args, **kwargs):
-    super(Review, self).__init__(*args, **kwargs)
-    self.last_reviewed_by = None
-    self.last_reviewed_at = None
+  REVIEWER_ROLE_NAME = "Reviewer"
 
   class STATES(object):
     """Review states container """
@@ -152,16 +164,15 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
   VALID_STATES = [STATES.UNREVIEWED, STATES.REVIEWED]
 
-  class ACRoles(object):
-    """ACR roles container """
-    REVIEWER = "Reviewer"
-    REVIEWABLE_READER = "Reviewable Reader"
-    REVIEW_EDITOR = "Review Editor"
-
   class NotificationTypes(object):
     """Notification types container """
     EMAIL_TYPE = "email"
     ISSUE_TRACKER = "issue_tracker"
+
+  class NotificationObjectTypes(object):
+    """Review Notification Object types container """
+    STATUS_UNREVIEWED = "review_status_unreviewed"
+    REVIEW_CREATED = "review_request_created"
 
   reviewable_id = db.Column(db.Integer, nullable=False)
   reviewable_type = db.Column(db.String, nullable=False)
@@ -196,9 +207,26 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       "reviewable_type",
   ]
 
+  def __init__(self, *args, **kwargs):
+    super(Review, self).__init__(*args, **kwargs)
+    self.last_reviewed_by = None
+    self.last_reviewed_at = None
+
+  def validate_acl(self):
+    """Reviewer is mandatory Role"""
+    super(Review, self).validate_acl()
+    reviewer_role_id = get_ac_roles_for("Review")[self.REVIEWER_ROLE_NAME].id
+    is_reviewers_acl = any(acl for acl in self.access_control_list
+                           if acl.ac_role_id == reviewer_role_id)
+    if not is_reviewers_acl:
+      raise exceptions.ValidationError("Reviewer role is mandatory")
+
   def handle_post(self):
     self._create_relationship()
     self._update_new_reviewed_by()
+    if (self.notification_type == Review.NotificationTypes.EMAIL_TYPE and
+            self.status == Review.STATES.UNREVIEWED):
+      add_notification(self, Review.NotificationObjectTypes.REVIEW_CREATED)
 
   def handle_put(self):
     self._update_reviewed_by()

@@ -3,6 +3,8 @@
 
 """Editor permissions. """
 
+# pylint: disable=invalid-name
+
 scope = "System"
 description = """
   This role grants a user basic object creation and editing permission.

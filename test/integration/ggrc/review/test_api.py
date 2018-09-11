@@ -6,10 +6,11 @@ import ddt
 
 from ggrc.models import all_models
 
-from integration.ggrc import TestCase
+from integration.ggrc import TestCase, generator
 from integration.ggrc.models import factories
 
 from integration.ggrc.api_helper import Api
+from integration.ggrc.review import build_reviewer_acl
 
 
 @ddt.ddt
@@ -20,6 +21,7 @@ class TestReviewApi(TestCase):
     super(TestReviewApi, self).setUp()
     self.api = Api()
     self.api.client.get("/login")
+    self.generator = generator.ObjectGenerator()
 
   def test_simple_get(self):
     """Test simple get"""
@@ -29,7 +31,7 @@ class TestReviewApi(TestCase):
           email_message="test email message",
           notification_type="email",
           reviewable=control,
-          status=all_models.Review.STATES.UNREVIEWED
+          status=all_models.Review.STATES.UNREVIEWED,
       )
     resp = self.api.get(all_models.Review, review.id)
     self.assert200(resp)
@@ -74,6 +76,7 @@ class TestReviewApi(TestCase):
                 "context": None,
                 "notification_type": "email",
                 "status": all_models.Review.STATES.UNREVIEWED,
+                "access_control_list": build_reviewer_acl()
             },
         },
     )
@@ -116,8 +119,19 @@ class TestReviewApi(TestCase):
 
   def test_last_reviewed(self):
     """last_reviewed_by, last_reviewed_by should be set if reviewed"""
-    review = factories.ReviewFactory(
-        status=all_models.Review.STATES.UNREVIEWED
+    control = factories.ControlFactory()
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.UNREVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
     )
     review_id = review.id
     resp = self.api.put(
@@ -136,13 +150,21 @@ class TestReviewApi(TestCase):
 
   def test_reviewable_revisions(self):
     """Check that proper revisions are created"""
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      control_id = control.id
-      review = factories.ReviewFactory(
-          reviewable=control,
-          status=all_models.Review.STATES.UNREVIEWED
-      )
+    control = factories.ControlFactory()
+    resp, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "status": all_models.Review.STATES.UNREVIEWED,
+            "access_control_list": build_reviewer_acl(),
+            "notification_type": all_models.Review.NotificationTypes.EMAIL_TYPE
+        },
+    )
+    control_id = control.id
     reviewable = review.reviewable
 
     control_revisions = all_models.Revision.query.filter_by(
@@ -151,10 +173,11 @@ class TestReviewApi(TestCase):
     ).order_by(
         all_models.Revision.created_at,
     ).all()
-    self.assertEquals(1, len(control_revisions))
+    self.assertEquals(2, len(control_revisions))
     self.assertEquals(all_models.Review.STATES.UNREVIEWED,
                       control_revisions[0].content["review_status"])
-
+    self.assertEquals(all_models.Review.STATES.UNREVIEWED,
+                      control_revisions[1].content["review_status"])
     resp = self.api.put(
         review,
         {
@@ -169,9 +192,9 @@ class TestReviewApi(TestCase):
     ).order_by(
         all_models.Revision.created_at,
     ).all()
-    self.assertEquals(2, len(control_revisions))
+    self.assertEquals(3, len(control_revisions))
     self.assertEquals(all_models.Review.STATES.REVIEWED,
-                      control_revisions[1].content["review_status"])
+                      control_revisions[2].content["review_status"])
 
     resp = self.api.put(
         reviewable,
@@ -187,6 +210,6 @@ class TestReviewApi(TestCase):
     ).order_by(
         all_models.Revision.created_at,
     ).all()
-    self.assertEquals(3, len(control_revisions))
+    self.assertEquals(4, len(control_revisions))
     self.assertEquals(all_models.Review.STATES.UNREVIEWED,
-                      control_revisions[2].content["review_status"])
+                      control_revisions[3].content["review_status"])

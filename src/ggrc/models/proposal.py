@@ -16,7 +16,6 @@ from ggrc.fulltext import mixin as ft_mixin
 from ggrc.utils import referenced_objects
 from ggrc.access_control import roleable
 from ggrc.utils.revisions_diff import builder
-from ggrc import settings
 from ggrc.models import comment
 
 # pylint: disable=too-few-public-methods
@@ -66,12 +65,6 @@ class Proposal(mixins.person_relation_factory("applied_by"),
   Collect all information about propose change to Proposable instances."""
 
   __tablename__ = 'proposals'
-
-  # pylint: disable=too-few-public-methods
-  class NotificationContext(object):
-    DIGEST_TITLE = "Proposal Digest"
-    DIGEST_TMPL = settings.JINJA2.get_template(
-        "notifications/proposal_digest.html")
 
   class STATES(object):
     """All states for proposals."""

@@ -44,6 +44,8 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
   default_to_current_user = db.Column(
       db.Boolean, nullable=False, default=False)
   notify_about_proposal = db.Column(db.Boolean, nullable=False, default=False)
+  notify_about_review_status = db.Column(db.Boolean,
+                                         nullable=False, default=False)
 
   access_control_list = db.relationship(
       'AccessControlList', backref='ac_role', cascade='all, delete-orphan')
