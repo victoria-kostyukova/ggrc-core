@@ -322,3 +322,16 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       self.params.add_comment(
           self.UPDATE_REMEDIATION_PLAN_TMPL.format(test_plan)
       )
+
+
+class AssessmentParamsBuilder(BaseIssueTrackerParamsBuilder):
+  """Issue tracker query builder for GGRC Assessment object."""
+  DETACH_TMPL = (
+      'Another bug {new_ticket_id} has been linked to track changes to the '
+      'GGRC Assessment. Changes to the GGRC Assessment will no longer be '
+      'tracked within this bug.'
+  )
+
+  def build_detach_comment(self, new_ticket):
+    self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
+    return self.params
