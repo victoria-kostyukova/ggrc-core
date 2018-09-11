@@ -7,6 +7,7 @@ import Revision from '../../../models/service-models/revision';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
 import Person from '../../../models/business-models/person';
+import Review from '../../../models/service-models/review';
 
 describe('revision-log component', function () {
   'use strict';
@@ -28,6 +29,10 @@ describe('revision-log component', function () {
 
     it('sets the change history to an empty array', function () {
       expect(viewModel.attr('changeHistory').length).toEqual(0);
+    });
+
+    it('sets the full history to an empty array', function () {
+      expect(viewModel.attr('fullHistory').length).toEqual(0);
     });
   });
 
@@ -81,7 +86,7 @@ describe('revision-log component', function () {
       let objChange2 = {updatedAt: new Date('2014-11-18')};
       let objChange3 = {updatedAt: new Date('2016-01-09')};
 
-      viewModel.attr('changeHistory', []);
+      viewModel.attr('fullHistory', []);
 
       spyOn(viewModel, '_computeMappingChanges').and.returnValue(
         new can.List([mapChange, mapChange2])
@@ -102,7 +107,7 @@ describe('revision-log component', function () {
         .toHaveBeenCalledWith(fetchedRevisions.mappings);
 
       // check the actual outcome
-      actual = can.makeArray(viewModel.attr('changeHistory'));
+      actual = can.makeArray(viewModel.attr('fullHistory'));
       actual = _.map(actual, function (item) {
         return item.attr();
       });
@@ -1200,6 +1205,130 @@ describe('revision-log component', function () {
       expect(result.length).toBe(2);
       expect(result[0].id).toBe(1);
       expect(result[1].id).toBe(55);
+    });
+  });
+
+  describe('showRevisionsHistory() method', () => {
+    const changes = [
+      {updatedAt: new Date('2016-04-14')},
+      {updatedAt: new Date('2016-03-17'), reviewWasChanged: 'unreviewed'},
+      {updatedAt: new Date('2016-01-09'), reviewWasChanged: 'reviewed'},
+      {updatedAt: new Date('2015-12-21')},
+      {updatedAt: new Date('2014-11-18'), reviewWasChanged: 'reviewed'},
+    ];
+
+    beforeEach(() => {
+      viewModel = getComponentVM(Component);
+      viewModel.attr('fullHistory', changes);
+    });
+
+    it('renders the full history', () => {
+      viewModel.showRevisionsHistory(false);
+
+      const result = viewModel.attr('changeHistory').serialize();
+
+      expect(result).toEqual(changes);
+    });
+
+    it('renders the last changes after changing review to Unreviewed', () => {
+      viewModel.showRevisionsHistory(true);
+
+      const result = viewModel.attr('changeHistory').serialize();
+      const expected = changes.slice(0, 3);
+
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe('changeLastUpdatesFilter() method', () => {
+    let $element;
+
+    beforeEach(() => {
+      $element = $('<input type="checkbox"/>');
+      viewModel = getComponentVM(Component);
+      spyOn(viewModel, 'showRevisionsHistory');
+    });
+
+    it('renders revisions history if checkbox is unchecked', () => {
+      $element.checked = false;
+      viewModel.changeLastUpdatesFilter($element);
+
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(false);
+    });
+
+    it('renders revisions history if checkbox is checked', () => {
+      $element.checked = true;
+      viewModel.changeLastUpdatesFilter($element);
+
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('init() method', () => {
+    let fetchDfd;
+    let method;
+    let review;
+
+    beforeEach(() => {
+      viewModel = getComponentVM(Component);
+      fetchDfd = can.Deferred();
+      method = Component.prototype.init.bind({viewModel: viewModel});
+      review = new Review({
+        last_reviewed_by: {id: 1},
+        status: 'Unreviewed',
+      });
+      spyOn(viewModel, 'fetchItems').and.returnValue(fetchDfd);
+      spyOn(viewModel, 'showRevisionsHistory');
+    });
+
+    it('should fetch the data', () => {
+      method();
+      fetchDfd.resolve();
+      expect(viewModel.fetchItems).toHaveBeenCalled();
+    });
+
+    it('should render full history if there is no review', () => {
+      method();
+      fetchDfd.resolve();
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(false);
+    });
+
+    it('should render full history if object is Reviewed', () => {
+      review.attr('status', 'Reviewed');
+      viewModel.attr('review', review);
+
+      method();
+      fetchDfd.resolve();
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(false);
+    });
+
+    it(`should render full history if object is Unreviewed and
+    _showLastReviewUpdates flag is false in review`, () => {
+      review.setShowLastReviewUpdates(false);
+      viewModel.attr('review', review);
+
+      method();
+      fetchDfd.resolve();
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(false);
+    });
+
+    it(`should render filtered history if object is Unreviewed and
+    _showLastReviewUpdates flag is true in review`, () => {
+      review.setShowLastReviewUpdates(true);
+      viewModel.attr('review', review);
+
+      method();
+      fetchDfd.resolve();
+      expect(viewModel.showRevisionsHistory).toHaveBeenCalledWith(true);
+    });
+
+    it('should reset ShowLastReviewUpdates flag in Review', () => {
+      viewModel.attr('review', review);
+      spyOn(review, 'setShowLastReviewUpdates');
+
+      method();
+      fetchDfd.resolve();
+      expect(review.setShowLastReviewUpdates).toHaveBeenCalledWith(false);
     });
   });
 });
