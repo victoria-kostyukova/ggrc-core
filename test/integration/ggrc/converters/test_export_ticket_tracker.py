@@ -52,7 +52,7 @@ class TestTicketTrackerExport(TestCase):
               "enabled": True,
               "component_id": "11111",
               "hotlist_id": "222222",
-              "issue_id": "333333",
+              "issue_id": iti.issue_id,
               "issue_url": "http://issue/333333"
           },
       })

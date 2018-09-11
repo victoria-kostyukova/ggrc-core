@@ -102,9 +102,20 @@ class TestUtilityFunctions(unittest.TestCase):
       }
       all_models.IssuetrackerIssue.get_issue = mock.MagicMock()
       # pylint: disable=protected-access
-      assessment_integration._handle_issuetracker(sender=None,
-                                                  obj=mock.MagicMock(),
-                                                  src=src)
+      issue_obj = mock.MagicMock()
+
+      # pylint: disable=unused-argument
+      def mock_to_dict(**kwargs):
+        return {"issue_id": issue_id}
+      issue_obj.to_dict = mock_to_dict
+
+      with mock.patch(
+          "ggrc.models.issuetracker_issue.IssuetrackerIssue.get_issue",
+          return_value=issue_obj
+      ):
+        assessment_integration._handle_issuetracker(sender=None,
+                                                    obj=mock.MagicMock(),
+                                                    src=src)
       update_info_mock.assert_called_once()
       self.assertEqual(update_info_mock.call_args[0][1]['enabled'],
                        issue_tracker_enabled)
