@@ -35,6 +35,7 @@ import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
+import {getLocalDate} from './plugins/utils/date-util';
 
 // Chrome likes to cache AJAX requests for Mustaches.
 let mustacheUrls = {};
@@ -746,6 +747,17 @@ Mustache.registerHelper('person_roles', function (person, scope, options) {
 Mustache.registerHelper('date', function (date, hideTime) {
   date = Mustache.resolve(date);
   return formatDate(date, hideTime);
+});
+
+/**
+ *  Helper for rendering datetime values in current local time
+ *
+ *  @return {String} - datetime string in the following format:
+ *  (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
+ */
+Mustache.registerHelper('dateTime', function (date) {
+  date = Mustache.resolve(date);
+  return getLocalDate(date);
 });
 
 /**
