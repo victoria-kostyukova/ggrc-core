@@ -55,6 +55,10 @@ export default Cacheable('CMS.Models.Program', {
         attr_title: 'Notes',
         attr_name: 'notes',
         disable_sorting: true,
+      }, {
+        attr_title: 'Review State',
+        attr_name: 'review_status',
+        order: 80,
       }]),
     add_item_view: GGRC.mustache_path +
       '/base_objects/tree_add_item.mustache',

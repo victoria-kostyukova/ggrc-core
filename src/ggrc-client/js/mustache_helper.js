@@ -1568,7 +1568,7 @@ Mustache.registerHelper('get_default_attr_value',
       status: 1,
       url: 1,
       verified: 1,
-      os_state: 1,
+      review_status: 1,
       archived: 1,
       last_comment: 1,
     });

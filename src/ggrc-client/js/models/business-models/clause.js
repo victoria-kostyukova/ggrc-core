@@ -59,6 +59,10 @@ export default Cacheable('CMS.Models.Clause', {
         attr_title: 'Assessment Procedure',
         attr_name: 'test_plan',
         disable_sorting: true,
+      }, {
+        attr_title: 'Review State',
+        attr_name: 'review_status',
+        order: 80,
       }]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },

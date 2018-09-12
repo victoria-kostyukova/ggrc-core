@@ -67,6 +67,10 @@ export default Directive('CMS.Models.Policy', {
         attr_title: 'Assessment Procedure',
         attr_name: 'test_plan',
         disable_sorting: true,
+      }, {
+        attr_title: 'Review State',
+        attr_name: 'review_status',
+        order: 80,
       }]);
     this._super(...arguments);
   },

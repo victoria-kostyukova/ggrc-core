@@ -40,17 +40,30 @@ describe('Model states test', function () {
 });
 
 describe('Model review state test', function () {
-  let reviewObjects = ['AccessGroup', 'Assessment', 'Audit', 'Clause',
-    'Contract', 'Control', 'DataAsset', 'Facility', 'Issue', 'Market',
-    'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
-    'Project', 'Regulation', 'Risk', 'Requirement', 'Standard', 'System',
-    'Threat', 'Vendor'];
+  const reviewObjects = ['Clause', 'Contract', 'Control', 'Objective',
+    'Policy', 'Program', 'Regulation', 'Risk', 'Requirement', 'Standard',
+    'Threat'];
+  const objectsWithoutReview = ['AccessGroup', 'Assessment',
+    'AssessmentTemplate', 'Audit', 'DataAsset', 'Facility', 'Issue', 'Market',
+    'Metric', 'OrgGroup', 'Process', 'Product', 'ProductGroup', 'Project',
+    'System', 'TechnologyEnvironment', 'Vendor'];
+
   reviewObjects.forEach(function (object) {
-    it('checks if ' + object + ' has os state in attr_list', function () {
-      expect(_.map(businessModels[object].attr_list, 'attr_title'))
+    it('checks if ' + object + ' has review status in attr_list', () => {
+      const attrList = businessModels[object].tree_view_options.attr_list;
+
+      expect(_.map(attrList, 'attr_title'))
         .toContain('Review State', 'for object ' + object);
-      expect(_.map(businessModels[object].attr_list, 'attr_name'))
-        .toContain('os_state', 'for object ' + object);
+      expect(_.map(attrList, 'attr_name'))
+        .toContain('review_status', 'for object ' + object);
+    });
+  });
+
+  objectsWithoutReview.forEach(function (object) {
+    it('checks if ' + object + ' has not review status in attr_list', () => {
+      const attrList = businessModels[object].tree_view_options.attr_list;
+
+      expect(_.map(attrList, 'attr_name')).not.toContain('review_status');
     });
   });
 });

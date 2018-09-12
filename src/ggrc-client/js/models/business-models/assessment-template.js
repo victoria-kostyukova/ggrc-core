@@ -88,10 +88,6 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
       attr_title: 'Last Updated By',
       attr_name: 'modified_by',
       order: 71,
-    }, {
-      attr_title: 'Review State',
-      attr_name: 'os_state',
-      order: 80,
     }],
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
   },

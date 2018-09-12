@@ -97,6 +97,10 @@ export default Cacheable('CMS.Models.Control', {
         attr_title: 'Assessment Procedure',
         attr_name: 'test_plan',
         disable_sorting: true,
+      }, {
+        attr_title: 'Review State',
+        attr_name: 'review_status',
+        order: 80,
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',
       'updated_at'],
