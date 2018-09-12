@@ -11,10 +11,8 @@ import '../../diff/instance-gca-diff';
 import '../../diff/instance-mapping-fields-diff';
 import '../../diff/instance-list-fields-diff';
 import template from './templates/related-proposals-item.mustache';
-import {
-  formatDate,
-  getPersonInfo,
-} from '../../../plugins/ggrc_utils';
+import {getPersonInfo} from '../../../plugins/ggrc_utils';
+import {getLocalDate} from '../../../plugins/utils/date-util';
 const tag = 'related-proposals-item';
 
 export default can.Component.extend({
@@ -72,14 +70,14 @@ export default can.Component.extend({
       let date;
 
       if (status === 'declined') {
-        date = formatDate(proposal.attr('decline_datetime'));
+        date = getLocalDate(proposal.attr('decline_datetime'));
         text = this.buildTooltipMessage(
           'Declined',
           this.getPersonEmail(proposal.attr('declined_by')),
           date,
           proposal.attr('decline_reason'));
       } else if (status === 'applied') {
-        date = formatDate(proposal.attr('apply_datetime'));
+        date = getLocalDate(proposal.attr('apply_datetime'));
         text = this.buildTooltipMessage(
           'Applied',
           this.getPersonEmail(proposal.attr('applied_by')),
