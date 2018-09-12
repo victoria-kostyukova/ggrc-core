@@ -23,7 +23,7 @@
           <person-data {person}="commentAuthor"></person-data>
         </div>
       {{/if}}
-      <div class="comment-object-item__header-author-info">{{assignee_types commentAuthorType}} {{date commentCreationDate}}</div>
+      <div class="comment-object-item__header-author-info">{{assignee_types commentAuthorType}} {{dateTime commentCreationDate}}</div>
     </div>
     {{#if hasRevision}}
       <div class="comment-list__ca-description">{{customAttributeData}}</div>

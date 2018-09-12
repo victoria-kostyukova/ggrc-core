@@ -7,13 +7,13 @@
     <p>
       <small>
         <em>
-          Created date {{date createdAt}}
+          Created date {{dateTime createdAt}}
           &nbsp;&nbsp;&nbsp;&nbsp;
           Last updated
           {{#if modifiedBy}}
             by <person-data {person}="modifiedBy"></person-data>
           {{/if}}
-          on {{date modifiedAt}}
+          on {{dateTime modifiedAt}}
         </em>
       </small>
     </p>
