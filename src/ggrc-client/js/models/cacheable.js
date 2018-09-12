@@ -463,7 +463,6 @@ export default can.Model('can.Model.Cacheable', {
 
   convert: {
     date: dateConverter,
-    datetime: dateConverter,
     packaged_datetime: makeDateUnpacker(['dateTime', 'date']),
   },
   serialize: {
