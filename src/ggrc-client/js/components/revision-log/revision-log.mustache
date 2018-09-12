@@ -19,7 +19,7 @@
     <paginate list="changeHistory" per-page="10" current="currentPage">
       <ul class="entry-list">
         {{#entries}}
-          <li>
+          <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
             <span class="person-label {{lowercase role }}"></span>
             <div class="w-status">
               <div class="entry-author">

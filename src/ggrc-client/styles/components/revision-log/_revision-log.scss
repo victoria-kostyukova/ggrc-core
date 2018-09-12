@@ -22,5 +22,17 @@ revision-log {
         margin-right: 5px;
       }
     }
+
+    .entry-list li {
+      margin: 0;
+      padding: 16px;
+    }
+
+    &__status-reviewed {
+      background-color: $revision-state-reviewed;
+    }
+    &__status-unreviewed {
+      background-color: $revision-state-unreviewed;
+    }
   }
 }
