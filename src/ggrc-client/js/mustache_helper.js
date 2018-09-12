@@ -971,18 +971,13 @@ function localizeDate(date, options, tmpl, allowNonISO) {
   return '';
 }
 
-can.each({
-  localize_date: 'MM/DD/YYYY',
-  localize_datetime: 'MM/DD/YYYY hh:mm:ss A Z',
-}, function (tmpl, fn) {
-  Mustache.registerHelper(fn, function (date, allowNonISO, options) {
-    // allowNonIso was not passed
-    if (!options) {
-      options = allowNonISO;
-      allowNonISO = false;
-    }
-    return localizeDate(date, options, tmpl, allowNonISO);
-  });
+Mustache.registerHelper('localize_date', function (date, allowNonISO, options) {
+  // allowNonIso was not passed
+  if (!options) {
+    options = allowNonISO;
+    allowNonISO = false;
+  }
+  return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
 });
 
 /**
