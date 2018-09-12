@@ -21,6 +21,7 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
+import {getUtcDate} from '../../plugins/utils/date-util';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -127,12 +128,12 @@ export default can.Component.extend({
       return this.attr('documents').unshift(...items);
     },
     createDocument: function (data) {
-      let date = new Date();
+      let date = getUtcDate();
       let modelType = this.attr('modelType');
       let document = new businessModels[modelType]({
         link: data,
         title: data,
-        created_at: date.toISOString(),
+        created_at: date,
         context: this.instance.context || new Context({
           id: null,
         }),

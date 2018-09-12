@@ -17,6 +17,7 @@ import {
 } from '../../plugins/utils/notifiers-utils';
 import Context from '../../models/service-models/context';
 import * as businessModels from '../../models/business-models';
+import {getUtcDate} from '../../plugins/utils/date-util';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',
@@ -37,7 +38,6 @@ export default can.Component.extend({
     confirmationCallback: '@',
     disabled: false,
     isUploading: false,
-
 
     onKeyup(element, event) {
       const ESCAPE_KEY_CODE = 27;
@@ -173,7 +173,7 @@ export default can.Component.extend({
             id: instanceId,
             type: instanceType,
           },
-          created_at: new Date(),
+          created_at: getUtcDate(),
         });
         return model;
       });

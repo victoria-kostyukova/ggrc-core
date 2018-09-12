@@ -6,6 +6,7 @@
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Context from '../../../models/service-models/context';
 import Evidence from '../../../models/business-models/evidence';
+import {getUtcDate} from '../../../plugins/utils/date-util';
 
 export default can.Component.extend({
   tag: 'create-url',
@@ -28,7 +29,7 @@ export default can.Component.extend({
         title: value,
         context: this.attr('context') || new Context({id: null}),
         kind: 'URL',
-        created_at: new Date(),
+        created_at: getUtcDate(),
         _stamp: Date.now(),
       };
 
