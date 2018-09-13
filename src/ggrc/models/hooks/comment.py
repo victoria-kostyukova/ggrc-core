@@ -25,8 +25,9 @@ def init_hook():
     comment_admin = comment_roles["Admin"]
     user = login.get_current_user()
     for comment in objects:
-      all_models.AccessControlList(
-          ac_role=comment_admin,
+      admin = [a for a in comment._access_control_list
+               if a.ac_role == comment_admin][0]
+      all_models.AccessControlPeople(
           person=user,
-          object=comment,
+          ac_list=admin,
       )

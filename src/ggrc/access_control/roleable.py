@@ -75,6 +75,8 @@ class Roleable(object):
         values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
+    if not values:
+      return
     # using ac_role_id instead of ac_role means we can't (easily) create a new
     # role and map people to it in a single request.
     role_map = {acl.ac_role.id: acl for acl in self._access_control_list}
