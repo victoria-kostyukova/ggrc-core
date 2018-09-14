@@ -25,6 +25,7 @@ OBJECTIVES = "objectives"
 PEOPLE = "people"
 GLOBAL_ROLES = "roles"
 USER_ROLES = "user_roles"
+ACL_ROLES = "access_control_roles"
 ORG_GROUPS = "org_groups"
 VENDORS = "vendors"
 ACCESS_GROUPS = "access_groups"
@@ -49,6 +50,7 @@ DOCUMENTS = "documents"
 METRICS = "metrics"
 TECHNOLOGY_ENVIRONMENTS = "technology_environments"
 PRODUCT_GROUPS = "product_groups"
+PROPOSALS = "proposals"
 
 ALL_SNAPSHOTABLE_OBJS = (
     ACCESS_GROUPS, CONTRACTS, CONTROLS, DATA_ASSETS, FACILITIES,

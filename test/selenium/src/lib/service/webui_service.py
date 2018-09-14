@@ -1,17 +1,20 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via UI."""
+# pylint: disable=useless-super-delegation
+import copy
 import os
 import re
 
 from dateutil import parser, tz
 
-from lib import factory, url
+from lib import factory, url, base
 from lib.constants import objects, messages, element, regex
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
+from lib.entities import entities_factory, entity
 from lib.entities.entity import Representation
-from lib.page import dashboard, export_page
+from lib.page import dashboard, proposal_digest, export_page
 from lib.page.widget import object_modal
 from lib.page.widget.info_widget import SnapshotedInfoPanel
 from lib.utils import selenium_utils, file_utils, conftest_utils
@@ -717,3 +720,86 @@ class ProgramsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
   def __init__(self, driver):
     super(ProgramsService, self).__init__(driver, objects.PROGRAMS)
+
+
+class ProposalsService(base.WithBrowser):
+  """Class for Proposals business layer's services objects."""
+  def __init__(self, driver):
+    super(ProposalsService, self).__init__(driver)
+
+  def create_proposal(self, obj):
+    """Create a proposal for an obj."""
+    if obj.type.lower() not in [objects.get_singular(objects.CONTROLS),
+                                objects.get_singular(objects.RISKS)]:
+      raise ValueError("Proposal can be created only for Controls and Risks.")
+    obj_info_page = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))(self._driver).open_info_page_of_obj(obj)
+    obj_info_page.click_propose_changes()
+    proposal_factory = entities_factory.ProposalsFactory()
+    proposal = proposal_factory.obj_inst()
+    proposed_description = proposal_factory.generate_string("Proposal")
+    proposal_modal = object_modal.ProposalModal(self._driver)
+    proposal_modal.set_description(proposed_description)
+    proposal_modal.click_propose()
+    proposal.changes = [{"obj_attr_type": "Description",
+                         "cur_value": obj.description,
+                         "proposed_value": proposed_description}]
+    return proposal
+
+  def open_obj_change_proposals_tab(self, obj):
+    """Open change proposals tab of an obj."""
+    if obj.type.lower() not in [objects.get_singular(objects.CONTROLS),
+                                objects.get_singular(objects.RISKS)]:
+      raise ValueError("Proposal can be created only for Controls and Risks.")
+    obj_info_page = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))(self._driver).open_info_page_of_obj(obj)
+    obj_info_page.open_tab("Change Proposals")
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return obj_info_page
+
+  def is_proposal_created(self, obj, proposal):
+    """Check if proposal is created for an obj."""
+    obj_info_page = self.open_obj_change_proposals_tab(obj)
+    return proposal in obj_info_page.get_related_proposals()
+
+  def is_proposal_apply_btn_exists(self, obj, proposal):
+    """Check if proposal apply btn exists for an obj."""
+    obj_info_page = self.open_obj_change_proposals_tab(obj)
+    return obj_info_page.proposal_apply_btn_exists(proposal)
+
+  def open_proposal_digest(self):
+    """Opem proposals digest."""
+    proposal_digest.ProposalDigest(self._driver).open_proposal_digest()
+
+  def get_proposal_email(self, obj, proposal):
+    """Get proposal email."""
+    proposal_copy = copy.deepcopy(proposal)
+    for changing in proposal_copy.changes:
+      changing.pop("cur_value", None)
+    person_name = None
+    for ac_row in obj.access_control_list:
+      if ac_row["person_email"] == proposal_copy.author:
+        person_name = ac_row["person_name"]
+        break
+    expected_email = entity.ProposalEmailUI(
+        recipient_email=obj.admins[0], author=person_name,
+        obj_type=obj.type.lower(), changes=proposal_copy.changes,
+        comment=proposal_copy.comment)
+    expected_email.diff_info = None
+    self._browser.element(
+        text=proposal_copy.changes[0]["obj_attr_type"]).wait_until_present()
+    return expected_email if expected_email in proposal_digest.ProposalDigest(
+        self._driver).get_proposal_emails() else None
+
+  def can_open_correct_obj(self, obj, proposal_email):
+    """Check if clicking on the Open btn in the proposal notification email
+    opens correct obj."""
+    proposal_digest_cls = proposal_digest.ProposalDigest(self._driver)
+    proposal_email_index = proposal_digest_cls.get_proposal_emails().index(
+        proposal_email)
+    proposal_digest_cls.click_open_btn_by_index(proposal_email_index)
+    obj_name = (obj.type + "s").lower()
+    service_cls = factory.get_cls_webui_service(obj_name)(self._driver)
+    actual_obj = service_cls.build_obj_from_page()
+    obj_copy = copy.deepcopy(obj)
+    return obj_copy.repr_ui() == actual_obj

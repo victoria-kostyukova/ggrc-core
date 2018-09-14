@@ -14,7 +14,8 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
-from lib.page.widget import page_tab, page_elements, object_modal, object_page
+from lib.page.widget import (
+    page_tab, page_elements, object_modal, related_proposals, object_page)
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, help_utils, ui_utils
@@ -779,6 +780,10 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
     comments_elem.click()
     comments_elem.send_keys(comment_msg)
 
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.link(xpath="//create-proposal-button/a").click()
+
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
     return [self.request_review_btn,
@@ -786,6 +791,20 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
             self.comment_area.add_section,
             self.reference_urls.add_button,
             self.assign_folder_button] + list(self.inline_edit_controls)
+
+  def get_related_proposals(self):
+    """Get related proposals."""
+    return related_proposals.RelatedProposals(self._driver).get_proposals()
+
+  def proposal_apply_btn_exists(self, proposal):
+    """Check if apply button exists for this proposal."""
+    related_proposals_cls = related_proposals.RelatedProposals(self._driver)
+    proposals = related_proposals_cls.get_proposals()
+    proposal_index = proposals.index(proposal)
+    return related_proposals_cls.apply_btn_existing_by_index(proposal_index)
+
+  def open_tab(self, tab_name):
+    self._browser.element(class_name="nav-tabs").link(text=tab_name).click()
 
 
 class Objectives(InfoWidget):
@@ -900,6 +919,10 @@ class Risks(InfoWidget):
     scope.update(
         admin=self.admins.get_people_emails()
     )
+
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.link(xpath="//create-proposal-button/a").click()
 
 
 class Threats(InfoWidget):

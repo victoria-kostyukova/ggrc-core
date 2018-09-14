@@ -294,3 +294,7 @@ class Products(Widget):
 
 class Projects(Widget):
   """Model for Projects generic widgets."""
+
+
+class Proposals(Widget):
+  """Model for Proposals generic widgets."""

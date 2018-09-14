@@ -3,3 +3,4 @@
 """Constants for test runner."""
 
 DESTRUCTIVE_TEST_METHOD_PREFIX = "test_destructive_"
+CHECK_PROPOSALS_TEST_METHOD_PREFIX = "test_check_proposals"

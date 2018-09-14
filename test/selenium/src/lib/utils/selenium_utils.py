@@ -50,7 +50,12 @@ def _login_if_needed(driver):
   current_logged_in_user = users.current_logged_in_user(users.UI_USER)
   if (not current_logged_in_user or
      current_logged_in_user.email != current_user.email):
+    # stop new cookies being set after
+    #   they are removed)
+    driver.get(url_module.Urls().gae_login(current_user))
+    # remove `session` cookie
     driver.delete_all_cookies()
+    # set `dev_appserver_login` cookie
     driver.get(url_module.Urls().gae_login(current_user))
     users.set_current_logged_in_user(users.UI_USER, users.current_user())
 

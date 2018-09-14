@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Web UI services"""
+# pylint: disable=invalid-name
 import copy
 import re
 
@@ -34,6 +35,11 @@ def create_asmt(selenium, audit):
   expected_asmt.modified_by = users.current_user().email
   expected_asmt.updated_at = expected_asmt_rest.updated_at
   return expected_asmt
+
+
+def create_proposal(selenium, obj):
+  """Create a proposal to obj."""
+  return webui_service.ProposalsService(selenium).create_proposal(obj)
 
 
 def assert_can_edit_asmt(selenium, asmt):
@@ -121,3 +127,26 @@ def is_error_404(selenium):
 def _browser(driver):
   """Return nerodia browser for the driver"""
   return nerodia.browser.Browser(browser=driver)
+
+
+def assert_proposal_is_created(selenium, obj, proposal):
+  """Check if proposal is created."""
+  assert webui_service.ProposalsService(selenium).is_proposal_created(
+      obj, proposal)
+
+
+def assert_proposal_apply_btn_exists(
+    selenium, obj, proposal, apply_btn_exists
+):
+  """Check proposal apply button existing."""
+  assert webui_service.ProposalsService(selenium).is_proposal_apply_btn_exists(
+      obj, proposal) == apply_btn_exists
+
+
+def assert_proposal_notification_connects_to_obj(selenium, obj, proposal):
+  """Check if proposal notification email exists."""
+  proposal_service = webui_service.ProposalsService(selenium)
+  proposal_service.open_proposal_digest()
+  proposal_email = proposal_service.get_proposal_email(obj, proposal)
+  assert proposal
+  assert proposal_service.can_open_correct_obj(obj, proposal_email)

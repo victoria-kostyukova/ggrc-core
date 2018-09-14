@@ -4,7 +4,7 @@
 
 from xdist.scheduler import LoadScheduling
 
-from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
+from lib.constants import test_runner
 
 
 class CustomPytestScheduling(LoadScheduling):
@@ -23,7 +23,10 @@ class CustomPytestScheduling(LoadScheduling):
       # unequal load on nodes.
       return
     for idx, test_name in enumerate(self.collection):
-      if self._is_destructive_test(test_name) and idx in self.pending:
+      if (
+          (self._is_destructive_test(test_name) or
+           self._is_check_proposals_test(test_name)) and idx in self.pending
+      ):
         idxs_to_send.append(idx)
     if not idxs_to_send:
       idxs_to_send = self.pending[:num]
@@ -38,4 +41,8 @@ class CustomPytestScheduling(LoadScheduling):
 
   @staticmethod
   def _is_destructive_test(test_id):
-    return DESTRUCTIVE_TEST_METHOD_PREFIX in test_id
+    return test_runner.DESTRUCTIVE_TEST_METHOD_PREFIX in test_id
+
+  @staticmethod
+  def _is_check_proposals_test(test_id):
+    return test_runner.CHECK_PROPOSALS_TEST_METHOD_PREFIX in test_id

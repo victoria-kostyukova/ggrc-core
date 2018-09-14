@@ -162,6 +162,25 @@ class UserRolesFactory(EntitiesFactory):
     return self.obj_inst()
 
 
+class AccessControlRolesFactory(EntitiesFactory):
+  """Factory class for ACL roles."""
+
+  def __init__(self):
+    super(AccessControlRolesFactory, self).__init__(objects.ACL_ROLES)
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create user role entity"""
+    return self.obj_inst()
+
+  def create_acl_role(self, **attrs):
+    """Create and return acl role entity with valid filled fields."""
+    return self.create(
+        name=self.generate_string(attrs["object_type"] + "Role"),
+        object_type=attrs["object_type"],
+        parent_type=attrs["parent_type"], read=attrs["read"],
+        update=attrs["update"], delete=attrs["delete"])
+
+
 class CommentsFactory(EntitiesFactory):
   """Factory class for Comments entities."""
 
@@ -681,3 +700,18 @@ class IssuesFactory(EntitiesFactory):
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return issue_obj
+
+
+class ProposalsFactory(EntitiesFactory):
+  """Factory class for Proposals entities."""
+
+  def __init__(self):
+    super(ProposalsFactory, self).__init__(objects.PROPOSALS)
+
+  def obj_inst(self):
+    """Create Assessment object's instance and set values for attributes:
+    type, verified, status.
+    """
+    return self.obj_entity_cls().update_attrs(
+        is_allow_none=False, author=users.current_user().email,
+        status=unicode(object_states.PROPOSED))

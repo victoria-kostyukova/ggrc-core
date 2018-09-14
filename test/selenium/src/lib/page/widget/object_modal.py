@@ -135,3 +135,15 @@ class WorkflowModal(BaseObjectModal):
     text_field = label_el.following_sibling(
         class_name="input-block-level").to_subtype()
     text_field.set(first_task_group_title)
+
+
+class ProposalModal(BaseObjectModal):
+  """Represents proposal object modal."""
+
+  def __init__(self, driver):
+    super(ProposalModal, self).__init__(driver)
+    self._fields = ["title", "description"]
+
+  def click_propose(self):
+    self._root.link(text="Propose").click()
+    self._root.element(class_name="spinner").wait_until_not_present()

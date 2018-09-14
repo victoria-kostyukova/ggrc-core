@@ -630,8 +630,8 @@ class Entity(Representation):
     return (
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
-        IssueEntity, CommentEntity, ObjectiveEntity, RiskEntity,
-        OrgGroupEntity)
+        IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
+        RiskEntity, OrgGroupEntity, ProposalEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -673,6 +673,18 @@ class UserRoleEntity(Representation):
     self.set_attrs(
         "type", "id", "created_at", "updated_at", "modified_by",
         "person", "role")
+
+
+class AccessControlRoleEntity(Representation):
+  """Class that represents model for ACL role entity"""
+
+  def __init__(self):
+    super(AccessControlRoleEntity, self).__init__()
+    self.set_attrs(
+        "context", "created_at", "default_to_current_user", "delete", "id",
+        "mandatory", "modified_by", "my_work", "name", "non_editable",
+        "object_type", "parent_type", "read", "selfLink", "tooltip", "type",
+        "update", "updated_at")
 
 
 class CustomAttributeDefinitionEntity(Representation):
@@ -779,3 +791,22 @@ class AssessmentEntity(Entity):
 
 class IssueEntity(Entity):
   """Class that represent model for Issue entity."""
+
+
+class ProposalEntity(Representation):
+  """Proposal entity from UI.
+
+  Changes attribute should be an array of dictionaries with keys obj_attr_type,
+  cur_value, proposed_value.
+  """
+  def __init__(self, **attrs):
+    super(ProposalEntity, self).__init__()
+    self.set_attrs(
+        "status", "author", "datetime", "changes", "comment", **attrs)
+
+
+class ProposalEmailUI(Representation):
+  """Proposal notification email."""
+  def __init__(self, **attrs):
+    self.set_attrs(
+        "recipient_email", "author", "obj_type", "changes", "comment", **attrs)

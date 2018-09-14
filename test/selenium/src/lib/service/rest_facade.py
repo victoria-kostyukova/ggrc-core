@@ -91,6 +91,11 @@ def create_user_with_role(role_name):
   return user
 
 
+def create_access_control_role(**attrs):
+  """Create a ACL role."""
+  return rest_service.AccessControlRolesService().create_acl_role(**attrs)
+
+
 def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
   rest_service.RelationshipsService().map_objs(
