@@ -131,3 +131,14 @@ class Proposal(object):
         :instance: The object that modified after applying of proposal.
       """,
   )
+
+
+class Import(object):
+  """Class storing import signals."""
+  signals = blinker.Namespace()
+  mapping_created = signals.signal(
+      "Mapping created",
+      """
+        :instance: The object that mapped via import.
+      """,
+  )

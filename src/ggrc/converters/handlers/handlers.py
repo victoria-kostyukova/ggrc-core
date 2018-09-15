@@ -20,6 +20,8 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 
 # pylint: disable=invalid-name
+from ggrc.services import signals
+
 logger = getLogger(__name__)
 
 MAPPING_PREFIX = "__mapping__:"
@@ -509,6 +511,10 @@ class MappingColumnHandler(ColumnHandler):
         ):
           mapping = all_models.Relationship(source=current_obj,
                                             destination=obj)
+          signals.Import.mapping_created.send(obj.__class__,
+                                              instance=obj)
+          signals.Import.mapping_created.send(current_obj.__class__,
+                                              instance=current_obj)
           relationships.append(mapping)
           db.session.add(mapping)
         else:

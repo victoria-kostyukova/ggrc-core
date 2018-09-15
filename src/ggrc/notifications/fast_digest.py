@@ -11,10 +11,12 @@ from ggrc import db
 from ggrc import rbac
 from ggrc import settings
 
-from ggrc.notifications.proposal_helpers import build_prosal_data, \
-  get_email_proposal_list, mark_proposals_sent
-from ggrc.notifications.review_helpers import build_review_data, \
-  get_review_notifications, move_notifications_to_history
+from ggrc.notifications.proposal_helpers import build_prosal_data
+from ggrc.notifications.proposal_helpers import get_email_proposal_list
+from ggrc.notifications.proposal_helpers import mark_proposals_sent
+from ggrc.notifications.review_helpers import build_review_data
+from ggrc.notifications.review_helpers import get_review_notifications
+from ggrc.notifications.review_helpers import move_notifications_to_history
 
 DIGEST_TITLE = "Proposal Digest"
 DIGEST_TMPL = settings.JINJA2.get_template("notifications/fast_digest.html")

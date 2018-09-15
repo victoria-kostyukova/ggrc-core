@@ -16,7 +16,7 @@ from ggrc.models import reflection
 from ggrc.models.mixins import issue_tracker
 from ggrc.models.mixins import rest_handable
 from ggrc.models.mixins import with_proposal_handable
-from ggrc.models.mixins import with_mappimg_via_import_Handable
+from ggrc.models.mixins import with_mappimg_via_import_handable
 
 from ggrc.access_control.role import get_ac_roles_for
 from ggrc.models.relationship import Relatable
@@ -27,7 +27,8 @@ from ggrc.notifications import add_notification
 
 class Reviewable(rest_handable.WithPutHandable,
                  rest_handable.WithRelationshipsHandable,
-                 with_proposal_handable.WithProposalHandable):
+                 with_proposal_handable.WithProposalHandable,
+                 with_mappimg_via_import_handable.WithMappingImportHandable):
   """Mixin to setup object as reviewable."""
 
   # REST properties
@@ -122,6 +123,13 @@ class Reviewable(rest_handable.WithPutHandable,
         self.review.status = all_models.Review.STATES.UNREVIEWED
         self.add_email_notification()
 
+  def _set_review_status_unreviewed(self):
+    """Set review status -> unreviewed"""
+    from ggrc.models import all_models
+    if self.review:
+      self.review.status = all_models.Review.STATES.UNREVIEWED
+      self.add_email_notification()
+
   def handle_put(self):
     self._update_status_on_attr()
 
@@ -132,10 +140,10 @@ class Reviewable(rest_handable.WithPutHandable,
     self._update_status_on_mapping(counterparty)
 
   def handle_proposal_applied(self):
-    from ggrc.models import all_models
-    if self.review:
-      self.review.status = all_models.Review.STATES.UNREVIEWED
-      self.add_email_notification()
+    self._set_review_status_unreviewed()
+
+  def handle_mapping_via_import_created(self):
+    self._set_review_status_unreviewed()
 
 
 class Review(mixins.person_relation_factory("last_reviewed_by"),

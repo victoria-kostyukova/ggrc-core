@@ -25,7 +25,7 @@ def get_review_notifications():
       all_models.Notification.object_type == all_models.Review.__name__,
       all_models.Notification.runner == all_models.Notification.RUNNER_FAST
   ).options(
-    joinedload("notification_type")
+      joinedload("notification_type")
   )
 
 
