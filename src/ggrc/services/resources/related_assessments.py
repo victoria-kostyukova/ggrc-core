@@ -66,10 +66,17 @@ class RelatedAssessmentsResource(common.Resource):
         raise Forbidden()
       acl = models.all_models.AccessControlList
       acr = models.all_models.AccessControlRole
-      ids_query = db.session.query(acl.object_id).join(acr).filter(
+      acp = models.all_models.AccessControlPeople
+      ids_query = db.session.query(
+          acl.object_id
+      ).join(
+          acr
+      ).join(
+          acp
+      ).filter(
           acr.read == 1,
           acl.object_type == "Assessment",
-          acl.person_id == get_current_user_id(),
+          acp.person_id == get_current_user_id(),
           acl.object_id.in_(ids_query),
       )
 
