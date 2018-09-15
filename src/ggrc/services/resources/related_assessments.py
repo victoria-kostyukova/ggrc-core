@@ -11,6 +11,7 @@ This resource works with the following queries:
     - optional: order_by=field_name,(asc|desc),[field_name,(asc|desc)]
 """
 
+import logging
 from collections import defaultdict
 
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -28,6 +29,9 @@ from ggrc.rbac import permissions
 from ggrc.services import common
 from ggrc.query import pagination
 from ggrc.query.exceptions import BadQueryException
+
+
+logger = logging.getLogger(__name__)
 
 
 class RelatedAssessmentsResource(common.Resource):
@@ -359,10 +363,11 @@ class RelatedAssessmentsResource(common.Resource):
 
           return self.json_success_response(response_object, )
 
-      except (ValueError, TypeError, AttributeError, BadQueryException):
+      except (ValueError, TypeError, AttributeError, BadQueryException) as err:
         # Type Error and Value Error are for invalid integer values,
         # Attribute error is for invalid models passed, which return None type
         # that does not have query attribute.
         # Bad query exception is for invalid parameters for limit such as
         # negative numbers.
+        logger.exception(err)
         raise BadRequest()
