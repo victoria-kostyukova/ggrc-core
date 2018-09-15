@@ -17,6 +17,7 @@ import flask
 
 from ggrc import db
 from ggrc import builder
+from ggrc import utils
 from ggrc.app import app
 from ggrc.services.common import Resource
 
@@ -182,6 +183,7 @@ class Api(object):
       data = {}
     obj_dict = builder.json.publish(obj)
     builder.json.publish_representation(obj_dict)
+    obj_dict = flask.json.loads(utils.as_json(obj_dict))
     obj_dict.update(data)
     data = {obj._inflector.table_singular: obj_dict}
     return self.put(obj, data)
