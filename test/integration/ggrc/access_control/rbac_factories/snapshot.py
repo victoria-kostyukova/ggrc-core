@@ -5,6 +5,7 @@
 
 import sqlalchemy as sa
 
+from ggrc import app
 from ggrc import db
 from ggrc.models import all_models, get_model
 
@@ -79,11 +80,12 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
         all_models.Revision.resource_type == snapshot.child_type,
         all_models.Revision.resource_id == snapshot.child_id,
     ).first()[0]
-    return self.api.client.get(
-        "api/revisions?id__in={}%2C{}".format(
-            snapshot.revision.id, last_revision
-        )
-    )
+    with app.app.app_context():
+      return self.api.client.get(
+          "api/revisions?id__in={}%2C{}".format(
+              snapshot.revision.id, last_revision
+          )
+      )
 
   def update(self):
     """Update snapshot to the latest version."""
