@@ -15,6 +15,8 @@ from ggrc import models
 from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
+    as params_builder
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.integrations import synchronization_jobs
 from ggrc.access_control.role import AccessControlRole
@@ -23,6 +25,8 @@ from integration.ggrc.models import factories
 from integration.ggrc import generator
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
+
+TICKET_ID = 123
 
 
 @ddt.ddt
@@ -108,6 +112,24 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     }}
     return payload
 
+  def put_request_payload_builder(self, issue_attrs):
+    """Build payload for PUT request to Issue Tracker"""
+    payload_attrs = dict(self.DEFAULT_ASSESSMENT_ATTRS, **issue_attrs)
+    payload = {
+        "issue_tracker": {
+            "enabled": payload_attrs["enabled"],
+            "status": payload_attrs["status"],
+            "component_id": payload_attrs["component_id"],
+            "hotlist_id": payload_attrs["hotlist_id"],
+            "issue_id": payload_attrs["issue_id"],
+            "issue_type": payload_attrs["issue_type"],
+            "issue_priority": payload_attrs["issue_priority"],
+            "issue_severity": payload_attrs["issue_severity"],
+            "title": payload_attrs["title"],
+        }
+    }
+    return payload
+
   def check_issuetracker_issue_fields(self,
                                       issue_tracker_issue,
                                       assmt_attrs):
@@ -161,7 +183,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_new_linked_assessment(self, assmt_attrs, ticket_attrs, upd_mock):
-    """Test linking new Issue to IssueTracker ticket sets correct fields"""
+    """Test link new Assessment to IssueTracker ticket sets correct fields"""
     with factories.single_commit():
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(
@@ -184,6 +206,113 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     assmt_id = response.json.get("assessment").get("id")
     it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
     self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_existing_assmt_link(self, update_mock):
+    """Test Assessment link to another ticket """
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+
+    new_ticket_id = TICKET_ID + 1
+    new_data = {"issue_id": new_ticket_id}
+    issue_request_payload = self.put_request_payload_builder(new_data)
+    response_payload = self.response_payload_builder(new_data)
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                      return_value=response_payload) as get_mock:
+        response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
+    get_mock.assert_called_once()
+    self.assert200(response)
+
+    # check if data was changed in our DB
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertEqual(int(issue_tracker_issue.issue_id), new_ticket_id)
+
+    # check detach comment was sent
+    detach_comment_tmpl = params_builder.AssessmentParamsBuilder.DETACH_TMPL
+    comment = detach_comment_tmpl.format(new_ticket_id=new_ticket_id)
+    expected_args = (TICKET_ID, {"comment": comment})
+    self.assertEqual(expected_args, update_mock.call_args[0])
+
+  @mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                     return_value=True)
+  def test_already_linked_ticket(self, enabled_mock):
+    """Test Assessment w/o IT couldn't be linked to already linked ticket"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+      new_assmt = factories.AssessmentFactory()
+
+    issue_data = {"issue_id": TICKET_ID}
+    issue_request_payload = self.put_request_payload_builder(issue_data)
+    response = self.api.put(new_assmt, issue_request_payload)
+    self.assert200(response)
+    self.assertTrue(response.json["assessment"]["issue_tracker"]["_warnings"])
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertFalse(issue_tracker_issue)
+    enabled_mock.assert_called()
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_creating_new_ticket_for_linked_issue(self, update_mock):
+    """Test create new ticket for already linked assessment"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=factories.AssessmentFactory(audit=audit)
+      )
+    new_data = {"issue_id": ''}
+    issue_request_payload = self.put_request_payload_builder(new_data)
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.create_issue",
+                      return_value={"issueId": TICKET_ID + 1}) as create_mock:
+        response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
+    self.assert200(response)
+
+    # Detach comment should be sent to previous ticket
+    update_mock.assert_called_once()
+    self.assertEqual(TICKET_ID, update_mock.call_args[0][0])
+    create_mock.assert_called_once()
+
+    # check if data was changed in our DB
+    issue_id = response.json.get("assessment").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue(
+        "Assessment",
+        issue_id,
+    )
+    self.assertNotEqual(int(issue_tracker_issue.issue_id), TICKET_ID)
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   def test_complete_assessment_create_issue(self, mock_create_issue):
