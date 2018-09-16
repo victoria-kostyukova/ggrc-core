@@ -8,6 +8,7 @@ from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control import people
 from ggrc.access_control.roleable import Roleable
 from ggrc.login import get_current_user
 from ggrc.models.deferred import deferred
@@ -165,17 +166,11 @@ class Audit(Snapshotable,
     Args:
       audit: Audit instance
     """
-    for acl in audit.access_control_list:
-      if acl.parent_id:
-        continue
-      data = {
-          "person": acl.person,
-          "ac_role": acl.ac_role,
-          "object": self,
-          "context": acl.context,
-      }
-      new_acl = AccessControlList(**data)
-      db.session.add(new_acl)
+    acl_dict = {acl.ac_role_id: acl for acl in self._access_control_list}
+    for original_acl in audit._access_control_list:
+      acl = acl_dict[original_acl.ac_role_id]
+      for acp in original_acl.access_control_people:
+        people.AccessControlPeople(ac_list=acl, person=acp.person)
 
   def clone(self, source_id, mapped_objects=None):
     """Clone audit with specified whitelisted children.
