@@ -160,7 +160,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   )
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
-  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_new_linked_assessment(self, assmt_attrs, ticket_attrs, upd_mock):
     """Test linking new Issue to IssueTracker ticket sets correct fields"""
     with factories.single_commit():
@@ -172,10 +171,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     assmt_request_payload = self.request_payload_builder(assmt_attrs, audit)
     response_payload = self.response_payload_builder(ticket_attrs)
-    with mock.patch("ggrc.integrations.issues.Client.get_issue",
-                    return_value=response_payload) as get_mock:
-      with mock.patch.object(integration_utils, "exclude_auditor_emails",
-                             return_value={u"user@example.com", }):
+
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                      return_value=response_payload) as get_mock:
         response = self.api.post(all_models.Assessment, assmt_request_payload)
 
     get_mock.assert_called_once()
