@@ -78,12 +78,13 @@ class ProgramRBACFactory(base.BaseRBACFactory):
     """Map new Control to Program."""
     with factories.single_commit():
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role_id=self.admin_control_id,
-          object_id=control.id,
-          object_type="Control",
-          person_id=self.user_id
-      )
+      for acl in control._access_control_list:
+        if acl.ac_role_id == self.admin_control_id:
+          factories.AccessControlPeopleFactory(
+              person_id=self.user_id,
+              ac_list=acl,
+          )
+
     program = all_models.Program.query.get(self.program_id)
 
     return self.objgen.generate_relationship(

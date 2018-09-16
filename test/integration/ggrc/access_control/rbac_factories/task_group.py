@@ -104,12 +104,12 @@ class TaskGroupRBACFactory(base.BaseRBACFactory):
     task_group = all_models.TaskGroup.query.get(self.task_group_id)
     with factories.single_commit():
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role_id=self.admin_control_id,
-          object_id=control.id,
-          object_type="Control",
-          person_id=self.user_id
-      )
+      for acl in control._access_control_list:
+        if acl.ac_role_id == self.admin_control_id:
+          factories.AccessControlPeopleFactory(
+              person_id=self.user_id,
+              ac_list=acl,
+          )
     return self.api.post(all_models.TaskGroupObject, {
         "task_group_object": {
             "context": None,

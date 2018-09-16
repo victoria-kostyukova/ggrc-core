@@ -103,12 +103,12 @@ class CycleTaskRBACFactory(base.BaseRBACFactory):
     """Map Control that was created by user to Cycle Task."""
     cycle_task = all_models.CycleTaskGroupObjectTask.query.first()
     control = factories.ControlFactory()
-    factories.AccessControlListFactory(
-        ac_role_id=self.admin_control_id,
-        object_id=control.id,
-        object_type="Control",
-        person_id=self.user_id
-    )
+    for acl in control._access_control_list:
+      if acl.ac_role_id == self.admin_control_id:
+        factories.AccessControlPeopleFactory(
+            person_id=self.user_id,
+            ac_list=acl,
+        )
     return self.objgen.generate_relationship(
         source=cycle_task,
         destination=control,
