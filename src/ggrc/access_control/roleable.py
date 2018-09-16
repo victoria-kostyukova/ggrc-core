@@ -126,6 +126,7 @@ class Roleable(object):
         ),
     )
 
+  @property
   def acl_json(self):
     acl_json = []
     for person, acl in self.access_control_list:
@@ -141,7 +142,7 @@ class Roleable(object):
     """Log custom attribute values."""
     # pylint: disable=not-an-iterable
     res = super(Roleable, self).log_json()
-    res["access_control_list"] = self.acl_json()
+    res["access_control_list"] = self.acl_json
     return res
 
   def get_persons_for_rolename(self, role_name):
