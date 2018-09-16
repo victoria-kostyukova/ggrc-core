@@ -52,8 +52,6 @@ class TestAccessControlRoleable(TestCase):
     """Test access_control_list setter with a basic dict object
     This is the format the frontend uses"""
     self.role = factories.AccessControlRoleFactory(object_type="Control")
-    import ipdb
-    ipdb.set_trace()
     obj = all_models.Control(
         title="New Control",
         access_control_list=acl_list(self),

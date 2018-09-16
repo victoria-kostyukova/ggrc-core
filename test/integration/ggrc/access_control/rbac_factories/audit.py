@@ -101,11 +101,14 @@ class AuditRBACFactory(base.BaseRBACFactory):
     """Map new snapshot of Control to Audit."""
     with factories.single_commit():
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role_id=self.admin_control_id,
-          object_id=control.id,
-          object_type="Control",
-          person_id=self.user_id
+      acl = [
+          acl
+          for acl in control._access_control_list
+          if acl.ac_role_id == self.admin_control_id
+      ][0]
+      factories.AccessControlPeopleFactory(
+          person_id=self.user_id,
+          ac_list=acl
       )
     audit = all_models.Audit.query.get(self.audit_id)
 

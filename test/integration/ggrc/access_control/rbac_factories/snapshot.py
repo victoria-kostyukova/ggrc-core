@@ -7,6 +7,7 @@ import sqlalchemy as sa
 
 from ggrc import app
 from ggrc import db
+from ggrc import app
 from ggrc.models import all_models, get_model
 
 from integration.ggrc import Api, generator, TestCase
