@@ -25,8 +25,8 @@ class Assignable(Roleable):
         A set of assignees.
     """
     assignees = defaultdict(list)
-    for acl in self.access_control_list:
+    for person, acl in self.access_control_list:
       if acl.ac_role.name in self.ASSIGNEE_TYPES:
-        assignees[acl.person].append(acl.ac_role.name)
+        assignees[person].append(acl.ac_role.name)
 
     return assignees
