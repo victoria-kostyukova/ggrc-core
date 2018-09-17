@@ -7,6 +7,7 @@ from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
+from cached_property import cached_property
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
@@ -67,6 +68,36 @@ class Roleable(object):
         for acp in acl.access_control_people
     ]
 
+  @cached_property
+  def acr_acl_map(self):
+    return {acl.ac_role: acl for acl in self._access_control_list}
+
+  @cached_property
+  def acr_id_acl_map(self):
+    return {acl.ac_role.id: acl for acl in self._access_control_list}
+
+  def _add_acp(self, acl, people):
+    for person in people:
+      AccessControlPeople(person=person, ac_list=acl)
+
+  def _remove_acp(self, acl, people):
+    if not people:
+      return
+    people_acp_map = {acp.person: acp for acp in acl.access_control_people}
+    for person in people:
+      acl.access_control_people.remove(people_acp_map[person])
+
+  def _update_acp(self, acl, new_people):
+    """Update access control people list for a single ACL entry.
+
+    Args:
+      acl: a single access control list model.
+      people: a set of people that should exist in ACP.
+    """
+    existing_people = {acp.person for acp in acl.access_control_people}
+    self._remove_acp(acl, existing_people - new_people)
+    self._add_acp(acl, new_people - existing_people)
+
   @access_control_list.setter
   def access_control_list(self, values):
     """Setter function for access control list.
@@ -77,14 +108,16 @@ class Roleable(object):
     """
     if not values:
       return
-    # using ac_role_id instead of ac_role means we can't (easily) create a new
-    # role and map people to it in a single request.
-    role_map = {acl.ac_role.id: acl for acl in self._access_control_list}
+
+    acls = defaultdict(set)
     for value in values:
-      AccessControlPeople(
-          ac_list=role_map[value["ac_role_id"]],
-          person=referenced_objects.get("Person", value["person"]["id"]),
-      )
+      person = referenced_objects.get("Person", value["person"]["id"])
+      acl = self.acr_id_acl_map[value["ac_role_id"]]
+      acls[acl].add(person)
+
+    for acl in self._access_control_list:
+      self._update_acp(acl, acls[acl])
+
 
   def extend_access_control_list(self, values):
     """Extend access control list.
