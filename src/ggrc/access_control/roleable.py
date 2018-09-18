@@ -73,6 +73,10 @@ class Roleable(object):
     return {acl.ac_role: acl for acl in self._access_control_list}
 
   @cached_property
+  def acr_name_acl_map(self):
+    return {acl.ac_role.name: acl for acl in self._access_control_list}
+
+  @cached_property
   def acr_id_acl_map(self):
     return {acl.ac_role.id: acl for acl in self._access_control_list}
 
