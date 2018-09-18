@@ -43,14 +43,9 @@ class TestAutomappings(TestCase):
   @classmethod
   def create_ac_roles(cls, obj, person_id, role_name="Admin"):
     """Create access control roles"""
-    ac_role = models.AccessControlRole.query.filter_by(
-        object_type=obj.type,
-        name=role_name
-    ).first()
-    factories.AccessControlListFactory(
-        ac_role=ac_role,
-        object=obj,
-        person_id=person_id
+    factories.AccessControlPeopleFactory(
+        ac_list=obj.acr_name_acl_map[role_name],
+        person_id=person_id,
     )
 
   def create_object(self, cls, data):
@@ -347,10 +342,10 @@ class TestAutomappings(TestCase):
         all_models.AccessControlList.object_id == destination_obj.id,
         all_models.AccessControlList.object_type == destination_obj.type,
     ).all()
-    self.assertEqual(len(acls), 3)
+    self.assertEqual(len(acls), 6)
     self.assertItemsEqual(
         roles,
-        [acl.parent.parent.ac_role.name for acl in acls]
+        [acl.parent.parent.ac_role.name for acl in acls if acl.parent]
     )
 
   def test_automapping_deletion(self):
