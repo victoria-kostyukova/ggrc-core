@@ -3,7 +3,6 @@
 
 """Handlers for access control roles."""
 
-from ggrc import models
 from ggrc.converters.handlers import handlers
 
 
@@ -14,8 +13,7 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     super(AccessControlRoleColumnHandler, self).__init__(
         row_converter, key, **options)
     role_name = (options.get("attr_name") or self.display_name)
-    self.acl = [acl for acl in row_converter.obj._access_control_people
-                if acl.ac_role.name==role_name][0]
+    self.acl = row_converter.obj.acr_name_acl_map[role_name]
 
   def set_obj_attr(self):
     """Update current AC list with correct people values."""
@@ -31,8 +29,8 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
       return
 
     list_new = set(self.value)
-    self.row_converter.obj._add_acp(list_new - list_old)
-    self.row_converter.obj._remove_acp(list_old - list_new)
+    self.row_converter.obj._add_acp(self.acl, list_new - list_old)
+    self.row_converter.obj._remove_acp(self.acl, list_old - list_new)
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
