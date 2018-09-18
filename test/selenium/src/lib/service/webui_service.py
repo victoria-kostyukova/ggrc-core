@@ -490,21 +490,13 @@ class SnapshotsWebUiService(BaseWebUiService):
     obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
     return obj_info_panel.is_link_get_latest_ver_exist()
 
-  def submit_obj_for_review(self, obj, usr_email):
+  def submit_obj_for_review(self, obj, usr_email, comment_msg):
     """Submit control for review scenario."""
     widget = self.open_info_page_of_obj(obj)
     widget.open_submit_for_review_popup()
     widget.select_assignee_user(usr_email)
-    widget.select_first_available_date()
-    widget.click_submit()
-    return self.info_widget_cls(self.driver)
-
-  def decline_review(self, obj, comment_msg):
-    """Decline review scenario."""
-    widget = self.open_info_page_of_obj(obj)
-    widget.click_decline_review()
-    widget.leave_decline_comment(comment_msg)
-    widget.click_save_and_close_on_decline()
+    widget.leave_request_review_comment(comment_msg)
+    widget.click_request()
     return self.info_widget_cls(self.driver)
 
   def approve_review(self, obj):

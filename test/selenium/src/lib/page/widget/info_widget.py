@@ -101,7 +101,10 @@ class InfoWidget(WithPageElements, base.Widget):
     self.core_elem = (self.info_widget_elem if self.is_snapshoted_panel else
                       self.tab_container.active_tab_elem)
     # for overridable methods
-    self._extend_list_all_scopes_by_review_state()
+    if (self.__class__ in
+        [Controls, Programs, Regulations, Objectives, Clauses, Contracts,
+         Policies, Risks, Standards, Threats, Requirements]):
+      self._extend_list_all_scopes_by_review_state()
     if not self.is_asmts_info_widget:
       self._extend_list_all_scopes_by_code()
     self.comment_area = self._comment_area()
@@ -126,9 +129,8 @@ class InfoWidget(WithPageElements, base.Widget):
     """Get object's review state text from Info Widget checking if exact UI
     elements are existed.
     """
-    return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
-        self.info_widget_elem, self._locators.TXT_OBJECT_REVIEWED) else
-        element.ReviewStates.UNREVIEWED)
+    return (element.ReviewStates.REVIEWED if self._browser.element(
+        class_name="state-reviewed") else element.ReviewStates.UNREVIEWED)
 
   def _get_url_match(self):
     """Returns instance of re.MatchObject for current page url."""
@@ -332,8 +334,8 @@ class InfoWidget(WithPageElements, base.Widget):
     'list all scopes' accordingly.
     """
     # pylint: disable=invalid-name
-    self.review_state_lbl = base.Label(
-        self.info_widget_elem, self._locators.TXT_OBJECT_REVIEW)
+    self.review_state_lbl = self._browser.element(
+        class_name="object-review__header-title")
     self.review_state_txt = self.get_review_state_txt()
     self._extend_list_all_scopes(
         self.review_state_lbl.text, self.review_state_txt)
@@ -423,7 +425,7 @@ class Programs(WithObjectReview, InfoWidget):
 
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
-    return [self.submit_for_review_link,
+    return [self.request_review_btn,
             self.info_3bbs_btn,
             self.comment_area.add_section,
             self.reference_urls.add_button] + list(self.inline_edit_controls)
@@ -750,24 +752,19 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
   def _add_obj_review_to_lsopes(self):
     """Extend list of scopes by object review section """
     review_msg = None
-    rejected_el = self._browser.element(toggle="isInitializing").next_sibling(
-        text=re.compile("Review was declined"))
-    approved_el = self._browser.element(class_name="object-approved")
-    if rejected_el.present:
-      review_msg = rejected_el.text
-    elif approved_el.present:
-      review_msg = approved_el.text
+    approved_el = self._browser.element(class_name="state-reviewed")
+    if approved_el.present:
+      review_msg = self._browser.element(class_name="object-review__body").text
     self._extend_list_all_scopes(self._elements.OBJECT_REVIEW_FULL, review_msg)
 
   def open_submit_for_review_popup(self):
     """Open submit for control popub by clicking on corresponding button."""
-    self._driver.find_element(
-        *WidgetInfoControl.LINK_SUBMIT_FOR_REVIEW).click()
+    self._browser.button(text="Request Review").click()
     selenium_utils.wait_for_js_to_load(self._driver)
 
   def select_assignee_user(self, user_email):
     """Select assignee user from dropdown on submit for review popup."""
-    self._browser.text_field(placeholder="Find reviewer").set(user_email)
+    self._browser.text_field(placeholder="Add person").set(user_email)
     ui_utils.select_user(self._browser, user_email)
 
   def select_first_available_date(self):
@@ -777,36 +774,28 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
                                   WidgetInfoControl.DATE_PICKER_LOCATOR)
     date_picker.select_month_start()
 
-  def click_submit(self):
-    """Click submit."""
-    self._driver.find_element(*WidgetInfoControl.SUBMIT_REVIEW_BUTTON).click()
+  def click_request(self):
+    """Click request."""
+    self._browser.element(
+        xpath="//div[@class='simple-modal request-review-modal']"
+              "//button[contains(., 'Request')]").click()
     selenium_utils.wait_for_js_to_load(self._driver)
 
   def click_approve_review(self):
     """Click approve review button."""
-    self._driver.find_element(*WidgetInfoControl.
-                              OBJECT_REVIEW_APPROVE_BTN).click()
+    self._browser.element(text="Mark Reviewed").click()
 
-  def click_decline_review(self):
-    """Click on becline review button."""
-    self._driver.find_element(*WidgetInfoControl.
-                              OBJECT_REVIEW_DECLINE_BTN).click()
-
-  def leave_decline_comment(self, comment_msg):
-    """Leave decline comment for decline option."""
-    comments_elem = self._driver.find_element(*WidgetInfoControl.
-                                              DECLINE_REVIEW_COMMENTS)
+  def leave_request_review_comment(self, comment_msg):
+    """Leave request review comment."""
+    comments_elem = self._browser.element(
+        xpath="//div[@class='simple-modal request-review-modal']"
+              "//div[@data-placeholder='Enter comment']")
     comments_elem.click()
     comments_elem.send_keys(comment_msg)
 
-  def click_save_and_close_on_decline(self):
-    """Click save and close on decline popup."""
-    self._driver.find_element(
-        *WidgetInfoControl.SAVE_AND_CLOSE_BTN).click()
-
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
-    return [self.submit_for_review_link,
+    return [self.request_review_btn,
             self.info_3bbs_btn,
             self.comment_area.add_section,
             self.reference_urls.add_button,

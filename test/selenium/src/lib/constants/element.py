@@ -135,8 +135,8 @@ class Common(object):
   OTHERS = "Others"
   OBJECT_REVIEW = "Object review"
   OBJECT_REVIEW_FULL = "object_review_txt"
-  APPROVED_DATE_REGEX = r" \w{3} \w{3} \d*\s*\w*"
-  DECLINED_DATE_REGEX = r"\d.+\w*\s*[^.]"
+  APPROVED_DATE_REGEX = r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M " \
+                        r"(\+|\-)\d{2}:\d{2}"
 
 
 class CommonModalCreate(object):

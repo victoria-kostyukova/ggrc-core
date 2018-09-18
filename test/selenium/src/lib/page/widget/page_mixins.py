@@ -49,4 +49,4 @@ class WithObjectReview(base.WithBrowser):
 
   def __init__(self, driver):
     super(WithObjectReview, self).__init__(driver)
-    self.submit_for_review_link = self._browser.link(text="Submit For Review")
+    self.request_review_btn = self._browser.button(text="Request Review")
