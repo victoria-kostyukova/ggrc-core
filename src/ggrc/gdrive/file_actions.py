@@ -14,7 +14,9 @@ from flask import json
 from oauth2client.client import HttpAccessTokenRefreshError
 
 from werkzeug.exceptions import (
-    BadRequest, NotFound, InternalServerError, Unauthorized
+    abort,
+    BadRequest,
+    InternalServerError
 )
 
 from ggrc.converters.import_helper import read_csv_file
@@ -32,15 +34,16 @@ logger = getLogger(__name__)
 
 def hande_http_error(ex):
   """Helper for http error handling"""
+  code = ex.resp.status
   message = json.loads(ex.content).get("error").get("message")
-  if ex.resp.status == 404:
-    raise NotFound(message)
-  if ex.resp.status == 401:
-    raise Unauthorized(message)
-  if ex.resp.status == 400:
+
+  if code == 403:
+    message = errors.GOOGLE_API_MESSAGE_MAP.get(message, message)
+  if code == 400:
     logger.warning(message)
-    raise BadRequest(errors.WRONG_FILE_FORMAT)
-  raise InternalServerError(message)
+    message = errors.WRONG_FILE_FORMAT
+
+  raise abort(code, description=message)
 
 
 def create_gdrive_file(csv_string, filename):

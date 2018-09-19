@@ -19,3 +19,9 @@ INTERNAL_SERVER_ERROR = (u"Processing of the file failed due "
 
 MISSING_KEYS = (u"Unable to validate gdrive api "
                 u"response: missed keys {}.")
+
+GOOGLE_API_MESSAGE_MAP = {
+    u"The user does not have sufficient permissions for this file.":
+        (u"You do not have access to create or edit in the attach folder, "
+         u"please request edit access from folder owner.")
+}
