@@ -80,12 +80,12 @@ class TestWorkflowsApiPost(TestCase):
     self.api.set_user(admin)
 
     related_models = (
-        (all_models.CycleTaskEntry, 33, False),
-        (all_models.TaskGroup, 21, False),
-        (all_models.TaskGroupTask, 21, True),
-        (all_models.Cycle, 3, False),
-        (all_models.CycleTaskGroup, 3, True),
-        (all_models.CycleTaskGroupObjectTask, 3, True),
+        (all_models.CycleTaskEntry, 26, False),
+        (all_models.TaskGroup, 16, False),
+        (all_models.TaskGroupTask, 16, True),
+        (all_models.Cycle, 2, False),
+        (all_models.CycleTaskGroup, 2, True),
+        (all_models.CycleTaskGroupObjectTask, 2, True),
     )
     for related_model, acl_count, is_deleted in related_models:
       self._delete_and_check_related_acl(related_model, acl_count, is_deleted)
@@ -169,14 +169,14 @@ class TestWorkflowsApiPost(TestCase):
     workflow = all_models.Workflow.query.one()
     task_group = all_models.TaskGroup.query.one()
 
-    actual_acl = all_models.AccessControlList.eager_query().filter(
+    ac_people = all_models.AccessControlPeople.query.filter(
         all_models.AccessControlList.person_id == task_group.contact_id,
     ).all()
-    self.assertEqual(len(actual_acl), 3)
+    self.assertEqual(len(ac_people), 3)
 
     actual = {
-        (acl.object_type, acl.object_id)
-        for acl in actual_acl
+        (acp.acl.object_type, acp.acl.object_id)
+        for acp in ac_people
     }
     self.assertIn((workflow.type, workflow.id), actual)
     self.assertIn((task_group.type, task_group.id), actual)
