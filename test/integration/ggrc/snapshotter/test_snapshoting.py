@@ -145,19 +145,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.assertEqual(snapshot_revision_content["child_type"], "Control")
     self.assertEqual(snapshot_revision_content["child_id"], control.id)
 
-    propagated_roles = self._get_propagated_base_roles("Snapshot")
-
-    self.assertEqual(db.session.query(models.AccessControlList.id).filter(
-        models.AccessControlList.object_id == snapshot_obj.id,
-        models.AccessControlList.object_type == "Snapshot",
-        models.AccessControlList.ac_role_id.in_([
-            propagated_roles["Auditors"].id,
-            propagated_roles["Audit Captains"].id
-        ]),
-        models.AccessControlList.person_id.in_(
-            people["Auditors"] + people["Audit Captains"]
-        )
-    ).count(), 7)
+    self.assertEqual(models.AccessControlPeople.query.count(), 7)
 
   def test_snapshot_update(self):
     """Test snapshot update with a simple change"""
