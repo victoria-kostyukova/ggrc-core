@@ -455,8 +455,8 @@ def _get_people_with_roles(comment_obj):
       Dict with Person instances and set of role names
   """
   assignees = defaultdict(set)
-  for acl in comment_obj.access_control_list:
-    assignees[acl.person].add(acl.ac_role.name)
+  for person, acl in comment_obj.access_control_list:
+    assignees[person].add(acl.ac_role.name)
   return assignees
 
 
