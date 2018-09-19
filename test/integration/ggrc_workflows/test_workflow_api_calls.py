@@ -145,7 +145,7 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.CycleTaskEntry, data)
     self.assertEqual(response.status_code, 201)
 
-    self._check_propagated_acl(3)
+    self._check_propagated_acl(2)
 
   @ddt.data('Admin', 'Workflow Member')
   def test_tg_assignee(self, role_name):
@@ -277,16 +277,19 @@ class TestWorkflowsApiPost(TestCase):
     related_count = len(related_objects) * 2  # *2 is for relationships
     bd_tasks_count = all_models.BackgroundTask.query.count()
 
-    all_acl = [acl for acl in all_models.AccessControlList.eager_query().all()]
+    all_acls = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.parent_id_nn != 0
+    ).count()
+
     self.assertEqual(
-        len(all_acl),
-        bd_tasks_count + roles_count + roles_count * related_count
+        all_acls,
+        bd_tasks_count + roles_count * related_count
     )
 
   def test_assign_workflow_acl(self):
     """Test propagation Workflow ACL roles on Workflow's update ACL records."""
     self._create_propagation_acl_test_data()
-    self._check_propagated_acl(3)
+    self._check_propagated_acl(2)
 
   def test_unassign_workflow_acl(self):
     """Test propagation Workflow ACL roles on person unassigned."""
