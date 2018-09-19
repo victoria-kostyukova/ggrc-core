@@ -122,7 +122,6 @@ class Roleable(object):
     for acl in self._access_control_list:
       self._update_acp(acl, acls[acl])
 
-
   def extend_access_control_list(self, values):
     """Extend access control list.
 
@@ -192,7 +191,7 @@ class Roleable(object):
       # This will be removed
       return []
     acps = self.acr_name_acl_map[role_name].access_control_people
-    return [acp.person for acp in acps]
+    return [acp.person.id for acp in acps]
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
