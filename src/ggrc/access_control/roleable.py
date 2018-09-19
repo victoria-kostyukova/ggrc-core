@@ -188,7 +188,11 @@ class Roleable(object):
 
   def get_person_ids_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
-    return []
+    if role_name not in self.acr_name_acl_map:
+      # This will be removed
+      return []
+    acps = self.acr_name_acl_map[role_name].access_control_people
+    return [acp.person for acp in acps]
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
