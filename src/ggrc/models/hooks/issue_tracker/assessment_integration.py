@@ -837,14 +837,14 @@ def _link_assessment(assessment, issue_tracker_info):
   ticket_id = issue_tracker_info['issue_id']
   if integration_utils.is_already_linked(ticket_id):
     logger.error(
-      "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
-      "already linked to another GGRC object",
-      assessment.id,
-      ticket_id,
+        "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
+        "already linked to another GGRC object",
+        assessment.id,
+        ticket_id,
     )
     assessment.add_warning(
-      "Unable to link to issue tracker. Ticket is already linked to another"
-      "GGRC object"
+        "Unable to link to issue tracker. Ticket is already linked to another"
+        "GGRC object"
     )
     issue_tracker_info['enabled'] = False
     return
@@ -853,25 +853,24 @@ def _link_assessment(assessment, issue_tracker_info):
     issues.Client().get_issue(ticket_id)
   except integrations_errors.Error as error:
     logger.error(
-      "Unable to link a ticket while creating object ID=%d: %s",
-      assessment.id,
-      error,
+        "Unable to link a ticket while creating object ID=%d: %s",
+        assessment.id,
+        error,
     )
     assessment.add_warning(
-      "Ticket tracker ID does not exist or you do not have access to it."
+        "Ticket tracker ID does not exist or you do not have access to it."
     )
     issue_tracker_info['enabled'] = False
     return
 
-  issue_tracker_request = _build_issuetracker_request(assessment,
-                                                      issue_tracker_info)
+  issue_params = prepare_issue_json(assessment, issue_tracker_info)
 
   try:
-    issues.Client().update_issue(ticket_id, issue_tracker_request)
+    issues.Client().update_issue(ticket_id, issue_params)
   except integrations_errors.Error as error:
     logger.error(
-      'Unable to link a ticket while creating assessment ID=%d: %s',
-      assessment.id, error)
+        'Unable to link a ticket while creating assessment ID=%d: %s',
+        assessment.id, error)
     issue_tracker_info['enabled'] = False
     assessment.add_warning('Unable to link a ticket.')
   else:
@@ -880,11 +879,22 @@ def _link_assessment(assessment, issue_tracker_info):
     issue_tracker_info['issue_url'] = issue_url
 
 
-def _create_issuetracker_issue(assessment, issue_tracker_info):
-  """Collects information and sends a request to create external issue."""
-  issue_params = prepare_issue_json(assessment, issue_tracker_info)
-  res = issues.Client().create_issue(issue_params)
-  return res['issueId']
+def _create_new_issuetracker_ticket(assessment, issue_tracker_info):
+  """Create new IssueTracker ticket for assessment"""
+  issue_tracker_request = prepare_issue_json(assessment, issue_tracker_info)
+  try:
+    res = issues.Client().create_issue(issue_tracker_request)
+  except integrations_errors.Error as error:
+    logger.error(
+        'Unable to create a ticket while creating assessment ID=%d: %s',
+        assessment.id, error)
+    issue_tracker_info['enabled'] = False
+    assessment.add_warning('Unable to create a ticket.')
+  else:
+    issue_id = res['issueId']
+    issue_url = integration_utils.build_issue_tracker_url(issue_id)
+    issue_tracker_info['issue_id'] = issue_id
+    issue_tracker_info['issue_url'] = issue_url
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
@@ -899,24 +909,12 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
   if (issue_tracker_info.get('enabled') and
           _is_issue_tracker_enabled(audit=assessment.audit)):
-    try:
-      issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
-    except integrations_errors.Error as error:
-      logger.error(
-          'Unable to create a ticket while creating assessment ID=%d: %s',
-          assessment.id, error)
-      issue_tracker_info = {
-          'enabled': False,
-      }
-      assessment.add_warning('Unable to create a ticket.')
+    if issue_tracker_info.get("issue_id"):
+      _link_assessment(assessment, issue_tracker_info)
     else:
-      issue_url = integration_utils.build_issue_tracker_url(issue_id)
-      issue_tracker_info['issue_id'] = issue_id
-      issue_tracker_info['issue_url'] = issue_url
+      _create_new_issuetracker_ticket(assessment, issue_tracker_info)
   else:
-    issue_tracker_info = {
-        'enabled': False,
-    }
+    issue_tracker_info = {'enabled': False}
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       assessment, issue_tracker_info)
