@@ -73,8 +73,10 @@ class Api(object):
       self.user_headers = {}
       self.person_name, self.person_email = None, None
 
-    self.client.get("/logout")
-    self.client.get("/login", headers=self.user_headers)
+    with app.app_context():
+      self.client.get("/logout")
+    with app.app_context():
+      self.client.get("/login", headers=self.user_headers)
     db.session.commit()
     db.session.flush()
 
