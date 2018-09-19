@@ -157,15 +157,13 @@ class TestRelatedAssessments(TestAssessmentBase):
       else:
         factories.RelationshipFactory(source=assessment, destination=audit)
 
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Assignees"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Assignees"],
           person=user,
-          object=assessment
       )
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Creators"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Creators"],
           person=user,
-          object=assessment
       )
 
   def _create_relationship(self, pair):
