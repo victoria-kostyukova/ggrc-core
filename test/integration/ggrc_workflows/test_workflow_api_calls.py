@@ -170,16 +170,16 @@ class TestWorkflowsApiPost(TestCase):
     task_group = all_models.TaskGroup.query.one()
 
     ac_people = all_models.AccessControlPeople.query.filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
+        all_models.AccessControlPeople.person_id == task_group.contact_id,
     ).all()
-    self.assertEqual(len(ac_people), 3)
+    self.assertEqual(len(ac_people), 2)
 
     actual = {
-        (acp.acl.object_type, acp.acl.object_id)
+        (acp.ac_list.object_type, acp.ac_list.object_id)
         for acp in ac_people
     }
     self.assertIn((workflow.type, workflow.id), actual)
-    self.assertIn((task_group.type, task_group.id), actual)
+    self.assertNotIn((task_group.type, task_group.id), actual)
 
   def test_task_group_assignee_gets_workflow_member(self):  # noqa pylint: disable=invalid-name
     """Test TaskGroup assignee gets WorkflowMember role."""
@@ -200,23 +200,13 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(response.status_code, 201)
 
     workflow = all_models.Workflow.query.one()
-    task_group = all_models.TaskGroup.query.one()
 
-    parent_acl = all_models.AccessControlList.eager_query().filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
-        all_models.AccessControlList.object_type == workflow.type,
-        all_models.AccessControlList.object_id == workflow.id
-    ).one()
-    tg_acl = all_models.AccessControlList.eager_query().filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
-        all_models.AccessControlList.object_type == task_group.type,
-        all_models.AccessControlList.object_id == task_group.id
-    ).one()
-    self.assertEqual(parent_acl.ac_role.name, "Workflow Member")
-    # Below we are using parent.parent to jump over the intermediary
-    # relationship.
-    self.assertEqual(tg_acl.parent.parent.id, parent_acl.id)
-    self.assertIn("Workflow Member", tg_acl.ac_role.name)
+    wf_members = [
+        acp.person.id
+        for acp in
+        workflow.acr_name_acl_map["Workflow Member"].access_control_people
+    ]
+    self.assertIn(self.people_ids[2], wf_members)
 
   def _create_propagation_acl_test_data(self):  # noqa pylint: disable=invalid-name
     """Create objects for Workflow ACL propagation test."""
@@ -321,8 +311,8 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
     workflow = all_models.Workflow.eager_query().one()
-    act_res = {acl.person_id: acl.ac_role_id
-               for acl in workflow.access_control_list}
+    act_res = {person.id: acl.ac_role_id
+               for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
   def test_update_workflow_acl_people(self):
@@ -347,8 +337,8 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.put(workflow, put_params)
     self.assert200(response)
     workflow = all_models.Workflow.eager_query().one()
-    act_res = {acl.person_id: acl.ac_role_id
-               for acl in workflow.access_control_list}
+    act_res = {person.id: acl.ac_role_id
+               for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
   def test_send_invalid_data(self):
