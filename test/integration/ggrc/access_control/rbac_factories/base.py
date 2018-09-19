@@ -89,8 +89,8 @@ class BaseRBACFactory(object):
   def assign_person(object_, acr, person_id):
     """Assign person to object."""
     for ac_list in object_._access_control_list:
-      if ac_list.ac_role == acr:
+      if ac_list.ac_role.name == acr.name and acr.object_type == object_.type:
         factories.AccessControlPeopleFactory(
             person_id=person_id,
-            ac_list = ac_list,
+            ac_list=ac_list,
         )
