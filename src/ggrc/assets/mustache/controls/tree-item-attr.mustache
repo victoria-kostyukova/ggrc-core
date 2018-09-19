@@ -75,6 +75,12 @@
       </span>
     {{/using}}
   {{/case}}
+  {{#case 'review_status'}}
+    <review-state {instance}="instance">
+      <span>{{reviewState}}</span>
+    </review-state>
+  {{/case}}
+
 
   {{#default}}
     {{#if_helpers '\

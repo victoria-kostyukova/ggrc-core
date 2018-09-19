@@ -89,6 +89,13 @@
         Open
       </questions-link>
   {{/case}}
+  {{^isScopeModel instance}}
+    {{#case 'review_status'}}
+      <review-state {instance}="instance">
+        <span>{{reviewState}}</span>
+      </review-state>
+    {{/case}}
+  {{/isScopeModel}}
 
   {{#default}}
       {{#if_helpers '\
