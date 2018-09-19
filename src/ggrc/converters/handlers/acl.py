@@ -35,8 +35,7 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
   def get_value(self):
     """Get list of emails for people with the current AC role."""
     people = sorted(
-        acl.person.email
-        for acl in self.row_converter.obj.access_control_list
-        if acl.ac_role == self.role
+        acp.person.email
+        for acp in self.acl.access_control_people
     )
     return "\n".join(people)
