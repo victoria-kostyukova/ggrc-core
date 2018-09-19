@@ -13,7 +13,6 @@ from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import Assessment, all_models
 from ggrc.models import Notification
 from ggrc.models import NotificationType
@@ -210,11 +209,11 @@ class TestCommentNotification(TestCase):
           recipients=",".join(recipient_types),
           send_by_default=False,
       )
-      ac_roles = get_custom_roles_for(obj.type)
-      for acr_id, acr_name in ac_roles.items():
-        if acr_name in recipient_types:
-          factories.AccessControlListFactory(
-              ac_role_id=acr_id, object=obj, person=person
+      for acl in obj._access_control_list:
+        if acl.ac_role.name in recipient_types:
+          factories.AccessControlPeopleFactory(
+              ac_list=acl,
+              person=person,
           )
 
     self.generator.generate_comment(
@@ -245,13 +244,11 @@ class TestCommentNotification(TestCase):
     cur_user = all_models.Person.query.filter_by(
         email="user@example.com"
     ).first()
-    assigee_role_id = {
-        v: k for k, v in get_custom_roles_for("Assessment").items()
-    }["Assignees"]
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
-      factories.AccessControlListFactory(
-          ac_role_id=assigee_role_id, person=cur_user, object=assessment
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Assignees"],
+          person=cur_user,
       )
     with freeze_time("2015-04-01 17:13:10"):
       self.generator.generate_comment(
