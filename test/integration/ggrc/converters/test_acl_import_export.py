@@ -49,7 +49,7 @@ class TestACLImportExport(TestCase):
     )
     self.assertEqual(acl.count(), 1)
     self.assertEqual(acl.first().ac_role_id, role_id)
-    self.assertEqual(acl.first().person.email, "user@example.com")
+    self.assertEqual(acl.first().access_control_people[0].person.email, "user@example.com")
 
   def test_acl_multiple_entries(self):
     """Test ACL column import with multiple emails."""
@@ -69,7 +69,7 @@ class TestACLImportExport(TestCase):
     self._check_csv_response(response, {})
     market = models.Market.query.first()
     self.assertEqual(
-        {acl.person.email for acl in market.access_control_list},
+        {person.email for person, _ in market.access_control_list},
         emails | {"user@example.com"},
     )
 
@@ -101,7 +101,7 @@ class TestACLImportExport(TestCase):
     self._check_csv_response(response, {})
     market = models.Market.query.first()
     self.assertEqual(
-        {acl.person.email for acl in market.access_control_list},
+        {person.email for person, _ in market.access_control_list},
         update_emails,
     )
 
@@ -131,7 +131,7 @@ class TestACLImportExport(TestCase):
     self._check_csv_response(response, {})
     market = models.Market.query.first()
     self.assertEqual(
-        {acl.person.email for acl in market.access_control_list},
+        {person.email for person, _ in market.access_control_list},
         emails | {"user@example.com"},
     )
 
@@ -224,7 +224,7 @@ class TestACLImportExport(TestCase):
     stored_roles = {}
     for role_name in roles.keys():
       stored_roles[role_name] = {
-          acl.person.email for acl in market.access_control_list
+          person.email for person, acl in market.access_control_list
           if acl.ac_role.name == role_name
       }
 
@@ -267,7 +267,7 @@ class TestACLImportExport(TestCase):
     stored_roles = {}
     for role_name in first_roles.keys():
       stored_roles[role_name] = {
-          acl.person.email for acl in market.access_control_list
+          person.email for person, acl in market.access_control_list
           if acl.ac_role.name == role_name
       }
 
@@ -280,7 +280,7 @@ class TestACLImportExport(TestCase):
     stored_roles = {}
     for role_name in edited_roles.keys():
       stored_roles[role_name] = {
-          acl.person.email for acl in market.access_control_list
+          person.email for person, acl in market.access_control_list
           if acl.ac_role.name == role_name
       }
 
@@ -324,7 +324,7 @@ class TestACLImportExport(TestCase):
       stored_roles[object_type] = {}
       for role_name in roles.keys():
         stored_roles[object_type][role_name] = {
-            acl.person.email for acl in obj.access_control_list
+            person.email for person, acl in obj.access_control_list
             if acl.ac_role.name == role_name and
             acl.ac_role.object_type == object_type
         }
@@ -359,7 +359,7 @@ class TestACLImportExport(TestCase):
     acl_revisions = models.Revision.query.filter_by(
         resource_type="AccessControlList"
     ).count()
-    self.assertEqual(acl_revisions, 6)
+    self.assertEqual(acl_revisions, 12)
 
   def test_acl_roles_clear(self):
     """Test clearing ACL roles for Program with '--' value"""
@@ -367,13 +367,9 @@ class TestACLImportExport(TestCase):
       program = factories.ProgramFactory()
       for role in ["Program Editors", "Program Editors", "Program Readers"]:
         person = factories.PersonFactory()
-        ac_role = models.all_models.AccessControlRole.query.filter_by(
-            object_type=program.type,
-            name=role,
-        ).first()
-        factories.AccessControlListFactory(
-            ac_role=ac_role,
-            object=program,
+        acl = program.acr_name_acl_map[role]
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
             person=person,
         )
 
@@ -385,7 +381,7 @@ class TestACLImportExport(TestCase):
       ]))
       self._check_csv_response(response, {})
       program = models.all_models.Program.query.first()
-      for acl in program.access_control_list:
+      for _, acl in program.access_control_list:
         self.assertNotEqual(acl.ac_role.name, role)
 
   def test_import_acl_validation(self):
