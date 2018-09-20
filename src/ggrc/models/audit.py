@@ -7,7 +7,6 @@ from sqlalchemy import orm
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
-from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import people
 from ggrc.access_control.roleable import Roleable
 from ggrc.login import get_current_user
@@ -201,9 +200,9 @@ class Audit(Snapshotable,
       return value
 
     if self.archived is not None and self.archived != value and \
-       not any(acl for acl in list(self.program.access_control_list)
+       not any(acl for person, acl in list(self.program.access_control_list)
                if acl.ac_role.name == "Program Managers" and
-               acl.person.id == user.id):
+               person.id == user.id):
       raise Forbidden()
     return value
 
