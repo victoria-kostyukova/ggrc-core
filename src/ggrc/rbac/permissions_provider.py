@@ -177,8 +177,8 @@ def is_auditor(instance, **_):
 
 def is_workflow_admin(instance, **_):
   """Check if current user has Admin role in scope of parent Workflow object"""
-  return any(acl for acl in instance.workflow.access_control_list
-             if acl.ac_role.name == "Admin" and acl.person == current_user)
+  return any(acl for person, acl in instance.workflow.access_control_list
+             if acl.ac_role.name == "Admin" and person == current_user)
 
 
 def is_allowed_based_on(instance, property_name, action, **_):
