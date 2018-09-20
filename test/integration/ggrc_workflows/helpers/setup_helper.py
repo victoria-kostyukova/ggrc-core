@@ -5,7 +5,6 @@
 They help to setup data for Workflow related tests.
 """
 
-from ggrc.access_control import role
 from ggrc.models import all_models
 from ggrc_workflows import ac_roles
 from integration.ggrc.models import factories
@@ -28,9 +27,10 @@ class WorkflowSetup(person_setup.PersonSetup):
         workflow: Workflow instance, in which scope person should have role.
     """
     wf_person = self.setup_person(g_rname, wf_rname)
-    wf_acr = role.get_ac_roles_for(all_models.Workflow.__name__)[wf_rname]
-    factories.AccessControlListFactory(ac_role=wf_acr, object=workflow,
-                                       person=wf_person)
+    factories.AccessControlPeopleFactory(
+        ac_list=workflow.acr_name_acl_map[wf_rname],
+        person=wf_person,
+    )
 
   def setup_workflow(self, wfa_g_rnames, wfm_g_rnames=(), **kwargs):
     """Setup Workflow object for tests usage.
