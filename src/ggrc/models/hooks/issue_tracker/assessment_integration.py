@@ -250,6 +250,9 @@ def _handle_audit_post(sender, objects=None, sources=None):
     issue_tracker_info = src.get('issue_tracker')
     if not issue_tracker_info:
       continue
+    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
+        src.get("access_control_list", [])
+    )
     integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
@@ -260,6 +263,9 @@ def _handle_audit_put(sender, obj=None, src=None, service=None):
   del sender, service  # Unused
   issue_tracker_info = src.get('issue_tracker')
   if issue_tracker_info:
+    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
+        src.get("access_control_list", [])
+    )
     integration_utils.validate_issue_tracker_info(issue_tracker_info)
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         obj, issue_tracker_info)
@@ -309,7 +315,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):
       _create_issuetracker_info(obj, issue_tracker_info)
       return
 
-    _, issue_tracker_info['cc_list'] = _collect_issue_emails(obj)
+    _, issue_tracker_info['cc_list'] = _collect_assessment_emails(obj)
 
   else:
     issue_tracker_info['enabled'] = False
@@ -471,7 +477,7 @@ def _get_roles(assessment):
   return all_roles
 
 
-def _collect_issue_emails(assessment):
+def _collect_assessment_emails(assessment):
   """Returns emails related to given assessment.
 
   The lexicographical first Assignee is used for assignee_email.
@@ -490,6 +496,71 @@ def _collect_issue_emails(assessment):
   cc_list = sorted(cc_list) if cc_list else []
   assignee_email = cc_list.pop(0) if cc_list else None
   return assignee_email, cc_list
+
+
+def _collect_audit_emails(acl_payload):
+  """Returns emails related to audit.
+
+  Args:
+    acl_payload: Dict with ACL data
+
+  Returns:
+    A tuple of (assignee_email, [related_people_emails])
+  """
+  person_ids = [acl.get("person", {}).get("id")
+                for acl in acl_payload]
+  if any(person_ids):
+    reporter_id = person_ids[0]
+
+    persons = db.session.query(
+        all_models.Person.id,
+        all_models.Person.email
+    ).filter(
+        all_models.Person.id.in_(person_ids)
+    )
+
+    persons = {person[0]: person[1]
+               for person in persons}
+    reporter_email = persons.pop(reporter_id)
+    cc_list = persons.values()
+
+    return reporter_email, cc_list
+  return "", []
+
+
+def _get_audit_ccs(assessment):
+  """Returns audit CCs regarding assessment.
+
+  Args:
+    assessment: An instance of Assessment model.
+
+  Returns:
+    List of audit ccs
+  """
+  audit_issuetracker_issue = assessment.audit.issuetracker_issue
+  if audit_issuetracker_issue is not None and audit_issuetracker_issue.cc_list:
+    audit_ccs = audit_issuetracker_issue.cc_list.split(",")
+  else:
+    audit_ccs = []
+
+  return audit_ccs
+
+
+def _group_cc_emails(audit_ccs, assessment_ccs):
+  """Returns grouped cc emails between audit and assessment.
+
+  Args:
+    audit_ccs: List of audit ccs
+    assessment_ccs: List of assessment ccs
+
+  Returns:
+    Grouped list of ccs
+  """
+  audit_ccs = frozenset(audit_ccs)
+  assessment_ccs = frozenset(assessment_ccs)
+  grouped_ccs = list(audit_ccs.union(assessment_ccs))
+
+  return grouped_ccs
 
 
 def _get_assessment_url(assessment):
@@ -691,7 +762,7 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
 
   integration_utils.normalize_issue_tracker_info(issue_tracker_info)
 
-  assignee_email, cc_list = _collect_issue_emails(assessment)
+  assignee_email, cc_list = _collect_assessment_emails(assessment)
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
     issue_tracker_info['cc_list'] = cc_list
@@ -720,9 +791,12 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_params['assignee'] = assignee
     issue_params['verifier'] = assignee
 
-  cc_list = issue_tracker_info.get('cc_list')
-  if cc_list is not None:
-    issue_params['ccs'] = cc_list
+  cc_list = issue_tracker_info.get('cc_list', [])
+  audit_ccs = _get_audit_ccs(assessment)
+  grouped_ccs = _group_cc_emails(audit_ccs, cc_list)
+
+  if grouped_ccs:
+    issue_params['ccs'] = grouped_ccs
 
   return issue_params
 
@@ -813,12 +887,15 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
   # handle assignee and cc_list update
-  assignee_email, cc_list = _collect_issue_emails(assessment)
+  assignee_email, cc_list = _collect_assessment_emails(assessment)
+  audit_ccs = _get_audit_ccs(assessment)
+  grouped_ccs = _group_cc_emails(audit_ccs, cc_list)
+
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
     issue_params['assignee'] = assignee_email
     issue_params['verifier'] = assignee_email
-    issue_params['ccs'] = cc_list
+    issue_params['ccs'] = grouped_ccs
 
   if issue_params:
     # Resend all properties upon any change.
