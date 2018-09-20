@@ -89,7 +89,7 @@ class TestUtilityFunctions(unittest.TestCase):
                     '._update_issuetracker_issue') as update_issue_mock, \
         mock.patch(self.ISSUE_TRACKED_NAMESPACE +
                    '._update_issuetracker_info') as update_info_mock, \
-        mock.patch(self.ISSUE_TRACKED_NAMESPACE + '._collect_issue_emails',
+        mock.patch(self.ISSUE_TRACKED_NAMESPACE + '._collect_assessment_emails',
                    side_effect=[(None, [])]):
       error_data = integrations_errors.HttpError('data')
       update_issue_mock.side_effect = error_data
