@@ -39,12 +39,8 @@ class TestIssueMapping(TestCase):
   def setup_roles(self):
     """Setup necessary roles needed by the tests"""
     query = all_models.Role.query
-    acr_query = all_models.AccessControlRole.query
     self.roles = {
         'creator': query.filter_by(name="Creator").first(),
-        'auditors': acr_query.filter_by(name="Auditors").first(),
-        'program_editors': acr_query.filter_by(
-            name="Program Editors").first()
     }
 
   def setup_users(self):
@@ -54,7 +50,8 @@ class TestIssueMapping(TestCase):
       user = factories.PersonFactory()
       rbac_factories.UserRoleFactory(
           role=self.roles['creator'],
-          person=user)
+          person=user,
+      )
       self.users[user_name] = user
 
   def setup_audits(self):
@@ -98,14 +95,12 @@ class TestIssueMapping(TestCase):
         destination=audit.program,
     )
     # Add auditor & program editor roles
-    factories.AccessControlListFactory(
-        ac_role=self.roles['auditors'],
-        object=audit,
-        person=self.users['auditor']
+    factories.AccessControlPeopleFactory(
+        ac_list=audit.acr_name_acl_map["Auditors"],
+        person=self.users['auditor'],
     )
-    factories.AccessControlListFactory(
-        ac_role=self.roles['program_editors'],
-        object=audit.program,
+    factories.AccessControlPeopleFactory(
+        ac_list=audit.program.acr_name_acl_map["Program Editors"],
         person=self.users['programeditor']
     )
 
