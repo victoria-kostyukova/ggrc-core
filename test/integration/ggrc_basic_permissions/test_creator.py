@@ -104,13 +104,17 @@ class TestCreator(TestCase):
         acr = all_models.AccessControlRole.query.filter_by(
             object_type=model_singular,
             name="Admin"
-        ).first()
-        factories.AccessControlListFactory(
+        ).one()
+        acl = all_models.AccessControlList.query.filter_by(
             object_id=obj_id,
             object_type=model_singular,
             ac_role=acr,
-            person_id=creator_id
+        ).one()
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
+            person_id=creator_id,
         )
+
         response = self.api.get(model, obj_id)
         if response.status_code != 200:
           all_errors.append("{} can't GET object {}".format(
@@ -240,7 +244,7 @@ class TestCreator(TestCase):
     }
     check(obj_1, 0)
     obj_2 = gen("Test Requirement 2", linked_acl)
-    obj2_acl = obj_2.access_control_list[0]
+    obj2_acl = obj_2.access_control_list[0][1]
     check(obj_2, 1)
     check(obj2_acl, 1)
 
@@ -281,14 +285,9 @@ class TestCreator(TestCase):
       asmnt = factories.AssessmentFactory(audit=audit)
       asmnt_id = asmnt.id
       factories.RelationshipFactory(source=audit, destination=asmnt)
-      verifier_role = all_models.AccessControlRole.query.filter_by(
-          object_type="Assessment",
-          name="Verifiers",
-      ).first()
-      factories.AccessControlListFactory(
+      factories.AccessControlPeopleFactory(
+          ac_list=asmnt.acr_name_acl_map["Verifiers"],
           person=self.users["creator"],
-          ac_role=verifier_role,
-          object=asmnt,
       )
 
     self.api.set_user(self.users["creator"])
