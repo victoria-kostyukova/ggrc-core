@@ -97,9 +97,9 @@ class TestCase(BaseTestCase, object):
   def get_persons_for_role_name(self, obj, role_name):
     """Generator. Return persons releated to sent instance and role_name."""
     role_id = self.get_role_id_for_obj(obj, role_name)
-    for acl in obj.access_control_list:
+    for person, acl in obj.access_control_list:
       if acl.ac_role_id == role_id:
-        yield acl.person
+        yield person
 
   @contextlib.contextmanager
   def custom_headers(self, headers=None):
