@@ -215,13 +215,9 @@ class TestPermissionsOnAssessmentRelatedAssignables(TestCase):
     )
     audit = factories.AuditFactory()
     assessment = factories.AssessmentFactory(audit=audit)
-    ac_role = all_models.AccessControlRole.query.filter_by(
-        object_type=assessment.type, name="Assignees"
-    ).first()
-    factories.AccessControlListFactory(
-        ac_role=ac_role,
-        object=assessment,
-        person=self.reader
+    factories.AccessControlPeopleFactory(
+        ac_list=assessment.acr_name_acl_map["Assignees"],
+        person=self.reader,
     )
     factories.RelationshipFactory(source=audit, destination=assessment)
     evidence = factories.EvidenceUrlFactory()
