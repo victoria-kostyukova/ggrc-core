@@ -377,8 +377,13 @@ class Workflow(roleable.Roleable,
                'unit',
                'is_verification_needed']
     if kwargs.get('clone_people', False):
-      access_control_list = [{"ac_role": acl.ac_role, "person": acl.person}
-                             for acl in self.access_control_list]
+      access_control_list = [
+          {
+              "ac_role_id": acl.ac_role.id,
+              "person": {"id": person.id}
+          }
+          for person, acl in self.access_control_list
+      ]
     else:
       role_id = {
           name: ind
