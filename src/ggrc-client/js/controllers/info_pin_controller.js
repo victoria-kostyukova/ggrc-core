@@ -173,15 +173,6 @@ export default can.Control({
   },
   changeMaximizedState: function (maximizedState) {
     this.showInstance(maximizedState);
-
-    let $activeTree = $('.cms_controllers_tree_view_node.active');
-    if (maximizedState) {
-      $activeTree
-        .addClass('maximized-info-pane');
-    } else {
-      $activeTree
-        .removeClass('maximized-info-pane');
-    }
   },
   close: function () {
     let visibleWidget = $('.widget-area .widget:visible');
