@@ -515,21 +515,15 @@ class TestCase(BaseTestCase, object):
     Returns:
       [(person, acr_role), ...] A list of persons with their roles.
     """
-    from ggrc.access_control.role import get_custom_roles_for
-    ac_roles = {
-        acr_name: acr_id
-        for acr_id, acr_name in get_custom_roles_for(obj.type).items()
-    }
     assignees = []
     with factories.single_commit():
       for person, roles in persons:
         person = factories.PersonFactory(email=person)
 
         for role in roles.split(","):
-          factories.AccessControlListFactory(
+          factories.AccessControlPeopleFactory(
+              ac_list=obj.acr_name_acl_map[role],
               person=person,
-              ac_role_id=ac_roles[role],
-              object=obj
           )
           assignees.append((person, role))
     return assignees
