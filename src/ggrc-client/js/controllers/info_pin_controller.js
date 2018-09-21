@@ -127,14 +127,14 @@ export default can.Control({
       instance.info_pane_preload();
     }
 
-    this.showInstance(maximizedState);
+    this.changeMaximizedState(maximizedState);
 
     // Temporary solution...
     setTimeout(infoPaneOpenDfd.resolve, 1000);
 
     return infoPaneOpenDfd;
   },
-  showInstance(maximizedState) {
+  changeMaximizedState(maximizedState) {
     this.element
       .removeClass(`${pinContentMaximizedClass} ${pinContentMinimizedClass}`)
       .removeClass(pinContentHiddenClass);
@@ -170,9 +170,6 @@ export default can.Control({
       button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache',
     }, confirmDfd.resolve);
     return confirmDfd;
-  },
-  changeMaximizedState: function (maximizedState) {
-    this.showInstance(maximizedState);
   },
   close: function () {
     let visibleWidget = $('.widget-area .widget:visible');
