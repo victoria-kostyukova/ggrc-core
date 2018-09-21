@@ -33,9 +33,14 @@
   </div>
   {{/drawRelatedAssessments}}
   {{#searchOnly}}
-    <view-object-buttons instance="displayItem"
-                         view-is-hidden="true">
-    </view-object-buttons>
+    {{#if displayItem.viewLink}}
+      {{^if displayItem.snapshot}}
+      <a href="{{displayItem.viewLink}}" target="_blank"
+        class="btn btn-mini btn-outline">
+        Open
+      </a>
+      {{/if}}
+    {{/if}}
   {{/searchOnly}}
   {{^searchOnly}}
     <object-selection-item
