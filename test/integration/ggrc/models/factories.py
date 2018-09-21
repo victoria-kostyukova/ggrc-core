@@ -363,6 +363,13 @@ class MarketFactory(TitledFactory):
     model = all_models.Market
 
 
+class AccessControlPeopleFactory(ModelFactory):
+  """Access Control People factory class"""
+
+  class Meta:
+    model = all_models.AccessControlPeople
+
+
 class AccessControlListFactory(ModelFactory):
   """Access Control List factory class"""
 
