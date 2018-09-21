@@ -13,7 +13,6 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
@@ -147,10 +146,13 @@ def related_people(exp, object_class, target_class, query):
 
   res = []
 
-  res.extend(db.session.query(AccessControlList.person_id).filter(
+  res.extend(db.session.query(all_models.AccessControlPeople.person_id).filter(
       sqlalchemy.and_(
-          AccessControlList.object_id.in_(exp['ids']),
-          AccessControlList.object_type == exp['object_name'])
+          all_models.AccessControlList.object_id.in_(exp['ids']),
+          all_models.AccessControlList.object_type == exp['object_name'],
+          all_models.AccessControlPeople.ac_list_id ==
+          all_models.AccessControlList.id,
+      )
   ))
   if res:
     return object_class.id.in_([obj[0] for obj in res])
