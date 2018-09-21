@@ -46,6 +46,13 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       remote_side=lambda: AccessControlList.id,
   )
 
+  access_control_people = db.relationship(
+      'AccessControlPeople',
+      foreign_keys='AccessControlPeople.ac_list_id',
+      backref='ac_list',
+      cascade='all, delete-orphan',
+  )
+
   @property
   def object_attr(self):
     return '{0}_object'.format(self.object_type)
