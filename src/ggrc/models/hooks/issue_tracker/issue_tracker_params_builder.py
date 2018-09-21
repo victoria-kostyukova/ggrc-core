@@ -160,7 +160,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     Args: obj - object to collect emails
     Return: A tuple (reporter_email, allowed_emails).
     """
-    all_emails = {acl.person.email for acl in obj.access_control_list}
+    all_emails = {person.email for person, _ in obj.access_control_list}
 
     # Add the person who triggered the event.
     all_emails |= {obj.modified_by.email}
