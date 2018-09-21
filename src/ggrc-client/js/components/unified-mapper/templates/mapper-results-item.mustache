@@ -35,10 +35,12 @@
   {{#searchOnly}}
     {{#if displayItem.viewLink}}
       {{^if displayItem.snapshot}}
-      <a href="{{displayItem.viewLink}}" target="_blank"
-        class="btn btn-mini btn-outline">
-        Open
-      </a>
+        <div class="flex-box-single">
+          <a href="{{displayItem.viewLink}}" target="_blank"
+            class="btn btn-mini btn-outline">
+            Open
+          </a>
+        </div>
       {{/if}}
     {{/if}}
   {{/searchOnly}}

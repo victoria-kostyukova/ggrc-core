@@ -176,15 +176,6 @@ mapper-results {
     }
 
     .related-assessments-button {
-      display: flex;
-
-      .btn {
-        position: relative;
-        top: -1px;
-      }
-    }
-
-    .related-assessments-button {
       flex: 0 1 $related-assessment-button-width;
     }
   }
