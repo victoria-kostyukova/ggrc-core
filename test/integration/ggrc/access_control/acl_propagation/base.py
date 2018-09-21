@@ -168,4 +168,5 @@ class TestACLPropagation(TestCase):
       raise NotImplementedError(
           "Action {} is not implemented for this test.".format(action_name)
       )
-    self.assert_result(action(), expected_result, action_name, model_name)
+    response = action()
+    self.assert_result(response, expected_result, action_name, model_name)
