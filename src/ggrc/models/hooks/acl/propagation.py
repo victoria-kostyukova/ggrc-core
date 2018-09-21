@@ -63,7 +63,6 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
     grandchild_object_type = rel_table.c.source_type
 
   select_statement = sa.select([
-      acl_table.c.person_id.label("person_id"),
       child_acr.c.id.label("ac_role_id"),
       rel_table.c.id.label("object_id"),
       sa.literal(all_models.Relationship.__name__).label("object_type"),
@@ -72,6 +71,7 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
       acl_table.c.id.label("parent_id_nn"),
+      acl_table.c.base_id.label("base_id"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -129,7 +129,6 @@ def _rel_child(parent_acl_ids, source=True):
   )
 
   select_statement = sa.select([
-      acl_table.c.person_id.label("person_id"),
       child_acr.c.id.label("ac_role_id"),
       object_id.label("object_id"),
       object_type.label("object_type"),
@@ -138,6 +137,7 @@ def _rel_child(parent_acl_ids, source=True):
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
       acl_table.c.id.label("parent_id_nn"),
+      acl_table.c.base_id.label("base_id"),
   ]).select_from(
       sa.join(
           sa.join(
@@ -335,6 +335,13 @@ def _delete_propagated_acls(acl_ids):
   db.session.plain_commit()
 
 
+def _set_empty_base_ids():
+  db.session.execute(
+    "UPDATE access_control_list SET base_id = id WHERE base_id IS NULL"
+  )
+  db.session.plain_commit()
+
+
 def propagate():
   """Propagate all ACLs caused by objects in new_objects list.
 
@@ -350,6 +357,8 @@ def propagate():
   if flask.g.deleted_objects:
     with utils.benchmark("Delete internal ACL entries for deleted objects"):
       _delete_orphan_acl_entries(flask.g.deleted_objects)
+
+  _set_empty_base_ids()
 
   # The order of propagation of relationships and other ACLs is important
   # because relationship code excludes other ACLs from propagating.
