@@ -172,7 +172,7 @@ class TestWorkflowsApiPost(TestCase):
     ac_people = all_models.AccessControlPeople.query.filter(
         all_models.AccessControlPeople.person_id == task_group.contact_id,
     ).all()
-    self.assertEqual(len(ac_people), 2)
+    self.assertEqual(len(ac_people), 1)
 
     actual = {
         (acp.ac_list.object_type, acp.ac_list.object_id)
