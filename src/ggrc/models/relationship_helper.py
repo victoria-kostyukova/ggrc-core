@@ -30,16 +30,20 @@ def program_audit(object_type, related_type, related_ids):
 
 def acl_obj_id(object_type, related_type, related_ids, role=None):
   if object_type == "Person":
-    return db.session.query(models.AccessControlList.person_id).filter(
+    return db.session.query(models.AccessControlPeople.person_id).join(
+        models.AccessControlList
+    ).filter(
         (models.AccessControlList.object_type == related_type) &
         (models.AccessControlList.object_id.in_(related_ids)) &
         (models.AccessControlList.parent_id.is_(None)) &
         (models.AccessControlRole.name == role if role else True)
     )
   elif related_type == "Person":
-    return db.session.query(models.AccessControlList.object_id).filter(
+    return db.session.query(models.AccessControlList.object_id).join(
+        models.AccessControlPeople
+    ).filter(
         (models.AccessControlList.object_type == object_type) &
-        (models.AccessControlList.person_id.in_(related_ids)) &
+        (models.AccessControlPeople.person_id.in_(related_ids)) &
         (models.AccessControlList.parent_id.is_(None)) &
         (models.AccessControlRole.name == role if role else True)
     )
