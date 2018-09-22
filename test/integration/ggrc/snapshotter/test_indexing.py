@@ -10,6 +10,7 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
+from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.snapshotter.indexer import delete_records
@@ -339,7 +340,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
     self.assertEqual(records.count(), 0)
 
-    self.client.post("/admin/full_reindex")
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
 
     records = get_records(audit, snapshots)
 
@@ -385,7 +387,9 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       db.session.add(revision)
     person_id = person.id
     snapshot_id = snapshot.id
-    self.client.post("/admin/full_reindex")
+
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -397,17 +401,13 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
   def test_index_by_acr(self):
     """Test index by ACR."""
     role_name = "Test name"
+    factories.AccessControlRoleFactory(name=role_name, object_type="Control")
     with factories.single_commit():
-      acr = factories.AccessControlRoleFactory(
-          name=role_name,
-          object_type="Control"
-      )
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role=acr,
+      factories.AccessControlPeopleFactory(
+          ac_list=control.acr_name_acl_map[role_name],
           person=person,
-          object=control
       )
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
@@ -423,7 +423,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.expire_all()
     person_id = person.id
     snapshot_id = snapshot.id
-    self.client.post("/admin/full_reindex")
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -470,7 +471,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    self.client.post("/admin/full_reindex")
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
@@ -499,24 +501,24 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    self.client.post("/admin/full_reindex")
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
   def test_index_deleted_acr(self):
     """Test index by removed ACR."""
     role_name = "Test name"
+    acr = factories.AccessControlRoleFactory(
+        name=role_name,
+        object_type="Control",
+    )
     with factories.single_commit():
-      acr = factories.AccessControlRoleFactory(
-          name=role_name,
-          object_type="Control"
-      )
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlListFactory(
-          ac_role=acr,
+      factories.AccessControlPeopleFactory(
+          ac_list=control.acr_name_acl_map[role_name],
           person=person,
-          object=control
       )
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
@@ -533,7 +535,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.delete(acr)
     db.session.commit()
     snapshot_id = snapshot.id
-    self.client.post("/admin/full_reindex")
+    with app.app_context():
+      self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     all_found_records = dict(Record.query.filter(
         Record.key == snapshot.id,
@@ -554,9 +557,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          ac_role=product_admin,
-          object=system,
+      factories.AccessControlPeopleFactory(
+          ac_list=system.acr_name_acl_map["Admin"],
           person=person,
       )
       system_id = system.id
@@ -582,20 +584,15 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
   def test_no_reindex_acr_for_same_obj(self):
     """Test that reindex records appear if
     acl is populated with current obj's role."""
-    system_admin = all_models.AccessControlRole.query.filter_by(
-        object_type="System",
-        name="Admin"
-    ).first()
+    system_role_name = "Admin"
     with factories.single_commit():
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      system_role = factories.AccessControlListFactory(
-          ac_role=system_admin,
-          object=system,
+      factories.AccessControlPeopleFactory(
+          ac_list=system.acr_name_acl_map[system_role_name],
           person=person,
       )
-      system_role_name = system_role.ac_role.name
       person_id = person.id
       person_name = person.name
       person_email = person.email
@@ -617,31 +614,16 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     """Test that snapshot reindex is not happened for
     acl where person has the same role for
     different kind of objects."""
-    product_admin = all_models.AccessControlRole.query.filter_by(
-        object_type="Product",
-        name="Admin"
-    ).first()
-    system_admin = all_models.AccessControlRole.query.filter_by(
-        object_type="System",
-        name="Admin"
-    ).first()
     with factories.single_commit():
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          ac_role=product_admin,
-          object=system,
-          person=person,
-      )
-      system_role = factories.AccessControlListFactory(
-          ac_role=system_admin,
-          object=system,
+      factories.AccessControlPeopleFactory(
+          ac_list=system.acr_name_acl_map["Admin"],
           person=person,
       )
       audit_id = audit.id
       system_id = system.id
-      system_role_name = system_role.ac_role.name
       person_id = person.id
       person_name = person.name
       person_email = person.email
@@ -653,14 +635,15 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.add(revision)
     db.session.commit()
     self._create_snapshots(audit, [system])
-    self.client.post("/admin/reindex_snapshots")
+    with app.app_context():
+      self.client.post("/admin/reindex_snapshots")
     snapshot = all_models.Snapshot.query.filter(
         all_models.Snapshot.parent_id == audit_id,
         all_models.Snapshot.parent_type == 'Audit',
         all_models.Snapshot.child_id == system_id,
         all_models.Snapshot.child_type == 'System',
     ).one()
-    self.assert_indexed_fields(snapshot, system_role_name, {
+    self.assert_indexed_fields(snapshot, "Admin", {
         "{}-email".format(person_id): person_email,
         "{}-name".format(person_id): person_name,
         "__sort__": person_email,
@@ -694,7 +677,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.add(revision)
     db.session.commit()
     self._create_snapshots(audit, [control])
-    self.client.post("/admin/reindex_snapshots")
+    with app.app_context():
+      self.client.post("/admin/reindex_snapshots")
     snapshot = all_models.Snapshot.query.filter(
         all_models.Snapshot.parent_id == audit_id,
         all_models.Snapshot.parent_type == "Audit",

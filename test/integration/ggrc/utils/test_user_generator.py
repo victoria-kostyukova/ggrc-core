@@ -185,7 +185,7 @@ class TestUserGenerator(TestCase):
     ):
       program = factories.ProgramFactory()
       audit_slug = 'Audit1'
-      self.import_data(OrderedDict([
+      rrrr = self.import_data(OrderedDict([
           ("object_type", "Audit"),
           ("Code*", audit_slug),
           ("Program*", program.slug),
@@ -195,9 +195,9 @@ class TestUserGenerator(TestCase):
           ("Audit Captains", "aturing@example.com")
       ]))
       audit = Audit.query.filter(Audit.slug == audit_slug).first()
-      auditors = [acl.person.email for acl in audit.access_control_list
+      auditors = [person.email for person, acl in audit.access_control_list
                   if acl.ac_role.name == "Auditors"]
-      captains = [acl.person.email for acl in audit.access_control_list
+      captains = [person.email for person, acl in audit.access_control_list
                   if acl.ac_role.name == "Audit Captains"]
       self.assertItemsEqual(["cbabbage@example.com"], auditors)
       self.assertItemsEqual(["aturing@example.com"], captains)
@@ -215,7 +215,7 @@ class TestUserGenerator(TestCase):
       assessment = Assessment.query.filter(
           Assessment.slug == assessment_slug).first()
       acl_roles = {
-          acl.ac_role.name: acl for acl in assessment.access_control_list
+          acl.ac_role.name: acl for _, acl in assessment.access_control_list
       }
       self.assertIn("aturing@example.com", acl_roles["Creators"].person.email)
       self.assertEqual("cbabbage@example.com",
