@@ -213,15 +213,17 @@ class TaskGroupTask(roleable.Roleable,
 
     if kwargs.get('clone_people', False):
       access_control_list = [
-          {"ac_role_id": i.ac_role_id, "person": {"id": i.person_id}}
-          for i in self.access_control_list]
+          {"ac_role_id": acl.ac_role_id, "person": {"id": person.id}}
+          for person, acl in self.access_control_list
+      ]
     else:
       role_id = {
           v: k for (k, v) in
           role.get_custom_roles_for(self.type).iteritems()
       }['Task Assignees']
-      access_control_list = [{"ac_role_id": role_id,
-                              "person": {"id": get_current_user().id}}]
+      access_control_list = [
+          {"ac_role_id": role_id, "person": {"id": get_current_user().id}}
+      ]
     kwargs['modified_by'] = get_current_user()
     return self.copy_into(_other,
                           columns,
