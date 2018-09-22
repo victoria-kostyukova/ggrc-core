@@ -89,10 +89,13 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
                                                   internal=role_internal_flag)
         person = factories.PersonFactory()
         role_person_list.append((role, person))
-        factories.AccessControlListFactory(
-            person=person,
+        acl = factories.AccessControlListFactory(
             ac_role=role,
             object=control,
+        )
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
+            person=person,
         )
     with factories.single_commit():
       latest_revision = all_models.Revision.query.filter(
@@ -158,31 +161,48 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
       person_1 = factories.PersonFactory()
       person_2 = factories.PersonFactory()
       person_3 = factories.PersonFactory()
-      factories.AccessControlListFactory(
-          person=person_1,
+      acl_1 = factories.AccessControlListFactory(
           ac_role=role_1,
           object=control,
       )
-      factories.AccessControlListFactory(
-          person=person_2,
+      factories.AccessControlPeopleFactory(
+          ac_list=acl_1,
+          person=person_1,
+      )
+      acl_2 = factories.AccessControlListFactory(
           ac_role=role_2,
           object=control,
       )
-      factories.AccessControlListFactory(
+      factories.AccessControlPeopleFactory(
+          ac_list=acl_2,
+          person=person_2,
+      )
+      acl_3 = factories.AccessControlListFactory(
           person=person_3,
           ac_role=role_3,
           object=control,
       )
+      factories.AccessControlPeopleFactory(
+          ac_list=acl_3,
+          person=person_3,
+      )
       for person in [person_1, person_2, person_3]:
-        factories.AccessControlListFactory(
-            person=person,
+        acl = factories.AccessControlListFactory(
             ac_role=role_4,
             object=control,
         )
-        factories.AccessControlListFactory(
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
+            person=person,
+        )
+        acl = factories.AccessControlListFactory(
             person=person,
             ac_role=internal_role_1,
             object=control,
+        )
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
+            person=person,
         )
 
     with factories.single_commit():
