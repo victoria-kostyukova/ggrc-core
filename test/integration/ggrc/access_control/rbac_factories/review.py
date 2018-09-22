@@ -29,7 +29,10 @@ class MappedReviewRBACFactory(universal_factory.UniversalRBACFactory):
       _, review = self.setup_review(self.acr.id, self.user_id)
       self.review_id = review.id
     else:
+      acr_id = self.acr.id
       _, review = self.setup_review()
+      self.parent = self.parent.__class__.query.get(self.parent_id)
+      self.acr = self.acr.__class__.query.get(acr_id)
       self.review_id = review.id
       self.assign_person(self.parent, self.acr, self.user_id)
 
