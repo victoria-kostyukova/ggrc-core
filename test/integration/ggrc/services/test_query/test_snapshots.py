@@ -542,17 +542,11 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
                           for snap in order_by_nz_result["values"]],
                          [process_nz_core_id, process_nz_prod_id])
 
-  def _add_owner(self, ownable_type, ownable_id, person_id):
+  def _add_owner(self, ownable, person_id):
     """Create ACL for provided object and person."""
-    acr = all_models.AccessControlRole.query.filter_by(
-        object_type=ownable_type,
-        name="Admin"
-    ).first()
-    factories.AccessControlListFactory(
+    factories.AccessControlPeopleFactory(
+        ac_list=ownable.acr_name_acl_map["Admin"],
         person_id=person_id,
-        object_type=ownable_type,
-        object_id=ownable_id,
-        ac_role=acr
     )
 
   def assert_rows_number_in_search(self, field, value, expected_num):
@@ -606,10 +600,10 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
       factories.RelationshipFactory(source=program, destination=controls[0])
       factories.RelationshipFactory(source=program, destination=controls[1])
 
-      self._add_owner("Control", control_ids[0], people_ids[0])
-      self._add_owner("Control", control_ids[0], people_ids[2])
-      self._add_owner("Control", control_ids[1], people_ids[0])
-      self._add_owner("Control", control_ids[1], people_ids[1])
+      self._add_owner(controls[0], people_ids[0])
+      self._add_owner(controls[0], people_ids[2])
+      self._add_owner(controls[1], people_ids[0])
+      self._add_owner(controls[1], people_ids[1])
 
     program = models.Program.query.filter_by(id=program_id).one()
 
@@ -765,6 +759,10 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
   )
   def test_acl_filter(self, test_role_name):
     """Control Snapshots are filtered and sorted by ACL Role."""
+    factories.AccessControlRoleFactory(
+        name=test_role_name,
+        object_type="Control"
+    )
     with factories.single_commit():
       program = factories.ProgramFactory()
       person1 = factories.PersonFactory(name="Ann", email="email1@example.com")
@@ -775,14 +773,9 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
       control2_id = control2.id
       factories.RelationshipFactory(source=program, destination=control1)
       factories.RelationshipFactory(source=program, destination=control2)
-      factories.AccessControlListFactory(
-          ac_role=factories.AccessControlRoleFactory(
-              name=test_role_name,
-              object_type="Control"
-          ),
+      factories.AccessControlPeopleFactory(
+          ac_list=control1.acr_name_acl_map[test_role_name],
           person=person1,
-          object_id=control1_id,
-          object_type="Control",
       )
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_type == "Control",

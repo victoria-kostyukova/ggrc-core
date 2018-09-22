@@ -7,6 +7,7 @@ import datetime
 import json
 
 from ggrc import db
+from ggrc import app
 from ggrc import models
 from integration.ggrc.services import TestCase
 
@@ -32,16 +33,18 @@ class TestCollectionPost(TestCase):
     data = json.dumps(
         {'services_test_mock_model': {'foo': 'bar', 'context': None}})
     self.client.get("/login")
-    response = self.client.post(
-        self.mock_url(),
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
     self.assertStatus(response, 201)
     self.assertIn('Location', response.headers)
-    response = self.client.get(
-        self.get_location(response), headers=self.get_headers())
+    with app.app.app_context():
+      response = self.client.get(
+          self.get_location(response), headers=self.get_headers())
     self.assert200(response)
     self.assertIn('Content-Type', response.headers)
     self.assertEqual('application/json', response.headers['Content-Type'])
@@ -49,7 +52,8 @@ class TestCollectionPost(TestCase):
     self.assertIn('foo', response.json['services_test_mock_model'])
     self.assertEqual('bar', response.json['services_test_mock_model']['foo'])
     # check the collection, too
-    response = self.client.get(self.mock_url(), headers=self.get_headers())
+    with app.app.app_context():
+      response = self.client.get(self.mock_url(), headers=self.get_headers())
     self.assert200(response)
     self.assertEqual(
         1, len(response.json['test_model_collection']['test_model']))
@@ -61,17 +65,19 @@ class TestCollectionPost(TestCase):
     data = json.dumps(
         [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
     self.client.get("/login")
-    response = self.client.post(
-        self.mock_url(),
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
     self.assert200(response)
     self.assertEqual(type(response.json), list)
     self.assertEqual(len(response.json), 1)
 
-    response = self.client.get(self.mock_url(), headers=self.get_headers())
+    with app.app.app_context():
+      response = self.client.get(self.mock_url(), headers=self.get_headers())
     self.assert200(response)
     self.assertEqual(
         1, len(response.json['test_model_collection']['test_model']))
@@ -85,12 +91,13 @@ class TestCollectionPost(TestCase):
         {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
     ])
     self.client.get("/login")
-    response = self.client.post(
-        self.mock_url(),
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
     self.assert200(response)
     self.assertEqual(type(response.json), list)
     self.assertEqual(len(response.json), 2)
@@ -98,7 +105,8 @@ class TestCollectionPost(TestCase):
         'bar1', response.json[0][1]['services_test_mock_model']['foo'])
     self.assertEqual(
         'bar2', response.json[1][1]['services_test_mock_model']['foo'])
-    response = self.client.get(self.mock_url(), headers=self.get_headers())
+    with app.app.app_context():
+      response = self.client.get(self.mock_url(), headers=self.get_headers())
     self.assert200(response)
     self.assertEqual(
         2, len(response.json['test_model_collection']['test_model']))
@@ -116,28 +124,31 @@ class TestCollectionPost(TestCase):
             {'foo': 'bar2', 'code': 'f2', 'context': None}},
     ])
     self.client.get("/login")
-    response = self.client.post(
-        self.mock_url(),
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
 
     self.assertEqual(400, response.status_code)
     self.assertEqual([400], [i[0] for i in response.json])
-    response = self.client.get(self.mock_url(), headers=self.get_headers())
+    with app.app.app_context():
+      response = self.client.get(self.mock_url(), headers=self.get_headers())
     self.assert200(response)
     self.assertEqual(
         0, len(response.json['test_model_collection']['test_model']))
 
   def test_post_bad_request(self):
     """Test collection post with invalid content."""
-    response = self.client.post(
-        self.mock_url(),
-        content_type='application/json',
-        data='This is most definitely not valid content.',
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data='This is most definitely not valid content.',
+          headers=self.get_headers(),
+      )
     self.assert400(response)
     self.assertEqual(
         response.json['message'],
@@ -147,12 +158,13 @@ class TestCollectionPost(TestCase):
 
   def test_bad_content_type(self):
     """Test post with bad content type."""
-    response = self.client.post(
-        self.mock_url(),
-        content_type='text/plain',
-        data="Doesn't matter, now does it?",
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          self.mock_url(),
+          content_type='text/plain',
+          data="Doesn't matter, now does it?",
+          headers=self.get_headers(),
+      )
     self.assertStatus(response, 415)
 
   def test_post_relationship(self):
@@ -174,12 +186,13 @@ class TestCollectionPost(TestCase):
             "context": None,
         },
     }])
-    response = self.client.post(
-        "/api/relationships",
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          "/api/relationships",
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
 
     self.assert200(response)
     relationships = models.Relationship.eager_query().all()
@@ -206,12 +219,13 @@ class TestCollectionPost(TestCase):
             "context": None,
         },
     }])
-    response = self.client.post(
-        "/api/relationships",
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          "/api/relationships",
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
 
     self.assert200(response)
     relationships = models.Relationship.eager_query().all()
@@ -236,12 +250,13 @@ class TestCollectionPost(TestCase):
             "context": None,
         },
     }])
-    response = self.client.post(
-        '/api/people',
-        content_type='application/json',
-        data=data,
-        headers=self.get_headers(),
-    )
+    with app.app.app_context():
+      response = self.client.post(
+          '/api/people',
+          content_type='application/json',
+          data=data,
+          headers=self.get_headers(),
+      )
     self.assert200(response)
     admin = models.Person.query.filter_by(email="user@example.com").first()
     new_user = models.Person.query.filter_by(email="test@example.com").first()

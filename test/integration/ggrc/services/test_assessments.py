@@ -55,14 +55,9 @@ class TestCollection(TestCase, WithQueryApi):
       context = factories.ContextFactory(related_object=assessment)
       assessment.context = context
       person = factories.PersonFactory()
-      ac_role = all_models.AccessControlRole.query.filter_by(
-          object_type=assessment.type,
-          name=role_name
-      ).first()
-      factories.AccessControlListFactory(
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map[role_name],
           person=person,
-          ac_role=ac_role,
-          object=assessment
       )
     assessment_id = assessment.id
     role = all_models.Role.query.filter(

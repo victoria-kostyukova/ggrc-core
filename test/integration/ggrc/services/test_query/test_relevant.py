@@ -32,17 +32,6 @@ class TestRelevant(TestCase, WithQueryApi):
   def setUp(self):
     super(TestRelevant, self).setUp()
     self.client.get("/login")
-    roles = collections.defaultdict(dict)
-    roles_query = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.object_type.in_([
-            all_models.Assessment.__name__,
-            all_models.Audit.__name__,
-            all_models.Program.__name__,
-        ])
-    )
-
-    for role in roles_query:
-      roles[role.object_type][role.name] = role
 
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
@@ -54,20 +43,17 @@ class TestRelevant(TestCase, WithQueryApi):
       for person in self.PEOPLE:
         people[person[0]] = factories.PersonFactory(email=person[1])
       # Correct roles and propagation for a given assessment
-      factories.AccessControlListFactory(
-          ac_role=roles["Assessment"]["Assignees"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Assignees"],
           person=people["assignee"],
-          object=assessment,
       )
-      factories.AccessControlListFactory(
-          ac_role=roles["Audit"]["Auditors"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.audit.acr_name_acl_map["Auditors"],
           person=people["auditor"],
-          object=assessment.audit,
       )
-      factories.AccessControlListFactory(
-          ac_role=roles["Program"]["Program Editors"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.audit.program.acr_name_acl_map["Program Editors"],
           person=people["program_editor"],
-          object=assessment.audit.program,
       )
 
   @ddt.data(*PEOPLE)

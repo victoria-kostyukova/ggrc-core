@@ -12,6 +12,7 @@ import mock
 import ddt
 from freezegun import freeze_time
 
+from ggrc.app import app
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 from integration.ggrc import api_helper
@@ -60,43 +61,52 @@ class TestServices(TestCase):
     return ret
 
   def test_x_requested_by_required(self):
-    response = self.client.post(self.mock_url())
+    with app.app_context():
+      response = self.client.post(self.mock_url())
     self.assert400(response)
     self.assertEqual(response.json['message'],
                      "X-Requested-By header is REQUIRED.")
-    response = self.client.put(self.mock_url() + "/1", data="blah")
+    with app.app_context():
+      response = self.client.put(self.mock_url() + "/1", data="blah")
     self.assert400(response)
     self.assertEqual(response.json['message'],
                      "X-Requested-By header is REQUIRED.")
-    response = self.client.delete(self.mock_url() + "/1")
+    with app.app_context():
+      response = self.client.delete(self.mock_url() + "/1")
     self.assert400(response)
     self.assertEqual(response.json['message'],
                      "X-Requested-By header is REQUIRED.")
 
   def test_empty_collection_get(self):
-    response = self.client.get(self.mock_url(), headers=self.get_headers())
+    with app.app_context():
+      response = self.client.get(self.mock_url(), headers=self.get_headers())
     self.assert200(response)
 
   def test_missing_resource_get(self):
-    response = self.client.get(self.mock_url("foo"),
-                               headers=self.get_headers())
+    with app.app_context():
+      response = self.client.get(self.mock_url("foo"),
+                                 headers=self.get_headers())
     self.assert404(response)
 
   def test_collection_put(self):
-    self.assert_allow(
-        self.client.put(self.mock_url(), headers=self.get_headers()),
-        COLLECTION_ALLOWED)
+    with app.app_context():
+      response = self.client.put(self.mock_url(), headers=self.get_headers())
+    self.assert_allow(response, COLLECTION_ALLOWED)
 
   def test_collection_delete(self):
-    self.assert_allow(
-        self.client.delete(self.mock_url(), headers=self.get_headers()),
-        COLLECTION_ALLOWED)
+    with app.app_context():
+      response = self.client.delete(
+          self.mock_url(),
+          headers=self.get_headers()
+      )
+    self.assert_allow(response, COLLECTION_ALLOWED)
 
   def _prepare_model_for_put(self, foo_param="buzz"):
     """Common object initializing sequence."""
     mock_obj = self.mock_model(foo=foo_param)
-    response = self.client.get(self.mock_url(mock_obj.id),
-                               headers=self.get_headers())
+    with app.app_context():
+      response = self.client.get(self.mock_url(mock_obj.id),
+                                headers=self.get_headers())
     self.assert200(response)
     self.assert_required_headers(response)
     return response
@@ -114,17 +124,19 @@ class TestServices(TestCase):
     # after the put - the lack of latency means it's easy to end up with
     # the same HTTP timestamp thanks to the standard's lack of precision.
     time.sleep(1.1)
-    response = self.client.put(
-        url,
-        data=json.dumps(obj),
-        headers=self.get_headers(
-            ("If-Unmodified-Since", original_headers["Last-Modified"]),
-            ("If-Match", original_headers["Etag"]),
-        ),
-        content_type="application/json",
-    )
+    with app.app_context():
+      response = self.client.put(
+          url,
+          data=json.dumps(obj),
+          headers=self.get_headers(
+              ("If-Unmodified-Since", original_headers["Last-Modified"]),
+              ("If-Match", original_headers["Etag"]),
+          ),
+          content_type="application/json",
+      )
     self.assert200(response)
-    response = self.client.get(url, headers=self.get_headers())
+    with app.app_context():
+      response = self.client.get(url, headers=self.get_headers())
     self.assert200(response)
     self.assertNotEqual(
         original_headers["Last-Modified"], response.headers["Last-Modified"])
@@ -139,15 +151,16 @@ class TestServices(TestCase):
     url = urlparse(obj["services_test_mock_model"]["selfLink"]).path
     original_headers = dict(response.headers)
     del obj["services_test_mock_model"]
-    response = self.client.put(
-        url,
-        data=json.dumps(obj),
-        headers=self.get_headers(
-            ("If-Unmodified-Since", original_headers["Last-Modified"]),
-            ("If-Match", original_headers["Etag"]),
-        ),
-        content_type="application/json",
-    )
+    with app.app_context():
+      response = self.client.put(
+          url,
+          data=json.dumps(obj),
+          headers=self.get_headers(
+              ("If-Unmodified-Since", original_headers["Last-Modified"]),
+              ("If-Match", original_headers["Etag"]),
+          ),
+          content_type="application/json",
+      )
     self.assert400(response)
     self.assertEqual(
         response.json['message'],
@@ -160,15 +173,16 @@ class TestServices(TestCase):
     obj["services_test_mock_model"]["validated"] = "Value Error"
     url = urlparse(obj["services_test_mock_model"]["selfLink"]).path
     original_headers = dict(response.headers)
-    response = self.client.put(
-        url,
-        data=json.dumps(obj),
-        headers=self.get_headers(
-            ("If-Unmodified-Since", original_headers["Last-Modified"]),
-            ("If-Match", original_headers["Etag"]),
-        ),
-        content_type="application/json",
-    )
+    with app.app_context():
+      response = self.client.put(
+          url,
+          data=json.dumps(obj),
+          headers=self.get_headers(
+              ("If-Unmodified-Since", original_headers["Last-Modified"]),
+              ("If-Match", original_headers["Etag"]),
+          ),
+          content_type="application/json",
+      )
     self.assert400(response)
     self.assertEqual(response.json['message'], "raised Value Error")
 
@@ -176,14 +190,15 @@ class TestServices(TestCase):
     """PUT of an invalid object data returns HTTP 400."""
     response = self._prepare_model_for_put(foo_param="tough")
     url = urlparse(response.json["services_test_mock_model"]["selfLink"]).path
-    response = self.client.put(
-        url,
-        content_type="application/json",
-        data="This is most definitely not valid content.",
-        headers=self.get_headers(
-            ("If-Unmodified-Since", response.headers["Last-Modified"]),
-            ("If-Match", response.headers["Etag"]))
-    )
+    with app.app_context():
+      response = self.client.put(
+          url,
+          content_type="application/json",
+          data="This is most definitely not valid content.",
+          headers=self.get_headers(
+              ("If-Unmodified-Since", response.headers["Last-Modified"]),
+              ("If-Match", response.headers["Etag"]))
+      )
     self.assert400(response)
     self.assertEqual(response.json['message'],
                      "The browser (or proxy) sent a request that "
@@ -199,12 +214,13 @@ class TestServices(TestCase):
                      ["services_test_mock_model"]
                      ["selfLink"]).path
       obj = response.json
-      return self.client.put(
-          url,
-          content_type="application/json",
-          data=json.dumps(obj),
-          headers=self.get_headers(*headers),
-      )
+      with app.app_context():
+        return self.client.put(
+            url,
+            content_type="application/json",
+            data=json.dumps(obj),
+            headers=self.get_headers(*headers),
+        )
 
     def check_response_428(response, missing_headers):
       """Make common assertions about 428-response, check missing headers."""
@@ -244,12 +260,13 @@ class TestServices(TestCase):
                      ["services_test_mock_model"]
                      ["selfLink"]).path
       obj = response.json
-      return self.client.put(
-          url,
-          content_type="application/json",
-          data=json.dumps(obj),
-          headers=self.get_headers(*headers),
-      )
+      with app.app_context():
+        return self.client.put(
+            url,
+            content_type="application/json",
+            data=json.dumps(obj),
+            headers=self.get_headers(*headers),
+        )
 
     def check_response_409(response):
       """Make common assertions about 428-response, check error message."""
@@ -283,49 +300,55 @@ class TestServices(TestCase):
 
   def test_options(self):
     mock_obj = self.mock_model()
-    response = self.client.open(
-        self.mock_url(mock_obj.id),
-        method="OPTIONS",
-        headers=self.get_headers(),
-    )
+    with app.app_context():
+      response = self.client.open(
+          self.mock_url(mock_obj.id),
+          method="OPTIONS",
+          headers=self.get_headers(),
+      )
     self.assert_options(response, RESOURCE_ALLOWED)
 
   def test_collection_options(self):
-    response = self.client.open(
-        self.mock_url(), method="OPTIONS", headers=self.get_headers())
+    with app.app_context():
+      response = self.client.open(
+          self.mock_url(), method="OPTIONS", headers=self.get_headers())
     self.assert_options(response, COLLECTION_ALLOWED)
 
   def test_get_bad_accept(self):
     mock1 = self.mock_model(foo="baz")
-    response = self.client.get(
-        self.mock_url(mock1.id),
-        headers=self.get_headers(("Accept", "text/plain")))
+    with app.app_context():
+      response = self.client.get(
+          self.mock_url(mock1.id),
+          headers=self.get_headers(("Accept", "text/plain")))
     self.assertStatus(response, 406)
     self.assertEqual("text/plain", response.headers.get("Content-Type"))
     self.assertEqual("application/json", response.data)
 
   def test_collection_get_bad_accept(self):
-    response = self.client.get(
-        self.mock_url(),
-        headers=self.get_headers(("Accept", "text/plain")))
+    with app.app_context():
+      response = self.client.get(
+          self.mock_url(),
+          headers=self.get_headers(("Accept", "text/plain")))
     self.assertStatus(response, 406)
     self.assertEqual("text/plain", response.headers.get("Content-Type"))
     self.assertEqual("application/json", response.data)
 
   def test_get_if_none_match(self):
     mock1 = self.mock_model(foo="baz")
-    response = self.client.get(
-        self.mock_url(mock1.id),
-        headers=self.get_headers(("Accept", "application/json")))
+    with app.app_context():
+      response = self.client.get(
+          self.mock_url(mock1.id),
+          headers=self.get_headers(("Accept", "application/json")))
     self.assert200(response)
     previous_headers = dict(response.headers)
-    response = self.client.get(
-        self.mock_url(mock1.id),
-        headers=self.get_headers(
-            ("Accept", "application/json"),
-            ("If-None-Match", previous_headers["Etag"]),
-        ),
-    )
+    with app.app_context():
+      response = self.client.get(
+          self.mock_url(mock1.id),
+          headers=self.get_headers(
+              ("Accept", "application/json"),
+              ("If-None-Match", previous_headers["Etag"]),
+          ),
+      )
     self.assertStatus(response, 304)
     self.assertIn("Etag", response.headers)
 

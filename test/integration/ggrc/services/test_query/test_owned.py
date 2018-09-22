@@ -34,10 +34,13 @@ class TestOwned(TestCase, WithQueryApi):
       for my_work in my_work_flags:
         role = factories.AccessControlRoleFactory(object_type="Control",
                                                   my_work=my_work)
-        factories.AccessControlListFactory(
+        acl = factories.AccessControlListFactory(
             ac_role=role,
-            person=self.person,
             object=self.control,
+        )
+        factories.AccessControlPeopleFactory(
+            ac_list=acl,
+            person=self.person,
         )
 
     control_id = self.control.id
