@@ -255,7 +255,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     super(Review, self).validate_acl()
     review_global_roles = role.get_ac_roles_data_for("Review").values()
     mandatory_role_ids = {acr[0] for acr in review_global_roles if acr[3]}
-    passed_acr_ids = {acl.ac_role_id for acl in self.access_control_list}
+    passed_acr_ids = {acl.ac_role_id for _, acl in self.access_control_list}
     missed_mandatory_roles = mandatory_role_ids - passed_acr_ids
     if missed_mandatory_roles:
       raise exceptions.ValidationError("{} roles are mandatory".format(
