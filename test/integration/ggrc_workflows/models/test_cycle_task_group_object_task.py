@@ -51,31 +51,23 @@ class TestCTGOT(BaseTestCase):
       taskgroup = wf_factories.TaskGroupFactory(workflow=workflow)
       task_1 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
       task_2 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
-      task_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Task Assignees",
-          all_models.AccessControlRole.object_type == task_1.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_1,
-                                         person=assignee_1)
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_2,
-                                         person=assignee_2)
+      factories.AccessControlPeopleFactory(
+          ac_list=task_1.acr_name_acl_map["Task Assignees"],
+          person=assignee_1,
+      )
+      factories.AccessControlPeopleFactory(
+          ac_list=task_2.acr_name_acl_map["Task Assignees"],
+          person=assignee_2,
+      )
       sec_assignee = factories.PersonFactory(email=self.TASK_SEC_ASSIGNEE)
-      task_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Task Secondary Assignees",
-          all_models.AccessControlRole.object_type == task_1.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_1,
-                                         person=sec_assignee)
-      wf_admin_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Admin",
-          all_models.AccessControlRole.object_type == workflow.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=wf_admin_role,
-                                         object=workflow,
-                                         person=workflow_admin)
+      factories.AccessControlPeopleFactory(
+          ac_list=task_1.acr_name_acl_map["Task Secondary Assignees"],
+          person=sec_assignee,
+      )
+      factories.AccessControlPeopleFactory(
+          ac_list=workflow.acr_name_acl_map["Admin"],
+          person=workflow_admin,
+      )
 
     generator = wf_generator.WorkflowsGenerator()
     self.cycle_id = generator.generate_cycle(workflow)[1].id
