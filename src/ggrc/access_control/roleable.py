@@ -8,6 +8,8 @@ from sqlalchemy import orm
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
+from werkzeug.exceptions import BadRequest
+
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
@@ -16,6 +18,7 @@ from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
 from ggrc import utils
+from ggrc.utils import errors
 from ggrc.utils import referenced_objects
 
 
@@ -115,6 +118,8 @@ class Roleable(object):
 
     acls = defaultdict(set)
     for value in values:
+      if value["ac_role_id"] not in self.acr_id_acl_map:
+        raise BadRequest(errors.BAD_PARAMS)
       person = referenced_objects.get("Person", value["person"]["id"])
       acl = self.acr_id_acl_map[value["ac_role_id"]]
       acls[acl].add(person)
