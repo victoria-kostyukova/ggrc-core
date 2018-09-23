@@ -245,6 +245,7 @@ class ImportRowConverter(RowConverter):
     self.handle_raw_data()
     self.check_mandatory_fields()
     if self.ignore:
+      db.session.rollback()
       return
     self.update_new_obj_cache()
     self.setup_object()
