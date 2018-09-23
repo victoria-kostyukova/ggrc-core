@@ -3,7 +3,6 @@
 
 """Test Access Control List"""
 
-from ggrc.app import app
 from ggrc.fulltext import mysql
 from ggrc.models import all_models
 from integration.ggrc import TestCase
@@ -39,11 +38,11 @@ class TestAccessControlList(TestCase):
         object_type="Control",
         read=True
     )
-    self.control = factories.ControlFactory()
     self.second_acr = factories.AccessControlRoleFactory(
         object_type="Control",
         read=True
     )
+    self.control = factories.ControlFactory()
     factories.AccessControlPeopleFactory(
         ac_list=self.control.acr_acl_map[self.acr],
         person=self.person,
@@ -121,8 +120,7 @@ class TestAccessControlList(TestCase):
     control = response.json['control']
     control['access_control_list'].append(
         acl_helper.get_acl_json(id_2, person_id))
-    with app.app_context():
-      response = self.api.put(self.control, {"control": control})
+    response = self.api.put(self.control, {"control": control})
     assert response.status_code == 200, \
         "PUTing control failed {}".format(response.status)
     acl = response.json['control']['access_control_list']
@@ -169,9 +167,9 @@ class TestAccessControlList(TestCase):
     # One ACL and Control created in setUp and on by POST
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlList"
+            resource_type="AccessControlPeople"
         ).count(),
-        7
+        2
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
@@ -190,9 +188,9 @@ class TestAccessControlList(TestCase):
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlList"
+            resource_type="AccessControlPeople"
         ).count(),
-        7
+        3
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
