@@ -7,16 +7,18 @@ import unittest
 import datetime
 
 import ddt
+from mock import patch
 
 from ggrc.models import all_models
 from ggrc_workflows.models import task_group_task
 
 
 @ddt.ddt
+@patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={})
 class TestTaskGroupTask(unittest.TestCase):
   """Task group task unit test class."""
 
-  def test_validate_task_type(self):
+  def test_validate_task_type(self, _):
     """Test validate start task type."""
     tgt = task_group_task.TaskGroupTask()
     self.assertRaises(ValueError,
@@ -24,7 +26,7 @@ class TestTaskGroupTask(unittest.TestCase):
     self.assertEqual("menu",
                      tgt.validate_task_type("task_type", "menu"))
 
-  def test_validate_date(self):
+  def test_validate_date(self, _):
     """Test validate date."""
     tgt = task_group_task.TaskGroupTask()
     self.assertEqual(
@@ -39,7 +41,7 @@ class TestTaskGroupTask(unittest.TestCase):
         tgt.validate_date('start_date',
                           datetime.datetime(2014, 7, 23, 0, 0, 0)))
 
-  def test_validate_start_date(self):
+  def test_validate_start_date(self, _):
     """Test on validation start date decorator."""
     tgt = task_group_task.TaskGroupTask()
     tgt.start_date = datetime.date(16, 4, 21)
@@ -123,7 +125,7 @@ class TestTaskGroupTask(unittest.TestCase):
   @ddt.data(*DATE_COMBINATION_LIST)
   @ddt.unpack
   def test_show_view_start_date(  # pylint: disable=too-many-arguments
-          self, unit, repeat_every, repeat_multiplier, date, expected):
+          self, unit, repeat_every, repeat_multiplier, date, expected, _):
     """Calculate view start date."""
     task_group = all_models.TaskGroup(workflow=all_models.Workflow())
     task_group.workflow.unit = unit
@@ -138,7 +140,7 @@ class TestTaskGroupTask(unittest.TestCase):
   @ddt.data(*DATE_COMBINATION_LIST)
   @ddt.unpack
   def test_show_view_end_date(  # pylint: disable=too-many-arguments
-          self, unit, repeat_every, repeat_multiplier, date, expected):
+          self, unit, repeat_every, repeat_multiplier, date, expected, _):
     """Calculate view end date."""
     task_group = all_models.TaskGroup(workflow=all_models.Workflow())
     task_group.workflow.unit = unit

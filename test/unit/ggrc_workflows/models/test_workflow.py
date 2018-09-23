@@ -9,6 +9,7 @@ from datetime import date
 
 import ddt
 from freezegun import freeze_time
+from mock import patch
 
 from ggrc_workflows.models import cycle_task_group_object_task as cycle_task
 from ggrc_workflows.models import cycle
@@ -37,29 +38,32 @@ class TestWorkflowState(unittest.TestCase):
   def test_get_state(self, task_states, result):
     """Test get state for {0}."""
     # pylint: disable=protected-access
-    self.assertEqual(
-        result,
-        workflow.WorkflowState._get_state([
-            cycle_task.CycleTaskGroupObjectTask(status=s) for s in task_states
-        ])
-    )
+    with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
+      self.assertEqual(
+          result,
+          workflow.WorkflowState._get_state([
+              cycle_task.CycleTaskGroupObjectTask(status=s)
+              for s in task_states
+          ])
+      )
 
   def test_get_object_state(self):
-
-    tasks_on_object = [
-        cycle_task.CycleTaskGroupObjectTask(
-            end_date=date(2015, 2, 1),
-            cycle=cycle.Cycle(is_current=True)
-        ),
-        cycle_task.CycleTaskGroupObjectTask(
-            end_date=date(2015, 1, 10),
-            cycle=cycle.Cycle(is_current=True)
-        ),
-    ]
-    with freeze_time("2015-02-01 13:39:20"):
-      self.assertEqual(
-          "Overdue", workflow.WorkflowState.get_object_state(tasks_on_object)
-      )
+    """Test get object state."""
+    with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
+      tasks_on_object = [
+          cycle_task.CycleTaskGroupObjectTask(
+              end_date=date(2015, 2, 1),
+              cycle=cycle.Cycle(is_current=True)
+          ),
+          cycle_task.CycleTaskGroupObjectTask(
+              end_date=date(2015, 1, 10),
+              cycle=cycle.Cycle(is_current=True)
+          ),
+      ]
+      with freeze_time("2015-02-01 13:39:20"):
+        self.assertEqual(
+            "Overdue", workflow.WorkflowState.get_object_state(tasks_on_object)
+        )
 
   @ddt.data(
       # (expected, setup_date, repeat_every, unit),
@@ -89,16 +93,17 @@ class TestWorkflowState(unittest.TestCase):
   @ddt.unpack
   def test_calc_repeated_dates(self, expected, setup_date, repeat_every, unit):
     """Test calculate repeated dates for repeat every {2} {3}."""
-    self.assertEqual(
-        expected,
-        workflow.Workflow(
-            repeat_every=repeat_every,
-            unit=unit,
-            repeat_multiplier=1
-        ).calc_next_adjusted_date(
-            setup_date
-        )
-    )
+    with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
+      self.assertEqual(
+          expected,
+          workflow.Workflow(
+              repeat_every=repeat_every,
+              unit=unit,
+              repeat_multiplier=1
+          ).calc_next_adjusted_date(
+              setup_date
+          )
+      )
 
   @ddt.data(
       # (expected, setup_date),
@@ -111,7 +116,8 @@ class TestWorkflowState(unittest.TestCase):
   @ddt.unpack
   def test_calc_one_time_dates(self, expected, setup_date):
     """Calculate one time dates for {1}."""
-    self.assertEqual(
-        expected,
-        workflow.Workflow().calc_next_adjusted_date(setup_date)
-    )
+    with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
+      self.assertEqual(
+          expected,
+          workflow.Workflow().calc_next_adjusted_date(setup_date)
+      )

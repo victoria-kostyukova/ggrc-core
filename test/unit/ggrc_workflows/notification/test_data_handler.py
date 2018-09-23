@@ -29,6 +29,7 @@ class GetCycleTaskUrlTestCase(unittest.TestCase):
 
 @patch(u"ggrc_workflows.models.cycle.get_url_root",
        return_value=u"http://www.foo.com/")
+@patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={})
 class GetCycleUrlTestCase(unittest.TestCase):
   """Tests for the get_cycle_url() function."""
 

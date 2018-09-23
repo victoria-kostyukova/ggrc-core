@@ -4,6 +4,7 @@
 """ Unit tests for the Assessment object """
 
 import ddt
+from mock import patch
 
 from sqlalchemy.orm import attributes
 
@@ -61,8 +62,9 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
   @ddt.data("", ",", ",,", None)
   def test_empty_recipients(self, recipients):
     """Test validation of empty recipients: '{}'"""
-    validator = comment.Commentable.validate_recipients
-    self.assertEqual(
-        validator(all_models.Assessment(), "recipients", recipients),
-        ""
-    )
+    with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
+      validator = comment.Commentable.validate_recipients
+      self.assertEqual(
+          validator(all_models.Assessment(), "recipients", recipients),
+          ""
+      )

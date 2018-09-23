@@ -9,6 +9,7 @@ from mock import MagicMock, patch
 from ggrc_workflows.models import task_group
 
 
+@patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={})
 class TestTaskGroupTask(unittest.TestCase):
   """Consists of Task Group model unittests."""
 
@@ -20,7 +21,7 @@ class TestTaskGroupTask(unittest.TestCase):
 
   @patch.object(task_group.TaskGroup, "ensure_assignee_is_workflow_member")
   # pylint: disable=invalid-name
-  def test_copy_when_clone_people_is_true_and_contact_is_not_none(self, _):
+  def test_copy_when_clone_people_is_true_and_contact_is_not_none(self, *_):
     """ Test copy() method with next parameters:
     clone_people: True
     self.contact: not None
@@ -36,7 +37,7 @@ class TestTaskGroupTask(unittest.TestCase):
          return_value="Current user person id=0x0011223344556677")
   # pylint: disable=invalid-name
   def test_copy_when_clone_people_is_false_and_contact_is_not_none(
-      self, get_current_user, _
+      self, get_current_user, *_
   ):
     """ Test copy() method with next parameters:
         clone_people: False
@@ -53,7 +54,7 @@ class TestTaskGroupTask(unittest.TestCase):
          return_value="Current user person id=0x0011223344556677")
   # pylint: disable=invalid-name
   def test_copy_when_clone_people_is_true_and_contact_is_none(
-      self, get_current_user, _
+      self, get_current_user, *_
   ):
     """ Test copy() method with next parameters:
         clone_people: True
@@ -70,7 +71,7 @@ class TestTaskGroupTask(unittest.TestCase):
          return_value="Current user person id=0x0011223344556677")
   # pylint: disable=invalid-name
   def test_copy_when_clone_people_is_false_and_contact_is_none(
-      self, get_current_user, _
+      self, get_current_user, *_
   ):
     """ Test copy() method with next parameters:
         clone_people: False
