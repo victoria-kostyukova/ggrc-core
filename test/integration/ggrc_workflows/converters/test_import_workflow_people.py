@@ -87,14 +87,18 @@ class TestWorkflowPeopleImport(TestCase):
     """
     workflow = Workflow.eager_query().filter(
         Workflow.slug == self.wf_slug).first()
-    exst_admins = [acl.person.email for acl in workflow.access_control_list
-                   if acl.ac_role.name == 'Admin']
+    exst_admins = [
+        acp.person.email
+        for acp in workflow.acr_name_acl_map['Admin'].access_control_people
+    ]
     expected_admins = [self.user_emails[idx]
                        for idx in expected_data['admins']]
     self.assertItemsEqual(exst_admins, expected_admins)
-
-    exst_members = [acl.person.email for acl in workflow.access_control_list
-                    if acl.ac_role.name == 'Workflow Member']
+    wf_members = workflow.acr_name_acl_map['Workflow Member']
+    exst_members = [
+        acp.person.email
+        for acp in wf_members.access_control_people
+    ]
     expected_members = [self.user_emails[idx]
                         for idx in expected_data['members']]
     self.assertItemsEqual(exst_members, expected_members)
@@ -116,15 +120,13 @@ class TestWorkflowPeopleImport(TestCase):
         AccessControlList.object_type == TaskGroup.__name__,
         AccessControlList.object_id == task_group.id
     ).all()
-    actual_admins = [a.person.email for a in acl
-                     if a.ac_role.name.startswith("Admin*")]
-    expected_admins = [self.user_emails[i] for i in exp_admin_ids]
-    self.assertItemsEqual(actual_admins, expected_admins)
+    propagated_admins = [acl for a in acl
+                         if a.ac_role.name.startswith("Admin*")]
+    self.assertEqual(len(propagated_admins), 1)
 
-    actual_members = [a.person.email for a in acl
-                      if a.ac_role.name.startswith("Workflow Member*")]
-    expected_members = [self.user_emails[i] for i in exp_member_ids]
-    self.assertItemsEqual(actual_members, expected_members)
+    propagated_members = [acl for a in acl
+                          if a.ac_role.name.startswith("Workflow Member*")]
+    self.assertEqual(len(propagated_members), 1)
 
   @ddt.data(
       {
