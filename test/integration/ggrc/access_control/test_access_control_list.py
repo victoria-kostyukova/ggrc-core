@@ -3,6 +3,7 @@
 
 """Test Access Control List"""
 
+from ggrc.app import app
 from ggrc.fulltext import mysql
 from ggrc.models import all_models
 from integration.ggrc import TestCase
@@ -34,19 +35,18 @@ class TestAccessControlList(TestCase):
     super(TestAccessControlList, self).setUp()
     self.api = Api()
     self.person = factories.PersonFactory(name="My Person")
-    self.control = factories.ControlFactory()
     self.acr = factories.AccessControlRoleFactory(
         object_type="Control",
         read=True
     )
+    self.control = factories.ControlFactory()
     self.second_acr = factories.AccessControlRoleFactory(
         object_type="Control",
         read=True
     )
-    self.acl = factories.AccessControlListFactory(
-        object=self.control,
-        ac_role_id=self.acr.id,
-        person=self.person
+    factories.AccessControlPeopleFactory(
+        ac_list=self.control.acr_acl_map[self.acr],
+        person=self.person,
     )
 
   def _post_control(self, id_, person_id, collection=False):
@@ -121,7 +121,8 @@ class TestAccessControlList(TestCase):
     control = response.json['control']
     control['access_control_list'].append(
         acl_helper.get_acl_json(id_2, person_id))
-    response = self.api.put(self.control, {"control": control})
+    with app.app_context():
+      response = self.api.put(self.control, {"control": control})
     assert response.status_code == 200, \
         "PUTing control failed {}".format(response.status)
     acl = response.json['control']['access_control_list']
@@ -170,7 +171,7 @@ class TestAccessControlList(TestCase):
         all_models.Revision.query.filter_by(
             resource_type="AccessControlList"
         ).count(),
-        2
+        7
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
@@ -191,7 +192,7 @@ class TestAccessControlList(TestCase):
         all_models.Revision.query.filter_by(
             resource_type="AccessControlList"
         ).count(),
-        3
+        7
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
