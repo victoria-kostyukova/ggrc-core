@@ -113,7 +113,7 @@ class Roleable(object):
         values: List of access control roles or dicts containing json
         representation of custom attribute values.
     """
-    if not values:
+    if values is None:
       return
 
     acls = defaultdict(set)
