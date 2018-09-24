@@ -40,8 +40,7 @@ class Generator(object):
       obj_name = obj_class._inflector.table_plural
     if data is None:
       data = {}
-    with app.app_context():
-      response = self.api.post(obj_class, data)
+    response = self.api.post(obj_class, data)
     response_obj = None
     if response.json:
       try:

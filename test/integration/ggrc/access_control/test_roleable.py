@@ -3,7 +3,6 @@
 
 """Test Access Control Roleable mixin"""
 import ddt
-from ggrc import app
 from ggrc import db
 from ggrc.access_control import roleable
 from ggrc.models import all_models
@@ -28,17 +27,16 @@ class TestAccessControlRoleable(TestCase):
   ])
   def test_inital_role_setup(self, model):
     """Check generating acl entries for {0.__name__}."""
-    with app.app.app_context():
-      obj = model()
-      generated_roles = [acl.ac_role for acl in obj._access_control_list]
-      control_visible_roles = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.object_type == obj.type,
-          all_models.AccessControlRole.internal == 0,
-      ).all()
-      self.assertItemsEqual(
-          generated_roles,
-          control_visible_roles,
-      )
+    obj = model()
+    generated_roles = [acl.ac_role for acl in obj._access_control_list]
+    control_visible_roles = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == obj.type,
+        all_models.AccessControlRole.internal == 0,
+    ).all()
+    self.assertItemsEqual(
+        generated_roles,
+        control_visible_roles,
+    )
 
   def test_with_dict(self):
     acl_list = [{

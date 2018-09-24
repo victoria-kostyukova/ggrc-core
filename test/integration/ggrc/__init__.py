@@ -318,10 +318,9 @@ class TestCase(BaseTestCase, object):
     }
     api = Api()
     api.set_user(person)  # Ok if person is None
-    with app.app_context():
-      response = api.client.post("/_service/import_csv",
-                                 data=data, headers=headers)
-      return json.loads(response.data)
+    response = api.client.post("/_service/import_csv",
+                               data=data, headers=headers)
+    return json.loads(response.data)
 
   @classmethod
   @patch("ggrc.gdrive.file_actions.get_gdrive_file",

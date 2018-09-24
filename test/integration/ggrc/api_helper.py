@@ -73,10 +73,8 @@ class Api(object):
       self.user_headers = {}
       self.person_name, self.person_email = None, None
 
-    with app.app_context():
-      self.client.get("/logout")
-    with app.app_context():
-      self.client.get("/login", headers=self.user_headers)
+    self.client.get("/logout")
+    self.client.get("/login", headers=self.user_headers)
     db.session.commit()
     db.session.flush()
 
@@ -109,12 +107,10 @@ class Api(object):
 
     json_data = self.resource.as_json(data)
     logging.info("request json" + json_data)
-    with app.app_context():
-      response = request(api_link, data=json_data, headers=headers.items())
+    response = request(api_link, data=json_data, headers=headers.items())
     if response.status_code == 401:
       self.set_user()
-      with app.app_context():
-        response = request(api_link, data=json_data, headers=headers.items())
+      response = request(api_link, data=json_data, headers=headers.items())
 
     if hasattr(flask.g, "referenced_object_stubs"):
       del flask.g.referenced_object_stubs
@@ -152,21 +148,18 @@ class Api(object):
                              api_link=self.api_link(model))
 
   def get(self, obj, id_):
-    with app.app_context():
-      return self.data_to_json(self.client.get(self.api_link(obj, id_)))
+    return self.data_to_json(self.client.get(self.api_link(obj, id_)))
 
   def head(self, obj, id_):
     return self.data_to_json(self.client.head(self.api_link(obj, id_)))
 
   def get_collection(self, obj, ids):
-    with app.app_context():
-      return self.data_to_json(self.client.get(
-          "{}?ids={}".format(self.api_link(obj), ids)))
+    return self.data_to_json(self.client.get(
+        "{}?ids={}".format(self.api_link(obj), ids)))
 
   def get_query(self, obj, query):
-    with app.app_context():
-      return self.data_to_json(self.client.get(
-          "{}?{}".format(self.api_link(obj), query)))
+    return self.data_to_json(self.client.get(
+        "{}?{}".format(self.api_link(obj), query)))
 
   def modify_object(self, obj, data=None):
     """Make a put call for a given object.

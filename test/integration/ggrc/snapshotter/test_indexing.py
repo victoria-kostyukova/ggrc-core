@@ -10,7 +10,6 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
-from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.snapshotter.indexer import delete_records
@@ -340,8 +339,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
     self.assertEqual(records.count(), 0)
 
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
 
     records = get_records(audit, snapshots)
 
@@ -388,8 +386,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     person_id = person.id
     snapshot_id = snapshot.id
 
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -423,8 +420,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.expire_all()
     person_id = person.id
     snapshot_id = snapshot.id
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
     person = all_models.Person.query.get(person_id)
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
@@ -471,8 +467,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
@@ -501,8 +496,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           revision=revision)
     db.session.expire_all()
     snapshot_id = snapshot.id
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
@@ -535,8 +529,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.delete(acr)
     db.session.commit()
     snapshot_id = snapshot.id
-    with app.app_context():
-      self.client.post("/admin/full_reindex")
+    self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     all_found_records = dict(Record.query.filter(
         Record.key == snapshot.id,
@@ -635,8 +628,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.add(revision)
     db.session.commit()
     self._create_snapshots(audit, [system])
-    with app.app_context():
-      self.client.post("/admin/reindex_snapshots")
+    self.client.post("/admin/reindex_snapshots")
     snapshot = all_models.Snapshot.query.filter(
         all_models.Snapshot.parent_id == audit_id,
         all_models.Snapshot.parent_type == 'Audit',
@@ -677,8 +669,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.add(revision)
     db.session.commit()
     self._create_snapshots(audit, [control])
-    with app.app_context():
-      self.client.post("/admin/reindex_snapshots")
+    self.client.post("/admin/reindex_snapshots")
     snapshot = all_models.Snapshot.query.filter(
         all_models.Snapshot.parent_id == audit_id,
         all_models.Snapshot.parent_type == "Audit",
