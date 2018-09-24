@@ -35,18 +35,18 @@ class TestRBAC(TestCase):
 
   def set_up_acl_object(self):
     """Set up a control with an access control role that grants RUD"""
-    self.control = factories.ControlFactory()
     self.all_acr = factories.AccessControlRoleFactory(
         object_type="Control",
         read=True,
         update=True,
         delete=True
     )
+    self.control = factories.ControlFactory()
     for name in ["Creator", "Reader", "Editor"]:
-      factories.AccessControlListFactory(
-          object=self.control,
-          ac_role_id=self.all_acr.id,
+      factories.AccessControlPeopleFactory(
+          ac_list=self.control.acr_acl_map[self.all_acr],
           person=self.people.get(name)
+
       )
 
 
@@ -100,15 +100,13 @@ class TestAssigneeRBAC(TestRBAC):
     with factories.single_commit():
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Creators"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Creators"],
           person=self.people.get("Editor"),
-          object=assessment
       )
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Assignees"],
+      factories.AccessControlPeopleFactory(
+          ac_list=assessment.acr_name_acl_map["Assignees"],
           person=self.people.get("Creator"),
-          object=assessment
       )
       factories.RelationshipFactory(source=audit, destination=assessment)
       control = factories.ControlFactory()
