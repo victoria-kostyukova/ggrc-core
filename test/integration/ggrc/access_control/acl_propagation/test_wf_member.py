@@ -25,7 +25,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
               "clone": (False, "unimplemented"),
           },
           "TaskGroup": {
-              "create": (False, "unimplemented"),
+              "create": False,
               "read": True,
               "update": False,
               "delete": False,
@@ -87,7 +87,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
               "clone": (False, "unimplemented"),
           },
           "TaskGroup": {
-              "create": (False, "unimplemented"),
+              "create": False,
               "read": True,
               "update": False,
               "delete": False,
