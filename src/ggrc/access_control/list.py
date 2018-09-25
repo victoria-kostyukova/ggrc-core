@@ -7,6 +7,7 @@ from ggrc import db
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.mixins import base
+from ggrc.access_control import people
 
 
 class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
@@ -99,3 +100,54 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
             'parent_id_nn',
         ),
     )
+
+  def _remove_people(self, obsolete_people):
+    if not obsolete_people:
+      return
+    people_acp_map = {acp.person: acp for acp in self.access_control_people}
+    for person in obsolete_people:
+      self.access_control_people.remove(people_acp_map[person])
+
+  def _add_people(self, additional_people):
+    for person in additional_people:
+      people.AccessControlPerson(ac_list=self, person=person)
+
+  def add_person(self, additional_person):
+    """Add a single person to current ACL entry.
+
+    Args:
+      additional_person: new person model that will be added.
+    """
+    self.add_people({additional_person})
+
+  def add_people(self, additional_people):
+    """Ensure that people are linked to the current ACL entry.
+
+    Args:
+      additional_people: set of people objects that will be added.
+    """
+    existing_people = {acp.person for acp in self.access_control_people}
+    self._add_people(additional_people - existing_people)
+
+  def remove_person(self, obsolete_person):
+    self.remove_people({obsolete_person})
+
+  def remove_people(self, obsolete_people):
+    """Remove the given people from the current ACL entry.
+
+    Args:
+      obsolete_people: set of people models that will be removed.
+    """
+    existing_people = {acp.person for acp in self.access_control_people}
+    self._remove_people(existing_people - obsolete_people)
+
+  def update_people(self, new_people):
+    """Update the list of current acl people to match new_people.
+
+    Args:
+      new_people: set of people objects. Any existing person missing from that
+        set will be removed. Any new people will be added.
+    """
+    existing_people = {acp.person for acp in self.access_control_people}
+    self._remove_people(existing_people - new_people)
+    self._add_people(new_people - existing_people)

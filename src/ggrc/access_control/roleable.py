@@ -83,28 +83,6 @@ class Roleable(object):
   def acr_id_acl_map(self):
     return {acl.ac_role.id: acl for acl in self._access_control_list}
 
-  def _add_acp(self, acl, people):
-    for person in people:
-      AccessControlPerson(person=person, ac_list=acl)
-
-  def _remove_acp(self, acl, people):
-    if not people:
-      return
-    people_acp_map = {acp.person: acp for acp in acl.access_control_people}
-    for person in people:
-      acl.access_control_people.remove(people_acp_map[person])
-
-  def _update_acp(self, acl, new_people):
-    """Update access control people list for a single ACL entry.
-
-    Args:
-      acl: a single access control list model.
-      people: a set of people that should exist in ACP.
-    """
-    existing_people = {acp.person for acp in acl.access_control_people}
-    self._remove_acp(acl, existing_people - new_people)
-    self._add_acp(acl, new_people - existing_people)
-
   @access_control_list.setter
   def access_control_list(self, values):
     """Setter function for access control list.
@@ -116,25 +94,16 @@ class Roleable(object):
     if values is None:
       return
 
-    acls = defaultdict(set)
+    new_acl_people_map = defaultdict(set)
     for value in values:
       if value["ac_role_id"] not in self.acr_id_acl_map:
         raise BadRequest(errors.BAD_PARAMS)
       person = referenced_objects.get("Person", value["person"]["id"])
       acl = self.acr_id_acl_map[value["ac_role_id"]]
-      acls[acl].add(person)
+      new_acl_people_map[acl].add(person)
 
     for acl in self._access_control_list:
-      self._update_acp(acl, acls[acl])
-
-  def extend_access_control_list(self, values):
-    """Extend access control list.
-
-    Args:
-        values: List of access control roles or dicts containing json
-        representation of custom attribute values.
-    """
-    pass  # TODO: acp
+      acl.update_people(new_acl_people_map[acl])
 
   @classmethod
   def eager_query(cls):
