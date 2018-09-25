@@ -118,7 +118,7 @@ class TaskGroup(roleable.Roleable,
     if self.contact.id in people_with_role_ids:
       return
     acl = self.workflow.acr_name_acl_map["Workflow Member"]
-    all_models.AccessControlPeople(
+    all_models.AccessControlPerson(
         ac_list=acl,
         person=self.contact,
     )

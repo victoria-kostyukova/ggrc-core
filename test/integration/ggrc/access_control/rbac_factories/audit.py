@@ -106,7 +106,7 @@ class AuditRBACFactory(base.BaseRBACFactory):
           for acl in control._access_control_list
           if acl.ac_role_id == self.admin_control_id
       ][0]
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           person_id=self.user_id,
           ac_list=acl
       )

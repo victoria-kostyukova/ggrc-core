@@ -54,7 +54,7 @@ class TestOrder(TestCase, WithQueryApi):
     ).join(
         all_models.AccessControlRole,
     ).join(
-        all_models.AccessControlPeople
+        all_models.AccessControlPerson
     ).join(
         all_models.Person,
     ).filter(all_models.AccessControlRole.name == role).order_by(
@@ -79,9 +79,9 @@ class TestOrder(TestCase, WithQueryApi):
             (all_models.AccessControlList.ac_role_id ==
              all_models.AccessControlRole.id),
             all_models.AccessControlRole.name == role,
-            (all_models.AccessControlPeople.ac_list_id ==
+            (all_models.AccessControlPerson.ac_list_id ==
              all_models.AccessControlList.id),
-            all_models.Person.id == all_models.AccessControlPeople.person_id)
+            all_models.Person.id == all_models.AccessControlPerson.person_id)
         .order_by(all_models.Person.email)]
     self._check_ordering("Control", sorted_titles, role)
 

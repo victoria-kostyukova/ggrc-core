@@ -50,7 +50,7 @@ class TestCustomAttributeExportDate(TestCase):
 
       admin = factories.PersonFactory(email="test@example.com", name='test')
 
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control.acr_name_acl_map["Admin"],
           person=admin
       )

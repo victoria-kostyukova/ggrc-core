@@ -43,7 +43,7 @@ class TestAccessControlList(TestCase):
         read=True
     )
     self.control = factories.ControlFactory()
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=self.control.acr_acl_map[self.acr],
         person=self.person,
     )
@@ -167,7 +167,7 @@ class TestAccessControlList(TestCase):
     # One ACL and Control created in setUp and on by POST
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlPeople"
+            resource_type="AccessControlPerson"
         ).count(),
         2
     )
@@ -188,7 +188,7 @@ class TestAccessControlList(TestCase):
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlPeople"
+            resource_type="AccessControlPerson"
         ).count(),
         3
     )

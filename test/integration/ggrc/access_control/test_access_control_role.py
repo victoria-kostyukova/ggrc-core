@@ -81,7 +81,7 @@ class TestAccessControlRole(TestCase):
       user = factories.PersonFactory()
       control = factories.ControlFactory()
       role_id = role.id
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control.acr_name_acl_map[ROLE_NAME],
           person=user,
       )

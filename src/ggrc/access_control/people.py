@@ -8,7 +8,7 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 
 
-class AccessControlPeople(mixins.Base, db.Model):
+class AccessControlPerson(mixins.Base, db.Model):
   """Access Control People
 
   Model is a mapping between a role a person and an object. It gives the

@@ -520,7 +520,7 @@ class TestCase(BaseTestCase, object):
         person = factories.PersonFactory(email=person)
 
         for role in roles.split(","):
-          factories.AccessControlPeopleFactory(
+          factories.AccessControlPersonFactory(
               ac_list=obj.acr_name_acl_map[role],
               person=person,
           )

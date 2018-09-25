@@ -54,8 +54,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   )
 
   access_control_people = db.relationship(
-      'AccessControlPeople',
-      foreign_keys='AccessControlPeople.person_id',
+      'AccessControlPerson',
+      foreign_keys='AccessControlPerson.person_id',
       backref="person",
   )
 

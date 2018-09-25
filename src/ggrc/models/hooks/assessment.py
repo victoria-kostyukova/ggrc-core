@@ -163,7 +163,7 @@ def generate_assignee_relations(assessment,
   acl_dict = {acl.ac_role: acl for acl in assessment._access_control_list}
 
   for person, role in person_roles:
-    all_models.AccessControlPeople(
+    all_models.AccessControlPerson(
         person=person,
         ac_list=acl_dict[ac_roles[role]],
     )

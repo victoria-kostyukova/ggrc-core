@@ -163,11 +163,11 @@ def is_auditor(instance, **_):
   exists_query = db.session.query(
       all_models.AccessControlList
   ).join(
-      all_models.AccessControlPeople
+      all_models.AccessControlPerson
   ).join(
       all_models.AccessControlRole
   ).filter(
-      all_models.AccessControlPeople.person_id == current_user.id,
+      all_models.AccessControlPerson.person_id == current_user.id,
       all_models.AccessControlList.object_type == instance.audit.type,
       all_models.AccessControlList.object_id == instance.audit.id,
       all_models.AccessControlRole.name == "Auditors",

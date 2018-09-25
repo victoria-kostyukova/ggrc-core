@@ -363,11 +363,11 @@ class MarketFactory(TitledFactory):
     model = all_models.Market
 
 
-class AccessControlPeopleFactory(ModelFactory):
+class AccessControlPersonFactory(ModelFactory):
   """Access Control People factory class"""
 
   class Meta:
-    model = all_models.AccessControlPeople
+    model = all_models.AccessControlPerson
 
 
 class AccessControlListFactory(ModelFactory):

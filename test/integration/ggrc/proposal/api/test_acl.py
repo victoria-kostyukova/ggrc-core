@@ -93,7 +93,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
             ac_role=role,
             object=control,
         )
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person=person,
         )
@@ -165,7 +165,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
           ac_role=role_1,
           object=control,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=acl_1,
           person=person_1,
       )
@@ -173,7 +173,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
           ac_role=role_2,
           object=control,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=acl_2,
           person=person_2,
       )
@@ -182,7 +182,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
           ac_role=role_3,
           object=control,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=acl_3,
           person=person_3,
       )
@@ -191,7 +191,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
             ac_role=role_4,
             object=control,
         )
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person=person,
         )
@@ -200,7 +200,7 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
             ac_role=internal_role_1,
             object=control,
         )
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person=person,
         )

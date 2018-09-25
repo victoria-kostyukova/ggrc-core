@@ -157,11 +157,11 @@ class TestRelatedAssessments(TestAssessmentBase):
       else:
         factories.RelationshipFactory(source=assessment, destination=audit)
 
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Assignees"],
           person=user,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Creators"],
           person=user,
       )

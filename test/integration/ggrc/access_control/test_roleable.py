@@ -65,7 +65,7 @@ class TestAccessControlRoleable(TestCase):
 
     def acl_query():
       return db.session.query(
-          all_models.AccessControlPeople.person_id,
+          all_models.AccessControlPerson.person_id,
       ).join(
           all_models.AccessControlList
       ).filter(

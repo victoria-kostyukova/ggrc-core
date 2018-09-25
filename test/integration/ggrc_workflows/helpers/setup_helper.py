@@ -27,7 +27,7 @@ class WorkflowSetup(person_setup.PersonSetup):
         workflow: Workflow instance, in which scope person should have role.
     """
     wf_person = self.setup_person(g_rname, wf_rname)
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=workflow.acr_name_acl_map[wf_rname],
         person=wf_person,
     )

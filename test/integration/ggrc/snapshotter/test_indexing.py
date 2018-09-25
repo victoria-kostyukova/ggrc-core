@@ -402,7 +402,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     with factories.single_commit():
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control.acr_name_acl_map[role_name],
           person=person,
       )
@@ -510,7 +510,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     with factories.single_commit():
       person = factories.PersonFactory(email="test@example.com", name='test')
       control = factories.ControlFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control.acr_name_acl_map[role_name],
           person=person,
       )
@@ -550,7 +550,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=system.acr_name_acl_map["Admin"],
           person=person,
       )
@@ -582,7 +582,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=system.acr_name_acl_map[system_role_name],
           person=person,
       )
@@ -611,7 +611,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       person = factories.PersonFactory(name="Test Name")
       system = factories.SystemFactory()
       audit = factories.AuditFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=system.acr_name_acl_map["Admin"],
           person=person,
       )

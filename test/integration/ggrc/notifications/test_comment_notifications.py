@@ -211,7 +211,7 @@ class TestCommentNotification(TestCase):
       )
       for acl in obj._access_control_list:
         if acl.ac_role.name in recipient_types:
-          factories.AccessControlPeopleFactory(
+          factories.AccessControlPersonFactory(
               ac_list=acl,
               person=person,
           )
@@ -246,7 +246,7 @@ class TestCommentNotification(TestCase):
     ).first()
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Assignees"],
           person=cur_user,
       )

@@ -6,7 +6,7 @@
 import sys
 
 from ggrc.access_control.list import AccessControlList
-from ggrc.access_control.people import AccessControlPeople
+from ggrc.access_control.people import AccessControlPerson
 from ggrc.access_control.role import AccessControlRole
 from ggrc.data_platform.attribute_definitions import AttributeDefinitions
 from ggrc.data_platform.attribute_templates import AttributeTemplates
@@ -93,7 +93,7 @@ all_models = [  # pylint: disable=invalid-name
 
     # ggrc models
     AccessControlList,
-    AccessControlPeople,
+    AccessControlPerson,
     AccessControlRole,
     AccessGroup,
     Assessment,

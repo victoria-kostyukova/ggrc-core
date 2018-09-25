@@ -55,7 +55,7 @@ class TestCollection(TestCase, WithQueryApi):
       context = factories.ContextFactory(related_object=assessment)
       assessment.context = context
       person = factories.PersonFactory()
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map[role_name],
           person=person,
       )

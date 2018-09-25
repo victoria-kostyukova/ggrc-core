@@ -110,7 +110,7 @@ class TestCreator(TestCase):
             object_type=model_singular,
             ac_role=acr,
         ).one()
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person_id=creator_id,
         )
@@ -285,7 +285,7 @@ class TestCreator(TestCase):
       asmnt = factories.AssessmentFactory(audit=audit)
       asmnt_id = asmnt.id
       factories.RelationshipFactory(source=audit, destination=asmnt)
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=asmnt.acr_name_acl_map["Verifiers"],
           person=self.users["creator"],
       )

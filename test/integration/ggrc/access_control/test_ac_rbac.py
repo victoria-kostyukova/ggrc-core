@@ -43,7 +43,7 @@ class TestRBAC(TestCase):
     )
     self.control = factories.ControlFactory()
     for name in ["Creator", "Reader", "Editor"]:
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=self.control.acr_acl_map[self.all_acr],
           person=self.people.get(name)
 
@@ -100,11 +100,11 @@ class TestAssigneeRBAC(TestRBAC):
     with factories.single_commit():
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Creators"],
           person=self.people.get("Editor"),
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Assignees"],
           person=self.people.get("Creator"),
       )

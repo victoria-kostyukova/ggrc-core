@@ -368,7 +368,7 @@ class TestACLImportExport(TestCase):
       for role in ["Program Editors", "Program Editors", "Program Readers"]:
         person = factories.PersonFactory()
         acl = program.acr_name_acl_map[role]
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person=person,
         )

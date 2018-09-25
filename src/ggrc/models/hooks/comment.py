@@ -27,7 +27,7 @@ def init_hook():
     for comment in objects:
       admin = [a for a in comment._access_control_list
                if a.ac_role == comment_admin][0]
-      all_models.AccessControlPeople(
+      all_models.AccessControlPerson(
           person=user,
           ac_list=admin,
       )

@@ -43,7 +43,7 @@ class TestAutomappings(TestCase):
   @classmethod
   def create_ac_roles(cls, obj, person_id, role_name="Admin"):
     """Create access control roles"""
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=obj.acr_name_acl_map[role_name],
         person_id=person_id,
     )

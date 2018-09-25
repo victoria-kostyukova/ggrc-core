@@ -169,8 +169,8 @@ class TestWorkflowsApiPost(TestCase):
     workflow = all_models.Workflow.query.one()
     task_group = all_models.TaskGroup.query.one()
 
-    ac_people = all_models.AccessControlPeople.query.filter(
-        all_models.AccessControlPeople.person_id == task_group.contact_id,
+    ac_people = all_models.AccessControlPerson.query.filter(
+        all_models.AccessControlPerson.person_id == task_group.contact_id,
     ).all()
     self.assertEqual(len(ac_people), 1)
 

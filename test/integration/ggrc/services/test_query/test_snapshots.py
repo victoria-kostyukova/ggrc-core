@@ -544,7 +544,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
 
   def _add_owner(self, ownable, person_id):
     """Create ACL for provided object and person."""
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=ownable.acr_name_acl_map["Admin"],
         person_id=person_id,
     )
@@ -773,7 +773,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
       control2_id = control2.id
       factories.RelationshipFactory(source=program, destination=control1)
       factories.RelationshipFactory(source=program, destination=control2)
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control1.acr_name_acl_map[test_role_name],
           person=person1,
       )

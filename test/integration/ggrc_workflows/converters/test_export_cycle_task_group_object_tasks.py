@@ -41,7 +41,7 @@ class TestExportTasks(TestCase):
         )
         task = factories.CycleTaskFactory()
         for role_name in ("Task Assignees", "Task Secondary Assignees"):
-          ggrc_factories.AccessControlPeopleFactory(
+          ggrc_factories.AccessControlPersonFactory(
               ac_list=task.acr_name_acl_map[role_name],
               person=person,
           )

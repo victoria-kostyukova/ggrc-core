@@ -215,7 +215,7 @@ class TestPermissionsOnAssessmentRelatedAssignables(TestCase):
     )
     audit = factories.AuditFactory()
     assessment = factories.AssessmentFactory(audit=audit)
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=assessment.acr_name_acl_map["Assignees"],
         person=self.reader,
     )

@@ -146,11 +146,11 @@ def related_people(exp, object_class, target_class, query):
 
   res = []
 
-  res.extend(db.session.query(all_models.AccessControlPeople.person_id).filter(
+  res.extend(db.session.query(all_models.AccessControlPerson.person_id).filter(
       sqlalchemy.and_(
           all_models.AccessControlList.object_id.in_(exp['ids']),
           all_models.AccessControlList.object_type == exp['object_name'],
-          all_models.AccessControlPeople.ac_list_id ==
+          all_models.AccessControlPerson.ac_list_id ==
           all_models.AccessControlList.id,
       )
   ))

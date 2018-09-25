@@ -43,15 +43,15 @@ class TestRelevant(TestCase, WithQueryApi):
       for person in self.PEOPLE:
         people[person[0]] = factories.PersonFactory(email=person[1])
       # Correct roles and propagation for a given assessment
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.acr_name_acl_map["Assignees"],
           person=people["assignee"],
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.audit.acr_name_acl_map["Auditors"],
           person=people["auditor"],
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=assessment.audit.program.acr_name_acl_map["Program Editors"],
           person=people["program_editor"],
       )

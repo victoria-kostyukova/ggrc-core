@@ -95,11 +95,11 @@ class TestIssueMapping(TestCase):
         destination=audit.program,
     )
     # Add auditor & program editor roles
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=audit.acr_name_acl_map["Auditors"],
         person=self.users['auditor'],
     )
-    factories.AccessControlPeopleFactory(
+    factories.AccessControlPersonFactory(
         ac_list=audit.program.acr_name_acl_map["Program Editors"],
         person=self.users['programeditor']
     )

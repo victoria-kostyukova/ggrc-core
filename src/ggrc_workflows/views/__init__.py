@@ -58,11 +58,11 @@ def get_user_task_count():
                 ("Task Assignees", "Task Secondary Assignees")),
         )
     ).join(
-        all_models.AccessControlPeople,
+        all_models.AccessControlPerson,
         sa.and_(
             all_models.AccessControlList.id ==
-            all_models.AccessControlPeople.ac_list_id,
-            all_models.AccessControlPeople.person_id ==
+            all_models.AccessControlPerson.ac_list_id,
+            all_models.AccessControlPerson.person_id ==
             current_user.id,
         )
     ).filter(

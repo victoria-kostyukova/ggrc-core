@@ -30,7 +30,7 @@ class TestFilterByAuditor(TestCase):
       self.audit_id = self.audit.id
       audit_context = factories.ContextFactory()
       self.audit.context = audit_context
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=self.audit.acr_name_acl_map["Auditors"],
           person=self.auditor,
       )

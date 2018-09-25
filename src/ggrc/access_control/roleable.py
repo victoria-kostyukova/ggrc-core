@@ -13,7 +13,7 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
-from ggrc.access_control.people import AccessControlPeople
+from ggrc.access_control.people import AccessControlPerson
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
@@ -85,7 +85,7 @@ class Roleable(object):
 
   def _add_acp(self, acl, people):
     for person in people:
-      AccessControlPeople(person=person, ac_list=acl)
+      AccessControlPerson(person=person, ac_list=acl)
 
   def _remove_acp(self, acl, people):
     if not people:

@@ -53,7 +53,7 @@ class TestAccessControlListValidation(TestCase):
       control_id = control.id
       person = factories.PersonFactory()
       person_id = person.id
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=control.acr_name_acl_map["Admin"],
           person=person,
       )

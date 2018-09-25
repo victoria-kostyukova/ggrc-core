@@ -61,8 +61,8 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   )
 
   access_control_people = db.relationship(
-      'AccessControlPeople',
-      foreign_keys='AccessControlPeople.ac_list_id',
+      'AccessControlPerson',
+      foreign_keys='AccessControlPerson.ac_list_id',
       backref='ac_list',
       cascade='all, delete-orphan',
   )

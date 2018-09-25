@@ -353,7 +353,7 @@ def load_access_control_list(user, permissions):
   acl_propagated = db.aliased(all_models.AccessControlList,
                               name="acl_propagated")
   acr = all_models.AccessControlRole
-  acp = all_models.AccessControlPeople
+  acp = all_models.AccessControlPerson
   additional_filters = _get_acl_filter()
   access_control_list = db.session.query(
       acl_propagated.object_type,

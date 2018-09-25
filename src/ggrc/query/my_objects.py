@@ -56,12 +56,12 @@ def _get_custom_roles(contact_id, model_names):
       all_models.AccessControlList.ac_role_id ==
       all_models.AccessControlRole.id
   ).join(
-      all_models.AccessControlPeople,
-      all_models.AccessControlPeople.ac_list_id ==
+      all_models.AccessControlPerson,
+      all_models.AccessControlPerson.ac_list_id ==
       all_models.AccessControlList.id
   ).filter(
       and_(
-          all_models.AccessControlPeople.person_id == contact_id,
+          all_models.AccessControlPerson.person_id == contact_id,
           all_models.AccessControlList.object_type.in_(model_names),
           all_models.AccessControlRole.my_work == sa.true(),
           all_models.AccessControlRole.read == sa.true()
@@ -101,8 +101,8 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
             all_models.CycleTaskGroupObjectTask.id,
         ),
     ).join(
-        all_models.AccessControlPeople,
-        all_models.AccessControlPeople.ac_list_id ==
+        all_models.AccessControlPerson,
+        all_models.AccessControlPerson.ac_list_id ==
         all_models.AccessControlList.id
     ).join(
         all_models.AccessControlRole,
@@ -119,7 +119,7 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
             Cycle.is_current == sa.true(),
             all_models.AccessControlRole.read == sa.true(),
             all_models.AccessControlRole.internal == sa.false(),
-            all_models.AccessControlPeople.person_id == contact_id,
+            all_models.AccessControlPerson.person_id == contact_id,
         )
     )
     return task_query

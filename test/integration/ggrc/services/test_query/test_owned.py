@@ -38,7 +38,7 @@ class TestOwned(TestCase, WithQueryApi):
             ac_role=role,
             object=self.control,
         )
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=acl,
             person=self.person,
         )

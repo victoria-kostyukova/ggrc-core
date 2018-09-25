@@ -51,20 +51,20 @@ class TestCTGOT(BaseTestCase):
       taskgroup = wf_factories.TaskGroupFactory(workflow=workflow)
       task_1 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
       task_2 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=task_1.acr_name_acl_map["Task Assignees"],
           person=assignee_1,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=task_2.acr_name_acl_map["Task Assignees"],
           person=assignee_2,
       )
       sec_assignee = factories.PersonFactory(email=self.TASK_SEC_ASSIGNEE)
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=task_1.acr_name_acl_map["Task Secondary Assignees"],
           person=sec_assignee,
       )
-      factories.AccessControlPeopleFactory(
+      factories.AccessControlPersonFactory(
           ac_list=workflow.acr_name_acl_map["Admin"],
           person=workflow_admin,
       )

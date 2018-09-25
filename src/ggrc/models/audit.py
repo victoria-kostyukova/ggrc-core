@@ -166,7 +166,7 @@ class Audit(Snapshotable,
       audit: Audit instance
     """
     for person, acl in audit.access_control_list:
-      people.AccessControlPeople(
+      people.AccessControlPerson(
           ac_list=self.acr_acl_map[acl.ac_role],
           person=person,
       )

@@ -110,7 +110,7 @@ def exclude_auditor_emails(emails):
   """Returns new email set with excluded auditor emails."""
   acl = all_models.AccessControlList
   acr = all_models.AccessControlRole
-  acp = all_models.AccessControlPeople
+  acp = all_models.AccessControlPerson
 
   if not isinstance(emails, set):
     emails = set(emails)

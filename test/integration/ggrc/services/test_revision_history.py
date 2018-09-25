@@ -70,7 +70,7 @@ class TestRevisionHistory(TestCase):
                         "Program Readers"]:
         person = self.people[role_name]
         rbac_factories.UserRoleFactory(role=roles["Creator"], person=person)
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=self.program.acr_name_acl_map[role_name],
             person=self.people[role_name],
         )
@@ -78,7 +78,7 @@ class TestRevisionHistory(TestCase):
       for role_name in ["ACL_Reader", "ACL_Editor"]:
         rbac_factories.UserRoleFactory(role=roles["Creator"],
                                        person=self.people[role_name])
-        factories.AccessControlPeopleFactory(
+        factories.AccessControlPersonFactory(
             ac_list=self.control.acr_name_acl_map[role_name],
             person=self.people[role_name],
         )

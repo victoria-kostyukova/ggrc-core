@@ -130,7 +130,7 @@ def _add_task_acl(task):
   """Add ACP entry for the current users background task."""
   admin_acl = task.acr_name_acl_map.get("Admin")
   if admin_acl:
-    people.AccessControlPeople(
+    people.AccessControlPerson(
         ac_list=admin_acl,
         person=get_current_user(),
     )
