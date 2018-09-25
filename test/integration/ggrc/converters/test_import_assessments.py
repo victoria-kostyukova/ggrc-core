@@ -172,11 +172,13 @@ class TestAssessmentImport(TestCase):
       for role in expected_types:
         try:
           user = all_models.Person.query.filter_by(name=user_name).first()
-          acl_len = all_models.AccessControlList.query.filter_by(
-              ac_role_id=ac_roles[role],
-              person_id=user.id,
-              object_id=asmt.id,
-              object_type=asmt.type,
+          acl_len = all_models.AccessControlPerson.query.join(
+              all_models.AccessControlList
+          ).filter(
+              all_models.AccessControlList.ac_role_id == ac_roles[role],
+              all_models.AccessControlPerson.person_id == user.id,
+              all_models.AccessControlList.object_id == asmt.id,
+              all_models.AccessControlList.object_type == asmt.type,
           ).count()
           self.assertEqual(
               acl_len, 1,
@@ -190,14 +192,16 @@ class TestAssessmentImport(TestCase):
 
   def _test_assigned_user(self, assessment, user_id, role):
     """Check if user has role on assessment"""
-    acls = all_models.AccessControlList.query.filter_by(
-        person_id=user_id,
-        object_id=assessment.id,
-        object_type=assessment.type,
+    acls = all_models.AccessControlPerson.query.join(
+        all_models.AccessControlList
+    ).filter(
+        all_models.AccessControlPerson.person_id == user_id,
+        all_models.AccessControlList.object_id == assessment.id,
+        all_models.AccessControlList.object_type == assessment.type,
     )
     self.assertEqual(
         [user_id] if user_id else [],
-        [i.person_id for i in acls if i.ac_role.name == role]
+        [i.person_id for i in acls if i.ac_list.ac_role.name == role]
     )
 
   def test_assessment_full_no_warnings(self):
