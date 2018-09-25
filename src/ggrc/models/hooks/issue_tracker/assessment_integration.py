@@ -756,20 +756,21 @@ def get_issue_info(obj):
 
 def get_reporter_email(assessment):
   """Get reporter email for assessment."""
-  person, acl, acr = (all_models.Person, all_models.AccessControlList,
-                      all_models.AccessControlRole)
+  person = all_models.Person
+  acl = all_models.AccessControlList
+  acr = all_models.AccessControlRole
+  acp = all_models.AccessControlPerson
+
   reporter_email = db.session.query(
       person.email,
   ).join(
+      acp
+  ).join(
       acl,
-      person.id == acl.person_id,
   ).join(
       acr,
-      sa.and_(
-          acl.ac_role_id == acr.id,
-          acr.name == "Audit Captains",
-      ),
   ).filter(
+      acr.name == "Audit Captains",
       acl.object_id == assessment.audit_id,
       acl.object_type == all_models.Audit.__name__,
   ).order_by(

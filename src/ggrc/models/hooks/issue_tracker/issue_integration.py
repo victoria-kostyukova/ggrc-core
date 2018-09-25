@@ -53,14 +53,9 @@ def _is_already_linked(ticket_id):
 def create_missed_issue_acl(email, role_name, obj):
   """Create missed acl for emails from IssueTracker"""
   person = all_models.Person.query.filter_by(email=email).first()
-  acr = all_models.AccessControlRole.query.filter_by(
-      name=role_name,
-      object_type=all_models.Issue.__name__,
-  ).first()
-  all_models.AccessControlList(
-      person_id=person.id,
-      ac_role_id=acr.id,
-      object=obj,
+  all_models.AccessControlPerson(
+      ac_list=obj.acr_name_acl_map[role_name],
+      person=person,
   )
 
 
