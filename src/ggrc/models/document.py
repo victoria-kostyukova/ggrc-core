@@ -262,13 +262,7 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   def add_admin_role(self):
     """Add current user to Document Admins"""
-    from ggrc.models import all_models
-    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
-        name="Admin", object_type=self.type).one()
-    self.extend_access_control_list([{
-        "ac_role": admin_role,
-        "person": login.get_current_user()
-    }])
+    self.acr_name_acl_map["Admin"].add_person(login.get_current_user())
 
   def handle_relationship_created(self, target):
     """Add document to parent folder if specified"""
