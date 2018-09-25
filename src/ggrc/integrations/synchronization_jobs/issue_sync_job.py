@@ -36,10 +36,10 @@ ISSUE_STATUS_MAPPING = {
 def get_current_issue_tracker_person_acl(sync_object, role_name):
   """Returns acl which used for sending emails to Issue Tracker."""
   # TODO: Reduce number of queries to DB.
-  acls = [acl for acl in sync_object.access_control_list
+  acls = [(person, acl) for person, acl in sync_object.access_control_list
           if acl.ac_role.name == role_name]
-  acls = sorted(acls, key=lambda acl: acl.person.name)
-  return acls[0] if acls else None
+  acls = sorted(acls, key=lambda acl: acl[0].name)
+  return acls[0] if acls else (None, None)
 
 
 def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
@@ -55,16 +55,13 @@ def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
     primary_contact_emails = [person.email
                               for person in issue_primary_contacts]
     if issue_tracker_assignee not in primary_contact_emails:
-      current_assignee_acl = get_current_issue_tracker_person_acl(
+      person, current_assignee_acl = get_current_issue_tracker_person_acl(
           sync_object,
           "Primary Contacts"
       )
       if current_assignee_acl:
-        sync_object.access_control_list.remove(current_assignee_acl)
-      sync_object.extend_access_control_list([{
-          "ac_role": assignees_role,
-          "person": new_assignee
-      }])
+        current_assignee_acl.remove_person(person)
+      sync_object.acr_acl_map[assignees_role].add_person(new_assignee)
 
 
 def sync_verifier_email(issuetracker_state, sync_object, admin_role):
@@ -77,14 +74,13 @@ def sync_verifier_email(issuetracker_state, sync_object, admin_role):
     issue_admins = sync_object.get_persons_for_rolename("Admin")
     admin_emails = [admin.email for admin in issue_admins]
     if issue_tracker_verifier not in admin_emails:
-      current_verifier_acl = get_current_issue_tracker_person_acl(sync_object,
-                                                                  "Admin")
+      person, current_verifier_acl = get_current_issue_tracker_person_acl(
+          sync_object,
+          "Admin",
+      )
       if current_verifier_acl:
-        sync_object.access_control_list.remove(current_verifier_acl)
-      sync_object.extend_access_control_list([{
-          "ac_role": admin_role,
-          "person": new_verifier
-      }])
+        current_verifier_acl.remove_person(person)
+      sync_object.acr_acl_map[admin_role].add_person(new_verifier)
 
 
 def sync_statuses(issuetracker_state, sync_object):
