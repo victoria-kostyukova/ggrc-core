@@ -165,11 +165,11 @@ class Audit(Snapshotable,
     Args:
       audit: Audit instance
     """
-    acl_dict = {acl.ac_role_id: acl for acl in self._access_control_list}
-    for original_acl in audit._access_control_list:
-      acl = acl_dict[original_acl.ac_role_id]
-      for acp in original_acl.access_control_people:
-        people.AccessControlPeople(ac_list=acl, person=acp.person)
+    for person, acl in audit.access_control_list:
+      people.AccessControlPeople(
+          ac_list=self.acr_acl_map[acl.ac_role],
+          person=person,
+      )
 
   def clone(self, source_id, mapped_objects=None):
     """Clone audit with specified whitelisted children.
