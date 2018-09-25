@@ -528,7 +528,7 @@ def _collect_audit_emails(acl_payload):
   return "", []
 
 
-def _get_audit_ccs(assessment):
+def get_audit_ccs(assessment):
   """Returns audit CCs regarding assessment.
 
   Args:
@@ -546,7 +546,7 @@ def _get_audit_ccs(assessment):
   return audit_ccs
 
 
-def _group_cc_emails(audit_ccs, assessment_ccs):
+def group_cc_emails(audit_ccs, assessment_ccs):
   """Returns grouped cc emails between audit and assessment.
 
   Args:
@@ -792,8 +792,8 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_params['verifier'] = assignee
 
   cc_list = issue_tracker_info.get('cc_list', [])
-  audit_ccs = _get_audit_ccs(assessment)
-  grouped_ccs = _group_cc_emails(audit_ccs, cc_list)
+  audit_ccs = get_audit_ccs(assessment)
+  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
 
   if grouped_ccs:
     issue_params['ccs'] = grouped_ccs
@@ -888,8 +888,8 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
 
   # handle assignee and cc_list update
   assignee_email, cc_list = _collect_assessment_emails(assessment)
-  audit_ccs = _get_audit_ccs(assessment)
-  grouped_ccs = _group_cc_emails(audit_ccs, cc_list)
+  audit_ccs = get_audit_ccs(assessment)
+  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
 
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email

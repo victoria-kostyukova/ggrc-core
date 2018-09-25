@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 # A list of field to watch for changes in.
-FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
+FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity', 'ccs')
 
 # Status values maps from GGRC to IssueTracker.
 ASSESSMENT_STATUSES_MAPPING = {
@@ -33,7 +33,10 @@ def sync_assessment_statuses():
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
-  assessment_issues = sync_utils.collect_issue_tracker_info("Assessment")
+  assessment_issues = sync_utils.collect_issue_tracker_info(
+      "Assessment",
+      include_ccs=True
+  )
   if not assessment_issues:
     return
   logger.debug('Syncing state of %d issues.', len(assessment_issues))

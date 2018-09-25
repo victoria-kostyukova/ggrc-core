@@ -18,7 +18,26 @@ logger = logging.getLogger(__name__)
 _BATCH_SIZE = 100
 
 
-def collect_issue_tracker_info(model_name, include_object=False):
+def _add_assessment_ccs(issue_object, assessment):
+  """Returns assessment and audit ccs regarding issue tracker."""
+
+  assessment_ccs = issue_object.cc_list.split(",") \
+      if issue_object.cc_list else []
+
+  audit_issue = assessment.audit.issuetracker_issue
+  if audit_issue is not None and audit_issue.cc_list:
+    audit_ccs = audit_issue.cc_list.split(",")
+  else:
+    audit_ccs = []
+
+  audit_ccs = frozenset(audit_ccs)
+  assessment_ccs = frozenset(assessment_ccs)
+
+  return list(audit_ccs.union(assessment_ccs))
+
+
+def collect_issue_tracker_info(model_name, include_object=False,
+                               include_ccs=False):
   """Returns issue tracker info associated with GGRC object."""
   issue_params = {}
   issue_objects = get_active_issue_info(model_name=model_name)
@@ -49,6 +68,10 @@ def collect_issue_tracker_info(model_name, include_object=False):
 
     if include_object:
       issue_params[iti.issue_id]["object"] = sync_object
+
+    if include_ccs:
+      grouped_ccs = _add_assessment_ccs(iti, sync_object)
+      issue_params[iti.issue_id]["state"]["ccs"] = grouped_ccs
 
   return issue_params
 
