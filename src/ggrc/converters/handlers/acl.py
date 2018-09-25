@@ -20,17 +20,10 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     value_is_correct = self.value or self.set_empty
     if not value_is_correct:
       return
-    list_old = {
-        acp.person
-        for acp in self.acl.access_control_people
-    }
     if self.set_empty:
-      self.row_converter.obj._remove_acp(self.acl, list_old)
-      return
-
-    list_new = set(self.value)
-    self.row_converter.obj._add_acp(self.acl, list_new - list_old)
-    self.row_converter.obj._remove_acp(self.acl, list_old - list_new)
+      self.acl.update_people(set())
+    else:
+      self.acl.update_people(set(self.value))
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
