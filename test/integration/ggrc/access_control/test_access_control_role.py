@@ -72,19 +72,18 @@ class TestAccessControlRole(TestCase):
   @ddt.unpack
   def test_mandatory_delete(self, mandatory, exp_response):
     """Test set empty field via import if acr mandatory is {mandatory}"""
+    role = factories.AccessControlRoleFactory(
+        name=ROLE_NAME,
+        object_type="Control",
+        mandatory=mandatory,
+    )
     with factories.single_commit():
       user = factories.PersonFactory()
       control = factories.ControlFactory()
-      role = factories.AccessControlRoleFactory(
-          name=ROLE_NAME,
-          object_type="Control",
-          mandatory=mandatory,
-      )
       role_id = role.id
-      factories.AccessControlListFactory(
+      factories.AccessControlPeopleFactory(
+          ac_list=control.acr_name_acl_map[ROLE_NAME],
           person=user,
-          ac_role_id=role.id,
-          object=control,
       )
     response = self.import_data(OrderedDict([
         ("object_type", "Control"),
@@ -93,8 +92,9 @@ class TestAccessControlRole(TestCase):
     ]))
     self._check_csv_response(response, exp_response)
     db_data = defaultdict(set)
-    for acl in all_models.Control.query.get(control.id).access_control_list:
-      db_data[acl.ac_role_id].add(acl.person_id)
+    control = all_models.Control.query.get(control.id)
+    for person, acl in control.access_control_list:
+      db_data[acl.ac_role_id].add(person.id)
     if mandatory:
       cur_user = all_models.Person.query.filter_by(
           email="user@example.com").first()
