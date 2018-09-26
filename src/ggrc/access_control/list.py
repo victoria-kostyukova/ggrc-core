@@ -139,7 +139,7 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       obsolete_people: set of people models that will be removed.
     """
     existing_people = {acp.person for acp in self.access_control_people}
-    self._remove_people(existing_people - obsolete_people)
+    self._remove_people(obsolete_people & existing_people)
 
   def update_people(self, new_people):
     """Update the list of current acl people to match new_people.
