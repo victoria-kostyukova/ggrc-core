@@ -538,42 +538,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     ).values("subproperty", "content"))
     self.assertFalse(all_found_records)
 
-  @patch("ggrc.fulltext.attributes.logger")
-  def test_no_reindex_acr_for_diff_obj(self, logger):
-    """Test that no reindex records appear if
-    acl is populated with other's obj role."""
-    product_admin = all_models.AccessControlRole.query.filter_by(
-        object_type="Product",
-        name="Admin"
-    ).first()
-    with factories.single_commit():
-      person = factories.PersonFactory(name="Test Name")
-      system = factories.SystemFactory()
-      audit = factories.AuditFactory()
-      factories.AccessControlPersonFactory(
-          ac_list=system.acr_name_acl_map["Admin"],
-          person=person,
-      )
-      system_id = system.id
-    revision = all_models.Revision.query.filter(
-        all_models.Revision.resource_id == system.id,
-        all_models.Revision.resource_type == system.type
-    ).one()
-    revision.content = system.log_json()
-    db.session.add(revision)
-    db.session.commit()
-    self._create_snapshots(audit, [system])
-    fulltext_records = Record.query.filter(
-        Record.key == system_id,
-        Record.type == "System",
-        Record.property == "Admin",
-    ).all()
-    self.assertEqual(len(fulltext_records), 0)
-    logger.warning.assert_called_once_with(
-        "Reindex: role %s, id %s is skipped for %s, id %s, "
-        "because it relates to %s", product_admin.name, product_admin.id,
-        system.__class__.__name__, system.id, product_admin.object_type)
-
   def test_no_reindex_acr_for_same_obj(self):
     """Test that reindex records appear if
     acl is populated with current obj's role."""
