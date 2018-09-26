@@ -8,6 +8,7 @@
 import mock
 import ddt
 
+from ggrc import db
 from ggrc import models
 from ggrc import settings
 from ggrc.models import all_models
@@ -110,12 +111,10 @@ class TestIssueIntegration(ggrc.TestCase):
   def test_exclude_auditor(self):
     """Test 'exclude_auditor_emails' util."""
     audit = factories.AuditFactory()
-    factories.AccessControlListFactory(
-        ac_role=factories.AccessControlRoleFactory(name="Auditors"),
-        person=factories.PersonFactory(email="auditor@example.com"),
-        object_id=audit.id,
-        object_type="Audit"
-    )
+    audit = factories.AuditFactory()
+    person = factories.PersonFactory(email="auditor@example.com")
+    audit.add_person_with_role_name(person, "Auditors")
+    db.session.commit()
 
     result = integration_utils.exclude_auditor_emails(["auditor@example.com",
                                                        "admin@example.com"])
