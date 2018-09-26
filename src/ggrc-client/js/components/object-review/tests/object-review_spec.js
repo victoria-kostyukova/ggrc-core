@@ -53,7 +53,7 @@ describe('object-review component', () => {
     });
   });
 
-  describe('"wasReviewed" getter', () => {
+  describe('"showLastReviewInfo" getter', () => {
     it(`should return true if "last_reviewed_by"
      contains info about person`, () => {
       const review = {
@@ -61,7 +61,7 @@ describe('object-review component', () => {
       };
       viewModel.attr('review', review);
 
-      expect(viewModel.attr('wasReviewed')).toBeTruthy();
+      expect(viewModel.attr('showLastReviewInfo')).toBeTruthy();
     });
 
     it('should return false if "last_reviewed_by" is empty', () => {
@@ -70,7 +70,7 @@ describe('object-review component', () => {
       };
       viewModel.attr('review', review);
 
-      expect(viewModel.attr('wasReviewed')).toBeFalsy();
+      expect(viewModel.attr('showLastReviewInfo')).toBeFalsy();
     });
   });
 
@@ -96,45 +96,20 @@ describe('object-review component', () => {
 
   describe('"showButtons" getter', () => {
     let review;
-    let instance;
 
     beforeEach(() => {
-      instance = {
-        snapshot: false,
-        isRevision: false,
-      };
-      review = {
-        status: 'Unreviewed',
-      };
-
-      viewModel.attr({
-        instance,
-        review,
-      });
+      review = new Review({status: 'Unreviewed'});
+      viewModel.attr({review});
     });
 
-    it('should return true', () => {
+    it('should return true if object is unreviewed', () => {
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
       expect(viewModel.attr('showButtons')).toBeTruthy();
     });
 
-    it('should return false if instance is snapshot', () => {
-      viewModel.attr('instance.snapshot', true);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-
-      expect(viewModel.attr('showButtons')).toBeFalsy();
-    });
-
-    it('should return false if instance is revision', () => {
-      viewModel.attr('instance.isRevision', true);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-
-      expect(viewModel.attr('showButtons')).toBeFalsy();
-    });
-
     it('should return false if object is reviewed', () => {
-      viewModel.attr('review.status', 'Reviewed');
+      review.attr('status', 'Reviewed');
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
       expect(viewModel.attr('showButtons')).toBeFalsy();
@@ -144,6 +119,33 @@ describe('object-review component', () => {
       spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
       expect(viewModel.attr('showButtons')).toBeFalsy();
+    });
+  });
+
+  describe('"isSnapshot" getter', () => {
+    beforeEach(() => {
+      const instance = {
+        snapshot: false,
+        isRevision: false,
+      };
+
+      viewModel.attr({instance});
+    });
+
+    it('should return false if instance is not snapshot or revision', () => {
+      expect(viewModel.attr('isSnapshot')).toBeFalsy();
+    });
+
+    it('should return true if instance is snapshot', () => {
+      viewModel.attr('instance.snapshot', true);
+
+      expect(viewModel.attr('isSnapshot')).toBeTruthy();
+    });
+
+    it('should return false if instance is revision', () => {
+      viewModel.attr('instance.isRevision', true);
+
+      expect(viewModel.attr('isSnapshot')).toBeTruthy();
     });
   });
 
@@ -189,6 +191,80 @@ describe('object-review component', () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
         expect(viewModel.attr('hasUpdatePermission')).toBeFalsy();
+      });
+    });
+  });
+
+  describe('loadReview() method', () => {
+    let refeshReviewDfd;
+
+    beforeEach(() => {
+      refeshReviewDfd = can.Deferred();
+      spyOn(Review.prototype, 'refresh').and.returnValue(refeshReviewDfd);
+    });
+
+    describe('should not refresh review', () => {
+      beforeEach(() => {
+        const instance = {
+          snapshot: false,
+          isRevision: false,
+          review: null,
+        };
+
+        viewModel.attr({instance});
+      });
+
+      it('if instance does not have review', () => {
+        viewModel.loadReview();
+
+        expect(Review.prototype.refresh).not.toHaveBeenCalled();
+        expect(viewModel.attr('review')).toBeNull();
+      });
+
+      it('if instance is snapshot', () => {
+        viewModel.attr('instance.snapshot', true);
+        viewModel.loadReview();
+
+        expect(Review.prototype.refresh).not.toHaveBeenCalled();
+        expect(viewModel.attr('review')).toBeNull();
+      });
+
+      it('if instance is revision', () => {
+        viewModel.attr('instance.isRevision', true);
+        viewModel.loadReview();
+
+        expect(Review.prototype.refresh).not.toHaveBeenCalled();
+        expect(viewModel.attr('review')).toBeNull();
+      });
+    });
+
+    describe('should refresh review', () => {
+      let review;
+
+      beforeEach(() => {
+        review = new Review({status: 'Reviewed'});
+        viewModel.attr('instance', {review});
+
+        spyOn(viewModel, 'showNotification');
+      });
+
+      it('and set review from response to attribute', () => {
+        viewModel.loadReview();
+
+        refeshReviewDfd.resolve(review);
+
+        expect(Review.prototype.refresh).toHaveBeenCalled();
+        expect(viewModel.attr('review')).toBe(review);
+      });
+
+      it('and show loader', () => {
+        viewModel.loadReview();
+
+        expect(viewModel.attr('loading')).toBeTruthy();
+
+        refeshReviewDfd.resolve(review);
+
+        expect(viewModel.attr('loading')).toBeFalsy();
       });
     });
   });
