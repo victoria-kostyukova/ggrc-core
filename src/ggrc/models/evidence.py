@@ -258,7 +258,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def add_admin_role(self):
     """Add current user as Evidence admin"""
-    self.acr_name_acl_map["Admin"].add_person(login.get_current_user())
+    self.add_person_with_role_name(login.get_current_user(), "Admin")
 
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""

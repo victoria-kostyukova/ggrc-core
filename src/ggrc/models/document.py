@@ -213,7 +213,7 @@ class Document(Roleable, Relatable, mixins.Titled,
     from ggrc.models import relationship
     rel = relationship.Relationship(
         source=parent_obj,
-        destination=self
+        destination=self,
     )
     db.session.add(rel)
 
@@ -262,7 +262,7 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   def add_admin_role(self):
     """Add current user to Document Admins"""
-    self.acr_name_acl_map["Admin"].add_person(login.get_current_user())
+    self.add_person_with_role_name(login.get_current_user(), "Admin")
 
   def handle_relationship_created(self, target):
     """Add document to parent folder if specified"""

@@ -61,7 +61,7 @@ def sync_assignee_email(issuetracker_state, sync_object, assignees_role):
       )
       if current_assignee_acl:
         current_assignee_acl.remove_person(person)
-      sync_object.acr_acl_map[assignees_role].add_person(new_assignee)
+      sync_object.add_person_with_role(new_assignee, assignees_role)
 
 
 def sync_verifier_email(issuetracker_state, sync_object, admin_role):
@@ -80,7 +80,7 @@ def sync_verifier_email(issuetracker_state, sync_object, admin_role):
       )
       if current_verifier_acl:
         current_verifier_acl.remove_person(person)
-      sync_object.acr_acl_map[admin_role].add_person(new_verifier)
+      sync_object.add_person_with_role(new_verifier, admin_role)
 
 
 def sync_statuses(issuetracker_state, sync_object):
