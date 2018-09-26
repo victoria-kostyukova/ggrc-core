@@ -34,11 +34,7 @@ def apply_acl(instance, content):
       continue
     for add in data["added"]:
       if (role_id, add["id"]) not in instance_acl_dict:
-        # add ACL if it hasn't added yet
-        all_models.AccessControlPerson(
-            ac_list=instance.acr_id_acl_map[int(role_id)],
-            person=person_dict[add["id"]],
-        )
+        instance.add_person_with_role_id(person_dict[add["id"]], role_id)
         any_acl_applied = True
     for delete in data["deleted"]:
       if (role_id, delete["id"]) in instance_acl_dict:
