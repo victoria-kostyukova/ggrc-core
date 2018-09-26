@@ -161,7 +161,10 @@ class Roleable(object):
 
   def get_persons_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
-    return []
+    return [
+        acp.person
+        for acp in self.acr_name_acl_map[role_name].access_control_people
+    ]
 
   def get_person_ids_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
