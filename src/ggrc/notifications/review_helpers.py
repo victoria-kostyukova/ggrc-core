@@ -61,17 +61,17 @@ def fill_owners_data(link, notification, owners_data, review, reviewable):
   notif_type_name = notification.notification_type.name
   review_notif_types = all_models.Review.NotificationObjectTypes
   if notif_type_name == review_notif_types.STATUS_UNREVIEWED:
-    for acl in reviewable.access_control_list:
+    for person, acl in reviewable.access_control_list:
       if acl.ac_role.notify_about_review_status:
         context = EmailReviewContext(reviewable, link, "")
-        owners_data[acl.person][review.id] = context
+        owners_data[person][review.id] = context
 
 
 def fill_reviewers_data(link, review, reviewable, reviewers_data):
   """Reviewers should get notification that object need to be reviewed"""
-  for acl in review.access_control_list:
+  for person, acl in review.access_control_list:
     context = EmailReviewContext(reviewable, link, review.email_message)
-    reviewers_data[acl.person][review.id] = context
+    reviewers_data[person][review.id] = context
 
 
 def move_notifications_to_history(notifications):
