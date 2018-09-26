@@ -512,16 +512,17 @@ def _get_roles(assessment):
 
   ac_list = access_control.list.AccessControlList
   ac_role = access_control.role.AccessControlRole
+  ac_people = access_control.people.AccessControlPerson
   query = db.session.query(
-      ac_list.person_id,
+      ac_people.person_id,
       ac_role.name,
       all_models.Person.email
   ).join(
+      ac_list,
+  ).join(
       ac_role,
-      ac_role.id == ac_list.ac_role_id
   ).join(
       all_models.Person,
-      all_models.Person.id == ac_list.person_id
   ).filter(
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
       ac_list.object_id == assessment.id,
