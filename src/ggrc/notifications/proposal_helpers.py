@@ -186,12 +186,12 @@ def build_prosal_data(proposals):
         list_values,
         object_url=get_object_url(proposal.instance),
     )
-    for acl in proposal.instance.access_control_list:
-      if acl.person == proposal.proposed_by:
+    for person, acl in proposal.instance.access_control_list:
+      if person == proposal.proposed_by:
         # Don't need to send proposal digest to person who make proposal
         continue
       if acl.ac_role.notify_about_proposal:
-        proposal_email_pools[acl.person][proposal.id] = proposal_email_context
+        proposal_email_pools[person][proposal.id] = proposal_email_context
   return proposal_email_pools
 
 
