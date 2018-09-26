@@ -53,9 +53,9 @@ class TestControlsImport(TestCase):
         name="Admin", object_type="Document").one()
     current_user = db.session.query(all_models.Person).filter_by(
         email="user@example.com").one()
-    acr = documents[0].access_control_list[0]
+    person, acr = documents[0].access_control_list[0]
     self.assertEquals(acr.ac_role_id, admin_role.id)
-    self.assertEquals(acr.person_id, current_user.id)
+    self.assertEquals(person.id, current_user.id)
 
   def test_import_control_end_date(self):
     """End date on control should be non editable."""

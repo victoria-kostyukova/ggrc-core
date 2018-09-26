@@ -400,10 +400,9 @@ class TestExportSnapshots(TestCase):
       for control in controls:
         for ac_role in ac_roles:
           person = factories.PersonFactory()
-          factories.AccessControlListFactory(
-              ac_role=ac_role,
+          factories.AccessControlPersonFactory(
+              ac_list=control.acr_acl_map[ac_role],
               person=person,
-              object=control,
           )
           control_acr_people[control.slug][ac_role.name] = person.email
       audit = factories.AuditFactory()
@@ -478,18 +477,17 @@ class TestExportSnapshots(TestCase):
   def test_export_deleted_acr(self):
     """Test exporting snapshots with ACL entries for deleted ACRs."""
     # pylint: disable=too-many-locals
+    ac_role = factories.AccessControlRoleFactory(
+        object_type="Control",
+        name="Custom Role",
+    )
     with factories.single_commit():
       # Create one more custom role
-      ac_role = factories.AccessControlRoleFactory(
-          object_type="Control",
-          name="Custom Role",
-      )
       control = factories.ControlFactory(slug="Control 1")
       person = factories.PersonFactory()
-      factories.AccessControlListFactory(
-          ac_role=ac_role,
+      factories.AccessControlPersonFactory(
+          ac_list=control.acr_acl_map[ac_role],
           person=person,
-          object=control,
       )
       audit = factories.AuditFactory()
 

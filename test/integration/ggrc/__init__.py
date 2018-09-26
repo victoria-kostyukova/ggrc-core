@@ -483,7 +483,7 @@ class TestCase(BaseTestCase, object):
   def assert_roles(self, obj, **roles):
     """Assert if persons have required role for object"""
     acl_person_roles = [
-        (acl.ac_role.name, acl.person) for acl in obj.access_control_list
+        (acl.ac_role.name, person) for person, acl in obj.access_control_list
     ]
     for role, person in roles.items():
       self.assertTrue((role, person) in acl_person_roles)

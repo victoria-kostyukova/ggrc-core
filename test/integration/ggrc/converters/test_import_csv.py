@@ -52,7 +52,7 @@ class TestBasicCsvImport(TestCase):
       self.assertNotEqual([], policy.access_control_list)
       self.assertEqual(
           "user@example.com",
-          policy.access_control_list[0].person.email
+          policy.access_control_list[0][0].email
       )
       owner = models.Person.query.filter_by(email="user@example.com").first()
       self.assert_roles(policy, Admin=owner)
@@ -86,7 +86,7 @@ class TestBasicCsvImport(TestCase):
       """Assert policy has the correct Admin set."""
       self.assertNotEqual([], policy.access_control_list)
       self.assertEqual("user@example.com",
-                       policy.access_control_list[0].person.email)
+                       policy.access_control_list[0][0].email)
       owner = models.Person.query.filter_by(email="user@example.com").first()
       self.assert_roles(policy, Admin=owner)
 

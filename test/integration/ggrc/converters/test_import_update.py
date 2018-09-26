@@ -38,6 +38,6 @@ class TestImportUpdates(TestCase):
     ).count()
     self.assertEqual(revision_count, 2)
     self.assertEqual(
-        policy.access_control_list[0].person.email,
+        policy.access_control_list[0][0].email,
         "user1@example.com"
     )
