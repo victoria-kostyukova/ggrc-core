@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Roleable model"""
+
+import logging
 from collections import defaultdict
 from sqlalchemy import and_
 from sqlalchemy import orm
@@ -20,6 +22,8 @@ from ggrc.models import reflection
 from ggrc import utils
 from ggrc.utils import errors
 from ggrc.utils import referenced_objects
+
+logger = logging.getLogger(__name__)
 
 
 class Roleable(object):
@@ -205,3 +209,40 @@ class Roleable(object):
           raise ValueError(message)
     if _import:
       return errors
+
+  def add_person_with_role(self, person, role):
+    acl = self.acr_acl_map.get(role)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid role '%s' with id %s to %s(%s)",
+          getattr(role, "name", None),
+          getattr(role, "id", None),
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)
+
+  def add_person_with_role_id(self, person, ac_role_id):
+    acl = self.acr_id_acl_map.get(ac_role_id)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid role by id %s to %s(%s)",
+          ac_role_id,
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)
+
+  def add_person_with_role_name(self, person, ac_role_name):
+    acl = self.acr_name_acl_map.get(ac_role_name)
+    if not acl:
+      logger.warning(
+          "Trying to add invalid role by name %s to %s(%s)",
+          ac_role_name,
+          self.type,
+          self.id,
+      )
+      return
+    acl.add_person(person)
