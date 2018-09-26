@@ -315,7 +315,7 @@ class TestDocument(TestCase):
     self.assertEquals(len(doc.access_control_list), 1)
     control_user = all_models.Person.query.get(editor.id)
     self.assertIn(control_user.id,
-                  [acr.person_id for acr in doc.access_control_list])
+                  [person.id for person, acr in doc.access_control_list])
 
   def test_api_documents_exist(self):
     """Test /api/document/documents_exist"""
