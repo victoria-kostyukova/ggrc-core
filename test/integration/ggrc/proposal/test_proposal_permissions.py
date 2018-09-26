@@ -24,25 +24,24 @@ class TestPermissions(TestCase):
     super(TestPermissions, self).setUp()
     self.api = Api()
     roles = {r.name: r for r in all_models.Role.query.all()}
-    ac_roles = {r.name: r for r in all_models.AccessControlRole.query.all()}
+    factories.AccessControlRoleFactory(
+        name="ACL_Reader",
+        object_type="Control",
+        update=0
+    )
+    factories.AccessControlRoleFactory(
+        name="ACL_Editor",
+        object_type="Control"
+    )
+    factories.AccessControlRoleFactory(
+        name="ACL_Nobody",
+        object_type="Control",
+        read=0,
+        update=0,
+        delete=0,
+    )
     with factories.single_commit():
       self.control = factories.ControlFactory()
-      acrs = {
-          "ACL_Reader": factories.AccessControlRoleFactory(
-              name="ACL_Reader",
-              object_type="Control",
-              update=0),
-          "ACL_Editor": factories.AccessControlRoleFactory(
-              name="ACL_Editor",
-              object_type="Control"),
-          "ACL_Nobody": factories.AccessControlRoleFactory(
-              name="ACL_Nobody",
-              object_type="Control",
-              read=0,
-              update=0,
-              delete=0,
-          ),
-      }
       self.program = factories.ProgramFactory()
       self.program.context.related_object = self.program
       self.relationship = factories.RelationshipFactory(
@@ -70,9 +69,8 @@ class TestPermissions(TestCase):
                         "Program Readers"]:
         person = self.people[role_name]
         rbac_factories.UserRoleFactory(role=roles["Creator"], person=person)
-        factories.AccessControlListFactory(
-            ac_role=ac_roles[role_name],
-            object=self.program,
+        factories.AccessControlPersonFactory(
+            ac_list=self.program.acr_name_acl_map[role_name],
             person=person,
         )
       self.proposal = factories.ProposalFactory(
@@ -93,9 +91,8 @@ class TestPermissions(TestCase):
       for role_name in ["ACL_Reader", "ACL_Editor", "ACL_Nobody"]:
         person = self.people[role_name]
         rbac_factories.UserRoleFactory(role=roles["Creator"], person=person)
-        factories.AccessControlListFactory(
-            ac_role=acrs[role_name],
-            object=self.control,
+        factories.AccessControlPersonFactory(
+            ac_list=self.control.acr_name_acl_map[role_name],
             person=person,
         )
 
