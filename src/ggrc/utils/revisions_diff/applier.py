@@ -19,8 +19,8 @@ def apply_acl(instance, content):
   any_acl_applied = False
   if not isinstance(instance, roleable.Roleable):
     return any_acl_applied
-  instance_acl_dict = {(l.ac_role_id, l.person_id): l
-                       for l in instance.access_control_list}
+  instance_acl_dict = {(l.ac_role_id, p.id): l
+                       for p, l in instance.access_control_list}
   person_ids = set()
   for role_id, data in content.get("access_control_list", {}).iteritems():
     person_ids |= {i["id"] for i in data["added"] + data["deleted"]}
@@ -35,16 +35,16 @@ def apply_acl(instance, content):
     for add in data["added"]:
       if (role_id, add["id"]) not in instance_acl_dict:
         # add ACL if it hasn't added yet
-        all_models.AccessControlList(
+        all_models.AccessControlPerson(
+            ac_list=instance.acr_id_acl_map[int(role_id)],
             person=person_dict[add["id"]],
-            ac_role=acr_dict[int(role_id)],
-            object=instance,
         )
         any_acl_applied = True
     for delete in data["deleted"]:
       if (role_id, delete["id"]) in instance_acl_dict:
-        acl = instance_acl_dict[(role_id, delete["id"])]
-        instance.access_control_list.remove(acl)
+        instance.acr_id_acl_map[role_id].remove_person(
+            person_dict[delete["id"]]
+        )
         any_acl_applied = True
   return any_acl_applied
 
