@@ -442,13 +442,6 @@ class TestCase(BaseTestCase, object):
     for f_string in formats:
       yield f_string.format(**kwargs)
 
-  # pylint: disable=too-many-arguments
-  def assert_filter_by_datetime(self, alias, datetime_value, slugs,
-                                formats=None, operator=None):
-    """Assert slugs for each date format ent datetime"""
-    for date_string in self.generate_date_strings(datetime_value, formats):
-      self.assert_slugs(alias, date_string, slugs, operator)
-
   @staticmethod
   def _get_latest_object_revisions(objects):
     """Get latest revisions of given objects."""
