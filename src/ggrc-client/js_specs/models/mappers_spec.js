@@ -8,7 +8,6 @@ import Cacheable from '../../js/models/cacheable';
 import Mappings from '../../js/models/mappers/mappings';
 
 describe('mappers', function () {
-
   let LL;
   beforeEach(function () {
     LL = GGRC.ListLoaders;
@@ -18,9 +17,7 @@ describe('mappers', function () {
   });
 
   describe('ListBinding', function () {
-
     describe('#init', function () {
-
       it('sets instance and loader to supplied arguments', function () {
         let lb = new LL.ListBinding(1, 2);
         expect(lb.instance).toBe(1);
@@ -30,22 +27,18 @@ describe('mappers', function () {
       it('creates a new observable list', function () {
         expect(new LL.ListBinding().list).toEqual(jasmine.any(can.List));
       });
-
     });
 
     describe('#refresh_stubs', function () {
-
       it('calls refresh_stubs on its loader', function () {
         let loader = jasmine.createSpyObj('loader', ['refresh_stubs']);
         let binding = new LL.ListBinding({}, loader);
         binding.refresh_stubs();
         expect(loader.refresh_stubs).toHaveBeenCalledWith(binding);
       });
-
     });
 
     describe('#refresh_instances', function () {
-
       it('calls refresh_instances on its loader', function () {
         let loader = jasmine.createSpyObj('loader', ['refresh_instances']);
         let binding = new LL.ListBinding({}, loader);
@@ -53,11 +46,9 @@ describe('mappers', function () {
         expect(loader.refresh_instances)
           .toHaveBeenCalledWith(binding, undefined);
       });
-
     });
 
     describe('#refresh_count', function () {
-
       let binding;
       beforeEach(function () {
         binding = new LL.ListBinding({}, {});
@@ -94,11 +85,9 @@ describe('mappers', function () {
           fail('Deferred returned from refresh_count was rejected');
         });
       });
-
     });
 
     describe('#refresh_list', function () {
-
       let binding;
       let loader;
       let otherBinding;
@@ -146,7 +135,6 @@ describe('mappers', function () {
     });
 
     describe('#refresh_instance', function () {
-
       it('enqueues the instance in a triggered RefreshQueue', function () {
         spyOn(RefreshQueue.prototype, 'enqueue');
         spyOn(RefreshQueue.prototype, 'trigger');
@@ -161,15 +149,11 @@ describe('mappers', function () {
         spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(dfd);
         expect(new LL.ListBinding(1, {}).refresh_instance()).toBe(dfd);
       });
-
     });
-
   });
 
   describe('MappingResult', function () {
-
     describe('#init', function () {
-
       it('sets the named properties to the positional parameters', function () {
         let mr;
         spyOn(LL.MappingResult.prototype, '_make_mappings').and.callFake(
@@ -203,7 +187,6 @@ describe('mappers', function () {
         expect(LL.MappingResult.prototype._make_mappings)
           .toHaveBeenCalledWith('mappings');
       });
-
     });
 
     describe('#_make_mappings', function () {
@@ -220,7 +203,6 @@ describe('mappers', function () {
     });
 
     describe('#get_bindings', function () {
-
       it('finds all depth-1 bindings touched by walk_instances', function () {
         let mr = new LL.MappingResult('foo', ['bar'], 'baz');
         let phonyBinding = {};
@@ -231,11 +213,9 @@ describe('mappers', function () {
         });
         expect(mr.get_bindings()).toEqual([phonyBinding]);
       });
-
     });
 
     describe('#bindings_compute', function () {
-
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
@@ -252,11 +232,9 @@ describe('mappers', function () {
         mr.bindings_compute();
         expect(mr.get_bindings_compute).toHaveBeenCalled();
       });
-
     });
 
     describe('#get_bindings_compute', function () {
-
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
@@ -283,11 +261,9 @@ describe('mappers', function () {
           expect(mr.watch_observe_trigger).toHaveBeenCalled();
         });
       });
-
     });
 
     describe('#get_mappings', function () {
-
       it('calls walk_instances', function () {
         let mr = new LL.MappingResult('foo', ['bar'], 'baz');
         spyOn(mr, 'walk_instances');
@@ -316,7 +292,6 @@ describe('mappers', function () {
     });
 
     describe('#mappings_compute', function () {
-
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
@@ -333,11 +308,9 @@ describe('mappers', function () {
         mr.mappings_compute();
         expect(mr.get_mappings_compute).toHaveBeenCalled();
       });
-
     });
 
     describe('#get_mappings_compute', function () {
-
       let mr;
       beforeEach(function () {
         mr = new LL.MappingResult('foo', ['bar'], 'baz');
@@ -364,7 +337,6 @@ describe('mappers', function () {
           expect(mr.watch_observe_trigger).toHaveBeenCalled();
         });
       });
-
     });
 
     describe('#walk_instances', function () {
@@ -395,7 +367,6 @@ describe('mappers', function () {
                 .toHaveBeenCalledWith(func, 'foo', 1);
             });
         });
-
       });
 
       describe('when last_instance is the same as this MappingResult\'s ' +
@@ -424,13 +395,10 @@ describe('mappers', function () {
           expect(sanityCheck).toBe(false);
         });
       });
-
     });
-
   });
 
   describe('GGRC.ListLoaders.BaseListLoader', function () {
-
     let ll;
     beforeEach(function () {
       ll = new GGRC.ListLoaders.BaseListLoader();
@@ -439,7 +407,6 @@ describe('mappers', function () {
     });
 
     describe('#attach', function () {
-
       it('calls the binding factory for the type', function () {
         spyOn(GGRC.ListLoaders.BaseListLoader, 'binding_factory');
 
@@ -456,11 +423,9 @@ describe('mappers', function () {
         ll.attach('instance');
         expect(ll.init_listeners).toHaveBeenCalledWith(fakeBinding);
       });
-
     });
 
     describe('#find_result_by_instance', function () {
-
       let notFound;
       let found;
       let list;
@@ -479,11 +444,9 @@ describe('mappers', function () {
         expect(ll.find_result_by_instance({instance: found}, list))
           .toBe(list[0]);
       });
-
     });
 
     describe('#is_duplicate_result', function () {
-
       it('returns false if instances do not match', function () {
         expect(ll.is_duplicate_result({instance: 1}, {instance: 2}))
           .toBe(false);
@@ -536,7 +499,6 @@ describe('mappers', function () {
             {instance: true, mappings: [], binding: 2}], binding: 1}
         )).toBe(true);
       });
-
     });
 
     describe('#insert_results', function () {
@@ -573,7 +535,6 @@ describe('mappers', function () {
         expect(ret).toEqual([]);
         expect(binding.list).toEqual([]);
       });
-
     });
 
     describe('#remove_instances', function () {
@@ -617,7 +578,6 @@ describe('mappers', function () {
       });
 
       describe('with mappings defined', function () {
-
         it('deletes only if all mappings are accounted for in instance', () => {
           let instance = new Dummy({id: 3});
           let binding = {
@@ -661,7 +621,6 @@ describe('mappers', function () {
           ]);
         });
       });
-
     });
 
     describe('#refresh_stubs', function () {
@@ -700,7 +659,6 @@ describe('mappers', function () {
     });
 
     describe('#refresh_instances', function () {
-
       it('returns promise based on existing deferred, ' +
          'returning binding list, if it exists', function () {
         let binding = {list: []};
@@ -736,7 +694,6 @@ describe('mappers', function () {
     });
 
     describe('#_refresh_instances', function () {
-
       it('returns promise based on binding list', function () {
         let ret;
         let binding = {list: [{instance: 'a'}]};
@@ -755,13 +712,10 @@ describe('mappers', function () {
           fail('sanity check failed for done callback from returned promise');
         }
       });
-
     });
-
   });
 
   describe('GGRC.ListLoaders.ReifyingListLoader', function () {
-
     describe('#init', function () {
       beforeEach(function () {
         spyOn(LL.BaseListLoader.prototype, 'init');
@@ -780,7 +734,6 @@ describe('mappers', function () {
         expect(rll.source).toBe(binding);
         expect(rll.source_binding).not.toBeDefined();
       });
-
     });
 
     describe('#insert_from_source_binding', function () {
@@ -835,7 +788,6 @@ describe('mappers', function () {
         expect(rll.insert_from_source_binding)
           .toHaveBeenCalledWith(binding, sourceBinding.list, 0);
       });
-
     });
 
     describe('listeners', function () {
@@ -876,7 +828,6 @@ describe('mappers', function () {
   });
 
   describe('GGRC.ListLoaders.CustomFilteredListLoader', function () {
-
     let cfll;
     let binding;
     beforeEach(function () {
@@ -886,7 +837,6 @@ describe('mappers', function () {
     });
 
     describe('_refresh_stubs', function () {
-
       it("gets results from binding's source binding", function () {
         spyOn(binding.source_binding, 'refresh_instances')
           .and.returnValue(new $.Deferred().reject());
@@ -907,7 +857,6 @@ describe('mappers', function () {
         cfll._refresh_stubs(binding);
         expect(cfll.filter_fn).toHaveBeenCalledWith(mockResult);
       });
-
     });
 
     describe('listeners', function () {

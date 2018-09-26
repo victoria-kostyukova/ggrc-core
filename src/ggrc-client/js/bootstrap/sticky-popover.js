@@ -4,7 +4,6 @@
 */
 
 !function ($) {
-
   'use strict';
 
 
@@ -152,5 +151,4 @@
 
   $.fn.sticky_popover.defaults = $.extend({}, $.fn.popover.defaults, {
   });
-
 }(window.jQuery);

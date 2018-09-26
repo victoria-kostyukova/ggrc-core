@@ -24,5 +24,4 @@ describe('can.mustache.helper.debugger', function () {
       }
     }
   );
-
 });

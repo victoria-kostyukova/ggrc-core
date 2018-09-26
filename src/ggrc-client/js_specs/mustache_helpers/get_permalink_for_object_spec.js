@@ -25,5 +25,4 @@ describe('can.mustache.helper.get_permalink_for_object', function () {
       expect(helper(instance)).toBe('');
     }
   );
-
 });
