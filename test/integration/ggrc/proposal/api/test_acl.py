@@ -139,7 +139,6 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
   def test_apply_acl(self):  # pylint: disable=too-many-locals
     """Test simple apply acl proposal."""
     with factories.single_commit():
-      control = factories.ControlFactory(title="1")
       role_1 = factories.AccessControlRoleFactory(
           name="role_1", object_type="Control")
       role_2 = factories.AccessControlRoleFactory(
@@ -150,58 +149,30 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
           name="role_4", object_type="Control")
       role_5 = factories.AccessControlRoleFactory(
           name="role_5", object_type="Control")
-      internal_role_1 = factories.AccessControlRoleFactory(
-          name="internal_role_1",
-          internal=True,
-          object_type="Control")
-      internal_role_2 = factories.AccessControlRoleFactory(
-          name="internal_role_2",
-          internal=True,
-          object_type="Control")
+    with factories.single_commit():
+      control = factories.ControlFactory(title="1")
       person_1 = factories.PersonFactory()
       person_2 = factories.PersonFactory()
       person_3 = factories.PersonFactory()
-      acl_1 = factories.AccessControlListFactory(
-          ac_role=role_1,
-          object=control,
-      )
+      acl_1 = control.acr_acl_map[role_1]
+      acl_2 = control.acr_acl_map[role_2]
+      acl_3 = control.acr_acl_map[role_3]
+      acl_4 = control.acr_acl_map[role_4]
       factories.AccessControlPersonFactory(
           ac_list=acl_1,
           person=person_1,
       )
-      acl_2 = factories.AccessControlListFactory(
-          ac_role=role_2,
-          object=control,
-      )
       factories.AccessControlPersonFactory(
           ac_list=acl_2,
           person=person_2,
-      )
-      acl_3 = factories.AccessControlListFactory(
-          person=person_3,
-          ac_role=role_3,
-          object=control,
       )
       factories.AccessControlPersonFactory(
           ac_list=acl_3,
           person=person_3,
       )
       for person in [person_1, person_2, person_3]:
-        acl = factories.AccessControlListFactory(
-            ac_role=role_4,
-            object=control,
-        )
         factories.AccessControlPersonFactory(
-            ac_list=acl,
-            person=person,
-        )
-        acl = factories.AccessControlListFactory(
-            person=person,
-            ac_role=internal_role_1,
-            object=control,
-        )
-        factories.AccessControlPersonFactory(
-            ac_list=acl,
+            ac_list=acl_4,
             person=person,
         )
 
@@ -234,18 +205,6 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
                                 {"id": person_3.id, "email": person_3.email}],
                       "deleted": [],
                   },
-                  internal_role_2.id: {
-                      "added": [{"id": person_1.id, "email": person_1.email},
-                                {"id": person_2.id, "email": person_2.email},
-                                {"id": person_3.id, "email": person_3.email}],
-                      "deleted": [],
-                  },
-                  internal_role_1.id: {
-                      "added": [],
-                      "deleted": [{"id": person_1.id, "email": person_1.email},
-                                  {"id": person_2.id, "email": person_2.email},
-                                  {"id": person_3.id, "email": person_3.email}]
-                  },
               }
           },
           agenda="agenda content")
@@ -258,8 +217,6 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
     role_3_id = role_3.id
     role_4_id = role_4.id
     role_5_id = role_5.id
-    internal_role_1_id = internal_role_1.id
-    internal_role_2_id = internal_role_2.id
     self.assertEqual(proposal.STATES.PROPOSED, proposal.status)
     revisions = all_models.Revision.query.filter(
         all_models.Revision.resource_type == control.type,
@@ -271,14 +228,11 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
     self.assert200(resp)
     control = all_models.Control.query.get(control_id)
     result_dict = collections.defaultdict(set)
-    for acl in control.access_control_list:
-      result_dict[acl.ac_role_id].add(acl.person_id)
+    for person, acl in control.access_control_list:
+      result_dict[acl.ac_role_id].add(person.id)
     self.assertEqual({person_1_id, person_2_id}, result_dict[role_1_id])
     self.assertEqual({person_1_id}, result_dict[role_2_id])
     self.assertEqual({person_3_id}, result_dict[role_3_id])
     self.assertEqual(set([]), result_dict[role_4_id])
     self.assertEqual({person_1_id, person_2_id, person_3_id},
                      result_dict[role_5_id])
-    self.assertEqual({person_1_id, person_2_id, person_3_id},
-                     result_dict[internal_role_1_id])
-    self.assertEqual(set(), result_dict[internal_role_2_id])
