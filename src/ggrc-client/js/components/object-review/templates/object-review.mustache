@@ -17,47 +17,50 @@
       <spinner {toggle}="loading"></spinner>
     </div>
   </div>
-  {{#if wasReviewed}}
-    <div class="object-review__body">
-      <div class="object-review__body-description">
-        Last reviewed by
-        <person-data class="inline-block" {person}="review.last_reviewed_by"></person-data>
-        on {{getDate}}
-      </div>
-      {{#if showHistoryLink}}
-        <a class="object-review__body-history" href="javascript:void(0)" ($click)="showLastChanges()">
-          Review History
-        </a>
+  {{^if isSnapshot}}
+    <div class="object-review__content">
+      {{#if showLastReviewInfo}}
+        <div class="object-review__body">
+          <div class="object-review__body-description">
+            Last reviewed by
+            <person-data class="inline-block" {person}="review.last_reviewed_by"></person-data>
+            on {{getDate}}
+          </div>
+          {{^if isReviewed}}
+            <a href="javascript:void(0)" ($click)="showLastChanges()">
+              Review History
+            </a>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if showButtons}}
+        <div class="object-review__buttons">
+          <button
+              {{#if loading}}disabled{{/if}}
+              ($click)="markReviewed()"
+              class="btn btn-green btn-small">
+            Mark Reviewed
+          </button>
+          <button
+              {{#if loading}}disabled{{/if}}
+              ($click)="changeReviewers($element)"
+              class="btn btn-white btn-small">
+            Request Review
+          </button>
+        </div>
       {{/if}}
     </div>
-  {{/if}}
-  {{#if showButtons}}
-    <div class="object-review__buttons">
-      <button
-          {{#if loading}}disabled{{/if}}
-          ($click)="markReviewed()"
-          class="btn btn-green btn-small">
-        Mark Reviewed
-      </button>
-      <button
-          {{#if loading}}disabled{{/if}}
-          ($click)="changeReviewers($element)"
-          class="btn btn-white btn-small">
-        Request Review
-      </button>
-    </div>
+    {{#if hasReviewers}}
+      <custom-roles
+        {read-only}="true"
+        {instance}="review">
+      </custom-roles>
+    {{/if}}
+    <request-review-modal
+      {review}="review"
+      {parent-instance}="instance"
+      {(modal-state)}="reviewersModalState"
+      (reviewers-updated)="reviewersUpdated(%event)">
+    </request-review-modal>
   {{/if}}
 </div>
-{{#if hasReviewers}}
-  <custom-roles
-    {read-only}="true"
-    {instance}="review">
-  </custom-roles>
-{{/if}}
-
-<request-review-modal
-  {review}="review"
-  {parent-instance}="instance"
-  {(modal-state)}="reviewersModalState"
-  (reviewers-updated)="reviewersUpdated(%event)">
-</request-review-modal>

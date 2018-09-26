@@ -246,7 +246,8 @@ export default can.Component.extend({
       const attributesSelector = `.row-fluid h6 + *,
         .pane-header__title-details .state-value,
         .pane-header__title-details h3,
-        related-documents`;
+        related-documents,
+        object-review`;
       let infoPanes = $target.find('.info .tier-content');
       let valuesOld = infoPanes.eq(0).find(attributesSelector);
       let valuesNew = infoPanes.eq(1).find(attributesSelector);

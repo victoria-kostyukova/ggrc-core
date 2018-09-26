@@ -4,8 +4,6 @@
  */
 
 .object-review {
-  margin-bottom: 20px;
-
   &__header {
     display: flex;
     line-height: 17px;
@@ -23,6 +21,10 @@
     &-spinner {
       margin-left: 6px;
     }
+  }
+
+  &__content {
+    margin-bottom: 20px;
   }
 
   &__body {
