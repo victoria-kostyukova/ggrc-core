@@ -20,18 +20,13 @@ class TestAudit(TestCase):
 
   def generate_control_mappings(self, control):
     """Map Control to several Assessments"""
-    acr_creator = all_models.AccessControlRole.query.filter_by(
-        name="Creators", object_type="Assessment"
-    ).first()
     with factories.single_commit():
       person = factories.PersonFactory()
       asmnt_ids = []
       for _ in range(2):
         asmnt = factories.AssessmentFactory()
         asmnt_ids.append(asmnt.id)
-        factories.AccessControlListFactory(
-            object=asmnt, person=person, ac_role=acr_creator
-        )
+        asmnt.add_person_with_role_name(person, "Creators")
 
     for asmnt_id in asmnt_ids:
       asmnt = all_models.Assessment.query.get(asmnt_id)
