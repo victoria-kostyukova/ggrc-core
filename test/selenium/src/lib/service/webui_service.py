@@ -11,7 +11,7 @@ from lib.constants import objects, messages, element, regex
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
-from lib.page import dashboard
+from lib.page import dashboard, export_page
 from lib.page.widget import object_modal
 from lib.page.widget.info_widget import SnapshotedInfoPanel
 from lib.utils import selenium_utils, file_utils, conftest_utils
@@ -204,15 +204,16 @@ class BaseWebUiService(object):
 
   def export_objs_via_tree_view(self, path_to_export_dir, src_obj):
     # pylint: disable=fixme
-    """Open generic widget of mapped objects, open modal of export from
-    Tree View, fill data according to 'src_objs' (filter by mapping to source
-    objects), 'mapped_objs' (export objects' types, export objects' filter
-    queries) and export objects to test's temporary directory as CSV file.
+    """Open generic widget of mapped objects
+    and export objects to test's temporary directory as CSV file.
     Get and return path to the exported file.
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    path_to_exported_file = objs_widget.tree_view.open_3bbs().select_export(
-    ).export_objs_to_csv(path_to_export_dir)
+    objs_widget.tree_view.open_3bbs().select_export()
+    export_page_object = export_page.ExportPage(self.driver)
+    export_page_object.open_export_page()
+    path_to_exported_file = export_page_object.download_obj_to_csv(
+        path_to_export_dir)
     # FIXME: Filename was "{obj_type} {snapshot_obj_type}
     # before migration of export page on background job.
     # Current behavior may be a bug.

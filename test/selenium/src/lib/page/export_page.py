@@ -4,7 +4,7 @@
 
 import os
 
-from lib import base
+from lib import base, environment
 from lib.constants import locator, element
 from lib.utils import selenium_utils, test_utils
 
@@ -18,8 +18,7 @@ class ExportItem(base.Component):
     self.export_item_elem = export_item_elem
 
   def download_csv(self):
-    base.Button(self.export_item_elem,
-                self._locators.DOWNLOAD_CSV_XPATH).click()
+    self.export_item_elem.button(text="Download CSV").click()
 
 
 class ExportPage(base.AbstractPage):
@@ -29,32 +28,23 @@ class ExportPage(base.AbstractPage):
 
   def __init__(self, driver):
     super(ExportPage, self).__init__(driver)
-    self.export_page = self._driver.find_element(
-        *self._locators.EXPORT_PAGE_CSS)
-    self.add_obj_type_btn = base.Button(
-        self.export_page, self._locators.ADD_OBJECT_TYPE_BTN_XPATH)
-    self.export_objs_btn = base.Button(
-        self.export_page, self._locators.EXPORT_OBJECTS_BTN_CSS)
+    self.export_page = self._browser.element(
+        class_name="content").element(id="csv_export")
+    self.export_objs_btn = self._browser.button(id="export-csv-button")
+    self.export_page_url = environment.app_url + "export"
+
+  def open_export_page(self):
+    selenium_utils.open_url(self.export_page_url)
+    selenium_utils.wait_for_js_to_load(self._driver)
 
   def get_export_items(self):
     """Get the list of all Export Items which are present on Export Page."""
     return [ExportItem(self._driver, export_item_elem) for export_item_elem in
-            self.export_page.find_elements(*self._locators.EXPORT_ITEM_CSS)]
+            self.export_page.elements(class_name="current-exports__item")]
 
-  def export_objs_to_csv(self, path_to_export_dir):
-    """Click to 'Export Objects' button to export objects, wait for export,
-    download as CSV and return path to the downloaded file.
-    """
-    export_items_before_count = len(self.get_export_items())
-    self.export_objs_btn.click()
-
-    def exported_item():
-      """Return the export item that was just created."""
-      difference = len(self.get_export_items()) - export_items_before_count
-      if difference == 1:
-        return self.get_export_items()[-1]
-      return None
-    export_item = test_utils.wait_for(exported_item)
+  def download_obj_to_csv(self, path_to_export_dir):
+    """Download as CSV and return path to the downloaded file."""
+    export_item = self.get_export_items()[-1]
     selenium_utils.set_chrome_download_location(
         self._driver, path_to_export_dir)
     downloads_before = os.listdir(path_to_export_dir)

@@ -6,9 +6,7 @@
 from lib import base
 from lib.constants import locator
 from lib.element import elements_list
-from lib.page import export_page
 from lib.page.modal import unified_mapper
-from lib.utils import selenium_utils
 
 
 class CommonDropdownSettings(elements_list.DropdownMenu):
@@ -24,15 +22,8 @@ class CommonDropdownSettings(elements_list.DropdownMenu):
     self.import_locator = self._locators.BTN_3BBS_IMPORT_CSS
 
   def select_export(self):
-    """Select Export objects in 3BBS dropdown modal to open Export Page with
-    Export Panel witch contains pre-filled object type (mapped objects type)
-    and filter by mapping (source object title).
-
-    Return: lib.page.export_page.ExportPage
-    """
+    """Select Export objects in 3BBS dropdown modal."""
     base.Button(self._driver, self._locators.BTN_3BBS_EXPORT_CSS).click()
-    selenium_utils.switch_to_new_window(self._driver)
-    return export_page.ExportPage(self._driver)
 
 
 class Assessments(CommonDropdownSettings):
