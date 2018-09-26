@@ -11,10 +11,10 @@ let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {
   contains: function (instance, args) {
     let value = Permission._resolve_permission_variable(args.value);
-    let list_value = instance[args.list_property] || [];
+    let listValue = instance[args.list_property] || [];
     let i;
-    for (i = 0; i < list_value.length; i++) {
-      if (list_value[i].id === value.id) {
+    for (i = 0; i < listValue.length; i++) {
+      if (listValue[i].id === value.id) {
         return true;
       }
     }
@@ -34,11 +34,11 @@ let _CONDITIONS_MAP = {
   },
   'in': function (instance, args) {
     let value = Permission._resolve_permission_variable(args.value);
-    let property_value = instance[args.property_name];
-    if (property_value instanceof Stub) {
-      property_value = property_value.reify();
+    let propertyValue = instance[args.property_name];
+    if (propertyValue instanceof Stub) {
+      propertyValue = propertyValue.reify();
     }
-    return value.indexOf(property_value) >= 0;
+    return value.indexOf(propertyValue) >= 0;
   },
   forbid: function (instance, args, action) {
     let blacklist = args.blacklist[action] || [];
@@ -51,12 +51,12 @@ let _CONDITIONS_MAP = {
     return !(instance.attr(args.property_name) === args.prevent_if);
   },
 };
-let permissions_compute = can.compute(GGRC.permissions);
+let permissionsCompute = can.compute(GGRC.permissions);
 
 const Permission = can.Construct({
-  _admin_permission_for_context: function (context_id) {
+  _admin_permission_for_context: function (contextId) {
     return new Permission(
-      ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
+      ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);
   },
 
   _all_resource_permission: function (permission) {
@@ -65,9 +65,9 @@ const Permission = can.Construct({
   },
 
   _permission_match: function (permissions, permission) {
-    let resource_types = permissions[permission.action] || {};
-    let resource_type = resource_types[permission.resource_type] || {};
-    let contexts = resource_type.contexts || [];
+    let resourceTypes = permissions[permission.action] || {};
+    let resourceType = resourceTypes[permission.resource_type] || {};
+    let contexts = resourceType.contexts || [];
 
     return (contexts.indexOf(permission.context_id) > -1);
   },
@@ -145,18 +145,18 @@ const Permission = can.Construct({
       return false;
     }.bind(this);
 
-    let action_obj = permissions[action] || {};
+    let actionObj = permissions[action] || {};
     let shortName = instance.constructor && instance.constructor.shortName;
-    let instance_type = instance.type || shortName;
-    let type_obj = action_obj[instance_type] || {};
-    let conditions_by_context = type_obj.conditions || {};
-    let resources = type_obj.resources || [];
+    let instanceType = instance.type || shortName;
+    let typeObj = actionObj[instanceType] || {};
+    let conditionsByContext = typeObj.conditions || {};
+    let resources = typeObj.resources || [];
     let context = instance.context || {id: null};
-    let conditions = conditions_by_context[context.id] || [];
+    let conditions = conditionsByContext[context.id] || [];
     let condition;
     let i;
 
-    conditions = conditions.concat(conditions_by_context.null || []);
+    conditions = conditions.concat(conditionsByContext.null || []);
 
     if (checkAdmin(0) || checkAdmin(null)) {
       return true;
@@ -165,9 +165,9 @@ const Permission = can.Construct({
       return true;
     }
     if (conditions.length === 0 && (this._is_allowed(permissions,
-      new Permission(action, instance_type, null)) ||
+      new Permission(action, instanceType, null)) ||
       this._is_allowed(permissions,
-        new Permission(action, instance_type, context.id)))) {
+        new Permission(action, instanceType, context.id)))) {
       return true;
     }
     // Check any conditions applied per instance
@@ -186,29 +186,29 @@ const Permission = can.Construct({
     return false;
   },
 
-  is_allowed: function (action, resource_type, context_id) {
+  is_allowed: function (action, resourceType, contextId) {
     return this._is_allowed(
-      permissions_compute(), new this(action, resource_type, context_id));
+      permissionsCompute(), new this(action, resourceType, contextId));
   },
 
   is_allowed_for: function (action, resource) {
-    return this._is_allowed_for(permissions_compute(), resource, action);
+    return this._is_allowed_for(permissionsCompute(), resource, action);
   },
 
-  is_allowed_any: function (action, resource_type) {
-    let allowed = this.is_allowed(action, resource_type);
-    let perms = permissions_compute();
+  is_allowed_any: function (action, resourceType) {
+    let allowed = this.is_allowed(action, resourceType);
+    let perms = permissionsCompute();
 
     if (!allowed) {
-      allowed = _.exists(perms, action, resource_type, 'contexts', 'length');
+      allowed = _.exists(perms, action, resourceType, 'contexts', 'length');
     }
     return !!allowed;
   },
 
   page_context_id: function () {
-    let page_instance = getPageInstance();
-    return (page_instance && page_instance.context &&
-            page_instance.context.id) || null;
+    let pageInstance = getPageInstance();
+    return (pageInstance && pageInstance.context &&
+            pageInstance.context.id) || null;
   },
 
   refresh: function () {
@@ -217,16 +217,16 @@ const Permission = can.Construct({
       type: 'get',
       dataType: 'json',
     }).then(function (perm) {
-      permissions_compute(perm);
+      permissionsCompute(perm);
       GGRC.permissions = perm;
     });
   },
 }, {
   // prototype
-  setup: function (action, resource_type, context_id) {
+  setup: function (action, resourceType, contextId) {
     this.action = action;
-    this.resource_type = resource_type;
-    this.context_id = context_id;
+    this.resource_type = resourceType;
+    this.context_id = contextId;
     return this;
   },
 });

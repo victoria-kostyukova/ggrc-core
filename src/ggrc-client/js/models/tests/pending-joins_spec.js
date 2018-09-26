@@ -70,10 +70,10 @@ describe('pending-joins module', () => {
       let instance;
       let binding;
       let dummy;
-      let dummy_join;
+      let dummyJoin;
       beforeEach(function () {
         dummy = new DummyModel({id: 1});
-        dummy_join = new mappingModels.DummyJoin({id: 1});
+        dummyJoin = new mappingModels.DummyJoin({id: 1});
         instance = jasmine.createSpyObj('instance',
           ['isNew', 'refresh', 'attr', 'dispatch']);
         binding = jasmine.createSpyObj('binding', ['refresh_stubs']);
@@ -89,12 +89,12 @@ describe('pending-joins module', () => {
 
       it('removes proxy object if it exists', function () {
         binding.list.push({instance: dummy, get_mappings: function () {
-          return [dummy_join];
+          return [dummyJoin];
         }});
-        spyOn(dummy_join, 'refresh').and.returnValue($.when());
-        spyOn(dummy_join, 'destroy');
+        spyOn(dummyJoin, 'refresh').and.returnValue($.when());
+        spyOn(dummyJoin, 'destroy');
         resolveDeferredBindings(instance);
-        expect(dummy_join.destroy).toHaveBeenCalled();
+        expect(dummyJoin.destroy).toHaveBeenCalled();
       });
     });
   });

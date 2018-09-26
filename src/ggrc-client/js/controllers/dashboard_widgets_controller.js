@@ -80,7 +80,7 @@ export default can.Control({
     this.element.html(frag[0]);
 
     let content = this.element;
-    let controller_content = null;
+    let controllerContent = null;
 
     if (prefs.getCollapsed(window.getPageToken(), this.element.attr('id'))) {
 
@@ -97,10 +97,10 @@ export default can.Control({
     }
 
     if (this.options.content_controller) {
-      controller_content = this.element.find(this.options.content_selector);
+      controllerContent = this.element.find(this.options.content_selector);
       if (this.options.content_controller_selector) {
-        controller_content =
-          controller_content.find(this.options.content_controller_selector);
+        controllerContent =
+          controllerContent.find(this.options.content_controller_selector);
       }
       if (this.options.content_controller_options.init) {
         this.options.content_controller_options.init();
@@ -108,8 +108,7 @@ export default can.Control({
 
       this.options.content_controller_options.show_header = true;
       this.content_controller = new this.options.content_controller(
-        controller_content
-        , this.options.content_controller_options
+        controllerContent, this.options.content_controller_options
       );
 
       if (this.content_controller.prepare) {

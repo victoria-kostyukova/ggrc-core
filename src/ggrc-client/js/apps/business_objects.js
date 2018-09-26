@@ -130,8 +130,8 @@ import * as businessModels from '../models/business-models/index';
       modelNames.sort();
       possibleModelType = modelNames.slice();
       can.each(modelNames, function (name) {
-        let w_list;
-        let child_model_list = [];
+        let wList;
+        let childModelList = [];
         let widgetConfig = getWidgetConfig(name);
         name = widgetConfig.name;
         GGRC.tree_view.basic_model_list.push({
@@ -140,31 +140,31 @@ import * as businessModels from '../models/business-models/index';
         });
 
         // Initialize child_model_list, and child_display_list each model_type
-        w_list = baseWidgetsByType[name];
+        wList = baseWidgetsByType[name];
 
-        can.each(w_list, function (item) {
+        can.each(wList, function (item) {
           let childConfig;
           if (possibleModelType.indexOf(item) !== -1) {
             childConfig = getWidgetConfig(name);
-            child_model_list.push({
+            childModelList.push({
               model_name: childConfig.name,
               display_name: childConfig.widgetName,
             });
           }
         });
         GGRC.tree_view.sub_tree_for.attr(name, {
-          model_list: child_model_list,
+          model_list: childModelList,
           display_list: businessModels[name]
-            .tree_view_options.child_tree_display_list || w_list,
+            .tree_view_options.child_tree_display_list || wList,
         });
       });
 
-      function apply_mixins(definitions) {
+      function applyMixins(definitions) {
         let mappings = {};
 
         // Recursively handle mixins
-        function reify_mixins(definition) {
-          let final_definition = {};
+        function reifyMixins(definition) {
+          let finalDefinition = {};
           if (definition._mixins) {
             can.each(definition._mixins, function (mixin) {
               if (typeof (mixin) === 'string') {
@@ -173,28 +173,28 @@ import * as businessModels from '../models/business-models/index';
                   console.debug('Undefined mixin: ' + mixin, definitions);
                 } else {
                   can.extend(
-                    final_definition,
-                    reify_mixins(definitions[mixin])
+                    finalDefinition,
+                    reifyMixins(definitions[mixin])
                   );
                 }
               } else if (can.isFunction(mixin)) {
                 // If function, call with current definition state
-                mixin(final_definition);
+                mixin(finalDefinition);
               } else {
                 // Otherwise, assume object and extend
-                can.extend(final_definition, mixin);
+                can.extend(finalDefinition, mixin);
               }
             });
           }
-          can.extend(final_definition, definition);
-          delete final_definition._mixins;
-          return final_definition;
+          can.extend(finalDefinition, definition);
+          delete finalDefinition._mixins;
+          return finalDefinition;
         }
 
         can.each(definitions, function (definition, name) {
           // Only output the mappings if it's a model, e.g., uppercase first letter
           if (name[0] === name[0].toUpperCase()) {
-            mappings[name] = reify_mixins(definition);
+            mappings[name] = reifyMixins(definition);
           }
         });
 
@@ -276,7 +276,7 @@ import * as businessModels from '../models/business-models/index';
         },
       };
 
-      extraContentControllerOptions = apply_mixins({
+      extraContentControllerOptions = applyMixins({
         objectives: {
           Objective: {
             draw_children: true,
@@ -655,9 +655,9 @@ import * as businessModels from '../models/business-models/index';
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
       if (getPageInstance() instanceof businessModels.Person) {
-        let person_options = extraContentControllerOptions.Person;
-        can.each(person_options, function (options, model_name) {
-          if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
+        let personOptions = extraContentControllerOptions.Person;
+        can.each(personOptions, function (options, modelName) {
+          if (modelName !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
               allow_creating: false,
               allow_mapping: true,
@@ -666,49 +666,49 @@ import * as businessModels from '../models/business-models/index';
         });
       }
 
-      can.each(farModels, function (model_name) {
-        let widgetConfig = getWidgetConfig(model_name);
-        model_name = widgetConfig.name;
+      can.each(farModels, function (modelName) {
+        let widgetConfig = getWidgetConfig(modelName);
+        modelName = widgetConfig.name;
 
-        let far_model;
+        let farModel;
         let descriptor = {};
-        let widget_id;
+        let widgetId;
 
-        far_model = businessModels[model_name];
-        if (far_model) {
-          widget_id = widgetConfig.widgetId;
+        farModel = businessModels[modelName];
+        if (farModel) {
+          widgetId = widgetConfig.widgetId;
           descriptor = {
             instance: object,
-            far_model: far_model,
+            far_model: farModel,
           };
         } else {
-          widget_id = model_name;
+          widgetId = modelName;
         }
 
         // Custom overrides
         if (extraDescriptorOptions.all &&
-            extraDescriptorOptions.all[model_name]) {
-          $.extend(descriptor, extraDescriptorOptions.all[model_name]);
+            extraDescriptorOptions.all[modelName]) {
+          $.extend(descriptor, extraDescriptorOptions.all[modelName]);
         }
 
         if (extraDescriptorOptions[object.constructor.shortName] &&
-            extraDescriptorOptions[object.constructor.shortName][model_name]) {
+            extraDescriptorOptions[object.constructor.shortName][modelName]) {
           $.extend(descriptor,
-            extraDescriptorOptions[object.constructor.shortName][model_name]);
+            extraDescriptorOptions[object.constructor.shortName][modelName]);
         }
 
         if (extraContentControllerOptions[object.constructor.shortName] &&
             extraContentControllerOptions[
-              object.constructor.shortName][model_name]) {
+              object.constructor.shortName][modelName]) {
           $.extend(true, descriptor, {
             content_controller_options:
             extraContentControllerOptions[
-              object.constructor.shortName][model_name],
+              object.constructor.shortName][modelName],
           });
         }
         descriptor.widgetType = 'treeview';
         widgetList.add_widget(
-          object.constructor.shortName, widget_id, descriptor);
+          object.constructor.shortName, widgetId, descriptor);
       });
     },
   });

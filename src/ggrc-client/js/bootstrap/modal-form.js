@@ -71,14 +71,14 @@ import {changeUrl} from '../router';
     },
     delete_object: function (e, data, xhr) {
       // If this modal is contained within another modal, pass the event onward
-      let $trigger_modal = this.$trigger.closest('.modal');
-      let delete_target;
+      let $triggerModal = this.$trigger.closest('.modal');
+      let deleteTarget;
 
-      if ($trigger_modal.length > 0) {
-        $trigger_modal.trigger('delete-object', [data, xhr]);
+      if ($triggerModal.length > 0) {
+        $triggerModal.trigger('delete-object', [data, xhr]);
       } else {
-        delete_target = this.$trigger.data('delete-target');
-        if (delete_target === 'refresh') {
+        deleteTarget = this.$trigger.data('delete-target');
+        if (deleteTarget === 'refresh') {
           // Refresh the page
           navigate(window.location.href.replace(/#.*/, ''));
         } else if (xhr && xhr.getResponseHeader('location')) {
@@ -94,7 +94,7 @@ import {changeUrl} from '../router';
       return this.$element.find('form').first();
     },
 
-    is_form_dirty: function (cache_values) {
+    is_form_dirty: function (cacheValues) {
       let that = this;
       let cache = {};
       let dirty = false;
@@ -110,7 +110,7 @@ import {changeUrl} from '../router';
         cache[field.name] = val;
       });
 
-      if (cache_values || !this._cached_values) {
+      if (cacheValues || !this._cached_values) {
         // Cache the initial form values as requested
         this._cached_values = cache;
       } else {
@@ -251,17 +251,17 @@ import {changeUrl} from '../router';
     focus_first_input: function (ev) {
       let that = this;
       setTimeout(function () {
-        let $first_input;
-        $first_input = that.$element.find('*[autofocus]');
-        if (!$first_input.length) {
-          $first_input = that.$element
+        let $firstInput;
+        $firstInput = that.$element.find('*[autofocus]');
+        if (!$firstInput.length) {
+          $firstInput = that.$element
             .find('input[type="text"], input[type="checkbox"], ' +
                   'select, textarea')
             .not('[placeholder*=autofill], label:contains(autofill) + *, ' +
                  '[disabled]').first();
         }
-        if ($first_input.length && (!ev || that.$element.is(ev.target))) {
-          $first_input.get(0).focus();
+        if ($firstInput.length && (!ev || that.$element.is(ev.target))) {
+          $firstInput.get(0).focus();
         }
       }, 100);
     },
@@ -314,9 +314,9 @@ import {changeUrl} from '../router';
     // Default form complete handler
     $('body').on('ajax:complete', function (e, xhr, status) {
       let data = null;
-      let modal_form;
-      let flash_types;
-      let type_i;
+      let modalForm;
+      let flashTypes;
+      let type;
       let message;
       let flash;
 
@@ -335,16 +335,16 @@ import {changeUrl} from '../router';
           // Handle 279 page refresh
           navigate(window.location.href.replace(/#.*/, ''));
         } else {
-          modal_form = $('.modal:visible:last').data('modal_form');
-          if (modal_form && xhr === modal_form.xhr) {
-            delete modal_form.xhr;
-            $('[data-toggle=modal-submit]', modal_form.$element)
+          modalForm = $('.modal:visible:last').data('modal_form');
+          if (modalForm && xhr === modalForm.xhr) {
+            delete modalForm.xhr;
+            $('[data-toggle=modal-submit]', modalForm.$element)
               .removeAttr('disabled')
               .removeClass('disabled')
               .each(function () {
                 $(this).text($(this).data('origText'));
               });
-            $('form', modal_form.$element).data('submitpending', false);
+            $('form', modalForm.$element).data('submitpending', false);
           }
         }
       }
@@ -359,19 +359,19 @@ import {changeUrl} from '../router';
 
       if (!e.stopFlash) {
         // Maybe handle AJAX flash messages
-        flash_types = ['error', 'alert', 'notice', 'warning'];
+        flashTypes = ['error', 'alert', 'notice', 'warning'];
 
-        for (type_i in flash_types) {
-          if (!flash_types.hasOwnProperty(type_i)) {
+        for (type in flashTypes) {
+          if (!flashTypes.hasOwnProperty(type)) {
             continue;
           }
-          message = xhr.getResponseHeader('x-flash-' + flash_types[type_i]);
+          message = xhr.getResponseHeader('x-flash-' + flashTypes[type]);
           message = JSON.parse(message);
           if (message) {
             if (!flash) {
               flash = {};
             }
-            flash[flash_types[type_i]] = message;
+            flash[flashTypes[type]] = message;
           }
         }
         if (flash) {

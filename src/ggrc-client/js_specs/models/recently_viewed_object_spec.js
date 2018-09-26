@@ -21,11 +21,11 @@ describe('RecentlyViewedObject model', () => {
         viewLink: '/',
         title: 'blah',
       });
-      let rvo_obj = RecentlyViewedObject.newInstance(obj);
-      expect(rvo_obj.type).toBe('RVO');
-      expect(rvo_obj.model).toBe(RVO);
-      expect(rvo_obj.viewLink).toBe('/');
-      expect(rvo_obj.title).toBe('blah');
+      let rvo = RecentlyViewedObject.newInstance(obj);
+      expect(rvo.type).toBe('RVO');
+      expect(rvo.model).toBe(RVO);
+      expect(rvo.viewLink).toBe('/');
+      expect(rvo.title).toBe('blah');
     });
   });
 });

@@ -44,28 +44,28 @@ export default can.Model('GGRC.Models.Search', {
       counts_only: true,
     }, params));
   },
-  counts_for_types: function (str, types, params, extra_columns) {
+  counts_for_types: function (str, types, params, extraColumns) {
     return this.findOne(
       $.extend({
         q: this._escapeSymbols(str),
         types: types.join(','),
         counts_only: true,
-        extra_columns: extra_columns && extra_columns.join(','),
+        extra_columns: extraColumns && extraColumns.join(','),
       }, params));
   },
   _escapeSymbols: function (str) {
     return str.replace(/(\\|%|_)/g, '\\$1');
   },
 }, {
-  getResultsForType: function (model_name) {
+  getResultsForType: function (modelName) {
     let entries;
 
     if (!(this.entries instanceof Array ||
       this.entries instanceof can.Observe.List)) {
-      entries = this.entries[model_name] || [];
+      entries = this.entries[modelName] || [];
     } else {
       entries = can.map(this.entries, function (v) {
-        if (v.type === model_name) {
+        if (v.type === modelName) {
           return v;
         }
       });

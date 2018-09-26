@@ -24,25 +24,25 @@ export default Cacheable('CMS.Models.NotificationConfig', {
     return this.findAll({person_id: GGRC.current_user.id});
   },
   setActive: function (active) {
-    let existing_types;
-    let all_types;
-    let valid_types;
+    let existingTypes;
+    let allTypes;
+    let validTypes;
 
     if (!GGRC.current_user) {
       console.warn('User object is not set.');
       return $.when();
     }
 
-    valid_types = $.map($('input[name=notifications]'), function (input) {
+    validTypes = $.map($('input[name=notifications]'), function (input) {
       return input.value;
     });
 
     return this.findActive().then((configs) => {
-      existing_types = $.map(configs, function (config) {
+      existingTypes = $.map(configs, function (config) {
         return config.notif_type;
       });
-      all_types = $.map(valid_types, (type) => {
-        let index = existing_types.indexOf(type);
+      allTypes = $.map(validTypes, (type) => {
+        let index = existingTypes.indexOf(type);
         if (index === -1) {
           // Create a new notificationConfig if it doesn't exist yet
           return new this({
@@ -54,7 +54,7 @@ export default Cacheable('CMS.Models.NotificationConfig', {
         }
         return configs[index];
       });
-      return $.when(...$.map(all_types, function (config) {
+      return $.when(...$.map(allTypes, function (config) {
         let enabled = active.indexOf(config.notif_type) !== -1;
         if (config.attr('enable_flag') === enabled) {
           // There was no change to this config object
@@ -65,9 +65,9 @@ export default Cacheable('CMS.Models.NotificationConfig', {
           config.attr('enable_flag', enabled);
           return config.save();
         }
-        return config.refresh().then(function (refreshed_config) {
-          refreshed_config.attr('enable_flag', enabled);
-          return refreshed_config.save();
+        return config.refresh().then(function (refreshedConfig) {
+          refreshedConfig.attr('enable_flag', enabled);
+          return refreshedConfig.save();
         });
       }));
     });

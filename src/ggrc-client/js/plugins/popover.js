@@ -40,12 +40,12 @@ import Spinner from 'spin.js';
             let spaceLeft = $(document).width() -
               ($el.offset().left + $el.width());
             let spaceRight = $el.offset().left;
-            let popover_size = 620;
+            let popoverSize = 620;
             // Display on right if there is enough space
             if ($el.closest('.widget-area:first-child').length &&
-                spaceLeft > popover_size) {
+                spaceLeft > popoverSize) {
               return 'right';
-            } else if (spaceRight > popover_size) {
+            } else if (spaceRight > popoverSize) {
               return 'left';
             }
             return 'top';

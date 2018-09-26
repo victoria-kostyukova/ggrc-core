@@ -194,14 +194,14 @@ describe('Cacheable model', () => {
     it('only pushes instances into the list for 100ms ' +
        'before yielding', function (done) {
       let list = new DummyModel.List();
-      let dummy_models = [
+      let dummyModels = [
         {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7},
       ];
       // Have our modelized instances ready for when
-      let dummy_insts = DummyModel.models(dummy_models);
+      let dummyInsts = DummyModel.models(dummyModels);
       // we want to see how our observable list gets items over time, so spy on the push method
       spyOn(list, 'push').and.callThrough();
-      spyOn(can, 'ajax').and.returnValue($.when(dummy_models));
+      spyOn(can, 'ajax').and.returnValue($.when(dummyModels));
       let st = 3; // preload Date.now() because it's called once before we even get to modelizing
       spyOn(Date, 'now').and.callFake(() => {
         // Date.now() is called once per item.
@@ -217,7 +217,7 @@ describe('Cacheable model', () => {
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
         let ids = can.map(items, function (item) {return item.id;});
-        return can.map(dummy_insts, function (inst) {
+        return can.map(dummyInsts, function (inst) {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });
       });
