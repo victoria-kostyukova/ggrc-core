@@ -276,38 +276,16 @@ class TestReviewNotification(TestCase):
         object_type="Review",
     ).one().id
 
-    control_admin = factories.PersonFactory()
-    control_admin_role = all_models.AccessControlRole.query.filter_by(
-        name="Admin",
-        object_type="Control",
-    ).one()
-
-    control_primary_contact = factories.PersonFactory()
-    control_prim_contact_role = all_models.AccessControlRole.query.filter_by(
-        name="Primary Contacts",
-        object_type="Control",
-    ).one()
-
-    control_secondary_contact = factories.PersonFactory()
-    control_sec_contact_role = all_models.AccessControlRole.query.filter_by(
-        name="Secondary Contacts",
-        object_type="Control",
-    ).one()
-
-    control = factories.ControlFactory(
-        access_control_list=[
-            {
-                "ac_role": control_admin_role,
-                "person": control_admin
-            }, {
-                "ac_role": control_prim_contact_role,
-                "person": control_primary_contact
-            }, {
-                "ac_role": control_sec_contact_role,
-                "person": control_secondary_contact
-            }
-        ]
-    )
+    with factories.single_commit():
+      control_admin = factories.PersonFactory()
+      control_primary_contact = factories.PersonFactory()
+      control_secondary_contact = factories.PersonFactory()
+      control = factories.ControlFactory()
+      control.add_person_with_role_name(control_admin, "Admin")
+      control.add_person_with_role_name(control_primary_contact,
+                                        "Primary Contacts")
+      control.add_person_with_role_name(control_secondary_contact,
+                                        "Secondary Contacts")
     email_message = "email email_message"
     _, review = self.generator.generate_object(
         all_models.Review,
