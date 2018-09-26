@@ -22,7 +22,7 @@ describe('display prefs model', function () {
     display_prefs.isNew() || display_prefs.destroy();
   });
 
-  describe('#init', function ( ){
+  describe('#init', function () {
     it('sets autoupdate to true by default', function () {
       expect(display_prefs.autoupdate).toBe(true);
     });
@@ -66,7 +66,7 @@ describe('display prefs model', function () {
         expect(display_prefs.getObject('baz').serialize()).toEqual({quux: {}});
       });
 
-      it('returns undefined when the key is not found', function (){
+      it('returns undefined when the key is not found', function () {
         expect(display_prefs.getObject('xyzzy')).not.toBeDefined();
       });
     });
