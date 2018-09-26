@@ -126,7 +126,6 @@ class TestWorkflowCycleStatePropagation(TestCase):
     ).count()
     self.assertEqual(
         internal_acl_count,
-        (1 + 2 * obj_count) * 2,
-        # wf role on 1 task group + number of tgo and tgt
-        # times 2 is for all relationships that belong to each object
+        4,  # Note this test does not make much sense anymore since we don't
+        # propagate acl entries for every person anymore.
     )
