@@ -3,6 +3,7 @@
 """Package contains Workflow related helper functions for REST API calls."""
 
 from ggrc import utils
+from ggrc.app import app
 from ggrc.access_control import role
 from ggrc.models import all_models
 
@@ -20,11 +21,12 @@ def _get_acl_subdict(acr_name, person, model):
       ACL entry sub-dict representation. It is used for inserting into object
       JSON representation under 'access_control_list' key.
   """
-  acr = role.get_ac_roles_for(model.__name__)[acr_name]
-  return {
-      "ac_role_id": acr.id,
-      "person": utils.create_stub(person)
-  }
+  with app.app_context():
+    acr = role.get_ac_roles_for(model.__name__)[acr_name]
+    return {
+        "ac_role_id": acr.id,
+        "person": utils.create_stub(person)
+    }
 
 
 def get_task_group_post_dict(workflow, contact):
@@ -79,17 +81,12 @@ def get_task_post_dict(task_group, people_roles, start_date, end_date):
   Returns:
       TaskGroupTask object dict representation for using in POST request.
   """
-  access_control_list = []
-  for acr_name, person in people_roles.iteritems():
-    access_control_list.append(
-        _get_acl_subdict(acr_name, person, all_models.TaskGroupTask)
-    )
-  return {
+  response = {
       "task_group_task": {
           "response_options": [],
           "start_date": start_date,
           "end_date": end_date,
-          "access_control_list": access_control_list,
+          "access_control_list": [],
           "custom_attributes": {},
           "task_group": utils.create_stub(task_group),
           "context": utils.create_stub(task_group.context),
@@ -100,6 +97,12 @@ def get_task_post_dict(task_group, people_roles, start_date, end_date):
           "slug": ""
       }
   }
+
+  for acr_name, person in people_roles.iteritems():
+    response["task_group_task"]["access_control_list"].append(
+        _get_acl_subdict(acr_name, person, all_models.TaskGroupTask)
+    )
+  return response
 
 
 def get_cycle_post_dict(workflow):
