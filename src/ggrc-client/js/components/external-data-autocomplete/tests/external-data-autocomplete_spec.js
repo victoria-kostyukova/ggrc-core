@@ -116,14 +116,15 @@ describe('external-data-autocomplete component', () => {
     });
 
     describe('onItemPicked() method', () => {
-      let saveDfd;
       let item;
+      let created;
+
       beforeEach(() => {
-        saveDfd = can.Deferred();
         item = {
           test: true,
         };
-        spyOn(viewModel, 'createOrGet').and.returnValue(saveDfd);
+        created = Promise.resolve(item);
+        spyOn(viewModel, 'createOrGet').and.returnValue(created);
       });
 
       it('turns on "saving" flag', () => {
@@ -140,50 +141,55 @@ describe('external-data-autocomplete component', () => {
         expect(viewModel.createOrGet).toHaveBeenCalledWith(item);
       });
 
-      it('dispatches event when istance was saved', () => {
+      it('dispatches event when istance was saved', (done) => {
         spyOn(viewModel, 'dispatch');
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve(item).then(() => {
+        created.then(() => {
           expect(viewModel.dispatch).toHaveBeenCalledWith({
             type: 'itemSelected',
             selectedItem: item,
           });
+          done();
         });
       });
 
-      it('turns off "saving" flag', () => {
+      it('turns off "saving" flag', (done) => {
         viewModel.attr('saving', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
+        created.then().finally(() => {
           expect(viewModel.attr('saving')).toBe(false);
+          done();
         });
       });
 
-      it('cleans search criteria if "autoClean" is turned on', () => {
+      it('cleans search criteria if "autoClean" is turned on', (done) => {
         viewModel.attr('searchCriteria', 'someText');
         viewModel.attr('autoClean', true);
 
         viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
+        created.then(() => {
           expect(viewModel.attr('searchCriteria')).toBe('');
+          done();
         });
       });
 
-      it('does not clean search criteria if "autoClean" is turned on', () => {
-        viewModel.attr('searchCriteria', 'someText');
-        viewModel.attr('autoClean', false);
+      it('does not clean search criteria if "autoClean" is turned on',
+        (done) => {
+          viewModel.attr('searchCriteria', 'someText');
+          viewModel.attr('autoClean', false);
 
-        viewModel.onItemPicked(item);
+          viewModel.onItemPicked(item);
 
-        saveDfd.resolve().then(() => {
-          expect(viewModel.attr('searchCriteria')).toBe('someText');
+          created.then(() => {
+            expect(viewModel.attr('searchCriteria')).toBe('someText');
+            done();
+          });
         });
-      });
     });
 
     describe('createOrGet() method', () => {
