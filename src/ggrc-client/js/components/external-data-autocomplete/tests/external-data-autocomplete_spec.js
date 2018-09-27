@@ -193,29 +193,27 @@ describe('external-data-autocomplete component', () => {
     });
 
     describe('createOrGet() method', () => {
-      let originalModels;
-      let createDfd;
       let item;
-      let response;
       let model;
 
       beforeEach(() => {
-        createDfd = can.Deferred();
         item = new can.Map({test: true});
         viewModel.attr('type', 'TestType');
-        businessModels.TestType = can.Map.extend({
-          create: jasmine.createSpy().and.returnValue(createDfd),
-          root_object: 'test',
-          cache: {},
-        }, {});
         model = {
           id: 'testId',
         };
-        response = [[201,
+
+        let response = [[201,
           {
             test: model,
           },
         ]];
+        businessModels.TestType = can.Map.extend({
+          create: jasmine.createSpy()
+            .and.returnValue(Promise.resolve(response)),
+          root_object: 'test',
+          cache: {},
+        }, {});
       });
 
       afterEach(() => {
@@ -245,41 +243,32 @@ describe('external-data-autocomplete component', () => {
       });
 
       it('returns new model if there is no value in cache', (done) => {
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(resultModel.attr('id')).toBe('testId');
-          expect(resultModel instanceof businessModels.TestType).toBe(true);
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(resultModel.attr('id')).toBe('testId');
+            expect(resultModel instanceof businessModels.TestType).toBe(true);
+            done();
+          });
       });
 
       it('returns cached model if there is value in cache', (done) => {
         businessModels.TestType.cache['testId'] = {cached: true};
 
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(resultModel).toBe(businessModels.TestType.cache['testId']);
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(resultModel).toBe(businessModels.TestType.cache['testId']);
+            done();
+          });
       });
 
       it('calls model reify', (done) => {
         model.reify = jasmine.createSpy('reify').and.returnValue(model);
 
-        let resultDfd = viewModel.createOrGet(item);
-
-        createDfd.resolve(response);
-
-        resultDfd.then((resultModel) => {
-          expect(model.reify).toHaveBeenCalled();
-          done();
-        });
+        viewModel.createOrGet(item)
+          .then((resultModel) => {
+            expect(model.reify).toHaveBeenCalled();
+            done();
+          });
       });
     });
   });
