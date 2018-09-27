@@ -26,8 +26,7 @@ export default can.Component.extend({
         this.attr('selectedItems').push(item);
         this.markItem(id, type, true);
       } else {
-        console.warn('Same Object is Selected Twice!' +
-          ' id: ', id, ' type:', type);
+        console.warn(`Same Object is Selected Twice! id: ${id} type: ${type}`);
       }
     },
     deselect: function (item) {

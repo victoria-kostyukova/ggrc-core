@@ -202,7 +202,7 @@ import {changeUrl} from '../router';
           if (!document.contains($trigger[0])) {
             $trigger = $('[data-link-purpose="open-edit-modal"]');
             if (_.isEmpty($trigger)) {
-              console.warn(WARN_MSG); // eslint-disable-line
+              console.warn(WARN_MSG);
               return;
             }
           }

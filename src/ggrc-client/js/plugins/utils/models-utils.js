@@ -156,8 +156,8 @@ function isScopeModel(type) {
  */
 const getModelByType = (type) => {
   if (!type || typeof type !== 'string') {
-    console.debug('Type is not provided or has incorrect format',
-      'Value of Type is: ', type);
+    console.warn('Type is not provided or has incorrect format.',
+      'Value of Type is:', type);
     return null;
   }
   return allModels[type];
@@ -176,7 +176,7 @@ can.Observe.prototype.reify = function () {
   model = allModels[type];
 
   if (!model) {
-    console.debug('`reify()` called with unrecognized type', this);
+    console.warn('`reify()` called with unrecognized type', this);
   } else {
     return model.model(this);
   }

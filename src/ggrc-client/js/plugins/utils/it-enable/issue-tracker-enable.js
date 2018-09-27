@@ -108,7 +108,7 @@ const IssueTrackerEnabler = can.Map.extend({
   },
   showLog() {
     let log = logger.readLog();
-    console.log('Show log, items in the log:', log.length);
+    console.warn(`Show log, items in the log: ${log.length}`);
 
     this.attr('logs').replace(log);
   },

@@ -283,8 +283,8 @@ export default can.Construct.extend({
       // Lookup and attach named mapper
         mapping = this.get_mapper(mapper, model.constructor.shortName);
         if (!mapping) {
-          console.debug(
-            'No such mapper:  ' + model.constructor.shortName + '.' + mapper);
+          console.warn(
+            `No such mapper: ${model.constructor.shortName}.${mapper}`);
         } else {
           binding = mapping.attach(model);
         }
@@ -292,7 +292,7 @@ export default can.Construct.extend({
       // Loader directly provided, so just attach
         binding = mapper.attach(model);
       } else {
-        console.debug('Invalid mapper specified:', mapper);
+        console.warn(`Invalid mapper specified: ${mapper}`);
       }
       if (binding && bindingAttr) {
         model[bindingAttr] = binding;
@@ -387,7 +387,7 @@ export default can.Construct.extend({
         if (typeof (mixin) === 'string') {
           // If string, recursive lookup
           if (!definitions[mixin]) {
-            console.debug('Undefined mixin: ' + mixin, definitions);
+            console.warn('Undefined mixin: ' + mixin, definitions);
           } else {
             can.extend(true, finalDefinition,
               that.reify_mixins(definitions[mixin], definitions));

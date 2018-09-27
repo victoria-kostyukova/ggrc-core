@@ -30,7 +30,7 @@ function populateFromWorkflow(form, workflow) {
   if (workflow.reify) {
     workflow = workflow.reify();
   } else {
-    console.log("Can't reify workflow");
+    console.warn('Can\'t reify workflow');
     return;
   }
   if (typeof workflow.cycles === undefined || !workflow.cycles) {

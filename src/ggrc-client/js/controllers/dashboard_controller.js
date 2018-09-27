@@ -207,7 +207,7 @@ const Dashboard = can.Control({
   add_dashboard_widget_from_name: function (name) {
     let descriptor = this.options.widget_descriptors[name];
     if (!descriptor) {
-      console.debug('Unknown descriptor: ', name);
+      console.warn(`Unknown descriptor: ${name}`);
     } else {
       return this.add_dashboard_widget_from_descriptor(descriptor);
     }

@@ -170,7 +170,7 @@ import * as businessModels from '../models/business-models/index';
               if (typeof (mixin) === 'string') {
                 // If string, recursive lookup
                 if (!definitions[mixin]) {
-                  console.debug('Undefined mixin: ' + mixin, definitions);
+                  console.warn(`Undefined mixin: ${mixin} ${definitions}`);
                 } else {
                   can.extend(
                     finalDefinition,

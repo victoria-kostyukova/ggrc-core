@@ -39,13 +39,13 @@ let mkdirp = require('mkdirp');
 let parserString = fs.readFileSync(parserGrammar, 'utf8');
 let filterTemplate = fs.readFileSync(parserTemplateFile, 'utf8');
 
-console.log('building parser');
+console.log('building parser'); // eslint-disable-line no-console
 parserSrc = peg.generate(parserString, {output: 'source'});
 
-console.log('saving parser to js files');
+console.log('saving parser to js files'); // eslint-disable-line no-console
 ggrcParser = filterTemplate.replace('"GENERATED_PLACEHOLDER"', parserSrc);
 
 mkdirp.sync(ggrcParserFolder);
 fs.writeFileSync(ggrcParserFolder + ggrcParserJsFile, ggrcParser);
 
-console.log('\ndone :)');
+console.log('\ndone :)'); // eslint-disable-line no-console

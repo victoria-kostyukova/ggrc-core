@@ -413,7 +413,7 @@ function applyChangesToCustomAttributeValue(values, changes) {
     values.each(function (item, key) {
       if (item.def.id === Number(fieldId)) {
         if (!item) {
-          console.error('Corrupted Date: ', values);
+          console.error(`Corrupted Date: ${values}`);
           return;
         }
         updateCustomAttributeValue(item, changes[fieldId]);

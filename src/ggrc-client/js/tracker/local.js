@@ -7,10 +7,11 @@ import BaseStrategy from './base';
 
 export default class LocalStrategy extends BaseStrategy {
   timing(category, variable, label, value) {
-    console.debug(`Category: ${category},
-    Variable: ${variable},
-    Label: ${label},
-    time: ${value}`);
+    console.warn(
+      `Category: ${category},
+       Variable: ${variable},
+       Label: ${label},
+       time: ${value}`);
   }
   trackError() {
     // just stub for Strategies consistency

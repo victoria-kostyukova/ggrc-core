@@ -65,10 +65,10 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
  * warning(
  *  options,
  *  function () {
- *    console.log('Success!');
+ *    console.warn('Success!');
  *  },
  *  function () {
- *    console.log('Fail:(');
+ *    console.warn('Fail:(');
  *  }
  * )
  */

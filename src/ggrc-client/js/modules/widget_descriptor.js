@@ -109,8 +109,8 @@ import Program from '../models/business-models/program';
       let objectVersionConfig = getWidgetConfig(id);
       // Should not even try to create descriptor if configuration options are missing
       if (!instance || !farModel) {
-        console
-          .debug('Arguments are missing or have incorrect format', arguments);
+        console.warn(
+          `Arguments are missing or have incorrect format ${arguments}`);
         return null;
       }
       let widgetId = objectVersionConfig.isObjectVersion ?

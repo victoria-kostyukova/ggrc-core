@@ -154,7 +154,7 @@ export default can.Component.extend({
           self.refreshRelatedDocuments();
         })
         .fail(function (err) {
-          console.error('Unable to create related document: ', err);
+          console.error(`Unable to create related document: ${err}`);
         })
         .done(function () {
           self.attr('isLoading', false);
@@ -166,7 +166,7 @@ export default can.Component.extend({
       let relationship = await Relationship.findRelationship(
         document, this.instance);
       if (!relationship.id) {
-        console.log('Unable to find relationship');
+        console.warn('Unable to find relationship');
         return can.Deferred().reject({
           error: 'Unable to find relationship',
         });
@@ -184,7 +184,7 @@ export default can.Component.extend({
           self.refreshRelatedDocuments();
         })
         .fail(function (err) {
-          console.error('Unable to remove related document: ', err);
+          console.error(`Unable to remove related document: ${err}`);
         })
         .done(function () {
           self.attr('isLoading', false);

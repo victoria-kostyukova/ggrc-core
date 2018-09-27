@@ -24,8 +24,7 @@ export default Cacheable('CMS.Models.Snapshot', {
   display_name: function () {
     if (!this.revision) {
       // temp solution till the bug GGRC-4839 is fixed
-      console.error(
-        `Revision is not defined for snapshot with ID: ${this.id}!`
+      console.error(`Revision is not defined for snapshot with ID: ${this.id}!`
       );
       return;
     }
@@ -34,8 +33,7 @@ export default Cacheable('CMS.Models.Snapshot', {
   display_type: function () {
     if (!this.revision) {
       // temp solution till the bug GGRC-4839 is fixed
-      console.error(
-        `Revision is not defined for snapshot with ID: ${this.id}!`
+      console.error(`Revision is not defined for snapshot with ID: ${this.id}!`
       );
       return;
     }

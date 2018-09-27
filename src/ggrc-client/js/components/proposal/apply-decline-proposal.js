@@ -78,7 +78,7 @@ export default can.Component.extend({
           }
         },
         (error) => {
-          console.log(error);
+          console.warn(error);
         }
       );
     },

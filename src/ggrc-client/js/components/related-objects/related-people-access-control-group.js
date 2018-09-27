@@ -80,8 +80,8 @@ export default can.Component.extend({
       let exist = _.find(this.attr('people'), {id: person.id});
 
       if (exist) {
-        console // eslint-disable-line
-          .warn(`User "${person.id}" already has role "${groupId}" assigned`);
+        console.warn(
+          `User "${person.id}" already has role "${groupId}" assigned`);
         return;
       }
 
@@ -104,8 +104,7 @@ export default can.Component.extend({
         {id: person.id});
 
       if (idx === -1) {
-        console // eslint-disable-line
-          .warn(`User "${person.id}" does not present in "people" list`);
+        console.warn(`User "${person.id}" does not present in "people" list`);
         return;
       }
 

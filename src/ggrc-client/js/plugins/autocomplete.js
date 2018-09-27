@@ -22,7 +22,7 @@ import * as businessModels from '../models/business-models';
       // Ensure that the input.change event still occurs
       change: function (event, ui) {
         if (!$(event.target).parents(document.body).length) {
-          console.warn( // eslint-disable-line
+          console.warn(
             'autocomplete menu change event is coming from detached nodes');
         }
         $(event.target).trigger('change');
@@ -268,7 +268,7 @@ import * as businessModels from '../models/business-models';
               // Really ugly way to hide canjs exception during scrolling.
               // Please note that it occurs in really rear cases.
               // Better solution is needed.
-              console.warn(error); // eslint-disable-line
+              console.warn(error);
             }
 
             context.removeAttr('items_loading');

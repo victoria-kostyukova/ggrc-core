@@ -254,7 +254,7 @@ import Mappings from '../../models/mappers/mappings';
         this.find_all_deferred =
           this.options.list_loader(this.options.parent_instance);
       } else {
-        console.debug('Unexpected code path', this);
+        console.warn(`Unexpected code path ${this}`);
       }
 
       return this.find_all_deferred;

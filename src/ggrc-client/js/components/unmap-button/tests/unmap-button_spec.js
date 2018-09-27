@@ -68,8 +68,8 @@ describe('unmap-button component', function () {
         refreshDfd.reject('Server Error');
         await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);
-        expect(console.warn).toHaveBeenCalledWith(
-          'Unmap failed', 'Server Error');
+        expect(console.warn)
+          .toHaveBeenCalledWith('Unmap failed', 'Server Error');
         done();
       });
 

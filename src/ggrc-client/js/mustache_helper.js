@@ -1379,8 +1379,8 @@ Mustache.registerHelper('with_mapping_count',
 
 Mustache.registerHelper('log', function () {
   let args = can.makeArray(arguments).slice(0, arguments.length - 1);
-  console.log(...['Mustache log']
-    .concat(_.map(args, function (arg) {
+  console.warn(
+    ...['Mustache log'].concat(_.map(args, function (arg) {
       return resolveComputed(arg);
     })));
 });

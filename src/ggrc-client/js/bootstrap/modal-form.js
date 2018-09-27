@@ -322,8 +322,8 @@ import {changeUrl} from '../router';
 
       try {
         data = JSON.parse(xhr.responseText);
-      } catch (exc) {
-        // console.debug('exc', exc);
+      } catch (e) {
+        console.warn('Response not in JSON format.');
       }
 
       if (!e.stopRedirect) {

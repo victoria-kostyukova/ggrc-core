@@ -104,6 +104,9 @@
       "properties": "never"
     }],
     "new-cap": 0,
-    "no-new": 0
+    "no-new": 0,
+    "no-console": ["error", {
+      "allow": ["warn", "error"]
+    }]
   }
 }

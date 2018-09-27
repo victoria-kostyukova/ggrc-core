@@ -25,8 +25,7 @@ function handleAjaxError(jqxhr, errorThrown = '') {
       try {
         response = JSON.parse(jqxhr.responseText);
       } catch (e) {
-        console // eslint-disable-line no-console
-          .warn('Response not in JSON format');
+        console.warn('Response not in JSON format');
       }
     }
 
