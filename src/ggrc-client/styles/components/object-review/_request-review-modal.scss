@@ -4,22 +4,33 @@
  */
 
 .request-review-modal {
-  max-height: 60vh;
+  $simple-modal-header-height: 80px;
+  $simple-modal-footer-height: 55px;
 
   .simple-modal__header {
     border-bottom: none;
   }
 
-  .simple-modal__header-text{
+  .simple-modal__header-text {
     font-size: 24px;
   }
 
   .simple-modal__footer {
+    height: $simple-modal-footer-height;
     border-top: none;
-    padding: 8px 16px 16px;
+    padding-right: 16px;
+  }
+
+  &__header {
+    height: $simple-modal-header-height;
   }
 
   &__note {
-    padding: 0 16px 10px;
+    padding: 0 16px;
+  }
+
+  &__content {
+    max-height: calc(100% - #{$simple-modal-header-height} - #{$simple-modal-footer-height});
+    overflow: auto;
   }
 }

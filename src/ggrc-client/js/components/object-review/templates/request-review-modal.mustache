@@ -8,32 +8,36 @@
   {replace-content}="true"
   {extra-css-class}="'request-review-modal'"
 >
-  <div class="simple-modal__header">
-    <div class="simple-modal__header-text">Request Review</div>
-    <button class="btn btn-small btn-icon" {{#if loading}}disabled{{/if}} ($click)="cancel()">
-      <i class="fa fa-times black"></i>
-    </button>
-  </div>
-  <div class="request-review-modal__note">An email notification will be sent to each reviewer.</div>
-  <div class="simple-modal__body">
-    <div class="simple-modal__section">
-      <custom-roles-modal
-        {instance}="review"
-        {is-new-instance}="review.isNew">
-      </custom-roles-modal>
+  <div class="request-review-modal__header">
+    <div class="simple-modal__header">
+      <div class="simple-modal__header-text">Request Review</div>
+      <button class="btn btn-small btn-icon" {{#if loading}}disabled{{/if}} ($click)="cancel()">
+        <i class="fa fa-times black"></i>
+      </button>
     </div>
-    <div class="simple-modal__section">
-      <div class="ggrc-form">
-        <div class="ggrc-form-item">
-          <div class="ggrc-form-item__row">
-            <label class="ggrc-form-item__label">
-              Comment
-            </label>
-            <rich-text
-              {hidden-toolbar}="true"
-              {placeholder}="'Enter comment'"
-              {(content)}="review.email_message">
-            </rich-text>
+    <div class="request-review-modal__note">An email notification will be sent to each reviewer.</div>
+  </div>
+  <div class="request-review-modal__content">
+    <div class="simple-modal__body">
+      <div class="simple-modal__section">
+        <custom-roles-modal
+          {instance}="review"
+          {is-new-instance}="review.isNew">
+        </custom-roles-modal>
+      </div>
+      <div class="simple-modal__section">
+        <div class="ggrc-form">
+          <div class="ggrc-form-item">
+            <div class="ggrc-form-item__row">
+              <label class="ggrc-form-item__label">
+                Comment
+              </label>
+              <rich-text
+                {hidden-toolbar}="true"
+                {placeholder}="'Enter comment'"
+                {(content)}="review.email_message">
+              </rich-text>
+            </div>
           </div>
         </div>
       </div>
