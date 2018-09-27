@@ -17,6 +17,7 @@ import {
 } from '../../events/eventTypes';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {getLocalDate} from '../../plugins/utils/date-util';
 
 const tag = 'object-review';
 
@@ -72,7 +73,7 @@ export default can.Component.extend({
         get() {
           const date = this.attr('review.last_reviewed_at');
 
-          return moment.utc(date).local().format('MM/DD/YYYY hh:mm:ss A Z');
+          return getLocalDate(date);
         },
       },
     },
