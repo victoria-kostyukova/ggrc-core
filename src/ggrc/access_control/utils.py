@@ -68,7 +68,7 @@ def insert_select_acls(select_statement):
   # process to_insert in chunks, retry failed inserts, allow maximum of
   # PROPAGATION_RETRIES total retries
   failures = 0
-  for chunk in utils.list_chunks(to_insert, chunk_size=50000):
+  for chunk in utils.list_chunks(to_insert, chunk_size=10000):
     inserted_successfully = False
     while not inserted_successfully:
       try:
