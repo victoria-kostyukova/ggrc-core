@@ -120,6 +120,14 @@ export default can.Component.extend({
       },
       deferred_to: parentViewModel.attr('deferred_to'),
       deferred_list: [],
+      /**
+       * This property is needed to work together with deferredSave() method.
+       * If it's true then mapped objects shouldn't be mapped immediately to
+       * target object - they will be stored in the scope of modal-connector
+       * component. This component will decide, when mapped objects should be
+       * mapped to target object.
+       * @property {boolean}
+       */
       deferred: false,
       allowedToCreate: function () {
         // Don't allow to create new instances for "In Scope" Objects that
@@ -214,9 +222,19 @@ export default can.Component.extend({
       self.viewModel.attr('submitCbs').fire();
     },
     map(model) {
-      this.viewModel.updateFreezedConfigToLatest();
-      this.viewModel.attr('newEntries').push(model);
-      this.mapObjects(this.viewModel.attr('newEntries'));
+      const viewModel = this.viewModel;
+      const newEntries = viewModel.attr('newEntries');
+
+      viewModel.updateFreezedConfigToLatest();
+      newEntries.push(model);
+
+      if (this.viewModel.attr('deferred')) {
+        // postpone map operation unless target object is saved
+        this.deferredSave(newEntries);
+      } else {
+        // map objects immediately
+        this.mapObjects(newEntries);
+      }
     },
     closeModal: function () {
       this.viewModel.attr('is_saving', false);
@@ -226,7 +244,7 @@ export default can.Component.extend({
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    deferredSave: function () {
+    deferredSave: function (objects) {
       let source = this.viewModel.attr('deferred_to').instance ||
         this.viewModel.attr('object');
       let data = {};
@@ -234,7 +252,7 @@ export default can.Component.extend({
       data = {
         multi_map: true,
         arr: _.compact(_.map(
-          this.viewModel.attr('selected'),
+          objects,
           function (desination) {
             if (allowedToMap(source, desination)) {
               desination.isNeedRefresh = true;
@@ -244,6 +262,7 @@ export default can.Component.extend({
         )),
       };
 
+      // Send data to modal-connector component
       this.viewModel.attr('deferred_to').controller.element.trigger(
         'defer:add', [data]);
       this.closeModal();
@@ -255,12 +274,13 @@ export default can.Component.extend({
         return;
       }
 
+      const selectedObjects = this.viewModel.attr('selected');
       // TODO: Figure out nicer / proper way to handle deferred save
       if (this.viewModel.attr('deferred')) {
-        return this.deferredSave();
+        return this.deferredSave(selectedObjects);
       }
       this.viewModel.attr('is_saving', true);
-      this.mapObjects(this.viewModel.attr('selected'));
+      this.mapObjects(selectedObjects);
     },
     mapObjects: function (objects) {
       let type = this.viewModel.attr('type');
