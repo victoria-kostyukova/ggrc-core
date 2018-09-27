@@ -24,7 +24,7 @@ IMPORT_BLOCKED = {
 }
 
 IMPORT_FAILED = {
-    "title": u"\u2757Could not import {filename} due to errors",
+    "title": u"[WARNING] Could not import {filename} due to errors",
     "body": u"Go to import page to check details or submit new import "
             u"request.",
     "url": u"import"
@@ -39,7 +39,8 @@ EXPORT_COMPLETED = {
 }
 
 EXPORT_FAILED = {
-    "title": u"\u2757Your GGRC export request did not finish due to errors",
+    "title": (u"[WARNING] Your GGRC export request did not finish due "
+              u"to errors"),
     "body": u"Please follow the link to write to sheets or download .csv",
     "url": u"export"
 }
