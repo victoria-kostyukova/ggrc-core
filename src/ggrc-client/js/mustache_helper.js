@@ -24,11 +24,11 @@ import {
   batchRequests,
 } from './plugins/utils/query-api-utils';
 import {
-  formatDate,
   isMappableType,
   allowedToMap,
   getHooks,
 } from './plugins/ggrc_utils';
+import {formatDate} from './plugins/utils/date-util';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';

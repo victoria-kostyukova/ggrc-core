@@ -6,10 +6,8 @@
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.mustache';
-import {
-  formatDate,
-  getPersonInfo,
-} from '../../../js/plugins/ggrc_utils';
+import {getPersonInfo} from '../../../js/plugins/ggrc_utils';
+import {formatDate} from '../../../js/plugins/utils/date-util';
 const tag = 'instance-gca-diff';
 
 const viewModel = DiffBaseVM.extend({

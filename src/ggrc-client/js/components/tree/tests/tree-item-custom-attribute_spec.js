@@ -6,7 +6,7 @@
 import Cacheable from '../../../models/cacheable';
 import {helpers} from './../tree-item-custom-attribute';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
-import * as Utils from '../../../plugins/ggrc_utils';
+import * as DateUtils from '../../../plugins/utils/date-util';
 
 describe('helpers.getCustomAttrValue', () => {
   let helper;
@@ -133,14 +133,14 @@ describe('helpers.getCustomAttrValue', () => {
       const caId = 9;
       const expected = 'expected date';
       const attrValue = '2017-09-30';
-      spyOn(Utils, 'formatDate')
+      spyOn(DateUtils, 'formatDate')
         .and.returnValue(expected);
 
       fakeInstance.customAttr(caId, attrValue);
       actual = helper(fakeInstance, caId, fakeOptions);
 
       expect(actual).toBe(expected);
-      expect(Utils.formatDate)
+      expect(DateUtils.formatDate)
         .toHaveBeenCalledWith(attrValue, true);
     });
   });

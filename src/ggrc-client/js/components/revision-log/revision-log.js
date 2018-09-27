@@ -9,14 +9,12 @@ import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.mustache';
 import tracker from '../../tracker';
-import {
-  formatDate,
-  getHighestAssigneeRole,
-} from '../../plugins/ggrc_utils';
+import {getHighestAssigneeRole} from '../../plugins/ggrc_utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
 import Stub from '../../models/stub';
 import Mappings from '../../models/mappers/mappings';
+import {formatDate} from '../../plugins/utils/date-util';
 
 const EMPTY_DIFF_VALUE = '—';
 

@@ -7,7 +7,6 @@ import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Permission from '../../permission';
 import * as aclUtils from '../utils/acl-utils';
 import {
-  formatDate,
   getMappableTypes,
   isMappableType,
   allowedToMap,
@@ -235,15 +234,5 @@ describe('getAssigneeType() method', function () {
 
     userType = getAssigneeType(instance);
     expect(userType).toEqual(expectedString);
-  });
-});
-
-describe('GGRC utils formatDate() method', function () {
-  it('should return empty string for false values', function () {
-    expect(formatDate(null)).toEqual('');
-    expect(formatDate(undefined)).toEqual('');
-    expect(formatDate('')).toEqual('');
-    expect(formatDate(false)).toEqual('');
-    expect(formatDate(0)).toEqual('');
   });
 });

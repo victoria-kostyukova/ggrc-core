@@ -7,7 +7,7 @@ import template from './last-comment.mustache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
 import {COMMENT_CREATED} from '../../events/eventTypes';
-import {formatDate} from '../../plugins/ggrc_utils';
+import {formatDate} from '../../plugins/utils/date-util';
 import Comment from '../../models/service-models/comment';
 
 export default can.Component.extend({

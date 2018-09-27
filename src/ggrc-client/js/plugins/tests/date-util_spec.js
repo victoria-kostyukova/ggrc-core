@@ -7,6 +7,7 @@ import {
   getClosestWeekday,
   getDate,
   getUtcDate,
+  formatDate,
 } from '../utils/date-util';
 
 describe('GGRC DateUtil', () => {
@@ -125,6 +126,15 @@ describe('GGRC DateUtil', () => {
       let expectedFormat = '07/24/2018';
 
       expect(result).toEqual(expectedFormat);
+    });
+  });
+  describe('formatDate() method', function () {
+    it('should return empty string for false values', () => {
+      expect(formatDate(null)).toEqual('');
+      expect(formatDate(undefined)).toEqual('');
+      expect(formatDate('')).toEqual('');
+      expect(formatDate(false)).toEqual('');
+      expect(formatDate(0)).toEqual('');
     });
   });
 });

@@ -86,36 +86,6 @@ function inViewport(el) {
   return isVisible;
 }
 
-function formatDate(date, hideTime) {
-  let currentTimezone = moment.tz.guess();
-  let formats = [
-    'YYYY-MM-DD',
-    'YYYY-MM-DDTHH:mm:ss',
-    'YYYY-MM-DDTHH:mm:ss.SSSSSS',
-  ];
-  let inst;
-
-  if ( !date ) {
-    return '';
-  }
-
-  if (typeof date === 'string') {
-    // string dates are assumed to be in ISO format
-
-    if (hideTime) {
-      return moment.utc(date, formats, true).format('MM/DD/YYYY');
-    }
-    return moment.utc(date, formats, true)
-      .format('MM/DD/YYYY hh:mm:ss A Z');
-  }
-
-  inst = moment(new Date(date.isComputed ? date() : date));
-  if (hideTime === true) {
-    return inst.format('MM/DD/YYYY');
-  }
-  return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A Z');
-}
-
 function getPersonInfo(person) {
   const dfd = can.Deferred();
   let actualPerson;
@@ -443,7 +413,6 @@ export {
   applyTypeFilter,
   isInnerClick,
   inViewport,
-  formatDate,
   getPersonInfo,
   getPickerElement,
   loadScript,

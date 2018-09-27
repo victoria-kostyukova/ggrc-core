@@ -5,7 +5,7 @@
 
 import template from './templates/apply-decline-proposal.mustache';
 import {REFRESH_TAB_CONTENT} from '../../events/eventTypes';
-import {formatDate} from '../../plugins/ggrc_utils';
+import {formatDate} from '../../plugins/utils/date-util';
 import Proposal from '../../models/service-models/proposal';
 const tag = 'apply-decline-proposal';
 

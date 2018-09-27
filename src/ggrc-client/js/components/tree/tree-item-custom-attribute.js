@@ -5,7 +5,7 @@
 
 import template from './templates/tree-item-custom-attribute.mustache';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
-import {formatDate} from '../../plugins/ggrc_utils';
+import {formatDate} from '../../plugins/utils/date-util';
 
 const formatValueMap = {
   [CONTROL_TYPE.CHECKBOX](caObject) {
