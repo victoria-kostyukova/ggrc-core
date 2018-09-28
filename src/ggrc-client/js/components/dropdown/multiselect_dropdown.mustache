@@ -24,7 +24,10 @@
       <ul class="multiselect-dropdown__list">
         <li class="multiselect-dropdown__element">
           <label class="multiselect-dropdown__label" >
-            <input type="checkbox" {($checked)}="_selectedAll" class="multiselect-dropdown__checkbox"/>
+            <input type="checkbox"
+              {($checked)}="_selectedAll"
+              ($click)="selectAll()"
+              class="multiselect-dropdown__checkbox"/>
             Select all
           </label>
         </li>

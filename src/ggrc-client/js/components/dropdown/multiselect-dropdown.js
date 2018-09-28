@@ -38,17 +38,6 @@ export default can.Component.extend({
             return item.attr('checked');
           });
         },
-        set: function (value) {
-          let options = this.attr('options');
-
-          options.forEach(function (option) {
-            option.attr('checked', value);
-          });
-
-          this.updateSelected();
-
-          return value;
-        },
       },
       isOpen: {
         type: 'boolean',
@@ -63,6 +52,16 @@ export default can.Component.extend({
             (item) => item.checked));
         },
       },
+    },
+    selectAll: function () {
+      let options = this.attr('options');
+      let value = !this.attr('_selectedAll');
+
+      options.forEach(function (option) {
+        option.attr('checked', value);
+      });
+
+      this.updateSelected();
     },
     updateSelected: function () {
       this.attr('_stateWasUpdated', true);
