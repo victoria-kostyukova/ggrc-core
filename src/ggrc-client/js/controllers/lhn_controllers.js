@@ -4,14 +4,13 @@
 */
 
 import './infinite-scroll-controller';
-import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
 import Cacheable from '../models/cacheable';
 import Search from '../models/service-models/search';
 import DisplayPrefs from '../models/local-storage/display-prefs';
 import * as businessModels from '../models/business-models';
+import '../components/recently-viewed/recently-viewed';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {},
@@ -991,42 +990,5 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
     filters[forModel].attr(key, value);
     this.run_search(term, param);
-  },
-});
-
-can.Control('GGRC.Controllers.RecentlyViewed', {
-  defaults: {
-    list_view: GGRC.mustache_path + '/dashboard/recently_viewed_list.mustache',
-    max_history: 10,
-    max_display: 3,
-  },
-}, {
-  init: function () {
-    let pageModel = getPageInstance();
-    let instanceList = [];
-    let that = this;
-
-    RecentlyViewedObject.findAll().done(function (objs) {
-      let maxHistory = that.options.max_history;
-      if (pageModel) {
-        instanceList.push(new RecentlyViewedObject(pageModel));
-        instanceList[0].save();
-        maxHistory--;
-      }
-
-      for (let i = objs.length - 1; i >= 0; i--) {
-        if ((pageModel && pageModel.viewLink === objs[i].viewLink)
-            || objs.length - i > maxHistory || !('viewLink' in objs[i])
-        ) {
-          objs.splice(i, 1)[0].destroy(); // remove duplicate of current page object or excessive objects
-        } else if (instanceList.length < that.options.max_display) {
-          instanceList.push(objs[i]);
-        }
-      }
-
-      can.view(that.options.list_view, {list: instanceList}, function (frag) {
-        that.element.find('.top-level.recent').html(frag);
-      });
-    });
   },
 });

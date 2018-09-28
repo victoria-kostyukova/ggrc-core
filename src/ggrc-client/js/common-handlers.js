@@ -20,7 +20,6 @@ $body.on('click', '.lhn-no-init', function () {
   import(/* webpackChunkName: "lhn" */'./controllers/lhn_controllers')
     .then(function () {
       $('#lhn').cms_controllers_lhn();
-      $(document.body).ggrc_controllers_recently_viewed();
     });
 });
 

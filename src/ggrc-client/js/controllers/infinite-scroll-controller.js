@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RecentlyViewedObject from '../models/local-storage/recently-viewed-object';
-
 can.Control('CMS.Controllers.InfiniteScroll', {
   defaults: {},
 }, {
@@ -95,11 +93,6 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     let instance = el.closest('[data-model]').data('model') ||
         el.closest(':data(model)').data('model');
     let delay = this.options.fade_in_delay;
-
-    // There isn't tooltip data available for recently viewed objects
-    if (instance instanceof RecentlyViewedObject) {
-      return;
-    }
 
     if (this.options.$extended.data('model') !== instance) {
       clearTimeout(this.fade_in_timeout);

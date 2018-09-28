@@ -18,6 +18,7 @@ import {RouterConfig} from '../../router';
 import routes from './routes';
 import '../../plugins/utils/it-enable/issue-tracker-enable';
 import {gapiClient} from '../../plugins/ggrc-gapi-client';
+import {saveRecentlyViewedObject} from '../../plugins/utils/recently-viewed-utils';
 
 const $area = $('.area').first();
 const instance = getPageInstance();
@@ -71,3 +72,5 @@ $area.cms_controllers_page_object(can.extend({
   },
   current_user: GGRC.current_user,
 }, extraPageOptions[modelName]));
+
+saveRecentlyViewedObject();

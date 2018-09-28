@@ -1,0 +1,16 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<ul class="recent">   
+  {{#items}}
+  <li>
+    <a href="{{viewLink}}">
+      <div class="oneline">
+        <i class="fa fa-{{icon}}"></i>
+          {{title}}
+      </div>
+    </a>
+  </li>
+  {{/items}}
+</ul>
