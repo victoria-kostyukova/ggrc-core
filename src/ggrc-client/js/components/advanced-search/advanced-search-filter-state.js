@@ -37,16 +37,23 @@ let viewModel = can.Map.extend({
           'Launch Status' : 'State';
         state.attr('label', stateLabel);
 
+        return state;
+      },
+    },
+    filterStates: {
+      get() {
+        let items = this.attr('stateModel.items') || [];
         let allStates =
           StateUtils.getStatesForModel(this.attr('modelName'));
-        this.attr('filterStates', allStates.map(function (filterState) {
+
+        let filterStates = allStates.map((filterState) => {
           return {
             value: filterState,
-            checked: (state.attr('items').indexOf(filterState) > -1),
+            checked: (items.indexOf(filterState) > -1),
           };
-        }));
+        });
 
-        return state;
+        return filterStates;
       },
     },
     /**
