@@ -30,7 +30,9 @@ class TestAssessmentBase(ggrc.TestCase):
       person_email: email of the person that should be propagated.
       mapped_obj: object which should contain a child ACL entry.
     """
-    query = all_models.AccessControlList.query.join(
+    query = all_models.AccessControlPerson.query.join(
+        all_models.AccessControlList,
+    ).join(
         all_models.AccessControlRole,
     ).join(
         all_models.Person,
