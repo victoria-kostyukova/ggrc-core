@@ -4,6 +4,7 @@
 """Test assessment base class used by test_assessment and
    test_assessment_generation modules"""
 
+from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import all_models
 
@@ -30,8 +31,14 @@ class TestAssessmentBase(ggrc.TestCase):
       person_email: email of the person that should be propagated.
       mapped_obj: object which should contain a child ACL entry.
     """
+    acl_prop = db.aliased(all_models.AccessControlList)
+    acl_base = db.aliased(all_models.AccessControlList)
     query = all_models.AccessControlPerson.query.join(
-        all_models.AccessControlList,
+        acl_base,
+        acl_base.id == all_models.AccessControlPerson.ac_list_id,
+    ).join(
+        acl_prop,
+        acl_prop.base_id == acl_base.id,
     ).join(
         all_models.AccessControlRole,
     ).join(
