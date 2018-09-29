@@ -66,16 +66,17 @@ class TestPropagation(BaseTestPropagation):
           rel_order[1]: audit.program,
       }
       factories.RelationshipFactory(**rel_data)
-      acl_entry = factories.AccessControlListFactory(
-          ac_role=self.roles["Program"]["Program Editors"],
-          object=audit.program,
-          person=person,
+      audit.program.add_person_with_role(
+          person,
+          self.roles["Program"]["Program Editors"],
       )
 
-    self.assertEqual(all_models.AccessControlList.query.count(), 1)
-    propagation._handle_acl_step([acl_entry.id])
+    acl_entries = [acl.id for acl in audit.program._access_control_list]
+
+    self.assertEqual(all_models.AccessControlList.query.count(), 7)
+    propagation._handle_acl_step(acl_entries)
     db.session.commit()
-    self.assertEqual(all_models.AccessControlList.query.count(), 3)
+    self.assertEqual(all_models.AccessControlList.query.count(), 13)
 
   @ddt.data(0, 2, 3)
   def test_single_acl_to_multiple(self, count):
