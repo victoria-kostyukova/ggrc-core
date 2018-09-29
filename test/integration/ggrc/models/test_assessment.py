@@ -25,6 +25,7 @@ from appengine import base
 class TestAssessment(TestAssessmentBase):
   """Assessment test cases"""
   # pylint: disable=invalid-name
+
   def test_auto_slug_generation(self):
     """Test auto slug generation"""
     factories.AssessmentFactory(title="Some title")
@@ -151,16 +152,8 @@ class TestAssessment(TestAssessmentBase):
       person_email = person.email
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Assignees"],
-          person=person,
-          object=assessment
-      )
-      factories.AccessControlListFactory(
-          ac_role_id=self.assignee_roles["Creators"],
-          person=person,
-          object=assessment
-      )
+      audit.add_person_with_role_name(person, "Assignees")
+      assessment.add_person_with_role_name(person, "Creators")
       factories.RelationshipFactory(source=audit, destination=assessment)
 
     # Add verifier to Assessment
@@ -216,11 +209,7 @@ class TestAssessment(TestAssessmentBase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       for ac_role_id in self.assignee_roles.values():
-        factories.AccessControlListFactory(
-            ac_role_id=ac_role_id,
-            person=person,
-            object=assessment
-        )
+        assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
 
       evidence = factories.EvidenceUrlFactory()
@@ -240,11 +229,7 @@ class TestAssessment(TestAssessmentBase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       for ac_role_id in self.assignee_roles.values():
-        factories.AccessControlListFactory(
-            ac_role_id=ac_role_id,
-            person=person,
-            object=assessment
-        )
+        assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
 
     # Remove verifier and assignee from Assessment
@@ -268,11 +253,7 @@ class TestAssessment(TestAssessmentBase):
       assessment = factories.AssessmentFactory(audit=audit)
       for ac_role_id in self.assignee_roles.values():
         for person in persons:
-          factories.AccessControlListFactory(
-              ac_role_id=ac_role_id,
-              person=person,
-              object=assessment
-          )
+          assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
 
     # Remove assignee roles for first person
@@ -283,7 +264,7 @@ class TestAssessment(TestAssessmentBase):
         ]
     })
     self.assertEqual(response.status_code, 200)
-    assignee_acl = all_models.AccessControlList.query.filter_by(
+    assignee_acl = all_models.AccessControlPerson.query.filter_by(
         person_id=person_ids[0]
     )
     # All roles for first person should be removed
@@ -303,11 +284,7 @@ class TestAssessment(TestAssessmentBase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       for ac_role_id in self.assignee_roles.values():
-        factories.AccessControlListFactory(
-            ac_role_id=ac_role_id,
-            person=person,
-            object=assessment
-        )
+        assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
       snapshot = self._create_snapshots(audit, [factories.ControlFactory()])[0]
       rel = factories.RelationshipFactory(
@@ -319,8 +296,10 @@ class TestAssessment(TestAssessmentBase):
       )
     response = self.api.delete(rel)
     self.assertEqual(response.status_code, 200)
-    snap_acls = all_models.AccessControlList.query.filter_by(
-        object_type="Snapshot"
+    snap_acls = all_models.AccessControlPerson.query.join(
+        all_models.AccessControlList
+    ).filter(
+        all_models.AccessControlList.object_type == "Snapshot"
     )
     self.assertEqual(snap_acls.count(), 0)
 
@@ -338,11 +317,7 @@ class TestAssessment(TestAssessmentBase):
       snap_rels = []
       for assessment in assessments:
         for ac_role_id in self.assignee_roles.values():
-          factories.AccessControlListFactory(
-              ac_role_id=ac_role_id,
-              person=person,
-              object=assessment
-          )
+          assessment.add_person_with_role_id(person, ac_role_id)
         factories.RelationshipFactory(source=audit, destination=assessment)
         snap_rels.append(factories.RelationshipFactory(
             source=assessment, destination=snapshot
@@ -366,11 +341,7 @@ class TestAssessment(TestAssessmentBase):
       assessment = factories.AssessmentFactory(audit=audit)
       snapshot = self._create_snapshots(audit, [factories.ControlFactory()])[0]
       for ac_role_id in self.assignee_roles.values():
-        factories.AccessControlListFactory(
-            ac_role_id=ac_role_id,
-            person=person,
-            object=assessment
-        )
+        assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
       snap_rel = factories.RelationshipFactory(
           source=assessment, destination=snapshot
@@ -393,9 +364,7 @@ class TestAssessment(TestAssessmentBase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       for ac_role_id in self.assignee_roles.values():
-        factories.AccessControlListFactory(
-            ac_role_id=ac_role_id, person=person, object=assessment
-        )
+        assessment.add_person_with_role_id(person, ac_role_id)
       factories.RelationshipFactory(source=audit, destination=assessment)
       control = factories.ControlFactory()
       objective = factories.ObjectiveFactory()

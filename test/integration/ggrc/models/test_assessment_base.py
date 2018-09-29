@@ -53,13 +53,12 @@ class TestAssessmentBase(ggrc.TestCase):
 
   def assert_mapped_role(self, role, person_email, mapped_obj):
     """Check if required role was created for mapped object"""
-    query = all_models.AccessControlList.query.join(
+    query = all_models.AccessControlPerson.query.join(
+        all_models.AccessControlList,
+    ).join(
         all_models.AccessControlRole,
-        all_models.AccessControlRole.id ==
-        all_models.AccessControlList.ac_role_id
     ).join(
         all_models.Person,
-        all_models.Person.id == all_models.AccessControlList.person_id
     ).filter(
         all_models.AccessControlList.object_id == mapped_obj.id,
         all_models.AccessControlList.object_type == mapped_obj.type,
