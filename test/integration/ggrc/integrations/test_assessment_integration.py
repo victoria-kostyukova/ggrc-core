@@ -1027,11 +1027,8 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     """Assign roles to people provided."""
     with factories.single_commit():
       for role_name, people in role_name_to_people.iteritems():
-        role = self.roles[role_name]
         for person in people:
-          factories.AccessControlListFactory(person=person,
-                                             ac_role=role,
-                                             object=self.audit)
+          self.audit.add_person_with_role_name(person, role_name)
 
   def create_asmt_with_issue_tracker(self, role_name_to_people,
                                      issue_tracker=None):
