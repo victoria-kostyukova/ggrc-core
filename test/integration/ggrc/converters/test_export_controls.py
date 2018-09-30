@@ -26,15 +26,7 @@ class TestExportControls(TestCase):
       with factories.single_commit():
         self.basic_owner = factories.PersonFactory(name="basic owner")
         self.control = factories.ControlFactory()
-        self.acr_id = all_models.AccessControlRole.query.filter_by(
-            object_type=self.control.type,
-            name="Admin"
-        ).first().id
-        self.owner_object = factories.AccessControlListFactory(
-            person=self.basic_owner,
-            object=self.control,
-            ac_role_id=self.acr_id
-        )
+        self.control.add_person_with_role_name(self.basic_owner, "Admin")
 
   def test_search_by_owner_email(self):
     self.assert_slugs("Admin",
@@ -51,11 +43,7 @@ class TestExportControls(TestCase):
     basic_email, basic_name = self.basic_owner.email, self.basic_owner.name
     with factories.single_commit():
       new_owner = factories.PersonFactory(name="new owner")
-      factories.AccessControlListFactory(
-          person=new_owner,
-          object=self.control,
-          ac_role_id=self.acr_id
-      )
+      self.control.add_person_with_role_name(new_owner, "Admin")
 
     self.assert_slugs("Admin",
                       new_owner.email,
@@ -72,7 +60,7 @@ class TestExportControls(TestCase):
 
   def test_search_by_deleted_owner(self):
     """Filter by deleted owner"""
-    db.session.delete(self.owner_object)
+    all_models.AccessControlPerson.query.delete()
     db.session.commit()
     self.assert_slugs("owners", self.basic_owner.email, [])
     self.assert_slugs("owners", self.basic_owner.name, [])
