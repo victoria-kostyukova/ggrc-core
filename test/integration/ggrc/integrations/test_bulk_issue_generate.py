@@ -425,21 +425,20 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     norights_asmnt_ids = assessment_ids[1:]
     _, assignee_user = self.gen.generate_person(user_role="Creator")
 
+    audit_role = factories.AccessControlRoleFactory(
+        name="Edit Role",
+        object_type="Audit",
+        update=True
+    )
     with factories.single_commit():
       assessment = all_models.Assessment.query.get(changed_asmnt_id)
       assessment.add_person_with_role_name(assignee_user, "Creators")
-
-      audit_role = factories.AccessControlRoleFactory(
-          name="Edit Role",
-          object_type="Audit",
-          update=True
-      )
-      factories.AccessControlListFactory(
+      acl = factories.AccessControlListFactory(
           object_id=audit_id,
           object_type="Audit",
           ac_role_id=audit_role.id,
-          person_id=assignee_user.id,
       )
+      factories.AccessControlPersonFactory(assignee_user, acl)
 
     self.api.set_user(assignee_user)
     response = self.generate_children_issues_for(
@@ -678,11 +677,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
       for issue in all_models.Issue.query.all():
         issue.modified_by = person
         for role_name in ["Admin", "Primary Contacts"]:
-          factories.AccessControlListFactory(
-              object=issue,
-              ac_role=role.get_ac_roles_for(issue.type)[role_name],
-              person=person,
-          )
+          issue.add_person_with_role_name(person, role_name)
 
     # Verify that IssueTracker issues hasn't updated data
     issues = all_models.IssuetrackerIssue.query.filter(
