@@ -55,11 +55,11 @@ class TestBackgroundTaskRolePropagation(TestCase):
     objects['audit'] = audit = factories.AuditFactory(
         program=objects['program'],
         access_control_list=[{
-            "ac_role": self.audit_roles['Auditors'],
-            "person": self.people['created_auditor']
+            "ac_role_id": self.audit_roles['Auditors'].id,
+            "person": {"id": self.people['created_auditor'].id},
         }, {
-            "ac_role": self.audit_roles['Audit Captains'],
-            "person": self.people['created_captain']
+            "ac_role_id": self.audit_roles['Audit Captains'].id,
+            "person": {"id": self.people['created_captain'].id},
         }]
     )
     factories.RelationshipFactory(source=program, destination=audit)
