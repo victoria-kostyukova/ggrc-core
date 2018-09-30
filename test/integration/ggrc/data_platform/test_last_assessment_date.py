@@ -83,9 +83,7 @@ class TestLastAssessmentDate(TestCase):
 
       for obj in itertools.chain(controls, objectives):
         acr = admin_control if obj.type == "Control" else admin_objective
-        factories.AccessControlListFactory(
-            object=obj, person=person, ac_role=acr
-        )
+        obj.add_person_with_role(person, acr)
 
       audit_0 = factories.AuditFactory(title="Audit_0")
       audit_1 = factories.AuditFactory(title="Audit_1")
