@@ -25,21 +25,13 @@ class TestEvidenceRolePropagation(TestCase):
   # just add them to data list to check if fix works.
 
   @ddt.data("Assignees", "Creators", "Verifiers")
-  def test_assessment_role_propagation_edit(self, role):
+  def test_assessment_role_propagation_edit(self, role_name):
     """Asses user with role '{0}' should be able to edit related evidence"""
 
     _, reader = self.generator.generate_person(user_role="Creator")
-    assignees_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Assessment.__name__, name=role
-    ).first()
-
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
-      factories.AccessControlListFactory(
-          ac_role=assignees_role,
-          object=assessment,
-          person=reader
-      )
+      assessment.add_person_with_role_name(reader, role_name)
       evidence = factories.EvidenceFactory()
       evidence_id = evidence.id
       factories.RelationshipFactory(source=assessment, destination=evidence)
@@ -67,16 +59,9 @@ class TestEvidenceRolePropagation(TestCase):
                                        status_code):
     """'{0}' assigned as '{1}' should get '{2}' when editing audit evidence"""
     _, user = self.generator.generate_person(user_role=user_role)
-    assignees_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Audit.__name__, name=audit_role
-    ).first()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          ac_role=assignees_role,
-          object=audit,
-          person=user
-      )
+      audit.add_person_with_role_name(user, audit_role)
       evidence = factories.EvidenceFactory()
       evidence_id = evidence.id
 
@@ -96,20 +81,13 @@ class TestEvidenceRolePropagation(TestCase):
     else:
       self.assertStatus(resp, status_code)
 
-  def test_audit_role_propagation_not_delete(self, role="Auditors"):
+  def test_audit_role_propagation_not_delete(self):
     """Audit user with role Auditors can NOT delete related evidence"""
-
+    role_name = "Auditors"
     _, reader = self.generator.generate_person(user_role="Reader")
-    assignees_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Audit.__name__, name=role
-    ).first()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      factories.AccessControlListFactory(
-          ac_role=assignees_role,
-          object=audit,
-          person=reader
-      )
+      audit.add_person_with_role_name(reader, role_name)
       evidence = factories.EvidenceFactory()
       evidence_id = evidence.id
 
