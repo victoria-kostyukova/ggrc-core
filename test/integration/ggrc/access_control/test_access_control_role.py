@@ -37,9 +37,10 @@ class TestAccessControlRole(TestCase):
           data={"name": name}, user_role=name)
       self.people[name] = user
 
-  def _post_role(self):
+  def _post_role(self, name=None):
     """Helper function for POSTing roles"""
-    name = random_str(prefix="Access Control Role - ")
+    if name is None:
+      name = random_str(prefix="Access Control Role - ")
     return self.api.post(AccessControlRole, {
         "access_control_role": {
             "name": name,
@@ -48,6 +49,15 @@ class TestAccessControlRole(TestCase):
             "read": True
         },
     })
+
+  def test_create_after_objects(self):
+    """Test eager creation of ACLs on existing objects with new ACR."""
+    control_id = factories.ControlFactory().id
+    role_name = "New Custom Role"
+    self._post_role(name=role_name)
+    control = all_models.Control.query.get(control_id)
+    self.assertIn(role_name, control.acr_name_acl_map.keys())
+    self.assertIsNotNone(control.acr_name_acl_map[role_name])
 
   def test_create(self):
     """Test Access Control Role creation"""

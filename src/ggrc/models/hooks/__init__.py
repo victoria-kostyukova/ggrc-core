@@ -13,9 +13,11 @@ from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
 from ggrc.models.hooks import acl
 from ggrc.models.hooks import proposal
+from ggrc.models.hooks import access_control_role
 
 
 ALL_HOOKS = [
+    access_control_role,
     assessment,
     audit,
     comment,
