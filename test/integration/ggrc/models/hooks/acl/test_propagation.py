@@ -82,7 +82,6 @@ class TestPropagation(BaseTestPropagation):
   def test_single_acl_to_multiple(self, count):
     """Test propagation of single ACL entry to multiple children."""
     with factories.single_commit():
-      person = factories.PersonFactory()
       program = factories.ProgramFactory()
       for i in range(count):
         audit = factories.AuditFactory(program=program)
@@ -90,32 +89,29 @@ class TestPropagation(BaseTestPropagation):
             source=program if i % 2 == 0 else audit,
             destination=program if i % 2 == 1 else audit,
         )
-      acl_entry = factories.AccessControlListFactory(
-          ac_role=self.roles["Program"]["Program Editors"],
-          object=program,
-          person=person,
-      )
 
-    self.assertEqual(all_models.AccessControlList.query.count(), 1)
-    child_ids = propagation._handle_acl_step([acl_entry.id])
+    acl_id = next(
+        acl.id for acl in program._access_control_list
+        if acl.ac_role.name in "Program Editors"
+    )
+
+    child_ids = propagation._handle_acl_step([acl_id])
 
     self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        # 1 original ACL entry, 2*count for objects+relationships
-        1 + count * 2
+        all_models.AccessControlList.query.filter(
+            all_models.AccessControlList.parent_id.isnot(None)
+        ).count(),
+        count * 2
     )
     self.assertEqual(
         db.session.execute(child_ids.alias("counts").count()).scalar(),
         count,
     )
 
-  @ddt.data(1, 2, 3)
-  def test_multi_acl_to_multiple(self, people_count):
+  def test_multi_acl_to_multiple(self):
     """Test multiple ACL propagation to multiple children."""
     audit_count = 3
-    program_roles = ["Program Editors", "Program Readers"]
     with factories.single_commit():
-      people = [factories.PersonFactory() for _ in range(people_count)]
       program = factories.ProgramFactory()
       for i in range(audit_count):
         audit = factories.AuditFactory(program=program)
@@ -123,40 +119,27 @@ class TestPropagation(BaseTestPropagation):
             source=program if i % 2 == 0 else audit,
             destination=program if i % 2 == 1 else audit,
         )
-      acl_ids = []
-      for person in people:
-        for role_name in program_roles:
-          acl_ids.append(
-              factories.AccessControlListFactory(
-                  ac_role=self.roles["Program"][role_name],
-                  object=program,
-                  person=person,
-              ).id,
-          )
+    acl_ids = [acl.id for acl in program._access_control_list]
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
-        people_count * len(program_roles)
+        11  # 5 program roles, 6 audit roles
     )
-    child_ids = propagation._handle_acl_step(acl_ids)
+    propagation._handle_acl_step(acl_ids)
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
-        len(acl_ids) + len(acl_ids) * audit_count * 2
-    )
-    self.assertEqual(
-        db.session.execute(child_ids.alias("counts").count()).scalar(),
-        audit_count * len(program_roles) * people_count
+        11 + 3 * 3 * 2
+        # 11 previous roles
+        # 3 audits
+        # 3 program propagated roles
+        # 2 propagations per audit (audit + relationship)
     )
 
   @ddt.data(1, 2, 3)
   def test_partial_acl_to_multiple(self, partial_count):
-    """Test propagating only a few acl entries to multiple objects."""
     audit_count = 3
-    people_count = 4
-    program_roles = ["Program Editors", "Program Readers"]
     with factories.single_commit():
-      people = [factories.PersonFactory() for _ in range(people_count)]
       program = factories.ProgramFactory()
       for i in range(audit_count):
         audit = factories.AuditFactory(program=program)
@@ -164,31 +147,24 @@ class TestPropagation(BaseTestPropagation):
             source=program if i % 2 == 0 else audit,
             destination=program if i % 2 == 1 else audit,
         )
-      acl_ids = []
-      for person in people:
-        for role_name in program_roles:
-          acl_ids.append(
-              factories.AccessControlListFactory(
-                  ac_role=self.roles["Program"][role_name],
-                  object=program,
-                  person=person,
-              ).id,
-          )
 
-    self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        people_count * len(program_roles)
-    )
+    propagated_roles = {
+        "Program Managers",
+        "Program Readers",
+        "Program Editors"
+    }
+
+    acl_ids = [acl.id for acl in program._access_control_list
+               if acl.ac_role.name in propagated_roles]
+
     propagate_acl_ids = acl_ids[:partial_count]
-    child_ids = propagation._handle_acl_step(propagate_acl_ids)
+    propagation._handle_acl_step(propagate_acl_ids)
 
     self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        len(acl_ids) + len(propagate_acl_ids) * audit_count * 2
-    )
-    self.assertEqual(
-        db.session.execute(child_ids.alias("counts").count()).scalar(),
-        audit_count * len(propagate_acl_ids)
+        all_models.AccessControlList.query.filter(
+            all_models.AccessControlList.parent_id.isnot(None)
+        ).count(),
+        partial_count * 3 * 2
     )
 
   def test_deep_propagation(self):
@@ -197,10 +173,7 @@ class TestPropagation(BaseTestPropagation):
     Test 3 people with 2 roles on programs to propagate to assessments
     """
     audit_count = 3
-    people_count = 3
-    program_roles = ["Program Editors", "Program Readers"]
     with factories.single_commit():
-      people = [factories.PersonFactory() for _ in range(people_count)]
       for i in range(audit_count):
         audit = factories.AuditFactory()
         assessment = factories.AssessmentFactory(audit=audit)
@@ -212,32 +185,19 @@ class TestPropagation(BaseTestPropagation):
             source=assessment if i % 2 == 0 else audit,
             destination=assessment if i % 2 == 1 else audit,
         )
-        acl_ids = []
 
-        for person in people:
-          for role_name in program_roles:
-            acl_ids.append(
-                factories.AccessControlListFactory(
-                    ac_role=self.roles["Program"][role_name],
-                    object=audit.program,
-                    person=person,
-                ).id,
-            )
+    acl_ids = [acl.id for acl in audit.program._access_control_list]
 
     propagation._propagate(acl_ids)
 
     assessment_acls = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.object_type ==
-        all_models.Assessment.__name__
+        all_models.Assessment.__name__,
+        all_models.AccessControlList.parent_id.isnot(None),
     ).all()
 
-    self.assertEqual(
-        len(assessment_acls),
-        3 * 2  # 3 people each with 2 roles on a program that should be
-        # propagated
-    )
-    for assessment_acl in assessment_acls:
-      self.assertIsNotNone(assessment_acl.parent_id)
+    # one for PR, PE, PM
+    self.assertEqual(len(assessment_acls), 3)
 
   def test_relationship_single_layer(self):
     """Test single layer propagation through relationships.
@@ -247,7 +207,6 @@ class TestPropagation(BaseTestPropagation):
     """
 
     with factories.single_commit():
-      person = factories.PersonFactory()
       audit = factories.AuditFactory()
       assessment1 = factories.AssessmentFactory(audit=audit)
       assessment2 = factories.AssessmentFactory(audit=audit)
@@ -267,35 +226,17 @@ class TestPropagation(BaseTestPropagation):
           ).id,
       ]
 
-      factories.AccessControlListFactory(
-          ac_role=self.roles["Audit"]["Audit Captains"],
-          object=audit,
-          person=person,
-      )
-      factories.AccessControlListFactory(
-          ac_role=self.roles["Assessment"]["Assignees"],
-          object=assessment1,
-          person=person,
-      )
-      factories.AccessControlListFactory(
-          ac_role=self.roles["Assessment"]["Assignees"],
-          object=assessment2,
-          person=person,
-      )
-
     child_ids = propagation._handle_relationship_step(relationship_ids, [])
 
     self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        3 + 2 + 2 + 4
-        # 3 Initial roles
-        # 2 roles for assessment 1 propagation to relationship and audit
-        # 2 roles for assessment 2 propagation to relationship and audit
-        # 4 for audit role propagation to two relationships and assessments
+        all_models.AccessControlList.query.filter(
+            all_models.AccessControlList.parent_id.isnot(None)
+        ).count(),
+        20
     )
     self.assertEqual(
         db.session.execute(child_ids.alias("counts").count()).scalar(),
-        4,  # audit captain to both assessments and both assignees to audit
+        10,
     )
 
   def test_propagation_conflict(self):
@@ -306,20 +247,16 @@ class TestPropagation(BaseTestPropagation):
     errors. This test checks for the most basic such scenario.
     """
     with factories.single_commit():
-      person = factories.PersonFactory()
       audit = factories.AuditFactory()
       relationship = factories.RelationshipFactory(
           source=audit,
           destination=audit.program,
       )
-      acl_entry = factories.AccessControlListFactory(
-          ac_role=self.roles["Program"]["Program Editors"],
-          object=audit.program,
-          person=person,
-      )
+
+    acl_ids = {acl.id for acl in audit.program._access_control_list}
 
     with app.app.app_context():
-      flask.g.new_acl_ids = {acl_entry.id}
+      flask.g.new_acl_ids = acl_ids
       flask.g.new_relationship_ids = {relationship.id}
       flask.g.deleted_objects = set()
 
@@ -327,35 +264,24 @@ class TestPropagation(BaseTestPropagation):
 
       db.session.commit()
 
-      self.assertEqual(all_models.AccessControlList.query.count(), 3)
+      self.assertEqual(all_models.AccessControlList.query.count(), 13)
 
   def test_propagate_all(self):
     """Test clean propagation of all ACL entries."""
     with factories.single_commit():
-      person = factories.PersonFactory()
-      task = wf_factories.TaskGroupTaskFactory()
+      wf_factories.TaskGroupTaskFactory()
       audit = factories.AuditFactory()
       factories.RelationshipFactory(
           source=audit,
           destination=audit.program,
       )
-      acl_ids = [
-          factories.AccessControlListFactory(
-              ac_role=self.roles["Program"]["Program Editors"],
-              object=audit.program,
-              person=person,
-          ).id
-      ]
-      factories.AccessControlListFactory(
-          ac_role=self.roles["Workflow"]["Workflow Member"],
-          object=task.workflow,
-          person=person,
-      )
+
+    acl_ids = [acl.id for acl in audit.program._access_control_list]
 
     propagation._propagate(acl_ids)
-    self.assertEqual(all_models.AccessControlList.query.count(), 4)
+    self.assertEqual(all_models.AccessControlList.query.count(), 17)
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 8)
+    self.assertEqual(all_models.AccessControlList.query.count(), 25)
 
   def test_complex_propagation_count(self):
     """Test multiple object ACL propagation.
@@ -440,31 +366,29 @@ class TestPropagation(BaseTestPropagation):
       evidence = factories.EvidenceUrlFactory()
       factories.RelationshipFactory(source=evidence, destination=assessment)
 
-    acl_entry = factories.AccessControlListFactory(
-        person=person,
-        ac_role=self.roles["Control"]["Admin"],
-        object=control,
-    )
+    acl_entry = control._access_control_list[0]
 
     propagation._propagate([acl_entry.id])
 
     self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        3,  # 1 for control, 1 for relationship to document and 1 for document.
+        all_models.AccessControlList.query.filter(
+            all_models.AccessControlList.parent_id.isnot(None)
+        ).count(),
+        2,  # 1 for relationship to document and 1 for document.
     )
 
-    acl_entry = factories.AccessControlListFactory(
-        person=person,
-        ac_role=self.roles["Program"]["Program Editors"],
-        object=assessment.audit.program,
+    acl_entry = next(
+        acl for acl in assessment.audit.program._access_control_list
+        if acl.ac_role.name == "Program Editors"
     )
     propagation._propagate([acl_entry.id])
 
     self.assertEqual(
-        all_models.AccessControlList.query.count(),
-        3 + 1 + 2 + 4 + 6 + 2 + 6 + 6
-        # 3 previous entries for control
-        # 1 original program ACL entry
+        all_models.AccessControlList.query.filter(
+            all_models.AccessControlList.parent_id.isnot(None)
+        ).count(),
+        2 + 2 + 4 + 6 + 2 + 6 + 6
+        # 2 previous entries for control
         # 2 for audit (relationship + audit propagation)
         # 4 for assessments (2 assessments and 2 relationships for them)
         # 6 for snapshots (3 snapshots with relationships)
@@ -480,23 +404,13 @@ class TestPropagationViaImport(BaseTestPropagation):
   def test_import_propagation(self):
     """Test propagation program roles via import"""
     # pylint: disable=too-many-locals
-    program_roles = ["Program Editors"]
     with factories.single_commit():
-      person = factories.PersonFactory()
       program = factories.ProgramFactory()
       control = factories.ControlFactory()
       control_1 = factories.ControlFactory()
       factories.RelationshipFactory(destination=program, source=control)
       factories.RelationshipFactory(destination=program, source=control_1)
-      acls = [
-          factories.AccessControlListFactory(
-              ac_role=self.roles["Program"][r],
-              object=program,
-              person=person,
-          )
-          for r in program_roles
-      ]
-    person_id = person.id
+
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.type,
@@ -510,16 +424,16 @@ class TestPropagationViaImport(BaseTestPropagation):
                                            child_type=control.type,
                                            child_id=control.id)
       factories.RelationshipFactory(destination=audit, source=snapshot)
+
     flask.g.new_relationship_ids = [rel.id]
-    flask.g.new_acl_ids = [a.id for a in acls]
+    flask.g.new_acl_ids = [a.id for a in program._access_control_list]
     flask.g.deleted_objects = []
 
     propagation.propagate()
     acl_q = all_models.AccessControlList.query.filter(
-        all_models.AccessControlList.person_id == person_id,
         all_models.AccessControlList.object_type == "Assessment",
     )
-    acl_count_before_import = int(acl_q.count())
+    self.assertEqual(acl_q.count(), 0)
     response = self.import_data(
         OrderedDict([
             ("object_type", "Assessment"),
@@ -541,5 +455,4 @@ class TestPropagationViaImport(BaseTestPropagation):
         ]),
     )
     self.check_import_errors(response)
-    acl_count_after_import = int(acl_q.count())
-    self.assertEqual(acl_count_before_import + 2, acl_count_after_import)
+    self.assertEqual(acl_q.count(), 20)
