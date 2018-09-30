@@ -8,13 +8,13 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc.models import all_models
-from integration.ggrc import TestCase
+from integration.ggrc.models import test_assessment_base
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
 
-class TestAuditRoleProgation(TestCase):
+class TestAuditRoleProgation(test_assessment_base.TestAssessmentBase):
   """TestAuditRoleProgation"""
 
   def setup_people(self):
@@ -52,11 +52,11 @@ class TestAuditRoleProgation(TestCase):
     objects['audit'] = audit = factories.AuditFactory(
         program=objects['program'],
         access_control_list=[{
-            "ac_role": self.audit_roles['Auditors'],
-            "person": self.people['created_auditor']
+            "ac_role_id": self.audit_roles['Auditors'].id,
+            "person": {"id": self.people['created_auditor'].id},
         }, {
-            "ac_role": self.audit_roles['Audit Captains'],
-            "person": self.people['created_captain']
+            "ac_role_id": self.audit_roles['Audit Captains'].id,
+            "person": {"id": self.people['created_captain'].id},
         }]
     )
     factories.RelationshipFactory(source=program, destination=audit)
@@ -74,8 +74,8 @@ class TestAuditRoleProgation(TestCase):
     # Issues
     objects['issue'] = factories.IssueFactory(
         access_control_list=[{
-            "ac_role": self.issue_roles['Admin'],
-            "person": self.people['issue_admin']
+            "ac_role_id": self.issue_roles['Admin'].id,
+            "person": {"id": self.people['issue_admin'].id},
         }]
     )
 
@@ -157,24 +157,19 @@ class TestAuditRoleProgation(TestCase):
     objects = self.objects
     audit = objects['audit']
     audit.access_control_list = [{
-        "ac_role": self.audit_roles['Audit Captains'],
-        "person": self.people['updated_captain']
+        "ac_role_id": self.audit_roles['Audit Captains'].id,
+        "person": {"id": self.people['updated_captain'].id},
     }, {
-        "ac_role": self.audit_roles['Auditors'],
-        "person": self.people['updated_auditor']
+        "ac_role_id": self.audit_roles['Auditors'].id,
+        "person": {"id": self.people['updated_auditor'].id},
     }]
     db.session.add(audit)
     db.session.commit()
 
-    all_acls = all_models.AccessControlList.query.filter().all()
-    acl_map = {(acl.object_id, acl.object_type, acl.person): [
-               aacl.ac_role.name for aacl in all_acls]
-               for acl in all_acls}
-    for acl in audit.access_control_list:
-      self.assertNotEqual(
-          len(all_acls), 0,
-          "No propagated acls created for {}".format(acl.ac_role.name))
+    all_acls = all_models.AccessControlList.query.count()
+    self.assertNotEqual(all_acls, 0)
 
+    for person, acl in audit.access_control_list:
       # Check if all objects have the Audit Captain Mapped role
       for obj in objects['snapshots'] + [
           objects['assessment'],
@@ -183,8 +178,7 @@ class TestAuditRoleProgation(TestCase):
           objects['evidence'],
           objects['comment'],
       ]:
-        key = (obj.id, obj.type, acl.person)
-        self.assertIn(key, acl_map)
+        self.assert_propagated_role(acl.ac_role.name, person.email, obj)
 
   def test_object_created(self):
     """Test if audit mapped roles are created for newly created objects"""
@@ -192,15 +186,10 @@ class TestAuditRoleProgation(TestCase):
     audit = objects['audit']
 
     all_acls = all_models.AccessControlList.query.filter().all()
-    acl_map = {(acl.object_id, acl.object_type, acl.person): [
-               aacl.ac_role.name for aacl in all_acls]
-               for acl in all_acls}
-    for acl in audit.access_control_list:
-
+    for person, acl in audit.access_control_list:
       self.assertNotEqual(
           len(all_acls), 0,
           "No propagated acls created for {}".format(acl.ac_role.name))
-
       # Check if all objects have the Audit Captain Mapped role
       for obj in objects['snapshots'] + [
           objects['assessment'],
@@ -209,8 +198,7 @@ class TestAuditRoleProgation(TestCase):
           objects['evidence'],
           objects['comment'],
       ]:
-        key = (obj.id, obj.type, acl.person)
-        self.assertIn(key, acl_map)
+        self.assert_propagated_role(acl.ac_role.name, person.email, obj)
 
   def test_acl_propagation_on_unmap(self):
     """Test if acls are deleted correctly when the object is unmapped"""
@@ -223,7 +211,7 @@ class TestAuditRoleProgation(TestCase):
         all_models.AccessControlList.object_type == "Issue",
         all_models.AccessControlList.object_id == issue.id,
     ).count()
-    self.assertEqual(acl_count, 1)
+    self.assertEqual(acl_count, 3)
 
     # Check if comment/document propagated roles were deleted:
     acl_count = all_models.AccessControlList.query.filter(
@@ -232,4 +220,4 @@ class TestAuditRoleProgation(TestCase):
                    ((self.objects['issue_comment'].id, "Comment"),
                     (self.objects['issue_document'].id, "Document")))
     ).count()
-    self.assertEqual(acl_count, 2)
+    self.assertEqual(acl_count, 8)
