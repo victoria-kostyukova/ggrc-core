@@ -17,7 +17,7 @@ CAV = factories.CustomAttributeValueFactory
 
 
 @ddt.ddt
-class TestCAD(TestCase):
+class TestMysql(TestCase):
   """Tests for basic functionality of cad model."""
 
   def test_cad_length(self):
@@ -134,26 +134,23 @@ class TestCAD(TestCase):
     """Test filter by acl internal or not."""
     title_1 = "title_1"
     title_2 = "title_2"
+    searchable_acr = factories.AccessControlRoleFactory(
+        name=title_1,
+        internal=False,
+        object_type="Control",
+    )
+    non_searchable_acr = factories.AccessControlRoleFactory(
+        name=title_2,
+        internal=True,
+        object_type="Control",
+    )
     with factories.single_commit():
-      searchable_person = factories.PersonFactory()
-      non_searchable_person = factories.PersonFactory()
+      searchable_person = factories.PersonFactory(email="yes@search.com")
+      non_searchable_person = factories.PersonFactory(email="non@search.com")
       control = factories.ControlFactory()
-      searchable_acr = factories.AccessControlRoleFactory(
-          name=title_1,
-          internal=False,
-          object_type="Control",
-      )
-      non_searchable_acr = factories.AccessControlRoleFactory(
-          name=title_2,
-          internal=True,
-          object_type="Control",
-      )
-      factories.AccessControlListFactory(ac_role=searchable_acr,
-                                         object=control,
-                                         person=searchable_person)
-      factories.AccessControlListFactory(ac_role=non_searchable_acr,
-                                         object=control,
-                                         person=non_searchable_person)
+      control.add_person_with_role(searchable_person, searchable_acr)
+      control.add_person_with_role(non_searchable_person, non_searchable_acr)
+
     searchable_contents = [
         (i.content, i.subproperty)
         for i in mysql.MysqlRecordProperty.query.filter(
