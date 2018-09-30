@@ -5,6 +5,7 @@
 
 import copy
 
+from ggrc import db
 from ggrc.models import all_models
 
 from integration.ggrc import api_helper
@@ -551,11 +552,8 @@ class TestCommentWithActionMixin(TestCase):
     )
 
     for acr in acrs:
-      factories.AccessControlListFactory(
-          ac_role=acr,
-          object=assessment,
-          person=reader
-      )
+      assessment.add_person_with_role(reader, acr)
+    db.session.commit()
 
     response = self.api.put(assessment, {"actions": {"add_related": [
         {
