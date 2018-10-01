@@ -438,7 +438,10 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
           object_type="Audit",
           ac_role_id=audit_role.id,
       )
-      factories.AccessControlPersonFactory(assignee_user, acl)
+      factories.AccessControlPersonFactory(
+          person=assignee_user,
+          ac_list=acl,
+      )
 
     self.api.set_user(assignee_user)
     response = self.generate_children_issues_for(
