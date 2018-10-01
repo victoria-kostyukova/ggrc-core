@@ -127,47 +127,6 @@ class Noted(object):
     )
 
 
-class Hierarchical(object):
-  """Mixin that defines `parent` and `child` fields to organize hierarchy."""
-
-  @declared_attr
-  def parent_id(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(
-        db.Integer, db.ForeignKey('{0}.id'.format(cls.__tablename__))),
-        cls.__name__)
-
-  @declared_attr
-  def children(cls):  # pylint: disable=no-self-argument
-    return db.relationship(
-        cls.__name__,
-        backref=db.backref(
-            'parent', remote_side='{0}.id'.format(cls.__name__)),
-    )
-
-  # REST properties
-  _api_attrs = reflection.ApiAttributes('children', 'parent')
-  _fulltext_attrs = [
-      'children',
-      'parent',
-  ]
-
-  @classmethod
-  def indexed_query(cls):
-    return super(Hierarchical, cls).indexed_query().options(
-        orm.Load(cls).subqueryload("children"),
-        orm.Load(cls).joinedload("parent"),
-    )
-
-  @classmethod
-  def eager_query(cls):
-    """Eager query"""
-    query = super(Hierarchical, cls).eager_query()
-    return query.options(
-        orm.subqueryload('children'),
-        # orm.joinedload('parent'),
-    )
-
-
 class WithStartDate(object):
   """Mixin that defines `start_date`."""
   # REST properties
@@ -808,7 +767,6 @@ __all__ = [
     "CustomAttributable",
     "Described",
     "FinishedDate",
-    "Hierarchical",
     "Noted",
     "Notifiable",
     "Slugged",
