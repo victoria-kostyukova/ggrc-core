@@ -270,12 +270,12 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
     No field should contain global auditors.
     """
-    acls = obj.access_control_list
 
     # Handle Admins list.
-    admins = [acl.person for acl in acls
-              if acl.ac_role.name == "Admin" and
-              acl.person.email in allowed_emails]
+    admins = [
+        person for person, acl in obj.access_control_list
+        if acl.ac_role.name == "Admin" and person.email in allowed_emails
+    ]
     admins = sorted(admins, key=lambda person: person.name)
 
     issue_verifier_email = admins[0].email if admins else ""
@@ -283,9 +283,9 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
     # Handle Primary Contacts list.
     primary_contacts = [
-        acl.person for acl in acls
+        person for person, acl in obj.access_control_list
         if acl.ac_role.name == "Primary Contacts" and
-        acl.person.email in allowed_emails
+        person.email in allowed_emails
     ]
     primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
