@@ -37,6 +37,10 @@ DUPLICATE_IN_MULTI_VALUE = (
 DUPLICATE_VALUE_IN_CSV = (u"Line {line} has the same {column_name} '{value}' "
                           u"as {processed_line}. The line will be ignored.")
 
+DUPLICATE_CAD_NAME = (u"Line {line}: Attribute name already exists at this "
+                      u"object type. Please choose another attribute name "
+                      u"and restart the import.")
+
 MAP_UNMAP_CONFLICT = (u"Line {line}: Object '{slug}' scheduled for mapping and"
                       u" unmapping at the same time. Mapping rule update will"
                       u" be ignored.")

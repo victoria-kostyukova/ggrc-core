@@ -31,6 +31,7 @@ from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
+from ggrc.models.exceptions import ReservedNameError
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
@@ -428,6 +429,9 @@ class ImportBlockConverter(BlockConverter):
       for row in self.row_converters_from_csv():
         try:
           row.process_row()
+        except ReservedNameError:
+          row.add_error(errors.DUPLICATE_CAD_NAME)
+          logger.exception(errors.DUPLICATE_CAD_NAME)
         except Exception:  # pylint: disable=broad-except
           row.add_error(errors.UNKNOWN_ERROR)
           logger.exception("Unexpected error on import")

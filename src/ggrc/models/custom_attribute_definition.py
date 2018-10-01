@@ -16,7 +16,7 @@ from ggrc.models.mixins import base
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
-from ggrc.models.exceptions import ValidationError
+from ggrc.models.exceptions import ValidationError, ReservedNameError
 from ggrc.models import reflection
 from ggrc.cache import memcache
 
@@ -295,8 +295,10 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       return value
 
     if name in self._get_reserved_names(definition_type):
-      raise ValueError(u"Attribute '{}' is reserved for this object type."
-                       .format(name))
+      raise ReservedNameError(
+          u"Attribute '{}' is reserved for this object type."
+          .format(name)
+      )
 
     if (self._get_global_cad_names(definition_type).get(name) is not None and
             self._get_global_cad_names(definition_type).get(name) != self.id):
@@ -307,8 +309,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     acrs = {i.lower() for i in acr.get_custom_roles_for(model_name).values()}
     if name in acrs:
       raise ValueError(u"Custom Role with a name of '{}' "
-
-                       u"already existsfor this object type".format(name))
+                       u"already exists for this object type".format(name))
 
     if definition_type == "assessment":
       self.validate_assessment_title(name)
