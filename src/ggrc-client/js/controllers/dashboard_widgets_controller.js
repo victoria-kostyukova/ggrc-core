@@ -7,7 +7,6 @@ import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
 import {inferObjectType} from '../plugins/utils/models-utils';
-import DisplayPrefs from '../models/local-storage/display-prefs';
 
 export default can.Control({
   pluginName: 'dashboard_widgets',
@@ -68,36 +67,17 @@ export default can.Control({
       return this._prepare_deferred;
     }
 
-    this._prepare_deferred = $.when(
+    this._prepare_deferred =
       can.view(this.options.widget_view, $.when(this.options))
-      , DisplayPrefs.getSingleton()
-    ).then(this.proxy('draw_widget'));
+        .then(this.proxy('draw_widget'));
 
     return this._prepare_deferred;
   },
-  draw_widget: function (frag, prefs) {
-
-    this.element.html(frag[0]);
-
-    let content = this.element;
-    let controllerContent = null;
-
-    if (prefs.getCollapsed(window.getPageToken(), this.element.attr('id'))) {
-
-      this.element
-        .find('.widget-showhide > a')
-        .showhide('hide');
-
-      content.add(this.element).css('height', '');
-      if (content.is('.ui-resizable')) {
-        content.resizable('destroy');
-      }
-    } else {
-      content.trigger('min_size');
-    }
+  draw_widget: function (frag) {
+    this.element.html(frag);
 
     if (this.options.content_controller) {
-      controllerContent = this.element.find(this.options.content_selector);
+      let controllerContent = this.element.find(this.options.content_selector);
       if (this.options.content_controller_selector) {
         controllerContent =
           controllerContent.find(this.options.content_controller_selector);

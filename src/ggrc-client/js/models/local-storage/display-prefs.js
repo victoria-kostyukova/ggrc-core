@@ -5,10 +5,7 @@
 
 import LocalStorage from './local-storage';
 
-let COLLAPSE = 'collapse';
 let LHN_SIZE = 'lhn_size';
-let OBJ_SIZE = 'obj_size';
-let SORTS = 'sorts';
 let LHN_STATE = 'lhn_state';
 let TREE_VIEW_HEADERS = 'tree_view_headers';
 let TREE_VIEW_STATES = 'tree_view_states';
@@ -106,27 +103,6 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
     let args = can.makeArray(arguments);
     args[0] === null && args.splice(0, 1);
     return can.getObject(args.join('.'), this);
-  },
-
-  // collapsed state
-  // widgets on a page may be collapsed such that only the title bar is visible.
-  // if pageId === null, this is a global value
-  setCollapsed: function (pageId, widgetId, isCollapsed) {
-    this.makeObject(pageId === null ? pageId : path, COLLAPSE)
-      .attr(widgetId, isCollapsed);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  getCollapsed: function (pageId, widgetId) {
-    let collapsed = this.getObject(pageId === null ? pageId : path, COLLAPSE);
-    if (!collapsed) {
-      collapsed = this.makeObject(pageId === null ? pageId : path, COLLAPSE)
-        .attr(this.makeObject(COLLAPSE, pageId).serialize());
-    }
-
-    return widgetId ? collapsed.attr(widgetId) : collapsed;
   },
 
   setTreeViewHeaders: function (modelName, displayList) {
@@ -243,51 +219,6 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
     return widgetId ? size.attr(widgetId) : size;
   },
 
-  // sorts = position of widgets in each column on a page
-  // This is also use at page load to determine which widgets need to be
-  // generated client-side.
-  getSorts: function (pageId, columnId) {
-    let sorts = this.getObject(path, SORTS);
-    if (!sorts) {
-      sorts = this.makeObject(path, SORTS)
-        .attr(this.makeObject(SORTS, pageId).serialize());
-      this.autoupdate && this.save();
-    }
-
-    return columnId ? sorts.attr(columnId) : sorts;
-  },
-
-  setSorts: function (pageId, widgetId, sorts) {
-    let pageSorts = this.makeObject(path, SORTS);
-
-    if (typeof sorts === 'undefined' && typeof widgetId === 'object') {
-      sorts = widgetId;
-      widgetId = undefined;
-    }
-
-    pageSorts.attr(widgetId ? widgetId : sorts, widgetId ? sorts : undefined);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  // reset function currently resets all layout for a page type (first element in URL path)
-  resetPagePrefs: function () {
-    this.removeAttr(path);
-    return this.save();
-  },
-
-  setPageAsDefault: function (pageId) {
-    let that = this;
-    can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS],
-      function (key) {
-        that.makeObject(key).attr(
-          pageId, new can.Observe(that.makeObject(path, key).serialize()));
-      });
-    this.save();
-    return this;
-  },
-
   getLHNState: function () {
     return this.makeObject(LHN_STATE);
   },
@@ -311,9 +242,3 @@ export default LocalStorage('CMS.Models.DisplayPrefs', {
   },
 
 });
-
-export {
-  COLLAPSE,
-  SORTS,
-  path,
-};

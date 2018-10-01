@@ -8,7 +8,6 @@ import {
   getCounts,
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 import TreeViewOptions from './tree-view-options';
 import Mappings from '../../models/mappers/mappings';
 
@@ -88,58 +87,54 @@ import Mappings from '../../models/mappers/mappings';
         .on('widget_hidden', this.widget_hidden.bind(this));
       this.element.closest('.widget')
         .on('widget_shown', this.widget_shown.bind(this));
-      DisplayPrefs.getSingleton().then(function (displayPrefs) {
-        let allowed;
 
-        this.display_prefs = displayPrefs;
+      this.element.uniqueId();
 
-        this.element.uniqueId();
+      this.options.attr('is_subtree',
+        this.element && this.element.closest('.inner-tree').length > 0);
 
-        this.options.attr('is_subtree',
-          this.element && this.element.closest('.inner-tree').length > 0);
-
-        if ('parent_instance' in opts && 'status' in opts.parent_instance) {
-          setAllowMapping = function () {
-            let isAccepted = opts.parent_instance.attr('status') === 'Accepted';
-            let admin = Permission.is_allowed('__GGRC_ADMIN__');
-            this.options.attr('allow_mapping_or_creating',
-              (admin || !isAccepted) &&
-              (this.options.allow_mapping || this.options.allow_creating));
-          }.bind(this);
-          setAllowMapping();
-          opts.parent_instance.bind('change', setAllowMapping);
-        } else {
+      if ('parent_instance' in opts && 'status' in opts.parent_instance) {
+        setAllowMapping = function () {
+          let isAccepted = opts.parent_instance.attr('status') === 'Accepted';
+          let admin = Permission.is_allowed('__GGRC_ADMIN__');
           this.options.attr('allow_mapping_or_creating',
-            this.options.allow_mapping || this.options.allow_creating);
+            (admin || !isAccepted) &&
+            (this.options.allow_mapping || this.options.allow_creating));
+        }.bind(this);
+        setAllowMapping();
+        opts.parent_instance.bind('change', setAllowMapping);
+      } else {
+        this.options.attr('allow_mapping_or_creating',
+          this.options.allow_mapping || this.options.allow_creating);
+      }
+
+      this.options.update_count =
+        _.isBoolean(this.element.data('update-count')) ?
+          this.element.data('update-count') :
+          true;
+
+      if (!this.options.scroll_element) {
+        this.options.attr('scroll_element', $('.object-area'));
+      }
+
+      // Override nested child options for allow_* properties
+      let allowed = {};
+      this.options.each(function (item, prop) {
+        if (prop.indexOf('allow') === 0 && item === false) {
+          allowed[prop] = item;
         }
-
-        this.options.update_count =
-          _.isBoolean(this.element.data('update-count')) ?
-            this.element.data('update-count') :
-            true;
-
-        if (!this.options.scroll_element) {
-          this.options.attr('scroll_element', $('.object-area'));
-        }
-
-        // Override nested child options for allow_* properties
-        allowed = {};
-        this.options.each(function (item, prop) {
-          if (prop.indexOf('allow') === 0 && item === false) {
-            allowed[prop] = item;
-          }
-        });
-        this.options.attr('child_options', this.options.child_options.slice(0));
-        can.each(this.options.child_options, function (options, i) {
-          this.options.child_options.attr(i,
-            new can.Map(can.extend(options.attr(), allowed)));
-        }.bind(this));
-
-        this._attached_deferred = can.Deferred();
-        if (this.element && this.element.closest('body').length) {
-          this._attached_deferred.resolve();
-        }
+      });
+      this.options.attr('child_options', this.options.child_options.slice(0));
+      can.each(this.options.child_options, function (options, i) {
+        this.options.child_options.attr(i,
+          new can.Map(can.extend(options.attr(), allowed)));
       }.bind(this));
+
+      this._attached_deferred = can.Deferred();
+      if (this.element && this.element.closest('body').length) {
+        this._attached_deferred.resolve();
+      }
+
       // Make sure the parent_instance is not a computable
       if (typeof this.options.parent_instance === 'function') {
         this.options.attr('parent_instance', this.options.parent_instance());
@@ -364,7 +359,7 @@ import Mappings from '../../models/mappers/mappings';
       instanceId = el.closest('.tree-item').data('object-id');
       parent = can.reduce(this.options.list, function (a, b) {
         switch (true) {
-          case !!a : return a;
+          case !!a: return a;
           case b.instance.id === instanceId: return b;
           default: return null;
         }
@@ -451,7 +446,7 @@ import Mappings from '../../models/mappers/mappings';
         drawItemsDfds.push(control._draw_node_deferred);
         filteredItems.push(control);
         return control.element[0];
-      }.bind(this));
+      });
 
       if ($footer.length) {
         $(items).insertBefore($footer);

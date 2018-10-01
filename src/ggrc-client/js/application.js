@@ -107,12 +107,7 @@
     }
     $('.dropdown-toggle').on('click', dropdownPosition);
   });
-  root.getPageToken = function getPageToken() {
-    return $(document.body).data('page-subtype') ||
-      $(document.body).data('page-type') ||
-      window.location.pathname
-        .substring(1, (window.location.pathname + '/').indexOf('/', 1));
-  };
+
   // Make sure GGRC.config is defined (needed to run Karma tests)
   GGRC.config = GGRC.config || {};
 })(window, GGRC, jQuery, can);
