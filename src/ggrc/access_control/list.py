@@ -65,6 +65,7 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       'AccessControlPerson',
       foreign_keys='AccessControlPerson.ac_list_id',
       backref='ac_list',
+      lazy='subquery',
       cascade='all, delete-orphan',
   )
 

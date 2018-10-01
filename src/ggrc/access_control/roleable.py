@@ -34,7 +34,6 @@ class Roleable(object):
   """
 
   _update_raw = ['access_control_list', ]
-  _include_links = []
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('access_control_list', True, True, True))
@@ -113,16 +112,22 @@ class Roleable(object):
   def eager_query(cls):
     """Eager Query"""
     query = super(Roleable, cls).eager_query()
-    return cls.eager_inclusions(
-        query,
-        Roleable._include_links
-    ).options(
+    return query.options(
         orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
         ).undefer_group(
             'AccessControlRole_complete'
+        ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            'Person_complete'
         ),
     )
 
