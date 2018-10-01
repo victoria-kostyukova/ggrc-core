@@ -4,10 +4,10 @@
 """Test Access Control Roleable mixin"""
 import ddt
 from ggrc import db
+from ggrc import utils
 from ggrc.access_control import roleable
 from ggrc.models import all_models
 from integration.ggrc import TestCase
-from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 
 
@@ -20,6 +20,66 @@ class TestAccessControlRoleable(TestCase):
     with factories.single_commit():
       self.role = factories.AccessControlRoleFactory(object_type="Control")
       self.person = factories.PersonFactory()
+
+  def test_roleable_eager_query(self):
+    with factories.single_commit():
+      people = [factories.PersonFactory() for _ in range(5)]
+      emails = {person.email for person in people}
+      control = factories.ControlFactory()
+      control.add_person_with_role_name(people[0], "Admin")
+      control_id = control.id
+
+    db.session.expire_all()
+    with utils.QueryCounter() as counter:
+      control = all_models.Control.eager_query().filter_by(
+          id=control_id
+      ).first()
+      eager_query_count = counter.get
+      self.assertEqual(len(control.access_control_list), 1)
+      self.assertEqual(eager_query_count, counter.get)
+      self.assertEqual(
+          control.access_control_list[0][1].ac_role.name,
+          "Admin",
+      )
+      self.assertEqual(eager_query_count, counter.get)
+      self.assertEqual(
+          control.access_control_list[0][0].email,
+          people[0].email,
+      )
+      self.assertEqual(eager_query_count, counter.get)
+
+    factories.AccessControlRoleFactory(object_type="Control", name="custom")
+
+    with factories.single_commit():
+      control_multi = factories.ControlFactory()
+      for person in people:
+        control_multi.add_person_with_role_name(person, "Admin")
+        control_multi.add_person_with_role_name(person, "custom")
+      control_multi_id = control_multi.id
+
+    db.session.expire_all()
+    with utils.QueryCounter() as counter:
+      control_multi = all_models.Control.eager_query().filter_by(
+          id=control_multi_id
+      ).first()
+      self.assertEqual(eager_query_count, counter.get)
+      self.assertEqual(
+          len(control_multi.access_control_list),
+          len(people) * 2,
+      )
+      self.assertEqual(eager_query_count, counter.get)
+      admins = {
+          person.email
+          for person in control_multi.get_persons_for_rolename("Admin")
+      }
+      self.assertEqual(admins, emails)
+      self.assertEqual(eager_query_count, counter.get)
+      custom_role_users = {
+          person.email
+          for person in control_multi.get_persons_for_rolename("custom")
+      }
+      self.assertEqual(custom_role_users, emails)
+      self.assertEqual(eager_query_count, counter.get)
 
   @ddt.data(*[
       model for model in all_models.all_models
