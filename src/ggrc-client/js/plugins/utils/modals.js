@@ -162,7 +162,7 @@ function _setupWarning(confirm, settings) {
         e.preventDefault();
 
         let confirmButton = confirm.find(buttonSelector);
-        if (!confirmButton.attr('disabled')) {
+        if (!confirmButton.hasClass('disabled')) {
           confirmButton.trigger('click');
         }
       }
