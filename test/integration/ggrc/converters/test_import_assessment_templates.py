@@ -85,7 +85,7 @@ class TestAssessmentTemplatesImport(TestCase):
 
     expected_messages = {
         "Assessment Template": {
-            "rows": 4,
+            "rows": 5,
             "updated": 0,
             "created": 4,
             "row_warnings": {
@@ -99,6 +99,11 @@ class TestAssessmentTemplatesImport(TestCase):
                     column_name="Default Verifiers",
                     email="user1@a.com"
                 ),
+            },
+            "row_errors": {
+                errors.DUPLICATE_CAD_NAME.format(
+                    line=15
+                )
             },
         }
     }
