@@ -4,6 +4,7 @@
 """Tests for /api/assessments endpoints."""
 
 import ddt
+import json
 
 from ggrc.models import all_models
 from integration.ggrc import api_helper
@@ -17,12 +18,7 @@ class TestAuditResource(TestCase):
 
   def setUp(self):
     super(TestAuditResource, self).setUp()
-    self.client.get("/login")
     self.api = api_helper.Api()
-
-  def _get_snapshot_counts(self, audit):
-    url = "/api/audits/{}/snapshot_counts".format(audit.id)
-    return self.client.get(url).json
 
   def test_snapshot_counts_query(self):
     """Test snapshot_counts endpoint"""
@@ -30,6 +26,7 @@ class TestAuditResource(TestCase):
     with factories.single_commit():
       audit_1 = factories.AuditFactory()
       control = factories.ControlFactory()
+      regulation = factories.RegulationFactory()
       factories.RelationshipFactory(
           source=audit_1,
           destination=control
@@ -41,6 +38,10 @@ class TestAuditResource(TestCase):
           all_models.Revision.resource_type == "Audit",
           all_models.Revision.resource_id == audit_1.id
       ).first()
+      revision_2 = all_models.Revision.query.filter(
+          all_models.Revision.resource_type == "Audit",
+          all_models.Revision.resource_id == audit_2.id
+      ).first()
       snapshot = factories.SnapshotFactory(
           parent=audit_1,
           child_type=control.type,
@@ -51,13 +52,28 @@ class TestAuditResource(TestCase):
           source=audit_1,
           destination=snapshot,
       )
+      snapshot2 = factories.SnapshotFactory(
+          parent=audit_2,
+          child_type=regulation.type,
+          child_id=regulation.id,
+          revision=revision_2
+      )
+      factories.RelationshipFactory(
+          source=audit_2,
+          destination=snapshot2,
+      )
 
     audits = [audit_1, audit_2]
     expected_snapshot_counts = {
-        audit_1.id: {"Control": 1},
-        audit_2.id: {}
+        audit_1.id: {"Control": 1, "Regulation": 0},
+        audit_2.id: {"Control": 0, "Regulation": 1},
     }
 
     for audit in audits:
-      snapshot_counts = self._get_snapshot_counts(audit)
+      response = self.api.send_request(
+          self.api.client.get,
+          api_link="/api/audits/{}/snapshot_counts".format(audit.id),
+          data={"snapshot_types": ["Control", "Regulation"]},
+      )
+      snapshot_counts = json.loads(response.data)
       self.assertEqual(snapshot_counts, expected_snapshot_counts[audit.id])
