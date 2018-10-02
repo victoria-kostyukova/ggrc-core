@@ -99,11 +99,13 @@ class TestTotalReindex(TestCase):
     """Test for check simple reindex procedure."""
     with ggrc_factories.single_commit():
       for factory in self.INDEXED_MODEL_FACTORIES:
-        for _ in range(5):
+        for _ in range(3):
           factory()
     indexer = fulltext.get_indexer()
-    count = indexer.record_type.query.count()
-    count = indexer.record_type.query.delete()
+    count = indexer.record_type.query.filter(
+        MysqlRecordProperty.type != "AccessControlRole"
+    ).count()
+    indexer.record_type.query.delete()
     self.client.get("/login")
     self.client.post("/admin/full_reindex")
 
