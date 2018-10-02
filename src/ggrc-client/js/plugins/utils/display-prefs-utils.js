@@ -9,6 +9,8 @@ const localStorageKey = 'display_prefs';
 const TREE_VIEW_HEADERS = 'tree_view_headers';
 const TREE_VIEW_STATES = 'tree_view_states';
 const MODAL_STATE = 'modal_state';
+const TREE_VIEW = 'tree_view';
+const CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
 const pageToken = window.location.pathname.replace(/\./g, '/');
 
 let preferences = null;
@@ -170,6 +172,32 @@ function setModalState(modelName, state) {
   saveObject(MODAL_STATE, value);
 }
 
+/**
+ * Gets objects list for sub tree per model
+ * @param {String} modelName model name
+ * @return {Array} list of displayed objects
+ */
+function getChildTreeDisplayList(modelName) {
+  let value = getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+  if (!value.attr(modelName)) {
+    return null; // in this case user should use default list an empty list, [], is different  than null
+  }
+  return value.attr(modelName).attr('display_list');
+}
+
+/**
+ * Sets displayed in sub-tree objects per model
+ * @param {String} modelName model name
+ * @param {Array} displayList list of displayed objects
+ */
+function setChildTreeDisplayList(modelName, displayList) {
+  let value = getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+  value.attr(modelName, {
+    display_list: displayList,
+  });
+  saveObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST, value);
+}
+
 export {
   getTreeViewHeaders,
   setTreeViewHeaders,
@@ -177,6 +205,8 @@ export {
   setTreeViewStates,
   getModalState,
   setModalState,
+  getChildTreeDisplayList,
+  setChildTreeDisplayList,
   clearPreferences,
   pageToken,
 };

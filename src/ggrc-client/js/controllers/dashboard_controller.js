@@ -9,7 +9,7 @@ import InfoPin from './info_pin_controller';
 import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
-import DisplayPrefs from '../models/local-storage/display-prefs';
+import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import LocalStorage from '../models/local-storage/local-storage';
 
 const Dashboard = can.Control({
@@ -19,23 +19,19 @@ const Dashboard = can.Control({
   },
 }, {
   init: function (el, options) {
-    DisplayPrefs.getSingleton().then(function (prefs) {
-      this.display_prefs = prefs;
+    this.init_tree_view_settings();
+    this.init_page_title();
+    this.init_page_header();
+    this.init_widget_descriptors();
+    if (!this.inner_nav_controller) {
+      this.init_inner_nav();
+    }
 
-      this.init_tree_view_settings();
-      this.init_page_title();
-      this.init_page_header();
-      this.init_widget_descriptors();
-      if (!this.inner_nav_controller) {
-        this.init_inner_nav();
-      }
-
-      // Before initializing widgets, hide the container to not show
-      // loading state of multiple widgets before reducing to one.
-      this.hide_widget_area();
-      this.init_default_widgets();
-      this.init_widget_area();
-    }.bind(this));
+    // Before initializing widgets, hide the container to not show
+    // loading state of multiple widgets before reducing to one.
+    this.hide_widget_area();
+    this.init_default_widgets();
+    this.init_widget_area();
   },
 
   init_tree_view_settings: function () {
@@ -48,13 +44,12 @@ const Dashboard = can.Control({
     validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
     // only change the display list
     can.each(validModels, function (mName) {
-      savedChildTreeDisplayList = this.display_prefs
-        .getChildTreeDisplayList(mName);
+      savedChildTreeDisplayList = getChildTreeDisplayList(mName);
       if (savedChildTreeDisplayList !== null) {
         GGRC.tree_view.sub_tree_for.attr(mName + '.display_list',
           savedChildTreeDisplayList);
       }
-    }.bind(this));
+    });
   },
 
   init_page_title: function () {

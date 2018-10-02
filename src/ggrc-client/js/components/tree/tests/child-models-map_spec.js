@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as DisplayPrefs from '../../../plugins/utils/display-prefs-utils';
 import childModelsMap from '../child-models-map';
 
 describe('child-models-map object', () => {
@@ -15,7 +16,7 @@ describe('child-models-map object', () => {
     let spy;
 
     beforeEach(() => {
-      spy = spyOn(childModelsMap.displayPrefs, 'getChildTreeDisplayList');
+      spy = spyOn(DisplayPrefs, 'getChildTreeDisplayList');
     });
 
     describe('if childModelsMap has no field for specified type', () => {
@@ -29,7 +30,8 @@ describe('child-models-map object', () => {
 
           childModelsMap.getModels(type);
 
-          expect(spy).toHaveBeenCalledWith(type);
+          expect(spy)
+            .toHaveBeenCalledWith(type);
           expectedResult[type] = returnValue;
         });
 
@@ -59,8 +61,6 @@ describe('child-models-map object', () => {
 
     describe('if childModelsMap has field for specified type', () => {
       it('does not calls getChildTreeDisplayList method', () => {
-        let spy = childModelsMap.displayPrefs.getChildTreeDisplayList;
-
         types.forEach((type) => {
           childModelsMap.attr('container')
             .attr(type, ['Audit']);
@@ -79,7 +79,7 @@ describe('child-models-map object', () => {
 
     beforeEach(() => {
       expectedResult = {};
-      spyOn(childModelsMap.displayPrefs, 'setChildTreeDisplayList');
+      spyOn(DisplayPrefs, 'setChildTreeDisplayList');
       types.forEach((type) => {
         childModelsMap.attr('container')
           .attr(type, 'old_child_models_for_' + type);
@@ -103,7 +103,7 @@ describe('child-models-map object', () => {
       let newModels = 'childs_for_Program';
       childModelsMap.setModels(type, newModels);
 
-      expect(childModelsMap.displayPrefs.setChildTreeDisplayList)
+      expect(DisplayPrefs.setChildTreeDisplayList)
         .toHaveBeenCalledWith(type, newModels);
     });
   });
