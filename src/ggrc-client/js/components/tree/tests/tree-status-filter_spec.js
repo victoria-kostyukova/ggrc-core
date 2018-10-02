@@ -7,6 +7,7 @@ import Component from '../tree-status-filter';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import router from '../../../router';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import * as DisplayPrefs from '../../../plugins/utils/display-prefs-utils';
 
 describe('tree-status-filter component', () => {
   let viewModel;
@@ -101,8 +102,7 @@ describe('tree-status-filter component', () => {
   describe('saveTreeStates() method', () => {
     const filters = ['A', 'B'];
     beforeEach(() => {
-      let displayPrefs = jasmine.createSpyObj(['setTreeViewStates']);
-      viewModel.attr('displayPrefs', displayPrefs);
+      spyOn(DisplayPrefs, 'setTreeViewStates');
     });
 
     describe('saves filter to display preferences', () => {
@@ -111,7 +111,7 @@ describe('tree-status-filter component', () => {
 
         viewModel.saveTreeStates(filters);
 
-        expect(viewModel.attr('displayPrefs').setTreeViewStates)
+        expect(DisplayPrefs.setTreeViewStates)
           .toHaveBeenCalledWith('testId', filters);
       });
     });
@@ -122,10 +122,7 @@ describe('tree-status-filter component', () => {
     beforeEach(() => {
       savedFilters = new can.List(['c', 'd']);
       spyOn(savedFilters, 'filter').and.returnValue(['c']);
-
-      viewModel.attr('displayPrefs', {
-        getTreeViewStates: jasmine.createSpy().and.returnValue(savedFilters),
-      });
+      spyOn(DisplayPrefs, 'getTreeViewStates').and.returnValue(savedFilters);
     });
 
     it('use filter set from query if it is presented', () => {

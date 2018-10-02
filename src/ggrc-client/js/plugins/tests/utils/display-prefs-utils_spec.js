@@ -9,8 +9,12 @@ import * as LocalStorage from '../../utils/local-storage-utils';
 describe('display-prefs-utils', () => {
   const localStorageKey = 'display_prefs';
 
-  afterEach(() => {
+  beforeEach(() => {
     spyOn(LocalStorage, 'clear');
+    DisplayPrefs.clearPreferences();
+  });
+
+  afterEach(() => {
     DisplayPrefs.clearPreferences();
   });
 
@@ -117,6 +121,74 @@ describe('display-prefs-utils', () => {
             tree_view_headers: {
               audit: {display_list: headers},
             },
+          },
+        });
+    });
+  });
+
+  describe('getTreeViewStates() method', () => {
+    it('should return empty array when there is no saved preferences', () => {
+      let result = DisplayPrefs.getTreeViewStates('any model name');
+
+      expect(result.serialize()).toEqual([]);
+    });
+
+    it('should return states list from local storage', () => {
+      let states = ['item1', 'item2', 'item3'];
+      let prefs = {
+        id: 1,
+        tree_view_states: {
+          'any model name': {status_list: states},
+        },
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+
+      let result = DisplayPrefs.getTreeViewStates('any model name');
+      expect(result.serialize()).toEqual(states);
+    });
+  });
+
+  describe('setTreeViewStates() method', () => {
+    beforeEach(() => {
+      let prefs = {
+        id: 1,
+        tree_view_states: {
+          audit: {status_list: ['item1', 'item2']},
+        },
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+      spyOn(LocalStorage, 'update');
+    });
+
+    it('should save statuses for model', () => {
+      let states = ['item3', 'item4', 'item5'];
+      DisplayPrefs.setTreeViewStates('control', states);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          tree_view_states: {
+            audit: {status_list: ['item1', 'item2']},
+            control: {status_list: states},
+          },
+        });
+    });
+
+    it('should update statuses for already saved model', () => {
+      let states = ['item3', 'item4', 'item5'];
+      DisplayPrefs.setTreeViewStates('audit', states);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          tree_view_states: {
+            audit: {status_list: states},
           },
         });
     });

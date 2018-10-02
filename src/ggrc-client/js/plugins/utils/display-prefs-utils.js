@@ -7,6 +7,7 @@ import * as LocalStorage from './local-storage-utils';
 
 const localStorageKey = 'display_prefs';
 const TREE_VIEW_HEADERS = 'tree_view_headers';
+const TREE_VIEW_STATES = 'tree_view_states';
 const pageToken = window.location.pathname.replace(/\./g, '/');
 
 let preferences = null;
@@ -116,9 +117,37 @@ function setTreeViewHeaders(modelName, headers) {
   saveObject(pageToken, TREE_VIEW_HEADERS, value);
 }
 
+/**
+ * Gets saved tree view states preferences per selected model
+ * @param {String} modelName model name
+ * @return {Array} list of saved states
+ */
+function getTreeViewStates(modelName) {
+  let value = getObject(TREE_VIEW_STATES);
+  if (!value.attr(modelName)) {
+    return new can.List();
+  }
+  return value.attr(modelName).attr('status_list');
+}
+
+/**
+ * Saves tree view states per model
+ * @param {String} modelName model name
+ * @param {Array} states selected statuses
+ */
+function setTreeViewStates(modelName, states) {
+  let value = getObject(TREE_VIEW_STATES);
+  value.attr(modelName, {
+    status_list: states,
+  });
+  saveObject(TREE_VIEW_STATES, value);
+}
+
 export {
   getTreeViewHeaders,
   setTreeViewHeaders,
+  getTreeViewStates,
+  setTreeViewStates,
   clearPreferences,
   pageToken,
 };

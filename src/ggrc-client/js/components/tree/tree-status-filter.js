@@ -5,7 +5,10 @@
 
 import * as StateUtils from '../../plugins/utils/state-utils';
 import router from '../../router';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
+import {
+  getTreeViewStates,
+  setTreeViewStates,
+} from '../../plugins/utils/display-prefs-utils';
 
 let viewModel = can.Map.extend({
   disabled: false,
@@ -16,7 +19,6 @@ let viewModel = can.Map.extend({
   filterStates: [],
   widgetId: null,
   modelName: null,
-  displayPrefs: null,
   define: {
     currentStates: {
       get() {
@@ -37,7 +39,7 @@ let viewModel = can.Map.extend({
   getDefaultStates() {
     let widgetId = this.attr('widgetId');
     // Get the status list from local storage
-    let savedStates = this.attr('displayPrefs').getTreeViewStates(widgetId);
+    let savedStates = getTreeViewStates(widgetId);
     // Get the status list from query string
     let queryStates = router.attr('state');
 
@@ -56,7 +58,7 @@ let viewModel = can.Map.extend({
   },
   saveTreeStates(selectedStates) {
     let widgetId = this.attr('widgetId');
-    this.attr('displayPrefs').setTreeViewStates(widgetId, selectedStates);
+    setTreeViewStates(widgetId, selectedStates);
   },
   setStatesDropdown(states) {
     let statuses = this.attr('filterStates').map((item) => {
@@ -116,15 +118,11 @@ export default can.Component.extend({
         };
       });
       vm.attr('filterStates', filterStates);
-
-      DisplayPrefs.getSingleton().then((displayPrefs) => {
-        vm.attr('displayPrefs', displayPrefs);
-
-        let defaultStates = vm.getDefaultStates();
-        vm.buildSearchQuery(defaultStates);
-        vm.setStatesDropdown(defaultStates);
-        vm.setStatesRoute(defaultStates);
-      });
+      
+      let defaultStates = vm.getDefaultStates();
+      vm.buildSearchQuery(defaultStates);
+      vm.setStatesDropdown(defaultStates);
+      vm.setStatesRoute(defaultStates);
     },
     '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {
