@@ -171,18 +171,23 @@ class TestIssueQueryBuilder(unittest.TestCase):
     mock_object.modified_by.email = "reporter_email"
 
     verifier = mock.MagicMock()
-    verifier.person.name = "admin_name"
-    verifier.person.email = "verifier_email"
-    verifier.ac_role.name = "Admin"
+    verifier_acl = mock.MagicMock()
+    verifier.name = "admin_name"
+    verifier.email = "verifier_email"
+    verifier_acl.ac_role.name = "Admin"
 
     assignee = mock.MagicMock()
-    assignee.person.name = "assignee_name"
-    assignee.person.email = "assignee_email"
-    assignee.ac_role.name = "Primary Contacts"
+    assignee_acl = mock.MagicMock()
+    assignee.name = "assignee_name"
+    assignee.email = "assignee_email"
+    assignee_acl.ac_role.name = "Primary Contacts"
 
-    access_control_list = [verifier, assignee, ]
+    access_control_list = [
+        (verifier, verifier_acl),
+        (assignee, assignee_acl),
+    ]
     mock_object.access_control_list = access_control_list
-    allowed_emails = {acl.person.email for acl in access_control_list}
+    allowed_emails = {person.email for person, _ in access_control_list}
 
     expected_result = {
         "verifier": "verifier_email",
@@ -206,51 +211,59 @@ class TestIssueQueryBuilder(unittest.TestCase):
     mock_object = mock.MagicMock()
     mock_object.modified_by.email = "reporter_email"
 
+    admin = mock.MagicMock()
+    admin.ac_role.name = "Admin"
+    primary_contact = mock.MagicMock()
+    primary_contact.ac_role.name = "Primary Contacts"
+
+    custom_role = mock.MagicMock()
+    custom_role.ac_role.name = "Custom Role"
+
     verifier_1 = mock.MagicMock()
-    verifier_1.person.name = "admin_name"
-    verifier_1.person.email = "verifier_email_1"
+    verifier_1.name = "admin_name"
+    verifier_1.email = "verifier_email_1"
     verifier_1.ac_role.name = "Admin"
 
     verifier_2 = mock.MagicMock()
-    verifier_2.person.name = "verifier_name"
-    verifier_2.person.email = "verifier_email_2"
+    verifier_2.name = "verifier_name"
+    verifier_2.email = "verifier_email_2"
     verifier_2.ac_role.name = "Admin"
 
     assignee_1 = mock.MagicMock()
-    assignee_1.person.name = "assignee_name"
-    assignee_1.person.email = "assignee_email_1"
+    assignee_1.name = "assignee_name"
+    assignee_1.email = "assignee_email_1"
     assignee_1.ac_role.name = "Primary Contacts"
 
     assignee_2 = mock.MagicMock()
-    assignee_2.person.name = "primary_contact_name"
-    assignee_2.person.email = "assignee_email_2"
+    assignee_2.name = "primary_contact_name"
+    assignee_2.email = "assignee_email_2"
     assignee_2.ac_role.name = "Primary Contacts"
 
     custom_role_1 = mock.MagicMock()
-    custom_role_1.person.name = "reporter_name"
-    custom_role_1.person.email = "reporter_email"
+    custom_role_1.name = "reporter_name"
+    custom_role_1.email = "reporter_email"
     custom_role_1.ac_role.name = "Custom Role"
 
     custom_role_2 = mock.MagicMock()
-    custom_role_2.person.name = "custom_name"
-    custom_role_2.person.email = "custom_email"
+    custom_role_2.name = "custom_name"
+    custom_role_2.email = "custom_email"
     custom_role_2.ac_role.name = "Custom Role"
 
     custom_role_3 = mock.MagicMock()
-    custom_role_3.person.name = "admin_name"
-    custom_role_3.person.email = "verifier_email_1"
+    custom_role_3.name = "admin_name"
+    custom_role_3.email = "verifier_email_1"
     custom_role_3.ac_role.name = "Custom Role"
 
     access_control_list = [
-        verifier_1,
-        verifier_2,
-        assignee_1,
-        assignee_2,
-        custom_role_1,
-        custom_role_2,
-        custom_role_3,
+        (verifier_1, admin),
+        (verifier_2, admin),
+        (assignee_1, primary_contact),
+        (assignee_2, primary_contact),
+        (custom_role_1, custom_role),
+        (custom_role_2, custom_role),
+        (custom_role_3, custom_role),
     ]
-    allowed_emails = {acl.person.email for acl in access_control_list}
+    allowed_emails = {person.email for person, _ in access_control_list}
     mock_object.access_control_list = access_control_list
 
     expected_result = {
