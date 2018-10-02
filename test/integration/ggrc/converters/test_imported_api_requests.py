@@ -57,7 +57,7 @@ class TestComprehensiveSheets(TestCase):
   LIMIT_DICT = {
       "LIST": {
           all_models.Revision: 67,
-          all_models.Event: 67,
+          all_models.Event: 69,
       },
       "SINGLE": {}
   }
