@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 # A list of field to watch for changes in.
-FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity', 'ccs')
+FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
 
 # Status values maps from GGRC to IssueTracker.
 ASSESSMENT_STATUSES_MAPPING = {
@@ -24,6 +24,22 @@ ASSESSMENT_STATUSES_MAPPING = {
     'Completed': 'VERIFIED',
     'Deprecated': 'OBSOLETE',
 }
+
+
+def _compare_ccs(ccs_payload, ccs_issuetracker):
+  """Validate CCs on payload and from third party server.
+
+  Args:
+    - ccs_payload: CCs on Issue Tracker Payload
+    - ccs_issuetracker: CCs from Issue Tracker
+
+  Returns:
+    bool object with validate or not indicator (True/False)
+  """
+  ccs_payload = frozenset(cc.strip() for cc in ccs_payload)
+  ccs_issuetracker = frozenset(cc.strip() for cc in ccs_issuetracker)
+
+  return bool(ccs_payload == ccs_issuetracker)
 
 
 def sync_assessment_statuses():
@@ -69,6 +85,9 @@ def sync_assessment_statuses():
       if all(
           assessment_state.get(field) == issuetracker_state.get(field)
           for field in FIELDS_TO_CHECK
+      ) and _compare_ccs(
+          assessment_state.get("ccs", []),
+          issuetracker_state.get("ccs", [])
       ):
         continue
 

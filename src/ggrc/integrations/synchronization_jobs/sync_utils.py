@@ -112,6 +112,7 @@ def iter_issue_batches(ids, include_emails=False):
           'type': state.get('type'),
           'priority': state.get('priority'),
           'severity': state.get('severity'),
+          'ccs': state.get('ccs', [])
       }
 
       if include_emails:
