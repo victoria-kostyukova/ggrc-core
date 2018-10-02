@@ -11,7 +11,7 @@ from sqlalchemy.ext import hybrid
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
-from ggrc.access_control import role, roleable
+from ggrc.access_control import roleable
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
@@ -117,11 +117,7 @@ class TaskGroup(roleable.Roleable,
         self.workflow.get_person_ids_for_rolename("Workflow Member"))
     if self.contact.id in people_with_role_ids:
       return
-    acl = self.workflow.acr_name_acl_map["Workflow Member"]
-    all_models.AccessControlPerson(
-        ac_list=acl,
-        person=self.contact,
-    )
+    self.workflow.add_person_with_role_name(self.contact, "Workflow Member")
 
   def copy(self, _other=None, **kwargs):
     columns = [

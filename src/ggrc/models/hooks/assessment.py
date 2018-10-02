@@ -146,27 +146,16 @@ def generate_assignee_relations(assessment,
       all_models.Person.id.in_(people)
   )}
 
-  person_roles = []
   for person_id in people:
     person = person_dict.get(person_id)
     if person is None:
       continue
-    if person_id in assignee_ids:
-      person_roles.append((person, "Assignees"))
+    if person.id in assignee_ids:
+      assessment.add_person_with_role_name(person, "Assignees")
     if person_id in verifier_ids:
-      person_roles.append((person, "Verifiers"))
+      assessment.add_person_with_role_name(person, "Verifiers")
     if person_id in creator_ids:
-      person_roles.append((person, "Creators"))
-
-  ac_roles = access_control.role.get_ac_roles_for(assessment.type)
-
-  acl_dict = {acl.ac_role: acl for acl in assessment._access_control_list}
-
-  for person, role in person_roles:
-    all_models.AccessControlPerson(
-        person=person,
-        ac_list=acl_dict[ac_roles[role]],
-    )
+      assessment.add_person_with_role_name(person, "Creators")
 
 
 def get_people_ids_based_on_role(assignee_role,

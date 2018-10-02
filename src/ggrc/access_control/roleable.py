@@ -15,7 +15,6 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
-from ggrc.access_control.people import AccessControlPerson
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection

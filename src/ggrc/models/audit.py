@@ -7,7 +7,6 @@ from sqlalchemy import orm
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
-from ggrc.access_control import people
 from ggrc.access_control.roleable import Roleable
 from ggrc.login import get_current_user
 from ggrc.models.deferred import deferred
@@ -166,10 +165,7 @@ class Audit(Snapshotable,
       audit: Audit instance
     """
     for person, acl in audit.access_control_list:
-      people.AccessControlPerson(
-          ac_list=self.acr_acl_map[acl.ac_role],
-          person=person,
-      )
+      self.add_person_with_role(person, acl.ac_role)
 
   def clone(self, source_id, mapped_objects=None):
     """Clone audit with specified whitelisted children.
