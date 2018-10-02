@@ -22,6 +22,11 @@ class TestAccessControlRoleable(TestCase):
       self.person = factories.PersonFactory()
 
   def test_roleable_eager_query(self):
+    """Test eager query on roleable object.
+
+    This test compares the query counts while accessing an object with a single
+    user role on it with an object with multiple users.
+    """
     with factories.single_commit():
       people = [factories.PersonFactory() for _ in range(5)]
       emails = {person.email for person in people}
