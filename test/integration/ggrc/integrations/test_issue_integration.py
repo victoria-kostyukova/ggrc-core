@@ -111,7 +111,6 @@ class TestIssueIntegration(ggrc.TestCase):
   def test_exclude_auditor(self):
     """Test 'exclude_auditor_emails' util."""
     audit = factories.AuditFactory()
-    audit = factories.AuditFactory()
     person = factories.PersonFactory(email="auditor@example.com")
     audit.add_person_with_role_name(person, "Auditors")
     db.session.commit()

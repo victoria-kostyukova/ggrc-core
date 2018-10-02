@@ -90,10 +90,7 @@ class TestPropagation(BaseTestPropagation):
             destination=program if i % 2 == 1 else audit,
         )
 
-    acl_id = next(
-        acl.id for acl in program._access_control_list
-        if acl.ac_role.name in "Program Editors"
-    )
+    acl_id = program.acr_name_acl_map["Program Editors"].id
 
     child_ids = propagation._handle_acl_step([acl_id])
 
@@ -320,7 +317,6 @@ class TestPropagation(BaseTestPropagation):
     """
     # pylint: disable=too-many-locals
     with factories.single_commit():
-      person = factories.PersonFactory()
       control = factories.ControlFactory()
       regulation = factories.RegulationFactory()
       objective = factories.ObjectiveFactory()

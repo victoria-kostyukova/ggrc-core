@@ -33,7 +33,7 @@ class TestAccessControlRoleable(TestCase):
     with utils.QueryCounter() as counter:
       control = all_models.Control.eager_query().filter_by(
           id=control_id
-      ).first()
+      ).one()
       eager_query_count = counter.get
       self.assertEqual(len(control.access_control_list), 1)
       self.assertEqual(eager_query_count, counter.get)
@@ -61,7 +61,7 @@ class TestAccessControlRoleable(TestCase):
     with utils.QueryCounter() as counter:
       control_multi = all_models.Control.eager_query().filter_by(
           id=control_multi_id
-      ).first()
+      ).one()
       self.assertEqual(eager_query_count, counter.get)
       self.assertEqual(
           len(control_multi.access_control_list),
@@ -99,14 +99,16 @@ class TestAccessControlRoleable(TestCase):
     )
 
   def test_with_dict(self):
+    """Test access_control_list setter with a basic dict object.
+
+    This test ensures frontend API compatibility.
+    """
     acl_list = [{
         "ac_role_id": self.role.id,
         "person": {
             "id": self.person.id
         }
     }]
-    """Test access_control_list setter with a basic dict object
-    This is the format the frontend uses"""
     obj = all_models.Control(
         title="New Control",
         access_control_list=acl_list

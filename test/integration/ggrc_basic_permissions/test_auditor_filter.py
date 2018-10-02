@@ -30,10 +30,7 @@ class TestFilterByAuditor(TestCase):
       self.audit_id = self.audit.id
       audit_context = factories.ContextFactory()
       self.audit.context = audit_context
-      factories.AccessControlPersonFactory(
-          ac_list=self.audit.acr_name_acl_map["Auditors"],
-          person=self.auditor,
-      )
+      self.audit.add_person_with_role_name(self.auditor, "Auditors")
     self.api.set_user(self.auditor)
 
   def test_query_audits_by_auditor(self):

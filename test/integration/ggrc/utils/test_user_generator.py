@@ -185,7 +185,7 @@ class TestUserGenerator(TestCase):
     ):
       program = factories.ProgramFactory()
       audit_slug = 'Audit1'
-      rrrr = self.import_data(OrderedDict([
+      self.import_data(OrderedDict([
           ("object_type", "Audit"),
           ("Code*", audit_slug),
           ("Program*", program.slug),
