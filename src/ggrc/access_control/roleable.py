@@ -5,6 +5,7 @@
 
 import logging
 from collections import defaultdict
+from collections import namedtuple
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy.orm import remote
@@ -23,6 +24,9 @@ from ggrc.utils import errors
 from ggrc.utils import referenced_objects
 
 logger = logging.getLogger(__name__)
+
+
+AclRecord = namedtuple("AclRecord", "person, acl_item")
 
 
 class Roleable(object):
@@ -68,7 +72,7 @@ class Roleable(object):
   @property
   def access_control_list(self):
     return [
-        (acp.person, acp.ac_list)
+        AclRecord(acp.person, acp.ac_list)
         for acl in self._access_control_list
         for acp in acl.access_control_people
     ]
