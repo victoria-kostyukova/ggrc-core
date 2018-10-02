@@ -4,10 +4,17 @@
 
 """Unit tests for google drive file actions"""
 
+import json
+
 import unittest
 
 import ddt
 from mock import mock
+
+from werkzeug.exceptions import HTTPException
+
+from ggrc.gdrive import file_actions
+from ggrc.gdrive import errors
 
 
 @ddt.ddt
@@ -63,3 +70,31 @@ class TestFileActions(unittest.TestCase):
     from ggrc.gdrive.file_actions import _build_request_body
     result = _build_request_body(folder_id, file_name)
     self.assertEquals(expected, result)
+
+  @ddt.data(400, 401, 403, 404)
+  def test_handle_http_error(self, code):
+    """Test for handle http errors when {code} code"""
+
+    ex = mock.Mock()
+    ex.resp.status = code
+    ex.content = json.dumps({
+        "error": {"message": "message"}
+    })
+
+    with self.assertRaises(HTTPException):
+      file_actions.hande_http_error(ex)
+
+  @ddt.idata(errors.GOOGLE_API_MESSAGE_MAP.iteritems())
+  @ddt.unpack
+  def test_handle_http_error_403(self, message, map_message):
+    """Test for handle http error when 403 code"""
+    ex = mock.Mock()
+    ex.resp.status = 403
+    ex.content = json.dumps({
+        "error": {"message": message}
+    })
+    with self.assertRaises(HTTPException) as raised_ex:
+      file_actions.hande_http_error(ex)
+
+    exception = raised_ex.exception
+    self.assertEqual(exception.description, map_message)
