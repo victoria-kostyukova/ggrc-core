@@ -3,8 +3,8 @@
 
 """Tests for /api/assessments endpoints."""
 
-import ddt
 import json
+import ddt
 
 from ggrc.models import all_models
 from integration.ggrc import api_helper
