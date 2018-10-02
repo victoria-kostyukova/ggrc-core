@@ -3,15 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as businessModels from '../../models/business-models';
 import template from './templates/export-panel.mustache';
-import router from '../../router';
-
-let filterModel = can.Map({
-  model_name: 'Program',
-  value: '',
-  filter: {},
-});
 
 export default can.Component.extend({
   tag: 'export-panel',
@@ -57,16 +49,6 @@ export default can.Component.extend({
     has_parent: false,
     removable: false,
     item: null,
-    fetch_relevant_data: function (id, type) {
-      let dfd = businessModels[type].findOne({id: id});
-      dfd.then(function (result) {
-        this.attr('item.relevant').push(new filterModel({
-          model_name: router.attr('relevant_type'),
-          value: router.attr('relevant_id'),
-          filter: result,
-        }));
-      }.bind(this));
-    },
     updateIsSelected: function (items, isSelected) {
       if (!items) {
         return;
@@ -85,15 +67,6 @@ export default can.Component.extend({
     },
   },
   events: {
-    inserted: function () {
-      let panelNumber = this.viewModel.attr('panelNumber');
-
-      if (panelNumber === 1 && router.attr('relevant_id')
-        && router.attr('relevant_type')) {
-        this.viewModel.fetch_relevant_data(router.attr('relevant_id'),
-          router.attr('relevant_type'));
-      }
-    },
     '[data-action=select_toggle] click': function (el, ev) {
       let type = el.data('type');
       let value = el.data('value');

@@ -8,27 +8,6 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('export-group component', function () {
   describe('events', function () {
-    describe('inserted() method', function () {
-      let method; // the method under test
-      let that;
-
-      beforeEach(function () {
-        that = {
-          viewModel: {
-            addObjectType: jasmine.createSpy(),
-          },
-        };
-        method = Component.prototype.events.inserted.bind(that);
-      });
-      it('calls addPanel with proper arguments', function () {
-        method();
-        expect(that.viewModel.addObjectType)
-          .toHaveBeenCalledWith(jasmine.objectContaining({
-            type: 'Program',
-            isSnapshots: undefined,
-          }));
-      });
-    });
     describe('addObjectType() method', function () {
       let data;
       let viewModel;
