@@ -23,7 +23,7 @@ start
     }
 
 word_list
-  = word:word ',' word_list:word_list
+  = word:word _* ',' _* word_list:word_list
     {
       return [word].concat(word_list);
     }
@@ -70,6 +70,7 @@ simple_exp
   / relevant_exp
   / paren_exp
   / text_exp
+  / in_exp
 
 relevant_exp
   = _* "#" relevant:word_list "#"
@@ -101,6 +102,16 @@ paren_exp
   = LEFT_P or_exp:or_exp RIGHT_P
     {
       return or_exp;
+    }
+
+in_exp
+  = left:word _* "IN"i _* LEFT_P right:word_list RIGHT_P
+    {
+      return {
+        left: left,
+        op: {name: "IN"},
+        right: right,
+      }
     }
 
 

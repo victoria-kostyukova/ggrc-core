@@ -285,6 +285,31 @@ describe('GGRC.query_parser', function () {
         });
     });
 
+    it('parses IN queries', () => {
+      let queries = [
+        'title IN(title1,title2)',
+        'title IN (title1, title2)',
+        'title IN("title1","title2")',
+        'title IN ("title1", "title2")',
+        'title in (title1,title2)',
+        'title in(title1, title2)',
+        'title in ("title1","title2")',
+        'title in("title1",    "title2")',
+      ];
+
+      queries.forEach((query) => {
+        let result = GGRC.query_parser.parse(query);
+
+        expect(result).toEqual({
+          expression: {
+            left: 'title',
+            op: {name: 'IN'},
+            right: ['title1', 'title2'],
+          },
+        });
+      });
+    });
+
     it('correctly handles escaped symbols inside quotes', function () {
       let queries = [
         'title ~ "test\\\\"',
