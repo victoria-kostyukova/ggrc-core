@@ -66,6 +66,7 @@ class BaseClientTest(unittest.TestCase):
                         'type': 'bug1',
                         'priority': 'P1',
                         'severity': 'S1',
+                        'ccs': []
                     },
                 },
                 {
@@ -75,6 +76,7 @@ class BaseClientTest(unittest.TestCase):
                         'type': 'bug2',
                         'priority': 'P2',
                         'severity': 'S2',
+                        'ccs': []
                     },
                 },
             ],
@@ -89,12 +91,14 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
+                  'ccs': []
               },
               't2': {
                   'status': 'FIXED',
                   'type': 'bug2',
                   'priority': 'P2',
                   'severity': 'S2',
+                  'ccs': []
               },
           },
       ])
