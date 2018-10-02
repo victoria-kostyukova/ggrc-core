@@ -38,18 +38,24 @@ class TestSpecialObjects(TestCase):
     self.import_file("program_audit.csv")
     self.assertEqual(2, Program.query.count())
     program = Program.query.filter(Program.slug == "prog-1").first()
-    p1_roles = all_models.AccessControlList.query.filter(
+    p1_acls = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.object_id == program.id,
         all_models.AccessControlList.object_type == "Program").all()
     # 2 Program Managers, 1 Primary Contact, 1 Secondary Contact,
     # 1 Program Editors, 1 Program Readers
-    self.assertEqual(6, len(p1_roles))
-    manager_ids = [r.person_id for r in p1_roles if
-                   r.ac_role.name == "Program Managers"]
-    editor_ids = [r.person_id for r in p1_roles if
-                  r.ac_role.name == "Program Editors"]
-    reader_ids = [r.person_id for r in p1_roles if
-                  r.ac_role.name == "Program Readers"]
+    self.assertEqual(5, len(p1_acls))
+    manager_ids = [acp.person_id
+                   for acl in p1_acls
+                   for acp in acl.access_control_people
+                   if acl.ac_role.name == "Program Managers"]
+    editor_ids = [acp.person_id
+                  for acl in p1_acls
+                  for acp in acl.access_control_people
+                  if acl.ac_role.name == "Program Editors"]
+    reader_ids = [acp.person_id
+                  for acl in p1_acls
+                  for acp in acl.access_control_people
+                  if acl.ac_role.name == "Program Readers"]
     manager_emails = [p.email for p in
                       Person.query.filter(Person.id.in_(manager_ids)).all()]
     editor_emails = [p.email for p in
