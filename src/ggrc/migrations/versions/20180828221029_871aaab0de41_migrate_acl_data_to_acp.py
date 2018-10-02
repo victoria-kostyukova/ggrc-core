@@ -41,25 +41,31 @@ acp = sa.sql.table(
 )
 
 
+ACL_COPY_STEP = 1000
+
+
 def _replace_old_indexes():
   """Remove and replace old indexes.
 
   Since we're removing people from access control list table we must first
   remove all indexes that reference that column.
   """
-  #the following index is needed for faster data migration from acl to acp
+  # the following index is needed for faster data migration from acl to acp
+  print "create role-object index"
   op.create_index(
       'ix_role_object',
       'access_control_list',
       ['ac_role_id', 'object_type', 'object_id'],
       unique=False
   )
+  print "drop person-object index"
   op.drop_index('ix_person_object', table_name='access_control_list')
   op.drop_constraint(
       u'access_control_list_ibfk_3',
       'access_control_list',
       type_='foreignkey',
   )
+  print "drop access control list index"
   op.drop_index('uq_access_control_list', table_name='access_control_list')
 
 
@@ -93,7 +99,16 @@ def _add_person_id():
 
 
 def _remove_propagated_entries():
+  print "remove propagated entries"
   op.execute(acl.delete().where(acl.c.parent_id.isnot(None)))
+
+
+def _get_max_acl_id():
+  connection = op.get_bind()
+  count = connection.execute(
+      "Select max(id) from access_control_list"
+  ).fetchall()
+  return count[0][0] or 0
 
 
 def _insert_acp_entries():
@@ -109,42 +124,58 @@ def _insert_acp_entries():
     group by acl1.id;
   """
 
+  print "insert access control people entries"
   acl1 = acl.alias("acl1")
   acl2 = acl.alias("acl2")
 
-  select_statement = sa.select([
-      acl1.c.id.label("id"),
-      acl1.c.person_id.label("person_id"),
-      sa.func.min(acl2.c.id).label("ac_list_id"),
-      acl1.c.created_at.label("created_at"),
-      acl1.c.updated_at.label("updated_at"),
-  ]).select_from(
-      sa.join(
-          acl1,
-          acl2,
-          sa.and_(
-              acl1.c.ac_role_id == acl2.c.ac_role_id,
-              acl1.c.object_type == acl2.c.object_type,
-              acl1.c.object_id == acl2.c.object_id,
-          )
-      )
-  ).group_by(acl1.c.id)
+  max_acl_id = _get_max_acl_id()
 
-  op.execute(
-      acp.insert().from_select(
-          [
-              acp.c.id,
-              acp.c.person_id,
-              acp.c.ac_list_id,
-              acp.c.created_at,
-              acp.c.updated_at,
-          ],
-          select_statement
-      )
-  )
+  for index in range(0, max_acl_id + 1, ACL_COPY_STEP):
+    print "handle acls from {} to {} of {}".format(
+        index,
+        index + ACL_COPY_STEP,
+        max_acl_id,
+    )
+
+    select_statement = sa.select([
+        acl1.c.id.label("id"),
+        acl1.c.person_id.label("person_id"),
+        sa.func.min(acl2.c.id).label("ac_list_id"),
+        acl1.c.created_at.label("created_at"),
+        acl1.c.updated_at.label("updated_at"),
+    ]).select_from(
+        sa.join(
+            acl1,
+            acl2,
+            sa.and_(
+                acl1.c.ac_role_id == acl2.c.ac_role_id,
+                acl1.c.object_type == acl2.c.object_type,
+                acl1.c.object_id == acl2.c.object_id,
+            )
+        )
+    ).where(
+        sa.and_(
+            acl1.c.id >= index,
+            acl1.c.id < (index + ACL_COPY_STEP),
+        )
+    ).group_by(acl1.c.id)
+
+    op.execute(
+        acp.insert().from_select(
+            [
+                acp.c.id,
+                acp.c.person_id,
+                acp.c.ac_list_id,
+                acp.c.created_at,
+                acp.c.updated_at,
+            ],
+            select_statement
+        )
+    )
 
 
 def _delete_redundant_acl_entries():
+  print "delete redundant acl entries"
   op.execute(
       acl.delete().where(
           ~acl.c.id.in_(sa.select([acp.c.ac_list_id]))
