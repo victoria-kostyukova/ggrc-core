@@ -122,16 +122,6 @@ class TestAccessControlRoleable(TestCase):
   def test_with_dict_objs_multiple(self):
     """Test access_control_list setter without ids"""
     role = factories.AccessControlRoleFactory(object_type="Control")
-
-    def acl_query():
-      return db.session.query(
-          all_models.AccessControlPerson.person_id,
-      ).join(
-          all_models.AccessControlList
-      ).filter(
-          all_models.AccessControlList.object_id == obj.id,
-          all_models.AccessControlList.object_type == "Control"
-      ).all()
     person_1 = factories.PersonFactory(name="Frodo", email="frodo@baggins.com")
     person_2 = factories.PersonFactory(name="Bilbo", email="bilbo@baggins.com")
     person_3 = factories.PersonFactory(name="Merry", email="merry@buck.com")
@@ -149,11 +139,19 @@ class TestAccessControlRoleable(TestCase):
     }]
     db.session.commit()
 
-    acls = acl_query()
+    acls = db.session.query(
+        all_models.AccessControlPerson.person_id,
+    ).join(
+        all_models.AccessControlList
+    ).filter(
+        all_models.AccessControlList.object_id == obj.id,
+        all_models.AccessControlList.object_type == "Control"
+    )
+
     self.assertItemsEqual([
         (person_1.id, ),
         (person_2.id, ),
-    ], acls)
+    ], acls.all())
 
     obj.access_control_list = [{
         "person": {
@@ -168,8 +166,7 @@ class TestAccessControlRoleable(TestCase):
     }]
     db.session.commit()
 
-    acls = acl_query()
     self.assertItemsEqual([
         (person_2.id, ),
         (person_3.id, ),
-    ], acls)
+    ], acls.all())
