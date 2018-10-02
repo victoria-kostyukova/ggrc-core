@@ -50,7 +50,6 @@ import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.mustache';
 
@@ -193,10 +192,6 @@ viewModel = can.Map.extend({
   options: {},
   $el: null,
   loading: false,
-  /**
-   *
-   */
-  displayPrefs: {},
   columns: {
     selected: [],
     available: [],
@@ -272,7 +267,6 @@ viewModel = can.Map.extend({
   setColumnsConfiguration: function () {
     let columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
-      this.attr('displayPrefs'),
       this.attr('options.widgetId')
     );
 
@@ -293,7 +287,6 @@ viewModel = can.Map.extend({
     let columns = TreeViewUtils.setColumnsForModel(
       this.attr('model').model_singular,
       selectedColumns,
-      this.attr('displayPrefs'),
       this.attr('options.widgetId')
     );
 
@@ -626,20 +619,16 @@ export default can.Component.extend({
         (admin || !isAccepted) && (allowMapping || allowCreating));
     }
 
-    DisplayPrefs.getSingleton().then(function (displayPrefs) {
-      viewModel.attr('displayPrefs', displayPrefs);
+    if (parentInstance && 'status' in parentInstance) {
+      setAllowMapping();
+      parentInstance.bind('change', setAllowMapping);
+    } else {
+      viewModel.attr('allow_mapping_or_creating',
+        allowMapping || allowCreating);
+    }
 
-      if (parentInstance && 'status' in parentInstance) {
-        setAllowMapping();
-        parentInstance.bind('change', setAllowMapping);
-      } else {
-        viewModel.attr('allow_mapping_or_creating',
-          allowMapping || allowCreating);
-      }
-
-      viewModel.setColumnsConfiguration();
-      viewModel.setSortingConfiguration();
-    });
+    viewModel.setColumnsConfiguration();
+    viewModel.setSortingConfiguration();
   },
   events: {
     '{viewModel.pageInfo} current': function () {

@@ -184,16 +184,11 @@ describe('advanced-search-mapping-criteria component', function () {
   describe('availableAttributes() method', function () {
     it('returns available attributes', function () {
       let attributes = ['attr1', 'attr2'];
-      spyOn(TreeViewUtils, 'getColumnsForModel').and.returnValue({
-        available: attributes,
-      });
+      spyOn(TreeViewUtils, 'getAvailableAttributes').and.returnValue(attributes);
       viewModel.attr('criteria.objectName', 'test');
 
       expect(viewModel.availableAttributes()).toBe(attributes);
-      expect(TreeViewUtils.getColumnsForModel).toHaveBeenCalledWith(
-        'test',
-        null
-      );
+      expect(TreeViewUtils.getAvailableAttributes).toHaveBeenCalledWith('test');
     });
   });
 });

@@ -6,7 +6,6 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
-import DisplayPrefs from '../../../models/local-storage/display-prefs';
 import Program from '../../../models/business-models/program';
 
 describe('mapper-results-columns-configuration component', function () {
@@ -52,23 +51,13 @@ describe('mapper-results-columns-configuration component', function () {
   });
 
   describe('init() method', function () {
-    const displayPrefs = 'displayPrefs';
-
     beforeEach(function () {
       spyOn(viewModel, 'initializeColumns');
-      spyOn(DisplayPrefs, 'getSingleton')
-        .and.returnValue($.Deferred().resolve(displayPrefs));
     });
 
     it('calls initializeColumns()', function () {
       viewModel.init();
       expect(viewModel.initializeColumns).toHaveBeenCalled();
-    });
-
-    it('updates viewModel.displayPrefs', function () {
-      viewModel.init();
-      expect(viewModel.attr('displayPrefs'))
-        .toEqual(displayPrefs);
     });
   });
 

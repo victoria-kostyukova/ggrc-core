@@ -7,7 +7,6 @@ import '../tree/tree-header-selector';
 import '../tree/tree-visible-column-checkbox';
 import tmpl from './templates/mapper-results-columns-configuration.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
@@ -32,12 +31,8 @@ export default can.Component.extend({
     selectedColumns: [],
     availableColumns: [],
     columns: {},
-    displayPrefs: null,
     init() {
       this.initializeColumns();
-      DisplayPrefs.getSingleton().then((displayPrefs) => {
-        this.attr('displayPrefs', displayPrefs);
-      });
     },
     getModel() {
       return businessModels[this.attr('modelType')];
@@ -59,8 +54,7 @@ export default can.Component.extend({
       const columns =
         TreeViewUtils.setColumnsForModel(
           this.getModel().model_singular,
-          selectedNames,
-          this.attr('displayPrefs')
+          selectedNames
         );
 
       this.attr('selectedColumns', columns.selected);

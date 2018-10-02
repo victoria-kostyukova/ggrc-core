@@ -4,7 +4,7 @@
  */
 
 import '../simple-popover/simple-popover';
-import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-mapping-criteria.mustache';
 import Mappings from '../../models/mappers/mappings';
@@ -102,11 +102,7 @@ let viewModel = can.Map.extend({
    * @return {can.List} - List of available attributes.
    */
   availableAttributes: function () {
-    let available = getColumnsForModel(
-      this.attr('criteria.objectName'),
-      null
-    ).available;
-    return available;
+    return getAvailableAttributes(this.attr('criteria.objectName'));
   },
   /**
    * Returns a list of available mapping types for specific model.

@@ -37,6 +37,10 @@ import {
   fileSafeCurrentDate,
   runExport,
 } from './import-export-utils';
+import {
+  getTreeViewHeaders,
+  setTreeViewHeaders,
+} from './display-prefs-utils';
 
 /**
 * TreeView-specific utils.
@@ -126,36 +130,17 @@ function hasNoFieldsLimit(type) {
 }
 
 /**
- * Get available and selected columns for Model type
- * @param {String} modelType - Model type.
- * @param {Object} displayPrefs - Display preferences.
- * @param {String} modelName - Model name.
- * @return {Object} Table columns configuration.
+ * Gets available attributes for Model type
+ * @param {String} modelType model type
+ * @return {Array} list of available columns for model
  */
-function getColumnsForModel(modelType, displayPrefs, modelName) {
+function getAvailableAttributes(modelType) {
   let Model = businessModels[modelType];
   let modelDefinition = Model.root_object;
-  let mandatoryAttrNames =
-    Model.tree_view_options.mandatory_attr_names ||
-    Cacheable.tree_view_options.mandatory_attr_names;
-  let savedAttrList = displayPrefs ?
-    displayPrefs.getTreeViewHeaders(modelName || Model.model_singular) :
-    [];
-  let displayAttrNames =
-    savedAttrList.length ? savedAttrList :
-      (Model.tree_view_options.display_attr_names ||
-      Cacheable.tree_view_options.display_attr_names);
   let disableConfiguration =
     !!Model.tree_view_options.disable_columns_configuration;
-  let mandatoryColumns;
-  let displayColumns;
-  let attrs;
-  let customAttrs;
-  let allAttrs;
-  let modelRoles;
-  let roleAttrs;
 
-  attrs = can.makeArray(
+  let attrs = can.makeArray(
     Model.tree_view_options.mapper_attr_list ||
     Model.tree_view_options.attr_list ||
     Cacheable.attr_list
@@ -177,7 +162,7 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
   });
 
   // add custom attributes information
-  customAttrs = disableConfiguration ?
+  let customAttrs = disableConfiguration ?
     [] :
     GGRC.custom_attr_defs
       .filter(function (def) {
@@ -197,11 +182,10 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
           disable_sorting: disableSorting,
         };
       });
-  allAttrs = attrs.concat(customAttrs);
 
   // add custom roles information
-  modelRoles = getRolesForType(modelType);
-  roleAttrs = modelRoles.map(function (role) {
+  let modelRoles = getRolesForType(modelType);
+  let roleAttrs = modelRoles.map(function (role) {
     return {
       attr_title: role.name,
       attr_name: role.name,
@@ -210,8 +194,32 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
       attr_type: 'role',
     };
   });
-  allAttrs = allAttrs.concat(roleAttrs);
 
+  return attrs.concat(customAttrs, roleAttrs);
+}
+
+/**
+ * Get available and selected columns for Model type
+ * @param {String} modelType - Model type.
+ * @param {String} modelName - Model name.
+ * @return {Object} Table columns configuration.
+ */
+function getColumnsForModel(modelType, modelName) {
+  let Model = businessModels[modelType];
+  let mandatoryAttrNames =
+    Model.tree_view_options.mandatory_attr_names ||
+    Cacheable.tree_view_options.mandatory_attr_names;
+  let savedAttrList = getTreeViewHeaders(modelName || Model.model_singular);
+  let displayAttrNames =
+    savedAttrList.length ? savedAttrList :
+      (Model.tree_view_options.display_attr_names ||
+      Cacheable.tree_view_options.display_attr_names);
+  let disableConfiguration =
+    !!Model.tree_view_options.disable_columns_configuration;
+  let mandatoryColumns;
+  let displayColumns;
+
+  let allAttrs = getAvailableAttributes(modelType);
   if (disableConfiguration) {
     return {
       available: allAttrs,
@@ -247,14 +255,12 @@ function getColumnsForModel(modelType, displayPrefs, modelName) {
  * Set selected columns for Model type
  * @param {String} modelType - Model type.
  * @param {Array} columnNames - Array of column names.
- * @param {Object} displayPrefs - Display preferences.
  * @param {String} modelName - Model name.
  * @return {Object} Table columns configuration.
  */
-function setColumnsForModel(modelType, columnNames, displayPrefs,
-  modelName) {
+function setColumnsForModel(modelType, columnNames, modelName) {
   let availableColumns =
-    getColumnsForModel(modelType, displayPrefs).available;
+    getColumnsForModel(modelType, modelName).available;
   let selectedColumns = [];
   let selectedNames = [];
 
@@ -270,13 +276,10 @@ function setColumnsForModel(modelType, columnNames, displayPrefs,
     }
   });
 
-  if (displayPrefs) {
-    displayPrefs.setTreeViewHeaders(
-      modelName || businessModels[modelType].model_singular,
-      selectedNames
-    );
-    displayPrefs.save();
-  }
+  setTreeViewHeaders(
+    modelName || businessModels[modelType].model_singular,
+    selectedNames
+  );
 
   return {
     available: availableColumns,
@@ -716,6 +719,7 @@ function startExport(modelName, parent, filter, request, transformToSnapshot) {
 }
 
 export {
+  getAvailableAttributes,
   getColumnsForModel,
   setColumnsForModel,
   getSortingForModel,

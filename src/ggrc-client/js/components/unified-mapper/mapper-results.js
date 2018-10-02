@@ -109,8 +109,7 @@ export default can.Component.extend({
     setColumnsConfiguration: function () {
       let columns =
         TreeViewUtils.getColumnsForModel(
-          this.getDisplayModel().model_singular,
-          this.attr('displayPrefs')
+          this.getDisplayModel().model_singular
         );
       this.attr('columns.available', columns.available);
       this.attr('columns.selected', columns.selected);

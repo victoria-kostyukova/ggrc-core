@@ -4,7 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
-import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 export default can.Component.extend({
@@ -24,11 +24,7 @@ export default can.Component.extend({
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
     availableAttributes: function () {
-      let available = getColumnsForModel(
-        this.attr('modelName'),
-        null
-      ).available;
-      return available;
+      return getAvailableAttributes(this.attr('modelName'));
     },
     addFilterAttribute: function () {
       let items = this.attr('filterItems');
