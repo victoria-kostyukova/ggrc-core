@@ -1,6 +1,8 @@
-[//]: <> (updated 9/26/2018)
+[//]: <> (updated 10/03/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
+
+[Changes to the mapping flow from scope to directives (v1.25.0, 10/03/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7bigh0kmx70)
 
 [Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l4dezngquz60)
 
@@ -60,6 +62,10 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
+### Changes to the mapping flow from scope to directives (v1.25.0, 10/03/2018)
+
+There are some changes, please contact your administrator for more information.
+
 ### Enhanced object review flow (v1.24.0, 09/26/2018)
 
 Once reviewer can be assigned for any object like control. The system will inform them through email, that their review has been requested. User with edit rights to object will also be able to mark it reviewed. When an object is modified (i.e. new mappings or attribute edits), the system will revert its state to ‘Unreviewed’ and inform admins, primary contacts and secondary contacts about this through email.
@@ -70,7 +76,7 @@ You can link all existing assessments in scope of a particular audit with other 
 
 ### Roles reorganization for scoping objects (v1.22.0, 09/18/2018)
 
-In addition to all the new roles added last release, there will be two new roles for scoping objects: ‘Assignee’ and ‘Verifier’. These fields will be mandatory and accept only one person and will be used in GGRCQ for integration with ticket tracking system.
+In addition to all the new roles added last release, there will be two new roles for scoping objects: ‘Assignee’ and ‘Verifier’. These fields will be mandatory and accept only one person and will be used for integration with ticket tracking system.
 
 People from ‘Primary Contacts’ and ‘Secondary Contacts’ fields will be migrated into a new role ‘Compliance Contacts’.
 
