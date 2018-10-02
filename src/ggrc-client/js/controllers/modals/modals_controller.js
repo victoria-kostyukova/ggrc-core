@@ -46,7 +46,10 @@ import {
   notifier,
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
+import {
+  getModalState,
+  setModalState,
+} from '../../plugins/utils/display-prefs-utils';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
@@ -126,33 +129,30 @@ export default can.Control({
     if (content) {
       this.element.html(content);
     }
-    DisplayPrefs.getSingleton().then((displayPrefs) => {
-      if (this.wasDestroyed()) {
-        return;
-      }
 
-      this.display_prefs = displayPrefs;
+    if (this.wasDestroyed()) {
+      return;
+    }
 
-      this.options.attr('$header', this.element.find('.modal-header'));
-      this.options.attr('$content', this.element.find('.modal-body'));
-      this.options.attr('$footer', this.element.find('.modal-footer'));
-      this.on();
-      this.fetch_all()
-        .then(this.proxy('apply_object_params'))
-        .then(this.proxy('serialize_form'))
-        .then(() => {
-          if (!this.wasDestroyed()) {
-            this.element.trigger('preload');
-          }
-        })
-        .then(this.proxy('autocomplete'))
-        .then(function () {
-          if (!this.wasDestroyed()) {
-            this.options.afterFetch(this.element);
-            this.restore_ui_status_from_storage();
-          }
-        }.bind(this));
-    });
+    this.options.attr('$header', this.element.find('.modal-header'));
+    this.options.attr('$content', this.element.find('.modal-body'));
+    this.options.attr('$footer', this.element.find('.modal-footer'));
+    this.on();
+    this.fetch_all()
+      .then(this.proxy('apply_object_params'))
+      .then(this.proxy('serialize_form'))
+      .then(() => {
+        if (!this.wasDestroyed()) {
+          this.element.trigger('preload');
+        }
+      })
+      .then(this.proxy('autocomplete'))
+      .then(function () {
+        if (!this.wasDestroyed()) {
+          this.options.afterFetch(this.element);
+          this.restore_ui_status_from_storage();
+        }
+      }.bind(this));
   },
 
   apply_object_params: function () {
@@ -779,34 +779,27 @@ export default can.Control({
   },
 
   save_ui_status: function () {
-    let modelName;
-    let resetVisible;
-    let uiArray;
-    let displayState;
     if (!this.options.model) {
       return;
     }
-    modelName = this.options.model.model_singular;
-    resetVisible = this.options.reset_visible ?
+    let modelName = this.options.model.model_singular;
+    let resetVisible = this.options.reset_visible ?
       this.options.reset_visible : false;
-    uiArray = this.options.ui_array ? this.options.ui_array : [];
-    displayState = {
+    let uiArray = this.options.ui_array ? this.options.ui_array : [];
+    let displayState = {
       reset_visible: resetVisible,
       ui_array: uiArray,
     };
 
-    this.display_prefs.setModalState(modelName, displayState);
-    this.display_prefs.save();
+    setModalState(modelName, displayState);
   },
 
   restore_ui_status_from_storage: function () {
-    let modelName;
-    let displayState;
     if (!this.options.model) {
       return;
     }
-    modelName = this.options.model.model_singular;
-    displayState = this.display_prefs.getModalState(modelName);
+    let modelName = this.options.model.model_singular;
+    let displayState = getModalState(modelName);
 
     // set up reset_visible and ui_array
     if (displayState !== null) {

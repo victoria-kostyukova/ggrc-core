@@ -8,6 +8,7 @@ import * as LocalStorage from './local-storage-utils';
 const localStorageKey = 'display_prefs';
 const TREE_VIEW_HEADERS = 'tree_view_headers';
 const TREE_VIEW_STATES = 'tree_view_states';
+const MODAL_STATE = 'modal_state';
 const pageToken = window.location.pathname.replace(/\./g, '/');
 
 let preferences = null;
@@ -143,11 +144,39 @@ function setTreeViewStates(modelName, states) {
   saveObject(TREE_VIEW_STATES, value);
 }
 
+/**
+ * Gets saved modal state per modal
+ * @param {Staring} modelName modal name
+ * @return {Object} modal state
+ */
+function getModalState(modelName) {
+  let value = getObject(MODAL_STATE);
+  if (!value.attr(modelName)) {
+    return null;
+  }
+  return value.attr(modelName).attr('display_state');
+}
+
+/**
+ * Sets modal state per model
+ * @param {Staring} modelName model name
+ * @param {Object} state modal state
+ */
+function setModalState(modelName, state) {
+  let value = getObject(MODAL_STATE);
+  value.attr(modelName, {
+    display_state: state,
+  });
+  saveObject(MODAL_STATE, value);
+}
+
 export {
   getTreeViewHeaders,
   setTreeViewHeaders,
   getTreeViewStates,
   setTreeViewStates,
+  getModalState,
+  setModalState,
   clearPreferences,
   pageToken,
 };

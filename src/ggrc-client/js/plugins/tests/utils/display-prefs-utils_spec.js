@@ -193,4 +193,72 @@ describe('display-prefs-utils', () => {
         });
     });
   });
+
+  describe('getModalState() method', () => {
+    it('should return null when there is no saved preferences', () => {
+      let result = DisplayPrefs.getModalState('any model name');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return state from local storage', () => {
+      let state = {};
+      let prefs = {
+        id: 1,
+        modal_state: {
+          'any model name': {display_state: state},
+        },
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+
+      let result = DisplayPrefs.getModalState('any model name');
+      expect(result.serialize()).toEqual(state);
+    });
+  });
+
+  describe('setModalState() method', () => {
+    beforeEach(() => {
+      let prefs = {
+        id: 1,
+        modal_state: {
+          audit: {display_state: {prop: 111}},
+        },
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+      spyOn(LocalStorage, 'update');
+    });
+
+    it('should save modal state for model', () => {
+      let state = {prop: 222};
+      DisplayPrefs.setModalState('control', state);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          modal_state: {
+            audit: {display_state: {prop: 111}},
+            control: {display_state: state},
+          },
+        });
+    });
+
+    it('should update modal state for already saved model', () => {
+      let state = {prop: 222};
+      DisplayPrefs.setModalState('audit', state);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          modal_state: {
+            audit: {display_state: state},
+          },
+        });
+    });
+  });
 });
