@@ -1422,6 +1422,13 @@ class ExtendedResource(Resource):
     """Get data for audit mapped objects counts grouped by child_type."""
     # id name is used as a kw argument and can't be changed here
     # pylint: disable=invalid-name,redefined-builtin
+
+    request_data = json.loads(self.request.data)
+    if "snapshot_types" not in request_data:
+      raise BadRequest()
+
+    snapshot_types = request_data["snapshot_types"]
+
     with benchmark("Check audit permissions"):
       obj = self.model.query.get(id)
       if not permissions.is_allowed_read_for(obj):
@@ -1463,7 +1470,10 @@ class ExtendedResource(Resource):
       )
 
       with benchmark("Make response"):
-        result = {child_type: count for child_type, count in snapshot_counts}
+        result = {snapshot_type: 0 for snapshot_type in snapshot_types}
+        for child_type, count in snapshot_counts:
+          if child_type in snapshot_types:
+            result[child_type] = count
 
     return self.json_success_response(result)
 
