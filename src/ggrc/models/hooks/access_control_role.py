@@ -29,6 +29,17 @@ from ggrc.models import inflector
 from ggrc.services import signals
 
 
+def handle_role_acls(role):
+  role_model = inflector.get_model(role.object_type)
+  for query_chunk in utils.generate_query_chunks(role_model.query):
+    for roleable_obj in query_chunk:
+      all_models.AccessControlList(
+          ac_role=role,
+          object=roleable_obj,
+      )
+    db.session.commit()
+
+
 def init_hook():
   """Initialize all hooks"""
 
@@ -37,11 +48,4 @@ def init_hook():
       all_models.AccessControlRole)
   def handle_role_posted(sender, obj=None, src=None, service=None, event=None):
     """Handle ACL entries creation for newly created access control role."""
-    role_model = inflector.get_model(obj.object_type)
-    for query_chunk in utils.generate_query_chunks(role_model.query):
-      for roleable_obj in query_chunk:
-        all_models.AccessControlList(
-            ac_role=obj,
-            object=roleable_obj,
-        )
-      db.session.commit()
+    handle_role_acls(obj)

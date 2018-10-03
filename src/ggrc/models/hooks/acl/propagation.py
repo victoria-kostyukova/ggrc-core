@@ -377,11 +377,17 @@ def propagate():
   del flask.g.deleted_objects
 
 
+def _add_missing_acl_entries():
+  pass
+
+
 @helpers.without_sqlalchemy_cache
 def propagate_all():
   """Re-evaluate propagation for all objects."""
   with utils.benchmark("Run propagate_all"):
 
+    with utils.benchmark("Add missing acl entries"):
+      _add_missing_acl_entries()
     with utils.benchmark("Get non propagated acl ids"):
       query = db.session.query(
           all_models.AccessControlList.id,
