@@ -505,11 +505,18 @@ def _collect_audit_emails(acl_payload):
     acl_payload: Dict with ACL data
 
   Returns:
-    A tuple of (assignee_email, [related_people_emails])
+    A tuple of (reporter_email, [related_people_emails])
   """
-  person_ids = [acl.get("person", {}).get("id")
-                for acl in acl_payload]
-  if any(person_ids):
+  role_id = access_control.role.get_ac_roles_for(
+      "Audit"
+  )["Audit Captains"].id
+
+  person_ids = [
+      acl["person"]["id"] for acl in acl_payload
+      if acl.get("ac_role_id") == role_id and acl.get("person", {}).get("id")
+  ]
+
+  if person_ids:
     reporter_id = person_ids[0]
 
     persons = db.session.query(
