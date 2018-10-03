@@ -130,8 +130,8 @@ class AuditResource(common.ExtendedResource):
   def post(self, *args, **kwargs):
     """This is to extend the post request for audit."""
     command_map = {
-      None: super(AuditResource, self).post,
-      "snapshot_counts": self.snapshot_counts_query,
+        None: super(AuditResource, self).post,
+        "snapshot_counts": self.snapshot_counts_query,
     }
     command = kwargs.pop("command", None)
     if command not in command_map:
