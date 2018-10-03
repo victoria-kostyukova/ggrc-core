@@ -405,4 +405,163 @@ describe('display-prefs-utils', () => {
         });
     });
   });
+
+  describe('getLHNavSize() method', () => {
+    it('should return null when there is no saved preferences', () => {
+      let result = DisplayPrefs.getLHNavSize();
+
+      expect(result).toBeNull();
+    });
+
+    it('should return LHN size from local storage', () => {
+      let size = 123;
+      let prefs = {
+        id: 1,
+        lhn_size: {
+          lhs: size,
+        },
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+
+      let result = DisplayPrefs.getLHNavSize();
+      expect(result).toBe(size);
+    });
+  });
+
+  describe('setLHNavSize() method', () => {
+    beforeEach(() => {
+      spyOn(LocalStorage, 'update');
+    });
+
+    it('should save LHN size', () => {
+      let size = 234;
+
+      spyOn(LocalStorage, 'get').and.returnValue([{id: 1}]);
+
+      DisplayPrefs.setLHNavSize(size);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          lhn_size: {
+            lhs: size,
+          },
+        });
+    });
+
+    it('should update LHN size', () => {
+      spyOn(LocalStorage, 'get').and.returnValue([{
+        id: 1,
+        lhn_size: {
+          lhs: 123,
+        },
+      }]);
+
+      DisplayPrefs.setLHNavSize(234);
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          lhn_size: {
+            lhs: 234,
+          },
+        });
+    });
+  });
+
+  describe('getLHNState() method', () => {
+    it('should return empty object when there is no saved preferences', () => {
+      let result = DisplayPrefs.getLHNState();
+
+      expect(result.serialize()).toEqual({});
+    });
+
+    it('should return LHN state from local storage', () => {
+      let state = {
+        open_category: 'category',
+        my_work: true,
+      };
+
+      let prefs = {
+        id: 1,
+        lhn_state: state,
+      };
+
+      spyOn(LocalStorage, 'get').and.returnValue([prefs]);
+
+      let result = DisplayPrefs.getLHNState();
+      expect(result.serialize()).toEqual(state);
+    });
+  });
+
+  describe('setLHNState() method', () => {
+    beforeEach(() => {
+      spyOn(LocalStorage, 'update');
+    });
+
+    ['open_category', 'panel_scroll', 'category_scroll', 'search_text',
+      'my_work', 'filter_params', 'is_open', 'is_pinned'].forEach((prop) => {
+      it(`should update ${prop} prop`, () => {
+        spyOn(LocalStorage, 'get').and.returnValue([{id: 1}]);
+        DisplayPrefs.setLHNState({
+          [prop]: 'value',
+        });
+
+        let updateArgs = LocalStorage.update.calls.argsFor(0);
+        expect(updateArgs[0]).toBe(localStorageKey);
+        expect(updateArgs[1]).toEqual(
+          {
+            id: 1,
+            lhn_state: {
+              [prop]: 'value',
+            },
+          });
+      });
+    });
+
+    it('should not update not allowed props', () => {
+      spyOn(LocalStorage, 'get').and.returnValue([{id: 1}]);
+      DisplayPrefs.setLHNState({
+        'not allowed prop': 'value',
+      });
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          lhn_state: {},
+        });
+    });
+
+    it('should update several properties', () => {
+      spyOn(LocalStorage, 'get').and.returnValue([{
+        id: 1,
+        lhn_state: {
+          open_category: 'category 1',
+        }}]);
+
+      DisplayPrefs.setLHNState({
+        open_category: 'ctageory 2',
+        panel_scroll: 123,
+        size: 234, // not allowed
+      });
+
+      let updateArgs = LocalStorage.update.calls.argsFor(0);
+      expect(updateArgs[0]).toBe(localStorageKey);
+      expect(updateArgs[1]).toEqual(
+        {
+          id: 1,
+          lhn_state: {
+            open_category: 'ctageory 2',
+            panel_scroll: 123,
+          },
+        });
+    });
+  });
 });

@@ -11,6 +11,8 @@ const TREE_VIEW_STATES = 'tree_view_states';
 const MODAL_STATE = 'modal_state';
 const TREE_VIEW = 'tree_view';
 const CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
+const LHN_SIZE = 'lhn_size';
+const LHN_STATE = 'lhn_state';
 const pageToken = window.location.pathname.replace(/\./g, '/');
 
 let preferences = null;
@@ -198,6 +200,38 @@ function setChildTreeDisplayList(modelName, displayList) {
   saveObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST, value);
 }
 
+function getLHNavSize() {
+  let value = getObject(LHN_SIZE);
+  if (!value.attr('lhs')) {
+    return null;
+  }
+  return value.attr('lhs');
+}
+
+function setLHNavSize(size) {
+  let value = getObject(LHN_SIZE);
+  value.attr('lhs', size);
+  saveObject(LHN_SIZE, value);
+}
+
+function getLHNState() {
+  return getObject(LHN_STATE);
+}
+
+function setLHNState(state) {
+  let value = getObject(LHN_STATE);
+  can.each(
+    ['open_category', 'panel_scroll', 'category_scroll', 'search_text',
+      'my_work', 'filter_params', 'is_open', 'is_pinned'],
+    (token) => {
+      if (typeof state[token] !== 'undefined') {
+        value.attr(token, state[token]);
+      }
+    }
+  );
+  saveObject(LHN_STATE, value);
+}
+
 export {
   getTreeViewHeaders,
   setTreeViewHeaders,
@@ -207,6 +241,10 @@ export {
   setModalState,
   getChildTreeDisplayList,
   setChildTreeDisplayList,
+  getLHNavSize,
+  setLHNavSize,
+  getLHNState,
+  setLHNState,
   clearPreferences,
   pageToken,
 };

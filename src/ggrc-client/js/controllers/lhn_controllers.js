@@ -8,7 +8,12 @@ import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
 import Cacheable from '../models/cacheable';
 import Search from '../models/service-models/search';
-import DisplayPrefs from '../models/local-storage/display-prefs';
+import {
+  getLHNavSize,
+  setLHNavSize,
+  getLHNState,
+  setLHNState,
+} from '../plugins/utils/display-prefs-utils';
 import * as businessModels from '../models/business-models';
 import '../components/recently-viewed/recently-viewed';
 
@@ -27,12 +32,12 @@ can.Control('CMS.Controllers.LHN', {
     // whole LHN search panel.  scroll events do not bubble, so this cannot be
     // set as a delegate on the controller element.
     self.lhs_holder_onscroll = _.debounce(function () {
-      self.options.display_prefs.setLHNState({panel_scroll: this.scrollTop});
+      setLHNState({panel_scroll: this.scrollTop});
     }, 250);
     this.element.find('.lhs-holder').on('scroll', self.lhs_holder_onscroll);
   },
   is_lhn_open: function () {
-    let isOpen = this.options.display_prefs.getLHNState().is_open;
+    let isOpen = getLHNState().is_open;
 
     if (typeof isOpen === 'undefined') {
       return false;
@@ -83,8 +88,8 @@ can.Control('CMS.Controllers.LHN', {
 
     checked = target.data('value') === 'my_work';
     this.obs.attr('my_work', checked);
-    // target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-green');
-    this.options.display_prefs.setLHNState('my_work', checked);
+
+    setLHNState({my_work: checked});
     this.set_active_tab(checked);
   },
   toggle_lhn: function (ev) {
@@ -98,14 +103,14 @@ can.Control('CMS.Controllers.LHN', {
     }
   },
   close_lhn: function () {
-    if (this.options.display_prefs.getLHNState().is_pinned) {
+    if (getLHNState().is_pinned) {
       return;
     }
 
     // not nested
     $('.lhn-trigger').removeClass('active');
 
-    let _width = this.options.display_prefs.getLHNavSize(null, null).lhs;
+    let _width = getLHNavSize();
     let width = _width || this.element.find('.lhs-holder').width();
     let safety = 20;
 
@@ -113,7 +118,7 @@ can.Control('CMS.Controllers.LHN', {
       .removeClass('active')
       .css('left', (-width - safety) + 'px');
 
-    this.options.display_prefs.setLHNState({is_open: false});
+    setLHNState({is_open: false});
   },
   open_lhn: function () {
     let lhsCtr = $('#lhs').control();
@@ -126,9 +131,7 @@ can.Control('CMS.Controllers.LHN', {
       .css('left', '')
       .addClass('active');
 
-    this.options.display_prefs.setLHNState({
-      is_open: true,
-    });
+    setLHNState({is_open: true});
     if (lhsCtr.options._hasPendingRefresh) {
       lhsCtr.refresh_counts();
       lhsCtr.refresh_visible_lists();
@@ -146,64 +149,55 @@ can.Control('CMS.Controllers.LHN', {
   },
 
   init_lhn: function () {
-    DisplayPrefs.getSingleton().done(function (prefs) {
-      let $lhs = $('#lhs');
-      let lhnSearchDfd;
-      let myWorkTab = false;
+    let $lhs = $('#lhs');
+    let myWorkTab = false;
 
-      this.options.display_prefs = prefs;
+    if (typeof getLHNState().my_work !== 'undefined') {
+      myWorkTab = !!getLHNState().my_work;
+    }
+    this.obs.attr('my_work', myWorkTab);
 
-      if (typeof prefs.getLHNState().my_work !== 'undefined') {
-        myWorkTab = !!prefs.getLHNState().my_work;
-      }
-      this.obs.attr('my_work', myWorkTab);
+    $lhs
+      .cms_controllers_lhn_search({
+        observer: this.obs,
+      })
+      .control('lhn_search')
+      .display();
 
-      lhnSearchDfd = $lhs
-        .cms_controllers_lhn_search({
-          observer: this.obs,
-          display_prefs: prefs,
-        })
-        .control('lhn_search')
-        .display();
+    $lhs.cms_controllers_lhn_tooltips();
 
-      $lhs.cms_controllers_lhn_tooltips();
+    let checked = this.obs.attr('my_work');
+    let value = checked ? 'my_work' : 'all';
+    let target = this.element.find(`#lhs input.my-work[value=${value}]`);
 
-      // Delay LHN initializations until after LHN is rendered
-      lhnSearchDfd.then(function () {
-        let checked = this.obs.attr('my_work');
-        let value = checked ? 'my_work' : 'all';
-        let target = this.element.find(`#lhs input.my-work[value=${value}]`);
+    target.prop('checked', true);
+    target.closest('.btn')[checked
+      ? 'addClass'
+      : 'removeClass'
+    ]('btn-green');
 
-        target.prop('checked', true);
-        target.closest('.btn')[checked
-          ? 'addClass'
-          : 'removeClass'
-        ]('btn-green');
+    // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
+    //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
+    //  open section is handled in the LHN Search controller.
 
-        // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
-        //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
-        //  open section is handled in the LHN Search controller.
+    if (getLHNState().open_category) {
+      this.element.one('list_displayed', this.initial_scroll.bind(this));
+    } else {
+      this.initial_scroll();
+    }
 
-        if (this.options.display_prefs.getLHNState().open_category) {
-          this.element.one('list_displayed', this.initial_scroll.bind(this));
-        } else {
-          this.initial_scroll();
-        }
+    this.toggle_filter_active();
 
-        this.toggle_filter_active();
+    if (getLHNState().is_pinned) {
+      this.pin();
+    }
 
-        if (this.options.display_prefs.getLHNState().is_pinned) {
-          this.pin();
-        }
-      }.bind(this));
-
-      this.initial_lhn_render();
-    }.bind(this));
+    this.initial_lhn_render();
   },
 
   initial_scroll: function () {
     this.element.find('.lhs-holder').scrollTop(
-      this.options.display_prefs.getLHNState().panel_scroll || 0
+      getLHNState().panel_scroll || 0
     );
   },
   // this uses polling to make sure LHN is there
@@ -253,16 +247,13 @@ can.Control('CMS.Controllers.LHN', {
     }
     $searchTitle.addClass('active');
     this.obs.attr('value', value);
-    this.options.display_prefs.setLHNState('search_text', value);
+    setLHNState({search_text: value});
     this._value = value;
   },
   mousedown: false,
   dragged: false,
   resize_lhn: function (resize, noTrigger) {
-    resize || (
-      resize = this.options.display_prefs &&
-      this.options.display_prefs.getLHNavSize(null, null).lhs
-    );
+    resize || (resize = getLHNavSize());
 
     let maxWidth = window.innerWidth * .75;
     let defaultSize = 240;
@@ -275,7 +266,7 @@ can.Control('CMS.Controllers.LHN', {
     this.element.find('.lhs-holder').width(resize);
 
     if (resize) {
-      this.options.display_prefs.setLHNavSize(null, 'lhs', resize);
+      setLHNavSize(resize);
     }
 
     if (!noTrigger) {
@@ -335,8 +326,7 @@ can.Control('CMS.Controllers.LHN', {
     // #extended-info - makes sure that menu doesn't close if tooltip is open and user has clicked inside
     // We should handle this form some manager, and avoid having God object
     if (!onLhn &&
-      this.options.display_prefs &&
-      !this.options.display_prefs.getLHNState().is_pinned &&
+      !getLHNState().is_pinned &&
       !$('#extended-info').hasClass('in')
     ) {
       this.close_lhn();
@@ -347,7 +337,7 @@ can.Control('CMS.Controllers.LHN', {
     this._super && this._super(...arguments);
   },
   '.lhn-pin click': function (element, event) {
-    if (this.options.display_prefs.getLHNState().is_pinned) {
+    if (getLHNState().is_pinned) {
       this.unpin();
     } else {
       this.pin();
@@ -356,12 +346,12 @@ can.Control('CMS.Controllers.LHN', {
   unpin: function () {
     this.element.find('.lhn-pin').removeClass('active');
     this.element.find('.bar-v').removeClass('disabled');
-    this.options.display_prefs.setLHNState('is_pinned', false);
+    setLHNState({is_pinned: false});
   },
   pin: function () {
     this.element.find('.lhn-pin').addClass('active');
     this.element.find('.bar-v').addClass('disabled');
-    this.options.display_prefs.setLHNState('is_pinned', true);
+    setLHNState({is_pinned: true});
   },
 });
 
@@ -385,64 +375,53 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 }, {
   display: function () {
-    let self = this;
-    let prefs = this.options.display_prefs;
-    let prefsDfd;
     let templatePath = GGRC.mustache_path + this.element.data('template');
-
-    prefsDfd = DisplayPrefs.getSingleton();
+    let lhnPrefs = getLHNState();
 
     // 2-way binding is set up in the view using can-value, directly connecting the
     //  search box and the display prefs to save the search value between page loads.
     //  We also listen for this value in the controller
     //  to trigger the search.
-    return can.view(templatePath, prefsDfd
-      .then((prefs) => prefs.getLHNState()))
-      .then(function (frag, xhr) {
-        let lhnPrefs = prefs.getLHNState();
-        let initialTerm;
-        let initialParams = {};
-        let savedFilters = prefs.getLHNState().filter_params;
+    let frag = can.view(templatePath, lhnPrefs);
+    let initialParams = {};
+    let savedFilters = lhnPrefs.filter_params;
 
-        self.element.html(frag);
-        self.post_init();
-        self.element.find('.sub-level')
-          .cms_controllers_infinite_scroll()
-          .on('scroll', _.debounce(function () {
-            self.options.display_prefs.setLHNState('category_scroll',
-              this.scrollTop);
-          }, 250));
+    this.element.html(frag);
+    this.post_init();
+    this.element.find('.sub-level')
+      .cms_controllers_infinite_scroll()
+      .on('scroll', _.debounce(function () {
+        setLHNState({category_scroll: this.scrollTop});
+      }, 250));
 
-        initialTerm = self.options.display_prefs
-          .getLHNState().search_text || '';
-        if (self.options.observer.my_work) {
-          initialParams = {contact_id: GGRC.current_user.id};
-        }
-        $.map(businessModels, function (model, name) {
-          if (model.default_lhn_filters) {
-            self.options.filter_params.attr(model.default_lhn_filters);
-          }
-        });
-        self.options.filter_params.attr(savedFilters);
-        self.options.loaded_lists = [];
-        self.run_search(initialTerm, initialParams);
+    let initialTerm = lhnPrefs.search_text || '';
+    if (this.options.observer.my_work) {
+      initialParams = {contact_id: GGRC.current_user.id};
+    }
+    $.map(businessModels, (model, name) => {
+      if (model.default_lhn_filters) {
+        this.options.filter_params.attr(model.default_lhn_filters);
+      }
+    });
+    this.options.filter_params.attr(savedFilters);
+    this.options.loaded_lists = [];
+    this.run_search(initialTerm, initialParams);
 
-        // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
-        //  open category is toggled open, and the search placed into the search box by display prefs is
-        //  sent to the search service.
+    // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
+    //  open category is toggled open, and the search placed into the search box by display prefs is
+    //  sent to the search service.
 
-        if (lhnPrefs.open_category) {
-          let selector = self.options.list_selector
-            .split(',')
-            .map((item) =>
-              `${item} > a[data-object-singular=${lhnPrefs.open_category}]`)
-            .join(',');
+    if (lhnPrefs.open_category) {
+      let selector = this.options.list_selector
+        .split(',')
+        .map((item) =>
+          `${item} > a[data-object-singular=${lhnPrefs.open_category}]`)
+        .join(',');
 
-          self.toggle_list_visibility(
-            self.element.find(selector)
-          );
-        }
-      });
+      this.toggle_list_visibility(
+        this.element.find(selector)
+      );
+    }
   },
   post_init: function () {
     let lhnCtr = $('#lhn').control();
@@ -592,7 +571,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
     // Notify the display prefs that the category the user just opened is to be reopened on next page load.
     if (!dontUpdatePrefs) {
-      this.options.display_prefs.setLHNState({
+      setLHNState({
         open_category: el.attr('data-object-singular'),
       });
     }
@@ -606,8 +585,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     // on closing a category, set the display prefs to reflect that there is no open category and no scroll
     //  for the next category opened.
     if (!dontUpdatePrefs) {
-      this.options.display_prefs.setLHNState({
-        open_category: null, category_scroll: 0,
+      setLHNState({
+        open_category: null,
+        category_scroll: 0,
       });
     }
   },
@@ -737,11 +717,10 @@ can.Control('CMS.Controllers.LHN_Search', {
           // If this category we're rendering is the one that is open, wait for the
           //  list to finish rendering in the content pane, then set the scrolltop
           //  of the category to the stored value in display prefs.
-          if (modelName === self.options.display_prefs
-            .getLHNState().open_category) {
+          if (modelName === getLHNState().open_category) {
             $list.one('list_displayed', function () {
               $(this).find(self.options.list_content_selector).scrollTop(
-                self.options.display_prefs.getLHNState().category_scroll || 0
+                getLHNState().category_scroll || 0
               );
             });
           }
@@ -934,8 +913,7 @@ can.Control('CMS.Controllers.LHN_Search', {
 
       // Construct extra_params based on filters:
       delete this.current_params.extra_params;
-      this.options.display_prefs.setLHNState('filter_params',
-        this.options.filter_params);
+      setLHNState({filter_params: this.options.filter_params});
       this.options.filter_params.each(function (obj, type) {
         let propertiesList = [];
         obj.each(function (v, k) {
@@ -970,7 +948,7 @@ can.Control('CMS.Controllers.LHN_Search', {
   },
 
   '.filters a click': function (el, ev) {
-    let term = this.options.display_prefs.getLHNState().search_text || '';
+    let term = getLHNState().search_text || '';
     let param = {};
     let key = el.data('key');
     let value = el.data('value');
