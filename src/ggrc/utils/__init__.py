@@ -288,11 +288,13 @@ def iso_to_us_date(date_string):
   return convert_date_format(date_string, DATE_FORMAT_ISO, DATE_FORMAT_US)
 
 
-def generate_query_chunks(query, chunk_size=CHUNK_SIZE):
+def generate_query_chunks(query, chunk_size=CHUNK_SIZE, include_order=True):
   """Make a generator splitting `query` into chunks of size `chunk_size`."""
   count = query.count()
+  if include_order:
+    query = query.order_by("id")
   for offset in range(0, count, chunk_size):
-    yield query.order_by("id").limit(chunk_size).offset(offset)
+    yield query.limit(chunk_size).offset(offset)
 
 
 def list_chunks(list_, chunk_size=CHUNK_SIZE):
