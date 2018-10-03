@@ -12,6 +12,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
+from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.integrations.synchronization_jobs import sync_utils
@@ -256,6 +257,98 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
       self.assertEqual(issue.assignee, email1)
       self.assertEqual(issue.cc_list, "")
+
+  def test_collect_audit_emails(self):
+    """Test _collect_audit_emails function."""
+    audit_captains = factories.PersonFactory.create_batch(3)
+    auditors = factories.PersonFactory.create_batch(3)
+
+    audit_captain_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Audit Captains",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+    auditor_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            audit_captain_role_id: audit_captains,
+            auditor_role_id: auditors
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    audit_reporter = audit_captains[0].email
+    audit_ccs = set(captain.email for captain in audit_captains[1:])
+    self.assertEquals(reporter_email, audit_reporter)
+    self.assertEquals(set(cc_list), audit_ccs)
+
+  def test_audit_emails_wh_captains(self):
+    """Test _collect_audit_emails without Audit Captains."""
+    auditors = factories.PersonFactory.create_batch(3)
+    auditor_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            auditor_role_id: auditors,
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    self.assertEquals(reporter_email, "")
+    self.assertEquals(cc_list, [])
+
+  def test_audit_emails_wh_auditors(self):
+    """Test _collect_audit_emails without Auditors."""
+    audit_captains = factories.PersonFactory.create_batch(3)
+    audit_captain_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Audit Captains",
+        all_models.AccessControlRole.object_type == "Audit",
+    ).one().id
+
+    acl_data = self._prepare_acl(
+        {
+            audit_captain_role_id: audit_captains
+        }
+    )
+    with app.app_context():
+      # pylint: disable=protected-access
+      reporter_email, cc_list = assessment_integration._collect_audit_emails(
+          acl_data
+      )
+    audit_reporter = audit_captains[0].email
+    audit_ccs = set(captain.email for captain in audit_captains[1:])
+    self.assertEquals(reporter_email, audit_reporter)
+    self.assertEquals(set(cc_list), audit_ccs)
+
+  @staticmethod
+  def _prepare_acl(configurations):
+    """Prepare ACL payload.
+    Args:
+      - configurations: Dictionary with key - ACR id,
+      and value - list of persons regarding ACR id
+    Returns:
+      -
+    """
+    acl_data = [
+        {
+            "ac_role_id": role_id,
+            "person": {"id": person.id, "type": "Person"}
+        } for role_id, persons in configurations.items()
+        for person in persons
+    ]
+    return acl_data
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
