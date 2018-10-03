@@ -70,10 +70,10 @@ class TestAuditResource(TestCase):
     }
 
     for audit in audits:
-      response = self.api.send_request(
-          self.api.client.get,
-          api_link="/api/audits/{}/snapshot_counts".format(audit.id),
-          data={"snapshot_types": ["Control", "Regulation"]},
+      response = self.api.client.post(
+          "/api/audits/{}/snapshot_counts".format(audit.id),
+          data=json.dumps({"snapshot_types": ("Control", "Regulation")}),
+          headers=self.headers
       )
       snapshot_counts = json.loads(response.data)
       self.assertEqual(snapshot_counts, expected_snapshot_counts[audit.id])
