@@ -21,9 +21,6 @@ can.Control('CMS.Controllers.LHN', {
   defaults: {},
 }, {
   init: function () {
-    let self = this
-        ;
-
     this.obs = new can.Observe();
 
     this.init_lhn();
@@ -31,10 +28,10 @@ can.Control('CMS.Controllers.LHN', {
     // Set up a scroll handler to capture the current scroll-Y position on the
     // whole LHN search panel.  scroll events do not bubble, so this cannot be
     // set as a delegate on the controller element.
-    self.lhs_holder_onscroll = _.debounce(function () {
+    let lhsHolderOnscroll = _.debounce(function () {
       setLHNState({panel_scroll: this.scrollTop});
     }, 250);
-    this.element.find('.lhs-holder').on('scroll', self.lhs_holder_onscroll);
+    this.element.find('.affix-holder').on('scroll', lhsHolderOnscroll);
   },
   is_lhn_open: function () {
     let isOpen = getLHNState().is_open;
@@ -196,7 +193,7 @@ can.Control('CMS.Controllers.LHN', {
   },
 
   initial_scroll: function () {
-    this.element.find('.lhs-holder').scrollTop(
+    this.element.find('.affix-holder').scrollTop(
       getLHNState().panel_scroll || 0
     );
   },
@@ -333,7 +330,7 @@ can.Control('CMS.Controllers.LHN', {
     }
   },
   destroy: function () {
-    this.element.find('.lhs-holder').off('scroll', self.lhs_holder_onscroll);
+    this.element.find('.affix-holder').off('scroll');
     this._super && this._super(...arguments);
   },
   '.lhn-pin click': function (element, event) {
