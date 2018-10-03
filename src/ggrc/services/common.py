@@ -1415,7 +1415,7 @@ class ExtendedResource(Resource):
             pk=cls.pk
         ),
         view_func=view_func,
-        methods=['GET']
+        methods=['GET', 'POST']
     )
 
   def snapshot_counts_query(self, id):
