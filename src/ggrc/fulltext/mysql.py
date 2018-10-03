@@ -225,8 +225,8 @@ def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
-  with benchmark("Update indexer before commit"):
-    if hasattr(db.session, "reindex_set"):
+  if hasattr(db.session, "reindex_set"):
+    with benchmark("Update indexer before commit"):
       db.session.reindex_set.warmup()
 
 
