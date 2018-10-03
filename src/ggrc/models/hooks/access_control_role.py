@@ -22,27 +22,61 @@ Note:
     new role must now be done in separate requests.
 """
 
+import logging
+
+import sqlalchemy as sa
+
 from ggrc import db
 from ggrc import utils
 from ggrc.models import all_models
 from ggrc.models import inflector
 from ggrc.services import signals
 
-
-def _get_missing_models_query(model):
-  return model.query
+logger = logging.getLogger(__name__)
 
 
-def handle_role_acls(role):
+def _get_missing_models_query(role, filter_=False):
   model = inflector.get_model(role.object_type)
-  query = _get_missing_models_query(model)
-  for query_chunk in utils.generate_query_chunks(query):
-    for roleable_obj in query_chunk:
-      all_models.AccessControlList(
-          ac_role=role,
-          object=roleable_obj,
+  if not model:
+    # We only log info instead of warning here because we still leave access
+    # control roles of obsolete objects in our database, so that we can use
+    # them with old revisions in our history log.
+    logger.info("Trying to handle role '%s' for non existent object '%s'",
+                   role.name, role.object_type)
+    return None
+
+  if not filter:
+    return model.query.order_by(model.id)
+
+  query = model.query.outerjoin(
+      all_models.AccessControlList,
+      sa.and_(
+          all_models.AccessControlList.object_type == model.__name__,
+          all_models.AccessControlList.object_id == model.id,
+          all_models.AccessControlList.ac_role_id == role.id
       )
-    db.session.commit()
+  ).filter(
+      all_models.AccessControlList.id.is_(None)
+  ).order_by(
+      model.id
+  )
+
+  return query
+
+
+def handle_role_acls(role, filter_=False):
+  with utils.benchmark("Generating ACL entries for role {}".format(role.name)):
+    query = _get_missing_models_query(role, filter_=filter_)
+    if not query:
+      return
+    query_generator = utils.generate_query_chunks(query, include_order=False)
+    for query_chunk in query_generator:
+      for roleable_obj in query_chunk:
+        all_models.AccessControlList(
+            ac_role=role,
+            object=roleable_obj,
+        )
+      db.session.commit()
 
 
 def init_hook():

@@ -19,6 +19,7 @@ from ggrc import utils
 from ggrc.utils import helpers
 from ggrc.access_control import utils as acl_utils
 from ggrc.models import all_models
+from ggrc.models.hooks import access_control_role
 
 logger = logging.getLogger(__name__)
 
@@ -378,7 +379,12 @@ def propagate():
 
 
 def _add_missing_acl_entries():
-  pass
+  roles = all_models.AccessControlRole.query.filter(
+      all_models.AccessControlRole.internal == 0,
+      all_models.AccessControlRole.parent_id.is_(None),
+  )
+  for role in roles:
+    access_control_role.handle_role_acls(role, filter_=True)
 
 
 @helpers.without_sqlalchemy_cache
