@@ -12,7 +12,6 @@ import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
-import DisplayPrefs from '../../../models/local-storage/display-prefs';
 import exportMessage from '../templates/export-message.mustache';
 
 describe('tree-widget-container component', function () {
@@ -566,8 +565,6 @@ describe('tree-widget-container component', function () {
       method = Component.prototype.init.bind({viewModel: vm});
       spyOn(vm, 'setSortingConfiguration');
       spyOn(vm, 'setColumnsConfiguration');
-      spyOn(DisplayPrefs, 'getSingleton')
-        .and.returnValue(can.Deferred().resolve());
     });
 
     it('sets up columns configuration', () => {

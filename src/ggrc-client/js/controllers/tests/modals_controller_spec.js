@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 import ModalsController from '../modals/modals_controller';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
 import Person from '../../models/business-models/person';
@@ -134,25 +133,6 @@ describe('ModalsController', function () {
     it('calls "disableEnableContentUI" method', () => {
       method();
       expect(ctrlInst.disableEnableContentUI).toHaveBeenCalledWith(false);
-    });
-  });
-
-  describe('after_preload() method', () => {
-    let ctrlInst;
-    let afterPreload; // the method under tests
-
-    beforeEach(function () {
-      ctrlInst = {
-        wasDestroyed: jasmine.createSpy('wasDestroyed'),
-      };
-      afterPreload = Ctrl.prototype.after_preload.bind(ctrlInst);
-    });
-
-    it('does not call DisplayPrefs.getSingleton if modal was destroyed', () => {
-      ctrlInst.wasDestroyed.and.returnValue(true);
-      spyOn(DisplayPrefs, 'getSingleton').and.returnValue(can.Deferred());
-      afterPreload();
-      expect(DisplayPrefs.getSingleton).not.toHaveBeenCalled();
     });
   });
 

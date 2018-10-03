@@ -10,7 +10,7 @@ import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
-import LocalStorage from '../models/local-storage/local-storage';
+import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 
 const Dashboard = can.Control({
   pluginName: 'cms_controllers_dashboard',
@@ -94,8 +94,8 @@ const Dashboard = can.Control({
     }
   },
 
-  '.nav-logout click': function (el, ev) {
-    LocalStorage.clearAll();
+  '.nav-logout click': function () {
+    clearLocalStorage();
   },
 
   init_widget_descriptors: function () {

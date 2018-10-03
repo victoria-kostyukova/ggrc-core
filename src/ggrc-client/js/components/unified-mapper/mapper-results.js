@@ -24,7 +24,6 @@ import {
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
-import DisplayPrefs from '../../models/local-storage/display-prefs';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 
@@ -60,7 +59,6 @@ export default can.Component.extend({
     selected: [],
     refreshItems: false,
     submitCbs: null,
-    displayPrefs: null,
     disableColumnsConfiguration: false,
     applyOwnedFilter: false,
     objectsPlural: false,
@@ -79,11 +77,7 @@ export default can.Component.extend({
     deferredList: [],
     disabledIds: [],
     init: function () {
-      let self = this;
       this.attr('submitCbs').add(this.onSearch.bind(this, true));
-      DisplayPrefs.getSingleton().then(function (displayPrefs) {
-        self.attr('displayPrefs', displayPrefs);
-      });
     },
     destroy: function () {
       this.attr('submitCbs').remove(this.onSearch.bind(this));

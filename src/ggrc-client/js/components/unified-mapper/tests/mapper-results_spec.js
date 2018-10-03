@@ -10,7 +10,6 @@ import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results';
-import DisplayPrefs from '../../../models/local-storage/display-prefs';
 import Program from '../../../models/business-models/program';
 
 describe('mapper-results component', function () {
@@ -30,22 +29,6 @@ describe('mapper-results component', function () {
       new Pagination({pageSizeSelect: [5, 10, 15]}));
     Component.prototype.viewModel.init = init;
     viewModel.init = init;
-  });
-
-  describe('init() method', function () {
-    let displayPrefs = 'displayPrefs';
-
-    beforeEach(function () {
-      spyOn(DisplayPrefs, 'getSingleton')
-        .and.returnValue(can.Deferred().resolve(displayPrefs));
-    });
-
-    it('updates viewModel.displayPrefs', function () {
-      viewModel.attr('displayPrefs', 'oldDisplayPrefs');
-      viewModel.init();
-      expect(viewModel.attr('displayPrefs'))
-        .toEqual(displayPrefs);
-    });
   });
 
   describe('destroy() method', function () {
