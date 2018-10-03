@@ -280,6 +280,21 @@ class TestPropagation(BaseTestPropagation):
     propagation.propagate_all()
     self.assertEqual(all_models.AccessControlList.query.count(), 25)
 
+  def test_creating_missing_acl_entries(self):
+    """Test clean propagation of all ACL entries."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      wf_factories.TaskGroupTaskFactory()
+      factories.RelationshipFactory(source=audit, destination=audit.program)
+
+    propagation.propagate_all()
+    self.assertEqual(all_models.AccessControlList.query.count(), 25)
+    all_models.AccessControlList.query.delete()
+    db.session.commit()
+    self.assertEqual(all_models.AccessControlList.query.count(), 0)
+    propagation.propagate_all()
+    self.assertEqual(all_models.AccessControlList.query.count(), 25)
+
   def test_complex_propagation_count(self):
     """Test multiple object ACL propagation.
 
