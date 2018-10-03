@@ -77,7 +77,7 @@ def trigger_migration():
     else:
       maint_row = Maintenance(under_maintenance=True)
       db.session.add(maint_row)
-    db.session.commit()
+    db.session.plain_commit()
   except sqlalchemy.exc.ProgrammingError as e:
     if re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
       mig_row = None
