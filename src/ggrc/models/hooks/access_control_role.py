@@ -29,9 +29,14 @@ from ggrc.models import inflector
 from ggrc.services import signals
 
 
+def _get_missing_models_query(model):
+  return model.query
+
+
 def handle_role_acls(role):
-  role_model = inflector.get_model(role.object_type)
-  for query_chunk in utils.generate_query_chunks(role_model.query):
+  model = inflector.get_model(role.object_type)
+  query = _get_missing_models_query(model)
+  for query_chunk in utils.generate_query_chunks(query):
     for roleable_obj in query_chunk:
       all_models.AccessControlList(
           ac_role=role,
