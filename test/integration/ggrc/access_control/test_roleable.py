@@ -90,10 +90,10 @@ class TestAccessControlRoleable(TestCase):
       model for model in all_models.all_models
       if issubclass(model, roleable.Roleable)
   ])
-  def test_inital_role_setup(self, model):
+  def test_initial_role_setup(self, model):
     """Check generating acl entries for {0.__name__}."""
     obj = model()
-    generated_roles = [acl.ac_role for acl in obj._access_control_list]
+    generated_roles = [acl.ac_role for acl in obj.acr_acl_map.values()]
     control_visible_roles = all_models.AccessControlRole.query.filter(
         all_models.AccessControlRole.object_type == obj.type,
         all_models.AccessControlRole.internal == 0,
