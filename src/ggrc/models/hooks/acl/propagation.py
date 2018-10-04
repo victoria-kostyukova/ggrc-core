@@ -384,6 +384,9 @@ def _add_missing_acl_entries():
       all_models.AccessControlRole.parent_id.is_(None),
   )
   for role in roles:
+    logger.info("Add missing acl entries on {} for role {}".format(
+        role.object_type, role.name
+    ))
     access_control_role.handle_role_acls(role, filter_=True)
 
 
@@ -391,7 +394,6 @@ def _add_missing_acl_entries():
 def propagate_all():
   """Re-evaluate propagation for all objects."""
   with utils.benchmark("Run propagate_all"):
-
     with utils.benchmark("Add missing acl entries"):
       _add_missing_acl_entries()
     with utils.benchmark("Get non propagated acl ids"):
