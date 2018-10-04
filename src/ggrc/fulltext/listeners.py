@@ -68,21 +68,21 @@ class ReindexSet(threading.local):
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
-  with benchmark("collect reindex models in session"):
-    ggrc_indexer = fulltext.get_indexer()
-    db.session.reindex_set = getattr(db.session, "reindex_set", ReindexSet())
-    getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
-    fields = ggrc_indexer.indexer_fields.get(target.__class__.__name__)
-    for getter in getters:
-      if fields and not fields_changed(target, fields):
-        continue
-      to_index_list = getter(target)
-      if not isinstance(to_index_list, Iterable):
-        to_index_list = [to_index_list]
-      for to_index in to_index_list:
-        db.session.reindex_set.add(to_index)
-    if isinstance(target, mixin.Indexed):
-      db.session.reindex_set.add(target)
+  # with benchmark("collect reindex models in session"):
+  ggrc_indexer = fulltext.get_indexer()
+  db.session.reindex_set = getattr(db.session, "reindex_set", ReindexSet())
+  getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
+  fields = ggrc_indexer.indexer_fields.get(target.__class__.__name__)
+  for getter in getters:
+    if fields and not fields_changed(target, fields):
+      continue
+    to_index_list = getter(target)
+    if not isinstance(to_index_list, Iterable):
+      to_index_list = [to_index_list]
+    for to_index in to_index_list:
+      db.session.reindex_set.add(to_index)
+  if isinstance(target, mixin.Indexed):
+    db.session.reindex_set.add(target)
 
 
 def register_fulltext_listeners():
