@@ -113,6 +113,7 @@ class ImportRowConverter(RowConverter):
       self.handle_raw_cell(attr_name, idx, header_dict)
 
   def update_new_obj_cache(self):
+    """Update local cache with newly created objects."""
     if not self.is_new or not getattr(self.obj, self.id_key):
       return
     self.is_new_object_set = True
@@ -168,6 +169,7 @@ class ImportRowConverter(RowConverter):
     return self.object_class.query.filter_by(**{key: value}).first()
 
   def get_value(self, key):
+    """Get the value for the row object key."""
     item = self.attrs.get(key) or self.objects.get(key)
     if item:
       return item.value
@@ -441,6 +443,7 @@ class ExportRowConverter(RowConverter):
                                              headers, options)
 
   def handle_obj_row_data(self):
+    """Create handlers for cells in the current row."""
     for attr_name, header_dict in self.headers.items():
       handler = header_dict["handler"]
       item = handler(self, attr_name, **header_dict)
