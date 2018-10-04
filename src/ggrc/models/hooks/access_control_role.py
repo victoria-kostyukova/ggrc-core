@@ -36,6 +36,20 @@ logger = logging.getLogger(__name__)
 
 
 def _get_missing_models_query(role, filter_=False):
+  """Get query for objects with a missing ACL entry for the given role.
+
+  Note that the filter flag here is just for optimization. When creating a new
+  access control role we can be sure that no object will have the ACL entry for
+  that role so we can skip the filter.
+
+  Args:
+    role: role object for which we want to check acl entries.
+    filter_: A flag to filter the possible objects that might already have the
+      given acl entry
+
+  Returns:
+    sqlalchemy query for the object type specified in the access control role.
+  """
   model = inflector.get_model(role.object_type)
   if not model:
     # We only log info instead of warning here because we still leave access
@@ -65,6 +79,12 @@ def _get_missing_models_query(role, filter_=False):
 
 
 def handle_role_acls(role, filter_=False):
+  """Handle creation of ACL entries for the given role.
+
+  This function takes care of eager acl creation when a new role is created.
+  Because this is called after the commit on the role, we can not have new
+  role creation and people assignment to that role in the same request.
+  """
   with utils.benchmark("Generating ACL entries on {} for role {}".format(
           role.object_type, role.name)):
     query = _get_missing_models_query(role, filter_=filter_)
@@ -92,4 +112,6 @@ def init_hook():
       all_models.AccessControlRole)
   def handle_role_posted(sender, obj=None, src=None, service=None, event=None):
     """Handle ACL entries creation for newly created access control role."""
+    # pylint: disable=unused-argument
+    # Arguments here have to be listed for the hooks to work.
     handle_role_acls(obj)
