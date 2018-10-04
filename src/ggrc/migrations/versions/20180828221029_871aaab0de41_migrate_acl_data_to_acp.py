@@ -104,6 +104,7 @@ def _remove_propagated_entries():
 
 
 def _get_max_acl_id():
+  """Get maximum acl id or 0 if there aren't any acl entries."""
   connection = op.get_bind()
   count = connection.execute(
       "Select max(id) from access_control_list"
@@ -191,6 +192,11 @@ def _migrate_data_to_acp():
 
 
 def _migrate_data_from_acp():
+  """Migrate data from ACP to ACL.
+
+  This function is only used for verification that migrate and downgrade do not
+  lose any data.
+  """
   op.execute("""
       insert into access_control_list (
           ac_role_id,
