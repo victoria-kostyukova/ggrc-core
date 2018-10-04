@@ -103,6 +103,7 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
     )
 
   def _remove_people(self, obsolete_people):
+    """Remove people from the current acl."""
     if not obsolete_people:
       return
     people_acp_map = {acp.person: acp for acp in self.access_control_people}
@@ -110,6 +111,7 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       self.access_control_people.remove(people_acp_map[person])
 
   def _add_people(self, additional_people):
+    """Add people to the current acl."""
     for person in additional_people:
       people.AccessControlPerson(ac_list=self, person=person)
 
