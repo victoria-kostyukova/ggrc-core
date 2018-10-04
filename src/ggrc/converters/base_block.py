@@ -458,7 +458,7 @@ class ImportBlockConverter(BlockConverter):
       shared_state[classes] = defaultdict(structures.CaseInsensitiveDict)
     return shared_state[classes]
 
-  def _store_revision_ids(self, event):
+  def store_revision_ids(self, event):
     """Store revision ids from the current event."""
     if event:
       self.revision_ids.extend(revision.id for revision in event.revisions)

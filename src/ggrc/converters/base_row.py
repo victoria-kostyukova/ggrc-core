@@ -326,7 +326,7 @@ class ImportRowConverter(RowConverter):
                        message=exp.message)
       db.session.commit_hooks_enable_flag.disable()
       db.session.commit()
-      self.block_converter._store_revision_ids(import_event)
+      self.block_converter.store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
       update_snapshot_index(modified_objects)
     except exc.SQLAlchemyError as err:
