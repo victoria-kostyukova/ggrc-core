@@ -69,7 +69,7 @@ def fill_owners_data(link, notification, owners_data, review, reviewable):
 
 def fill_reviewers_data(link, review, reviewable, reviewers_data):
   """Reviewers should get notification that object need to be reviewed"""
-  for person, acl in review.access_control_list:
+  for person, _ in review.access_control_list:
     context = EmailReviewContext(reviewable, link, review.email_message)
     reviewers_data[person][review.id] = context
 

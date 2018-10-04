@@ -334,7 +334,7 @@ def build_expression(exp, object_class, target_class, query):
   """Make an SQLAlchemy filtering expression from exp expression tree."""
   if not exp:
     # empty expression doesn't required filter
-    return
+    return None
   if autocast.is_autocast_required_for(exp):
     exp = validate("left", "right")(autocast.autocast)(exp, target_class)
   if not exp:
