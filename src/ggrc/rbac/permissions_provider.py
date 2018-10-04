@@ -17,7 +17,7 @@ Permission = namedtuple(
     'action resource_type resource_id context_id'
 )
 
-_contributing_resource_types = {}
+_CONTRIBUTING_RESOURCE_TYPES = {}
 
 
 def get_contributing_resource_types(resource_type):
@@ -25,7 +25,7 @@ def get_contributing_resource_types(resource_type):
      This is needed because permissions may be given for, e.g., "Contract", but
      the restriction on join is done knowing only "Directive".
   """
-  resource_types = _contributing_resource_types.get(resource_type, None)
+  resource_types = _CONTRIBUTING_RESOURCE_TYPES.get(resource_type, None)
   if resource_types is None:
     resource_types = [resource_type]
     resource_model = get_model(resource_type)
@@ -35,7 +35,7 @@ def get_contributing_resource_types(resource_type):
           manager.class_.__name__
           for manager in resource_manager.subclass_managers(True)
       )
-    _contributing_resource_types[resource_type] = resource_types
+    _CONTRIBUTING_RESOURCE_TYPES[resource_type] = resource_types
   return resource_types
 
 
@@ -43,7 +43,7 @@ class DefaultUserPermissionsProvider(object):
   def __init__(self, settings):
     pass
 
-  def permissions_for(self, user):
+  def permissions_for(self, _):
     return DefaultUserPermissions()
 
 
