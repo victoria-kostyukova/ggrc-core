@@ -314,7 +314,7 @@ def load_personal_context(user, permissions):
       .append(personal_context.id)
 
 
-def _get_acl_filter():
+def _get_acl_filter(acl_model):
   """Get filter for acl entries.
 
   This creates a filter to select only acl entries for objects that were
@@ -331,16 +331,18 @@ def _get_acl_filter():
     return []
   roleable_models = {m.__name__ for m in all_models.all_models
                      if issubclass(m, Roleable)}
-  keys = [(type_, id_)
-          for type_, ids in stubs.iteritems()
-          for id_ in ids
-          if type_ in roleable_models]
+  keys = [
+      (type_, id_)
+      for type_, ids in stubs.iteritems()
+      for id_ in ids
+      if type_ in roleable_models
+  ]
   if not keys:
     return []
   return [
       sa.tuple_(
-          all_models.AccessControlList.object_type,
-          all_models.AccessControlList.object_id,
+          acl_model.object_type,
+          acl_model.object_id,
       ).in_(
           keys,
       )
@@ -354,7 +356,7 @@ def load_access_control_list(user, permissions):
                               name="acl_propagated")
   acr = all_models.AccessControlRole
   acp = all_models.AccessControlPerson
-  additional_filters = _get_acl_filter()
+  additional_filters = _get_acl_filter(acl_propagated)
   access_control_list = db.session.query(
       acl_propagated.object_type,
       acl_propagated.object_id,
