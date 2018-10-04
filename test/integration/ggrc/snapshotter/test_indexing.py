@@ -5,7 +5,6 @@
 
 import ddt
 
-from mock import patch
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db

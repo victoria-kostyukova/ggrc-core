@@ -49,7 +49,10 @@ class TestACLImportExport(TestCase):
     )
     self.assertEqual(acl.count(), 1)
     self.assertEqual(acl.first().ac_role_id, role_id)
-    self.assertEqual(acl.first().access_control_people[0].person.email, "user@example.com")
+    self.assertEqual(
+        acl.first().access_control_people[0].person.email,
+        "user@example.com",
+    )
 
   def test_acl_multiple_entries(self):
     """Test ACL column import with multiple emails."""

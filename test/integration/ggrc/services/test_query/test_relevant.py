@@ -3,8 +3,6 @@
 
 """Tests for relevant operator."""
 
-import collections
-
 import ddt
 
 from ggrc.models import all_models

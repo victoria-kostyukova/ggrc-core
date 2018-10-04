@@ -8,7 +8,6 @@ import ddt
 import mock
 
 from ggrc import db
-from ggrc.access_control import role
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector

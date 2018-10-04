@@ -338,7 +338,7 @@ def _delete_propagated_acls(acl_ids):
 
 def _set_empty_base_ids():
   db.session.execute(
-    "UPDATE access_control_list SET base_id = id WHERE base_id IS NULL"
+      "UPDATE access_control_list SET base_id = id WHERE base_id IS NULL"
   )
   db.session.plain_commit()
 
