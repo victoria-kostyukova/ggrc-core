@@ -176,6 +176,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
     value = super(ValueMapFullTextAttr, self).get_value_for(instance)
     if value is not None:
       return self.value_map.get(value, None)
+    return None
 
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
@@ -184,7 +185,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
     """
     rev_val = content[self.alias]
     if rev_val is None:
-      return
+      return None
     if not isinstance(rev_val, bool):
       rev_val = bool(int(str(rev_val)))
     return self.value_map.get(rev_val, None)
@@ -286,7 +287,7 @@ class DatetimeValue(object):
     """returns parsed datetime pairs for selected operation"""
     converted_pairs = date_parsers.parse_date(unicode(value))
     if not converted_pairs:
-      return
+      return None
     date_dict = {
         "=": converted_pairs,
         "~": converted_pairs,
@@ -309,7 +310,7 @@ class DateValue(DatetimeValue):
   def get_filter_value(self, value, operation):
     results = super(DateValue, self).get_filter_value(value, operation)
     if not results:
-      return
+      return None
     return [i.date() if i else i for i in results]
 
 
@@ -344,6 +345,7 @@ class DatetimeFullTextAttr(TimezonedDatetimeValue, FullTextAttr):
     """
     if self.prop_getter in content:
       return content[self.alias].replace("T", " ")
+    return None
 
 
 DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
