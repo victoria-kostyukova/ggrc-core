@@ -50,11 +50,12 @@ describe('Mappings', () => {
   };
 
   const allTypes = _.concat(modules.core, modules.audit, modules.workflow);
-  const common = _.difference(allTypes, ['Evidence']);
+  const common = _.difference(allTypes, ['Evidence', 'AssessmentTemplate']);
 
   const mappingRules = {
     AccessGroup: common,
-    Assessment: modules.core.concat(modules.audit),
+    Assessment: _.difference(modules.audit, ['AssessmentTemplate'])
+      .concat(modules.core),
     AssessmentTemplate: ['Audit'],
     Audit: _.difference(modules.core, ['Person']).concat(modules.audit),
     Contract: common,
@@ -62,7 +63,7 @@ describe('Mappings', () => {
     CycleTaskGroupObjectTask: _.difference(modules.core, ['Person', 'Document'])
       .concat('Audit'),
     DataAsset: common,
-    Document: _.difference(modules.audit, ['Evidence']).concat(modules.core),
+    Document: _.difference(common, modules.workflow),
     Evidence: ['Assessment', 'Audit'],
     Facility: common,
     Issue: common,

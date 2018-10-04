@@ -18,7 +18,7 @@ const businessObjects = [
   'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
   'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
   'Requirement', 'Objective', 'Audit', 'Assessment',
-  'AssessmentTemplate', 'Risk', 'Threat', 'Document',
+  'Risk', 'Threat', 'Document',
 ];
 
 const scopingObjects = [
@@ -155,6 +155,9 @@ const scopingObjects = [
       _mixins: [
         'related_object',
       ],
+      _canonical: {
+        assessmenttemplate: 'AssessmentTemplate',
+      },
     },
     Assessment: {
       _related: ['Person', 'Evidence'],
