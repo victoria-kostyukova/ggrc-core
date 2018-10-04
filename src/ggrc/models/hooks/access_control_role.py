@@ -45,7 +45,7 @@ def _get_missing_models_query(role, filter_=False):
                 role.name, role.object_type)
     return None
 
-  if not filter:
+  if not filter_:
     return model.query.order_by(model.id)
 
   query = model.query.outerjoin(
