@@ -67,7 +67,7 @@ def trigger_migration():
     if maint_row and maint_row.under_maintenance:
       logger.info(
           'System is under maintenance. Try running migration later.')
-      return
+      return None
     mig_row = MigrationLog(is_migration_complete=False)
     db.session.add(mig_row)
 
@@ -120,6 +120,7 @@ def _turn_off_maintenance_mode():
     db.session.add(db_row)
     db.session.commit()
     return "Maintenance mode turned off successfully"
+  return "Maintenance mode has was not turned on."
 
 
 @maintenance_app.route('/maintenance/turnoff_maintenance_mode',
