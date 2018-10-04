@@ -1,8 +1,8 @@
-[//]: <> (updated 10/03/2018)
+[//]: <> (updated 10/04/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Changes to the mapping flow from scope to directives (v1.25.0, 10/03/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7bigh0kmx70)
+[Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7bigh0kmx70)
 
 [Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l4dezngquz60)
 
@@ -62,7 +62,7 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
-### Changes to the mapping flow from scope to directives (v1.25.0, 10/03/2018)
+### Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)
 
 There are some changes, please contact your administrator for more information.
 
