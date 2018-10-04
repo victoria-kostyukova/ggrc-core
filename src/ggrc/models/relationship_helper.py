@@ -9,26 +9,14 @@ from sqlalchemy import sql
 from ggrc import db
 from ggrc.extensions import get_extension_modules
 from ggrc import models
-from ggrc.models import Audit
 from ggrc.models import Snapshot
 from ggrc.models import all_models
 from ggrc.models.relationship import Relationship
 from ggrc.snapshotter.rules import Types
 
 
-def program_audit(object_type, related_type, related_ids):
-  if {object_type, related_type} != {"Program", "Audit"} or not related_ids:
-    return None
-
-  if object_type == "Program":
-    return db.session.query(Audit.program_id).filter(
-        Audit.id.in_(related_ids))
-  else:
-    return db.session.query(Audit.id).filter(
-        Audit.program_id.in_(related_ids))
-
-
 def acl_obj_id(object_type, related_type, related_ids, role=None):
+  """Handle person object relationships through ACL."""
   if object_type == "Person":
     return db.session.query(models.AccessControlPerson.person_id).join(
         models.AccessControlList
@@ -47,8 +35,7 @@ def acl_obj_id(object_type, related_type, related_ids, role=None):
         (models.AccessControlList.parent_id.is_(None)) &
         (models.AccessControlRole.name == role if role else True)
     )
-  else:
-    return None
+  return None
 
 
 def custom_attribute_mapping(object_type, related_type, related_ids):
@@ -67,39 +54,8 @@ def custom_attribute_mapping(object_type, related_type, related_ids):
   )
 
 
-def risk_assessment_person(object_type, related_type, related_ids):
-  if {object_type, related_type} != {"RiskAssessment", "Person"}:
-    return None
-  if object_type == "Person":
-    return db.session \
-        .query(all_models.RiskAssessment.ra_manager_id) \
-        .filter(all_models.RiskAssessment.id.in_(related_ids)) \
-        .union(
-            db.session.query(all_models.RiskAssessment.ra_counsel_id)
-                      .filter(all_models.RiskAssessment.id.in_(related_ids))
-        )
-  else:
-    return db.session \
-        .query(all_models.RiskAssessment.id) \
-        .filter(
-            (all_models.RiskAssessment.ra_manager_id.in_(related_ids)) |
-            (all_models.RiskAssessment.ra_counsel_id.in_(related_ids))
-        )
-
-
-def program_risk_assessment(object_type, related_type, related_ids):
-  if {object_type, related_type} != {"Program", "RiskAssessment"} or \
-          not related_ids:
-    return None
-  if object_type == "Program":
-    return db.session.query(all_models.RiskAssessment.program_id).filter(
-        all_models.RiskAssessment.id.in_(related_ids))
-  else:
-    return db.session.query(all_models.RiskAssessment.id).filter(
-        all_models.RiskAssessment.program_id.in_(related_ids))
-
-
 def task_group_object(object_type, related_type, related_ids):
+  """Handle task group object relationship."""
   if not related_ids:
     return None
   if object_type == "TaskGroup":
@@ -110,31 +66,14 @@ def task_group_object(object_type, related_type, related_ids):
     return db.session.query(all_models.TaskGroupObject.object_id).filter(
         (all_models.TaskGroupObject.object_type == related_type) &
         all_models.TaskGroupObject.task_group_id.in_(related_ids))
-  else:
-    return None
-
-
-def _audit_snapshot(object_type, related_type, related_ids):
-  if {object_type, related_type} != {"Audit", "Snapshot"} or not related_ids:
-    return None
-
-  if object_type == "Audit":
-    return db.session.query(Snapshot.parent_id).filter(
-        Snapshot.id.in_(related_ids))
-  else:
-    return db.session.query(Snapshot.id).filter(
-        Snapshot.parent_id.in_(related_ids))
+  return None
 
 
 def get_special_mappings(object_type, related_type, related_ids):
   return [
-      _audit_snapshot(object_type, related_type, related_ids),
       acl_obj_id(object_type, related_type, related_ids),
-      program_audit(object_type, related_type, related_ids),
-      program_risk_assessment(object_type, related_type, related_ids),
       task_group_object(object_type, related_type, related_ids),
       custom_attribute_mapping(object_type, related_type, related_ids),
-      risk_assessment_person(object_type, related_type, related_ids),
   ]
 
 
