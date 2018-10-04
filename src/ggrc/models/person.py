@@ -133,7 +133,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
                            'person_language')
 
   @validates('email')
-  def validate_email(self, key, email):
+  def validate_email(self, _, email):
     if not Person.is_valid_email(email):
       message = "Email address '{}' is invalid. Valid email must be provided"
       raise ValidationError(message.format(email))
@@ -144,7 +144,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     # Borrowed from Django
     # literal form, ipv4 address (SMTP 4.1.3)
     email_re = re.compile(
-        '^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$',
+        r'^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$',
         re.IGNORECASE)
     return email_re.match(val) if val else False
 
@@ -200,14 +200,14 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         for user_role in self.user_roles
         if user_role.role.name in role_hierarchy
     ])
-    if len(unique_roles) == 0:
+    if not unique_roles:
       return u"No Access"
-    else:
-      # -1 as default to make items not in this list appear on top
-      # and thus shown to the user
-      sorted_roles = sorted(unique_roles,
-                            key=lambda x: role_hierarchy.get(x, -1))
-      return sorted_roles[0]
+
+    # -1 as default to make items not in this list appear on top
+    # and thus shown to the user
+    sorted_roles = sorted(unique_roles,
+                          key=lambda x: role_hierarchy.get(x, -1))
+    return sorted_roles[0]
 
 
 @event.listens_for(Session, 'after_flush_postexec')
