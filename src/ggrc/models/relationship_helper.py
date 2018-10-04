@@ -78,6 +78,7 @@ def get_special_mappings(object_type, related_type, related_ids):
 
 
 def get_extension_mappings(object_type, related_type, related_ids):
+  """Get mappings handler from etenstion modules."""
   queries = []
   for extension in get_extension_modules():
     get_ids = getattr(extension, "contributed_get_ids_related_to", None)
