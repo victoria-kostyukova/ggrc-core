@@ -83,6 +83,12 @@
           <td>All objects last time modified before or on March 3rd, 2015</td>
         </tr>
         <tr>
+          <td><span class="code">IN</span></td>
+          <td><strong>matches any value in the list of values</strong></td>
+          <td><span class="code">admin IN (“john doe”, “nick doe”)</span></td>
+          <td>All objects which matches input values for admin field will be returned. Object Admins matching <em>john doe</em> or <em>nick doe</em> or both will be returned</td>
+        </tr>
+        <tr>
           <td><span class="code">AND</span></td>
           <td><strong>logical AND</strong></td>
           <td><span class="code">title ~ PCI AND admin = “john doe”</span></td>
