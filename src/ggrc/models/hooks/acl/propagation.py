@@ -337,6 +337,7 @@ def _delete_propagated_acls(acl_ids):
 
 
 def _set_empty_base_ids():
+  """Set base_id for new entries."""
   db.session.execute(
       "UPDATE access_control_list SET base_id = id WHERE base_id IS NULL"
   )
@@ -379,14 +380,18 @@ def propagate():
 
 
 def _add_missing_acl_entries():
+  """Add missing ACL entries.
+
+  Since we now rely on eager ACL creation, this function helps for creating
+  those entries for older objects that have not had any person on a given role.
+  """
   roles = all_models.AccessControlRole.query.filter(
       all_models.AccessControlRole.internal == 0,
       all_models.AccessControlRole.parent_id.is_(None),
   )
   for role in roles:
-    logger.info("Add missing acl entries on {} for role {}".format(
-        role.object_type, role.name
-    ))
+    logger.info("Add missing acl entries on %s for role %s",
+                role.object_type, role.name)
     access_control_role.handle_role_acls(role, filter_=True)
 
 
