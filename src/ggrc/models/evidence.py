@@ -161,6 +161,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   @simple_property
   def parent_obj(self):
+    # pylint: disable=attribute-defined-outside-init
     return self._parent_obj
 
   @parent_obj.setter
