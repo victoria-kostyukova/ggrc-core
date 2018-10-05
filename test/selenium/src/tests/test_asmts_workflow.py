@@ -83,9 +83,7 @@ class TestAssessmentsWorkflow(base.Test):
         status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(obj=expected_asmt)
     # 'actual_asmt': audit (None)
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments")
-    self.xfail_equal_assert(
-        expected_asmt, actual_asmt, "Issue in app GGRC-3094", "comments")
+    self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   def test_asmt_logs(
