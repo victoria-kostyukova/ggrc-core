@@ -94,6 +94,8 @@ a {
     text-decoration: underline;
   }
   &.icon-link {
+    width: auto;
+
     &:hover {
       text-decoration: none;
     }
