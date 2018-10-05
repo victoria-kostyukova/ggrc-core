@@ -152,18 +152,20 @@ const scopingObjects = [
     },
     Audit: {
       _related: ['Evidence'],
-      _mixins: [
-        'related_object',
-      ],
       _canonical: {
+        related_objects_as_source: _.difference(businessObjects, ['Document']),
         assessmenttemplate: 'AssessmentTemplate',
       },
+      related_objects_as_source: Proxy(
+        null, 'destination', 'Relationship', 'source', 'related_destinations'),
     },
     Assessment: {
       _related: ['Person', 'Evidence'],
-      _mixins: [
-        'related_object',
-      ],
+      _canonical: {
+        related_objects_as_source: _.difference(businessObjects, ['Document']),
+      },
+      related_objects_as_source: Proxy(
+        null, 'destination', 'Relationship', 'source', 'related_destinations'),
     },
     Evidence: {
       _canonical: {
