@@ -13,18 +13,20 @@ import CustomAttributeDefinition from '../custom-attributes/custom-attribute-def
 import AccessControlRole from '../custom-roles/access-control-role';
 
 const businessObjects = [
-  'Metric', 'TechnologyEnvironment', 'AccessGroup',
-  'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-  'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
-  'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-  'Requirement', 'Objective', 'Audit', 'Assessment',
-  'Risk', 'Threat', 'Document',
+  'Assessment', 'AccessGroup', 'Audit', 'Contract', 'Control', 'DataAsset',
+  'Document', 'Facility', 'Issue', 'Market', 'Metric', 'Objective', 'OrgGroup',
+  'Policy', 'Process', 'Product', 'ProductGroup', 'Program', 'Project',
+  'Regulation', 'Requirement', 'Risk', 'Standard', 'System',
+  'TechnologyEnvironment', 'Threat', 'Vendor',
 ];
 
+const coreObjects = _.difference(businessObjects,
+  ['Assessment', 'Audit', 'Document', 'Program']);
+
 const scopingObjects = [
-  'Metric', 'TechnologyEnvironment', 'AccessGroup',
-  'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-  'Product', 'ProductGroup', 'Project', 'System',
+  'AccessGroup', 'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup',
+  'Process', 'Product', 'ProductGroup', 'Project', 'System',
+  'TechnologyEnvironment', 'Vendor',
 ];
 
 (function (GGRC, can) {
@@ -33,139 +35,148 @@ const scopingObjects = [
     relatedMappings: {
       _related: ['Person', 'Workflow'],
     },
+    relatedObject: {
+      related_objects_as_source: Proxy(
+        null, 'destination', 'Relationship', 'source', 'related_destinations'),
+    },
+
     Person: {
       _related: ['TaskGroupTask', 'Workflow',
         ...GGRC.roleableTypes.map((model) => model.model_singular)],
     },
-    // Governance
-    Control: {
+
+    Program: {
       _mixins: [
-        'related_object', 'relatedMappings',
+        'relatedObject', 'relatedMappings',
       ],
+      _canonical: {
+        related_objects_as_source:
+          [...coreObjects, 'Audit', 'Assessment', 'Document', 'Program'],
+      },
     },
-    Objective: {
-      _mixins: ['related_object', 'relatedMappings'],
-    },
-    Requirement: {
-      _mixins: ['related_object', 'relatedMappings'],
-    },
+
     Document: {
-      _mixins: ['related_object'],
-      _related: ['Person'],
-    },
-    related_object: {
+      _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source: businessObjects,
       },
-      related_objects_as_source: Proxy(
-        null, 'destination', 'Relationship', 'source', 'related_destinations'),
-    },
-    // Program
-    Program: {
-      _mixins: [
-        'related_object', 'relatedMappings',
-      ],
-    },
-    directive_object: {
-      _mixins: [
-        'related_object', 'relatedMappings',
-      ],
+      _related: ['Person'],
     },
 
-    // Directives
-    Regulation: {
-      _mixins: ['directive_object'],
+    // Core objects
+    coreObjectsMappings: {
+      _mixins: ['relatedObject', 'relatedMappings'],
       _canonical: {
-        related_objects_as_source: _.difference(
-          businessObjects, scopingObjects),
+        related_objects_as_source: businessObjects,
       },
-      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
+    },
+
+    Issue: {
+      _mixins: ['coreObjectsMappings'],
     },
     Contract: {
-      _mixins: ['directive_object'],
+      _mixins: ['coreObjectsMappings'],
     },
-    Standard: {
-      _mixins: ['directive_object'],
-      _canonical: {
-        related_objects_as_source: _.difference(
-          businessObjects, scopingObjects),
-      },
-      _related: _.concat(scopingObjects, ['Person', 'Workflow']),
+    Control: {
+      _mixins: ['coreObjectsMappings'],
+    },
+    Objective: {
+      _mixins: ['coreObjectsMappings'],
     },
     Policy: {
-      _mixins: ['directive_object'],
+      _mixins: ['coreObjectsMappings'],
+    },
+    Requirement: {
+      _mixins: ['coreObjectsMappings'],
+    },
+    Regulation: {
+      _mixins: ['relatedObject'],
+      _canonical: {
+        related_objects_as_source:
+          _.difference(businessObjects, scopingObjects),
+      },
+      _related: [...scopingObjects, 'Person', 'Workflow'],
+    },
+    Risk: {
+      _mixins: ['coreObjectsMappings'],
+    },
+    Standard: {
+      _mixins: ['relatedObject'],
+      _canonical: {
+        related_objects_as_source:
+          _.difference(businessObjects, scopingObjects),
+      },
+      _related: [...scopingObjects, 'Person', 'Workflow'],
+    },
+    Threat: {
+      _mixins: ['coreObjectsMappings'],
     },
 
-    // Business objects
-    business_object: {
-      _mixins: [
-        'related_object',
-      ],
+    // Scoping objects
+    scopingObjectsMappings: {
+      _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source: _.difference(businessObjects,
-          ['Standard', 'Regulation']),
+        related_objects_as_source:
+          _.difference(businessObjects, ['Standard', 'Regulation']),
       },
       _related: ['Workflow', 'Person', 'Standard', 'Regulation'],
     },
     AccessGroup: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     DataAsset: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     Facility: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     Market: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     Metric: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     OrgGroup: {
-      _mixins: ['business_object'],
-    },
-    Vendor: {
-      _mixins: ['business_object'],
-    },
-    Product: {
-      _mixins: ['business_object'],
-    },
-    ProductGroup: {
-      _mixins: ['business_object'],
-    },
-    Project: {
-      _mixins: ['business_object'],
-    },
-    System: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
     Process: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
+    },
+    Product: {
+      _mixins: ['scopingObjectsMappings'],
+    },
+    ProductGroup: {
+      _mixins: ['scopingObjectsMappings'],
+    },
+    Project: {
+      _mixins: ['scopingObjectsMappings'],
+    },
+    System: {
+      _mixins: ['scopingObjectsMappings'],
     },
     TechnologyEnvironment: {
-      _mixins: ['business_object'],
+      _mixins: ['scopingObjectsMappings'],
     },
-    UserRole: {
-      person: Direct('Person', 'user_roles', 'person'),
-      role: Direct('Role', 'user_roles', 'role'),
+    Vendor: {
+      _mixins: ['scopingObjectsMappings'],
     },
+
+    // Audit
     Audit: {
-      _related: ['Evidence'],
+      _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source: _.difference(businessObjects, ['Document']),
-        assessmenttemplate: 'AssessmentTemplate',
+        related_objects_as_source: [...coreObjects,
+          'Assessment', 'AssessmentTemplate', 'Audit', 'Program'],
       },
-      related_objects_as_source: Proxy(
-        null, 'destination', 'Relationship', 'source', 'related_destinations'),
+      _related: ['Evidence'],
     },
     Assessment: {
-      _related: ['Person', 'Evidence'],
+      _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source: _.difference(businessObjects, ['Document']),
+        related_objects_as_source:
+          [...coreObjects, 'Assessment', 'Audit', 'Program'],
       },
-      related_objects_as_source: Proxy(
-        null, 'destination', 'Relationship', 'source', 'related_destinations'),
+      _related: ['Person', 'Evidence'],
     },
     Evidence: {
       _canonical: {
@@ -175,24 +186,23 @@ const scopingObjects = [
     AssessmentTemplate: {
       _related: ['Audit'],
     },
-    Issue: {
-      _mixins: [
-        'related_object', 'relatedMappings',
-      ],
-    },
-    Comment: {
-      _mixins: ['related_object'],
+
+    // Other
+    UserRole: {
+      person: Direct('Person', 'user_roles', 'person'),
+      role: Direct('Role', 'user_roles', 'role'),
     },
     MultitypeSearch: {
       _canonical: {
         related_objects_as_source: [
-          'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'ProductGroup', 'Project', 'System', 'Regulation',
-          'Policy', 'Contract', 'Standard', 'Program', 'Issue', 'Control',
-          'Requirement', 'Objective', 'Audit', 'Assessment',
-          'AssessmentTemplate', 'AccessGroup', 'Risk', 'Threat', 'Document',
-          'Metric', 'TechnologyEnvironment', 'Workflow', 'Evidence', 'Person',
-          'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask',
+          'AccessGroup', 'Assessment', 'AssessmentTemplate', 'Audit',
+          'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
+          'Document', 'Evidence', 'Facility', 'Issue', 'Market', 'Metric',
+          'Objective', 'OrgGroup', 'Person', 'Process', 'Product',
+          'ProductGroup', 'Project', 'Policy', 'Program', 'Regulation',
+          'Requirement', 'Risk', 'Standard', 'System', 'TaskGroup',
+          'TaskGroupTask', 'TechnologyEnvironment', 'Threat',
+          'Vendor', 'Workflow',
         ],
       },
     },
@@ -213,12 +223,6 @@ const scopingObjects = [
           internal: false,
         });
       }, 'AccessControlRole'),
-    },
-    Risk: {
-      _mixins: ['directive_object'],
-    },
-    Threat: {
-      _mixins: ['directive_object'],
     },
   });
 })(window.GGRC, window.can);
