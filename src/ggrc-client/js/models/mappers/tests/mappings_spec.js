@@ -75,7 +75,7 @@ describe('Mappings', function () {
       ],
     },
   };
-  let directives = ['Contract', 'Policy', 'Regulation', 'Standard'];
+
   let mappingRules;
   let filtered;
 
@@ -105,7 +105,7 @@ describe('Mappings', function () {
     AssessmentTemplate: [],
     Audit: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
       'TaskGroup', 'Workflow', 'Assessment', 'Document']),
-    Contract: _.difference(filtered, directives),
+    Contract: _.difference(filtered, ['Contract']),
     Control: filtered,
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
       'TaskGroup', 'Workflow', 'Assessment', 'Document']),
@@ -121,7 +121,7 @@ describe('Mappings', function () {
     Objective: filtered,
     OrgGroup: _.difference(filtered, ['Standard', 'Regulation']),
     Person: [],
-    Policy: _.difference(filtered, directives),
+    Policy: _.difference(filtered, ['Policy']),
     Process: _.difference(filtered, ['Standard', 'Regulation']),
     Product: _.difference(filtered, ['Standard', 'Regulation']),
     ProductGroup: _.difference(filtered, ['Standard', 'Regulation']),
@@ -129,11 +129,11 @@ describe('Mappings', function () {
       ['Program', 'Audit', 'RiskAssessment', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: _.difference(filtered, ['Standard', 'Regulation']),
-    Regulation: _.difference(filtered, directives.concat(modules.core.scope)),
+    Regulation: _.difference(filtered, [...modules.core.scope, 'Regulation']),
     Risk: filtered,
     RiskAssessment: [],
     Requirement: filtered,
-    Standard: _.difference(filtered, directives.concat(modules.core.scope)),
+    Standard: _.difference(filtered, [...modules.core.scope, 'Standard']),
     System: _.difference(filtered, ['Standard', 'Regulation']),
     TaskGroup: _.difference(filtered, ['Audit', 'Person',
       'TaskGroup', 'Workflow', 'Assessment', 'Document']),

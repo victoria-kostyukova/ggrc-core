@@ -76,6 +76,9 @@ const scopingObjects = [
     },
     Contract: {
       _mixins: ['coreObjectsMappings'],
+      _canonical: {
+        related_objects_as_source: _.difference(businessObjects, ['Contract']),
+      },
     },
     Control: {
       _mixins: ['coreObjectsMappings'],
@@ -85,6 +88,9 @@ const scopingObjects = [
     },
     Policy: {
       _mixins: ['coreObjectsMappings'],
+      _canonical: {
+        related_objects_as_source: _.difference(businessObjects, ['Policy']),
+      },
     },
     Requirement: {
       _mixins: ['coreObjectsMappings'],
@@ -93,7 +99,7 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          _.difference(businessObjects, scopingObjects),
+          _.difference(businessObjects, [...scopingObjects, 'Regulation']),
       },
       _related: [...scopingObjects, 'Person', 'Workflow'],
     },
@@ -104,7 +110,7 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source:
-          _.difference(businessObjects, scopingObjects),
+          _.difference(businessObjects, [...scopingObjects, 'Standard']),
       },
       _related: [...scopingObjects, 'Person', 'Workflow'],
     },
