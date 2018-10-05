@@ -110,7 +110,7 @@ describe('Mappings', function () {
     CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
       'TaskGroup', 'Workflow', 'Assessment', 'Document']),
     DataAsset: _.difference(filtered, ['Standard', 'Regulation']),
-    Evidence: ['Assessment', 'Audit'],
+    Evidence: [],
     Document: _.difference(filtered,
       ['Audit', 'Assessment', 'Document', 'Person', 'Workflow', 'TaskGroup']),
     Facility: _.difference(filtered, ['Standard', 'Regulation']),

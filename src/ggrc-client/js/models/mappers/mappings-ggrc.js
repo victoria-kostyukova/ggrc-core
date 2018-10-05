@@ -51,14 +51,14 @@ const scopingObjects = [
       ],
       _canonical: {
         related_objects_as_source:
-          [...coreObjects, 'Audit', 'Assessment', 'Document', 'Program'],
+          [...coreObjects, 'Audit', 'Document'],
       },
     },
 
     Document: {
       _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source: businessObjects,
+        related_objects_as_source: [...coreObjects, 'Program'],
       },
       _related: ['Person'],
     },
@@ -125,10 +125,15 @@ const scopingObjects = [
         related_objects_as_source:
           _.difference(businessObjects, ['Standard', 'Regulation']),
       },
-      _related: ['Workflow', 'Person', 'Standard', 'Regulation'],
+      _related: ['Person', 'Regulation', 'Standard', 'Workflow'],
     },
     AccessGroup: {
       _mixins: ['scopingObjectsMappings'],
+      _canonical: {
+        related_objects_as_source:
+          _.difference(businessObjects,
+            ['AccessGroup', 'Standard', 'Regulation']),
+      },
     },
     DataAsset: {
       _mixins: ['scopingObjectsMappings'],
@@ -172,22 +177,19 @@ const scopingObjects = [
       _mixins: ['relatedObject'],
       _canonical: {
         related_objects_as_source: [...coreObjects,
-          'Assessment', 'AssessmentTemplate', 'Audit', 'Program'],
+          'Assessment', 'AssessmentTemplate'],
       },
-      _related: ['Evidence'],
+      _related: ['Evidence', 'Program'],
     },
     Assessment: {
       _mixins: ['relatedObject'],
       _canonical: {
-        related_objects_as_source:
-          [...coreObjects, 'Assessment', 'Audit', 'Program'],
+        related_objects_as_source: coreObjects,
       },
-      _related: ['Person', 'Evidence'],
+      _related: ['Audit', 'Evidence', 'Person'],
     },
     Evidence: {
-      _canonical: {
-        related_objects_as_source: ['Audit', 'Assessment'],
-      },
+      _related: ['Assessment', 'Audit'],
     },
     AssessmentTemplate: {
       _related: ['Audit'],

@@ -50,16 +50,16 @@ describe('Mappings', () => {
     ['Assessment', 'Audit', 'Document', 'Person', 'Program']);
 
   const mappingRules = {
-    AccessGroup: coreObjectsRules,
-    Assessment: [...modules.core, 'Evidence', 'Assessment',
-      'Audit', 'Person', 'Program'],
+    AccessGroup: _.difference(coreObjectsRules, ['AccessGroup']),
+    Assessment: [...modules.core, 'Evidence', 'Audit', 'Person'],
     AssessmentTemplate: ['Audit'],
-    Audit: [...modules.audit, ...modules.core, 'Program'],
+    Audit: [...modules.core, 'Evidence', 'Assessment',
+      'AssessmentTemplate', 'Program'],
     Contract: _.difference(coreObjectsRules, ['Contract']),
     Control: coreObjectsRules,
     CycleTaskGroupObjectTask: [...modules.core, 'Audit', 'Program'],
     DataAsset: coreObjectsRules,
-    Document: _.difference(coreObjectsRules, modules.workflow),
+    Document: [...modules.core, 'Person', 'Program'],
     Evidence: ['Assessment', 'Audit'],
     Facility: coreObjectsRules,
     Issue: coreObjectsRules,
@@ -73,7 +73,8 @@ describe('Mappings', () => {
     Process: coreObjectsRules,
     Product: coreObjectsRules,
     ProductGroup: coreObjectsRules,
-    Program: coreObjectsRules,
+    Program:
+      [...modules.core, ...modules.workflow, 'Audit', 'Document', 'Person'],
     Project: coreObjectsRules,
     Regulation: _.difference(coreObjectsRules, ['Regulation']),
     Requirement: coreObjectsRules,
