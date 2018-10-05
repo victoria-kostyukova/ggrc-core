@@ -41,7 +41,7 @@ const scopingObjects = [
     },
 
     Person: {
-      _related: ['TaskGroupTask', 'Workflow',
+      _related: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
         ...GGRC.roleableTypes.map((model) => model.model_singular)],
     },
 
@@ -179,7 +179,7 @@ const scopingObjects = [
         related_objects_as_source: [...coreObjects,
           'Assessment', 'AssessmentTemplate'],
       },
-      _related: ['Evidence', 'Program'],
+      _related: ['Evidence', 'Person', 'Program'],
     },
     Assessment: {
       _mixins: ['relatedObject'],
@@ -189,7 +189,7 @@ const scopingObjects = [
       _related: ['Audit', 'Evidence', 'Person'],
     },
     Evidence: {
-      _related: ['Assessment', 'Audit'],
+      _related: ['Assessment', 'Audit', 'Person'],
     },
     AssessmentTemplate: {
       _related: ['Audit'],

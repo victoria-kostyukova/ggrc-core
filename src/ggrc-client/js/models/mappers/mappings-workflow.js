@@ -38,10 +38,10 @@ let mappings = {
       'task_group_objects'),
   },
   TaskGroupTask: {
-    _related: ['Workflow'],
+    _related: ['Person', 'Workflow'],
   },
   Workflow: {
-    _related: ['TaskGroup', 'TaskGroupTask'],
+    _related: ['Person', 'TaskGroup', 'TaskGroupTask'],
   },
   CycleTaskGroupObjectTask: {
     _canonical: {
@@ -52,6 +52,7 @@ let mappings = {
       // collection. The result of the operation is the total list.
       related_objects_as_source: _workflowObjectTypes.concat('Audit'),
     },
+    _related: ['Person'],
     // Needed for related_objects mapper
     related_objects_as_source: Proxy(
       null,
