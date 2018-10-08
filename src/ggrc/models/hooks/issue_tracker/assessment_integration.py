@@ -319,7 +319,8 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
 
   issue_tracker_info = dict(initial_info, **new_info)
 
-  old_ticket_id = int(initial_info.get('issue_id')) if initial_info else None
+  initial_issue_id = initial_info.get('issue_id')
+  old_ticket_id = int(initial_issue_id) if initial_issue_id else None
   get_ticket_id = issue_tracker_info.get('issue_id', None)
   ticket_id = int(get_ticket_id) if get_ticket_id else None
 
@@ -347,6 +348,9 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
   issue_tracker_info['title'] = obj.title
   if not issue_tracker_info.get('due_date'):
     issue_tracker_info['due_date'] = obj.start_date
+  issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
+      obj.status
+  )
 
   if ticket_id != old_ticket_id and issue_tracker_info['enabled']:
     _link_assessment(obj, issue_tracker_info)
@@ -360,11 +364,11 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
   except integrations_errors.Error as error:
     if error.status == 429:
       logger.error(
-          'The request updating ticket ID=%s for assessment ID=%d was '
+          'The request updating ticket ID=%d for assessment ID=%d was '
           'rate limited: %s', ticket_id, obj.id, error)
     else:
       logger.error(
-          'Unable to update a ticket ID=%s while updating '
+          'Unable to update a ticket ID=%d while updating '
           'assessment ID=%d: %s', ticket_id, obj.id, error)
     obj.add_warning('Unable to update a ticket.')
 
@@ -908,7 +912,6 @@ def _link_assessment(assessment, issue_tracker_info):
     assessment.add_warning('Unable to link a ticket.')
   else:
     issue_url = integration_utils.build_issue_tracker_url(ticket_id)
-    issue_tracker_info['issue_id'] = ticket_id
     issue_tracker_info['issue_url'] = issue_url
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         assessment, issue_tracker_info)

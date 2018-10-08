@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for assessments with IssueTracker integration."""
+# pylint: disable=too-many-lines
+# this module will be refactored in the future when we make base testcase class
+# for issuetracker integration.
 
 from collections import OrderedDict
 
@@ -29,6 +32,7 @@ from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 TICKET_ID = 123
 
 
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   """Test set for IssueTracker integration functionality."""
