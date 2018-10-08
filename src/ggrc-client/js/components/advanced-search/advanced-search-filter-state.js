@@ -40,6 +40,13 @@ let viewModel = can.Map.extend({
         return state;
       },
     },
+    /**
+     * Contains available states for specific model.
+     * @type {string}
+     * @example
+     * Active
+     * Draft
+     */
     filterStates: {
       get() {
         let items = this.attr('stateModel.items') || [];
@@ -84,14 +91,6 @@ let viewModel = can.Map.extend({
    * Regulation
    */
   modelName: null,
-  /**
-   * Contains available states for specific model.
-   * @type {string}
-   * @example
-   * Active
-   * Draft
-   */
-  filterStates: [],
   /**
    * Saves selected states.
    * @param {Array} selectedStates - selected states.
