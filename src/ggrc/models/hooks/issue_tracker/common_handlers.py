@@ -7,20 +7,40 @@
 
 import itertools
 
+from flask import request
+
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import handlers_mapping
 from ggrc.services import signals
 
 
+def global_synchronisation_enabled():
+  """Checks if we should synchronise objects via hooks.
+
+  We shouldn't run these hooks if integration to IssueTracker turned off or
+  it was called by import request.
+
+  We can detect that it was called by import via trying to get request. Import
+  calls doesn't have requests.
+  """
+  try:
+    request.method
+  except RuntimeError:
+    return False
+
+  return settings.ISSUE_TRACKER_ENABLED
+
+
 def handle_object_creation_event(sender, objects=None, **kwargs):
   """Common handler for 'collection_posted' event.
+
   Args:
       sender: A class of Resource handling the POST request.
       objects: A list of model instances created from the POSTed JSON.
       sources: A list of original POSTed JSON dictionaries.
   """
-  if not settings.ISSUE_TRACKER_ENABLED:
+  if not global_synchronisation_enabled():
     return
 
   sources = kwargs.get("sources", [])
@@ -33,11 +53,12 @@ def handle_object_creation_event(sender, objects=None, **kwargs):
 
 def handle_object_deletion_event(sender, obj=None, **kwargs):
   """Common handler for 'model_deleted' event.
+
   Args:
       sender: A class of Resource handling the DELETE request.
       obj: Model instance for deletion.
   """
-  if not settings.ISSUE_TRACKER_ENABLED:
+  if not global_synchronisation_enabled():
     return
 
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
@@ -47,11 +68,12 @@ def handle_object_deletion_event(sender, obj=None, **kwargs):
 def handle_object_updating_event(sender, obj=None, initial_state=None,
                                  **kwargs):
   """Common handler for 'model_put' event.
+
   Args:
       sender: A class of Resource handling the PUT request.
       obj: Model instance for update.
   """
-  if not settings.ISSUE_TRACKER_ENABLED:
+  if not global_synchronisation_enabled():
     return
 
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
@@ -63,7 +85,8 @@ def handle_object_updating_event(sender, obj=None, initial_state=None,
 
 def handle_comment_creation_event(sender, objects=None, **kwargs):
   """Common handler for adding comment."""
-  if not settings.ISSUE_TRACKER_ENABLED:
+
+  if not global_synchronisation_enabled():
     return
 
   for obj in objects:
@@ -84,6 +107,7 @@ def handle_comment_creation_event(sender, objects=None, **kwargs):
 
 def init_hook():
   """Initialize common handlers for all models from handlers dict."""
+
   issue_tracker_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS
   for model, model_handlers in issue_tracker_handlers.iteritems():
     if handlers_mapping.CREATE_HANDLER_NAME in model_handlers:
