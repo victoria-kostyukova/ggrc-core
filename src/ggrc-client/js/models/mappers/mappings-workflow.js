@@ -101,12 +101,4 @@ let mappings = {
   },
 };
 
-// Insert `workflows` mappings to all business object types
-can.each(_workflowObjectTypes, function (type) {
-  mappings[type] = {
-    _canonical: {
-      task_groups: 'TaskGroup',
-    },
-  };
-});
 new Mappings('ggrc_workflows', mappings);

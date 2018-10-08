@@ -77,7 +77,7 @@ export default Cacheable('CMS.Models.Issue', {
   getAllowedMappings() {
     return _.union(
       GGRC.config.snapshotable_objects,
-      ['Issue', 'Program', 'Project', 'TaskGroup', 'Document']
+      ['Issue', 'Program', 'Project', 'Document']
     );
   },
   buildIssueTrackerConfig(instance) {

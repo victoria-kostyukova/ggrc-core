@@ -33,7 +33,7 @@ const scopingObjects = [
   new Mappings('ggrc_core', {
     base: {},
     relatedMappings: {
-      _related: ['Person', 'Workflow'],
+      _related: ['Person', 'TaskGroup', 'Workflow'],
     },
     relatedObject: {
       related_objects_as_source: Proxy(
@@ -101,7 +101,7 @@ const scopingObjects = [
         related_objects_as_source:
           _.difference(businessObjects, [...scopingObjects, 'Regulation']),
       },
-      _related: [...scopingObjects, 'Person', 'Workflow'],
+      _related: [...scopingObjects, 'Person', 'TaskGroup', 'Workflow'],
     },
     Risk: {
       _mixins: ['coreObjectsMappings'],
@@ -112,7 +112,7 @@ const scopingObjects = [
         related_objects_as_source:
           _.difference(businessObjects, [...scopingObjects, 'Standard']),
       },
-      _related: [...scopingObjects, 'Person', 'Workflow'],
+      _related: [...scopingObjects, 'Person', 'TaskGroup', 'Workflow'],
     },
     Threat: {
       _mixins: ['coreObjectsMappings'],
@@ -125,7 +125,7 @@ const scopingObjects = [
         related_objects_as_source:
           _.difference(businessObjects, ['Standard', 'Regulation']),
       },
-      _related: ['Person', 'Regulation', 'Standard', 'Workflow'],
+      _related: ['Person', 'Regulation', 'Standard', 'TaskGroup', 'Workflow'],
     },
     AccessGroup: {
       _mixins: ['scopingObjectsMappings'],
