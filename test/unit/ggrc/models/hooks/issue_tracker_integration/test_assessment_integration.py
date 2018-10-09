@@ -10,6 +10,7 @@ import mock
 
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
+from ggrc.models.hooks.issue_tracker import common_handlers
 from ggrc.integrations import integrations_errors
 from ggrc.models.hooks.issue_tracker import integration_utils
 
@@ -91,7 +92,10 @@ class TestUtilityFunctions(unittest.TestCase):
                    '._update_issuetracker_info') as update_info_mock, \
         mock.patch(self.ISSUE_TRACKED_NAMESPACE +
                    '._collect_assessment_emails',
-                   side_effect=[(None, [])]):
+                   side_effect=[(None, [])]), \
+        mock.patch.object(common_handlers,
+                          'global_synchronization_enabled',
+                          return_value=True):
       error_data = integrations_errors.HttpError('data')
       update_issue_mock.side_effect = error_data
       src = {
