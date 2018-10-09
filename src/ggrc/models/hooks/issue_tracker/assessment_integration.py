@@ -302,12 +302,12 @@ def _handle_audit_put_after_commit(sender, obj=None, **kwargs):
       _ARCHIVED_TMPL if obj.archived else _UNARCHIVED_TMPL)
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-branches
 def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
   """Handles IssueTracker information during assessment update event."""
   del sender  # Unused
 
-  if not common_handlers.global_synchronisation_enabled():
+  if not common_handlers.global_synchronization_enabled():
     return
 
   if not _is_issue_tracker_enabled(audit=obj.audit):
@@ -396,7 +396,7 @@ def _handle_assessment_deleted(sender, obj=None, service=None):
   """Handles assessment delete event."""
   del sender, service  # Unused
 
-  if not common_handlers.global_synchronisation_enabled():
+  if not common_handlers.global_synchronization_enabled():
     return
 
   issue_obj = all_models.IssuetrackerIssue.get_issue(
@@ -460,7 +460,7 @@ def start_update_issue_job(audit_id, message):
 
 def handle_assessment_create(assessment, src):
   """Handles issue tracker related data."""
-  if not common_handlers.global_synchronisation_enabled():
+  if not common_handlers.global_synchronization_enabled():
     return
 
   # Get issue tracker data from request.

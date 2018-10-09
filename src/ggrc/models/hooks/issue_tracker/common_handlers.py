@@ -15,8 +15,8 @@ from ggrc.models.hooks.issue_tracker import handlers_mapping
 from ggrc.services import signals
 
 
-def global_synchronisation_enabled():
-  """Checks if we should synchronise objects via hooks.
+def global_synchronization_enabled():
+  """Checks if we should synchronize objects via hooks.
 
   We shouldn't run these hooks if integration to IssueTracker turned off or
   it was called by import request.
@@ -40,7 +40,7 @@ def handle_object_creation_event(sender, objects=None, **kwargs):
       objects: A list of model instances created from the POSTed JSON.
       sources: A list of original POSTed JSON dictionaries.
   """
-  if not global_synchronisation_enabled():
+  if not global_synchronization_enabled():
     return
 
   sources = kwargs.get("sources", [])
@@ -58,7 +58,7 @@ def handle_object_deletion_event(sender, obj=None, **kwargs):
       sender: A class of Resource handling the DELETE request.
       obj: Model instance for deletion.
   """
-  if not global_synchronisation_enabled():
+  if not global_synchronization_enabled():
     return
 
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
@@ -73,7 +73,7 @@ def handle_object_updating_event(sender, obj=None, initial_state=None,
       sender: A class of Resource handling the PUT request.
       obj: Model instance for update.
   """
-  if not global_synchronisation_enabled():
+  if not global_synchronization_enabled():
     return
 
   object_handlers = handlers_mapping.ISSUE_TRACKER_HANDLERS.get(sender, {})
@@ -86,7 +86,7 @@ def handle_object_updating_event(sender, obj=None, initial_state=None,
 def handle_comment_creation_event(sender, objects=None, **kwargs):
   """Common handler for adding comment."""
 
-  if not global_synchronisation_enabled():
+  if not global_synchronization_enabled():
     return
 
   for obj in objects:
