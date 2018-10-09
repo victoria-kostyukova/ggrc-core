@@ -414,6 +414,16 @@ import {changeUrl} from '../router';
     let $el = this.$element;
     let shownevents;
 
+    let classList = $el && $el[0] && $el[0].classList;
+    if (!classList.contains('modal')) {
+      // class 'modal' is needed for proper 'preventdoubleescape' handling
+      // (yes, thats how we handle esc on modals right now - finding
+      // closest element with 'modal' class)
+      //
+      // class 'no-border' is to remove border that comes with 'modal'
+      classList.add('modal', 'no-border');
+    }
+
     if (!(shownevents = $._data($el[0], 'events').shown) ||
       $(shownevents).filter(function () {
         return $.inArray('arrange', this.namespace.split('.')) > -1;
@@ -471,15 +481,19 @@ import {changeUrl} from '../router';
       if (!$el.attr('tabindex')) {
         $el.attr('tabindex', -1);
       }
-      setTimeout(function () {
-        $el.focus();
-      }, 1);
     }
     // This is a hack to stop propagation for
     // modals when we dismiss modal
     $(document).on('keyup.dismiss.modal', (e) => {
       e.stopPropagation();
     });
+
+    // to make sure opened modal is always in focus
+    // thus esc will be triggered on the correct one
+    setTimeout(function () {
+      $el.focus();
+    }, 0);
+
     originalModalShow.apply(this, arguments);
   };
 
