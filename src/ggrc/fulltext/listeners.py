@@ -90,8 +90,6 @@ def register_fulltext_listeners():
   ggrc_indexer = fulltext.get_indexer()
 
   for model in all_models.all_models:
-    for action in ACTIONS:
-      event.listen(model, action, _runner)
     if not issubclass(model, mixin.Indexed):
       continue
     for sub_model in model.mro():
@@ -99,6 +97,12 @@ def register_fulltext_listeners():
         ggrc_indexer.indexer_rules[rule.model].append(rule.rule)
         if rule.fields:
           ggrc_indexer.indexer_fields[rule.model].update(rule.fields)
+
+  for model in all_models.all_models:
+    if issubclass(model, mixin.Indexed) or \
+            model.__name__ in ggrc_indexer.indexer_rules:
+      for action in ACTIONS:
+        event.listen(model, action, _runner)
 
 
 def fields_changed(obj, fields):
