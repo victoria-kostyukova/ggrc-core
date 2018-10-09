@@ -18,10 +18,9 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.mixins import attributevalidator
 from ggrc.models.mixins import base
-from ggrc.fulltext.mixin import Indexed
 
 
-class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
+class AccessControlRole(attributevalidator.AttributeValidator,
                         base.ContextRBAC, mixins.Base, db.Model):
   """Access Control Role
 
