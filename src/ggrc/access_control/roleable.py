@@ -150,6 +150,15 @@ class Roleable(object):
         ).load_only(
             "id", "name", "object_type", "internal"
         ),
+        orm.subqueryload(
+            '_access_control_list'
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).load_only(
+            "id", "name", "email"
+        ),
     )
 
   @property
