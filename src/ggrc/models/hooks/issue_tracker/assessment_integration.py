@@ -24,6 +24,8 @@ from ggrc.models import all_models
 from ggrc.integrations import issues, constants
 from ggrc.integrations import integrations_errors
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.models.hooks.issue_tracker import common_handlers
+
 from ggrc.rbac import permissions
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.services import signals
@@ -305,6 +307,9 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
   """Handles IssueTracker information during assessment update event."""
   del sender  # Unused
 
+  if not common_handlers.global_synchronisation_enabled():
+    return
+
   if not _is_issue_tracker_enabled(audit=obj.audit):
     # Skip updating issue and info if feature is disabled on Audit level.
     return
@@ -391,6 +396,9 @@ def _handle_assessment_deleted(sender, obj=None, service=None):
   """Handles assessment delete event."""
   del sender, service  # Unused
 
+  if not common_handlers.global_synchronisation_enabled():
+    return
+
   issue_obj = all_models.IssuetrackerIssue.get_issue(
       _ASSESSMENT_MODEL_NAME, obj.id)
 
@@ -452,6 +460,9 @@ def start_update_issue_job(audit_id, message):
 
 def handle_assessment_create(assessment, src):
   """Handles issue tracker related data."""
+  if not common_handlers.global_synchronisation_enabled():
+    return
+
   # Get issue tracker data from request.
   info = src.get('issue_tracker') or {}
 
