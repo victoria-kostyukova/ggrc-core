@@ -7,6 +7,7 @@ from datetime import datetime
 import logging
 
 import sqlalchemy as sa
+import flask
 
 from ggrc import db
 from ggrc.automapper import rules
@@ -248,11 +249,23 @@ def register_automapping_listeners():
 
   def automap(session, _):
     """Automap after_flush handler."""
+    relationships = [
+        obj for obj in session.new if isinstance(obj, Relationship)
+    ]
+    if not relationships:
+      return
+
     with benchmark("automap"):
       automapper = AutomapperGenerator()
-      for obj in session.new:
-        if isinstance(obj, Relationship):
-          automapper.generate_automappings(obj)
+      referenced_objects = getattr(flask.g, "referenced_object_stubs", None)
+      if referenced_objects:
+        del flask.g.referenced_object_stubs
+      if hasattr(flask.g, "_request_permissions"):
+        del flask.g._request_permissions
+      for obj in relationships:
+        automapper.generate_automappings(obj)
       automapper.propagate_acl()
+      if referenced_objects:
+        flask.g.referenced_object_stubs = referenced_objects
 
   sa.event.listen(sa.orm.session.Session, "after_flush", automap)
