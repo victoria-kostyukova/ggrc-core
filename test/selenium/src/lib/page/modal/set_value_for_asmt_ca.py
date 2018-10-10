@@ -3,8 +3,6 @@
 """Modals for create objects."""
 
 from lib import base
-from lib.constants import locator
-from lib.utils import selenium_utils
 
 
 class SetValueForAsmtDropdown(base.Modal):
@@ -12,42 +10,33 @@ class SetValueForAsmtDropdown(base.Modal):
 
   def __init__(self, driver):
     super(SetValueForAsmtDropdown, self).__init__(driver)
-    self.modal_elem = selenium_utils.get_when_visible(
-        self._driver, locator.ModalSetValueForAsmtCA.MODAL_LOCATOR)
-    self.modal_header_lbl = base.Label(
-        self._driver, locator.ModalSetValueForAsmtCA.MODAL_HEADER)
+    self.modal_elem = self._browser.div(class_name="in").div(
+        class_name="simple-modal")
+    self.modal_header_lbl = self.modal_elem.div(
+        class_name="simple-modal__header-text")
 
   def click_close_button(self):
     """Click close button."""
-    base.Button(
-        self._driver, locator.ModalSetValueForAsmtCA.BUTTON_CLOSE).click()
+    self.modal_elem.button(text="Close").click()
 
   def click_save_button(self):
     """Click save button."""
-    base.Button(
-        self._driver,
-        locator.ModalSetValueForAsmtCA.BUTTON_SAVE).click()
+    self.modal_elem.button(text="Save").click()
 
   def set_dropdown_comment(self, comment):
     """Set comment via dropdown."""
-    input_field = base.TextInputField(
-        self._driver,
-        locator.ModalSetValueForAsmtCA.INPUT_COMMENT)
+    input_field = self.modal_elem.div(text="Comment").parent(
+        tag_name="div").div(class_name="ql-editor")
     input_field.click()
-    input_field.element.send_keys(comment)
+    input_field.send_keys(comment)
 
   def set_dropdown_url(self, url):
     """Set evidence url via dropdown."""
-    base.Button(
-        self._driver,
-        locator.ModalSetValueForAsmtCA.BUTTON_ADD_URL).click()
-    base.TextInputField(
-        self._driver,
-        locator.ModalSetValueForAsmtCA.INPUT_EVIDENCE_URL).enter_text(
-        url)
-    base.Button(
-        self._driver,
-        locator.ModalSetValueForAsmtCA.BUTTON_CONFIRM_URL).click()
+    modal_url_root_element = self.modal_elem.div(text="Evidence url").parent(
+        tag_name="div")
+    modal_url_root_element.button(text="Add").click()
+    modal_url_root_element.input().send_keys(url)
+    modal_url_root_element.button(class_name="create-form__confirm").click()
 
   def fill_dropdown_lca(self, **kwargs):
     """Fill comment or url for Assessment dropdown."""
