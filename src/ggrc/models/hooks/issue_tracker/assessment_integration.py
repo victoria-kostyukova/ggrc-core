@@ -356,7 +356,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
     _link_assessment(obj, issue_tracker_info)
     if not obj.warnings:
       _detach_assessment(ticket_id, old_ticket_id)
-      return
+    return
 
   try:
     _update_issuetracker_issue(
@@ -883,7 +883,6 @@ def _link_assessment(assessment, issue_tracker_info):
         "review object. Linking the same ticket to multiple objects is not "
         "allowed due to potential for conflicting updates."
     )
-    issue_tracker_info['enabled'] = False
     return
 
   try:
@@ -897,7 +896,6 @@ def _link_assessment(assessment, issue_tracker_info):
     assessment.add_warning(
         "Ticket tracker ID does not exist or you do not have access to it."
     )
-    issue_tracker_info['enabled'] = False
     return
 
   issue_params = prepare_issue_json(assessment, issue_tracker_info)
