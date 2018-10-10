@@ -39,7 +39,7 @@ class TestExport(TestCase):
     }
     extr_comment = factories.CommentFactory(description="bad_desc")
     extr_assessment = factories.AssessmentFactory()
-    db.engine.execute(
+    db.session.execute(
         'update assessments set '
         'updated_at = "2010-10-10", '
         'created_at = "2010-10-10";'
