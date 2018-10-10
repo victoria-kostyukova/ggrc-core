@@ -335,7 +335,7 @@ def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
         )
         new_ticket_id = it_issue.issue_id if it_issue else None
         if old_ticket_id and new_ticket_id and old_ticket_id != new_ticket_id:
-          _detach_assessment(ticket_id, old_ticket_id)
+          _detach_assessment(new_ticket_id, old_ticket_id)
       return
 
     _, issue_tracker_info['cc_list'] = _collect_assessment_emails(obj)
