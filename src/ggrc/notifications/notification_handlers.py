@@ -214,7 +214,7 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   if state_change:
     _add_state_change_notif(obj, state_change, remove_existing=True)
 
-  is_changed = False
+  is_changed = obj.has_acl_changes()
 
   for attr_name, val in attrs.items():
     if attr_name in notifications.IGNORE_ATTRS:

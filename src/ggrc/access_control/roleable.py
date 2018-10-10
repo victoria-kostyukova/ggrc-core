@@ -8,6 +8,7 @@ from collections import defaultdict
 from collections import namedtuple
 from sqlalchemy import and_
 from sqlalchemy import orm
+from sqlalchemy import inspect
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
@@ -199,6 +200,22 @@ class Roleable(object):
       return []
     acps = self.acr_name_acl_map[role_name].access_control_people
     return [acp.person.id for acp in acps]
+
+  def has_acl_changes(self):
+    """Check if the object has had any acl changes in the session.
+
+    Since access_control_list is now a normal property it no longer stores any
+    history info that is needed for notifications. This helper function is
+    meant to replace history check on access_control_list property.
+
+    Returns:
+      boolean flag signifying if there are any access control people changes
+      in the current session.
+    """
+    return any(
+        inspect(acl).attrs["access_control_people"].history.has_changes()
+        for acl in self._access_control_list
+    )
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
