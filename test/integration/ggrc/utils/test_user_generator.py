@@ -214,12 +214,18 @@ class TestUserGenerator(TestCase):
       ]))
       assessment = Assessment.query.filter(
           Assessment.slug == assessment_slug).first()
-      acl_roles = {
-          acl.ac_role.name: acl for _, acl in assessment.access_control_list
-      }
-      self.assertIn("aturing@example.com", acl_roles["Creators"].person.email)
-      self.assertEqual("cbabbage@example.com",
-                       acl_roles["Secondary Contacts"].person.email)
+      creators_acl = assessment.acr_name_acl_map["Creators"]
+      creators = [
+          acp.person.email
+          for acp in creators_acl.access_control_people
+      ]
+      contacts_acl = assessment.acr_name_acl_map["Secondary Contacts"]
+      secondary_contacts = [
+          acp.person.email
+          for acp in contacts_acl.access_control_people
+      ]
+      self.assertIn("aturing@example.com", creators)
+      self.assertEqual("cbabbage@example.com", secondary_contacts[0])
 
       # checks person profile was created successfully
       emails = ["aturing@example.com", "cbabbage@example.com"]
