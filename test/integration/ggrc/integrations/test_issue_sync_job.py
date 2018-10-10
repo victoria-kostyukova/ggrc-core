@@ -125,7 +125,7 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           admin_emails,
           [new_verifier.email, ]
       )
@@ -134,7 +134,7 @@ class TestIssueIntegration(ggrc.TestCase):
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(primary_contacts_emails, [self.assignee.email])
+      self.assertItemsEqual(primary_contacts_emails, [self.assignee.email])
 
   def test_sync_assignee_email(self):
     """Test adding new assignee email into Issue ACL."""
@@ -167,14 +167,14 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(admin_emails, [self.verifier.email, ])
+      self.assertItemsEqual(admin_emails, [self.verifier.email, ])
 
       # Check changed primary contacts
       primary_contacts_emails = [
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           primary_contacts_emails,
           [new_assignee.email, ]
       )
@@ -289,7 +289,7 @@ class TestIssueIntegration(ggrc.TestCase):
       admin_emails = [
           person.email for person in issue.get_persons_for_rolename("Admin")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           admin_emails,
           [second_verifier.email, new_verifier.email, ]
       )
@@ -299,7 +299,7 @@ class TestIssueIntegration(ggrc.TestCase):
           person.email
           for person in issue.get_persons_for_rolename("Primary Contacts")
       ]
-      self.assertListEqual(
+      self.assertItemsEqual(
           primary_contacts_emails,
           [second_assignee.email, new_assignee.email, ]
       )
