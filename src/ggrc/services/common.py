@@ -657,6 +657,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
+    flask.g.referenced_object_stubs = {obj.type: {obj.id}}
     with benchmark("Query delete permissions"):
       if not permissions.is_allowed_delete(
           self.model.__name__, obj.id, obj.context_id)\
@@ -1128,6 +1129,10 @@ class Resource(ModelView):
       res = []
       headers = {"Content-Type": "application/json"}
       with benchmark("collection post > body loop: {}".format(len(body))):
+        with benchmark("Set referenced_stubs"):
+          flask.g.referenced_object_stubs = self._gather_referenced_objects(
+              body
+          )
         with benchmark("Build stub query cache"):
           self._build_request_stub_cache(body)
         try:
