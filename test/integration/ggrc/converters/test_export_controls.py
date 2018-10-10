@@ -45,18 +45,24 @@ class TestExportControls(TestCase):
       new_owner = factories.PersonFactory(name="new owner")
       self.control.add_person_with_role_name(new_owner, "Admin")
 
+    new_owner_email = new_owner.email
+    new_owner_name = new_owner.email
+    control_slug = self.control.slug
+
+    self.client.post("/admin/full_reindex")
+
     self.assert_slugs("Admin",
-                      new_owner.email,
-                      [self.control.slug])
+                      new_owner_email,
+                      [control_slug])
     self.assert_slugs("Admin",
-                      new_owner.name,
-                      [self.control.slug])
+                      new_owner_name,
+                      [control_slug])
     self.assert_slugs("Admin",
                       basic_email,
-                      [self.control.slug])
+                      [control_slug])
     self.assert_slugs("Admin",
                       basic_name,
-                      [self.control.slug])
+                      [control_slug])
 
   def test_search_by_deleted_owner(self):
     """Filter by deleted owner"""
