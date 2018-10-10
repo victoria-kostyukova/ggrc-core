@@ -128,6 +128,12 @@ class TestAuditSnapshotQueries(TestCase, WithQueryApi):
     snapshot_map = {snapshot.revision.content["title"]: snapshot
                     for snapshot in snapshots}
 
+    for snapshot in snapshots:
+      factories.RelationshipFactory(
+          source=audit,
+          destination=snapshot,
+      )
+
     # create Assessments and issues and map some snapshots to them
     # Markets and Controls represent snapshots of those objects.
 
