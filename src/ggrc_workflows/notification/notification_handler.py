@@ -165,7 +165,7 @@ def handle_cycle_task_status_change(*objs):
 
 
 def handle_cycle_task_group_object_task_put(obj):
-  if inspect(obj).attrs._access_control_list.history.has_changes():
+  if obj.has_acl_changes():
     types = ["cycle_task_reassigned", "cycle_created", "manual_cycle_created"]
     if not pusher.notification_exists_for(obj, notification_names=types):
       pusher.push(obj, pusher.get_notification_type("cycle_task_reassigned"))
