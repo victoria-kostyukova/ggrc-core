@@ -9,11 +9,11 @@ from ggrc.services import common
 class IssueResource(common.ExtendedResource):
   """Resource handler for issues."""
 
-  def get(self, *args, **kwargs):
+  def post(self, *args, **kwargs):
     # This is to extend the get request for additional data.
     # pylint: disable=arguments-differ
     command_map = {
-        None: super(IssueResource, self).get,
+        None: super(IssueResource, self).post,
         "snapshot_counts": self.snapshot_counts_query,
     }
     command = kwargs.pop("command", None)
