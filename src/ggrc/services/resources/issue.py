@@ -8,6 +8,7 @@ from ggrc.services import common
 
 class IssueResource(common.ExtendedResource):
   """Resource handler for issues."""
+  # pylint: disable=abstract-method
 
   def post(self, *args, **kwargs):
     # This is to extend the get request for additional data.
