@@ -188,3 +188,15 @@ class AssessmentResource(common.ExtendedResource):
       data = self._get_related_data(assessment)
     with benchmark("Make response"):
       return self.json_success_response(data, )
+
+  def post(self, *args, **kwargs):
+    # This is to extend the get request for additional data.
+    # pylint: disable=arguments-differ
+    command_map = {
+        None: super(AssessmentResource, self).post,
+        "snapshot_counts": self.snapshot_counts_query,
+    }
+    command = kwargs.pop("command", None)
+    if command not in command_map:
+      self.not_found_response()
+    return command_map[command](*args, **kwargs)
