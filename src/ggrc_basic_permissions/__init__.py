@@ -360,9 +360,9 @@ def load_access_control_list(user, permissions):
   access_control_list = db.session.query(
       acl_propagated.object_type,
       acl_propagated.object_id,
-      sa.func.max(acr.read),
-      sa.func.max(acr.update),
-      sa.func.max(acr.delete),
+      acr.read,
+      acr.update,
+      acr.delete,
   ).filter(
       sa.and_(
           acp.person_id == user.id,
@@ -372,9 +372,6 @@ def load_access_control_list(user, permissions):
           acl_propagated.object_type != all_models.Relationship.__name__,
           *additional_filters
       )
-  ).group_by(
-      acl_propagated.object_type,
-      acl_propagated.object_id,
   )
 
   for object_type, object_id, read, update, delete in access_control_list:
