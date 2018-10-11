@@ -162,7 +162,20 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
 
   @classmethod
   def indexed_query(cls):
-    return cls._populate_query(super(Assessment, cls).indexed_query())
+    return super(Assessment, cls).indexed_query().options(
+        orm.Load(cls).load_only(
+            "id",
+            "design",
+            "operationally",
+            "audit_id",
+        ),
+        orm.Load(cls).joinedload(
+            "audit"
+        ).load_only(
+            "archived",
+            "folder"
+        ),
+    )
 
   def log_json(self):
     out_json = super(Assessment, self).log_json()

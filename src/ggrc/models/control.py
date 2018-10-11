@@ -88,7 +88,14 @@ class ControlCategorized(Categorizable):
   @classmethod
   def indexed_query(cls):
     return super(ControlCategorized, cls).indexed_query().options(
-        orm.subqueryload('categorizations').joinedload('category'),
+        orm.Load(cls).subqueryload(
+            "categorizations"
+        ).joinedload(
+            "category"
+        ).load_only(
+            "name",
+            "type",
+        ),
     )
 
 
@@ -141,7 +148,14 @@ class AssertionCategorized(Categorizable):
   @classmethod
   def indexed_query(cls):
     return super(AssertionCategorized, cls).indexed_query().options(
-        orm.subqueryload('categorized_assertions').joinedload('category'),
+        orm.Load(cls).subqueryload(
+            "categorized_assertions"
+        ).joinedload(
+            "category"
+        ).load_only(
+            "name",
+            "type",
+        ),
     )
 
 
@@ -242,18 +256,18 @@ class Control(WithLastAssessmentDate,
         ),
         orm.Load(cls).joinedload(
             'kind',
-        ).undefer_group(
-            "Option_complete"
+        ).load_only(
+            "title"
         ),
         orm.Load(cls).joinedload(
             'means',
-        ).undefer_group(
-            "Option_complete"
+        ).load_only(
+            "title"
         ),
         orm.Load(cls).joinedload(
             'verify_frequency',
-        ).undefer_group(
-            "Option_complete"
+        ).load_only(
+            "title"
         ),
     )
 

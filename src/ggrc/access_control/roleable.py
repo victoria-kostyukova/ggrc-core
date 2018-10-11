@@ -169,18 +169,25 @@ class Roleable(object):
     query = super(Roleable, cls).indexed_query()
     return query.options(
         orm.subqueryload(
+            "_access_control_list"
+        ).load_only(
+            "id",
+            "person_id",
+            "ac_role_id",
+        ),
+        orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "person"
-        ).undefer_group(
-            'Person_complete'
+        ).load_only(
+            "id", "name", "email"
         ),
         orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
-        ).undefer_group(
-            'AccessControlRole_complete'
+        ).load_only(
+            "id", "name", "object_type", "internal"
         ),
     )
 

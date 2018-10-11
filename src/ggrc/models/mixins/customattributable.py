@@ -128,13 +128,16 @@ class CustomAttributable(object):
         ),
         orm.Load(cls).subqueryload(
             "custom_attribute_definitions"
-        ).undefer_group(
-            "CustomAttributeDefinition_complete"
+        ).load_only(
+            "id",
+            "title",
+            "attribute_type",
         ),
         orm.Load(cls).subqueryload("custom_attribute_values").load_only(
             "id",
             "attribute_value",
             "attribute_object_id",
+            "custom_attribute_id",
         ),
     )
 

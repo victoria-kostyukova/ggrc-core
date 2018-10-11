@@ -78,7 +78,13 @@ class Product(Roleable,
   @classmethod
   def indexed_query(cls):
     return super(Product, cls).indexed_query().options(
-        orm.Load(cls).undefer_group(
-            "Product_complete",
+        orm.Load(cls).load_only(
+            "version",
+            "kind_id",
+        ),
+        orm.Load(cls).subqueryload(
+            "kind",
+        ).load_only(
+            "title"
         ),
     )

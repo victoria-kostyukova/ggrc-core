@@ -117,5 +117,9 @@ class WithEvidence(object):
   @classmethod
   def indexed_query(cls):
     return super(WithEvidence, cls).indexed_query().options(
-        sa.orm.subqueryload("evidences").undefer_group("Evidence_complete"),
+        sa.orm.subqueryload("evidences").load_only(
+            "kind",
+            "title",
+            "link",
+        ),
     )

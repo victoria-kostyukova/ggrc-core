@@ -75,7 +75,6 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   )
 
   _fulltext_attrs = [
-      "title",
       "link",
       "description",
       "kind",
@@ -129,6 +128,8 @@ class Evidence(Roleable, Relatable, mixins.Titled,
         orm.Load(cls).undefer_group(
             "Evidence_complete",
         ),
+        orm.Load(cls).subqueryload('related_sources'),
+        orm.Load(cls).subqueryload('related_destinations'),
     )
 
   @simple_property

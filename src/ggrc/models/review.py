@@ -20,7 +20,6 @@ from ggrc.models.mixins import with_proposal_handable
 from ggrc.models.mixins import with_mappimg_via_import_handable
 
 from ggrc.models.relationship import Relatable
-from ggrc.fulltext import mixin as ft_mixin
 
 from ggrc.notifications import add_notification
 
@@ -82,6 +81,24 @@ class Reviewable(rest_handable.WithPutHandable,
   def eager_query(cls):
     return super(Reviewable, cls).eager_query().options(
         sa.orm.joinedload("review")
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Reviewable, cls).indexed_query().options(
+        sa.orm.Load(cls).subqueryload(
+            "review"
+        ).load_only(
+            "status",
+            "notification_type",
+        ),
+        sa.orm.Load(cls).subqueryload(
+            "review"
+        ).joinedload(
+            "issuetracker_issue"
+        ).load_only(
+            "issue_url",
+        ),
     )
 
   def log_json(self):
@@ -161,7 +178,6 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
              Relatable,
              mixins.base.ContextRBAC,
              mixins.Base,
-             ft_mixin.Indexed,
              db.Model):
   """Review object"""
   # pylint: disable=too-few-public-methods
@@ -213,11 +229,6 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       "issuetracker_issue",
       "status",
   )
-
-  _fulltext_attrs = [
-      "reviewable_id",
-      "reviewable_type",
-  ]
 
   def validate_acl(self):
     """Reviewer is mandatory Role"""

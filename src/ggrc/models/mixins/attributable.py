@@ -65,6 +65,15 @@ class Attributable(object):
             "value_datetime",
             "value_string",
             "value_integer",
+        ),
+        orm.Load(cls).subqueryload(
+            "_attributes"
+        ).joinedload(
+            "attribute_template"
+        ).joinedload(
+            "attribute_definition"
+        ).load_only(
+            "name",
         )
     )
 

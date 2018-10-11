@@ -103,7 +103,11 @@ class Documentable(object):
   @classmethod
   def indexed_query(cls):
     return super(Documentable, cls).indexed_query().options(
-        sa.orm.subqueryload("documents").undefer_group("Document_complete"),
+        sa.orm.subqueryload("documents").load_only(
+            "title",
+            "link",
+            "kind",
+        ),
     )
 
 
