@@ -118,7 +118,12 @@ def _compare_custom_fields(custom_fields_payload, custom_fields_issuetracker):
     - custom_fields_issuetracker: custom_fields from Issue Tracker
 
   Returns:
-    bool object with validate or not indicator (True/False)
+    tuple with bool objects (due_dates_equals, remove_custom_fields)
+
+    due_dates_equals: bool object with validate or not indicator (True/False)
+
+    remove_custom_fields: bool object that indicate to remove "custom_fields"
+    from payload
   """
   if any(custom_fields_payload):
     due_date_payload = _extract_date(
@@ -128,13 +133,21 @@ def _compare_custom_fields(custom_fields_payload, custom_fields_issuetracker):
     due_date_payload = None
 
   if any(custom_fields_issuetracker):
-    due_date_issuetracker = _extract_date(
-        custom_fields_issuetracker[0]["Due Date"].strip()
+    due_date_raw = sync_utils.parse_due_date(
+        custom_fields_issuetracker
     )
+    if due_date_raw is None:
+      # due date is empty after processing,
+      # in that case we shouldn't synchronize custom fields
+      return True, True
+    else:
+      due_date_issuetracker = _extract_date(due_date_raw)
   else:
-    due_date_issuetracker = None
+    # custom fields is empty from issue tracker,
+    # in that case we shouldn't synchronize custom fields
+    return True, True
 
-  return due_date_payload == due_date_issuetracker
+  return due_date_payload == due_date_issuetracker, False
 
 
 def _compare_ccs(ccs_payload, ccs_issuetracker):
@@ -172,13 +185,18 @@ def _is_need_synchronize_issue(object_id, issue_payload, issuetracker_state):
         "with status: %s.", object_id, issue_payload.get("status")
     )
     return False
+
+  due_dates_equals, remove_custom_fields = _compare_custom_fields(
+      issue_payload.get("custom_fields", []),
+      issuetracker_state.get("custom_fields", [])
+  )
+  if remove_custom_fields:
+    issue_payload.pop("custom_fields", [])
+
   if all(
       issue_payload.get(field) == issuetracker_state.get(field)
       for field in FIELDS_TO_CHECK
-  ) and _compare_custom_fields(
-      issue_payload.get("custom_fields", []),
-      issuetracker_state.get("custom_fields", [])
-  ) and _compare_ccs(
+  ) and due_dates_equals and _compare_ccs(
       issue_payload.get("ccs", []),
       issuetracker_state.get("ccs", [])
   ):
