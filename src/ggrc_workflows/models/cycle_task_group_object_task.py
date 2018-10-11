@@ -320,7 +320,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
            .undefer_group('Workflow_complete'),
         orm.joinedload('cycle')
            .joinedload('workflow')
-           .joinedload('access_control_list'),
+           .joinedload('_access_control_list'),
         orm.joinedload('cycle_task_group')
            .undefer_group('CycleTaskGroup_complete'),
     )
