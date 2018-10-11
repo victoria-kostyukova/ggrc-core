@@ -275,6 +275,108 @@ class BaseClientTest(unittest.TestCase):
             'priority': 'P2',
             'severity': 'S2',
             'ccs': [],
-            'component_id': None,
-            'custom_fields': []
+            'component_id': None
         })
+
+  def test_due_date_equals(self):
+    """Due date current and issue tracker equals."""
+    custom_fields_payload = [
+        {
+            "name": "Due Date",
+            "value": "2018-10-10",
+            "type": "DATE",
+            "display_string": "Due Date"
+        }
+    ]
+    custom_fields_issuetracker = [
+        {
+            "Due Date": "2018-10-10"
+        },
+        {
+            "field1": "value1"
+        },
+        {
+            "field2": "value2"
+        }
+    ]
+    due_dates_equals, remove_custom_fields = \
+        assessment_sync_job._compare_custom_fields(
+            custom_fields_payload,
+            custom_fields_issuetracker
+        )
+    self.assertTrue(due_dates_equals)
+    self.assertFalse(remove_custom_fields)
+
+  def test_due_date_not_equals(self):
+    """Due date current and issue tracker not equals."""
+    custom_fields_payload = [
+        {
+            "name": "Due Date",
+            "value": "2018-10-10",
+            "type": "DATE",
+            "display_string": "Due Date"
+        }
+    ]
+    custom_fields_issuetracker = [
+        {
+            "Due Date": "2018-11-10"
+        },
+        {
+            "field1": "value1"
+        },
+        {
+            "field2": "value2"
+        }
+    ]
+    due_dates_equals, remove_custom_fields = \
+        assessment_sync_job._compare_custom_fields(
+            custom_fields_payload,
+            custom_fields_issuetracker
+        )
+    self.assertFalse(due_dates_equals)
+    self.assertFalse(remove_custom_fields)
+
+  def test_due_date_is_empty(self):
+    """Due date is empty for issue tracker."""
+    custom_fields_payload = [
+        {
+            "name": "Due Date",
+            "value": "2018-10-10",
+            "type": "DATE",
+            "display_string": "Due Date"
+        }
+    ]
+    custom_fields_issuetracker = [
+        {
+            "field1": "value1"
+        },
+        {
+            "field2": "value2"
+        }
+    ]
+    due_dates_equals, remove_custom_fields = \
+        assessment_sync_job._compare_custom_fields(
+            custom_fields_payload,
+            custom_fields_issuetracker
+        )
+    self.assertTrue(due_dates_equals)
+    self.assertTrue(remove_custom_fields)
+
+  def test_custom_fields_is_empty(self):
+    """Custom fields for issue tracker is empty."""
+    custom_fields_payload = [
+        {
+            "name": "Due Date",
+            "value": "2018-10-10",
+            "type": "DATE",
+            "display_string": "Due Date"
+        }
+    ]
+    custom_fields_issuetracker = []
+    due_dates_equals, remove_custom_fields = \
+        assessment_sync_job._compare_custom_fields(
+            custom_fields_payload,
+            custom_fields_issuetracker
+        )
+    self.assertTrue(due_dates_equals)
+    self.assertTrue(remove_custom_fields)

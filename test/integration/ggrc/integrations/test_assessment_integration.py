@@ -417,7 +417,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'type': None,
               'severity': u'S3',
               'ccs': [],
-              'custom_fields': [],
               'component_id': 11111
           })
 
