@@ -24,7 +24,7 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import BadRequest, Forbidden, HTTPException
+from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 import ggrc.builder.json
 import ggrc.models
@@ -1431,6 +1431,8 @@ class ExtendedResource(Resource):
 
     with benchmark("Check audit permissions"):
       obj = self.model.query.get(id)
+      if not obj:
+        raise NotFound()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
 
