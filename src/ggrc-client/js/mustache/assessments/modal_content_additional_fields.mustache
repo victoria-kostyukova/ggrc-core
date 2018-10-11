@@ -10,14 +10,12 @@
     <label class="ggrc-form-item__label">
       Notes
     </label>
-    <input data-id="note_txtbx"
-      tabindex="10"
-      class="input-block-level"
-      placeholder="Enter Notes"
-      name="notes"
-      type="text"
-      id="notes"
-      {$value}="notes"/>
+    <rich-text 
+        tabindex="10"
+        {hidden-toolbar}="true"
+        {placeholder}="'Enter Notes'"
+        {(content)}="notes">
+    </rich-text>
   </div>
 </div>
 
