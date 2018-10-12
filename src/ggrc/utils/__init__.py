@@ -6,6 +6,7 @@
 This module should contain only the most general utility function and any
 specific utilities should be in their own module.
 """
+import itertools
 import collections
 import logging
 import datetime
@@ -298,6 +299,15 @@ def list_chunks(list_, chunk_size=CHUNK_SIZE):
   """Yield successive chunk of chunk_size from list."""
   for index in range(0, len(list_), chunk_size):
     yield list_[index:index + chunk_size]
+
+
+def iter_chunks(iterable, chunk_size=CHUNK_SIZE):
+  """Yield successive chunk of chunk_size from iterable."""
+  while True:
+    chunk = itertools.islice(iterable, chunk_size)
+    if not chunk:
+      return
+    yield chunk
 
 
 def create_stub(object_, context_id=None):

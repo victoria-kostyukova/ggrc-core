@@ -9,6 +9,7 @@ from sqlalchemy import orm
 from ggrc import db
 
 from ggrc import fulltext
+from ggrc import utils
 
 
 class ReindexRule(namedtuple("ReindexRule", ["model", "rule", "fields"])):
@@ -39,16 +40,19 @@ class Indexed(object):
   @classmethod
   def insert_records(cls, ids):
     """Calculate and insert records into fulltext_record_properties table."""
-    instances = cls.indexed_query().filter(cls.id.in_(ids)).all()
+    instances = cls.indexed_query().filter(cls.id.in_(ids))
     indexer = fulltext.get_indexer()
     rows = itertools.chain(*[indexer.records_generator(i) for i in instances])
-    values = list(rows)
-    query = """
-        INSERT INTO fulltext_record_properties (
-          `key`, type, tags, property, subproperty, content
-        ) VALUES (:key, :type, :tags, :property, :subproperty, :content)
-    """
-    db.session.execute(query, values)
+    for vals_chunk in utils.iter_chunks(rows, chunk_size=10000):
+      query = """
+          INSERT INTO fulltext_record_properties (
+            `key`, type, tags, property, subproperty, content
+          ) VALUES (:key, :type, :tags, :property, :subproperty, :content)
+      """
+      values = list(vals_chunk)
+      if not values:
+        return
+      db.session.execute(query, values)
 
   @classmethod
   def get_delete_query_for(cls, ids):
