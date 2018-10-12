@@ -6,9 +6,8 @@
 import logging
 import datetime
 
-from ggrc.integrations import issues, integrations_errors
+from ggrc.integrations import issues, integrations_errors, constants
 from ggrc.integrations.synchronization_jobs import sync_utils
-
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +39,10 @@ def _get_due_date(assessment_state):
   due_date = assessment_state["due_date"]
   if due_date is not None:
     return {
-        "name": "Due Date",
+        "name": constants.CUSTOM_FIELDS_DUE_DATE,
         "value": due_date.strftime("%Y-%m-%d"),
         "type": "DATE",
-        "display_string": "Due Date",
+        "display_string": constants.CUSTOM_FIELDS_DUE_DATE,
     }
   return None
 

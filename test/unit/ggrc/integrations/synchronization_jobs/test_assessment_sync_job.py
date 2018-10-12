@@ -9,7 +9,7 @@ import unittest
 import mock
 
 from ggrc.integrations.synchronization_jobs import assessment_sync_job
-from ggrc.integrations import integrations_errors
+from ggrc.integrations import integrations_errors, constants
 from ggrc.integrations.synchronization_jobs import sync_utils
 
 
@@ -282,15 +282,15 @@ class BaseClientTest(unittest.TestCase):
     """Due date current and issue tracker equals."""
     custom_fields_payload = [
         {
-            "name": "Due Date",
+            "name": constants.CUSTOM_FIELDS_DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": "Due Date"
+            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
         {
-            "Due Date": "2018-10-10"
+            constants.CUSTOM_FIELDS_DUE_DATE: "2018-10-10"
         },
         {
             "field1": "value1"
@@ -311,15 +311,15 @@ class BaseClientTest(unittest.TestCase):
     """Due date current and issue tracker not equals."""
     custom_fields_payload = [
         {
-            "name": "Due Date",
+            "name": constants.CUSTOM_FIELDS_DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": "Due Date"
+            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
         {
-            "Due Date": "2018-11-10"
+            constants.CUSTOM_FIELDS_DUE_DATE: "2018-11-10"
         },
         {
             "field1": "value1"
@@ -340,10 +340,10 @@ class BaseClientTest(unittest.TestCase):
     """Due date is empty for issue tracker."""
     custom_fields_payload = [
         {
-            "name": "Due Date",
+            "name": constants.CUSTOM_FIELDS_DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": "Due Date"
+            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
@@ -366,10 +366,10 @@ class BaseClientTest(unittest.TestCase):
     """Custom fields for issue tracker is empty."""
     custom_fields_payload = [
         {
-            "name": "Due Date",
+            "name": constants.CUSTOM_FIELDS_DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": "Due Date"
+            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
         }
     ]
     custom_fields_issuetracker = []

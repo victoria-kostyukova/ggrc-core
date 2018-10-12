@@ -21,7 +21,7 @@ from ggrc import db
 from ggrc import utils
 from ggrc import settings
 from ggrc.models import all_models
-from ggrc.integrations import issues
+from ggrc.integrations import issues, constants
 from ggrc.integrations import integrations_errors
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.rbac import permissions
@@ -842,10 +842,10 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
   due_date = issue_tracker_info.get('due_date')
   if due_date:
     custom_fields.append({
-        "name": "Due Date",
+        "name": constants.CUSTOM_FIELDS_DUE_DATE,
         "value": due_date.strftime("%Y-%m-%d"),
         "type": "DATE",
-        "display_string": "Due Date"
+        "display_string": constants.CUSTOM_FIELDS_DUE_DATE
     })
 
   if custom_fields:
@@ -1015,10 +1015,10 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
   due_date = issue_tracker_info.get('due_date')
   if due_date:
     custom_fields.append({
-        "name": "Due Date",
+        "name": constants.CUSTOM_FIELDS_DUE_DATE,
         "value": due_date.strftime("%Y-%m-%d"),
         "type": "DATE",
-        "display_string": "Due Date"
+        "display_string": constants.CUSTOM_FIELDS_DUE_DATE
     })
 
   if custom_fields:

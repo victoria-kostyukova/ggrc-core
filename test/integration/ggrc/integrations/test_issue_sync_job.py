@@ -14,6 +14,7 @@ import flask
 from ggrc.models import all_models
 from ggrc.integrations.synchronization_jobs import issue_sync_job
 from ggrc.integrations.synchronization_jobs import sync_utils
+from ggrc.integrations import constants
 from integration import ggrc
 from integration.ggrc.models import factories
 
@@ -208,7 +209,7 @@ class TestIssueIntegration(ggrc.TestCase):
                 "priority": "P2",
                 "severity": "S2",
                 "custom_fields": [{
-                    "Due Date": due_date
+                    constants.CUSTOM_FIELDS_DUE_DATE: due_date
                 }],
             },
             "2": {

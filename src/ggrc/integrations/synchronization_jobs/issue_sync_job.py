@@ -11,7 +11,7 @@ from datetime import datetime
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.integrations.synchronization_jobs import sync_utils
-
+from ggrc.integrations import constants
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +98,9 @@ def sync_statuses(issuetracker_state, sync_object):
 
 def sync_due_date(custom_fields, sync_object):
   """Sync issue object due date."""
-  issue_tracker_due_date = custom_fields.get("Due Date")
+  issue_tracker_due_date = custom_fields.get(
+      constants.CUSTOM_FIELDS_DUE_DATE
+  )
   date_format = "%Y-%m-%d"
 
   if issue_tracker_due_date:
@@ -148,7 +150,7 @@ def sync_issue_attributes():
       sync_verifier_email(issuetracker_state, sync_object, admin_role)
 
       custom_fields = {
-          "Due Date": sync_utils.parse_due_date(
+          constants.CUSTOM_FIELDS_DUE_DATE: sync_utils.parse_due_date(
               issuetracker_state.get("custom_fields", [])
           )
       }
