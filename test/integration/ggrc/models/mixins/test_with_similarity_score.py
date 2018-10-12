@@ -150,15 +150,15 @@ class TestWithSimilarityScore(TestCase):
 
     risk_asmnt_ids = {asmnt.id for asmnt in assessments
                       if asmnt.assessment_type == "Risk"}
-    for assessment in assessments:
+    for asmnt_id in {asmnt.id for asmnt in assessments}:
       similar_objects = models.Assessment.get_similar_objects_query(
-          id_=assessment.id,
+          id_=asmnt_id,
           type_="Assessment",
       ).all()
 
       # Current assessment is not similar to itself
-      if risk_asmnt_ids and assessment.id in risk_asmnt_ids:
-        expected_ids = risk_asmnt_ids - {assessment.id}
+      if risk_asmnt_ids and asmnt_id in risk_asmnt_ids:
+        expected_ids = risk_asmnt_ids - {asmnt_id}
       else:
         expected_ids = set()
 
@@ -174,7 +174,7 @@ class TestWithSimilarityScore(TestCase):
               "expression": {
                   "op": {"name": "similar"},
                   "object_name": "Assessment",
-                  "ids": [str(assessment.id)],
+                  "ids": [str(asmnt_id)],
               },
           },
       }]
