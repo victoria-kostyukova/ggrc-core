@@ -11,9 +11,10 @@ from ggrc import models
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
+from ggrc.services.resources import mixins
 
 
-class AssessmentResource(common.ExtendedResource):
+class AssessmentResource(mixins.SnapshotCounts, common.ExtendedResource):
   """Resource handler for Assessments."""
 
   # method post is abstract and not used.
@@ -25,7 +26,6 @@ class AssessmentResource(common.ExtendedResource):
     command_map = {
         None: super(AssessmentResource, self).get,
         "related_objects": self.related_objects,
-        "snapshot_counts": self.snapshot_counts_query,
     }
     command = kwargs.pop("command", None)
     if command not in command_map:
@@ -188,15 +188,3 @@ class AssessmentResource(common.ExtendedResource):
       data = self._get_related_data(assessment)
     with benchmark("Make response"):
       return self.json_success_response(data, )
-
-  def post(self, *args, **kwargs):
-    # This is to extend the get request for additional data.
-    # pylint: disable=arguments-differ
-    command_map = {
-        None: super(AssessmentResource, self).post,
-        "snapshot_counts": self.snapshot_counts_query,
-    }
-    command = kwargs.pop("command", None)
-    if command not in command_map:
-      self.not_found_response()
-    return command_map[command](*args, **kwargs)

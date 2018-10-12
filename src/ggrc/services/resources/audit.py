@@ -17,9 +17,10 @@ from ggrc import models
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
+from ggrc.services.resources import mixins
 
 
-class AuditResource(common.ExtendedResource):
+class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
   """Resource handler for audits."""
 
   # method post is abstract and not used.
@@ -126,14 +127,3 @@ class AuditResource(common.ExtendedResource):
       statuses_json.sort(key=lambda k: (k["name"], k["verified"]))
       response_object = {"statuses": statuses_json, "total": total}
       return self.json_success_response(response_object, )
-
-  def post(self, *args, **kwargs):
-    """This is to extend the post request for audit."""
-    command_map = {
-        None: super(AuditResource, self).post,
-        "snapshot_counts": self.snapshot_counts_query,
-    }
-    command = kwargs.pop("command", None)
-    if command not in command_map:
-      self.not_found_response()
-    return command_map[command](*args, **kwargs)

@@ -4,20 +4,9 @@
 """Issue API resource optimization."""
 
 from ggrc.services import common
+from ggrc.services.resources import mixins
 
 
-class IssueResource(common.ExtendedResource):
+# pylint: disable=abstract-method
+class IssueResource(mixins.SnapshotCounts, common.ExtendedResource):
   """Resource handler for issues."""
-  # pylint: disable=abstract-method
-
-  def post(self, *args, **kwargs):
-    # This is to extend the get request for additional data.
-    # pylint: disable=arguments-differ
-    command_map = {
-        None: super(IssueResource, self).post,
-        "snapshot_counts": self.snapshot_counts_query,
-    }
-    command = kwargs.pop("command", None)
-    if command not in command_map:
-      self.not_found_response()
-    return command_map[command](*args, **kwargs)
