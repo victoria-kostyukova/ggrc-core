@@ -23,6 +23,7 @@ class TestTicketTrackerExport(TestCase):
     self.api = api_helper.Api()
 
   @patch('ggrc.integrations.issues.Client.update_issue')
+  @patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_assessment_export(self, _):
     """Export of Ticket Tracker attribute of assessment. """
     with patch.object(models.hooks.issue_tracker.assessment_integration,

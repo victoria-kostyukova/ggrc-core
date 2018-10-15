@@ -15,6 +15,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
+from ggrc import settings
 from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
@@ -186,6 +187,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   )
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_new_linked_assessment(self, assmt_attrs, ticket_attrs, upd_mock):
     """Test link new Assessment to IssueTracker ticket sets correct fields"""
     with factories.single_commit():
@@ -212,6 +214,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_existing_assmt_link(self, update_mock):
     """Test Assessment link to another ticket """
     with factories.single_commit():
@@ -254,6 +257,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
   @mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
                      return_value=True)
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_already_linked_ticket(self, enabled_mock):
     """Test Assessment w/o IT couldn't be linked to already linked ticket"""
     with factories.single_commit():
@@ -283,6 +287,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     enabled_mock.assert_called()
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_creating_new_ticket_for_linked_issue(self, update_mock):
     """Test create new ticket for already linked assessment"""
     with factories.single_commit():
@@ -319,6 +324,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     self.assertNotEqual(int(issue_tracker_issue.issue_id), TICKET_ID)
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_complete_assessment_create_issue(self, mock_create_issue):
     """Test the creation of issue for completed assessment."""
     audit = factories.AuditFactory()
@@ -352,6 +358,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEqual(mock_create_issue._mock_call_args[0][0]['status'],
                        'VERIFIED')
 
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_info(self):
     """Test that Issue Tracker issues are updated by the utility."""
     cli_patch = mock.patch.object(sync_utils.issues, 'Client')
@@ -422,6 +429,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
   # pylint: disable=unused-argument
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_assignee(self, mocked_update_issue):
     """Test assignee sync in case it has been updated."""
     email1 = "email1@example.com"
@@ -456,6 +464,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_title(self, mocked_update_issue):
     """Test title sync in case it has been updated."""
     with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
@@ -478,6 +487,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEqual(issue.title, new_title)
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_due_date(self, mocked_update_issue):
     """Test title sync in case it has been updated."""
     with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
@@ -527,6 +537,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   )
   @ddt.unpack
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_change_assessment_status(self, status,
                                     additional_kwargs,
                                     mocked_update_issue):
@@ -664,6 +675,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_basic_import(self, mock_create_issue, mock_update_issue):
     """Test basic import functionality."""
     with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
@@ -691,6 +703,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self._check_csv_response(response, {})
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_audit_delete(self, mock_create_issue):
     """Test deletion of an audit."""
     with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
@@ -714,6 +727,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assert200(result)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_ccs_many_audit_captains(self, mock_update_issue):
     """CCS of assessment should include secondary audit captains."""
     with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
@@ -816,6 +830,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 @mock.patch('ggrc.models.hooks.issue_tracker.'
             'assessment_integration._is_issue_tracker_enabled',
             return_value=True)
+@mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
 @mock.patch('ggrc.integrations.issues.Client')
 class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
   """Test people used in IssueTracker Issues."""
