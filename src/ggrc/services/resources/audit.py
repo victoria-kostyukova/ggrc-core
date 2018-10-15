@@ -41,7 +41,7 @@ class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
   def summary_query(self, id):
     """Get data for audit summary page."""
     # id name is used as a kw argument and can't be changed here
-    # pylint: disable=invalid-name,redefined-builtin
+    # pylint: disable=invalid-name,redefined-builtin,too-many-locals
     with benchmark("check audit permissions"):
       audit = models.Audit.query.get(id)
       if not permissions.is_allowed_read_for(audit):
