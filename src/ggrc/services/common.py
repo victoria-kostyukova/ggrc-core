@@ -947,6 +947,15 @@ class Resource(ModelView):
           src["destination"]["id"],
           src["destination"]["type"]
       ))
+      if obj:
+        logger.warning(
+            "The relationship between %s %s and %s %s is already exist.",
+            src["source"]["type"],
+            src["source"]["id"],
+            src["destination"]["type"],
+            src["destination"]["id"],
+        )
+        obj.updated_at = datetime.datetime.utcnow()
     if obj is None:
       obj = self.model()
       db.session.add(obj)
