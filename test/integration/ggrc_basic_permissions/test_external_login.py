@@ -125,19 +125,20 @@ class TestExternalPermissions(TestCase):
 
     # check relationship post
     destination = factories.SystemFactory()
+    relationship_data = json.dumps([{
+        "relationship": {
+            "source": {"id": model_json['id'],
+                       "type": model_json['type']},
+            "destination": {"id": destination.id,
+                            "type": destination.type},
+            "context": {"id": None},
+            "is_external": True
+        }
+    }])
     with mock.patch.multiple(PersonClient, _post=self._mock_post):
       response = self._post(
           "/api/relationships",
-          data=json.dumps([{
-              "relationship": {
-                  "source": {"id": model_json['id'],
-                             "type": model_json['type']},
-                  "destination": {"id": destination.id,
-                                  "type": destination.type},
-                  "context": {"id": None},
-                  "is_external": True
-              }
-          }]),
+          data=relationship_data,
           headers=headers)
       self.assert200(response)
     relationship = all_models.Relationship.query.get(
@@ -151,6 +152,14 @@ class TestExternalPermissions(TestCase):
     self.assertIsNone(relationship.parent_id)
     self.assertIsNone(relationship.automapping_id)
     self.assertIsNone(relationship.context_id)
+
+    # check that POST on creation of existing relation return 200 code
+    with mock.patch.multiple(PersonClient, _post=self._mock_post):
+      response = self._post(
+          "/api/relationships",
+          data=relationship_data,
+          headers=headers)
+      self.assert200(response)
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')

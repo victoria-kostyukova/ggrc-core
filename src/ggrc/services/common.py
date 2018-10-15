@@ -948,7 +948,10 @@ class Resource(ModelView):
           src["destination"]["type"]
       ))
       if obj:
-        logger.warning(
+        # Manually trigger relationship update in order for revisions and
+        # event being created. We expect positive response when POSTing
+        # an existing relationship.
+        logger.info(
             "The relationship between %s %s and %s %s is already exist.",
             src["source"]["type"],
             src["source"]["id"],
