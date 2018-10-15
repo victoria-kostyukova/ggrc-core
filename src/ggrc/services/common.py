@@ -327,9 +327,11 @@ class ModelView(View):
       return None
 
   def not_found_message(self):
+    """Generate Not Found message"""
     return '{0} not found.'.format(self.model._inflector.title_singular)
 
   def not_found_response(self):
+    """Generate Not Found response"""
     return current_app.make_response((self.not_found_message(), 404, []))
 
   def collection_last_modified(self):
@@ -415,6 +417,7 @@ class Resource(ModelView):
   """
 
   def dispatch_request(self, *args, **kwargs):  # noqa
+    # pylint: disable=too-many-return-statements,arguments-differ
     with benchmark("Dispatch request"):
       with benchmark("dispatch_request > Check Headers"):
         method = request.method
@@ -461,6 +464,7 @@ class Resource(ModelView):
               cache.clear()
 
   def post(self, *args, **kwargs):
+    """POST operation handler."""
     raise NotImplementedError()
 
   def get(self, id):
@@ -866,6 +870,7 @@ class Resource(ModelView):
     ggrc.builder.json.create(obj, src)
 
   def get_context_id_from_json(self, src):
+    """Get context id from json."""
     context = src.get('context', None)
     if context:
       context_id = context.get('id', None)
@@ -1566,6 +1571,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
 
 
 def _is_creator():
+  """Check that current user is Creator."""
   current_user = get_current_user(use_external_user=False)
   return hasattr(current_user, 'system_wide_role') \
       and current_user.system_wide_role == "Creator"
