@@ -459,8 +459,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'hotlist_ids': [],
                 'priority': None,
                 'assignee': email1,
-                'verifier': email1,
-                'ccs': [email2]}
+                'verifier': email1}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
@@ -568,8 +567,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'hotlist_ids': [],
                 'priority': None,
                 'assignee': email1,
-                'verifier': email1,
-                'ccs': []}
+                'verifier': email1}
       asmt_link = assessment_integration._get_assessment_url(asmt)
       if 'comment' in additional_kwargs:
         additional_kwargs['comment'] = \
@@ -821,10 +819,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       issue_tracker_cc = issue_tracker_assessment.cc_list.split(',')[0]
       assessment_emails = [person.email for person in assessment_persons]
       self.assertIn(issue_tracker_cc, assessment_emails)
-      self.assertItemsEqual(
-          mock_update_issue.call_args[0][1]["ccs"],
-          [issue_tracker_cc, audit_cc]
-      )
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'

@@ -380,3 +380,60 @@ class BaseClientTest(unittest.TestCase):
         )
     self.assertTrue(due_dates_equals)
     self.assertTrue(remove_custom_fields)
+
+  def test_group_ccs(self):
+    """Group ccs from system and issutracker."""
+    ccs_payload = [
+        "test1@test.com",
+        "test2@test.com",
+        "test3@test.com"
+    ]
+    ccs_issuetracker = [
+        "test1@test.com",
+        "test2@test.com",
+        "test3@test.com",
+        "test4@test.com"
+    ]
+    ccs_grouped = \
+        assessment_sync_job._group_ccs_with_issuetracker(
+            ccs_payload,
+            ccs_issuetracker
+        )
+    expected_result = [
+        "test1@test.com",
+        "test2@test.com",
+        "test3@test.com",
+        "test4@test.com"
+    ]
+    self.assertListEqual(ccs_grouped, expected_result)
+
+  def test_group_ccs_wh_system(self):
+    """Group ccs w/h ccs from system."""
+    ccs_payload = []
+    ccs_issuetracker = [
+        "test1@test.com",
+        "test2@test.com",
+        "test3@test.com",
+        "test4@test.com"
+    ]
+    ccs_grouped = \
+        assessment_sync_job._group_ccs_with_issuetracker(
+            ccs_payload,
+            ccs_issuetracker
+        )
+    self.assertListEqual(ccs_issuetracker, ccs_grouped)
+
+  def test_group_ccs_wh_issuetracker(self):
+    """Group ccs w/h ccs from issuetracker."""
+    ccs_payload = [
+        "test1@test.com",
+        "test2@test.com",
+        "test3@test.com"
+    ]
+    ccs_issuetracker = []
+    ccs_grouped = \
+        assessment_sync_job._group_ccs_with_issuetracker(
+            ccs_payload,
+            ccs_issuetracker
+        )
+    self.assertListEqual(ccs_payload, ccs_grouped)
