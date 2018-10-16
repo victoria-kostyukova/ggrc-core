@@ -307,7 +307,7 @@ def send_daily_digest_notifications():
     return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
-def generate_cycle_tasks_notifs(day=None):
+def generate_cycle_tasks_notifs():
   """Generate notifications for cycle
   task group object tasks on status change.
 
@@ -315,8 +315,7 @@ def generate_cycle_tasks_notifs(day=None):
     day (date): send notification date.
   """
   with benchmark("generate notifications for cycle tasks"):
-    if day is None:
-      day = date.today() - relativedelta.relativedelta(days=1)
+    day = date.today() - relativedelta.relativedelta(days=1)
     send_datetime = datetime.combine(day, SEND_TIME)
 
     updated_tasks = CycleTaskGroupObjectTask.query.filter(

@@ -91,7 +91,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1)
 
-      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      generate_cycle_tasks_notifs()
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
           Notification.object_type == cycle.type,
@@ -129,7 +129,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1)
 
-      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      generate_cycle_tasks_notifs()
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
           Notification.object_type == cycle.type,
@@ -161,7 +161,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task2)
 
-      generate_cycle_tasks_notifs(date(2015, 5, 1))
+      generate_cycle_tasks_notifs()
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
           Notification.object_type == cycle.type,
@@ -247,7 +247,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1)
 
-      generate_cycle_tasks_notifs(date(2015, 5, 3))
+      generate_cycle_tasks_notifs()
       user = Person.query.get(self.user.id)
       _, notif_data = common.get_daily_notifications()
       self.assertNotIn(user.email, notif_data)
