@@ -7,7 +7,6 @@
 
 from datetime import datetime
 from datetime import timedelta
-from datetime import date
 
 from freezegun import freeze_time
 

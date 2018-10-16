@@ -9,8 +9,6 @@ import collections
 import json
 import logging
 
-from datetime import date
-
 import sqlalchemy
 from sqlalchemy import true
 from flask import flash
