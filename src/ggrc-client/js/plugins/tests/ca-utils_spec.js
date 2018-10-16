@@ -11,7 +11,7 @@ import {
   isCommentRequired,
   isEvidenceRequired,
   isUrlRequired,
-  updateCustomAttributeValue,
+  setCustomAttributeValue,
 } from '../utils/ca-utils';
 
 describe('ca-utils', function () {
@@ -264,7 +264,7 @@ describe('ca-utils', function () {
     });
   });
 
-  describe('updateCustomAttributeValue() method', function () {
+  describe('setCustomAttributeValue() method', function () {
     let ca;
 
     beforeEach(function () {
@@ -277,7 +277,7 @@ describe('ca-utils', function () {
       });
 
       it('assigns "Person" to "attribute_value" attr', function () {
-        updateCustomAttributeValue(ca);
+        setCustomAttributeValue(ca);
 
         expect(ca.attr('attribute_value')).toBe('Person');
       });
@@ -285,7 +285,7 @@ describe('ca-utils', function () {
       it('assigns object with specified id to "attribute_object" attr',
         function () {
           let value = 'mockValue';
-          updateCustomAttributeValue(ca, value);
+          setCustomAttributeValue(ca, value);
 
           expect(ca.attr('attribute_object').serialize()).toEqual({
             type: 'Person',
@@ -295,7 +295,7 @@ describe('ca-utils', function () {
 
       it('assigns value to "attribute_object_id" attr', function () {
         let value = 'mockValue';
-        updateCustomAttributeValue(ca, value);
+        setCustomAttributeValue(ca, value);
 
         expect(ca.attr('attribute_object_id')).toBe(value);
       });
@@ -305,7 +305,7 @@ describe('ca-utils', function () {
         const falsyValues = ['', null, undefined, false, 0, NaN];
 
         falsyValues.forEach((falsy) => {
-          updateCustomAttributeValue(ca, falsy);
+          setCustomAttributeValue(ca, falsy);
 
           expect(ca.attr('attribute_object_id')).toBeNull();
           expect(ca.attr('attribute_object')).toBeNull();

@@ -4,7 +4,7 @@
  */
 
 import {
-  applyChangesToCustomAttributeValue,
+  applyChangesToCAValue,
   isEvidenceRequired,
   isCommentRequired,
   isUrlRequired,
@@ -186,7 +186,7 @@ export default can.Component.extend({
 
       return this.attr('deferredSave').push(function () {
         let caValues = self.attr('instance.custom_attribute_values');
-        applyChangesToCustomAttributeValue(
+        applyChangesToCAValue(
           caValues,
           new can.Map(changes));
 

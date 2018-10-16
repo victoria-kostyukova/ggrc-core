@@ -388,7 +388,7 @@ function getCustomAttributes(instance, type) {
  * @param {*} ca
  * @param {*} value
  */
-function updateCustomAttributeValue(ca, value) {
+function setCustomAttributeValue(ca, value) {
   if (ca.attr('attributeType') === 'person') {
     let attributeObject = value ? {id: value, type: 'Person'} : null;
     let attributeObjectId = value || null;
@@ -408,7 +408,7 @@ function updateCustomAttributeValue(ca, value) {
  * @param {*} values
  * @param {*} changes
  */
-function applyChangesToCustomAttributeValue(values, changes) {
+function applyChangesToCAValue(values, changes) {
   can.Map.keys(changes).forEach(function (fieldId) {
     values.each(function (item, key) {
       if (item.def.id === Number(fieldId)) {
@@ -416,7 +416,7 @@ function applyChangesToCustomAttributeValue(values, changes) {
           console.error(`Corrupted Date: ${values}`);
           return;
         }
-        updateCustomAttributeValue(item, changes[fieldId]);
+        setCustomAttributeValue(item, changes[fieldId]);
         values.splice(key, 1, values[key]);
       }
     });
@@ -474,12 +474,12 @@ export {
   isCommentRequired,
   isUrlRequired,
   convertToFormViewField,
-  applyChangesToCustomAttributeValue,
+  applyChangesToCAValue,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
   CA_DD_FLAGS,
   ddValidationValueToMap,
   ddValidationMapToValue,
   getLCAPopupTitle,
-  updateCustomAttributeValue,
+  setCustomAttributeValue,
 };

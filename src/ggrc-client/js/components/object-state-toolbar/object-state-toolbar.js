@@ -8,13 +8,7 @@ import template from './object-state-toolbar.mustache';
 
 const tag = 'object-state-toolbar';
 const activeStates = ['In Progress', 'Rework Needed', 'Not Started'];
-// Helper function - might be some util/helpers method
-function checkIsCurrentUserVerifier(verifiers) {
-  return verifiers
-    .filter(function (verifier) {
-      return verifier.id === GGRC.current_user.id;
-    }).length;
-}
+
 /**
  * Object State Toolbar Component allowing Object state modification
  */
@@ -30,7 +24,9 @@ export default can.Component.extend({
       },
       isCurrentUserVerifier: {
         get: function () {
-          return checkIsCurrentUserVerifier(this.attr('verifiers'));
+          let verifiers = this.attr('verifiers');
+          return !!_.find(verifiers, (verifier) =>
+            verifier.id === GGRC.current_user.id);
         },
       },
       hasVerifiers: {

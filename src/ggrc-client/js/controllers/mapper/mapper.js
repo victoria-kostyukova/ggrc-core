@@ -11,7 +11,7 @@ import '../../components/object-search/object-search';
 import {
   isInScopeModel,
 } from '../../plugins/utils/snapshot-utils';
-import assessmentTemplateCloneTemplate from './assessment-template-clone-modal.mustache';
+import asmtTemplateCloneTemplate from './assessment-template-clone-modal.mustache';
 import objectGeneratorTemplate from './object-generator-modal.mustache';
 import objectMapperTemplate from './object-mapper-modal.mustache';
 import objectSearchTemplate from './object-search-modal.mustache';
@@ -209,7 +209,7 @@ const ObjectBulkUpdate = ObjectMapper.extend({
 
 const AssessmentTemplateClone = ObjectMapper.extend({
   defaults: {
-    component: assessmentTemplateCloneTemplate,
+    component: asmtTemplateCloneTemplate,
   },
 }, {});
 

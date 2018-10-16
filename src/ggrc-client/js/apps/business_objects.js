@@ -70,7 +70,7 @@ import * as businessModels from '../models/business-models/index';
       let possibleModelType;
       let farModels;
       let extraDescriptorOptions;
-      let extraContentControllerOptions;
+      let extraContentOptions;
 
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
@@ -276,7 +276,7 @@ import * as businessModels from '../models/business-models/index';
         },
       };
 
-      extraContentControllerOptions = applyMixins({
+      extraContentOptions = applyMixins({
         objectives: {
           Objective: {
             draw_children: true,
@@ -655,7 +655,7 @@ import * as businessModels from '../models/business-models/index';
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
       if (getPageInstance() instanceof businessModels.Person) {
-        let personOptions = extraContentControllerOptions.Person;
+        let personOptions = extraContentOptions.Person;
         can.each(personOptions, function (options, modelName) {
           if (modelName !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
@@ -697,13 +697,11 @@ import * as businessModels from '../models/business-models/index';
             extraDescriptorOptions[object.constructor.shortName][modelName]);
         }
 
-        if (extraContentControllerOptions[object.constructor.shortName] &&
-            extraContentControllerOptions[
-              object.constructor.shortName][modelName]) {
+        if (extraContentOptions[object.constructor.shortName] &&
+            extraContentOptions[object.constructor.shortName][modelName]) {
           $.extend(true, descriptor, {
             content_controller_options:
-            extraContentControllerOptions[
-              object.constructor.shortName][modelName],
+            extraContentOptions[object.constructor.shortName][modelName],
           });
         }
         descriptor.widgetType = 'treeview';
