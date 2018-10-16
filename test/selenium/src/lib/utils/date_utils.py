@@ -5,12 +5,12 @@ import datetime
 
 
 def closest_working_day():
-  """Returns the nearest working day today or in future.
+  """Returns the nearest working day today or in past.
   Used for a datepicker that does not allow to choose weekends.
   """
   date = datetime.datetime.today()
   while _is_weekend(date):  # Saturday, Sunday
-    date += datetime.timedelta(days=1)
+    date += datetime.timedelta(days=-1)
   return date.date()
 
 
