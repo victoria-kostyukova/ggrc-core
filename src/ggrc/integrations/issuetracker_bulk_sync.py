@@ -155,7 +155,10 @@ class IssueTrackerBulkCreator(object):
     issue_json = None
     integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
     if hasattr(integration_handler, "prepare_issue_json"):
-      issue_json = integration_handler.prepare_issue_json(object_)
+      issue_json = integration_handler.prepare_issue_json(
+          object_,
+          create_issuetracker=True
+      )
 
     if not issue_json:
       raise integrations_errors.Error(
@@ -264,7 +267,7 @@ class IssueTrackerBulkCreator(object):
     return [{
         "object_type_": obj_type,
         "object_id_": obj_id,
-        "cc_list": ",".join(info["ccs"]),
+        "cc_list": ",".join(info.get("ccs", [])),
         "enabled": info["enabled"],
         "title": info["title"],
         "component_id": info["component_id"],

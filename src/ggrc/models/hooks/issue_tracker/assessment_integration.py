@@ -675,11 +675,6 @@ def _fill_current_value(issue_params, assessment, initial_info):
     issue_params['hotlist_ids'] = [current_hotlist_id] if (
         current_hotlist_id) else []
 
-  if 'ccs' not in issue_params:
-    current_cc_list = initial_info.get('cc_list')
-    if current_cc_list:
-      issue_params['ccs'] = current_cc_list
-
   return issue_params
 
 
@@ -808,12 +803,14 @@ def create_asmnt_comment(assessment, issue_id):
   return "\n".join(comments)
 
 
-def prepare_issue_json(assessment, issue_tracker_info=None):
+def prepare_issue_json(assessment, issue_tracker_info=None,
+                       create_issuetracker=False):
   """Create json that will be sent to IssueTracker.
 
   Args:
       assessment: Instance of Assessment.
       issue_tracker_info: Dict with IssueTracker info.
+      create_issuetracker: Bool indicator for crate issuetracker state.
 
   Returns:
       Dict with IssueTracker issue info.
@@ -845,7 +842,6 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
       'assignee': '',
       'verifier': '',
       'status': issue_tracker_info['status'],
-      'ccs': [],
       'comment': create_asmnt_comment(assessment, issue_id),
   }
   custom_fields = []
@@ -869,12 +865,12 @@ def prepare_issue_json(assessment, issue_tracker_info=None):
     issue_params['assignee'] = assignee
     issue_params['verifier'] = assignee
 
-  cc_list = issue_tracker_info.get('cc_list', [])
-  audit_ccs = get_audit_ccs(assessment)
-  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
-
-  if grouped_ccs:
-    issue_params['ccs'] = grouped_ccs
+  if create_issuetracker:
+    cc_list = issue_tracker_info.get('cc_list', [])
+    audit_ccs = get_audit_ccs(assessment)
+    grouped_ccs = group_cc_emails(audit_ccs, cc_list)
+    if grouped_ccs:
+      issue_params['ccs'] = grouped_ccs
 
   return issue_params
 
@@ -928,7 +924,11 @@ def _link_assessment(assessment, issue_tracker_info):
 
 def _create_new_issuetracker_ticket(assessment, issue_tracker_info):
   """Create new IssueTracker ticket for assessment"""
-  issue_tracker_request = prepare_issue_json(assessment, issue_tracker_info)
+  issue_tracker_request = prepare_issue_json(
+      assessment,
+      issue_tracker_info,
+      create_issuetracker=True
+  )
   try:
     res = issues.Client().create_issue(issue_tracker_request)
   except integrations_errors.Error as error:
@@ -1011,14 +1011,12 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
 
   # handle assignee and cc_list update
   assignee_email, cc_list = _collect_assessment_emails(assessment)
-  audit_ccs = get_audit_ccs(assessment)
-  grouped_ccs = group_cc_emails(audit_ccs, cc_list)
+  del cc_list
 
   if assignee_email is not None:
     issue_tracker_info['assignee'] = assignee_email
     issue_params['assignee'] = assignee_email
     issue_params['verifier'] = assignee_email
-    issue_params['ccs'] = grouped_ccs
 
   custom_fields = []
 

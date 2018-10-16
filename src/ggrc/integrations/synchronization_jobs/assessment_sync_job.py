@@ -162,7 +162,23 @@ def _compare_ccs(ccs_payload, ccs_issuetracker):
   ccs_payload = set(cc.strip() for cc in ccs_payload)
   ccs_issuetracker = set(cc.strip() for cc in ccs_issuetracker)
 
-  return ccs_payload == ccs_issuetracker
+  return ccs_payload.issubset(ccs_issuetracker)
+
+
+def _group_ccs_with_issuetracker(ccs_payload, ccs_issuetracker):
+  """Group ccs from ggrc system and issuetracker.
+
+  Args:
+    - ccs_system: CCs on Issue Tracker Payload
+    - ccs_tracker: CCs from Issue Tracker
+
+  Returns:
+      list of grouped ccs from ggrc and issuetracker.
+  """
+  ccs_system = set(cc.strip() for cc in ccs_payload)
+  ccs_tracker = set(cc.strip() for cc in ccs_issuetracker)
+
+  return list(ccs_system.union(ccs_tracker))
 
 
 def _is_need_synchronize_issue(object_id, issue_payload, issuetracker_state):
@@ -192,13 +208,27 @@ def _is_need_synchronize_issue(object_id, issue_payload, issuetracker_state):
   if remove_custom_fields:
     issue_payload.pop("custom_fields", [])
 
+  ccs_equals = _compare_ccs(
+      issue_payload.get("ccs", []),
+      issuetracker_state.get("ccs", [])
+  )
+
+  if not ccs_equals:
+    # union ccs from system and issuetracker
+    # if not equals (or not subset)
+    issue_payload["ccs"] = _group_ccs_with_issuetracker(
+        issue_payload.get("ccs", []),
+        issuetracker_state.get("ccs", [])
+    )
+  else:
+    # restore ccs from issuetracker
+    # (ccs from system is subset)
+    issue_payload["ccs"] = issuetracker_state.get("ccs", [])
+
   if all(
       issue_payload.get(field) == issuetracker_state.get(field)
       for field in FIELDS_TO_CHECK
-  ) and due_dates_equals and _compare_ccs(
-      issue_payload.get("ccs", []),
-      issuetracker_state.get("ccs", [])
-  ):
+  ) and due_dates_equals and ccs_equals:
     return False
   return True
 

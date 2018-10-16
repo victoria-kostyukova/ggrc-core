@@ -336,7 +336,8 @@ def create_comment_handler(sync_object, comment, author):
     sync_object.add_warning("Unable to update a ticket in issue tracker.")
 
 
-def prepare_issue_json(issue, issue_tracker_info=None):
+def prepare_issue_json(issue, issue_tracker_info=None,
+                       create_issuetracker=False):
   """Prepare issuetracker issue json for Issue object."""
   if not issue_tracker_info:
     issue_tracker_info = issue.issuetracker_issue.to_dict()
