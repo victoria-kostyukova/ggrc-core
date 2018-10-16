@@ -11,7 +11,7 @@ const allModels = Object.assign({}, businessModels, serviceModels);
 
 /*  RefreshQueue
  *
- *  enqueue(obj, force=false) -> queue or null
+ *  enqueue(objs, force=false) -> queue or null
  *  trigger() -> Deferred
  */
 
@@ -210,24 +210,24 @@ const RefreshQueue = can.Construct({
 
     return this;
   },
-  enqueue: function (obj, force) {
+  enqueue: function (objs, force) {
     let queue;
-    if (!obj) {
+    if (!objs) {
       return;
     }
     if (this.triggered) {
       return null;
     }
-    if (obj.push) {
-      can.each(obj, function (o) {
-        this.enqueue(o, force);
+    if (objs.push) {
+      can.each(objs, function (obj) {
+        this.enqueue(obj, force);
       }, this);
       return this;
     }
 
-    this.objects.push(obj);
-    if (force || !obj.selfLink) {
-      queue = this.constructor.refresh_queue_manager.enqueue(obj, force);
+    this.objects.push(objs);
+    if (force || !objs.selfLink) {
+      queue = this.constructor.refresh_queue_manager.enqueue(objs, force);
       if (this.queues.indexOf(queue) === -1) {
         this.queues.push(queue);
       }

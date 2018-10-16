@@ -69,11 +69,11 @@
   //  adding it here for easy universal use across can.List
   //  as well as arrays.
   if (!can.reduce) {
-    can.reduce = function (a, f, i) {
-      if (_.isNull(a)) {
+    can.reduce = function (ctx, arg1, arg2) {
+      if (_.isNull(ctx)) {
         return null;
       }
-      return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]);
+      return [].reduce.apply(ctx, arguments.length < 3 ? [arg1] : [arg1, arg2]);
     };
   }
 
