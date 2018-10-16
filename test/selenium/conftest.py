@@ -613,10 +613,18 @@ def app_workflow():
 
 @pytest.fixture()
 def app_task_group(app_workflow):
-  """Creates a Task Group within `workflow`."""
+  """Creates a Task Group within `app_workflow`."""
   task_group = app_entity_factory.TaskGroupFactory().create(
       workflow=app_workflow)
   return workflow_rest_service.create_task_group(task_group)
+
+
+@pytest.fixture()
+def app_task_group_task(app_task_group):
+  """Creates a Task Group Task within `app_task_group`."""
+  task_group_task = app_entity_factory.TaskGroupTaskFactory().create(
+      task_group=app_task_group)
+  return workflow_rest_service.create_task_group_task(task_group_task)
 
 
 @pytest.fixture()

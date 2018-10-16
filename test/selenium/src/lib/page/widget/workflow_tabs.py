@@ -51,6 +51,12 @@ class SetupTab(object):
     self.open_task_group(task_group)
     return self._task_group_panel.added_objs()
 
+  def delete_task_group(self, task_group):
+    """Deletes task group."""
+    self.open_task_group(task_group)
+    self._task_group_panel.click_to_edit()
+    object_modal.get_modal_obj("task_group_task").delete()
+
   def task_group_rows(self):
     """Returns task group rows."""
     return self._task_group_tree.tree_items()

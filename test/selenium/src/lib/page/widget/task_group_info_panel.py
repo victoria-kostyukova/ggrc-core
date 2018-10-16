@@ -3,7 +3,7 @@
 """Task Group info panel."""
 from lib import base
 from lib.entities import app_entity_factory
-from lib.page.widget import table_with_headers
+from lib.page.widget import table_with_headers, page_elements
 
 
 class TaskGroupInfoPanel(base.WithBrowser):
@@ -22,6 +22,16 @@ class TaskGroupInfoPanel(base.WithBrowser):
   def wait_to_be_init(self):
     """Wait for panel to be initialized."""
     self._create_task_button.wait_until_present()
+
+  @property
+  def _three_bbs(self):
+    """Returns three bbs element."""
+    return page_elements.ThreeBbs(self._root.element(
+        class_name="pane-header__toolbar"))
+
+  def click_to_edit(self):
+    """Clicks to edit task group."""
+    self._three_bbs.select_option_by_text("Edit Task Group")
 
   def click_add_obj(self):
     """Clicks `Add Object` button."""

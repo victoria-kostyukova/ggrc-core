@@ -9,7 +9,7 @@ import pytest
 
 from lib import base
 from lib.entities import app_entity_factory, ui_dict_convert
-from lib.page.widget import workflow_tabs, object_modal
+from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.ui import workflow_ui_facade, ui_facade
 from lib.utils import test_utils, date_utils
 
@@ -21,8 +21,7 @@ class TestCreateWorkflow(base.Test):
   def workflow(self):
     """Create workflow via UI."""
     workflow = app_entity_factory.WorkflowFactory().create()
-    workflow.task_groups = [app_entity_factory.TaskGroupFactory().create(
-        workflow=workflow)]
+    app_entity_factory.TaskGroupFactory().create(workflow=workflow)
     workflow_ui_facade.create_workflow(workflow)
     return workflow
 
@@ -83,3 +82,32 @@ class TestWorkflowPage(base.Test):
     if not objs:
       pytest.xfail("This is a bug, see GGRC-6125")
     test_utils.list_obj_assert(objs, [app_control])
+
+  def test_delete_task_group(self, app_workflow, app_task_group, selenium):
+    """Test deletion of task group."""
+    workflow_ui_facade.delete_task_group(app_task_group)
+    assert not workflow_ui_facade.task_group_objs(app_workflow)
+    assert ui_facade.active_tab_name() == "Setup (0)"
+
+
+class TestActivateWorkflow(base.Test):
+  """Test workflow activation."""
+
+  @pytest.fixture()
+  def activate_workflow(
+      self, app_workflow, app_task_group, app_task_group_task, selenium
+  ):
+    """Activates workflow."""
+    workflow_ui_facade.activate_workflow(app_workflow)
+
+  def test_active_cycles_tab_after_workflow_activation(
+      self, activate_workflow
+  ):
+    """Test Active Cycles tab after activation of workflow."""
+    # pylint: disable=invalid-name
+    assert ui_facade.active_tab_name() == "Active Cycles (1)"
+
+  def test_history_tab_after_workflow_activation(self, activate_workflow):
+    """Test History tab after activation of workflow."""
+    # pylint: disable=invalid-name
+    assert "History (0)" in object_page.ObjectPage().top_tabs.tab_names

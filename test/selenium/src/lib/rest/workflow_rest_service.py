@@ -22,3 +22,17 @@ def create_task_group(task_group):
       workflow=rest_convert.to_basic_rest_obj(task_group.workflow),
       context=task_group.workflow.rest_context
   )
+
+
+def create_task_group_task(task_group_task):
+  """Creates task group task via REST."""
+  return base_rest_service.create_obj(
+      task_group_task,
+      access_control_list=rest_convert.build_access_control_list(
+          task_group_task),
+      title=task_group_task.title,
+      start_date=task_group_task.start_date.isoformat(),
+      end_date=task_group_task.due_date.isoformat(),
+      task_group=rest_convert.to_basic_rest_obj(task_group_task.task_group),
+      context=task_group_task.task_group.rest_context
+  )

@@ -7,7 +7,7 @@
 """
 from lib import base
 from lib.entities import entity
-from lib.page.modal import unified_mapper
+from lib.page.modal import unified_mapper, delete_object
 from lib.page.widget import page_elements
 
 
@@ -65,6 +65,18 @@ class BaseObjectModal(base.WithBrowser):
   def save_and_close(self):
     """Clicks Save & Close button and waits for changes to happen."""
     self._root.link(data_toggle="modal-submit", text="Save & Close").click()
+    self._wait_for_submit_changes()
+
+  def delete(self):
+    """Clicks Delete button, confirms deletion in new popup
+    and waits for changes to happen.
+    """
+    self._root.link(text="Delete").click()
+    delete_object.DeleteObjectModal().confirm_delete()
+    self._wait_for_submit_changes()
+
+  def _wait_for_submit_changes(self):
+    """Waits for changes after submit."""
     self._root.wait_until(lambda modal: not modal.exists)
     # Spinner sometimes appears for loading content after modal is closed.
     # Though it's not a responsibility of modal to wait for it, it looks

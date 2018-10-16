@@ -17,4 +17,4 @@ def get_obj(app_obj):
 
 def active_tab_name():
   """Returns a tab name of the active tab."""
-  return object_page.ObjectPage().top_tabs.active_tab_name()
+  return object_page.ObjectPage().top_tabs.active_tab.name

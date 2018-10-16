@@ -42,13 +42,25 @@ class _Base(object):
 
   def obj_dict(self):
     """Returns a dict of attributes.
-    As workflow contains task groups, and task group contains a workflow,
-    the object itself is filtered to prevent endless recursion.
+    Circular references related to entities are replaced with strings
+    containing info on object type and Python object id.
     """
-    return attr.asdict(
-        self, dict_factory=collections.OrderedDict,
-        filter=lambda a, v: a.name not in (self.obj_name(),
-                                           self.plural_obj_name()))
+    def process_obj(obj, seen_entity_obj_ids):
+      """Convert an obj to dict replacing circular references."""
+      if attr.has(obj):
+        if id(obj) in seen_entity_obj_ids:
+          return "{} with object id {} was here".format(
+              obj.obj_type(), id(obj))
+        seen_entity_obj_ids.add(id(obj))
+        return collections.OrderedDict(
+            (attr_name, process_obj(attr_value, seen_entity_obj_ids))
+            for attr_name, attr_value
+            in attr.asdict(obj, recurse=False).iteritems())
+      if isinstance(obj, list):
+        return [process_obj(list_elem, seen_entity_obj_ids)
+                for list_elem in obj]
+      return obj
+    return process_obj(self, seen_entity_obj_ids=set())
 
   @classmethod
   def fields(cls):
@@ -97,11 +109,9 @@ class Person(_Base):
 
 
 @attr.s
-class Control(_Base):
+class Control(_Base, _WithTitleAndCode):
   """Represents Control entity."""
-  title = attr.ib()
   admins = attr.ib()
-  code = attr.ib()
   assertions = attr.ib()
 
 

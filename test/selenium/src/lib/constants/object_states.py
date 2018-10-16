@@ -25,3 +25,10 @@ READY_FOR_EXT_REVIEW = "Ready for External Review"
 # For Issue
 FIXED = "Fixed"
 FIXED_AND_VERIFIED = "Fixed and Verified"
+
+# For Workflow
+INACTIVE = "Inactive"
+
+# For Workflow cycles
+ASSIGNED = "Assigned"
+FINISHED = "Finished"

@@ -4,7 +4,7 @@
 from lib import url
 from lib.entities import ui_dict_convert
 from lib.page import dashboard
-from lib.page.widget import workflow_tabs, task_group_info_panel
+from lib.page.widget import workflow_tabs, task_group_info_panel, workflow_page
 from lib.ui import internal_ui_operations
 from lib.utils import selenium_utils
 
@@ -58,3 +58,17 @@ def get_objs_added_to_task_group(task_group):
   setup_tab = workflow_tabs.SetupTab()
   setup_tab.open_via_url(task_group.workflow)
   return setup_tab.get_objs_added_to_task_group(task_group)
+
+
+def delete_task_group(task_group):
+  """Deletes task group."""
+  setup_tab = workflow_tabs.SetupTab()
+  setup_tab.open_via_url(task_group.workflow)
+  setup_tab.delete_task_group(task_group)
+
+
+def activate_workflow(workflow):
+  """Activates workflow."""
+  setup_tab = workflow_tabs.SetupTab()
+  setup_tab.open_via_url(workflow)
+  workflow_page.WorkflowPage().activate_workflow()

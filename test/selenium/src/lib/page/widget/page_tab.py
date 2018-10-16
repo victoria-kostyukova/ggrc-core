@@ -4,7 +4,7 @@
 
 
 class Tabs(object):
-  """Represents tab page element on web pages."""
+  """Represents a container with tab elements."""
 
   TOP = "top"
   INTERNAL = "internal"
@@ -17,15 +17,42 @@ class Tabs(object):
     else:
       raise NotImplementedError
 
-  def active_tab_name(self):
-    """Returns name of the active tab."""
-    return self._root.li(class_name="active").text
+  @property
+  def tabs(self):
+    """Returns a list of tabs."""
+    return [Tab(tab_el) for tab_el in self._root.lis()]
+
+  @property
+  def tab_names(self):
+    """Returns a list of tab names."""
+    return [tab.name for tab in self.tabs]
+
+  @property
+  def active_tab(self):
+    """Returns active tab."""
+    return Tab(self._root.li(class_name="active"))
 
   def ensure_tab(self, tab_name):
     """Ensure that page tab `tab_name` is opened"""
-    if self.active_tab_name() != tab_name:
-      self.select_tab(tab_name)
+    if self.active_tab.name != tab_name:
+      self._tab_with_name(tab_name).select()
 
-  def select_tab(self, tab_name):
-    """Selects tab with name `tab_name`."""
-    self._root.li(text=tab_name).click()
+  def _tab_with_name(self, name):
+    """Returns tab with name `name`."""
+    return Tab(self._root.li(text=name))
+
+
+class Tab(object):
+  """Represents a single tab element."""
+
+  def __init__(self, tab_el):
+    self._root = tab_el
+
+  @property
+  def name(self):
+    """Returns name of the tab."""
+    return self._root.text
+
+  def select(self):
+    """Selects tab."""
+    self._root.click()

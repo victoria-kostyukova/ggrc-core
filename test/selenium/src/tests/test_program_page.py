@@ -22,7 +22,7 @@ class TestProgramPage(base.Test):
     # pylint: disable=invalid-name
     info_page = webui_service.ProgramsService(
         selenium).open_info_page_of_obj(program)
-    active_tab_name = info_page.top_tabs.active_tab_name()
+    active_tab_name = info_page.top_tabs.active_tab.name
     assert active_tab_name == "Program Info"
 
   @pytest.mark.smoke_tests

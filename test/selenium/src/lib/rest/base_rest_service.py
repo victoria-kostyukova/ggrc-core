@@ -11,7 +11,7 @@ def create_obj(obj, **mapping):
   """
   result_obj_dict = send_create_obj_request(obj, mapping)
   obj.obj_id = result_obj_dict["id"]
-  if hasattr(obj, "code"):
+  if hasattr(obj, "code") and not obj.code:
     obj.code = result_obj_dict["slug"]
   obj.rest_context = result_obj_dict["context"]
   return obj
