@@ -2,10 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import re
-from sqlalchemy import event
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.session import Session
 
 from ggrc import builder
 from ggrc import db
@@ -31,6 +29,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     """Initialize profile relationship while creating Person instance"""
     super(Person, self).__init__(*args, **kwargs)
     self.profile = PersonProfile()
+
+    self.build_object_context(
+        context=1,
+        name='Personal Context',
+        description=''
+    )
 
   __tablename__ = 'people'
 
@@ -208,16 +212,3 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     sorted_roles = sorted(unique_roles,
                           key=lambda x: role_hierarchy.get(x, -1))
     return sorted_roles[0]
-
-
-@event.listens_for(Session, 'after_flush_postexec')
-def receive_after_flush(session, _):
-  """Make sure newly created users have a personal context set"""
-  for o in session.identity_map.values():
-    if not isinstance(o, Person):
-      continue
-    user_context = o.get_or_create_object_context(
-        context=1,
-        name='Personal Context for {0}'.format(o.id),
-        description='')
-    db.session.add(user_context)
