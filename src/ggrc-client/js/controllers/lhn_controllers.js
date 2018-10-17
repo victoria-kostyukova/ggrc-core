@@ -210,7 +210,7 @@ can.Control('CMS.Controllers.LHN', {
     // this is ugly, but the trigger doesn't nest inside our top element
     $('.lhn-trigger').on('click', this.toggle_lhn.bind(this));
     import(/* webpackChunkName: "mousetrap" */'mousetrap')
-      .then(function (Mousetrap) {
+      .then(function ({'default': Mousetrap}) {
         Mousetrap.bind('alt+m', self.toggle_lhn.bind(self));
       });
     this.resize_lhn();

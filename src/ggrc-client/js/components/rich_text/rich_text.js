@@ -48,39 +48,40 @@ export default can.Component.extend('richText', {
     showAlert: false,
     length: 0,
     initEditor(container, toolbarContainer, countContainer) {
-      import(/* webpackChunkName: "quill" */'quill').then((Quill) => {
-        let editor = new Quill(container, {
-          theme: 'snow',
-          bounds: container,
-          placeholder: this.attr('placeholder'),
-          modules: {
-            toolbar: {
-              container: toolbarContainer,
+      import(/* webpackChunkName: "quill" */'quill')
+        .then(({'default': Quill}) => {
+          let editor = new Quill(container, {
+            theme: 'snow',
+            bounds: container,
+            placeholder: this.attr('placeholder'),
+            modules: {
+              toolbar: {
+                container: toolbarContainer,
+              },
+              history: {
+                delay: 0,
+              },
+              clipboard: {
+                matchers: [
+                  [Node.TEXT_NODE, this.urlMatcher],
+                ],
+              },
             },
-            history: {
-              delay: 0,
-            },
-            clipboard: {
-              matchers: [
-                [Node.TEXT_NODE, this.urlMatcher],
-              ],
-            },
-          },
+          });
+          this.setContentToEditor(editor, this.attr('content'));
+
+          if (this.attr('maxLength')) {
+            this.restrictPasteOperation(editor);
+            this.restrictMaxLength(editor);
+          }
+
+          if (this.attr('hiddenToolbar')) {
+            editor.on('selection-change', this.onSelectionChange.bind(this));
+          }
+
+          editor.on('text-change', this.onChange.bind(this));
+          this.attr('editor', editor);
         });
-        this.setContentToEditor(editor, this.attr('content'));
-
-        if (this.attr('maxLength')) {
-          this.restrictPasteOperation(editor);
-          this.restrictMaxLength(editor);
-        }
-
-        if (this.attr('hiddenToolbar')) {
-          editor.on('selection-change', this.onSelectionChange.bind(this));
-        }
-
-        editor.on('text-change', this.onChange.bind(this));
-        this.attr('editor', editor);
-      });
     },
     setContentToEditor(editor, content) {
       if (content !== editor.root.innerHTML) {
