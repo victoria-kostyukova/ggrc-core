@@ -54,7 +54,6 @@ class TestWfNotifsGenerator(TestCase):
   def test_ctasks_notifs_generator_daily_digest(self):
     """Test cycle tasks notifications generation job."""
     with freeze_time("2015-05-01 14:29:00"):
-      generate_cycle_tasks_notifs()
       self.assert_notifications_for_object(self.cycle, "manual_cycle_created")
       self.assert_notifications_for_object(self.ctask,
                                            "manual_cycle_created",
