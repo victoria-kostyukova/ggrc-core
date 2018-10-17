@@ -25,6 +25,15 @@ class TestExternalPermissions(TestCase):
     self.settings_patcher = mock.patch("ggrc.login.appengine.settings")
     self.settings_mock = self.settings_patcher.start()
     self.settings_mock.ALLOWED_QUERYAPI_APP_IDS = [self.allowed_appid]
+    self.headers = {
+        "Content-Type": "application/json",
+        "X-requested-by": "GGRC",
+        "X-appengine-inbound-appid": self.allowed_appid,
+        "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
+        "X-external-user": json.dumps({"email": "new_ext_user@example.com"})
+    }
+    with mock.patch.multiple(PersonClient, _post=self._mock_post):
+      self.client.get("/login", headers=self.headers)
 
   @staticmethod
   def _mock_post(*args, **kwargs):
@@ -76,18 +85,9 @@ class TestExternalPermissions(TestCase):
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   def test_post_modifier(self, model):
     """Test modifier of models when working as external user."""
-    headers = {
-        "Content-Type": "application/json",
-        "X-requested-by": "GGRC",
-        "X-appengine-inbound-appid": self.allowed_appid,
-        "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
-        "X-external-user": json.dumps({"email": "new_ext_user@example.com"})
-    }
-
     model_plural = model._inflector.table_plural
     model_singular = model._inflector.table_singular
     with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      self.client.get("/login", headers=headers)
       response = self._post(
           "api/{}".format(model_plural),
           data=json.dumps({
@@ -96,16 +96,13 @@ class TestExternalPermissions(TestCase):
                   "context": 0
               }
           }),
-          headers=headers)
+          headers=self.headers)
       self.assertEqual(response.status_code, 201)
 
     ext_person = all_models.Person.query.filter_by(
         email="new_ext_user@example.com"
     ).first()
     ext_person_id = ext_person.id
-
-    # check that external user has Creator role
-    self.assertEqual(ext_person.system_wide_role, "Creator")
 
     # check model modifier
     model_json = response.json[model_singular]
@@ -123,12 +120,16 @@ class TestExternalPermissions(TestCase):
         all_models.Event.id.desc()).first()
     self.assertEqual(event.modified_by_id, ext_person_id)
 
-    # check relationship post
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_relationship_creation(self):
+    """Test external relationship post on behalf of external user."""
     destination = factories.SystemFactory()
+    source = factories.MarketFactory()
     relationship_data = json.dumps([{
         "relationship": {
-            "source": {"id": model_json['id'],
-                       "type": model_json['type']},
+            "source": {"id": source.id,
+                       "type": source.type},
             "destination": {"id": destination.id,
                             "type": destination.type},
             "context": {"id": None},
@@ -139,12 +140,18 @@ class TestExternalPermissions(TestCase):
       response = self._post(
           "/api/relationships",
           data=relationship_data,
-          headers=headers)
+          headers=self.headers)
       self.assert200(response)
+
+    ext_person = all_models.Person.query.filter_by(
+        email="new_ext_user@example.com"
+    ).first()
+    ext_person_id = ext_person.id
+
     relationship = all_models.Relationship.query.get(
         response.json[0][-1]["relationship"]["id"])
-    self.assertEqual(relationship.source_type, model_json['type'])
-    self.assertEqual(relationship.source_id, model_json['id'])
+    self.assertEqual(relationship.source_type, source.type)
+    self.assertEqual(relationship.source_id, source.id)
     self.assertEqual(relationship.destination_type, "System")
     self.assertEqual(relationship.destination_id, destination.id)
     self.assertTrue(relationship.is_external)
@@ -158,8 +165,29 @@ class TestExternalPermissions(TestCase):
       response = self._post(
           "/api/relationships",
           data=relationship_data,
-          headers=headers)
+          headers=self.headers)
       self.assert200(response)
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_external_user_creation(self):
+    """Test creation of external user and its role."""
+    with mock.patch.multiple(PersonClient, _post=self._mock_post):
+      response = self._post(
+          "api/{}".format("markets"),
+          data=json.dumps({
+              "market": {
+                  "title": "some market",
+                  "context": 0
+              }
+          }),
+          headers=self.headers)
+      self.assertEqual(response.status_code, 201)
+
+    ext_person = all_models.Person.query.filter_by(
+        email="new_ext_user@example.com"
+    ).first()
+    self.assertEqual(ext_person.system_wide_role, "Creator")
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
@@ -178,7 +206,6 @@ class TestExternalPermissions(TestCase):
 
     model_plural = model._inflector.table_plural
     model_singular = model._inflector.table_singular
-
     with mock.patch.multiple(PersonClient, _post=self._mock_post):
       self.client.get("/login", headers=headers)
       response = self._post(
