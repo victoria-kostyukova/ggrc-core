@@ -116,6 +116,7 @@ import * as businessModels from '../models/business-models/index';
         issues: path + '/issues/info.mustache',
         evidence: path + '/evidence/info.mustache',
         documents: path + '/documents/info.mustache',
+        risks: path + '/risks/info.mustache',
       };
       widgetList.add_widget(object.constructor.shortName, 'info', {
         widget_id: 'info',
