@@ -7,6 +7,7 @@
 
 from datetime import datetime
 from datetime import timedelta
+import ddt
 
 from freezegun import freeze_time
 
@@ -23,6 +24,7 @@ from integration.ggrc.models import factories
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
+@ddt.ddt
 class TestWfNotifsGenerator(TestCase):
   """Test wf cycle tasks notifications generation."""
   def setUp(self):
@@ -86,6 +88,29 @@ class TestWfNotifsGenerator(TestCase):
                                            "cycle_task_due_today",
                                            "cycle_task_overdue",
                                            "cycle_task_declined")
+
+  @ddt.data(("2015-05-01 14:29:00", ("all_cycle_tasks_completed",
+                                     "manual_cycle_created")),
+            ("2015-05-02 07:29:00", ("all_cycle_tasks_completed",
+                                     "manual_cycle_created")),
+            ("2015-05-02 14:29:00", ("all_cycle_tasks_completed",
+                                     "manual_cycle_created")),
+            ("2015-05-03 07:29:00", ("manual_cycle_created",)))
+  @ddt.unpack
+  def test_cycle_task_update_timelines(self, _datetime, notifications):
+    """Test cycle task has been updated:
+    1) the day before job is called;
+    2) the same day job is called before 08:00 AM UTC;
+    3) the same day job is called after 08:00 AM UTC;
+    4) two days before job is called.
+    """
+    with freeze_time("2015-05-01 14:29:00"):
+      # Move task to Finished
+      self.wf_generator.modify_object(
+          self.ctask, data={"status": "Verified"})
+    with freeze_time(_datetime):
+      generate_cycle_tasks_notifs()
+      self.assert_notifications_for_object(self.cycle, *notifications)
 
   def test_ctasks_notifs_generator_daily_digest_called_twice(self):
     """No duplicated notifications should be generated"""
