@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 PROPAGATION_DEPTH_LIMIT = 50
 
 
-def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
+def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True,
+                user_id=None):
   """Get left side of relationships mappings through source."""
   rel_table = all_models.Relationship.__table__
   acl_table = all_models.AccessControlList.__table__
@@ -68,7 +69,7 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
       rel_table.c.id.label("object_id"),
       sa.literal(all_models.Relationship.__name__).label("object_type"),
       sa.func.now().label("created_at"),
-      sa.literal(login.get_current_user_id()).label("modified_by_id"),
+      sa.literal(user_id).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
       acl_table.c.id.label("parent_id_nn"),
@@ -106,7 +107,7 @@ def _rel_parent(parent_acl_ids=None, relationship_ids=None, source=True):
   return select_statement
 
 
-def _rel_child(parent_acl_ids, source=True):
+def _rel_child(parent_acl_ids, source=True, user_id=None):
   """Get left side of relationships mappings through source."""
   rel_table = all_models.Relationship.__table__
   acl_table = all_models.AccessControlList.__table__
@@ -134,7 +135,7 @@ def _rel_child(parent_acl_ids, source=True):
       object_id.label("object_id"),
       object_type.label("object_type"),
       sa.func.now().label("created_at"),
-      sa.literal(login.get_current_user_id()).label("modified_by_id"),
+      sa.literal(user_id).label("modified_by_id"),
       sa.func.now().label("updated_at"),
       acl_table.c.id.label("parent_id"),
       acl_table.c.id.label("parent_id_nn"),
@@ -198,39 +199,41 @@ def _get_child_ids(parent_ids):
   )
 
 
-def _handle_propagation_parents(parent_acl_ids):
+def _handle_propagation_parents(parent_acl_ids, user_id):
   """Propagate ACL records from parent objects to relationships."""
-  src_select = _rel_parent(parent_acl_ids, source=True)
-  dst_select = _rel_parent(parent_acl_ids, source=False)
+  src_select = _rel_parent(parent_acl_ids, source=True, user_id=user_id)
+  dst_select = _rel_parent(parent_acl_ids, source=False, user_id=user_id)
   select_statement = sa.union(src_select, dst_select)
   acl_utils.insert_select_acls(select_statement)
 
 
-def _handle_propagation_children(new_parent_ids):
+def _handle_propagation_children(new_parent_ids, user_id):
   """Propagate ACL records from relationships to child objects."""
-  src_select = _rel_child(new_parent_ids, source=True)
-  dst_select = _rel_child(new_parent_ids, source=False)
+  src_select = _rel_child(new_parent_ids, source=True, user_id=user_id)
+  dst_select = _rel_child(new_parent_ids, source=False, user_id=user_id)
   select_statement = sa.union(src_select, dst_select)
   acl_utils.insert_select_acls(select_statement)
 
 
-def _handle_propagation_rel(relationship_ids, new_acl_ids):
+def _handle_propagation_rel(relationship_ids, new_acl_ids, user_id):
   """Handle propagation for relationship object."""
   src_select = _rel_parent(
       parent_acl_ids=new_acl_ids,
       relationship_ids=relationship_ids,
-      source=True
+      source=True,
+      user_id=user_id,
   )
   dst_select = _rel_parent(
       parent_acl_ids=new_acl_ids,
       relationship_ids=relationship_ids,
-      source=False
+      source=False,
+      user_id=user_id,
   )
   select_statement = sa.union(src_select, dst_select)
   acl_utils.insert_select_acls(select_statement)
 
 
-def _handle_acl_step(parent_acl_ids):
+def _handle_acl_step(parent_acl_ids, user_id):
   """Handle role propagation through relationships.
 
   For handling relationships of type:
@@ -240,31 +243,31 @@ def _handle_acl_step(parent_acl_ids):
   Object (either Assessment, Issue, Document, Comment)
   """
 
-  _handle_propagation_parents(parent_acl_ids)
+  _handle_propagation_parents(parent_acl_ids, user_id)
   new_parent_ids = _get_child_ids(parent_acl_ids)
-  _handle_propagation_children(new_parent_ids)
+  _handle_propagation_children(new_parent_ids, user_id)
 
   return _get_child_ids(new_parent_ids)
 
 
-def _handle_relationship_step(relationship_ids, new_acl_ids):
+def _handle_relationship_step(relationship_ids, new_acl_ids, user_id):
   """Propagate first level or ACLs caused by new relationships."""
 
-  _handle_propagation_rel(relationship_ids, new_acl_ids)
+  _handle_propagation_rel(relationship_ids, new_acl_ids, user_id)
   new_parent_ids = _get_relationship_acl_ids(relationship_ids)
-  _handle_propagation_children(new_parent_ids)
+  _handle_propagation_children(new_parent_ids, user_id)
 
   return _get_child_ids(new_parent_ids)
 
 
-def _propagate(parent_acl_ids):
+def _propagate(parent_acl_ids, user_id):
   """Propagate ACL entries through the entire propagation tree."""
 
   # The following for statement is a replacement for `while True` statement
   # with a safety cutoff limit.
   for _ in range(PROPAGATION_DEPTH_LIMIT):
 
-    child_ids = _handle_acl_step(parent_acl_ids)
+    child_ids = _handle_acl_step(parent_acl_ids, user_id)
 
     count_query = child_ids.alias("counts").count()
     child_id_count = db.session.execute(count_query).scalar()
@@ -281,7 +284,7 @@ def _propagate(parent_acl_ids):
                   "tree for cycles, invalid entries or too deep entries.")
 
 
-def _propagate_relationships(relationship_ids, new_acl_ids):
+def _propagate_relationships(relationship_ids, new_acl_ids, user_id):
   """Start ACL propagation for newly created relationships.
 
   Note this function will only propagate old ACL entries. All newly created
@@ -289,8 +292,8 @@ def _propagate_relationships(relationship_ids, new_acl_ids):
   """
   if not relationship_ids:
     return
-  child_ids = _handle_relationship_step(relationship_ids, new_acl_ids)
-  _propagate(child_ids)
+  child_ids = _handle_relationship_step(relationship_ids, new_acl_ids, user_id)
+  _propagate(child_ids, user_id)
 
 
 def _delete_orphan_acl_entries(deleted_objects):
@@ -362,6 +365,8 @@ def propagate():
 
   _set_empty_base_ids()
 
+  current_user_id = login.get_current_user_id()
+
   # The order of propagation of relationships and other ACLs is important
   # because relationship code excludes other ACLs from propagating.
   if flask.g.new_relationship_ids:
@@ -369,10 +374,11 @@ def propagate():
       _propagate_relationships(
           flask.g.new_relationship_ids,
           flask.g.new_acl_ids,
+          current_user_id,
       )
   if flask.g.new_acl_ids:
     with utils.benchmark("Propagate new ACL entries"):
-      _propagate(flask.g.new_acl_ids)
+      _propagate(flask.g.new_acl_ids, current_user_id)
 
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids

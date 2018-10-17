@@ -44,6 +44,7 @@ class TestPropagation(BaseTestPropagation):
   def setUp(self):
     super(TestPropagation, self).setUp()
     sa.event.remove(Session, "after_flush", acl.after_flush)
+    self.user_id = factories.PersonFactory().id
 
   def tearDown(self):
     sa.event.listen(Session, "after_flush", acl.after_flush)
@@ -74,7 +75,7 @@ class TestPropagation(BaseTestPropagation):
     acl_entries = [acl.id for acl in audit.program._access_control_list]
 
     self.assertEqual(all_models.AccessControlList.query.count(), 7)
-    propagation._handle_acl_step(acl_entries)
+    propagation._handle_acl_step(acl_entries, self.user_id)
     db.session.commit()
     self.assertEqual(all_models.AccessControlList.query.count(), 13)
 
@@ -92,7 +93,7 @@ class TestPropagation(BaseTestPropagation):
 
     acl_id = program.acr_name_acl_map["Program Editors"].id
 
-    child_ids = propagation._handle_acl_step([acl_id])
+    child_ids = propagation._handle_acl_step([acl_id], self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
@@ -122,7 +123,7 @@ class TestPropagation(BaseTestPropagation):
         all_models.AccessControlList.query.count(),
         11  # 5 program roles, 6 audit roles
     )
-    propagation._handle_acl_step(acl_ids)
+    propagation._handle_acl_step(acl_ids, self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
@@ -155,7 +156,7 @@ class TestPropagation(BaseTestPropagation):
                if acl.ac_role.name in propagated_roles]
 
     propagate_acl_ids = acl_ids[:partial_count]
-    propagation._handle_acl_step(propagate_acl_ids)
+    propagation._handle_acl_step(propagate_acl_ids, self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
@@ -185,7 +186,7 @@ class TestPropagation(BaseTestPropagation):
 
     acl_ids = [acl.id for acl in audit.program._access_control_list]
 
-    propagation._propagate(acl_ids)
+    propagation._propagate(acl_ids, self.user_id)
 
     assessment_acls = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.object_type ==
@@ -223,7 +224,11 @@ class TestPropagation(BaseTestPropagation):
           ).id,
       ]
 
-    child_ids = propagation._handle_relationship_step(relationship_ids, [])
+    child_ids = propagation._handle_relationship_step(
+        relationship_ids,
+        [],
+        self.user_id,
+    )
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
@@ -275,7 +280,7 @@ class TestPropagation(BaseTestPropagation):
 
     acl_ids = [acl.id for acl in audit.program._access_control_list]
 
-    propagation._propagate(acl_ids)
+    propagation._propagate(acl_ids, self.user_id)
     self.assertEqual(all_models.AccessControlList.query.count(), 17)
     propagation.propagate_all()
     self.assertEqual(all_models.AccessControlList.query.count(), 25)
@@ -379,7 +384,7 @@ class TestPropagation(BaseTestPropagation):
 
     acl_entry = control._access_control_list[0]
 
-    propagation._propagate([acl_entry.id])
+    propagation._propagate([acl_entry.id], self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
@@ -392,7 +397,7 @@ class TestPropagation(BaseTestPropagation):
         acl for acl in assessment.audit.program._access_control_list
         if acl.ac_role.name == "Program Editors"
     )
-    propagation._propagate([acl_entry.id])
+    propagation._propagate([acl_entry.id], self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
