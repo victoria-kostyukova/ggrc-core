@@ -604,3 +604,14 @@ class TestReviewStatusUpdate(TestCase):
 
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
+  def test_review_status_update(self):
+    """Test updating folder preserves review status"""
+    control = factories.ControlFactory()
+    factories.ReviewFactory(
+        reviewable=control,
+        status=all_models.Review.STATES.REVIEWED,
+    )
+    self.api.put(control, {"folder": factories.random_str()})
+    control = all_models.Control.query.get(control.id)
+    self.assertEqual(control.review.status, all_models.Review.STATES.REVIEWED)

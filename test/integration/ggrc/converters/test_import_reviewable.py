@@ -386,3 +386,25 @@ class TestImportReviewable(TestCase):
         all_models.Review.STATES.UNREVIEWED,
         control.review_status
     )
+
+  def test_change_control_folder(self):
+    """Updating folder via import should not change review status."""
+    control = factories.ControlFactory(title="Control")
+    factories.ReviewFactory(
+        reviewable=control,
+        status=all_models.Review.STATES.REVIEWED,
+    )
+    import_data = OrderedDict(
+        [
+            ("object_type", "Control"),
+            ("Code*", control.slug),
+            ("Folder", factories.random_str())
+        ]
+    )
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+    control = all_models.Control.query.get(control.id)
+    self.assertEqual(
+        all_models.Review.STATES.REVIEWED,
+        control.review_status,
+    )
