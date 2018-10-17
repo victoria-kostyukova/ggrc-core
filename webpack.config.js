@@ -4,8 +4,7 @@
  */
 
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
@@ -22,21 +21,16 @@ const nodeModulesDir = path.resolve(__dirname, 'node_modules');
 const STATIC_FOLDER = '/static/';
 
 module.exports = function (env) {
-  const extractSass = new ExtractTextPlugin({
-    filename: isProd ? '[name].[chunkhash].css' : '[name].css',
-    allChunks: true,
-    // disable: isDev
-  });
   const config = {
+    mode: isProd ? 'production' : 'development',
     context: contextDir,
     entry: {
-      vendor: 'entrypoints/vendor',
       styles: 'entrypoints/styles',
       dashboard: getEntryModules('dashboard'),
       'import': getEntryModules('import'),
       'export': getEntryModules('export'),
       admin: getEntryModules('admin'),
-      login: 'entrypoints/login',
+      login: ['entrypoints/vendor', 'entrypoints/login'],
     },
     output: {
       filename: isProd ? '[name].[chunkhash].js' : '[name].js?[hash]',
@@ -56,13 +50,12 @@ module.exports = function (env) {
           },
         }],
       }, {
-        test: /\.css$/,
-        use: extractSass.extract({
-          fallback: 'style-loader',
-          use: {
-            loader: 'css-loader',
-          },
-        }),
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {loader: 'css-loader', options: {sourceMap: true, importLoaders: 1}},
+          {loader: 'sass-loader', options: {sourceMap: true}},
+        ],
       }, {
         test: /\.(png|jpe?g|gif)$/,
         exclude: /node_modules/,
@@ -90,16 +83,6 @@ module.exports = function (env) {
             name: '[name].[ext]',
           },
         }],
-      }, {
-        test: /\.scss$/,
-        use: extractSass.extract({
-          use: [{
-            loader: 'css-loader',
-          }, {
-            loader: 'sass-loader',
-          }],
-          fallback: 'style-loader',
-        }),
       }, {
         test: require.resolve('jquery'),
         use: [{
@@ -140,7 +123,9 @@ module.exports = function (env) {
       },
     },
     plugins: [
-      extractSass,
+      new MiniCssExtractPlugin({
+        filename: isProd ? '[name].[chunkhash].css' : '[name].css',
+      }),
       new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
@@ -171,30 +156,29 @@ module.exports = function (env) {
   if (isProd) {
     config.plugins = [
       ...config.plugins,
-      new UglifyJSPlugin({
-        sourceMap: true,
-        uglifyOptions: {
-          output: {
-            comments: false,
-            beautify: false,
-          },
-        },
-      }),
       new CleanWebpackPlugin(['./src/ggrc/static/']),
     ];
   }
 
   if (!env || (env && !env.test)) {
-    config.plugins = [
-      ...config.plugins,
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'common',
-        chunks: ['dashboard', 'import', 'export', 'admin'],
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-      }),
-    ];
+    config.optimization = {
+      splitChunks: {
+        cacheGroups: {
+          common: {
+            name: 'common',
+            test: /\.js$/,
+            chunks: (chunk) =>
+              ['dashboard', 'import', 'export', 'admin'].includes(chunk.name),
+          },
+          vendor: {
+            name: 'vendor',
+            chunks: 'initial',
+            test: /node_modules|vendor/,
+            enforce: true,
+          },
+        },
+      },
+    };
   }
 
   if (env && env.debug) {
@@ -213,5 +197,9 @@ module.exports = function (env) {
 };
 
 function getEntryModules(entryName) {
-  return [`entrypoints/${entryName}`, `entrypoints/${entryName}/bootstrap`];
+  return [
+    'entrypoints/vendor',
+    `entrypoints/${entryName}`,
+    `entrypoints/${entryName}/bootstrap`,
+  ];
 }
