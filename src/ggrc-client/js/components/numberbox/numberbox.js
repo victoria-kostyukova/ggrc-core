@@ -55,7 +55,7 @@ export default can.Component.extend({
     validateValue() {
       const validationPattern = this.buildValidationPattern();
 
-      if (!this.attr('value').match(validationPattern)) {
+      if (!(this.attr('value') || '').match(validationPattern)) {
         this.attr('value', '');
       }
     },

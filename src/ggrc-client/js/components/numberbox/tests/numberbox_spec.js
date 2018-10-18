@@ -161,6 +161,16 @@ describe('numberbox component', () => {
         expect(viewModel.attr('value')).toEqual(negativeInt);
       });
     });
+
+    it('should reset value if value is falsly', () => {
+      const falslyValues = [null, undefined];
+
+      falslyValues.forEach((falslyValue) => {
+        viewModel.attr('value', falslyValue);
+        validateValueMethod();
+        expect(viewModel.attr('value')).toEqual('');
+      });
+    });
   });
 
   describe('"buildValidationPattern" method', () => {
