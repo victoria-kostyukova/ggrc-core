@@ -45,7 +45,7 @@ class RelationshipResource(ggrc.services.common.Resource):
     is_snapshot = bool(parent) and child["type"] in snapshot_rules.Types.all
     return parent, child, is_snapshot
 
-  def _get_model_instance(self, src=None, body=None):
+  def _get_model_instance(self, src=None):
     """For Parent and Snapshottable src and dst, create an empty Snapshot."""
     _, _, is_snapshot = self._parse_snapshot_data(src)
 
@@ -53,7 +53,7 @@ class RelationshipResource(ggrc.services.common.Resource):
       obj = Snapshot()
       db.session.add(obj)
       return obj
-    return super(RelationshipResource, self)._get_model_instance(src, body)
+    return super(RelationshipResource, self)._get_model_instance(src)
 
   def json_create(self, obj, src):
     """For Parent and Snapshottable src and dst, fill in the Snapshot obj."""

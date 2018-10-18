@@ -24,7 +24,6 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
 
 import ggrc.builder.json
@@ -898,33 +897,28 @@ class Resource(ModelView):
 
     return src
 
-  def _get_relationships_cache(self, body):
-    cache = getattr(self, "_relationship_cache", None)
-    if cache is not None:
-      return cache
-    relationships = self.model.query.filter(tuple_(
-        self.model.source_id, self.model.source_type,
-        self.model.destination_id, self.model.destination_type).in_((
-            src["relationship"]["source"].get("id", -1),
-            src["relationship"]["source"].get("type"),
-            src["relationship"]["destination"].get("id", -1),
-            src["relationship"]["destination"].get("type")
-        ) for src in body)
-    )
+  def _get_relationship(self, src):
+    relationship = self.model.query.filter(
+        self.model.source_id == src["source"]["id"],
+        self.model.source_type == src["source"]["type"],
+        self.model.destination_id == src["destination"]["id"],
+        self.model.destination_type == src["destination"]["type"]
+    ).first()
+    if relationship:
+      # Manually trigger relationship update in order for revisions and
+      # event being created. We expect positive response when POSTing
+      # an existing relationship.
+      logger.info(
+          "The relationship between %s %s and %s %s is already exist.",
+          src["source"]["type"],
+          src["source"]["id"],
+          src["destination"]["type"],
+          src["destination"]["id"],
+      )
+      relationship.updated_at = datetime.datetime.utcnow()
+    return relationship
 
-    cache = {
-        (
-            relationship.source_id,
-            relationship.source_type,
-            relationship.destination_id,
-            relationship.destination_type,
-        ): relationship
-        for relationship in relationships
-    }
-    setattr(self, "_relationship_cache", cache)
-    return cache
-
-  def _get_model_instance(self, src=None, body=None):
+  def _get_model_instance(self, src=None):
     """Get a model instance.
 
     This function creates a new model instance and returns it. The function is
@@ -941,24 +935,7 @@ class Resource(ModelView):
 
     obj = None
     if self.model.__name__ == "Relationship":
-      obj = self._get_relationships_cache(body).get((
-          src["source"]["id"],
-          src["source"]["type"],
-          src["destination"]["id"],
-          src["destination"]["type"]
-      ))
-      if obj:
-        # Manually trigger relationship update in order for revisions and
-        # event being created. We expect positive response when POSTing
-        # an existing relationship.
-        logger.info(
-            "The relationship between %s %s and %s %s is already exist.",
-            src["source"]["type"],
-            src["source"]["id"],
-            src["destination"]["type"],
-            src["destination"]["id"],
-        )
-        obj.updated_at = datetime.datetime.utcnow()
+      obj = self._get_relationship(src)
     if obj is None:
       obj = self.model()
       db.session.add(obj)
@@ -1017,7 +994,7 @@ class Resource(ModelView):
       sources = []
       for wrapped_src in body:
         src = self._unwrap_collection_post_src(wrapped_src)
-        obj = self._get_model_instance(src, body)
+        obj = self._get_model_instance(src)
         with benchmark("Deserialize object"):
           self.json_create(obj, src)
         with benchmark("Send model POSTed event"):
