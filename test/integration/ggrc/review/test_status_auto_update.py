@@ -132,6 +132,44 @@ class TestReviewStatusUpdate(TestCase):
     review = all_models.Review.query.get(review_id)
     self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
 
+  def test_update_gca(self):
+    """if existing GCA value of reviewable is changed review -> unreviewed"""
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(
+          definition_type="control",
+          title="rich_test_gca",
+          attribute_type="Rich Text"
+      )
+      control = factories.ControlFactory()
+
+      control.custom_attribute_values = [{
+          "attribute_value": "starting_value",
+          "custom_attribute_id": gca.id
+      }]
+      review = factories.ReviewFactory(
+          status=all_models.Review.STATES.REVIEWED, reviewable=control
+      )
+    review_id = review.id
+    reviewable = review.reviewable
+
+    review = all_models.Review.query.get(review_id)
+
+    self.assertEqual(review.status, all_models.Review.STATES.REVIEWED)
+
+    self.api.modify_object(
+        reviewable, {
+            "custom_attribute_values":
+            [{
+                "custom_attribute_id": gca.id,
+                "attribute_value": "new_value",
+            }],
+        }
+    )
+
+    review = all_models.Review.query.get(review_id)
+    self.assertEqual(review.status, all_models.Review.STATES.UNREVIEWED)
+
   def test_reference_url(self):
     """If reference url is updated state should not updated"""
     with factories.single_commit():
