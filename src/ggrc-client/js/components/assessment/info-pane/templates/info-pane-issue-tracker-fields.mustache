@@ -106,14 +106,13 @@
   </div>
   <div class="ggrc-form-item__multiple-row">
     <!-- use "inline-edit-control" to save styles... -->
-    <inline-edit-control>
+    <inline-edit-control {value}="instance.issue_tracker.issue_type">
       <div class="inline">
         <base-inline-control-title
           class="inline__header"
           is-edit-icon-denied="true">
             <div class="ggrc-form__title">Ticket Type</div>
         </base-inline-control-title>
-        <span>{{instance.issue_tracker.issue_type}}</span>
       </div>
     </inline-edit-control>
   </div>
