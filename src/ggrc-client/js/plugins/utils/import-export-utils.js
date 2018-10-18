@@ -17,6 +17,9 @@ export const jobStatuses = {
   FINISHED: 'Finished',
 };
 
+export const PRIMARY_TIMEOUT = 2000;
+export const SECONDARY_TIMEOUT = 5000;
+
 export const isStoppedJob = (jobStatus) => {
   return [jobStatuses.BLOCKED, jobStatuses.ANALYSIS_FAILED].includes(jobStatus);
 };
