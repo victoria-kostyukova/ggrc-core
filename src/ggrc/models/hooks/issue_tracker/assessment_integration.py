@@ -871,6 +871,8 @@ def prepare_issue_json(assessment, issue_tracker_info=None,
     grouped_ccs = group_cc_emails(audit_ccs, cc_list)
     if grouped_ccs:
       issue_params['ccs'] = grouped_ccs
+    else:
+      issue_params['ccs'] = []
 
   return issue_params
 
