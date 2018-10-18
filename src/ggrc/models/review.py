@@ -125,11 +125,10 @@ class Reviewable(rest_handable.WithPutHandable,
 
   def _update_status_on_custom_attrs(self):
     """Update review status when reviewable custom attrs are changed"""
-    from ggrc.models import all_models
     if not hasattr(self, "custom_attribute_values"):
       return
     if (self.review and
-            self.review.status != all_models.Review.STATES.UNREVIEWED):
+            self.review.status != Review.STATES.UNREVIEWED):
       if self._has_custom_attr_changes():
         self._set_review_status_unreviewed()
 
