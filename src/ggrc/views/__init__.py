@@ -218,7 +218,10 @@ def run_issues_update(task):
     from ggrc.integrations import issuetracker_bulk_sync
     bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
     params = getattr(task, "parameters", {})
-    return bulk_updater.sync_issuetracker(params.get("objects"))
+    return bulk_updater.sync_issuetracker(
+        params.get("objects"),
+        create_issuetracker=False
+    )
   except integrations_errors.Error as error:
     logger.error('Bulk issue update failed with error: %s', error.message)
     raise exceptions.BadRequest(error.message)
