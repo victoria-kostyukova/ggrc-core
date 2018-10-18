@@ -196,18 +196,11 @@ class TestExternalPermissions(TestCase):
   def test_post_invalid_modifier(self, email):
     """Test that validation is working for X-external-user."""
     model = all_models.Market
-    headers = {
-        "Content-Type": "application/json",
-        "X-requested-by": "GGRC",
-        "X-appengine-inbound-appid": self.allowed_appid,
-        "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
-        "X-external-user": email
-    }
+    self.headers["X-external-user"] = email
 
     model_plural = model._inflector.table_plural
     model_singular = model._inflector.table_singular
     with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      self.client.get("/login", headers=headers)
       response = self._post(
           "api/{}".format(model_plural),
           data=json.dumps({
@@ -216,5 +209,5 @@ class TestExternalPermissions(TestCase):
                   "context": 0
               }
           }),
-          headers=headers)
+          headers=self.headers)
       self.assertEqual(response.status_code, 400)
