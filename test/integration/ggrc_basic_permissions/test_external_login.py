@@ -21,6 +21,8 @@ class TestExternalPermissions(TestCase):
 
   def setUp(self):
     """Set up request mock and mock dependencies."""
+    super(TestExternalPermissions, self).setUp()
+    self.clear_data()
     self.allowed_appid = "ggrcq-id"
     self.settings_patcher = mock.patch("ggrc.login.appengine.settings")
     self.settings_mock = self.settings_patcher.start()
