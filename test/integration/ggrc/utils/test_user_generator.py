@@ -86,6 +86,7 @@ class TestUserGenerator(TestCase):
 
       roles = UserRole.query.filter_by(person_id=user.id)
       self.assertEqual(roles.count(), 1)
+      self.assertEqual(response.json[0][1]['person']['id'], user.id)
 
     # checks person profile was created successfully
     self.assert_profiles_restrictions()

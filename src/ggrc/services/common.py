@@ -1092,7 +1092,9 @@ class Resource(ModelView):
         if ext_flags_passed == {True}:
           from ggrc.utils import user_generator
           created_people = []
+          created_people_response = []
           any_created = False
+
           for obj in body:
             person_json = obj.get("person")
             person = user_generator.find_or_create_external_user(
@@ -1100,19 +1102,25 @@ class Resource(ModelView):
                 person_json["name"],
             )
             if person:
-              response_part = (201, self.object_for_json(person))
               any_created = True
-            else:
-              response_part = (400, {"Failed": True})
-            created_people.append(response_part)
+            created_people.append(person)
 
           if any_created:
             with benchmark("person collection commit"):
               log_event(db.session)
               db.session.commit()
-            return self.json_success_response(created_people)
+
+          for person in created_people:
+            if person:
+              response_part = (201, self.object_for_json(person))
+            else:
+              response_part = (400, {"Failed": True})
+            created_people_response.append(response_part)
+
+          if any_created:
+            return self.json_success_response(created_people_response)
           return current_app.make_response(
-              (self.as_json(created_people),
+              (self.as_json(created_people_response),
                400,
                [("Content-type", "text/plain")]),
           )
