@@ -240,7 +240,7 @@ class Document(Roleable, Relatable, mixins.Titled,
         parent_folder_id = self._get_folder(parent)
         self.add_gdrive_file_folder(parent_folder_id)
       self._build_relationship(parent)
-      self._parent_obj = None
+      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
     elif (self.kind == Document.FILE and
           self.source_gdrive_id and not self.link):
       self.gdrive_id = self.source_gdrive_id

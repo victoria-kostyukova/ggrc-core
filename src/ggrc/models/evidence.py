@@ -161,6 +161,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   @simple_property
   def parent_obj(self):
+    """Getter for local parent object property."""
     # pylint: disable=attribute-defined-outside-init
     return self._parent_obj
 
@@ -237,7 +238,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       if self.kind == Evidence.FILE and self.source_gdrive_id:
         self.exec_gdrive_file_copy_flow(parent)
       self._build_relationship(parent)
-      self._parent_obj = None
+      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
 
   def exec_gdrive_file_copy_flow(self, parent):
     """Execute google gdrive file copy flow

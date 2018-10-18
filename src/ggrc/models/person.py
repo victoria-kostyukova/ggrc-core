@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module with Person model definition."""
+
 import re
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import relationship
@@ -24,6 +26,7 @@ from ggrc.models.person_profile import PersonProfile
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
              Relatable, base.ContextRBAC, Base, Indexed, db.Model):
+  """Person model definition."""
 
   def __init__(self, *args, **kwargs):
     """Initialize profile relationship while creating Person instance"""
@@ -104,10 +107,11 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @classmethod
   def _filter_by_user_role(cls, predicate):
+    """Custom filter by user roles."""
     from ggrc_basic_permissions.models import Role, UserRole
     return UserRole.query.join(Role).filter(
         (UserRole.person_id == cls.id) &
-        (UserRole.context_id == None) &  # noqa
+        (UserRole.context_id.is_(None)) &  # noqa
         predicate(Role.name)
     ).exists()
 
@@ -138,6 +142,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @validates('email')
   def validate_email(self, _, email):
+    """Email property validator."""
     if not Person.is_valid_email(email):
       message = "Email address '{}' is invalid. Valid email must be provided"
       raise ValidationError(message.format(email))
@@ -145,8 +150,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @staticmethod
   def is_valid_email(val):
-    # Borrowed from Django
-    # literal form, ipv4 address (SMTP 4.1.3)
+    """Check for valid email.
+
+    Borrowed from Django. Literal form, ipv4 address (SMTP 4.1.3).
+    """
     email_re = re.compile(
         r'^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$',
         re.IGNORECASE)
@@ -183,8 +190,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     the system-wide context, it shows the highest ranked one (if there are
     multiple) or "No Access" if there are none.
     """
-    # FIXME: This method should be in `ggrc_basic_permissions`, since it
-    #   depends on `Role` and `UserRole` objects
 
     if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return SystemWideRoles.SUPERUSER

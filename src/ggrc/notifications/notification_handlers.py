@@ -331,6 +331,7 @@ def _recipients_changed(history):
 
 
 def handle_assignable_created(objects):
+  """Handler for new assignable objects."""
   names = ["{}_open".format(obj._inflector.table_singular) for obj in objects]
   notif_types = models.NotificationType.query.filter(
       models.NotificationType.name.in_(set(names))
@@ -430,12 +431,14 @@ def register_handlers():  # noqa: C901
 
   @signals.Restful.model_put.connect_via(models.Assessment)
   def assessment_send_reminder(sender, obj=None, src=None, service=None):
+    """Assessment put listener."""
     reminder_type = src.get("reminderType", False)
     if reminder_type:
       handle_reminder(obj, reminder_type)
 
   @signals.Restful.collection_posted.connect_via(models.Comment)
   def comment_created_listener(sender, objects=None, sources=None, **kwargs):
+    """Listener for comments posted."""
     for obj, src in izip(objects, sources):
       handle_comment_created(obj, src)
 
@@ -443,4 +446,5 @@ def register_handlers():  # noqa: C901
   @signals.Restful.model_put.connect_via(models.Relationship)
   @signals.Restful.model_deleted.connect_via(models.Relationship)
   def relationship_altered_listener(sender, obj=None, src=None, service=None):
+    """Listener for modified relationships."""
     handle_relationship_altered(obj)

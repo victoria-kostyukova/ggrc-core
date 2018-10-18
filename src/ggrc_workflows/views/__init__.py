@@ -31,6 +31,7 @@ logger = getLogger(__name__)
 
 
 def get_user_task_count():
+  """Optimized function for fetching current user task count."""
   with benchmark("Get user task count RAW"):
     current_user = get_current_user()
 
