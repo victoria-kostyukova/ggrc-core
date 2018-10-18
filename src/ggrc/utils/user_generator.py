@@ -54,7 +54,7 @@ def add_creator_role(user, **kwargs):
       role=basic_roles.creator(),
       **kwargs
   )
-  flask.g.user_creator_roles_cache[user.email] = user
+  flask.g.user_creator_roles_cache[user.email] = user_creator_role
   db.session.add(user_creator_role)
 
 
