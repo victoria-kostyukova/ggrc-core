@@ -6,8 +6,7 @@
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const FileManagerPlugin = require('filemanager-webpack-plugin');
 const path = require('path');
 const getReleaseNotesDate = require('./getReleaseNotesDate.js');
 const ENV = process.env;
@@ -144,8 +143,13 @@ module.exports = function (env) {
       new ManifestPlugin({
         publicPath: STATIC_FOLDER,
       }),
-      new WebpackShellPlugin({
-        onBuildEnd: ['cp src/ggrc/static/manifest.json src/ggrc/manifest.json'],
+      new FileManagerPlugin({
+        onEnd: {
+          copy: [{
+            source: './src/ggrc/static/manifest.json',
+            destination: './src/ggrc/manifest.json',
+          }],
+        },
       }),
     ],
     stats: {
@@ -156,7 +160,13 @@ module.exports = function (env) {
   if (isProd) {
     config.plugins = [
       ...config.plugins,
-      new CleanWebpackPlugin(['./src/ggrc/static/']),
+      new FileManagerPlugin({
+        onStart: {
+          'delete': [
+            './src/ggrc/static/',
+          ],
+        },
+      }),
     ];
   }
 
