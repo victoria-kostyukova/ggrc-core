@@ -10,14 +10,14 @@ import json
 import flask_login
 from flask import url_for, redirect, request, session, g, flash
 
-from ggrc import db
-from ggrc.utils.log_event import log_event
+from ggrc.login import common
 
 default_user_name = 'Example User'
 default_user_email = 'user@example.com'
 
 
 def get_user():
+  """Gets current user from the request headers."""
   if 'X-ggrc-user' in request.headers:
     json_user = json.loads(request.headers['X-ggrc-user'])
     email = json_user.get('email', default_user_email)
@@ -41,12 +41,10 @@ def before_request(*args, **kwargs):
 
 
 def login():
+  """Logs in current user."""
   from ggrc.login.common import get_next_url
   db_user = get_user()
-  if db_user.id is None:
-    db.session.flush()
-    log_event(db.session, db_user, db_user.id)
-    db.session.commit()
+  common.commit_user_and_role(db_user)
   if db_user.system_wide_role != 'No Access':
     flask_login.login_user(db_user)
     return redirect(get_next_url(request, default_url=url_for('dashboard')))

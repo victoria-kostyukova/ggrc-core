@@ -45,10 +45,7 @@ def get_user():
 def login():
   """Log in current user."""
   user = get_user()
-  if user.id is None:
-    db.session.flush()
-    log_event(db.session, user, user.id)
-    db.session.commit()
+  common.commit_user_and_role(user)
   if user.system_wide_role != 'No Access':
     flask_login.login_user(user)
     return flask.redirect(common.get_next_url(
