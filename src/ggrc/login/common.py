@@ -29,7 +29,8 @@ def commit_user_and_role(user):
     db.session.flush()
     if db_user:
       log_event(db.session, db_user, db_user.id, flush=False)
-    if db_role and not db_user:
-      # log_event of user includes event of role creation
-      log_event(db.session, db_role, flush=False)
+    elif db_role:
+      # log_event of user includes event of role creation.
+      # if no user in cache, then it was created before but has no role.
+      log_event(db.session, db_role, user.id, flush=False)
     db.session.commit()
