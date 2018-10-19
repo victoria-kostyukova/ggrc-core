@@ -156,10 +156,12 @@ describe('GGRC Utils Widgets', function () {
     let method;
     let queryDfd;
     let getCounts;
+    let snapshotCountsDfd;
     let id = 1;
 
     beforeEach(function () {
       queryDfd = can.Deferred();
+      snapshotCountsDfd = can.Deferred();
       method = WidgetsUtils.initCounts;
       getCounts = WidgetsUtils.getCounts;
 
@@ -187,6 +189,9 @@ describe('GGRC Utils Widgets', function () {
 
       spyOn($.when, 'apply')
         .and.returnValue(queryDfd);
+
+      spyOn(SnapshotUtils, 'getSnapshotsCounts')
+        .and.returnValue(snapshotCountsDfd);
     });
 
     it('should not make request when no widget was provided', function () {
@@ -195,55 +200,59 @@ describe('GGRC Utils Widgets', function () {
       expect(QueryAPI.batchRequests).not.toHaveBeenCalled();
     });
 
-    it('should init counts for snapshotable objects', function () {
+    it('should init counts for snapshotable objects', async function (done) {
       let result;
 
-      method(['Control'], 'Assessment', 1);
+      queryDfd.resolve();
+      snapshotCountsDfd.resolve({
+        Control: 11,
+      });
 
-      expect(QueryAPI.batchRequests)
-        .toHaveBeenCalledWith({
-          type: 'count',
-          objectName: 'Snapshot',
+      await method(['Control'], 'Assessment', 1);
+
+      result = getCounts();
+      expect(result.Control).toEqual(11);
+      done();
+    });
+
+    it('should init counts for non-snapshotable objects',
+      async function (done) {
+        let result;
+
+        queryDfd.resolve({
+          Assessment: {
+            total: 10,
+          },
         });
+        snapshotCountsDfd.resolve({});
+
+        await method(['Assessment'], 'Control', 1);
+
+        expect(QueryAPI.batchRequests)
+          .toHaveBeenCalledWith({
+            type: 'count',
+            objectName: 'Assessment',
+          }
+          );
+
+        result = getCounts();
+
+        expect(result.Assessment).toEqual(10);
+
+        done();
+      });
+
+    it('should init counts for virtual objects', async function (done) {
+      let result;
 
       queryDfd.resolve({
-        Snapshot: {
+        Cycle: {
           total: 10,
         },
       });
+      snapshotCountsDfd.resolve({});
 
-      result = getCounts();
-
-      expect(result.Control).toEqual(10);
-    });
-
-    it('should init counts for non-snapshotable objects', function () {
-      let result;
-
-      method(['Assessment'], 'Control', 1);
-
-      expect(QueryAPI.batchRequests)
-        .toHaveBeenCalledWith({
-          type: 'count',
-          objectName: 'Assessment',
-        }
-        );
-
-      queryDfd.resolve({
-        Assessment: {
-          total: 10,
-        },
-      });
-
-      result = getCounts();
-
-      expect(result.Assessment).toEqual(10);
-    });
-
-    it('should init counts for virtual objects', function () {
-      let result;
-
-      method([{
+      await method([{
         name: 'Cycle',
         countsName: 'ActiveCycle',
       }], 'Control', 1);
@@ -254,15 +263,11 @@ describe('GGRC Utils Widgets', function () {
           objectName: 'Cycle',
         });
 
-      queryDfd.resolve({
-        Cycle: {
-          total: 10,
-        },
-      });
-
       result = getCounts();
 
       expect(result.ActiveCycle).toEqual(10);
+
+      done();
     });
   });
 
