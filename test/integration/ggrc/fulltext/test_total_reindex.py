@@ -97,22 +97,30 @@ class TestTotalReindex(TestCase):
 
   def test_simple_reindex(self):
     """Test for check simple reindex procedure."""
+    self.client.get("/login")
+    # Hack to index the person object that we do not delete between different
+    # tests.
+    self.client.post("/admin/full_reindex")
+
     with ggrc_factories.single_commit():
       for factory in self.INDEXED_MODEL_FACTORIES:
         for _ in range(3):
           factory()
     indexer = fulltext.get_indexer()
     count = indexer.record_type.query.filter(
-        MysqlRecordProperty.type != "AccessControlRole"
+        MysqlRecordProperty.type != "Context"
     ).count()
     indexer.record_type.query.delete()
+    self.assertNotEqual(count, 0)
+    db.session.commit()
+    self.assertEqual(indexer.record_type.query.count(), 0)
     self.client.get("/login")
     self.client.post("/admin/full_reindex")
 
     # ACR roles are created in migration and aren't removed in setup
     # Index for them will be created only after reindexing
     reindexed_count = indexer.record_type.query.filter(
-        MysqlRecordProperty.type != "AccessControlRole"
+        MysqlRecordProperty.type != "Context"
     ).count()
     self.assertEqual(count, reindexed_count)
 
