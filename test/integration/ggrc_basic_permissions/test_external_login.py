@@ -9,42 +9,47 @@ import ddt
 import mock
 
 from ggrc.models import all_models
+from ggrc import settings
 
-from ggrc.integrations.client import PersonClient
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 
+def _mock_post(*args, **kwargs):
+  """IntegrationService post mock."""
+  # pylint: disable=unused-argument
+  res = []
+  for name in kwargs["payload"]["usernames"]:
+    res.append({'firstName': name, 'lastName': name, 'username': name})
+  return {'persons': res}
+
+
 @ddt.ddt
+@mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id')
+@mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+@mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+@mock.patch('ggrc.integrations.client.PersonClient._post', _mock_post)
 class TestExternalPermissions(TestCase):
   """Tests for external permissions and modified by."""
+  _external_app_user = ''
 
   def setUp(self):
     """Set up request mock and mock dependencies."""
     super(TestExternalPermissions, self).setUp()
+    self._external_app_user = settings.EXTERNAL_APP_USER
+    settings.EXTERNAL_APP_USER = 'External App <external_app@example.com>'
     self.clear_data()
-    self.allowed_appid = "ggrcq-id"
-    self.settings_patcher = mock.patch("ggrc.login.appengine.settings")
-    self.settings_mock = self.settings_patcher.start()
-    self.settings_mock.ALLOWED_QUERYAPI_APP_IDS = [self.allowed_appid]
     self.headers = {
         "Content-Type": "application/json",
         "X-requested-by": "GGRC",
-        "X-appengine-inbound-appid": self.allowed_appid,
+        "X-appengine-inbound-appid": "ggrcq-id",
         "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
         "X-external-user": json.dumps({"email": "new_ext_user@example.com"})
     }
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      self.client.get("/login", headers=self.headers)
+    self.client.get("/login", headers=self.headers)
 
-  @staticmethod
-  def _mock_post(*args, **kwargs):
-    """IntegrationService post mock."""
-    # pylint: disable=unused-argument
-    res = []
-    for name in kwargs["payload"]["usernames"]:
-      res.append({'firstName': name, 'lastName': name, 'username': name})
-    return {'persons': res}
+  def tearDown(self):
+    settings.EXTERNAL_APP_USER = self._external_app_user
 
   def _post(self, url, data, headers):
     return self.client.post(
@@ -83,23 +88,20 @@ class TestExternalPermissions(TestCase):
   ]
 
   @ddt.data(*MODELS)
-  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   def test_post_modifier(self, model):
     """Test modifier of models when working as external user."""
     model_plural = model._inflector.table_plural
     model_singular = model._inflector.table_singular
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      response = self._post(
-          "api/{}".format(model_plural),
-          data=json.dumps({
-              model_singular: {
-                  "title": "{}1".format(model_singular),
-                  "context": 0
-              }
-          }),
-          headers=self.headers)
-      self.assertEqual(response.status_code, 201)
+    response = self._post(
+        "api/{}".format(model_plural),
+        data=json.dumps({
+            model_singular: {
+                "title": "{}1".format(model_singular),
+                "context": 0
+            }
+        }),
+        headers=self.headers)
+    self.assertEqual(response.status_code, 201)
 
     ext_person = all_models.Person.query.filter_by(
         email="new_ext_user@example.com"
@@ -122,8 +124,6 @@ class TestExternalPermissions(TestCase):
         all_models.Event.id.desc()).first()
     self.assertEqual(event.modified_by_id, ext_person_id)
 
-  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   def test_relationship_creation(self):
     """Test external relationship post on behalf of external user."""
     destination = factories.SystemFactory()
@@ -138,12 +138,11 @@ class TestExternalPermissions(TestCase):
             "is_external": True
         }
     }])
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      response = self._post(
-          "/api/relationships",
-          data=relationship_data,
-          headers=self.headers)
-      self.assert200(response)
+    response = self._post(
+        "/api/relationships",
+        data=relationship_data,
+        headers=self.headers)
+    self.assert200(response)
 
     ext_person = all_models.Person.query.filter_by(
         email="new_ext_user@example.com"
@@ -163,36 +162,30 @@ class TestExternalPermissions(TestCase):
     self.assertIsNone(relationship.context_id)
 
     # check that POST on creation of existing relation return 200 code
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      response = self._post(
-          "/api/relationships",
-          data=relationship_data,
-          headers=self.headers)
-      self.assert200(response)
+    response = self._post(
+        "/api/relationships",
+        data=relationship_data,
+        headers=self.headers)
+    self.assert200(response)
 
-  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   def test_external_user_creation(self):
     """Test creation of external user and its role."""
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      response = self._post(
-          "api/{}".format("markets"),
-          data=json.dumps({
-              "market": {
-                  "title": "some market",
-                  "context": 0
-              }
-          }),
-          headers=self.headers)
-      self.assertEqual(response.status_code, 201)
+    response = self._post(
+        "api/{}".format("markets"),
+        data=json.dumps({
+            "market": {
+                "title": "some market",
+                "context": 0
+            }
+        }),
+        headers=self.headers)
+    self.assertEqual(response.status_code, 201)
 
     ext_person = all_models.Person.query.filter_by(
         email="new_ext_user@example.com"
     ).first()
     self.assertEqual(ext_person.system_wide_role, "Creator")
 
-  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   @ddt.data("new_ext_user@example.com",
             json.dumps({"email": "external_app"}))
   def test_post_invalid_modifier(self, email):
@@ -202,14 +195,13 @@ class TestExternalPermissions(TestCase):
 
     model_plural = model._inflector.table_plural
     model_singular = model._inflector.table_singular
-    with mock.patch.multiple(PersonClient, _post=self._mock_post):
-      response = self._post(
-          "api/{}".format(model_plural),
-          data=json.dumps({
-              model_singular: {
-                  "title": "{}_invalid_1".format(model_singular),
-                  "context": 0
-              }
-          }),
-          headers=self.headers)
-      self.assertEqual(response.status_code, 400)
+    response = self._post(
+        "api/{}".format(model_plural),
+        data=json.dumps({
+            model_singular: {
+                "title": "{}_invalid_1".format(model_singular),
+                "context": 0
+            }
+        }),
+        headers=self.headers)
+    self.assertEqual(response.status_code, 400)
