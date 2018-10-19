@@ -1,9 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Conversions from UI dicts to App entities."""
-import datetime
-
 from lib.entities import app_entity_factory
+from lib.utils import date_utils
 
 
 def ui_to_app(obj_name, ui_dict):
@@ -58,4 +57,4 @@ def email_to_app_person(email):
 
 def str_to_date(date_str):
   """Converts date string to the date object."""
-  return datetime.datetime.strptime(date_str, "%m/%d/%Y").date()
+  return date_utils.str_to_date(date_str, "%m/%d/%Y")

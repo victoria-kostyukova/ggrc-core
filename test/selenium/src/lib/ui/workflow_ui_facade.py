@@ -72,3 +72,12 @@ def activate_workflow(workflow):
   setup_tab = workflow_tabs.SetupTab()
   setup_tab.open_via_url(workflow)
   workflow_page.WorkflowPage().activate_workflow()
+
+
+def get_workflow_cycles(workflow):
+  """Builds and returns a tree of workflow cycles / cycle task groups
+  / cycle tasks.
+  """
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_via_url(workflow)
+  return active_cycles_tab.get_workflow_cycles()

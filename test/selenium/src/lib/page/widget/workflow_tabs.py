@@ -2,28 +2,61 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow top tabs."""
 from lib.page.modal import object_mapper
-from lib.page.widget import tree_widget, task_group_info_panel, object_modal
-from lib.ui import internal_ui_operations
+from lib.page.widget import (
+    task_group_info_panel, object_modal, workflow_tree_widgets, object_page)
 from lib.utils import test_utils
 
 
-class SetupTab(object):
-  """Setup tab."""
-
-  def __init__(self):
-    self._task_group_tree = TaskGroupTree()
+class ActiveCyclesTab(object_page.ObjectPage):
+  """Active Cycles tab."""
 
   @staticmethod
-  def open_via_url(workflow):
-    """Opens Setup tab via URL."""
-    internal_ui_operations.open_obj_tab_via_url(workflow, "task_group")
+  def _url_fragment():
+    """See superclass."""
+    return "current"
+
+  @property
+  def _tree_widget(self):
+    """Returns tree widget with active cycles."""
+    return workflow_tree_widgets.WorkflowCycleTreeWidget(
+        container=self._browser.section(id=self._url_fragment()))
+
+  def get_workflow_cycles(self):
+    """Expands the tree, then builds and returns a list of WorkflowCycle entity
+    objects.
+    """
+    workflow_cycles = []
+    for workflow_cycle_row in self._tree_widget.workflow_cycle_rows():
+      workflow_cycle_row.expand()
+      for cycle_task_group_row in workflow_cycle_row.cycle_task_group_rows():
+        cycle_task_group_row.expand()
+      workflow_cycles.append(workflow_cycle_row.build_obj_with_tree())
+    return workflow_cycles
+
+
+class SetupTab(object_page.ObjectPage):
+  """Setup tab."""
+
+  @staticmethod
+  def _url_fragment():
+    """See superclass."""
+    return "task_group"
+
+  @property
+  def _task_group_tree(self):
+    """Returns tree widget with task groups."""
+    return workflow_tree_widgets.SetupTaskGroupTree(
+        container=self._browser.section(id=self._url_fragment()))
 
   def wait_to_be_init(self):
-    """Wait for page to be fully initialized."""
+    """Waits for page to be fully initialized."""
+    rows = self.task_group_rows()
+
     def is_assignee_set():
       """Assignee column is one of the last places to be init on the page."""
-      return self.task_group_rows()[-1].text_for_header("Assignee") != ""
-    test_utils.wait_for(is_assignee_set)
+      return rows[-1].text_for_header("Assignee") != ""
+    if rows:
+      test_utils.wait_for(is_assignee_set)
 
   def open_task_group(self, task_group):
     """Opens task group."""
@@ -67,21 +100,3 @@ class SetupTab(object):
     panel = task_group_info_panel.TaskGroupInfoPanel()
     panel.wait_to_be_init()
     return panel
-
-
-class TaskGroupTree(tree_widget.TreeWidget):
-  """Represents tree of TaskGroups."""
-
-  def __init__(self):
-    super(TaskGroupTree, self).__init__(table_row_cls=TaskGroupTreeItem)
-
-
-class TaskGroupTreeItem(tree_widget.TreeItem):
-  """Represents a row of task group."""
-
-  def __init__(self, row_el, table_header_names):
-    super(TaskGroupTreeItem, self).__init__(
-        row_el=row_el,
-        table_header_names=table_header_names,
-        header_attr_mapping={"Summary": "title"}
-    )

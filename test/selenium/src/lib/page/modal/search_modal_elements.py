@@ -31,7 +31,16 @@ class SearchFilterArea(object):
     improved when tests that use these features will be added.
     """
     filter_row = self._root.element(class_name="filter-container__attribute")
+    title = self._escape_filter_string(title)
     filter_row.text_field(name="right").set(title)
+
+  @staticmethod
+  def _escape_filter_string(str_to_escape):
+    """Returns an escaped string for searching.
+    Some special symbols should be escaped (GGRC-3004).
+    """
+    backslash = "\\"
+    return str_to_escape.replace(backslash, backslash + backslash)
 
   def _click_search(self):
     """Clicks `Search` button."""
@@ -74,6 +83,7 @@ class _SearchResultRow(object):
   """Represents a search result item in object mapper."""
 
   def __init__(self, container, table_header_names):
+    self._root = container
     self._table_row = table_with_headers.TableRow(
         container=container,
         table_header_names=table_header_names,
@@ -86,5 +96,5 @@ class _SearchResultRow(object):
 
   def select(self):
     """Selects search result for mapping."""
-    self._table_row.root.element(
+    self._root.element(
         tag_name="object-selection-item").checkbox().set()

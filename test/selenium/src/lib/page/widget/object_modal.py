@@ -9,6 +9,7 @@ from lib import base
 from lib.entities import entity
 from lib.page.modal import unified_mapper, delete_object
 from lib.page.widget import page_elements
+from lib.utils import ui_utils
 
 
 def get_modal_obj(obj_type, _selenium=None):
@@ -81,7 +82,7 @@ class BaseObjectModal(base.WithBrowser):
     # Spinner sometimes appears for loading content after modal is closed.
     # Though it's not a responsibility of modal to wait for it, it looks
     # to be safe as long as implementation is general.
-    self._browser.element(class_name="spinner").wait_until_not_present()
+    ui_utils.wait_for_spinner_to_disappear()
 
   def set_title(self, title):
     """Sets title."""

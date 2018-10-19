@@ -111,3 +111,11 @@ class TestActivateWorkflow(base.Test):
     """Test History tab after activation of workflow."""
     # pylint: disable=invalid-name
     assert "History (0)" in object_page.ObjectPage().top_tabs.tab_names
+
+  def test_active_cycles_task_tree(self, activate_workflow, app_workflow):
+    """Test active cycles tree."""
+    workflow_cycles = workflow_ui_facade.get_workflow_cycles(
+        app_workflow)
+    expected_workflow_cycle = app_entity_factory.WorkflowCycleFactory(
+    ).create_from_workflow(app_workflow)
+    test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])

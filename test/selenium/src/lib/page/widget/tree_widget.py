@@ -1,18 +1,18 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tree view."""
+import inflection
 
-from lib import base
 from lib.page.widget import table_with_headers
 from lib.utils import test_utils
 
 
-class TreeWidget(base.WithBrowser):
+class TreeWidget(object):
   """Tree widget."""
 
-  def __init__(self, table_row_cls=None):
+  def __init__(self, container, table_row_cls=None):
     super(TreeWidget, self).__init__()
-    self._root = self._browser
+    self._root = container
     if table_row_cls:
       self._table_row_cls = table_row_cls
     else:
@@ -39,13 +39,13 @@ class TreeWidget(base.WithBrowser):
 
   def _tree_item_rows(self):
     """Returns tree item elements."""
-    return self._root.elements(tag_name="tree-item")
+    return self._root.elements(class_name="tree-item-content")
 
   def _wait_loading(self):
     """Wait for elements to load."""
     def results_present():
       """Return if results are present."""
-      if self._browser.element(class_name="tree-no-results-message").present:
+      if self._root.element(class_name="tree-no-results-message").present:
         return True
       if list(self._tree_item_rows()):
         return True
@@ -56,12 +56,13 @@ class TreeWidget(base.WithBrowser):
 class TreeItem(object):
   """Tree item."""
 
-  def __init__(self, row_el, table_header_names, header_attr_mapping=None):
+  def __init__(self, row_el, table_header_names):
+    self._root = row_el
+    self._table_header_names = table_header_names
     self._table_row = table_with_headers.TableRow(
         container=row_el,
         table_header_names=table_header_names,
-        cell_locator={"class_name": "attr-content"},
-        header_attr_mapping=header_attr_mapping
+        cell_locator={"class_name": "attr-content"}
     )
     self.text_for_header = self._table_row.text_for_header
 
@@ -71,8 +72,10 @@ class TreeItem(object):
 
   def obj_dict(self):
     """Returns an obj dict."""
-    return self._table_row.obj_dict(self)
+    dict_keys = [inflection.underscore(header_name.replace(" ", ""))
+                 for header_name in self._table_header_names]
+    return self._table_row.obj_dict(self, dict_keys=dict_keys)
 
   def select(self):
     """Clicks tree item to open info panel."""
-    self._table_row.root.element(class_name="selectable-attrs").click()
+    self._root.element(class_name="selectable-attrs").click()

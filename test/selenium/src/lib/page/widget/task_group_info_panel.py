@@ -4,6 +4,7 @@
 from lib import base
 from lib.entities import app_entity_factory
 from lib.page.widget import table_with_headers, page_elements
+from lib.utils import ui_utils
 
 
 class TaskGroupInfoPanel(base.WithBrowser):
@@ -22,6 +23,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
   def wait_to_be_init(self):
     """Wait for panel to be initialized."""
     self._create_task_button.wait_until_present()
+    ui_utils.wait_for_spinner_to_disappear()
 
   @property
   def _three_bbs(self):
@@ -69,29 +71,31 @@ class TaskRow(object):
     self._table_row = table_with_headers.TableRow(
         container=row_el,
         table_header_names=header_names,
-        cell_locator={"class_name": "task_group_tasks__list-item-column"},
-        header_attr_mapping={"Task Assignees": "assignees"}
+        cell_locator={"class_name": "task_group_tasks__list-item-column"}
     )
 
+  @property
   def assignees(self):
     """Returns list of assignees."""
     return [el.text for el in self._table_row.cell_for_header(
         "Task Assignees").elements(class_name="tree-field__item")]
 
+  @property
   def start_date(self):
     """Returns start date."""
-    return self._initial_setup().split(" - ")[0].strip()
+    return self._initial_setup.split(" - ")[0].strip()
 
+  @property
   def due_date(self):
     """Returns due date."""
-    return self._initial_setup().split(" - ")[1].strip()
+    return self._initial_setup.split(" - ")[1].strip()
 
   def obj_dict(self):
     """Returns object dictionary for the row."""
-    obj_dict = self._table_row.obj_dict(self)
-    obj_dict.update(start_date=self.start_date(), due_date=self.due_date())
-    return obj_dict
+    dict_keys = ["title", "assignees", "start_date", "due_date"]
+    return self._table_row.obj_dict(self, dict_keys)
 
+  @property
   def _initial_setup(self):
     """Returns text of initial setup cell."""
     return self._table_row.text_for_header("Initial Setup")

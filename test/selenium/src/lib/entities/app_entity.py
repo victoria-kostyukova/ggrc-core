@@ -90,6 +90,7 @@ class TaskGroup(_Base, _WithTitleAndCode):
   """Represents TaskGroup entity."""
   assignee = attr.ib()
   workflow = attr.ib()
+  task_group_tasks = attr.ib()
 
 
 @attr.s
@@ -99,6 +100,33 @@ class TaskGroupTask(_Base, _WithTitleAndCode):
   start_date = attr.ib()
   due_date = attr.ib()
   task_group = attr.ib()
+
+
+@attr.s
+class WorkflowCycle(_Base):
+  """Represents Cycle Workflow entity."""
+  title = attr.ib()
+  admins = attr.ib()
+  wf_members = attr.ib()
+  state = attr.ib()
+  due_date = attr.ib()
+  cycle_task_groups = attr.ib()
+
+
+@attr.s
+class CycleTaskGroup(_Base):
+  """Represents Cycle TaskGroup entity."""
+  title = attr.ib()
+  state = attr.ib()
+  cycle_tasks = attr.ib()
+
+
+@attr.s
+class CycleTask(_Base):
+  """Represents Cycle TaskGroupTask entity."""
+  title = attr.ib()
+  state = attr.ib()
+  due_date = attr.ib()
 
 
 @attr.s

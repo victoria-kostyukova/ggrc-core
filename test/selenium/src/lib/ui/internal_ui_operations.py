@@ -1,10 +1,9 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
-from lib import factory, url
+from lib import factory
 from lib.entities import entity_operations, ui_dict_convert
 from lib.page.widget import object_page, object_modal
-from lib.utils import selenium_utils
 
 
 def submit_obj(obj):
@@ -26,8 +25,3 @@ def build_obj(app_obj):
 def info_widget_cls(obj):
   """Returns a corresponding page object from info_widget module."""
   return factory.get_cls_widget(object_name=obj.obj_name(), is_info=True)()
-
-
-def open_obj_tab_via_url(obj, obj_tab):
-  """Returns an url to the `obj_tab` of `obj`."""
-  return selenium_utils.open_url(url.obj_tab_url(obj, obj_tab))

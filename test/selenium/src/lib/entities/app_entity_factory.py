@@ -4,6 +4,7 @@
 import datetime
 
 from lib import users
+from lib.constants import object_states
 from lib.entities import app_entity
 from lib.utils import random_utils, date_utils
 
@@ -24,11 +25,17 @@ class _BaseFactory(object):
     raise NotImplementedError
 
   @property
+  def _empty_attrs(self):
+    """Returns a dict of attributes used to create an empty entity object (e.g.
+    empty lists or dicts).
+    May be overridden in subclass.
+    """
+    return {}
+
+  @property
   def _default_attrs(self):
-    """Returns a valid dict of attributes used to create a default object:
-    * mandatory attributes are set to random values
-    * other attributes are set to empty not-None values (e.g. empty lists or
-    dicts) if needed.
+    """Returns a dict of random mandatory attributes used to create a default
+    object.
     May be overridden in subclass.
     """
     return {}
@@ -50,7 +57,9 @@ class _BaseFactory(object):
     """
     all_attr_names = self._entity_cls.fields()
     all_attrs = dict.fromkeys(all_attr_names)
-    for attr_name, attr_value in attrs.iteritems():
+    attrs_to_set = self._empty_attrs
+    attrs_to_set.update(attrs)
+    for attr_name, attr_value in attrs_to_set.iteritems():
       all_attrs[attr_name] = attr_value
     obj = self._entity_cls(**all_attrs)
     self._post_obj_init(obj)
@@ -72,13 +81,20 @@ class WorkflowFactory(_BaseFactory):
   _entity_cls = app_entity.Workflow
 
   @property
+  def _empty_attrs(self):
+    """See superclass."""
+    return {
+        "admins": [],
+        "wf_members": [],
+        "task_groups": []
+    }
+
+  @property
   def _default_attrs(self):
     """See superclass."""
     return {
         "title": self._obj_title,
-        "admins": [users.current_person()],
-        "wf_members": [],
-        "task_groups": []
+        "admins": [users.current_person()]
     }
 
   def _post_obj_init(self, obj):
@@ -92,6 +108,13 @@ class TaskGroupFactory(_BaseFactory):
   _entity_cls = app_entity.TaskGroup
 
   @property
+  def _empty_attrs(self):
+    """See superclass."""
+    return {
+        "task_group_tasks": []
+    }
+
+  @property
   def _default_attrs(self):
     """See superclass."""
     return {
@@ -100,14 +123,25 @@ class TaskGroupFactory(_BaseFactory):
     }
 
   def _post_obj_init(self, obj):
-    """Add task group for a workflow associated with this task group."""
+    """Add this task group for a workflow associated with this task group.
+    Set task group for each task group task associated with this task group.
+    """
     if obj.workflow:
       obj.workflow.task_groups.append(obj)
+    for task in obj.task_group_tasks:
+      task.task_group = obj
 
 
 class TaskGroupTaskFactory(_BaseFactory):
   """Factory for TaskGroupTask entities."""
   _entity_cls = app_entity.TaskGroupTask
+
+  @property
+  def _empty_attrs(self):
+    """See superclass."""
+    return {
+        "assignees": []
+    }
 
   @property
   def _default_attrs(self):
@@ -119,6 +153,62 @@ class TaskGroupTaskFactory(_BaseFactory):
         "start_date": closest_working_day,
         "due_date": closest_working_day + datetime.timedelta(days=14)
     }
+
+  def _post_obj_init(self, obj):
+    """Add task group task for a task group associated with this task group
+    task.
+    """
+    if obj.task_group:
+      obj.task_group.task_group_tasks.append(obj)
+
+
+class WorkflowCycleFactory(_BaseFactory):
+  """Factory for WorflowCycle entities."""
+  _entity_cls = app_entity.WorkflowCycle
+
+  def create_from_workflow(self, workflow):
+    """Creates expected WorkflowCycle entity from Workflow entity."""
+    cycle_task_groups = [
+        CycleTaskGroupFactory().create_from_task_group(task_group)
+        for task_group in workflow.task_groups]
+    cycle_tasks = [cycle_task for cycle_task_group in cycle_task_groups
+                   for cycle_task in cycle_task_group.cycle_tasks]
+    return self.create_empty(
+        title=workflow.title,
+        admins=workflow.admins,
+        wf_members=workflow.wf_members,
+        state=object_states.ASSIGNED,
+        due_date=max(cycle_task.due_date for cycle_task in cycle_tasks),
+        cycle_task_groups=cycle_task_groups
+    )
+
+
+class CycleTaskGroupFactory(_BaseFactory):
+  """Factory for CycleTaskGroup entities."""
+  _entity_cls = app_entity.CycleTaskGroup
+
+  def create_from_task_group(self, task_group):
+    """Creates expected CycleTaskGroup entity from TaskGroup entity."""
+    cycle_tasks = [CycleTaskFactory().create_from_task(task)
+                   for task in task_group.task_group_tasks]
+    return self.create_empty(
+        title=task_group.title,
+        state=object_states.ASSIGNED,
+        cycle_tasks=cycle_tasks
+    )
+
+
+class CycleTaskFactory(_BaseFactory):
+  """Factory for CycleTask entities."""
+  _entity_cls = app_entity.CycleTask
+
+  def create_from_task(self, task_group_task):
+    """Creates expected CycleTask entity from TaskGroupTask entity."""
+    return self.create_empty(
+        title=task_group_task.title,
+        state=object_states.ASSIGNED,
+        due_date=task_group_task.due_date
+    )
 
 
 class PersonFactory(_BaseFactory):
@@ -137,6 +227,14 @@ class PersonFactory(_BaseFactory):
 class ControlFactory(_BaseFactory):
   """Factory for Control entities."""
   _entity_cls = app_entity.Control
+
+  @property
+  def _empty_attrs(self):
+    """See superclass."""
+    return {
+        "admins": [],
+        "assertions": []
+    }
 
   @property
   def _default_attrs(self):

@@ -14,7 +14,8 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import widget_info, tab_containers, tables
 from lib.page.modal import update_object
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
-from lib.page.widget import page_tab, page_elements, object_modal, object_page
+from lib.page.widget import (
+    tab_element, page_elements, object_modal, object_page)
 from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
                                          WithPageElements)
 from lib.utils import selenium_utils, help_utils, ui_utils
@@ -92,7 +93,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
       self._extend_list_all_scopes_by_review_state()
     self.comment_area = self._comment_area()
     self.edit_popup = object_modal.get_modal_obj(self.obj_name, self._driver)
-    self.tabs = page_tab.Tabs(self._browser, page_tab.Tabs.INTERNAL)
+    self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.INTERNAL)
 
   def title(self):
     """Returns object title."""
@@ -122,16 +123,18 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   def _extract_text_from_footer(self, group_idx):
     """Returns some text part from footer."""
     footer_regexp = r"Created date (.+) {4}Last updated by\n(.+)\non (.+)"
-    footer_text = self._browser.element(class_name="info-widget-footer").text
-    return re.search(footer_regexp, footer_text).group(group_idx)
+    footer_el = self._browser.element(class_name="info-widget-footer")
+    footer_el.element(class_name="person-name").wait_until_present()
+    return re.search(footer_regexp, footer_el.text).group(group_idx)
 
-  def wait_save(self):
+  @staticmethod
+  def wait_save():
     """Wait for object to be saved and page to be updated.
     Please note that in some cases spinner disappears before DOM changes
     are fully finished. So this code may need to be changed
     in case of a race condition.
     """
-    self._browser.element(class_name="spinner").wait_until_not_present()
+    ui_utils.wait_for_spinner_to_disappear()
 
   def get_review_state_txt(self):
     """Get object's review state text from Info Widget checking if exact UI

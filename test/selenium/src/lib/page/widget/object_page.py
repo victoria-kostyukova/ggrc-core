@@ -3,17 +3,36 @@
 """Represents a page with the url of some object."""
 import re
 
-from lib import base, environment
-from lib.page.widget import page_tab
+from lib import base, environment, url
+from lib.page.widget import tab_element
+from lib.utils import selenium_utils
 
 
 class ObjectPage(base.WithBrowser):
   """Represents some tab of some object page."""
 
+  @staticmethod
+  def _url_fragment():
+    """Returns url fragment of the page that can be navigated to.
+     May be overridden in a subclass.
+     """
+    pass
+
+  def wait_to_be_init(self):
+    """Waits for page to be fully initialized.
+    May be overridden in a subclass.
+    """
+    pass
+
+  def open_via_url(self, obj):
+    """Opens the tab via URL."""
+    selenium_utils.open_url(url.obj_tab_url(obj, self._url_fragment()))
+    self.wait_to_be_init()
+
   @property
   def top_tabs(self):
     """Returns Tabs page elements for top page tabs."""
-    return page_tab.Tabs(self._browser, page_tab.Tabs.TOP)
+    return tab_element.Tabs(self._browser, tab_element.Tabs.TOP)
 
   def _get_url_match(self):
     """Returns instance of re.MatchObject for current page url."""

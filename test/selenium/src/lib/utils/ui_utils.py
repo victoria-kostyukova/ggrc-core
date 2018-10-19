@@ -3,6 +3,7 @@
 """GGRC UI utility functions"""
 import tenacity
 
+from lib import browsers
 from lib.utils import test_utils
 
 
@@ -23,3 +24,9 @@ def select_user(root, email):
     raise tenacity.TryAgain
   row = test_utils.assert_wait(autocomplete_row)
   row.click()
+
+
+def wait_for_spinner_to_disappear():
+  """Waits until there are no spinners on the page."""
+  browser = browsers.get_browser()
+  browser.wait_until(lambda br: len(br.divs(class_name="spinner")) == 0)
