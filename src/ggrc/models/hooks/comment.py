@@ -22,4 +22,4 @@ def init_hook():
     # pylint: disable=unused-argument
     user = login.get_current_user()
     for comment in objects:
-      comment.add_person_with_role_name(user, "admin")
+      comment.add_person_with_role_name(user, "Admin")
