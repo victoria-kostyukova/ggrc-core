@@ -7,6 +7,7 @@ import cPickle
 import datetime
 import itertools
 import zlib
+import logging
 
 import flask
 import sqlalchemy as sa
@@ -32,6 +33,9 @@ from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
+
+
+logger = logging.getLogger(__name__)
 
 
 blueprint = flask.Blueprint(
@@ -338,7 +342,10 @@ def _get_acl_filter(acl_model):
       if type_ in roleable_models
   ]
   if not keys:
-    return []
+    logger.warning("Using full permissions query")
+    return [
+        acl_model.object_type != all_models.Relationship.__name__,
+    ]
   return [
       sa.tuple_(
           acl_model.object_type,
@@ -369,7 +376,6 @@ def load_access_control_list(user, permissions):
           acp.ac_list_id == acl_base.id,
           acl_base.id == acl_propagated.base_id,
           acl_propagated.ac_role_id == acr.id,
-          acl_propagated.object_type != all_models.Relationship.__name__,
           *additional_filters
       )
   )
