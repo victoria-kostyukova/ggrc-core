@@ -21,6 +21,8 @@ from ggrc.integrations.synchronization_jobs.issue_sync_job import \
 from integration.ggrc.models import factories
 from integration import ggrc
 from integration.ggrc.api_helper import Api
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 TICKET_ID = 123
 
@@ -311,7 +313,6 @@ class TestIssueIntegration(ggrc.TestCase):
         "assignee": "assignee@example.com",
         "ccs": ["cc1@example.com", "cc2@example.com"],
     }
-
     with factories.single_commit():
       factories.PersonFactory(email="verifier@example.com")
       factories.PersonFactory(email="assignee@example.com")
@@ -473,20 +474,27 @@ class TestIssueIntegration(ggrc.TestCase):
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_adding_comment_to_issue(self, update_issue_mock, url_builder_mock):
     """Test adding comment to issue."""
-    # TODO: this test depends on outer scope. Different username
-    # in different calls
+    role = all_models.Role.query.filter(
+        all_models.Role.name == "Administrator"
+    ).one()
+    with factories.single_commit():
+      client_user = factories.PersonFactory(name="Test User")
+      rbac_factories.UserRoleFactory(role=role, person=client_user)
+    self.api.set_user(client_user)
+    self.client.get("/login")
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
         issue_tracked_obj=factories.IssueFactory()
     )
     comment = factories.CommentFactory(description="test comment")
-
     expected_result = {
-        "comment": u"A new comment is added by 'Example User' to the"
-                   u" 'Issue': 'test comment'.\n"
-                   u"Use the following to link to get more "
-                   u"information from the GGRC 'Issue'. Link - "
-                   u"http://issue_url.com"
+        "comment":
+            params_builder.BaseIssueTrackerParamsBuilder.COMMENT_TMPL.format(
+                author=client_user.name,
+                comment=comment.description,
+                model="Issue",
+                link="http://issue_url.com",
+            )
     }
 
     with mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True):
