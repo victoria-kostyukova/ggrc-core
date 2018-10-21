@@ -330,9 +330,13 @@ def _get_acl_filter(acl_model):
   Returns:
     list of filter statements.
   """
-  stubs = getattr(flask.g, "referenced_object_stubs", {})
-  if not stubs:
-    return []
+  stubs = getattr(flask.g, "referenced_object_stubs", None)
+  if stubs is None:
+    logger.warning("Using full permissions query")
+    return [
+        acl_model.object_type != all_models.Relationship.__name__,
+    ]
+
   roleable_models = {m.__name__ for m in all_models.all_models
                      if issubclass(m, Roleable)}
   keys = [
@@ -342,9 +346,8 @@ def _get_acl_filter(acl_model):
       if type_ in roleable_models
   ]
   if not keys:
-    logger.warning("Using full permissions query")
     return [
-        acl_model.object_type != all_models.Relationship.__name__,
+        sa.false()
     ]
   return [
       sa.tuple_(
