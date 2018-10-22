@@ -65,7 +65,7 @@ class AuditRBACFactory(base.BaseRBACFactory):
     """Clone existing Audit with Assessment Templates."""
     return self.api.post(all_models.Audit, {
         "audit": {
-            "program": {"id": self.program_id},
+            "program": {"id": self.program_id, "type": "Program"},
             "context": None,
             "operation": "clone",
             "cloneOptions": {

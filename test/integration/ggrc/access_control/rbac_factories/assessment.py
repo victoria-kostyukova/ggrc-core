@@ -37,7 +37,7 @@ class AssessmentRBACFactory(base.BaseRBACFactory):
         "assessment": {
             "title": "New Assessment",
             "context": None,
-            "audit": {"id": self.audit_id},
+            "audit": {"id": self.audit_id, "type": "Audit"},
         },
     })
 

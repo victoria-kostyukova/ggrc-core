@@ -40,7 +40,7 @@ class AssessmentTemplateRBACFactory(base.BaseRBACFactory):
     """Create new Assessment Template object."""
     return self.api.post(all_models.AssessmentTemplate, {
         "assessment_template": {
-            "audit": {"id": self.audit_id},
+            "audit": {"id": self.audit_id, "type": "Audit"},
             "context": None,
             "default_people": {
                 "assignees": self.default_assignees,
