@@ -119,7 +119,7 @@ class TestPermissions(TestCase):
 
   def api_proposal_status_change(self, proposal_id, status):
     return self.api.put(all_models.Proposal.query.get(proposal_id),
-                        {"proposal": {"status": status}})
+                        {"status": status})
 
   @ddt.data(
       ("Creator", 403),
