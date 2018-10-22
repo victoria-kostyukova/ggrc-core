@@ -19,7 +19,7 @@
 
 .lhn-type {
   @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-  
+
   a {
     float: left;
     height: 34px;
@@ -212,21 +212,6 @@ h4.search-title {
   }
 
   ul.sub-level,
-  ul.sub-actions {
-    li {
-      a {
-        .lhs-main-title {
-          &.span8 {
-            span.lhs-item {
-              width: 100% !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  ul.sub-level,
   ul.sub-actions,
   ul.mid-level {
     background:#fff;
@@ -244,9 +229,6 @@ h4.search-title {
           left: 40px;
           top: 14px;
         }
-      }
-      &.no-access {
-        padding-left:28px;
       }
       a {
         font-size: 12px;

@@ -19,7 +19,7 @@
     </a>
   </li>
 
-  {{#list}}
+  {{#each list}}
     <li class="{{class.category}} {{firstnonempty status filter_params.Workflow.status}}" data-model="true" {{data 'model'}}>
       <a href="{{viewLink}}" class="show-extended">
         <div class="lhs-main-title">
@@ -29,10 +29,8 @@
         </div>
       </a>
     </li>
-  {{/list}}
+  {{/each}}
 
-  {{#list.is_loading}}
-    <li class="spinny">
-      <spinner toggle="list.is_loading"></spinner>
-    </li>
-  {{/list.is_loading}}
+  <li class="spinny">
+    <spinner {toggle}="list.is_loading"></spinner>
+  </li>

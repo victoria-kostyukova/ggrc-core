@@ -3,22 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#list}}
+{{#each list}}
 <li class="{{class.category}}" data-model="true" {{data 'model'}}>
-  {{#using program=program}}
   <a href="{{viewLink}}" class="show-extended">
-      <div>
-        <span class="lhs-item lhs-item-medium">
-          {{title}}
-        </span>
-      </div>
+     <span class="lhs-item lhs-item-medium">
+       {{title}}
+     </span>
   </a>
-  {{/using}}
 </li>
-{{/list}}
+{{/each}}
 
-{{#list.is_loading}}
-  <li class="spinny">
-    <spinner toggle="list.is_loading"></spinner>
-  </li>
-{{/list.is_loading}}
+<li class="spinny">
+  <spinner {toggle}="list.is_loading"></spinner>
+</li>

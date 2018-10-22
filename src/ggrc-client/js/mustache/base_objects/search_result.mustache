@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#list}}
+{{#each list}}
 <li class="{{class.category}}" data-model="true" {{data 'model'}}>
   <a href="{{viewLink}}" class="show-extended">
     <div>
@@ -20,10 +20,8 @@
     </div>
   </a>
 </li>
-{{/list}}
+{{/each}}
 
-{{#list.is_loading}}
-  <li class="spinny">
-    <spinner toggle="list.is_loading"></spinner>
-  </li>
-{{/list.is_loading}}
+<li class="spinny">
+  <spinner {toggle}="list.is_loading"></spinner>
+</li>
