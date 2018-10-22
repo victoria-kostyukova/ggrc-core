@@ -657,7 +657,15 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    flask.g.referenced_object_stubs = {obj.type: {obj.id}}
+
+    # marking objects for which we have to fetch permissions
+    if obj.type == "Relationship":
+      flask.g.referenced_object_stubs = collections.defaultdict(set)
+      for related_obj in (obj.source, obj.destination, obj):
+        flask.g.referenced_object_stubs[related_obj.type].add(related_obj.id)
+    else:
+      flask.g.referenced_object_stubs = {obj.type: {obj.id}}
+
     with benchmark("Query delete permissions"):
       if not permissions.is_allowed_delete(
           self.model.__name__, obj.id, obj.context_id)\
