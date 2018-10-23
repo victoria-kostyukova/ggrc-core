@@ -205,6 +205,8 @@ class TestGetObjectColumnDefinitions(TestCase):
       "Technical Leads",
       "Legal Counsels",
       "System Owners",
+      "Line of Defense One Contacts",
+      "Vice Presidents",
   }
 
   @classmethod
@@ -706,6 +708,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Folder",
         "Primary Contacts",
         "Secondary Contacts",
+        "Line of Defense One Contacts",
+        "Vice Presidents",
     }
     names.update(self.SCOPING_ROLES)
     self._test_single_object(all_models.System, names,

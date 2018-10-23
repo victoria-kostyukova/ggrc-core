@@ -362,4 +362,6 @@ class ScopedCommentable(Commentable):
       "Assignee",
       "Verifier",
       "Compliance Contacts",
+      "Line of Defense One Contacts",
+      "Vice Presidents",
   ])

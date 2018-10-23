@@ -36,7 +36,8 @@ RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts"]
 SCOPING_RECIPIENTS = ["Admin", "Primary Contacts", "Secondary Contacts",
                       "Assignee", "Verifier", "Compliance Contacts",
                       "Product Managers", "Technical / Program Managers",
-                      "Technical Leads", "System Owners", "Legal Counsels"]
+                      "Technical Leads", "System Owners", "Legal Counsels",
+                      "Line of Defense One Contacts", "Vice Presidents", ]
 
 
 class TestCommentableImport(TestCase):

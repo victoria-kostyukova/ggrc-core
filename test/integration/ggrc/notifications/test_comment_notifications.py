@@ -198,7 +198,8 @@ class TestCommentNotification(TestCase):
       recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
                          "Assignee", "Compliance Contacts", "Verifier",
                          "Product Managers", "Technical / Program Managers",
-                         "Technical Leads", "System Owners", "Legal Counsels"]
+                         "Technical Leads", "System Owners", "Legal Counsels",
+                         "Line of Defense One Contacts", "Vice Presidents", ]
     else:
       recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
     person = all_models.Person.query.first()
