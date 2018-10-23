@@ -1,8 +1,10 @@
-[//]: <> (updated 10/16/2018)
+[//]: <> (updated 10/24/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7bigh0kmx70)
+[Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9cm5fsgdlmne)
+
+[Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.eg0wu7janrz)
 
 [Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l4dezngquz60)
 
@@ -61,6 +63,10 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)
+
+You can link assessments and issues with existing tickets by going to the edit view. In this view you can specify the ticket id (if left blank a new ticket will be generated). You can also specify ticket attributes like Hotlist ID, Component ID, ticket priority, ticket severity, ticket title.
 
 ### Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)
 
