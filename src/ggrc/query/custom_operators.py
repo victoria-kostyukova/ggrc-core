@@ -146,12 +146,16 @@ def related_people(exp, object_class, target_class, query):
 
   res = []
 
-  res.extend(db.session.query(all_models.AccessControlPerson.person_id).filter(
+  acl = all_models.AccessControlList
+  acp = all_models.AccessControlPerson
+
+  # Note using we are using base_id in the join statement because this filter
+  # should include propagated roles as well.
+  res.extend(db.session.query(acp.person_id).filter(
       sqlalchemy.and_(
-          all_models.AccessControlList.object_id.in_(exp['ids']),
-          all_models.AccessControlList.object_type == exp['object_name'],
-          all_models.AccessControlPerson.ac_list_id ==
-          all_models.AccessControlList.id,
+          acl.object_id.in_(exp['ids']),
+          acl.object_type == exp['object_name'],
+          acp.ac_list_id == acl.base_id,
       )
   ))
   if res:
