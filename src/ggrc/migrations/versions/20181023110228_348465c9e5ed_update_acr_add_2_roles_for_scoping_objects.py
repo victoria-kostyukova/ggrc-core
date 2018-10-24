@@ -9,6 +9,8 @@ Create Date: 2018-10-23 11:02:28.166523
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
+import datetime
+
 from alembic import op
 
 from ggrc.migrations.utils import migrator
@@ -58,24 +60,21 @@ def _add_roles_for_objects(objects, new_roles):
   update_entries = []
   for object_name in objects:
     for role_name in new_roles:
-      update_entries.append(
-          "('{}', '{}', NOW(), NOW(), {}, 1, 0, 0)".format(role_name,
-                                                           object_name,
-                                                           user_id)
-      )
+      update_entries.append({
+          'name': role_name,
+          'object_type': object_name,
+          'mandatory': False,
+          'non_editable': True,
+          'created_at': datetime.datetime.now(),
+          'updated_at': datetime.datetime.now(),
+          'default_to_current_user': False,
+          'modified_by_id': user_id,
+      })
 
-  insert_sql = """
-        INSERT INTO access_control_roles (
-            name,
-            object_type,
-            created_at,
-            updated_at,
-            modified_by_id,
-            non_editable,
-            mandatory,
-            default_to_current_user
-        ) values """ + ", ".join(update_entries)
-  connection.execute(insert_sql)
+  op.bulk_insert(
+      acr_propagation.ACR_TABLE,
+      update_entries
+  )
 
 
 def upgrade():
