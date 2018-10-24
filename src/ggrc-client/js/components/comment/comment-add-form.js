@@ -45,7 +45,8 @@ export default can.Component.extend({
             'notifications to Admins, Assignee, Verifier, ' +
             'Compliance Contacts, Primary Contacts, Secondary Contacts, ' +
             'Product Managers, Technical Leads, Technical / Program Managers,' +
-            ' Legal Counsels, System Owners';
+            ' Legal Counsels, System Owners, Line of Defense One Contacts, ' +
+            'Vice Presidents';
           } else {
             title = 'Comments will be sent as part of daily digest email ' +
             'notification.';
