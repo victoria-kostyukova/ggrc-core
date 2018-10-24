@@ -1029,20 +1029,6 @@ Mustache.registerHelper('assignee_types', function (value, options) {
   return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
 });
 
-Mustache.registerHelper('visibility_delay', function (delay, options) {
-  delay = resolveComputed(delay);
-
-  return function (el) {
-    setTimeout(function () {
-      if ($(el.parentNode).is(':visible')) {
-        $(el).append(options.fn(options.contexts));
-      }
-      can.view.hookup($(el).children()); // FIXME dubious indentation - was this intended to be in the 'if'?
-    }, delay);
-    return el;
-  };
-});
-
 Mustache.registerHelper('is_dashboard', function (options) {
   return /dashboard/.test(window.location) ?
     options.fn(options.contexts) :

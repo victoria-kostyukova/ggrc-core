@@ -27,13 +27,12 @@
   <div class="row-fluid">
     <div class="span12">
       <h6>Status</h6>
-      <p class="{{#if_equals status 'Active'}}Active{{/if_equals}}{{#if_equals status 'Inactive'}}Inactive{{/if_equals}}{{#if_equals status 'Draft'}}Draft{{/if_equals}}">
+      <p class="extended-info__wf-status extended-info__wf-status_{{lowercase status}}">
         {{status}}
       </p>
       </div>
     </div>
   </div>
-
 
   <div class="links">
     <div class="row-fluid">

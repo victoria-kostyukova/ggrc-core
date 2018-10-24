@@ -6,11 +6,9 @@
 {{#instance}}
   <div class="row-fluid">
     <div class="span12">
-      {{#using program=instance.program}}
-        <a class="main-title {{instance.class.category}} oneline" href="{{viewLink}}">
-          {{instance.title}}
-        </a>
-      {{/using}}
+      <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+        {{title}}
+      </a>
     </div>
   </div>
 
@@ -60,11 +58,9 @@
   <div class="links">
     <div class="row-fluid">
       <div class="span12">
-        {{#using program=instance.program}}
-          <a class="secondary oneline {{instance.class.category}}" href="{{program.viewLink}}#audit/audit/{{id}}">
-            View {{instance.title}}
-          </a>
-        {{/using}}
+        <a class="secondary oneline {{instance.class.category}}" href="{{instance.program.viewLink}}#audit/audit/{{id}}">
+          View {{instance.title}}
+        </a>
       </div>
     </div>
   </div>

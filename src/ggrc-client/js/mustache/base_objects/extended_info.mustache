@@ -26,8 +26,7 @@
 
   <div class="row-fluid">
     <div class="span5">
-      {{#visibility_delay 500}}
-      <div class="info">
+      <div class="tiny-data">
         <i class="fa fa-control color"></i>
         {{#with_mapping_count instance 'Control'}}
           {{count}}
@@ -49,7 +48,6 @@
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
         {{/with_mapping_count}}
       </div>
-      {{/visibility_delay}}
     </div>
   </div>
 

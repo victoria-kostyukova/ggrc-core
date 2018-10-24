@@ -4,138 +4,70 @@
  */
 
 .extended-info {
-  position:absolute;
-  top:-1px;
-  right:-422px;
+  position: absolute;
+  top: -1px;
+  right: -422px;
   z-index: zIndex(extended-info);
-  width:400px;
-  padding:2px 10px;
-  background:#fff;
-  border:1px solid #ddd;
-  &.fade {
-    display: none;
-  }
-  &.in {
-    @include opacity(1);
-    display: block;
-  }
-  span.error {
-    font-size:12px;
-    font-weight:normal;
-    color:#e00;
-  }
-  a.main-title {
-    &.oneline {
-      display: inline-block;
-    }
-    i {
-      @include opacity(0.5);
-    }
+  width: 400px;
+  padding: 2px 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+
+  .main-title {
+    display: inline-block;
+
     &:hover {
-      i {
-        @include opacity(1);
-      }
-      text-decoration:none;
+      text-decoration: none;
     }
   }
+
   p {
-    font-size:12px;
-    &.Draft {
-      color:darken(#f60,10%);
-      font-weight:bold;
+    font-size: 12px;
+  }
+
+  &__wf-status {
+    font-weight: bold;
+
+    &_draft {
+      color: darken(#f60, 10%);
     }
-    &.Active {
-      color:$green;
-      font-weight:bold;
+
+    &_active {
+      color: $green;
     }
-    &.Inactive {
-      color:#666;
-      font-weight:bold;
+
+    &_inactive {
+      color: #666;
     }
   }
+
   .rtf {
-    font-size:12px;
-    line-height:16px;
-    a {
-      display:inline;
-      padding:0;
-    }
+    font-size: 12px;
+    line-height: 16px;
   }
-  .extended-info-contact {
-    @extend %oneline;
-    p {
-      font-size:12px;
-      span {
-        line-height:16px;
-        display: block;
-      }
-    }
-  }
+
   .code {
     @extend %oneline;
-    font-size:11px;
-    font-style:italic;
-    color:#777;
+    font-size: 11px;
+    font-style: italic;
+    color: #777;
   }
+
   .links {
-    margin-top:6px;
+    margin-top: 6px;
     [class*="span"] {
-      min-height:24px;
+      min-height: 24px;
     }
-    border-top:1px solid #ccc;
-    font-size:12px;
+    border-top: 1px solid #ccc;
+    font-size: 12px;
+
     a {
       display: inline-block;
       line-height: 26px;
-      &.primary {
-        float:right;
-        i {
-          float: left;
-          margin-top: 5px;
-          margin-right: 4px;
-        }
-      }
     }
+
     .secondary {
       color: #999;
     }
-    span {
-      &.primary {
-        text-align: right;
-        display: inline-block;
-        line-height: 26px;
-        color: #999;
-        i {
-          @include opacity(0.45);
-          margin-top: 4px;
-        }
-      }
-    }
-  }
-  .info {
-    @include box-shadow(none);
-    font-size:12px;
-    padding: 0;
-  }
-  a {
-    padding-left:0;
-    &:hover {
-      text-decoration:underline;
-      background:none;
-    }
-    &.url {
-      font-size:12px;
-      color:#369;
-      margin-bottom:6px;
-    }
-    &.oneline {
-      display: inline-block;
-    }
-  }
-  .no-url {
-    display: inline-block;
-    font-size: 12px;
-    margin-bottom: 10px;
-    font-style: italic;
   }
 }
