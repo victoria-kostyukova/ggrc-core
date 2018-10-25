@@ -14,6 +14,9 @@ import sqlalchemy as sa
 from sqlalchemy import func
 from alembic import op
 
+from ggrc.models import all_models
+from ggrc.migrations import utils
+
 # revision identifiers, used by Alembic.
 revision = 'e2ff62fe34eb'
 down_revision = '348465c9e5ed'
@@ -35,17 +38,39 @@ COMMENTABLE_SCOPING_TABLES = [
 ]
 
 
+TABLES_MAPPINGS = {
+    model.__tablename__: model.__name__ for model in all_models.all_models
+    if model.__tablename__ in COMMENTABLE_SCOPING_TABLES
+}
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
+  connection = op.get_bind()
+
   for name in COMMENTABLE_SCOPING_TABLES:
     commentable_table = sa.sql.table(
-        name, sa.Column('recipients', sa.String(length=250))
+        name,
+        sa.Column('id', sa.Integer()),
+        sa.Column('recipients', sa.String(length=250))
     )
 
     # replace all None data with empty string for recipients field
-    op.execute(commentable_table.update()
-               .where(commentable_table.c.recipients.is_(None))
-               .values(recipients=''))
+    connection.execute(commentable_table.update()
+                       .where(commentable_table.c.recipients.is_(None))
+                       .values(recipients=''))
+
+    # select all entities to update
+    commentable_entities = connection.execute(
+        commentable_table.select().where(commentable_table.c.recipients != '')
+    ).fetchall()
+    commentable_ids = [entity.id for entity in commentable_entities]
+
+    model_name = TABLES_MAPPINGS[name]
+    # add objects to objects without revisions
+    if commentable_ids:
+      utils.add_to_objects_without_revisions_bulk(connection, commentable_ids,
+                                                  model_name)
 
     # add Line of Defense One Contacts, Vice President to recipients list
     op.execute(commentable_table.update()
