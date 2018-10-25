@@ -362,7 +362,7 @@ class TestACLImportExport(TestCase):
     acl_revisions = models.Revision.query.filter_by(
         resource_type="AccessControlList"
     ).count()
-    self.assertEqual(acl_revisions, 12)
+    self.assertEqual(acl_revisions, 14)
 
   def test_acl_roles_clear(self):
     """Test clearing ACL roles for Program with '--' value"""
