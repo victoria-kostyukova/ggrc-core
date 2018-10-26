@@ -15,7 +15,7 @@
         <i class="fa fa-times black"></i>
       </button>
     </div>
-    <div class="request-review-modal__note">An email notification will be sent to each reviewer.</div>
+    <div class="request-review-modal__email-note">An email notification will be sent to each reviewer.</div>
   </div>
   <div class="request-review-modal__content">
     <div class="simple-modal__body">
@@ -52,6 +52,12 @@
         ($click)="save()">
           Request
       </button>
+      {{#if_equals review.status 'Reviewed'}}
+        <div class="request-review-modal__status-note">
+          <i class="fa fa-exclamation-triangle"></i>
+          By clicking 'Request' the object status will be reverted to an 'Unreviewed'
+        </div>
+      {{/if_equals}}
     </div>
   </div>
 </simple-modal>

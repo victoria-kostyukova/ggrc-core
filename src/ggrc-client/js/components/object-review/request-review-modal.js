@@ -54,6 +54,7 @@ export default can.Component.extend({
       const review = this.attr('review');
 
       this.attr('loading', true);
+      review.attr('status', 'Unreviewed');
 
       saveReview(review, this.attr('parentInstance'))
         .then((review) => {

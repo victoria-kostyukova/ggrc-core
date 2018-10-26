@@ -6,27 +6,44 @@
 .request-review-modal {
   $simple-modal-header-height: 80px;
   $simple-modal-footer-height: 55px;
+  min-width: 40%;
 
-  .simple-modal__header {
-    border-bottom: none;
-  }
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+    }
 
-  .simple-modal__header-text {
-    font-size: 24px;
-  }
+    &__header-text {
+      font-size: 24px;
+    }
 
-  .simple-modal__footer {
-    height: $simple-modal-footer-height;
-    border-top: none;
-    padding-right: 16px;
+    &__footer {
+      height: $simple-modal-footer-height;
+      border-top: none;
+      padding: 8px 16px;
+    }
+
+    &__toolbar {
+      align-items: center;
+      justify-content: space-between;
+
+      .fa {
+        color: $icon-color-empty;
+        margin-right: 10px;
+      }
+    }
   }
 
   &__header {
     height: $simple-modal-header-height;
   }
 
-  &__note {
+  &__email-note {
     padding: 0 16px;
+  }
+
+  &__status-note {
+    margin-right: 20px;
   }
 
   &__content {
