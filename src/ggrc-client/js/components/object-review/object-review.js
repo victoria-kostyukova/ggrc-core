@@ -43,18 +43,12 @@ export default can.Component.extend({
           return !!this.attr('review.last_reviewed_by');
         },
       },
-      showButtons: {
-        get() {
-          return !this.attr('isReviewed') &&
-            this.attr('hasUpdatePermission');
-        },
-      },
       isSnapshot: {
         get() {
           return isSnapshot(this.attr('instance'));
         },
       },
-      hasUpdatePermission: {
+      showButtons: {
         get() {
           const instance = this.attr('review') || this.attr('instance');
 
