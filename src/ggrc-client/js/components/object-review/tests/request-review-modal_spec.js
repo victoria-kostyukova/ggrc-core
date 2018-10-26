@@ -123,6 +123,20 @@ describe('request-review-modal component', () => {
       saveDfd.resolve(review);
     });
 
+    it('should set Unreviewed status', (done) => {
+      viewModel.attr('review.access_control_list', newACL);
+      viewModel.attr('review.status', 'Reviewed');
+
+      viewModel.save();
+
+      saveDfd.then(() => {
+        expect(review.save).toHaveBeenCalled();
+        expect(viewModel.attr('review.status')).toEqual('Unreviewed');
+        done();
+      });
+      saveDfd.resolve(review);
+    });
+
     it('should change modal window state to false', (done) => {
       viewModel.attr('review.access_control_list', newACL);
 

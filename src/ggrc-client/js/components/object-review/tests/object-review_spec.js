@@ -94,34 +94,6 @@ describe('object-review component', () => {
     });
   });
 
-  describe('"showButtons" getter', () => {
-    let review;
-
-    beforeEach(() => {
-      review = new Review({status: 'Unreviewed'});
-      viewModel.attr({review});
-    });
-
-    it('should return true if object is unreviewed', () => {
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-
-      expect(viewModel.attr('showButtons')).toBeTruthy();
-    });
-
-    it('should return false if object is reviewed', () => {
-      review.attr('status', 'Reviewed');
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-
-      expect(viewModel.attr('showButtons')).toBeFalsy();
-    });
-
-    it('should return false if user doesn\'t have "update" permissions', () => {
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
-
-      expect(viewModel.attr('showButtons')).toBeFalsy();
-    });
-  });
-
   describe('"isSnapshot" getter', () => {
     beforeEach(() => {
       const instance = {
@@ -149,7 +121,7 @@ describe('object-review component', () => {
     });
   });
 
-  describe('"hasUpdatePermission" getter', () => {
+  describe('"showButtons" getter', () => {
     describe('if review exists', () => {
       beforeEach(() => {
         const review = new Review();
@@ -161,14 +133,14 @@ describe('object-review component', () => {
       "is_allowed_for update review" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-        expect(viewModel.attr('hasUpdatePermission')).toBeTruthy();
+        expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
       it(`should return false if user does not have 
       "is_allowed_for update review" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
-        expect(viewModel.attr('hasUpdatePermission')).toBeFalsy();
+        expect(viewModel.attr('showButtons')).toBeFalsy();
       });
     });
 
@@ -183,14 +155,14 @@ describe('object-review component', () => {
       "is_allowed_for update instance" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
-        expect(viewModel.attr('hasUpdatePermission')).toBeTruthy();
+        expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
       it(`should return false if user does not have 
       "is_allowed_for update instance" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
-        expect(viewModel.attr('hasUpdatePermission')).toBeFalsy();
+        expect(viewModel.attr('showButtons')).toBeFalsy();
       });
     });
   });
