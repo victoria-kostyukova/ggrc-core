@@ -163,7 +163,7 @@ class LhnMenu(object):
     def get_spinny(object_name):
       return (
           By.CSS_SELECTOR,
-          '[data-model-name="{}"] .spinny'.format(object_name))
+          '[data-model-name="{}"] .spinny .spinner'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
