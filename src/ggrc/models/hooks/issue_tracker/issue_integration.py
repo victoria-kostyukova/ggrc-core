@@ -355,3 +355,15 @@ def prepare_issue_json(issue, issue_tracker_info=None,
   if "type" not in params:
     params["type"] = issue_tracker_info.get("issue_type")
   return params
+
+
+def prepare_issue_update_json(issue, issue_tracker_info=None):
+  """Prepare issuetracker issue json for Issue object update."""
+  if not issue_tracker_info:
+    issue_tracker_info = issue.issue_tracker
+
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  builder.handle_issue_tracker_info(issue, issue_tracker_info)
+  issue_tracker_params = builder.params
+  params = issue_tracker_params.get_issue_tracker_params()
+  return params
