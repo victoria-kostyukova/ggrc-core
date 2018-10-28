@@ -1092,3 +1092,16 @@ def load_issuetracked_objects(parent_type, parent_id):
           all_models.Audit.issuetracker_issue
       )
   )
+
+
+def prepare_issue_update_json(assmt, issue_tracker_info=None):
+  """Prepare issuetracker issue json for Assessment object update."""
+  if not issue_tracker_info:
+    issue_tracker_info = assmt.issue_tracker
+
+  integration_utils.set_values_for_missed_fields(assmt, issue_tracker_info)
+  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
+  builder.handle_issue_tracker_info(assmt, issue_tracker_info)
+  issue_tracker_params = builder.params
+  params = issue_tracker_params.get_issue_tracker_params()
+  return params
