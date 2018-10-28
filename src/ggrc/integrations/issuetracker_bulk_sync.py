@@ -189,6 +189,9 @@ class IssueTrackerBulkCreator(object):
     elif not result and not issue_json.get("issue_id"):
       raise integrations_errors.Error("Unknown error")
 
+    if not issue_json.get("assignee") and result:
+      issue_json["assignee"] = result.get("issueState", {}).get("assignee")
+
   @staticmethod
   def _add_error(error_list, object_, error):
     """Save error information"""
