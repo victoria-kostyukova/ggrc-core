@@ -392,6 +392,19 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
         interval=10
     )
 
+  def _get_issue_json(self, object_):
+    """Get json data for issuetracker issue related to provided object."""
+    issue_json = None
+    integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
+    if hasattr(integration_handler, "prepare_issue_update_json"):
+      issue_json = integration_handler.prepare_issue_update_json(object_)
+
+    if not issue_json:
+      raise integrations_errors.Error(
+          "Can't create issuetracker issue json for {}".format(object_.type)
+      )
+    return issue_json
+
 
 class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
   """Class with methods for bulk tickets creation for child objects."""
