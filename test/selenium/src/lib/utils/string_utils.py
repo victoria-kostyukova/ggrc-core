@@ -214,3 +214,11 @@ def escape_html(str_to_escape):
   """Replaces <, > and & characters with HTML-safe sequences (&lt, &gt; &amp;).
   """
   return cgi.escape(str_to_escape)
+
+
+def remove_from_end(the_str, str_to_remove):
+  """Removes `str_to_remove` from the end of `the_str`."""
+  if the_str.endswith(str_to_remove):
+    return the_str[:-len(str_to_remove)]
+  raise ValueError("String `{}` doesn't end with `{}`".format(
+      the_str, str_to_remove))

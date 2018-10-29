@@ -4,8 +4,9 @@
 import datetime
 
 from lib import users
+from lib.constants import object_states
 from lib.entities import app_entity
-from lib.utils import random_utils, date_utils
+from lib.utils import random_utils, date_utils, string_utils
 
 
 def get_factory_by_obj_name(obj_name):
@@ -13,6 +14,13 @@ def get_factory_by_obj_name(obj_name):
   return {
       "control": ControlFactory
   }[obj_name]
+
+
+def get_factory_by_entity_cls(entity_cls):
+  """Returns a factory class by entity class."""
+  # pylint: disable=protected-access
+  return next(factory_cls for factory_cls in _BaseFactory.__subclasses__()
+              if factory_cls._entity_cls == entity_cls)
 
 
 class _BaseFactory(object):
@@ -25,8 +33,8 @@ class _BaseFactory(object):
 
   @property
   def _empty_attrs(self):
-    """Returns a dict of attributes used to create an empty entity object (e.g.
-    empty lists or dicts).
+    """Returns a dict of attributes used to create an empty entity object so
+    all attributes will have values of valid types (e.g. empty lists or dicts).
     May be overridden in subclass.
     """
     return {}
@@ -73,7 +81,7 @@ class _BaseFactory(object):
   @classmethod
   def _obj_name(cls):
     """Returns object name for app entity."""
-    return cls.__name__.rstrip("Factory")
+    return string_utils.remove_from_end(cls.__name__, "Factory")
 
 
 class WorkflowFactory(_BaseFactory):
@@ -93,8 +101,11 @@ class WorkflowFactory(_BaseFactory):
   def _default_attrs(self):
     """See superclass."""
     return {
+        "state": object_states.DRAFT,
         "title": self._obj_title,
-        "admins": [users.current_person()]
+        "admins": [users.current_person()],
+        "is_archived": False,
+        "recurrences_started": False
     }
 
   def _post_obj_init(self, obj):
@@ -224,11 +235,11 @@ class ControlFactory(_BaseFactory):
   @property
   def _default_attrs(self):
     """See superclass."""
-    from lib.rest import control_assertions
+    from lib.rest_services import control_rest_service
     return {
         "title": self._obj_title,
         "admins": [users.current_person()],
-        "assertions": [control_assertions.assertion_with_name("Security")]
+        "assertions": [control_rest_service.assertion_with_name("Security")]
     }
 
 

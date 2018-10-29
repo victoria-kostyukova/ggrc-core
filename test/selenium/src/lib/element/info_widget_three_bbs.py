@@ -72,3 +72,11 @@ class AssessmentInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   def select_deprecate(self):
     """Selects `Deprecate` option."""
     self._three_bbs.option_by_text("Deprecate").click()
+
+
+class WorkflowInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Workflow info widget."""
+
+  def select_archive(self):
+    """Selects `Archive workflow` option."""
+    self._three_bbs.option_by_text("Archive workflow").click()

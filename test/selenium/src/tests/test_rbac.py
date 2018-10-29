@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tests for RBAC"""
 # pylint: disable=no-self-use
+# pylint: disable=unused-argument
 
 import pytest
 
@@ -67,7 +68,7 @@ class TestRBAC(base.Test):
         webui_facade.assert_can_edit(selenium, obj, can_edit=can_edit)
         webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
       else:
-        webui_facade.assert_cannot_view(selenium, obj)
+        webui_facade.assert_cannot_view(obj)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -158,7 +159,7 @@ class TestAuditorRole(base.Test):
     creator = test_data["creator"]
     users.set_current_user(creator)
     control = test_data["control"]
-    webui_facade.assert_cannot_view(selenium, control)
+    webui_facade.assert_cannot_view(control)
 
   @pytest.mark.smoke_tests
   def test_auditor_can_create_asmt(

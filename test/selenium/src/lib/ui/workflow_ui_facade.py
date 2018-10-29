@@ -5,7 +5,7 @@ from lib import url
 from lib.entities import ui_dict_convert
 from lib.page import dashboard
 from lib.page.widget import workflow_tabs, task_group_info_panel, workflow_page
-from lib.ui import internal_ui_operations
+from lib.ui import internal_ui_operations, ui_facade
 from lib.utils import selenium_utils
 
 
@@ -71,7 +71,8 @@ def activate_workflow(workflow):
   """Activates workflow."""
   setup_tab = workflow_tabs.SetupTab()
   setup_tab.open_via_url(workflow)
-  workflow_page.WorkflowPage().activate_workflow()
+  workflow_page.WorkflowPage().activate_workflow(
+      is_workflow_repeat=bool(workflow.repeat_unit))
 
 
 def get_workflow_cycles(workflow):
@@ -97,3 +98,11 @@ def get_objs_mapped_to_cycle_task(cycle_task):
   active_cycles_tab.open_via_url(
       cycle_task.task_group_task.task_group.workflow)
   return active_cycles_tab.get_objs_mapped_to_cycle_task(cycle_task)
+
+
+def archive_workflow(workflow):
+  """Archives workflow."""
+  ui_facade.open_obj(workflow)
+  internal_ui_operations.info_widget_cls(workflow).three_bbs.select_archive()
+  workflow.is_archived = True
+  workflow.recurrences_started = False

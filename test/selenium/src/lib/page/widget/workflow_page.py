@@ -9,8 +9,9 @@ class WorkflowPage(base.WithBrowser):
   """Represents any tab of workflow page."""
   # pylint: disable=too-few-public-methods
 
-  def activate_workflow(self):
+  def activate_workflow(self, is_workflow_repeat):
     """Activates workflow."""
     self._browser.button(text="Activate Workflow").click()
-    self._browser.link(text="Proceed").click()
+    if not is_workflow_repeat:
+      self._browser.link(text="Proceed").click()
     ui_utils.wait_for_spinner_to_disappear()

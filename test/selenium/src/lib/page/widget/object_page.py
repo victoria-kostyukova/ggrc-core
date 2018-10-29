@@ -51,7 +51,7 @@ class ObjectPage(base.WithBrowser):
     """Gets id of the object (if possible)."""
     match = self._get_url_match()
     if match:
-      return match.group(1)
+      return int(match.group(1))
     return None
 
   def get_current_url_fragment(self):

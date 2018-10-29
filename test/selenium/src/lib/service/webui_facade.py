@@ -2,15 +2,12 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Web UI services"""
 import copy
-import re
-
-import nerodia
 
 from lib import users, base
 from lib.constants import objects
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, ui_utils
 
 from lib.entities import entities_factory
 
@@ -55,10 +52,10 @@ def assert_can_view(selenium, obj):
       obj_copy.repr_ui(), actual_obj, "audit", "custom_attributes", "program")
 
 
-def assert_cannot_view(selenium, obj):
+def assert_cannot_view(obj):
   """Assert that current user cannot view object via UI"""
   selenium_utils.open_url(obj.url)
-  assert is_error_403(selenium)
+  assert ui_utils.is_error_403()
 
 
 def assert_can_edit(selenium, obj, can_edit):
@@ -83,7 +80,7 @@ def assert_can_delete(selenium, obj, can_delete):
   if can_delete:
     info_page.three_bbs.select_delete().confirm_delete()
     selenium_utils.open_url(obj.url)
-    assert is_error_404(selenium)
+    assert ui_utils.is_error_404()
 
 
 def _get_ui_service(selenium, obj):
@@ -106,18 +103,3 @@ def _assert_title_editable(obj, selenium, info_page):
   new_ui_obj = _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
   base.Test.general_equal_assert(
       obj.repr_ui(), new_ui_obj, "audit", "custom_attributes")
-
-
-def is_error_403(selenium):
-  """Return whether current page is 403 error"""
-  return _browser(selenium).h1(visible_text="Forbidden").exists
-
-
-def is_error_404(selenium):
-  """Return whether current page is 404 error"""
-  return _browser(selenium).body(visible_text=re.compile("not found")).exists
-
-
-def _browser(driver):
-  """Return nerodia browser for the driver"""
-  return nerodia.browser.Browser(browser=driver)

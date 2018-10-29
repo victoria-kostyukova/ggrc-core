@@ -16,8 +16,10 @@ def ui_to_app(obj_name, ui_dict):
 def workflow_ui_to_app(ui_dict):
   """Converts Workflow ui_dict to app_entity."""
   return app_entity_factory.WorkflowFactory().create_empty(
-      obj_id=ui_dict["obj_id"],
+      obj_id=int(ui_dict["obj_id"]),
       title=ui_dict["title"],
+      state=ui_dict["state"],
+      is_archived=ui_dict["is_archived"],
       admins=emails_to_app_people(ui_dict["admins"]),
       wf_members=emails_to_app_people(ui_dict["workflow_members"]),
       task_groups=[],

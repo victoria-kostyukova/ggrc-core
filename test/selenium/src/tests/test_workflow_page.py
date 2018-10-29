@@ -12,7 +12,7 @@ from lib.entities import (
     app_entity_factory, ui_dict_convert, cycle_entity_creation)
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.ui import workflow_ui_facade, ui_facade
-from lib.utils import test_utils, date_utils
+from lib.utils import test_utils, date_utils, ui_utils
 
 
 class TestCreateWorkflow(base.Test):
@@ -50,6 +50,30 @@ class TestCreateWorkflow(base.Test):
     actual_task_groups = workflow_ui_facade.task_group_objs(
         workflow)
     test_utils.list_obj_assert(actual_task_groups, workflow.task_groups)
+
+
+class TestWorkflowInfoPageActions(base.Test):
+  """Test actions available on workflow Info page."""
+
+  def test_edit_workflow(self, app_workflow, selenium):
+    """Test editing workflow."""
+    new_title = "[EDITED]" + app_workflow.title
+    ui_facade.edit_obj(app_workflow, title=new_title)
+    actual_workflow = ui_facade.get_obj(app_workflow)
+    app_workflow.title = new_title
+    test_utils.obj_assert(actual_workflow, app_workflow)
+
+  def test_delete_workflow(self, app_workflow, selenium):
+    """Test deletion of workflow."""
+    ui_facade.delete_obj(app_workflow)
+    ui_facade.open_obj(app_workflow)
+    assert ui_utils.is_error_404()
+
+  def test_archive_workflow(self, activated_repeat_on_workflow, selenium):
+    """Test archiving of workflow."""
+    workflow_ui_facade.archive_workflow(activated_repeat_on_workflow)
+    actual_workflow = ui_facade.get_obj(activated_repeat_on_workflow)
+    test_utils.obj_assert(actual_workflow, activated_repeat_on_workflow)
 
 
 class TestWorkflowSetupTab(base.Test):
@@ -129,13 +153,17 @@ class TestActivateWorkflow(base.Test):
         app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
+
+class TestActiveCyclesTab(base.Test):
+  """Test Active Cycles tab."""
+
   @pytest.mark.xfail(reason="Fails in CI, not sure why")
   def test_map_obj_to_cycle_task(
-      self, activate_workflow, app_workflow, app_control, selenium
+      self, activated_workflow, app_control, selenium
   ):
     """Test mapping of obj to a cycle task."""
     cycle_task = cycle_entity_creation.create_workflow_cycle(
-        app_workflow).cycle_task_groups[0].cycle_tasks[0]
+        activated_workflow).cycle_task_groups[0].cycle_tasks[0]
     workflow_ui_facade.map_obj_to_cycle_task(
         obj=app_control, cycle_task=cycle_task)
     selenium.refresh()  # reload page to check mapping is saved

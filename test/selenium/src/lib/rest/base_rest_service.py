@@ -1,43 +1,140 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""REST service for entities."""
+"""Base REST services."""
+from lib.constants import objects
+from lib.entities import app_entity_factory
 from lib.rest import api_client
 
 
-def create_obj(obj, **mapping):
-  """Creates obj `obj` via REST.
-  This method modifies the argument object rather than creating a new object
-  as argument object is an "expected" object.
-  """
-  result_obj_dict = send_create_obj_request(obj, mapping)
-  obj.obj_id = result_obj_dict["id"]
-  if hasattr(obj, "code") and not obj.code:
-    obj.code = result_obj_dict["slug"]
-  obj.rest_context = result_obj_dict["context"]
-  return obj
+class ObjectRestService(object):
+  """Base REST service for manipulating `app_entity` objects."""
 
+  @property
+  def _app_entity_cls(self):
+    """Returns an `app_entity` class that this service is expected to handle.
+    Should be overridden in subclass.
+    """
+    raise NotImplementedError
 
-def send_create_obj_request(obj, rest_obj_dict):
-  """Creates obj `rest_obj."""
-  url = _create_obj_api_url(obj)
-  obj_name = obj.obj_name()
-  json_body = [{obj_name: rest_obj_dict}]
-  response = api_client.send_post(url, json_body)
-  assert response[0][0] == 201
-  return response[0][1][obj_name]
+  @property
+  def _obj_name(self):
+    """Returns object name. May be overridden in subclass."""
+    return self._app_entity_cls.obj_name()
 
+  @staticmethod
+  def _map_to_rest_for_create_obj(obj):
+    """Returns a mapping from `app_entity` attributes to dict for
+    Create obj (POST) request.
+    May be overridden in subclass.
+    """
+    # pylint: disable=unused-argument
+    return {}
 
-def _create_obj_api_url(obj):
-  """Returns API url for object creation."""
-  return _api_url(obj.plural_obj_name())
+  def _map_to_rest_for_edit_obj(self, obj):
+    """Returns a mapping from `app_entity` attributes to dict for
+    Edit obj (PUT) request.
+    May be overridden in subclass.
+    """
+    mapping = self._map_to_rest_for_create_obj(obj)
+    mapping.update(self._map_to_rest_specific_for_edit_obj(obj))
+    return mapping
 
+  @staticmethod
+  def _map_to_rest_specific_for_edit_obj(obj):
+    """Returns a part of mapping from `app_entity` attributes to dict for
+    Edit obj request, specific for Edit obj request.
+    May be overridden in subclass.
+    """
+    # pylint: disable=invalid-name
+    return {"id": obj.obj_id}
 
-def get_obj_collection(collection_name):
-  """Returns a requested collection."""
-  response = api_client.send_get(_api_url(collection_name))
-  return response["{}_collection".format(collection_name)][collection_name]
+  @staticmethod
+  def _map_from_rest(rest_dict):
+    """Returns mapping from REST response's dict to `app_entity` attributes.
+    May be overridden in subclass.
+    """
+    # pylint: disable=unused-argument
+    return {}
 
+  def create(self, obj):
+    """Sends request to create an object."""
+    url = self._api_url(self._plural_obj_name)
+    json_body = [{self._obj_name: self._map_to_rest_for_create_obj(obj)}]
+    response_elems = api_client.send_post(url, json_body).json()
+    assert len(response_elems) == 1  # one object is created
+    response_obj_dict = self._get_obj_dict_from_post_response_elem(
+        response_elems[0])
+    self._set_attrs_from_response(obj, response_obj_dict)
+    return obj
 
-def _api_url(url):
-  """Appends `/api` to the url."""
-  return "api/{}".format(url)
+  def _get_obj_dict_from_post_response_elem(self, response_elem):
+    """Gets obj dict from part of response to Create object(s) request."""
+    # pylint: disable=invalid-name
+    assert response_elem[0] == 201
+    return response_elem[1][self._obj_name]
+
+  def get(self, obj):
+    """Sends request to get the object."""
+    url = self._api_url(self._plural_obj_name + "/" + str(obj.obj_id))
+    response = api_client.send_get(url)
+    rest_dict = response.json()
+    assert self._obj_name in rest_dict
+    self._set_headers_from_response(obj, response)
+    return self._create_obj_from_rest_dict(rest_dict)
+
+  def edit(self, obj):
+    """Sends request to edit the object."""
+    if not obj.rest_headers_for_update:
+      self.get(obj)  # to set If-Match and If-Unmodified-Since headers
+    url = self._api_url(self._plural_obj_name + "/" + str(obj.obj_id))
+    json_body = {self._obj_name: self._map_to_rest_for_edit_obj(obj)}
+    response = api_client.send_put(
+        url, json_body, headers=obj.rest_headers_for_update)
+    assert self._obj_name in response.json()
+    self._set_headers_from_response(obj, response)
+
+  def get_collection(self):
+    """Gets a collection."""
+    response = api_client.send_get(self._api_url(self._plural_obj_name)).json()
+    rest_dicts = response["{}_collection".format(
+        self._plural_obj_name)][self._plural_obj_name]
+    entity_objs = []
+    for rest_dict in rest_dicts:
+      entity_obj = self._create_obj_from_rest_dict(rest_dict)
+      entity_objs.append(entity_obj)
+    return entity_objs
+
+  @staticmethod
+  def _set_attrs_from_response(obj, result_dict):
+    """Sets `obj`'s attributes generated on back-end."""
+    obj.obj_id = result_dict["id"]
+    if hasattr(obj, "code") and not obj.code:
+      obj.code = result_dict["slug"]
+    obj.rest_context = result_dict["context"]
+
+  @staticmethod
+  def _set_headers_from_response(obj, response):
+    """Sets `If-Match` and `If-Unmodified-Since` headers.
+    These headers are required for PUT and DELETE requests.
+    If-Match is calculated based on `updated_at`.
+    If-Unmodified-Since corresponds to `updated_at`.
+    """
+    obj.rest_headers_for_update = {}
+    obj.rest_headers_for_update["If-Match"] = response.headers["Etag"]
+    obj.rest_headers_for_update["If-Unmodified-Since"] = response.headers[
+        "Last-Modified"]
+
+  @property
+  def _plural_obj_name(self):
+    """Returns plural obj name."""
+    return objects.get_plural(self._obj_name)
+
+  def _create_obj_from_rest_dict(self, rest_dict):
+    """Create an `app_entity` object from response dict."""
+    return app_entity_factory.get_factory_by_entity_cls(
+        self._app_entity_cls)().create_empty(**self._map_from_rest(rest_dict))
+
+  @staticmethod
+  def _api_url(url):
+    """Prepends `api/` to the url."""
+    return "api/{}".format(url)

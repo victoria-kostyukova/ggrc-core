@@ -324,6 +324,17 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     return tab_containers.changelog_tab_validate(
         self._browser.driver, self._active_tab_root.locate())
 
+  def edit_obj(self, **changes):
+    """Makes changes `changes` to object."""
+    self.three_bbs.select_edit()
+    modal = object_modal.get_modal_obj(self.obj_name)
+    modal.fill_form(**changes)
+    modal.save_and_close()
+
+  def delete_obj(self):
+    """Deletes object."""
+    self.three_bbs.select_delete().confirm_delete()
+
 
 class Programs(WithObjectReview, InfoWidget):
   """Model for program object Info pages and Info panels."""
@@ -351,6 +362,7 @@ class Programs(WithObjectReview, InfoWidget):
 class Workflow(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""
   _locators = locator.WidgetInfoWorkflow
+  _dropdown_settings_cls = info_widget_three_bbs.WorkflowInfoWidgetThreeBbbs
 
   def __init__(self, _driver=None):
     super(Workflow, self).__init__()
@@ -366,7 +378,8 @@ class Workflow(InfoWidget):
     return {
         "obj_id": self.get_obj_id(),
         "title": self.title(),
-        "status": self.status(),
+        "state": self.status(),
+        "is_archived": self.is_archived,
         "description": self.description(),
         "admins": self.admins.get_people_emails(),
         "workflow_members": self.workflow_members.get_people_emails(),
@@ -375,6 +388,11 @@ class Workflow(InfoWidget):
         "modified_by": self.modified_by(),
         "updated_at": self.updated_at()
     }
+
+  @property
+  def is_archived(self):
+    """Returns whether workflow is archived."""
+    return self._browser.element(class_name="state-archived").present
 
   @property
   def workflow_members(self):

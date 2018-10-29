@@ -40,3 +40,14 @@ def wait_for_alert(text):
   browser.element(
       class_name="alert-info", text=re.compile(text)).wait_until(
       lambda e: e.present)
+
+
+def is_error_403():
+  """Returns whether current page is 403 error."""
+  return browsers.get_browser().h1(visible_text="Forbidden").exists
+
+
+def is_error_404():
+  """Returns whether current page is 404 error."""
+  return browsers.get_browser().body(
+      visible_text=re.compile("not found")).exists

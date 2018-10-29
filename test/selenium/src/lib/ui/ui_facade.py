@@ -7,12 +7,29 @@ from lib.ui import internal_ui_operations
 from lib.utils import selenium_utils
 
 
-def get_obj(app_obj):
+def open_obj(obj):
+  """Opens the url of obj."""
+  selenium_utils.open_url(entity_operations.obj_url(obj))
+
+
+def get_obj(obj):
   """Opens the url of `app_obj`, builds the object from the page and
   returns it.
   """
-  selenium_utils.open_url(entity_operations.obj_url(app_obj))
-  return internal_ui_operations.build_obj(app_obj)
+  open_obj(obj)
+  return internal_ui_operations.build_obj(obj)
+
+
+def edit_obj(obj, **changes):
+  """Updates object."""
+  open_obj(obj)
+  internal_ui_operations.info_widget_cls(obj).edit_obj(**changes)
+
+
+def delete_obj(obj):
+  """Deletes object."""
+  open_obj(obj)
+  internal_ui_operations.info_widget_cls(obj).delete_obj()
 
 
 def active_tab_name():

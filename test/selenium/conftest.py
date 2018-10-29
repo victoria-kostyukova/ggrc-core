@@ -16,13 +16,14 @@ from selenium.webdriver.remote.remote_connection import (
     LOGGER as SELENIUM_LOGGER)
 
 from lib import dynamic_fixtures, environment, url, users, browsers
-from lib.constants import element
+from lib.constants import element, workflow_repeat_units
 from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
-from lib.entities import entities_factory, app_entity_factory
+from lib.entities import entities_factory
 from lib.page import dashboard
-from lib.rest import (
-    workflow_rest_service, person_rest_service, control_rest_service)
+from lib.rest_services import workflow_rest_service
+from lib.rest_facades import (
+    control_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.service import rest_service, rest_facade
 from lib.service.rest import session_pool
 from lib.utils import conftest_utils, help_utils, selenium_utils
@@ -607,35 +608,56 @@ def obj(request):
 @pytest.fixture()
 def app_workflow():
   """Creates a Workflow."""
-  workflow = app_entity_factory.WorkflowFactory().create()
-  return workflow_rest_service.create_workflow(workflow)
+  return workflow_rest_facade.create_workflow()
+
+
+@pytest.fixture()
+def activated_workflow(app_workflow):
+  """Creates an activated workflow."""
+  task_group = workflow_rest_facade.create_task_group(
+      workflow=app_workflow)
+  workflow_rest_facade.create_task_group_task(task_group=task_group)
+  workflow_rest_service.WorkflowRestService().activate(app_workflow)
+  return app_workflow
+
+
+@pytest.fixture()
+def app_repeat_on_workflow():
+  """Creates a repeat on workflow."""
+  return workflow_rest_facade.create_workflow(
+      repeat_every=1, repeat_unit=workflow_repeat_units.WEEKDAY)
+
+
+@pytest.fixture()
+def activated_repeat_on_workflow(app_repeat_on_workflow):
+  """Creates an activated repeat on workflow."""
+  task_group = workflow_rest_facade.create_task_group(
+      workflow=app_repeat_on_workflow)
+  workflow_rest_facade.create_task_group_task(task_group=task_group)
+  workflow_rest_service.WorkflowRestService().activate(
+      app_repeat_on_workflow)
+  return app_repeat_on_workflow
 
 
 @pytest.fixture()
 def app_task_group(app_workflow):
   """Creates a Task Group within `app_workflow`."""
-  task_group = app_entity_factory.TaskGroupFactory().create(
-      workflow=app_workflow)
-  return workflow_rest_service.create_task_group(task_group)
+  return workflow_rest_facade.create_task_group(workflow=app_workflow)
 
 
 @pytest.fixture()
 def app_task_group_task(app_task_group):
   """Creates a Task Group Task within `app_task_group`."""
-  task_group_task = app_entity_factory.TaskGroupTaskFactory().create(
-      task_group=app_task_group)
-  return workflow_rest_service.create_task_group_task(task_group_task)
+  return workflow_rest_facade.create_task_group_task(task_group=app_task_group)
 
 
 @pytest.fixture()
 def app_person():
   """Creates a Person."""
-  person = app_entity_factory.PersonFactory().create()
-  return person_rest_service.create_person(person)
+  return person_rest_facade.create_person()
 
 
 @pytest.fixture()
 def app_control():
   """Creates a control."""
-  control = app_entity_factory.ControlFactory().create()
-  return control_rest_service.create_control(control)
+  return control_rest_facade.create_control()

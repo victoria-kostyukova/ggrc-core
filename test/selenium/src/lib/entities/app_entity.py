@@ -24,6 +24,8 @@ class _Base(object):
   # `context` in REST. It is required to be properly set in some REST queries
   # (e.g. create task group)
   rest_context = attr.ib()
+  # HTTP headers required for PUT / DELETE requests
+  rest_headers_for_update = attr.ib()
 
   @classmethod
   def obj_name(cls):
@@ -78,10 +80,14 @@ class _WithTitleAndCode(object):
 @attr.s
 class Workflow(_Base, _WithTitleAndCode):
   """Represents Workflow entity."""
+  state = attr.ib()
   admins = attr.ib()
   wf_members = attr.ib()
-  repeat_wf = attr.ib()
+  is_archived = attr.ib()
+  repeat_unit = attr.ib()
+  repeat_every = attr.ib()
   task_groups = attr.ib()
+  recurrences_started = attr.ib()
 
 
 @attr.s
