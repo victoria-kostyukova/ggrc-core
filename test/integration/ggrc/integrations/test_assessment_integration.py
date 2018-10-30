@@ -250,6 +250,43 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEqual(assmt_issue_tracker_info[field],
                        audit_issue_tracker_info[field])
 
+  def test_prepare_update_json(self):
+    """Test prepare_update_json method for Assessment."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit,
+          component_id=213,
+          hotlist_id=333,
+          issue_type="BUG",
+          issue_priority="P0",
+          issue_severity="S0",
+      )
+      assmt = factories.AssessmentFactory(
+          audit=audit,
+          title="title",
+      )
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=assmt,
+          title='',
+      )
+    without_info = assessment_integration.prepare_issue_update_json(assmt)
+    issue_info = assmt.issue_tracker
+    with_info = assessment_integration.prepare_issue_update_json(assmt,
+                                                                 issue_info)
+    expected_info = {
+        'component_id': 213,
+        'severity': u'S0',
+        'title': assmt.title,
+        'hotlist_ids': [333, ],
+        'priority': u'P0',
+        'type': u'BUG',
+    }
+    self.assertEqual(expected_info, with_info)
+    self.assertEqual(without_info, with_info)
+
   def test_fill_missing_values_from_default(self):
     """Check prepare_json_method get missed values from default values."""
     with factories.single_commit():

@@ -12,6 +12,7 @@ from ggrc import models
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.models.hooks.issue_tracker import issue_integration
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
 from ggrc.integrations import integrations_errors
@@ -685,3 +686,32 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
           },
       })
     update_issue_mock.assert_not_called()
+
+  def test_prepare_update_json(self):
+    """Test prepare_update_json method for Issue."""
+    with factories.single_commit():
+      issue = factories.IssueFactory()
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=issue,
+          title='title',
+          component_id=123,
+          hotlist_id=321,
+          issue_type="PROCESS",
+          issue_priority="P3",
+          issue_severity="S3",
+      )
+    without_info = issue_integration.prepare_issue_update_json(issue)
+    issue_info = issue.issue_tracker
+    with_info = issue_integration.prepare_issue_update_json(issue, issue_info)
+
+    expected_info = {
+        'component_id': 123,
+        'severity': u'S3',
+        'title': iti.title,
+        'hotlist_ids': [321, ],
+        'priority': u'P3',
+        'type': u'PROCESS',
+    }
+    self.assertEqual(expected_info, with_info)
+    self.assertEqual(without_info, with_info)
