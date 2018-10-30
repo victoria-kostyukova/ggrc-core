@@ -299,6 +299,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
             enabled=True,
             issue_tracked_obj=issue,
             issue_id=None,
+            title='',
             component_id=12345,
             hotlist_id=54321,
             issue_priority="P2",
@@ -631,12 +632,12 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     )
     for issue in issues:
       issue.enabled = 1
-      issue.title = "test title"
+      issue.title = ""
       issue.component_id = "1"
       issue.hotlist_id = "1"
-      issue.issue_type = "test tipe"
-      issue.issue_priority = "P1"
-      issue.issue_severity = "S1"
+      issue.issue_type = "BUG"
+      issue.issue_priority = "P2"
+      issue.issue_severity = "S2"
       issue.assignee = "test@example.com"
       issue.cc_list = ""
       issue.issue_id = 123
@@ -649,7 +650,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     response = self.update_issues_for(asmnt_issuetracker_info)
     self.assert200(response)
     self.assertEqual(response.json.get("errors"), [])
-    self.assert_obj_issues(asmnt_issuetracker_info, "assignees@example.com")
+    self.assert_obj_issues(asmnt_issuetracker_info)
 
   def test_issue_bulk_generate(self):
     """Test bulk update of issues for Issues."""
@@ -661,6 +662,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
             enabled=True,
             issue_tracked_obj=issue,
             issue_id=self.issue_id,
+            title="",
             component_id=12345,
             hotlist_id=54321,
             issue_priority="P2",
@@ -670,7 +672,6 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
 
     with factories.single_commit():
       person = factories.PersonFactory()
-      person_email = person.email
       for issue in all_models.Issue.query.all():
         issue.modified_by = person
         for role_name in ["Admin", "Primary Contacts"]:
@@ -701,7 +702,6 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     for issue in issues:
       parent_obj = issue.Issue_issue_tracked
       self.assertEqual(issue.title, parent_obj.title)
-      self.assertEqual(issue.assignee, person_email)
       self.assertEqual(issue.cc_list, "")
 
   def test_rate_limited_update(self):
