@@ -131,8 +131,6 @@ export default can.Construct.extend({
       value: cmsModel.model_singular,
       singular: cmsModel.model_singular,
       plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
-      table_plural: cmsModel.table_plural,
-      title_singular: cmsModel.title_singular,
     };
   },
   /**

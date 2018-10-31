@@ -184,8 +184,6 @@ describe('Mappings', function () {
       category: 'category',
       title_plural: 'title_plural',
       model_singular: 'model_singular',
-      table_plural: 'table_plural',
-      title_singular: 'title_singular',
     };
     let expectedResult = {
       category: 'category',
@@ -193,8 +191,6 @@ describe('Mappings', function () {
       value: 'model_singular',
       plural: 'title_plural',
       singular: 'model_singular',
-      table_plural: 'table_plural',
-      title_singular: 'title_singular',
     };
 
     it('returns specified object', function () {

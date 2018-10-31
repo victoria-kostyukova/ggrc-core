@@ -12,17 +12,14 @@
           <optgroup label="{{name}}">
             {{#each items}}
               {{#if name}}
-                  <option data-singular="{{singular}}"
-                          data-plural="{{plural}}"
-                          value="{{value}}"
-                          label="{{name}}"></option>
+                  <option value="{{value}}" label="{{name}}"></option>
               {{/if}}
             {{/each}}
           </optgroup>
       {{/if}}
     {{else}}
       {{#if name}}
-          <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
+          <option value="{{value}}" label="{{name}}"></option>
       {{/if}}
     {{/if}}
   {{/each}}
