@@ -117,6 +117,11 @@ export default can.Construct.extend({
     types.forEach((modelName) => {
       return this._addFormattedType(modelName, groups);
     });
+
+    _.forEach(groups, (group) => {
+      group.items = _.sortBy(group.items, 'name');
+    });
+
     return groups;
   },
   /**

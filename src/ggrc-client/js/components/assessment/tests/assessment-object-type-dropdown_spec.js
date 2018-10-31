@@ -34,26 +34,4 @@ describe('assessment-object-type-dropdown component', function () {
     result = viewModel.attr('objectTypes');
     expect(result).toEqual(objectTypes);
   });
-
-  it('sorts types within a group by name', function () {
-    let result;
-
-    let objectTypes = {
-      groupFoo: {
-        name: 'Bar-ish Objects',
-        items: [
-          {name: 'Car'}, {name: 'Bar'}, {name: 'Zar'}, {name: 'Dar'},
-        ],
-      },
-    };
-
-    let expected = [
-      {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'},
-    ];
-
-    spyOn(Mappings, 'groupTypes').and.returnValue(objectTypes);
-
-    result = viewModel.attr('objectTypes');
-    expect(result.groupFoo.items).toEqual(expected);
-  });
 });

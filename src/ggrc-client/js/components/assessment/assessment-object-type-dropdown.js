@@ -14,10 +14,6 @@ export default can.Component.extend({
           let objectTypes = Mappings
             .groupTypes(GGRC.config.snapshotable_objects);
 
-          _.forEach(objectTypes, function (objGroup) {
-            objGroup.items = _.sortBy(objGroup.items, 'name');
-          });
-
           // remove the groups that have ended up being empty
           objectTypes = _.pickBy(objectTypes, function (objGroup) {
             return objGroup.items && objGroup.items.length > 0;
