@@ -1,0 +1,39 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="autocomplete-dropdown flex-box flex-col">
+    <div class="autocomplete-dropdown__input-container {{#isDisabled}}disabled{{/isDisabled}}" 
+         ($click)="openCloseDropdown(%event)">
+        <input type="text"
+               readonly="readonly"
+               value="{{value}}"               
+               class="{{#if isOpen}}dropdown-focus{{/isOpen}}"
+               {{#isDisabled}}disabled{{/isDisabled}}/>
+            <span class="autocomplete-dropdown__icon">
+                <i class="fa fa-caret-down"></i>
+            </span>
+    </div>
+    {{#if isOpen}}
+        <div class="autocomplete-dropdown__body-wrapper">
+            <div class="dropdown-menu dropdown-menu-form autocomplete-dropdown__body">
+                <input class="autocomplete-dropdown__input"
+                       placeholder="Lookup attributes..."
+                       ($click)="onFocus(%event)"
+                       ($input)="filterOptions($element)"/>
+                <ul class="autocomplete-dropdown__list">
+                    {{#filteredOptions}}
+                        <li class="autocomplete-dropdown__element">
+                            <label class="autocomplete-dropdown__label"
+                                   ($click)="onChange(.)"
+                                   value="{{value}}">
+                                {{value}}
+                            </label>
+                        </li>
+                    {{/filteredOptions}}
+                </ul>
+            </div>
+        </div>
+    {{/if}}
+</div>  

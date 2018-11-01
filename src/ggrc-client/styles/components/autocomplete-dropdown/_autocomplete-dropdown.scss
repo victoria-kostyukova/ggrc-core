@@ -1,0 +1,113 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.autocomplete-dropdown {
+  max-width: 350px;
+  min-width: 150px;
+
+  input.autocomplete-dropdown__input::-webkit-input-placeholder{
+    color: #969696;
+  }
+
+  label.autocomplete-dropdown__label {
+    margin-left: 8px;
+    padding: 2px 0 2px 4px;
+    font-size: 12px;
+    user-select: none;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  .autocomplete-dropdown {
+    line-height: 28px;
+
+    &__input-container {
+      cursor: pointer;
+      line-height: 28px;
+      position: relative;
+
+      &.disabled {
+        opacity: 0.47;
+        cursor: not-allowed;
+        background-color: #eee;
+        border-color: #ddd;
+        outline: none;
+      }
+
+      input {
+        width: 100%;
+        padding: 4px 24px 4px 8px;
+        box-sizing: border-box;
+        height: 28px;
+        cursor: pointer;
+        text-overflow: ellipsis;
+        border: 1px solid #bbb;
+        border-radius: 5px;
+        color: rgb(85, 85, 85);
+    
+        &:focus {
+          outline-color: rgb(59, 153, 252);
+          outline-offset: -2px;
+          outline-style: auto;
+          outline-width: 3px;
+        }
+        &[disabled] {
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    &__input {
+      margin-top: 10px;
+      margin-bottom: 14px;
+      width: 80%;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+    }
+
+    &__body-wrapper {
+      position: absolute;
+      margin-top: 28px;
+      float: none;
+      display: block;
+    }
+
+    &__body {
+      box-sizing: border-box;
+      width: 100%;
+      float: none;
+      display: block;
+    }
+
+    &__list {
+      border-top: 1px solid #E0E0E0;
+      padding-top: 5px;
+      margin: 0;
+      overflow-y: auto;
+      max-height: 300px;
+    }
+
+    &__element {
+      &:hover {
+        background-color: #4599FE;
+      }
+    }
+
+    &__icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 24px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.7;
+    }
+  }
+}

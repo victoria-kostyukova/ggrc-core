@@ -5,11 +5,9 @@
 
 <div class="filter-attribute flex-box flex-box-multi">
   <div class="filter-attribute__name">
-    <select {($value)}="attribute.field">
-      {{#each availableAttributes}}
-      <option value="{{attr_title}}">{{attr_title}}</option>
-      {{/each}}
-    </select>
+    <autocomplete-dropdown {(value)}="attribute.field"
+                           {options}="attributeTitles">
+    </autocomplete-dropdown>
   </div>
   <div class="filter-attribute__operator">
     <select {($value)}="attribute.operator">

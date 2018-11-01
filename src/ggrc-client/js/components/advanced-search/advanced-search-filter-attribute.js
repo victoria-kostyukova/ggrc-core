@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.mustache';
 
 /**
@@ -42,6 +43,15 @@ let viewModel = can.Map.extend({
    * @type {object}
    */
   attribute: {},
+  /**
+   * Returns titles of available attributes for specific model.
+   * @return {list}
+   */
+  attributeTitles: function () {
+    return this.attr('availableAttributes').map((item) => {
+      return {value: item.attr_title};
+    });
+  },
   /**
    * Indicates Filter Attribute can be transformed to Filter Group.
    * @type {boolean}
