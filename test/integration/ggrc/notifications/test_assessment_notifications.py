@@ -74,7 +74,8 @@ class TestAssessmentNotification(TestCase):
     )
     factories.CustomAttributeValueFactory(
         custom_attribute=self.cad2,
-        attributable=self.assessment
+        attributable=self.assessment,
+        attribute_value='Person'
     )
 
     self.cad3 = factories.CustomAttributeDefinitionFactory(

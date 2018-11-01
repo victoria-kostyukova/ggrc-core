@@ -275,14 +275,16 @@ class TestCustomAttributableMixin(TestCase):
           attribute_type="Map:Person",
           title="CA 2",
       )
+      person = factories.PersonFactory()
       prog = factories.ProgramFactory()
+
     prog.custom_attribute_values = [
         {
-            "attribute_value": "Person:1",
+            "attribute_value": "Person:%s" % person.id,
             "custom_attribute_id": cad1.id,
         }, {
             "attribute_value": "Person",
-            "attribute_object_id": "1",
+            "attribute_object_id": str(person.id),
             "custom_attribute_id": cad2.id,
         }
     ]
@@ -290,7 +292,7 @@ class TestCustomAttributableMixin(TestCase):
     prog = prog.__class__.query.get(prog.id)
 
     self.assertEqual(
-        {"1"},
+        {str(person.id)},
         set(v.attribute_object_id for v in prog.custom_attribute_values),
     )
     self.assertEqual(
@@ -298,6 +300,97 @@ class TestCustomAttributableMixin(TestCase):
         set(v.attribute_value for v in prog.custom_attribute_values),
     )
     self.assertEqual(len(prog.custom_attribute_values), 2)
+
+  def test_validate_ca_with_wrong_id(self):
+    """Test adding custom "Map:Person" attribute with not existing Person."""
+    with factories.single_commit():
+      attribute_definition = factories.CustomAttributeDefinitionFactory(
+          definition_type="program",
+          attribute_type="Map:Person"
+      )
+      program = factories.ProgramFactory()
+
+    program.custom_attribute_values = [
+        {
+            "attribute_value": "Person:0",
+            "custom_attribute_id": attribute_definition.id,
+        }
+    ]
+
+    with self.assertRaises(ValueError) as exception:
+      program.validate_custom_attributes()
+
+      self.assertEqual(exception.exception.message,
+                       'Person with 0 id not exists')
+
+  def test_validate_ca_with_empty_id(self):
+    """Test adding empty id to mandatory custom "Map:Person" attribute."""
+    with factories.single_commit():
+      attribute_definition = factories.CustomAttributeDefinitionFactory(
+          definition_type="program",
+          attribute_type="Map:Person",
+          title='Person',
+          mandatory=True
+      )
+      program = factories.ProgramFactory()
+
+    program.custom_attribute_values = [
+        {
+            "attribute_value": "Person",
+            "custom_attribute_id": attribute_definition.id,
+        }
+    ]
+
+    with self.assertRaises(ValueError) as exception:
+      program.validate_custom_attributes()
+
+      self.assertEqual(exception.exception.message,
+                       'Missing mandatory attribute: Person')
+
+  def test_validate_empty_mapping_ca(self):
+    """Test adding empty id non-mandatory custom "Map:Person" attribute."""
+    with factories.single_commit():
+      attribute_definition = factories.CustomAttributeDefinitionFactory(
+          definition_type="program",
+          attribute_type="Map:Person",
+          title='Person'
+      )
+      program = factories.ProgramFactory()
+
+    program.custom_attribute_values = [
+        {
+            "attribute_value": "Person",
+            "custom_attribute_id": attribute_definition.id,
+        }
+    ]
+
+    program.validate_custom_attributes()
+    program = program.__class__.query.get(program.id)
+
+    self.assertEqual(len(program.custom_attribute_values), 1)
+
+  def test_validate_invalid_type_ca(self):
+    """Test adding invalid attribute type to custom "Map:Person" attribute."""
+    with factories.single_commit():
+      attribute_definition = factories.CustomAttributeDefinitionFactory(
+          definition_type="program",
+          attribute_type="Map:Person",
+          mandatory=True
+      )
+      program = factories.ProgramFactory()
+
+    program.custom_attribute_values = [
+        {
+            "attribute_value": "Assessment:1",
+            "custom_attribute_id": attribute_definition.id,
+        }
+    ]
+
+    with self.assertRaises(ValueError) as exception:
+      program.validate_custom_attributes()
+
+      self.assertEqual(exception.exception.message,
+                       'Invalid attribute type: Assessment expected Person')
 
 
 @ddt.ddt
