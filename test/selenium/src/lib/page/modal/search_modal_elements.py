@@ -21,7 +21,7 @@ class SearchFilterArea(object):
   def select_obj_type(self, obj_type):
     """Selects object type."""
     self._root.select(name="type-select").option(
-        data_singular=obj_type).click()
+        value=obj_type).click()
 
   def _set_title(self, title):
     """Types in title into search criteria text box.
