@@ -65,15 +65,13 @@ class TestAuditResource(TestCase):
 
     audits = [audit_1, audit_2]
     expected_snapshot_counts = {
-        audit_1.id: {"Control": 1, "Regulation": 0},
-        audit_2.id: {"Control": 0, "Regulation": 1},
+        audit_1.id: {"Control": 1},
+        audit_2.id: {"Regulation": 1},
     }
 
     for audit in audits:
-      response = self.api.client.post(
+      response = self.api.client.get(
           "/api/audits/{}/snapshot_counts".format(audit.id),
-          data=json.dumps({"snapshot_types": ("Control", "Regulation")}),
-          headers=self.headers
       )
       snapshot_counts = json.loads(response.data)
       self.assertEqual(snapshot_counts, expected_snapshot_counts[audit.id])

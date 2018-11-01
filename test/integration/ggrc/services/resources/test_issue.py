@@ -67,15 +67,13 @@ class TestIssueResource(TestCase):
 
     issues = [issue_1, issue_2]
     expected_snapshot_counts = {
-        issue_1.id: {"Control": 1, "Regulation": 0},
-        issue_2.id: {"Control": 0, "Regulation": 1},
+        issue_1.id: {"Control": 1},
+        issue_2.id: {"Regulation": 1},
     }
 
     for issue in issues:
-      response = self.api.client.post(
+      response = self.api.client.get(
           "/api/issues/{}/snapshot_counts".format(issue.id),
-          data=json.dumps({"snapshot_types": ("Control", "Regulation")}),
-          headers=self.headers
       )
       snapshot_counts = json.loads(response.data)
       self.assertEqual(snapshot_counts,

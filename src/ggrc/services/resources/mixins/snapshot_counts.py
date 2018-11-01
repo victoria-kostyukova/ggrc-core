@@ -8,11 +8,11 @@ class SnapshotCounts(object):
   # pylint: disable=too-few-public-methods
   """Extends resource with snapshot_counts."""
 
-  def post(self, *args, **kwargs):
+  def get(self, *args, **kwargs):
     """snapshot_counts endpoint handler"""
     # pylint: disable=arguments-differ
     command = kwargs.get("command", None)
     if command is None or command != "snapshot_counts":
-      return super(SnapshotCounts, self).post(*args, **kwargs)
+      return super(SnapshotCounts, self).get(*args, **kwargs)
     kwargs.pop("command")
     return self.snapshot_counts_query(*args, **kwargs)
