@@ -65,7 +65,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       "Rich Text": lambda self: self._validate_rich_text(),
       "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
-      "Map:Person": lambda self: self._validate_map_person(),
+      "Map:Person": lambda self: self._validate_map_object(),
       "Checkbox": lambda self: self._validate_checkbox(),
   }
 
@@ -241,25 +241,95 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
         db.UniqueConstraint('attributable_id', 'custom_attribute_id'),
     )
 
-  def _validate_map_person(self):
-    """Validate and correct mapped person values
+  def _validate_map_object(self):
+    """Validate and correct mapped object values
 
-    Mapped person custom attribute is only valid if both attribute_value and
+    Mapped object custom attribute is only valid if both attribute_value and
     attribute_object_id are set. To keep the custom attribute api consistent
     with other types, we allow setting the value to a string containing both
     in this way "attribute_value:attribute_object_id". This validator checks
     Both scenarios and changes the string value to proper values needed by
     this custom attribute.
-
-    Note: this validator does not check if id is a proper person id.
     """
+    self._extract_object_id_from_value()
+    self._validate_mandatory_mapping()
+    self._validate_map_type()
+    self._validate_object_existence()
+
+  def _extract_object_id_from_value(self):
+    """Extract attribute_object_id from attribute_value"""
     if self.attribute_value and ":" in self.attribute_value:
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       self.attribute_object_id = id_
 
+  def _validate_mandatory_mapping(self):
+    """Validate mandatory mapping attribute"""
+    if self.custom_attribute.mandatory and not self.attribute_object_id:
+      raise ValueError('Missing mandatory attribute: %s' %
+                       self.custom_attribute.title)
+
+  def _validate_map_type(self):
+    """Validate related CAD attribute_type and provided attribute_value
+
+    Related custom attribute definition's attribute_type column must starts
+    with "Map:".
+
+    Example:
+      "Map:Person" - for mapping with Person model
+
+    Provided attribute_value should match to custom attribute definition's
+    attribute_type. If definition have "Map:Person" attribute_type,
+    attribute_value must be "Person".
+    """
+    from ggrc.models import all_models
+
+    mapping_prefix = 'Map:'
+
+    defined_type = self.custom_attribute.attribute_type
+    if not defined_type.startswith(mapping_prefix):
+      raise ValueError('Invalid definition type: %s expected mapping' %
+                       defined_type)
+
+    if not self.attribute_value:
+      return
+
+    try:
+      expected_type = defined_type.split(mapping_prefix)[1]
+    except IndexError:
+      raise ValueError("Invalid definition type: mapping type didn't provided")
+
+    if self.attribute_value != expected_type:
+      raise ValueError('Invalid attribute type: %s expected %s' %
+                       (self.attribute_value, expected_type))
+
+    related_model = getattr(all_models, self.attribute_value)
+    if not related_model or not issubclass(related_model, db.Model):
+      raise ValueError('Invalid attribute type: %s' % self.attribute_value)
+
+  def _validate_object_existence(self):
+    """Validate existence of provided attribute_object_id
+
+    To verify that attribute type is correct,
+    must be called after '_validate_map_type()' method.
+    """
+    from ggrc.models import all_models
+
+    if not self.attribute_object_id:
+      return
+
+    related_model = getattr(all_models, self.attribute_value)
+    related_object = related_model.query.filter_by(
+        id=self.attribute_object_id)
+
+    object_existence = db.session.query(related_object.exists()).scalar()
+
+    if not object_existence:
+      raise ValueError('Invalid attribute value: %s' %
+                       self.custom_attribute.title)
+
   def _validate_dropdown(self):
-    """Validate dropdown opiton."""
+    """Validate dropdown option."""
     valid_options = set(self.custom_attribute.multi_choice_options.split(","))
     if self.attribute_value:
       self.attribute_value = self.attribute_value.strip()

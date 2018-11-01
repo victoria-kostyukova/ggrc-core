@@ -204,6 +204,9 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     for value in values:
+      # TODO: decompose to smaller methods
+      # TODO: remove complicated nested conditions, better to use
+      # instant exception raising
       if not value.get("attribute_object_id"):
         # value.get("attribute_object", {}).get("id") won't help because
         # value["attribute_object"] can be None
@@ -245,7 +248,8 @@ class CustomAttributable(object):
               attributable=self,
               custom_attribute=custom_attribute,
               custom_attribute_id=custom_attribute_id,
-              attribute_value=value.get("attribute_value")
+              attribute_value=value.get("attribute_value"),
+              attribute_object_id=value.get("attribute_object_id"),
           )
           cav.attribute_object = attribute_object
         else:
