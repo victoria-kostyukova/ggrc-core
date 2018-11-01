@@ -16,5 +16,5 @@ pytest-selenium==1.13.0
 pytest-xdist==1.22.5
 python-dateutil==2.7.3
 requests==2.19.1
-selenium==3.14.0
+selenium==3.14.1
 tenacity==5.0.2
