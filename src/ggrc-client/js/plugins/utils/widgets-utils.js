@@ -10,6 +10,7 @@ import {
 } from './query-api-utils';
 import {
   isSnapshotRelated,
+  getSnapshotsCounts,
 } from './snapshot-utils';
 import {
   isObjectVersion,

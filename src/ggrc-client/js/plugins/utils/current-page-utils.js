@@ -10,7 +10,6 @@ import {
 import {
   isSnapshotRelated,
   transformQuery,
-  getSnapshotsCounts,
 } from './snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
 import {inferObjectType} from './models-utils';
