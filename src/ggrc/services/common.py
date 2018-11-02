@@ -1471,7 +1471,7 @@ class ExtendedResource(Resource):
       )
 
       with benchmark("Make response"):
-        result = {child_type: count for child_type, count in snapshot_counts}
+        result = dict(snapshot_counts)
 
     return self.json_success_response(result)
 
