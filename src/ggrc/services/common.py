@@ -652,19 +652,23 @@ class Resource(ModelView):
           object_for_json, self.modified_at(obj),
           obj_etag=etag(self.modified_at(obj), get_info(obj)))
 
-  def delete(self, id):
-    with benchmark("Query for object"):
-      obj = self.get_object(id)
-    if obj is None:
-      return self.not_found_response()
-
-    # marking objects for which we have to fetch permissions
+  @classmethod
+  def _mark_delete_object_permissions(cls, obj):
+    """Mark objects to fetch permissions on delete request."""
     if obj.type == "Relationship":
       flask.g.referenced_object_stubs = collections.defaultdict(set)
       for related_obj in (obj.source, obj.destination, obj):
         flask.g.referenced_object_stubs[related_obj.type].add(related_obj.id)
     else:
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
+
+  def delete(self, id):
+    with benchmark("Query for object"):
+      obj = self.get_object(id)
+    if obj is None:
+      return self.not_found_response()
+
+    self._mark_delete_object_permissions(obj)
 
     with benchmark("Query delete permissions"):
       if not permissions.is_allowed_delete(
