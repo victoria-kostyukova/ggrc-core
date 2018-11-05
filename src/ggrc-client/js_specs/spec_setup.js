@@ -44,6 +44,11 @@ GGRC.config = {
     'Metric',
     'TechnologyEnvironment',
   ],
+  snapshot_related: [
+    'Audit',
+    'Assessment',
+    'Issue',
+  ],
   VERSION: '1.0-Test (abc)',
 };
 GGRC.Bootstrap = {

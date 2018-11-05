@@ -88,6 +88,15 @@ function isSnapshotRelated(parent, child) {
     isInScopeModel(parent) && isSnapshotModel(child);
 }
 
+/**
+ * Check if object type related to snapshots.
+ * @param {String} type - Type of object
+ * @return {Boolean} True or False
+ */
+function isSnapshotRelatedType(type) {
+  return GGRC.config.snapshot_related.indexOf(type) > -1;
+}
+
 function isInScopeModel(model) {
   return inScopeModels.indexOf(model) > -1;
 }
@@ -244,7 +253,7 @@ function getSnapshotItemQuery(instance, childId, childType) {
  * @param {Array} data - Array of snapshot names
  * @return {Promise} Promise
  */
-function getSnapshotsCounts(instance, data) {
+function getSnapshotsCounts(instance) {
   let url = `${instance.selfLink}/snapshot_counts`;
 
   const stopFn = tracker.start(
@@ -252,7 +261,7 @@ function getSnapshotsCounts(instance, data) {
     tracker.USER_JOURNEY_KEYS.API,
     tracker.USER_ACTIONS[instance.type.toUpperCase()].SNAPSHOTS_COUNT);
 
-  return $.post(url, {snapshot_types: data})
+  return $.get(url)
     .then((counts) => {
       stopFn();
       return counts;
@@ -269,6 +278,7 @@ export {
   isSnapshotScope,
   isSnapshotParent,
   isSnapshotRelated,
+  isSnapshotRelatedType,
   isSnapshotModel,
   isInScopeModel,
   toObject,

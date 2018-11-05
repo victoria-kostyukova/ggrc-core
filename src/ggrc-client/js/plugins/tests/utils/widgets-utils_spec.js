@@ -359,10 +359,12 @@ describe('GGRC Utils Widgets', function () {
     let widgets;
     let refreshCounts;
     let countsMap;
+    let snapshotCountsDfd;
 
     beforeEach(function () {
       refreshCounts = WidgetsUtils.refreshCounts;
       countsMap = WidgetsUtils.getCounts();
+      snapshotCountsDfd = can.Deferred();
 
       widgets =
         {
@@ -403,9 +405,14 @@ describe('GGRC Utils Widgets', function () {
               {Assessment: {count: 0, total: 0}, selfLink: null},
               {Audit: {count: 3, total: 4}, selfLink: null},
             ]));
+
+      spyOn(SnapshotUtils, 'getSnapshotsCounts')
+        .and.returnValue(snapshotCountsDfd);
     });
 
     it('should reinit counts', function (done) {
+      snapshotCountsDfd.resolve({});
+
       refreshCounts()
         .then(function (counts) {
           let reqParams;

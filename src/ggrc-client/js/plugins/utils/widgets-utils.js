@@ -10,6 +10,7 @@ import {
 } from './query-api-utils';
 import {
   isSnapshotRelated,
+  isSnapshotRelatedType,
   getSnapshotsCounts,
 } from './snapshot-utils';
 import {
@@ -108,30 +109,6 @@ function getCounts() {
   return widgetsCounts;
 }
 
-/**
- * Get snapshots list
- * @param {Array|Object} widgets - list of widgets
- * @return {Array} - list of required snapshots
- */
-function getRequiredSnapshots(widgets) {
-  let requiredSnapshots = [];
-  let type = getPageInstance().type;
-
-  let widgetsObj = getWidgetConfigs(can.makeArray(widgets));
-
-  _.each(widgetsObj, (widgetObj) => {
-    if (_isSnapshotRelated(type, widgetObj)) {
-      requiredSnapshots.push(widgetObj.name);
-    }
-  });
-
-  return requiredSnapshots;
-}
-
-function _isSnapshotRelated(type, object) {
-  return isSnapshotRelated(type, object.name) || object.isObjectVersion;
-}
-
 function initWidgetCounts(widgets, type, id) {
   let resultsArray = [];
 
@@ -143,9 +120,8 @@ function initWidgetCounts(widgets, type, id) {
     resultsArray.push(_initWidgetCounts(widgets, type, id));
   }
 
-  let snapshots = getRequiredSnapshots(widgets);
-  if (snapshots.length) {
-    resultsArray.push(getSnapshotsCounts(getPageInstance(), snapshots));
+  if (isSnapshotRelatedType(type)) {
+    resultsArray.push(getSnapshotsCounts(getPageInstance()));
   }
 
   return Promise.all(resultsArray).then((values) => {
@@ -180,7 +156,10 @@ function _initWidgetCounts(widgets, type, id) {
     let expression = TreeViewUtils
       .makeRelevantExpression(widgetObject.name, type, id);
 
-    if (!_isSnapshotRelated(type, widgetObject)) {
+    let snapshotRelatedOrVersion = isSnapshotRelated(type, widgetObject.name) ||
+                            widgetObject.isObjectVersion;
+
+    if (!snapshotRelatedOrVersion) {
       param = buildParam(widgetObject.name,
         {}, expression, null,
         widgetObject.additionalFilter ?
