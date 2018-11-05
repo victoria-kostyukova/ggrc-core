@@ -13,9 +13,16 @@ class RelatedProposals(base.WithBrowser):
 
   def get_proposals(self):
     """Get proposal rows."""
-    elements = self._browser.elements(tag_name="related-proposals-item")
+    obj_list_element = self._browser.element(
+        tag_name="object-list").wait_until(
+        lambda e: e.exists).wait_until(
+        lambda e: e.browser.execute_script(
+            "return $(arguments[0]).viewModel().attr('isLoading')",
+            e) is False)
+    elements = obj_list_element.elements(tag_name="related-proposals-item")
     proposal_rows = [ProposalRow(
-        row_element=element).get_proposal() for element in elements]
+        row_element=element.wait_until(
+            lambda e: e.exists)).get_proposal() for element in elements]
     return proposal_rows
 
   def proposal_row(self, proposal):
