@@ -75,7 +75,7 @@ class CommonUnifiedMapperModal(base.Modal):
     latest_filter_elem = self._driver.find_elements(
         *self._locators.FILTER_ROW_CSS)
     latest_filter = {
-        "name": base.DropdownStatic(
+        "name": base.DropdownAutocomplete(
             latest_filter_elem[-1], self._locators.FILTER_ATTRIBUTE_NAME),
         "compare_op": base.DropdownStatic(
             latest_filter_elem[-1], self._locators.FILTER_ATTRIBUTE_COMPARE),

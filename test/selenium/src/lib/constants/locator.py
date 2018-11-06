@@ -257,7 +257,8 @@ class CommonModalUnifiedMapper(object):
   FILTER_ADD_ATTRIBUTE_BTN = (By.XPATH, "//button[text()='Add Attribute']")
   FILTER_ROW_CSS = (By.CSS_SELECTOR, ".filter-container__attribute")
   FILTER_OPERATOR = (By.CSS_SELECTOR, ".filter-operator__content select")
-  FILTER_ATTRIBUTE_NAME = (By.CSS_SELECTOR, ".filter-attribute__name select")
+  FILTER_ATTRIBUTE_NAME = (
+      By.CSS_SELECTOR, ".filter-attribute__name autocomplete-dropdown")
   FILTER_ATTRIBUTE_COMPARE = (
       By.CSS_SELECTOR, ".filter-attribute__operator select")
   FILTER_ATTRIBUTE_VALUE = (By.CSS_SELECTOR, ".filter-attribute__value input")

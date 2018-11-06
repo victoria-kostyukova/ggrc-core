@@ -350,6 +350,17 @@ class DropdownStatic(Element):
       exception.ElementNotFound(val)
 
 
+class DropdownAutocomplete(Element):
+  """Dropdown with autocomplete elements."""
+
+  def select(self, value_name):
+    """Selects autocomplete dropdown element based on element value."""
+    self.element.click()
+    selenium_utils.get_when_visible(self._driver, (
+        By.CSS_SELECTOR, "label[value={}]".format(
+            value_name))).click()
+
+
 class WithBrowser(InstanceRepresentation):
   """Class to contain a driver and browser instances"""
 
