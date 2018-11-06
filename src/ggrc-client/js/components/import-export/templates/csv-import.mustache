@@ -40,7 +40,14 @@
         {{#case 'Not Started'}}
           <label class="confirm-action">
             <input type="checkbox" {($checked)}="isConfirm">
-            I confirm, that data being imported is complete and accurate.
+            <span>
+              I confirm that the import file containing {{importedObjectsCount}}
+              {{#if_equals importedObjectsCount 1}}object{{else}}objects{{/if_equals}} is complete and accurate to the best of my knowledge.
+              I understand that regardless of GGRC's integrity check of the import file, the quality of this import data and adherence
+              to the approved <a href="https://sites.google.com/corp/google.com/ece/common-model-for-compliance-google">taxonomy</a>
+              and mapping model is my responsibility. Note: bulk import files when not appropriately validated for quality, can have a
+              material effect on the data quality of the overall system.
+            </span>
           </label>
           <button type="button"
                   class="btn btn-small btn-green"
