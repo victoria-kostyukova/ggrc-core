@@ -120,7 +120,7 @@ class Reviewable(rest_handable.WithPutHandable,
     out_json["review_issue_link"] = self.review_issue_link
     return out_json
 
-  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id",
+  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by", "modified_by_id",
                      "slug", "_access_control_list", "folder"}
 
   def _update_status_on_attr(self):
@@ -191,7 +191,8 @@ class Reviewable(rest_handable.WithPutHandable,
     self._update_status_on_mapping(counterparty)
 
   def handle_proposal_applied(self):
-    self._set_review_status_unreviewed()
+    self._update_status_on_attr()
+    self._update_status_on_custom_attrs()
 
   def handle_mapping_via_import_created(self, counterparty):
     if self._is_counterparty_snapshottable(counterparty):
