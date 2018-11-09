@@ -1,7 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-""" Unit tests for the Assessment object """
+""" Unit tests for the Reviewable object """
 
 import unittest
 
