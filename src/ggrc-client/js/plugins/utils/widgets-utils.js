@@ -124,6 +124,8 @@ function initWidgetCounts(widgets, type, id) {
     resultsArray.push(getSnapshotsCounts(getPageInstance()));
   }
 
+  let baseCounts = widgets.reduce((result, val) => ({...result, [val]: 0}), {});
+
   return Promise.all(resultsArray).then((values) => {
     let combinedValue = _.chain(values)
       .compact()
@@ -131,6 +133,8 @@ function initWidgetCounts(widgets, type, id) {
         return Object.assign(sum, value);
       }, {})
       .value();
+
+    combinedValue = Object.assign({}, baseCounts, combinedValue);
 
     if (!_.isEmpty(combinedValue)) {
       getCounts().attr(combinedValue);
