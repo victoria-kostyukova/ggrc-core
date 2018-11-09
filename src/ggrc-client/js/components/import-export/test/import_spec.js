@@ -49,6 +49,39 @@ describe('csv-import component', () => {
     });
   });
 
+  describe('processLoadedInfo() method', () => {
+    it('should set number of imported objects ' +
+      'when there is loaded info', () => {
+      const data = [];
+      let countRows = 0;
+
+      for (let i = 4; i < 7; i++) {
+        const obj = {
+          rows: i,
+          block_errors: [],
+          row_errors: [],
+          row_warnings: [],
+          block_warnings: [],
+        };
+
+        data.push(obj);
+
+        countRows += i;
+      }
+
+      vm.processLoadedInfo(data);
+
+      expect(vm.attr('importedObjectsCount')).toEqual(countRows);
+    });
+
+    it('should not set "importedObjectsCount" field ' +
+      'when there is not loaded info', () => {
+      vm.processLoadedInfo([]);
+
+      expect(vm.attr('importedObjectsCount')).toEqual(0);
+    });
+  });
+
   describe('resetFile() method', () => {
     it('should reset file\'s info', () => {
       vm.attr({
@@ -143,9 +176,56 @@ describe('csv-import component', () => {
         expect(vm.attr('fileName')).toEqual('file.csv');
         expect(vm.attr('state')).toEqual('New Status');
         expect(vm.attr('jobId')).toEqual(13);
-
         expect(vm.attr('message')).toBeTruthy();
 
+        done();
+      });
+    });
+
+    it(`should set number of imported objects in "importedObjectsCount" field
+      when there are imported objects`, (done) => {
+      spyOn(backendGdriveClient, 'withAuth')
+        .and.returnValue(can.Deferred().resolve({
+          objects: {
+            Control: 15,
+            Assessment: 5,
+            Program: 19,
+          },
+          import_export: {
+            id: 13,
+            status: 'New Status',
+          },
+        }));
+
+      vm.analyseSelectedFile({
+        id: 42,
+        name: 'file.csv',
+      }).then(() => {
+        expect(vm.attr('importedObjectsCount')).toEqual(39);
+        done();
+      });
+    });
+
+    it(`should not set "importedObjectsCount" field
+    when there are not imported objects`, (done) => {
+      spyOn(backendGdriveClient, 'withAuth')
+        .and.returnValue(can.Deferred().resolve({
+          objects: {
+            Control: 0,
+            Assessment: 0,
+            Program: 0,
+          },
+          import_export: {
+            id: 13,
+            status: 'New Status',
+          },
+        }));
+
+      vm.analyseSelectedFile({
+        id: 42,
+        name: 'file.csv',
+      }).then(() => {
+        expect(vm.attr('importedObjectsCount')).toEqual(0);
         done();
       });
     });
