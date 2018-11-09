@@ -15,12 +15,12 @@ class TestReviewableMixin(unittest.TestCase):
 
   @mock.patch("ggrc.notifications.add_notification")
   def test_handle_proposal_ignorable(self, mock_add_notification):
-    """Test that changes of attrs from ignore list does not revert review state."""
+    """Test that chages of ignorable attrs does not change review state."""
     reviewable = review.Reviewable()
 
-    attribute_changes = [
-      mock.Mock(key=attr, history=mock.Mock(has_changes=lambda: True))
-      for attr in reviewable.ATTRS_TO_IGNORE]
+    attribute_changes = [mock.Mock(key=attr,
+                                   history=mock.Mock(has_changes=lambda: True))
+                         for attr in reviewable.ATTRS_TO_IGNORE]
     with mock.patch("ggrc.db.inspect",
                     return_value=mock.Mock(attrs=attribute_changes)):
 
