@@ -11,9 +11,11 @@ from ggrc.models import review
 
 
 class TestReviewableMixin(unittest.TestCase):
+  """Unit tests for Reviewable mixin."""
 
   @mock.patch("ggrc.notifications.add_notification")
-  def test_handle_proposal_ignorable_attrs_review_state(self, mock_add_notification):
+  def test_handle_proposal_ignorable(self, mock_add_notification):
+    """Test that changes of attrs from ignore list does not revert review state."""
     reviewable = review.Reviewable()
 
     attribute_changes = [
@@ -22,7 +24,7 @@ class TestReviewableMixin(unittest.TestCase):
     with mock.patch("ggrc.db.inspect",
                     return_value=mock.Mock(attrs=attribute_changes)):
 
-      mocked_review = mock.Mock(status=review.Review.STATES.REVIEWED)      
+      mocked_review = mock.Mock(status=review.Review.STATES.REVIEWED)
       with mock.patch("ggrc.models.review.Reviewable.review",
                       return_value=mocked_review):
         reviewable.handle_proposal_applied()
