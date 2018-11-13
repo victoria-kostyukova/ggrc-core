@@ -131,10 +131,6 @@ export default can.Control({
       this.element.html(content);
     }
 
-    if (this.wasDestroyed()) {
-      return;
-    }
-
     this.options.attr('$header', this.element.find('.modal-header'));
     this.options.attr('$content', this.element.find('.modal-body'));
     this.options.attr('$footer', this.element.find('.modal-footer'));
@@ -148,12 +144,16 @@ export default can.Control({
         }
       })
       .then(this.proxy('autocomplete'))
-      .then(function () {
+      .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
           this.restore_ui_status_from_storage();
         }
-      }.bind(this));
+      })
+      .fail((error) => {
+        notifierXHR('error')(error);
+        this.element.modal_form('hide');
+      });
   },
 
   apply_object_params: function () {
