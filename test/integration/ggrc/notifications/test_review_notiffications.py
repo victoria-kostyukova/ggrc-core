@@ -169,8 +169,8 @@ class TestReviewNotification(TestCase):
     self.assertEqual(expected_notifications, len(notyf_unreviewed_type))
 
   @ddt.data(
-    (all_models.Review.NotificationTypes.EMAIL_TYPE, 0),
-    (all_models.Review.NotificationTypes.ISSUE_TRACKER, 0),
+      (all_models.Review.NotificationTypes.EMAIL_TYPE, 0),
+      (all_models.Review.NotificationTypes.ISSUE_TRACKER, 0),
   )
   @ddt.unpack
   def test_proposal_apply_review_status(self, notification_type,
@@ -187,17 +187,17 @@ class TestReviewNotification(TestCase):
 
       user = factories.PersonFactory()
       acl = factories.AccessControlListFactory(
-        ac_role=factories.AccessControlRoleFactory(object_type="Control"),
-        object=control
+          ac_role=factories.AccessControlRoleFactory(object_type="Control"),
+          object=control
       )
 
       proposal_content = {
-        "access_control_list": {
-          acl.ac_role_id: {
-            "added": [{"id": user.id, "email": user.email}],
-            "deleted": []
+          "access_control_list": {
+              acl.ac_role_id: {
+                  "added": [{"id": user.id, "email": user.email}],
+                  "deleted": []
+              }
           }
-        }
       }
 
       proposal = factories.ProposalFactory(
@@ -212,9 +212,10 @@ class TestReviewNotification(TestCase):
 
     review_notif_types = all_models.Review.NotificationObjectTypes
     notif_unreviewed_type = all_models.Notification.query.join(
-      all_models.NotificationType
+        all_models.NotificationType
     ).filter(
-      all_models.NotificationType.name == review_notif_types.STATUS_UNREVIEWED
+        all_models.NotificationType.name ==
+        review_notif_types.STATUS_UNREVIEWED
     ).all()
 
     self.assertEqual(num_notifications_expected, len(notif_unreviewed_type))
