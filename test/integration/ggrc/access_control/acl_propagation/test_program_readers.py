@@ -124,7 +124,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
           "MappedReview Program": {
               "create_review": True,
               "read_review": True,
-              "update_review": True,
+              "update_review": False,
               "delete_review": False,
           },
       },
@@ -236,7 +236,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
           "MappedReview Program": {
               "create_review": True,
               "read_review": True,
-              "update_review": True,
+              "update_review": False,
               "delete_review": False,
           },
       },
@@ -349,7 +349,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
           "MappedReview Program": {
               "create_review": True,
               "read_review": True,
-              "update_review": True,
+              "update_review": False,
               "delete_review": False,
           },
       },
