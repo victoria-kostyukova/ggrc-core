@@ -1078,22 +1078,28 @@ def create_missing_issuetrackerissues(parent_type, parent_id):
   Assessment created without issuetracker_issue if parent Audit's
   issuetracker_issue is disabled. But load_issuetracked_objects assumes that
   each Assessment has issuetracker_issue.
-  """
-  if parent_type != "Audit":
-    return
 
-  audit = all_models.Audit.query.get(parent_id)
-  if audit.issuetracker_issue and audit.assessments:
-    issue_tracker_info = audit.issuetracker_issue.get_issue(
-        parent_type, parent_id
-    ).to_dict()
-    for assessment in audit.assessments:
-      if assessment.issuetracker_issue is None:
-        all_models.IssuetrackerIssue.create_or_update_from_dict(
-            assessment, issue_tracker_info)
-    # flush is needed here to 'load_issuetracked_objects' be able to load
-    # missing assessments
-    db.session.flush()
+  Returns:
+      List with Issuetracker issues.
+  """
+  new_issuetracker_issues = []
+  if parent_type == "Audit":
+    audit = all_models.Audit.query.get(parent_id)
+    if audit.issuetracker_issue and audit.assessments:
+      issue_tracker_info = audit.issuetracker_issue.get_issue(
+          parent_type, parent_id
+      ).to_dict()
+      for assessment in audit.assessments:
+        if assessment.issuetracker_issue is None:
+          new_issuetracker_issues.append(
+              all_models.IssuetrackerIssue.create_or_update_from_dict(
+                  assessment, issue_tracker_info
+              )
+          )
+          # flush is needed here to 'load_issuetracked_objects' be able to load
+          # missing assessments
+          db.session.flush()
+  return new_issuetracker_issues
 
 
 def load_issuetracked_objects(parent_type, parent_id):

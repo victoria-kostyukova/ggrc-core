@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test bulk issuetracker synchronization."""
+# pylint: disable=too-many-lines
 import unittest
 from collections import OrderedDict
 
@@ -740,6 +741,35 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
         "Tickets generation for audit \"{}\" was completed".format(title),
         body
     )
+
+  def test_proper_revisions_creation(self):
+    """Test all revisions are created for new IssuetrackerIssues"""
+    with factories.single_commit():
+      asmnt = factories.AssessmentFactory()
+      factories.IssueTrackerIssueFactory(issue_tracked_obj=asmnt.audit)
+    response = self.generate_children_issues_for(
+        "Audit", asmnt.audit.id, "Assessment"
+    )
+    self.assert200(response)
+    revisions = db.session.query(
+        all_models.Revision.action,
+        all_models.IssuetrackerIssue.object_type,
+        all_models.IssuetrackerIssue.object_id
+    ).join(
+        all_models.IssuetrackerIssue,
+        all_models.Revision.resource_id == all_models.IssuetrackerIssue.id
+    ).filter(
+        all_models.Revision.resource_type == 'IssuetrackerIssue',
+        all_models.IssuetrackerIssue.object_id.in_(
+            (asmnt.id, asmnt.audit.id)
+        )
+    ).all()
+    expected_revisions = {
+        (u'created', u'Assessment', asmnt.id),
+        (u'modified', u'Assessment', asmnt.id),
+        (u'created', u'Audit', asmnt.audit.id)
+    }
+    self.assertEquals(set(revisions), expected_revisions)
 
 
 @ddt.ddt

@@ -321,11 +321,12 @@ class IssueTrackerBulkCreator(object):
         "issue_url": info["issue_url"],
     } for (obj_type, obj_id), info in issue_info.items()]
 
-  def log_issues(self, issue_objs):
+  def log_issues(self, issue_objs, action='modified'):
     """Create log information about issues such as event and revisions.
 
     Args:
         issue_objs: [(obj_type, obj_id)] List with types and ids of objects.
+        action: action that will be displayed in revisions
     """
     current_user_id = login.get_current_user_id()
     event_id_query = all_models.Event.__table__.insert().values(
@@ -336,18 +337,19 @@ class IssueTrackerBulkCreator(object):
     )
     try:
       event_id = db.session.execute(event_id_query).inserted_primary_key[0]
-      self.create_revisions(issue_objs, event_id, current_user_id)
+      self.create_revisions(issue_objs, event_id, current_user_id, action)
     except sa.exc.OperationalError as error:
       logger.exception(error)
 
   @staticmethod
-  def create_revisions(resources, event_id, user_id):
+  def create_revisions(resources, event_id, user_id, action):
     """Create revisions for provided objects in bulk.
 
     Args:
         resources: [(obj_type, obj_id)] List with types and ids of objects.
         event_id: id of event that lead to revisions creation.
         user_id: id of user for which revisions should be created.
+        action: action that will be displayed in revisions
     """
     issue_objs = all_models.IssuetrackerIssue.query.filter(
         sa.tuple_(
@@ -360,7 +362,7 @@ class IssueTrackerBulkCreator(object):
             "resource_id": obj.id,
             "resource_type": obj.type,
             "event_id": event_id,
-            "action": 'modified',
+            "action": action,
             "content": obj.log_json(),
             "resource_slug": None,
             "source_type": None,
@@ -519,7 +521,14 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
                   parent_type, child_type
               )
           )
-        handler.create_missing_issuetrackerissues(parent_type, parent_id)
+        issuetracker_issues = handler.create_missing_issuetrackerissues(
+            parent_type, parent_id
+        )
+        if issuetracker_issues:
+          self.log_issues(
+              [('Assessment', obj.object_id) for obj in issuetracker_issues],
+              action='created'
+          )
         for obj in handler.load_issuetracked_objects(parent_type, parent_id):
           issuetracked_info.append(IssuetrackedObjInfo(obj))
 
