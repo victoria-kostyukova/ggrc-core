@@ -349,7 +349,7 @@ class TestProgramReadersPropagation(base.TestACLPropagation):
           "MappedReview Program": {
               "create_review": True,
               "read_review": True,
-              "update_review": False,
+              "update_review": True,
               "delete_review": False,
           },
       },
