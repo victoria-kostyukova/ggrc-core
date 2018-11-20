@@ -596,33 +596,20 @@ p {
 }
 
 .hidden-widgets-list {
-  .dropdown-menu,
-  .dropdown-list {
-    @extend %clearfix;
+  .dropdown-menu {
     width: 400px;
-    .inner-nav-item {
-      float: left;
-      width: 200px;
-    }
+    column-count: 2;
+    column-gap: 0;
+
     &.right-pos {
       right: 0;
       left: auto;
     }
-    &.mid-pos {
-      right: auto;
-      left: 300px;
-      top: -146px;
-    }
+
     &.one-item {
+      column-count: 1;
       width: 160px;
-      .inner-nav-item {
-        float: none;
-        clear: both;
-      }
     }
-  }
-  &.child-node-wrap {
-    text-align: left;
   }
 }
 
@@ -929,44 +916,6 @@ p {
   margin-top: 30px;
   h3 {
     margin-bottom: 10px;
-  }
-}
-
-.popover-child-node {
-  @include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
-  border: 1px solid rgba(0,0,0, .2);
-  .arrow {
-    display: none !important;
-  }
-}
-
-.child-node-wrap {
-  a {
-    @include transition(color .2s ease);
-    padding: 0 14px 0 10px;
-    display: block;
-    line-height: 29px;
-    font-size: 13px;
-    color: $gray;
-    text-transform: none;
-    i {
-      @include opacity(.4);
-    }
-    &:hover {
-      color: $black;
-      text-decoration: none;
-      i {
-        @include opacity(1);
-      }
-    }
-  }
-}
-
-.child-node {
-  .popover-template:hover {
-    i {
-      background-position: -246px -416px;
-    }
   }
 }
 

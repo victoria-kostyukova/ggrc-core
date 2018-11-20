@@ -105,18 +105,8 @@ ul.internav {
     &.hidden-widgets-list {
       position: relative;
 
-      .dropdown-menu {
-        column-count: 2;
-        column-gap: 0;
-      }
-
       a {
         white-space:nowrap;
-        &.dropdown-toggle {
-          &:hover {
-            background: none;
-          }
-        }
       }
     }
     &.active {
