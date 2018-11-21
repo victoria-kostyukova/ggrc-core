@@ -375,6 +375,7 @@ class TestCase(BaseTestCase, object):
     argument as objects to make template
     """
     request_body = {
+        "export_to": "csv",
         "objects": objects,
     }
     return self.client.post("/_service/export_csv_template",
