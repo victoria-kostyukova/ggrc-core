@@ -68,7 +68,7 @@ export default can.Component.extend({
     modifySelection: function (ctx, el, ev) {
       let selectionFilter = this.attr('itemSelector');
       let isSelected = selectionFilter ?
-        can.$(ev.target).closest(selectionFilter, el).length :
+        $(ev.target).closest(selectionFilter, el).length :
         true;
       this.clearSelection();
       // Select Item only in case required HTML item was clicked

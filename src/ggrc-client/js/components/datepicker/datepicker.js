@@ -94,7 +94,7 @@ export default can.Component.extend({
       };
 
       if (viewModel.attr('noWeekends')) {
-        options.beforeShowDay = can.$.datepicker.noWeekends;
+        options.beforeShowDay = $.datepicker.noWeekends;
       }
 
       element.datepicker(options);

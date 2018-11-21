@@ -54,7 +54,7 @@ export default can.Control({
   },
 
   get_widget_view: function (el) {
-    let widgetView = can.$(el)
+    let widgetView = $(el)
       .closest('[data-widget-view]').attr('data-widget-view');
     if (widgetView && widgetView.length > 0) {
       return GGRC.mustache_path + widgetView;

@@ -24,7 +24,7 @@ export default Cacheable('CMS.Models.Person', {
       dataType: 'json',
       data: {s: request.term},
       success: function (data) {
-        response(can.$.map(data, function (item) {
+        response($.map(data, function (item) {
           return can.extend({}, item.person, {
             label: item.person.email,
             value: item.person.id,

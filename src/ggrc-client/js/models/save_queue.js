@@ -187,4 +187,4 @@ import BackgroundTask from '../models/service-models/background-task';
         .always(this._resolve.bind(this)); // Move on to the next one
     },
   });
-})(window.can, window.can.$);
+})(window.can, window.$);
