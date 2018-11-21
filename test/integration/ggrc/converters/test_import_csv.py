@@ -213,6 +213,81 @@ class TestBasicCsvImport(TestCase):
     self.assertNotEqual(None, models.Relationship.find_related(obj2, obj2))
     self.assertEqual(None, models.Relationship.find_related(obj3, obj3))
 
+  @ddt.data(['Standard', ('Regulation', 'Policy', 'Contract', 'Requirement'),
+             {"Standard": ["map:standard"]}],
+            ['Regulation', ('Standard', 'Policy', 'Contract', 'Requirement'),
+             {"Regulation": ["map:regulation"]}],
+            ['Policy', ('Regulation', 'Standard', 'Contract', 'Requirement'),
+             {"Policy": ["map:policy"]}],
+            ['Requirement', ('Regulation', 'Policy', 'Contract', 'Standard'),
+             {}],
+            ['Contract', ('Regulation', 'Policy', 'Standard', 'Requirement'),
+             {"Contract": ["map:contract"]}])
+  @ddt.unpack
+  def test_map_core_objects(self, check_object, other_objects, block_warnings):
+    """Ensure that core GRC objects correctly map to each other
+
+    Core objects to test are:
+    * Standard
+    * Regulation
+    * Policy
+    * Requirement
+    * Contract
+
+    CANNOT be mapped the following pairs:
+    * Standard to Standard
+    * Regulation to Regulation
+    * Policy to Policy
+    * Contract to Contract
+    (however, Requirement CAN be mapped to Requirement)
+    """
+
+    data_block = [
+        OrderedDict([
+            ("object_type", obj_type),
+            ("Code*", "{}-1".format(obj_type.upper())),
+            ("Title*", "{}-1".format(obj_type)),
+            ("Admin*", "user@example.com"),
+        ]) for obj_type in other_objects
+    ]
+
+    # Add object to check
+    data_block.extend([
+        OrderedDict([
+            ("object_type", check_object),
+            ("Code*", "{}-1".format(check_object.upper())),
+            ("Title*", "{}-1".format(check_object)),
+            ("Admin*", "user@example.com"),
+            ("map:regulation", ""),
+            ("map:policy", ""),
+            ("map:contract", ""),
+            ("map:requirement", ""),
+            ("map:standard", ""),
+        ]),
+        OrderedDict([
+            ("object_type", check_object),
+            ("Code*", "{}-2".format(check_object.upper())),
+            ("Title*", "{}-2".format(check_object)),
+            ("Admin*", "user@example.com"),
+            ("map:regulation", "REGULATION-1"),
+            ("map:policy", "POLICY-1"),
+            ("map:contract", "CONTRACT-1"),
+            ("map:requirement", "REQUIREMENT-1"),
+            ("map:standard", "STANDARD-1"),
+        ]),
+    ])
+
+    response = self.import_data(*data_block)
+
+    self._check_csv_response(response, {
+        obj_type: {
+            "block_warnings": {
+                "Line 18: Attribute '{}' does not exist. "
+                "Column will be ignored.".format(warn_column)
+            } for warn_column in warn_columns
+        } for obj_type, warn_columns in block_warnings.iteritems()
+    })
+
   def test_policy_unique_title(self):
     filename = "policy_sample1.csv"
     response_json = self.import_file(filename)
