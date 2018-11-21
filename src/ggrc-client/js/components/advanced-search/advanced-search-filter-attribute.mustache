@@ -34,7 +34,9 @@
   {{/if}}
   {{#if showActions}}
   <div class="filter-attribute__action">
-    <button class="filter-attribute__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
+    <button type="button" class="filter-attribute__remove" ($click)="remove()">
+      <i class="fa fa-trash"></i>
+    </button>
     {{#if extendable}}
     <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
     {{/if}}

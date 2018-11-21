@@ -20,20 +20,23 @@
   <div class="proposal-confirm__actions">
     <spinner toggle="isLoading"></spinner>
     {{#if canDisplayApplyButton}}
-      <button class="btn btn-green proposal-confirm__button"
+      <button type="button"
+        class="btn btn-green proposal-confirm__button"
         ($click)="confirm(true)"
         {{#if isLoading}}disabled{{/if}}>
           Apply
       </button>
     {{/if}}
     {{#if canDisplayDeclineButton}}
-      <button class="btn btn-red proposal-confirm__button"
+      <button type="button"
+        class="btn btn-red proposal-confirm__button"
         ($click)="confirm()"
         {{#if isLoading}}disabled{{/if}}>
           Decline
       </button>
     {{/if}}
-    <button class="btn btn-small proposal-confirm__button btn-white"
+    <button type="button"
+      class="btn btn-small proposal-confirm__button btn-white"
       ($click)="closeModal()"
       {{#if isLoading}}disabled{{/if}}>
         Cancel

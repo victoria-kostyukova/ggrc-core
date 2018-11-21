@@ -43,7 +43,11 @@
   {{#if showAddButton}}
   <div class="mapping-container__footer">
     <div>
-      <button class="btn btn-small btn-white" ($click)="addMappingCriteria()">Add Mapping Filter</button>
+      <button type="button"
+              class="btn btn-small btn-white"
+              ($click)="addMappingCriteria()">
+        Add Mapping Filter
+      </button>
     </div>
   </div>
   {{/if}}

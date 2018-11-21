@@ -7,7 +7,7 @@
         {{^if withoutDetails}}
             <read-more class="description" {text}="itemData.description"></read-more>
             <div class="more-information-wrapper">
-                <button class="btn btn-link more-information-button">More Information</button>
+                <button type="button" class="btn btn-link more-information-button">More Information</button>
             </div>
         {{/if}}
     </business-object-list-item>
@@ -28,7 +28,7 @@
                 {{instnace.type}} version as on {{dateTime instance.updated_at}}
             </span>
         </div>
-        <button class="btn btn-small btn-icon" can-click="hide">
+        <button type="button" class="btn btn-small btn-icon" can-click="hide">
             <i class="fa fa-times black"></i>
         </button>
     </div>

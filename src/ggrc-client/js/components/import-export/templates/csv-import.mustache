@@ -25,7 +25,8 @@
         {{#case 'Select'}}
           <spinner {toggle}="isLoading"></spinner>
 
-          <button ($click)="selectFile()"
+          <button type="button"
+                  ($click)="selectFile()"
                   class="btn btn-small btn-green"
                   {{#if isLoading}}disabled{{/if}}>
             {{#if importStatus}}
@@ -41,12 +42,14 @@
             <input type="checkbox" {($checked)}="isConfirm">
             I confirm, that data being imported is complete and accurate.
           </label>
-          <button class="btn btn-small btn-green"
+          <button type="button"
+                  class="btn btn-small btn-green"
                   ($click)="proceed()"
                   {{^if isConfirm}}disabled{{/if}}>
             Proceed
           </button>
-          <button ($click)="selectFile()"
+          <button type="button"
+                  ($click)="selectFile()"
                   class="btn btn-small btn-white">
             Choose new file to import
           </button>
@@ -54,44 +57,52 @@
 
         {{#case 'Analysis'}}
           <div>Analyzing file in Progress: <spinner {toggle}="true"></spinner></div>
-          <button class="btn btn-small btn-white margin-top-20"
+          <button type="button"
+                  class="btn btn-small btn-white margin-top-20"
                   ($click)="stopImport(jobId)">
             Cancel
           </button>
         {{/case}}
 
         {{#case 'Blocked'}}
-          <button ($click)="proceedWithWarnings()"
+          <button type="button"
+                  ($click)="proceedWithWarnings()"
                   class="btn btn-small btn-green">
               Proceed in spite of warnings
           </button>
-          <button ($click)="downloadImportContent(jobId, fileName)"
+          <button type="button"
+                  ($click)="downloadImportContent(jobId, fileName)"
                   class="btn btn-small btn-white">
             Download import file for edit
           </button>
-          <button ($click)="selectFile()"
+          <button type="button"
+                  ($click)="selectFile()"
                   class="btn btn-small btn-white">
             Choose new file to import
           </button>
         {{/case}}
 
         {{#case 'Analysis Failed'}}
-          <button ($click)="downloadImportContent(jobId, fileName)"
+          <button type="button"
+                  ($click)="downloadImportContent(jobId, fileName)"
                   class="btn btn-small btn-green">
             Download import file for edit
           </button>
-          <button ($click)="selectFile()"
+          <button type="button"
+                  ($click)="selectFile()"
                   class="btn btn-small btn-white">
             Choose new file to import
           </button>
         {{/case}}
 
         {{#case 'Failed'}}
-          <button ($click)="downloadImportContent(jobId, fileName)"
+          <button type="button"
+                  ($click)="downloadImportContent(jobId, fileName)"
                   class="btn btn-small btn-green">
             Download import file for edit
           </button>
-          <button ($click)="selectFile()"
+          <button type="button"
+                  ($click)="selectFile()"
                   class="btn btn-small btn-white">
             Choose new file to import
           </button>

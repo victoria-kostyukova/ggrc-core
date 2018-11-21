@@ -6,5 +6,9 @@
     <content/>
 </object-list>
 {{#if requireLimit}}
-    <button class="btn btn-small btn-link btn-link-nopadding" ($click)="toggleShowAll()">{{showAllButtonText}}</button>
+    <button type="button"
+            class="btn btn-small btn-link btn-link-nopadding"
+            ($click)="toggleShowAll()">
+      {{showAllButtonText}}
+    </button>
 {{/if}}

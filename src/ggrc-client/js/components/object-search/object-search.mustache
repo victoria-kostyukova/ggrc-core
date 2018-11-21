@@ -62,9 +62,9 @@
         <div class="object-controls__actions">
           <div class="object-controls__actions--left">
             {{^if mappingItems.length}}
-            <button class="btn btn-small btn-white" ($click)="addFilterAttribute">Add Attribute</button>
+            <button type="button" class="btn btn-small btn-white" ($click)="addFilterAttribute">Add Attribute</button>
             {{/if}}
-            <button class="btn btn-small btn-white" ($click)="addMappingFilter">Add Mapping Filter</button>
+            <button type="button" class="btn btn-small btn-white" ($click)="addMappingFilter">Add Mapping Filter</button>
           </div>
           <div class="object-controls__actions--right">
             <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} ($click)="resetFilters()">Reset</button>

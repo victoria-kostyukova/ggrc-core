@@ -26,9 +26,19 @@
       {{^searchOnly}}
         <div class="list-selection-switcher">
           Select:
-          <button can-click="deselectAll" class="btn btn-link" {{#isLoading}}disabled="disabled"{{/isLoading}}>None</button>
+          <button type="button"
+                  can-click="deselectAll"
+                  class="btn btn-link"
+                  {{#isLoading}}disabled="disabled"{{/isLoading}}>
+            None
+          </button>
           |
-          <button can-click="selectAll" class="btn btn-link" {{#isLoading}}disabled="disabled"{{/isLoading}}>All</button>
+          <button type="button"
+                  can-click="selectAll"
+                  class="btn btn-link"
+                  {{#isLoading}}disabled="disabled"{{/isLoading}}>
+            All
+          </button>
         </div>
       {{/searchOnly}}
     </div>

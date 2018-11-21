@@ -14,26 +14,31 @@
       {{#if isShowActionButtons}}
           <div class="request-control">
             {{#if_equals instance.status 'Assigned'}}
-              <button class="btn btn-mini btn-lightBlue"
+              <button type="button"
+                      class="btn btn-mini btn-lightBlue"
                       ($click)="changeStatus"
                       data-value="In Progress">Start</button>
             {{/if_equals}}
             {{#if_equals instance.status 'In Progress'}}
-              <button class="btn btn-mini btn-white"
+              <button type="button"
+                      class="btn btn-mini btn-white"
                       ($click)="changeStatus"
                       data-value="Finished">Finish</button>
             {{/if_equals}}
             {{#if_equals instance.status 'Declined'}}
-              <button class="btn btn-mini btn-white"
+              <button type="button"
+                      class="btn btn-mini btn-white"
                       ($click)="changeStatus"
                       data-value="Finished">Finish</button>
             {{/if_equals}}
             {{#if_equals instance.status 'Finished'}}
               {{#if instance.is_verification_needed}}
-                <button class="btn btn-mini btn-red"
+                <button type="button"
+                        class="btn btn-mini btn-red"
                         ($click)="changeStatus"
                         data-value="Declined">Decline</button>
-                <button class="btn btn-mini btn-green"
+                <button type="button"
+                        class="btn btn-mini btn-green"
                         ($click)="changeStatus"
                         data-value="Verified">Verify</button>
               {{/if}}
@@ -55,7 +60,7 @@
      <cycle-end-cycle cycle="instance">
        {{#is_allowed 'update' instance.workflow.reify}}
          {{#if instance.is_current}}
-           <button class="btn btn-white btn-small end-cycle">End Cycle</button>
+           <button type="button" class="btn btn-white btn-small end-cycle">End Cycle</button>
          {{/if}}
        {{/is_allowed}}
      </cycle-end-cycle>

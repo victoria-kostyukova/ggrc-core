@@ -37,6 +37,7 @@
         <div class="object-review__buttons">
           {{^if isReviewed}}
             <button
+                type="button"
                 {{#if loading}}disabled{{/if}}
                 ($click)="markReviewed()"
                 class="btn btn-green btn-small">
@@ -44,6 +45,7 @@
             </button>
           {{/if}}
           <button
+              type="button"
               {{#if loading}}disabled{{/if}}
               ($click)="changeReviewers($element)"
               class="btn btn-white btn-small">

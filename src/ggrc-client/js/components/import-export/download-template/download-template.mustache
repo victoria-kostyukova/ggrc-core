@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<button class="btn btn-white btn-small" ($click)="showDialog">
+<button type="button" class="btn btn-white btn-small" ($click)="showDialog">
   Download import template
 </button>
 
@@ -13,7 +13,7 @@
               extra-css-class="download-template">
   <div class="simple-modal__header">
     <div class="simple-modal__header-text">{{modalTitle}}</div>
-    <button class="btn btn-small btn-icon" ($click)="close()">
+    <button type="button" class="btn btn-small btn-icon" ($click)="close()">
       <i class="fa fa-times black"></i>
     </button>
   </div>
@@ -39,15 +39,15 @@
 
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar {{#if isLoading}}disabled{{/if}}">
-      <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="close()">
+      <button type="button" class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="close()">
         Cancel
       </button>
-      <button class="btn btn-small btn-green simple-modal__toolbar-item"
+      <button type="button" class="btn btn-small btn-green simple-modal__toolbar-item"
               {{^if selected.length}}disabled="disabled"{{/if}}
               ($click)="downloadCSV">
         Download CSV
       </button>
-      <button class="btn btn-small btn-green simple-modal__toolbar-item"
+      <button type="button" class="btn btn-small btn-green simple-modal__toolbar-item"
               {{^if selected.length}}disabled="disabled"{{/if}}
               ($click)="downloadSheet">
         Download Sheet

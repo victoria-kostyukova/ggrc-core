@@ -32,10 +32,10 @@
             <spinner {toggle}="true"></spinner>
           {{/case}}
           {{#case 'Finished'}}
-            <button class="btn btn-small btn-white" ($click)="downloadCSV(id, title)">
+            <button type="button" class="btn btn-small btn-white" ($click)="downloadCSV(id, title)">
               Download CSV
             </button>
-            <button class="btn btn-small btn-white" ($click)="openSheet(id)">
+            <button type="button" class="btn btn-small btn-white" ($click)="openSheet(id)">
               Write to Sheet
             </button>
             {{#isDisabled id}}

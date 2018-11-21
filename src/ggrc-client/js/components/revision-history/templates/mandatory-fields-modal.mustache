@@ -9,7 +9,10 @@
               {extra-css-class}="'mandatory-fields'">
   <div class="simple-modal__header">
       <div class="simple-modal__header-text">Global custom attribute validation</div>
-      <button class="btn btn-small btn-icon" {{#if loading}}disabled{{/if}} ($click)="cancel()">
+      <button type="button" 
+              class="btn btn-small btn-icon"
+              {{#if loading}}disabled{{/if}}
+              ($click)="cancel()">
           <i class="fa fa-times black"></i>
       </button>
   </div>
@@ -34,13 +37,16 @@
   </div>
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar">
-      <button class="btn btn-small btn-green simple-modal__toolbar-item"
+      <button type="button"
+        class="btn btn-small btn-green simple-modal__toolbar-item"
         {{disable_if_errors instance}}
         {{#if loading}}disabled{{/if}}
         ($click)="save()">
           Apply
       </button>
-      <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="cancel()">Cancel</button>
+      <button type="button"
+              class="btn btn-small btn-white simple-modal__toolbar-item"
+              ($click)="cancel()">Cancel</button>
       <spinner toggle="loading"></spinner>
     </div>
   </div>

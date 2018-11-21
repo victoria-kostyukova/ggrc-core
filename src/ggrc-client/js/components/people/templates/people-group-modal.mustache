@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-    <button class="btn btn-small btn-icon" ($click)="cancel()">
+    <button type="button" class="btn btn-small btn-icon" ($click)="cancel()">
       <i class="fa fa-times black"></i>
     </button>
   </div>
@@ -69,12 +69,14 @@
 
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar people-group-modal__footer">
-      <button class="btn btn-green people-group-modal__button"
+      <button type="button"
+        class="btn btn-green people-group-modal__button"
         ($click)="save()"
         {{#if isLoading}}disabled{{/if}}>
           Save &amp; Close
       </button>
-      <button class="btn btn-small people-group-modal__button btn-white"
+      <button type="button"
+        class="btn btn-small people-group-modal__button btn-white"
         ($click)="cancel()"
         {{#if isLoading}}disabled{{/if}}>
           Cancel

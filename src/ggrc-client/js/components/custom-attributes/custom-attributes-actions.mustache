@@ -7,7 +7,9 @@
 <confirm-edit-action
   (set-in-progress)="edit()"
   {instance}="instance">
-  <button class="btn btn-small btn-gray custom-attributes-actions__edit-button" ($click)="confirmEdit()">
+  <button type="button"
+          class="btn btn-small btn-gray custom-attributes-actions__edit-button"
+          ($click)="confirmEdit()">
     Edit Answers
   </button>
 </confirm-edit-action>
