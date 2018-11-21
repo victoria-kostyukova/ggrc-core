@@ -46,7 +46,8 @@ class TestMappingRules(BaseTestMappingRules):
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                    'ProductGroup', 'TechnologyEnvironment']
+                    'ProductGroup', 'TechnologyEnvironment', 'Standard',
+                    'Policy', 'Regulation']
   cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
@@ -74,7 +75,8 @@ class TestMappingRules(BaseTestMappingRules):
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Process',
                   'Product', 'Program', 'Project', 'Risk', 'Requirement',
                   'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
-                  'TechnologyEnvironment']
+                  'TechnologyEnvironment', 'Standard', 'Regulation',
+                  'Contract']
   program_rules = ['AccessGroup', 'Contract', 'Control',
                    'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                    'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
@@ -86,7 +88,8 @@ class TestMappingRules(BaseTestMappingRules):
                       'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                       'Process', 'Product', 'Program', 'Project', 'Risk',
                       'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                      'ProductGroup', 'TechnologyEnvironment']
+                      'ProductGroup', 'TechnologyEnvironment', 'Standard',
+                      'Policy', 'Contract']
   risk_rules = ['AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                 'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
@@ -98,7 +101,8 @@ class TestMappingRules(BaseTestMappingRules):
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                    'ProductGroup', 'TechnologyEnvironment']
+                    'ProductGroup', 'TechnologyEnvironment', 'Policy',
+                    'Regulation', 'Contract']
   threat_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
@@ -166,7 +170,8 @@ class TestUnMappingRules(BaseTestMappingRules):
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                    'ProductGroup', 'TechnologyEnvironment']
+                    'ProductGroup', 'TechnologyEnvironment', 'Standard',
+                    'Policy', 'Regulation']
   cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
@@ -194,7 +199,8 @@ class TestUnMappingRules(BaseTestMappingRules):
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Process',
                   'Product', 'Program', 'Project', 'Risk', 'Requirement',
                   'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
-                  'TechnologyEnvironment']
+                  'TechnologyEnvironment', 'Standard', 'Regulation',
+                  'Contract']
   program_rules = ['AccessGroup', 'Contract', 'Control',
                    'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                    'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
@@ -206,7 +212,8 @@ class TestUnMappingRules(BaseTestMappingRules):
                       'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                       'Process', 'Product', 'Program', 'Project', 'Risk',
                       'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                      'ProductGroup', 'TechnologyEnvironment']
+                      'ProductGroup', 'TechnologyEnvironment', 'Standard',
+                      'Policy', 'Contract']
   risk_rules = ['AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                 'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
@@ -218,7 +225,8 @@ class TestUnMappingRules(BaseTestMappingRules):
                     'Issue', 'Market', 'Objective', 'OrgGroup', 'Person',
                     'Process', 'Product', 'Program', 'Project', 'Risk',
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
-                    'ProductGroup', 'TechnologyEnvironment']
+                    'ProductGroup', 'TechnologyEnvironment', 'Policy',
+                    'Regulation', 'Contract']
   threat_rules = ['AccessGroup', 'Contract', 'Control',
                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
                   'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
