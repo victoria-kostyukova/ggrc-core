@@ -87,6 +87,17 @@ class Revision(base.ContextRBAC, Base, db.Model):
 
     self._content = content
 
+    # replace review with proper review stub
+    if "review" in self._content and self._content["review"] is not None:
+      review = self._content["review"]
+      result = {
+          "context_id": review.context_id,
+          "id": review.id,
+          "type": review.type,
+          "href": "/api/reviews/{}".format(review.id),
+      }
+      self._content["review"] = result
+
     for attr in ["source_type",
                  "source_id",
                  "destination_type",
