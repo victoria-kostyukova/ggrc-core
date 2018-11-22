@@ -12,6 +12,7 @@ from integration.ggrc import TestCase
 
 from integration.ggrc.models import factories
 from integration.ggrc import api_helper
+from integration.ggrc.review import build_reviewer_acl
 
 
 def _get_revisions(obj, field="resource"):
@@ -42,6 +43,7 @@ class TestRevisions(TestCase):
     super(TestRevisions, self).setUp()
     self.gen = integration.ggrc.generator.ObjectGenerator()
     self.api_helper = api_helper.Api()
+    self.api_helper.client.get("/login")
 
   def test_revisions(self):
     """ Test revision creation for POST and PUT """
@@ -337,3 +339,51 @@ class TestRevisions(TestCase):
     content = revisions[0].content
     self.assertEqual(
         content["custom_attribute_values"][0]["attribute_value"], "0")
+
+  def test_revision_review_stub(self):
+    """ Test proper review stub population in revision content """
+    control = factories.ControlFactory()
+    revisions = _get_revisions(control)
+    self.assertEqual(len(revisions), 1)
+    self.assertEqual(revisions[0].action, "created")
+
+    resp = self.api_helper.post(
+        all_models.Review,
+        {
+            "review": {
+                "reviewable": {
+                    "type": control.type,
+                    "id": control.id,
+                },
+                "context": None,
+                "notification_type": "email",
+                "status": all_models.Review.STATES.REVIEWED,
+                "access_control_list": build_reviewer_acl()
+            },
+        },
+    )
+    self.assertEqual(201, resp.status_code)
+    self.assertIn("review", resp.json)
+    resp_review = resp.json["review"]
+    self.assertEqual(all_models.Review.STATES.REVIEWED,
+                     resp_review["status"])
+
+    revisions = _get_revisions(control)
+    self.assertEqual(len(revisions), 2)
+    self.assertEqual(revisions[0].action, "created")
+    self.assertEqual(revisions[1].action, "modified")
+
+    rev_content = revisions[1].content
+    self.assertIsNotNone(rev_content)
+    self.assertIn("review", rev_content)
+    review = rev_content["review"]
+    self.assertIsNotNone(review)
+
+    expected = {
+        "context_id": None,
+        "href": "/api/reviews/{}".format(resp_review["id"]),
+        "id": resp_review["id"],
+        "type": resp_review["type"],
+    }
+
+    self.assertEqual(review, expected)
