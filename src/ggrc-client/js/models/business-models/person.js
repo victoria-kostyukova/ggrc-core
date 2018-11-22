@@ -17,22 +17,6 @@ export default Cacheable('CMS.Models.Person', {
   create: 'POST /api/people',
   update: 'PUT /api/people/{id}',
   destroy: 'DELETE /api/people/{id}',
-  search: function (request, response) {
-    return can.ajax({
-      type: 'get',
-      url: '/api/people',
-      dataType: 'json',
-      data: {s: request.term},
-      success: function (data) {
-        response($.map(data, function (item) {
-          return can.extend({}, item.person, {
-            label: item.person.email,
-            value: item.person.id,
-          });
-        }));
-      },
-    });
-  },
   is_custom_attributable: true,
   attributes: {
     context: Stub,
