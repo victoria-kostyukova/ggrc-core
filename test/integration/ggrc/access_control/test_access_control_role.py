@@ -134,7 +134,7 @@ class TestAccessControlRole(TestCase):
     # Primary Contacts role of Control is non-editable
     ac_role = AccessControlRole.query.filter_by(
         object_type="Control",
-        name="Primary Contacts",
+        name="Control Operators",
     ).first()
 
     response = self.api.put(ac_role, {field_name: field_value})
@@ -147,7 +147,7 @@ class TestAccessControlRole(TestCase):
     # Primary Contacts role of Control is non-editable
     ac_role = AccessControlRole.query.filter_by(
         object_type="Control",
-        name="Primary Contacts",
+        name="Control Operators",
     ).first()
 
     response = self.api.delete(ac_role)

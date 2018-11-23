@@ -78,6 +78,8 @@ class AssessmentTemplate(assessment.AuditRelationship,
       "Secondary Assignees": "Secondary Assignees",
       "Primary Contacts": "Primary Contacts",
       "Secondary Contacts": "Secondary Contacts",
+      "Control Owners": "Control Owners",
+      "Control Operators": "Control Operators",
   }
 
   _title_uniqueness = False

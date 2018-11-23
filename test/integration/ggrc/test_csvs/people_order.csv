@@ -38,7 +38,7 @@ Assessment,Code*,Template,Audit*,Title*,Description,Assignees*,Creators*,Verifie
 ,ASSESSMENT-6,,AUDIT-1,assessment6,,turing@example.com,user@1.com,blue@example.com,Control,,
 ,,,,,,,,,,,
 Object type,,,,,,,,,,,
-Control,Code*,Title*,Description,State,Review State,Admin*,Primary Contacts,Principal Assignees,Secondary Assignees,Secondary Contacts,Assertions*
+Control,Code*,Title*,Description,State,Review State,Admin*,Control Operators,Principal Assignees,Secondary Assignees,Control Owners,Assertions*
 ,CONTROL-1,control1,,Draft,Unreviewed,turing@example.com,blue@example.com,test@example.com,user@2.com,terminator@example.com,Privacy
 ,CONTROL-2,control2,,Draft,Unreviewed,blue@example.com,terminator@example.com,user@2.com,user@1.com,test@example.com,Privacy
 ,CONTROL-3,control3,,Draft,Unreviewed,terminator@example.com,test@example.com,user@1.com,turing@example.com,user@2.com,Privacy

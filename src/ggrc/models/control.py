@@ -243,6 +243,15 @@ class Control(WithLastAssessmentDate,
       'version',
   ]
 
+  VALID_RECIPIENTS = frozenset([
+      "Assignees",
+      "Creators",
+      "Verifiers",
+      "Admin",
+      "Control Operators",
+      "Control Owners",
+  ])
+
   @classmethod
   def indexed_query(cls):
     return super(Control, cls).indexed_query().options(

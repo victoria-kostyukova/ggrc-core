@@ -65,8 +65,8 @@ class TestOrder(TestCase, WithQueryApi):
     self._check_ordering("Assessment", sorted_titles, role)
 
   @ddt.data("Admin",
-            "Primary Contacts",
-            "Secondary Contacts",
+            "Control Operators",
+            "Control Owners",
             "Principal Assignees",
             "Secondary Assignees")
   def test_control_roles(self, role):

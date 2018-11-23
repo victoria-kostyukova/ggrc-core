@@ -26,21 +26,22 @@ class TestCheckPopulatedContent(unittest.TestCase):
 
   def setUp(self):
     super(TestCheckPopulatedContent, self).setUp()
-    self.object_type = "Control"
     self.object_id = 1
     self.user_id = 123
 
   @ddt.data(
       # content, expected
-      (None, None),
-      ('principal_assessor', ("Principal Assignees", 1)),
-      ('secondary_assessor', ("Secondary Assignees", 2)),
-      ('contact', ("Primary Contacts", 3)),
-      ('secondary_contact', ("Secondary Contacts", 4)),
-      ('owners', ("Admin", 5)),
+      (None, None, "Control"),
+      ('principal_assessor', ("Principal Assignees", 1), "Control"),
+      ('secondary_assessor', ("Secondary Assignees", 2), "Control"),
+      ('contact', ("Primary Contacts", 3), "AccessGroup"),
+      ('secondary_contact', ("Secondary Contacts", 4), "AccessGroup"),
+      ('contact', ("Control Operators", 3), "Control"),
+      ('secondary_contact', ("Control Owners", 4), "Control"),
+      ('owners', ("Admin", 5), "Control"),
   )
   @ddt.unpack
-  def test_check_populated_content(self, key, role):
+  def test_check_populated_content(self, key, role, object_type):
     """Test populated content for revision if ACL doesn't exists."""
     content = {}
     if key:
@@ -54,7 +55,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
           "ac_role_id": role_id,
           "context_id": None,
           "created_at": None,
-          "object_type": self.object_type,
+          "object_type": object_type,
           "updated_at": None,
           "object_id": self.object_id,
           "modified_by_id": None,
@@ -71,47 +72,51 @@ class TestCheckPopulatedContent(unittest.TestCase):
       role_dict[role_id] = role_name
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
 
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value=role_dict) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
-      get_roles.assert_called_once_with(self.object_type)
+      get_roles.assert_called_once_with(object_type)
 
   @ddt.data(None, {}, {"id": None})
   def test_populated_content_no_user(self, user_dict):
     """Test populated content for revision without user id."""
+    object_type = "Control"
     content = {"principal_assessor": user_dict}
     role_dict = {1: "Principal Assignees"}
     expected = {"access_control_list": []}
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value=role_dict) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
-      get_roles.assert_called_once_with(self.object_type)
+      get_roles.assert_called_once_with(object_type)
 
   @ddt.data(
-      'principal_assessor',
-      'secondary_assessor',
-      'contact',
-      'secondary_contact',
+      ("principal_assessor", "Control"),
+      ("secondary_assessor", "Control"),
+      ("contact", "Control"),
+      ("secondary_contact", "Control"),
+      ("contact", "AccessGroup"),
+      ("secondary_contact", "AccessGroup"),
   )
-  def test_populated_content_no_role(self, key):
+  @ddt.unpack
+  def test_populated_content_no_role(self, key, object_type):
     """Test populated content for revision without roles."""
     content = {key: {"id": self.user_id}}
     expected = {"access_control_list": []}
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value={}) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
-      get_roles.assert_called_once_with(self.object_type)
+      get_roles.assert_called_once_with(object_type)
 
   @ddt.data({
       "url": "www.url-foo.com",
@@ -151,7 +156,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
 
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = "Control"
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     revision.created_at = datetime.datetime(2017, 11, 12, 13, 14, 15)
     revision.updated_at = datetime.datetime(2018, 11, 12, 13, 14, 15)
@@ -169,7 +174,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     """Test populated content for old revision with label."""
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = "Control"
 
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
 
@@ -258,7 +263,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     """
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = "Control"
 
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
 
@@ -282,7 +287,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     """Test filtering of internal roles for {}."""
     obj = mock.Mock()
     obj.id = self.object_id
-    obj.__class__.__name__ = self.object_type
+    obj.__class__.__name__ = "Control"
     for acl_entry in acl_entries:
       acl_entry.update({"person_id": 1, "ac_role_id": 1})
 

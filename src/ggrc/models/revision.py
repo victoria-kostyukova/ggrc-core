@@ -242,6 +242,17 @@ class Revision(base.ContextRBAC, Base, db.Model):
         "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
         "owners": reverted_roles_dict.get("Admin"),
     }
+    # for Control type we do not have Primary and Secondary Contacts roles.
+    if (self.resource_type == "Control" or
+            self.resource_type == "Snapshot" and
+            self._content["child_type"] == "Control"):
+      map_field_to_role["contact"] = (
+          reverted_roles_dict.get("Control Operators")
+      )
+      map_field_to_role["secondary_contact"] = (
+          reverted_roles_dict.get("Control Owners")
+      )
+
     exists_roles = {i["ac_role_id"] for i in access_control_list}
 
     for field, role_id in map_field_to_role.items():

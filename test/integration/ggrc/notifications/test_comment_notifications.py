@@ -199,6 +199,8 @@ class TestCommentNotification(TestCase):
                          "Product Managers", "Technical / Program Managers",
                          "Technical Leads", "System Owners", "Legal Counsels",
                          "Line of Defense One Contacts", "Vice Presidents", ]
+    elif obj_factory == factories.ControlFactory:
+      recipient_types = ["Admin", "Control Operators", "Control Owners"]
     else:
       recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
     person = all_models.Person.query.first()
