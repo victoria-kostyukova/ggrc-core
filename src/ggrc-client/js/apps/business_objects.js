@@ -136,6 +136,7 @@ _.assign(CoreExtension, {
             treeViewDepth: 0,
           },
           CycleTaskGroupObjectTask: {
+            widget_id: 'task',
             widget_name: () => {
               if (object instanceof businessModels.Person) {
                 return 'Tasks';
