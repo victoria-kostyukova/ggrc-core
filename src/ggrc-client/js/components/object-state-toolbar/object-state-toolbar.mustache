@@ -5,32 +5,32 @@
 
 <div class="object-state-toolbar">
   {{#if isActiveState}}
-      <button type="button"
-              class="btn btn-small btn-darkBlue object-state-toolbar__item"
-              {{#if disabled}}disabled{{/if}}
-              ($click)="changeState()">Complete
-      </button>
+    <button type="button"
+            class="btn btn-small btn-darkBlue object-state-toolbar__item"
+            {{#if disabled}}disabled{{/if}}
+            ($click)="changeState()">Complete
+    </button>
   {{/if}}
   {{#if isInReview}}
     {{#if isCurrentUserVerifier}}
-        <button type="button"
-                class="btn btn-small btn-green object-state-toolbar__item"
-                {{#if disabled}}disabled{{/if}}
-                ($click)="changeState('Verified')">Verify</button>
-        <button type="button"
-                class="btn btn-small btn-red object-state-toolbar__item"
-                {{#if disabled}}disabled{{/if}}
-                ($click)="changeState('Rework Needed')">Needs Rework
-        </button>
+      <button type="button"
+              class="btn btn-small btn-green object-state-toolbar__item"
+              {{#if disabled}}disabled{{/if}}
+              ($click)="changeState('Verified')">Verify</button>
+      <button type="button"
+              class="btn btn-small btn-red object-state-toolbar__item"
+              {{#if disabled}}disabled{{/if}}
+              ($click)="changeState('Rework Needed')">Needs Rework
+      </button>
     {{/if}}
   {{/if}}
   {{#unless isInProgress}}
-      {{#if hasPreviousState}}
-        <button type="button"
-                class="btn btn-small btn-link object-state-toolbar__item"
-                {{#if disabled}}disabled{{/if}}
-                ($click)="changeState('In Progress', true)">Undo
-        </button>
-      {{/if}}
+    {{#if hasPreviousState}}
+      <button type="button"
+              class="btn btn-small btn-link object-state-toolbar__item"
+              {{#if disabled}}disabled{{/if}}
+              ($click)="changeState('In Progress', true)">Undo
+      </button>
+    {{/if}}
   {{/unless}}
 </div>

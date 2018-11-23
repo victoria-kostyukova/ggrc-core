@@ -4,12 +4,12 @@
 }}
 
 {{#visibleItems}}
-    <content></content>
+  <content></content>
 {{/visibleItems}}
 {{#if isOverLimit}}
-    <div class="flex-box flex-row limit-button-container">
-        <button type="button"
-                class="btn btn-link"
-                ($click)="toggleShowAll(%event)">{{showAllButtonText}}</button>
-    </div>
+  <div class="flex-box flex-row limit-button-container">
+    <button type="button"
+            class="btn btn-link"
+            ($click)="toggleShowAll(%event)">{{showAllButtonText}}</button>
+  </div>
 {{/if}}
