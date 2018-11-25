@@ -20,7 +20,7 @@ from ggrc.migrations.utils import acr_propagation
 
 # revision identifiers, used by Alembic.
 revision = "d9c56989ac07"
-down_revision = "9beabcd92f34"
+down_revision = "05b0a3e7b4ed"
 
 ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
