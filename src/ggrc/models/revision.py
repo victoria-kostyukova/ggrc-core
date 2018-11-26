@@ -10,7 +10,6 @@ from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
-from ggrc import utils
 from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils import referenced_objects
 from ggrc.utils.revisions_diff import meta_info
@@ -87,11 +86,6 @@ class Revision(base.ContextRBAC, Base, db.Model):
         }
 
     self._content = content
-
-    # replace review with proper review stub
-    if "review" in self._content and self._content["review"] is not None:
-      review = self._content["review"]
-      self._content["review"] = utils.create_stub(review, review.context_id)
 
     for attr in ["source_type",
                  "source_id",
