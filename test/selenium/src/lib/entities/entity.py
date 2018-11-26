@@ -22,6 +22,7 @@ class Representation(object):
   people_attrs_names = [
       "creators", "assignees", "verifiers", "admins", "primary_contacts",
       "secondary_contacts", "audit_captains", "auditors",
+      "control_operators", "control_owners",
       "principal_assignees", "secondary_assignees", "managers", "editors",
       "readers"]  # multiply
 
@@ -44,7 +45,7 @@ class Representation(object):
   def all_attrs_names(cls):
     """All possible entities' attributes names include REST."""
     return list(set(cls.get_attrs_names() + [
-        "access_control_list", "recipients", "people_values", "default_people",
+        "access_control_list", "recipients", "default_people",
         "modal_title", "assignee_type", "user_roles"]))
 
   @classmethod
@@ -98,6 +99,8 @@ class Representation(object):
         "EVIDENCE_URLS": "evidence_urls",
         "ASSERTIONS": "assertions",
         "PRIMARY_CONTACTS": "primary_contacts",
+        "CONTROL_OPERATORS": "control_operators",
+        "CONTROL_OWNERS": "control_owners",
         "URL": "url",
         "ID": "id", "RISK_TYPE": "risk_type"
     }
@@ -733,8 +736,11 @@ class ControlEntity(Entity):
 
   def __init__(self, **attrs):
     super(ControlEntity, self).__init__()
+    self.delete_attrs(
+        "primary_contacts", "secondary_contacts")
     self.set_attrs(
-        "principal_assignees", "secondary_assignees", "program",
+        "control_operators", "control_owners", "principal_assignees",
+        "secondary_assignees", "program",
         "assertions", **attrs)
 
 

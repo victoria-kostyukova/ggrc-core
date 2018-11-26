@@ -166,6 +166,8 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   ADMIN = roles.ADMIN
   PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
+  CONTROL_OPERATORS = roles.CONTROL_OPERATORS
+  CONTROL_OWNERS = roles.CONTROL_OWNERS
   VERIFIED = "Verified"
   STATUS = "Status"
   AUDIT_CAPTAINS = "Audit Captains"
@@ -333,8 +335,8 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonControl.CONTROL)
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   ADMIN = TransformationSetVisibleFields.ADMIN
-  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
-  SECONDARY_CONTACTS = TransformationSetVisibleFields.SECONDARY_CONTACTS
+  CONTROL_OPERATORS = TransformationSetVisibleFields.CONTROL_OPERATORS
+  CONTROL_OWNERS = TransformationSetVisibleFields.CONTROL_OWNERS
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
   KIND_NATURE = "Kind/Nature"
   FRAUD_RELATED = "Fraud Related"
@@ -347,7 +349,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
-      PRIMARY_CONTACTS, ADMIN)
+      CONTROL_OPERATORS, ADMIN)
 
 
 class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):

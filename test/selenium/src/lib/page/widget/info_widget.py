@@ -768,10 +768,10 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
     super(Controls, self).__init__(driver)
     self.admin_text, self.admin_entered_text = (
         self.get_header_and_value_txt_from_people_scopes(
-            self._elements.ADMIN.upper()))
-    self.primary_contact_text, self.primary_contact_entered_text = (
+            roles.ADMIN.upper()))
+    self.control_operator_text, self.control_operator_entered_text = (
         self.get_header_and_value_txt_from_people_scopes(
-            self._elements.PRIMARY_CONTACTS.upper()))
+            roles.CONTROL_OPERATORS.upper()))
     self._assertions = self._browser.element(
         class_name="custom-attr-wrap").element(
         text="Assertions").parent().text.splitlines()
@@ -779,8 +779,8 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
     self.assertions_entered_text = self._assertions[1:]
     self.reference_urls = self._related_urls(self._reference_url_label)
     self._extend_list_all_scopes(
-        [self.admin_text, self.primary_contact_text, self.assertions_text],
-        [self.admin_entered_text, self.primary_contact_entered_text,
+        [self.admin_text, self.control_operator_text, self.assertions_text],
+        [self.admin_entered_text, self.control_operator_entered_text,
          self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
     self.proposals_tab = "Change Proposals"

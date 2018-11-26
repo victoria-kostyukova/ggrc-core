@@ -11,7 +11,7 @@ import random
 
 from lib import factory, users
 from lib.constants import (
-    element, objects, roles, value_aliases, messages, object_states)
+    objects, roles, value_aliases, messages, object_states)
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.decorator import lazy_property
 from lib.entities import entity
@@ -372,8 +372,8 @@ class ControlsFactory(EntitiesFactory):
         status=unicode(object_states.DRAFT), **attrs)
     if is_add_rest_attrs:
       obj.update_attrs(recipients=",".join((
-          unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-          unicode(roles.SECONDARY_CONTACTS))))
+          unicode(roles.ADMIN), unicode(roles.CONTROL_OPERATORS),
+          unicode(roles.CONTROL_OWNERS))))
     return obj
 
   @classmethod
@@ -541,18 +541,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:
-      elements = element.CommonAudit
-      obj.update_attrs(
-          default_people=default_people,
-          people_values=[{"value": v, "title": t} for v, t in [
-              (roles.ADMIN, elements.OBJECT_ADMINS),
-              (roles.AUDIT_LEAD, elements.AUDIT_CAPTAIN),
-              (roles.AUDITORS, elements.AUDITORS),
-              (roles.PRINCIPAL_ASSIGNEES, elements.PRINCIPAL_ASSIGNEES),
-              (roles.SECONDARY_ASSIGNEES, elements.SECONDARY_ASSIGNEES),
-              (roles.PRIMARY_CONTACTS, elements.PRIMARY_CONTACTS),
-              (roles.SECONDARY_CONTACTS, elements.SECONDARY_CONTACTS),
-              (roles.OTHER, elements.OTHERS)]])
+      obj.update_attrs(default_people=default_people)
     return obj
 
 
