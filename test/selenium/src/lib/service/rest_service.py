@@ -15,7 +15,7 @@ from lib.entities.entities_factory import (
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
-from lib.utils import help_utils
+from lib.utils import help_utils, test_utils
 
 
 class BaseRestService(object):
@@ -80,54 +80,58 @@ class BaseRestService(object):
   def get_items_from_resp(resp):
     """Check response (waiting object of requests library) from server and get
     items {key: value} from it."""
-    def get_extra_items(resp_dict):
-      """Get extra items {key: value} that used in entities."""
-      extra = {}
-      if resp_dict.get("selfLink"):
-        extra.update({"href": resp_dict.get("selfLink")})
-      if resp_dict.get("viewLink"):
-        extra.update(
-            {"url": environment.app_url + resp_dict.get("viewLink")[1:]})
-      return extra
-    if isinstance(resp, requests.models.Response):
-      try:
-        resp_text = json.loads(resp.text, encoding="utf-8")
-      except UnicodeDecodeError as unicode_err:
-        raise requests.exceptions.ContentDecodingError(
-            messages.ExceptionsMessages.err_server_req_resp.format(
-                resp.request.body, resp.status_code + unicode_err, resp.text))
-      resp_status_code = resp.status_code
-      req_method = resp.request.method
-      is_query_resp = False
-      # check response from server
-      if resp_status_code == client.RestClient.STATUS_CODES["OK"]:
-        # 'POST' request methods
-        if req_method == "POST" and isinstance(resp_text, list):
-          # REST API: [[201, {resp}]] to {resp}
-          if len(resp_text[0]) == 2 and resp_text[0][0] == 201:
-            resp_text = resp_text[0][1]
-          # QUERY API: [[{resp}]] to {resp}
-          elif len(resp_text[0]) == 1 and resp_text[0] != 201:
-            is_query_resp = True
-            resp_text = resp_text[0]
-        # 'PUT' request methods
-        if req_method == "PUT":
-          pass
-      # {resp} == {key: {value}}
-      if isinstance(resp_text, dict) and len(resp_text) == 1:
-        # {key: {value}} to {value}
-        resp_text = resp_text.itervalues().next()
-        return (dict(resp_text.items() +
-                     ({}.items() if is_query_resp else
-                      get_extra_items(resp_text).items())))
+    def get_items_from_resp():
+      """Get items from responce."""
+      def get_extra_items(resp_dict):
+        """Get extra items {key: value} that used in entities."""
+        extra = {}
+        if resp_dict.get("selfLink"):
+          extra.update({"href": resp_dict.get("selfLink")})
+        if resp_dict.get("viewLink"):
+          extra.update(
+              {"url": environment.app_url + resp_dict.get("viewLink")[1:]})
+        return extra
+      if isinstance(resp, requests.models.Response):
+        try:
+          resp_text = json.loads(resp.text, encoding="utf-8")
+        except UnicodeDecodeError as unicode_err:
+          raise requests.exceptions.ContentDecodingError(
+              messages.ExceptionsMessages.err_server_req_resp.format(
+                  resp.request.body,
+                  resp.status_code + unicode_err, resp.text))
+        resp_status_code = resp.status_code
+        req_method = resp.request.method
+        is_query_resp = False
+        # check response from server
+        if resp_status_code == client.RestClient.STATUS_CODES["OK"]:
+          # 'POST' request methods
+          if req_method == "POST" and isinstance(resp_text, list):
+            # REST API: [[201, {resp}]] to {resp}
+            if len(resp_text[0]) == 2 and resp_text[0][0] == 201:
+              resp_text = resp_text[0][1]
+            # QUERY API: [[{resp}]] to {resp}
+            elif len(resp_text[0]) == 1 and resp_text[0] != 201:
+              is_query_resp = True
+              resp_text = resp_text[0]
+          # 'PUT' request methods
+          if req_method == "PUT":
+            pass
+        # {resp} == {key: {value}}
+        if isinstance(resp_text, dict) and len(resp_text) == 1:
+          # {key: {value}} to {value}
+          resp_text = resp_text.itervalues().next()
+          return (dict(resp_text.items() +
+                       ({}.items() if is_query_resp else
+                        get_extra_items(resp_text).items())))
+        else:
+          resp_code, resp_message = resp_text[0]
+          raise requests.exceptions.ContentDecodingError(
+              messages.ExceptionsMessages.err_server_req_resp.format(
+                  resp.request.body, resp_code, resp_message))
       else:
-        resp_code, resp_message = resp_text[0]
-        raise requests.exceptions.ContentDecodingError(
-            messages.ExceptionsMessages.err_server_req_resp.format(
-                resp.request.body, resp_code, resp_message))
-    else:
-      raise requests.exceptions.RequestException(
-          messages.ExceptionsMessages.err_server_resp.format(resp))
+        raise requests.exceptions.RequestException(
+            messages.ExceptionsMessages.err_server_resp.format(resp))
+    return test_utils.wait_for(get_items_from_resp)
 
   @staticmethod
   def set_obj_attrs(obj, attrs, **kwargs):
