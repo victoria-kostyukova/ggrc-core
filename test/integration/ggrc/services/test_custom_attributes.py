@@ -14,6 +14,7 @@ import ddt
 from ggrc import utils
 from ggrc import models
 from ggrc import builder
+from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.mixins import customattributable
 
@@ -97,6 +98,62 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertEqual(len(product.custom_attribute_values), 1)
     self.assertEqual(product.custom_attribute_values[0].attribute_value,
                      "my custom attribute value")
+
+  @ddt.data(
+      ("control", "Control title")
+  )
+  @ddt.unpack
+  def test_create_from_ggrcq(self, definition_type, title):
+    """Test create definition only for GGRCQ."""
+    payload = [
+        {
+            "custom_attribute_definition": {
+                "attribute_type": "Text",
+                "context": {"id": None},
+                "definition_type": definition_type,
+                "helptext": "",
+                "mandatory": False,
+                "modal_title": "Title",
+                "placeholder": "",
+                "title": title
+            }
+        }
+    ]
+    response = self.client.post(
+        "/api/custom_attribute_definitions",
+        content_type='application/json',
+        data=utils.as_json(payload),
+        headers={'X-Requested-By': settings.GGRC_Q_ACTION_HEADER}
+    )
+    self.assertEqual(response.status_code, 200)
+
+  @ddt.data(
+      ("control", "Control title")
+  )
+  @ddt.unpack
+  def test_create_from_ggrc(self, definition_type, title):
+    """Test create definition not allowed for GGRC."""
+    payload = [
+        {
+            "custom_attribute_definition": {
+                "attribute_type": "Text",
+                "context": {"id": None},
+                "definition_type": definition_type,
+                "helptext": "Some text",
+                "mandatory": False,
+                "modal_title": "Modal title",
+                "placeholder": "Placeholder",
+                "title": title
+            }
+        }
+    ]
+    response = self.client.post(
+        "/api/custom_attribute_definitions",
+        content_type='application/json',
+        data=utils.as_json(payload),
+        headers={'X-Requested-By': 'GGRC'}
+    )
+    self.assertEqual(response.status_code, 405)
 
   def test_custom_attribute_put_add(self):
     """Test edits with adding new CA values."""
