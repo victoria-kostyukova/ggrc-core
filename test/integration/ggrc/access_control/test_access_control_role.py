@@ -6,6 +6,7 @@ from collections import OrderedDict, defaultdict
 
 import ddt
 
+from ggrc import settings
 from ggrc.access_control.role import AccessControlRole
 from ggrc.converters import errors
 from ggrc.models import all_models
@@ -37,14 +38,14 @@ class TestAccessControlRole(TestCase):
           data={"name": name}, user_role=name)
       self.people[name] = user
 
-  def _post_role(self, name=None):
+  def _post_role(self, name=None, object_type="Control"):
     """Helper function for POSTing roles"""
     if name is None:
       name = random_str(prefix="Access Control Role - ")
     return self.api.post(AccessControlRole, {
         "access_control_role": {
             "name": name,
-            "object_type": "Control",
+            "object_type": object_type,
             "context": None,
             "read": True
         },
@@ -154,3 +155,18 @@ class TestAccessControlRole(TestCase):
     assert response.status_code == 403, \
         "Forbidden error should be thrown when non-editable " \
         "role {} deleted.".format(ac_role.name)
+
+  @ddt.data("Control")
+  def test_create_from_ggrcq(self, object_type):
+    """Test that create action only for GGRCQ."""
+    self.api.headers.update(
+        {"X-Requested-By": settings.GGRC_Q_ACTION_HEADER}
+    )
+    response = self._post_role(object_type=object_type)
+    self.assertEqual(response.status_code, 201)
+
+  @ddt.data("Control")
+  def test_create_from_ggrc(self, object_type):
+    """Test create action not allowed for GGRC."""
+    response = self._post_role(object_type=object_type)
+    self.assertEqual(response.status_code, 405)
