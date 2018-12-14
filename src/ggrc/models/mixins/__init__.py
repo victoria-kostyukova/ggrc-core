@@ -188,6 +188,12 @@ class WithEndDate(object):
     )
 
 
+# pylint: disable=too-few-public-methods
+class ReadOnlyGGRC(object):
+  """Mixin that make object read-only for GGRC."""
+  pass
+
+
 class Timeboxed(WithStartDate, WithEndDate):
   """Mixin that defines `start_date` and `end_date` fields."""
 
