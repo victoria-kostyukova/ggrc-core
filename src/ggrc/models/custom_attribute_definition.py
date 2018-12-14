@@ -5,6 +5,7 @@
 
 import re
 import flask
+import sqlalchemy as sa
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
@@ -21,6 +22,7 @@ from ggrc.access_control import role as acr
 from ggrc.models.exceptions import ValidationError
 from ggrc.models import reflection
 from ggrc.cache import memcache
+from ggrc.utils import validators
 
 
 @memcache.cached
@@ -337,6 +339,23 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       raise ValueError(
           errors.DUPLICATE_CUSTOM_ROLE.format(role_name=name)
       )
+
+
+sa.event.listen(
+    CustomAttributeDefinition,
+    "before_insert",
+    validators.validate_definition_type_ggrcq
+)
+sa.event.listen(
+    CustomAttributeDefinition,
+    "before_update",
+    validators.validate_definition_type_ggrcq
+)
+sa.event.listen(
+    CustomAttributeDefinition,
+    "before_delete",
+    validators.validate_definition_type_ggrcq
+)
 
 
 @memcache.cached

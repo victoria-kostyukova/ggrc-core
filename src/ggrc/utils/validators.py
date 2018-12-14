@@ -24,3 +24,19 @@ def validate_object_type_ggrcq(mapper, content, target):
 
   if is_ggrc_action:
     raise exceptions.MethodNotAllowed()
+
+
+def validate_definition_type_ggrcq(mapper, content, target):
+  """Validate GGRCQ action for object with definition_type."""
+  from ggrc.models import get_model
+
+  del mapper, content  # Unused
+  request_header = request.headers.get("X-Requested-By")
+  model = get_model(target.definition_type)
+  is_ggrc_action = all([
+      issubclass(model, mixins.ReadOnlyGGRC),
+      request_header != settings.GGRC_Q_ACTION_HEADER
+  ])
+
+  if is_ggrc_action:
+    raise exceptions.MethodNotAllowed()
