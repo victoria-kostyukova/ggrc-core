@@ -18,6 +18,7 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.mixins import attributevalidator
 from ggrc.models.mixins import base
+from ggrc.utils import validators
 
 
 class AccessControlRole(attributevalidator.AttributeValidator,
@@ -164,10 +165,41 @@ def invalidate_noneditable_change(session, flush_context, instances):
       raise Forbidden()
 
 
-sa.event.listen(AccessControlRole, "after_insert", invalidate_acr_caches)
-sa.event.listen(AccessControlRole, "after_delete", invalidate_acr_caches)
-sa.event.listen(AccessControlRole, "after_update", invalidate_acr_caches)
-sa.event.listen(Session, 'before_flush', invalidate_noneditable_change)
+sa.event.listen(
+    AccessControlRole,
+    "before_insert",
+    validators.validate_object_type_ggrcq
+)
+sa.event.listen(
+    AccessControlRole,
+    "before_update",
+    validators.validate_object_type_ggrcq
+)
+sa.event.listen(
+    AccessControlRole,
+    "before_delete",
+    validators.validate_object_type_ggrcq
+)
+sa.event.listen(
+    AccessControlRole,
+    "after_insert",
+    invalidate_acr_caches
+)
+sa.event.listen(
+    AccessControlRole,
+    "after_delete",
+    invalidate_acr_caches
+)
+sa.event.listen(
+    AccessControlRole,
+    "after_update",
+    invalidate_acr_caches
+)
+sa.event.listen(
+    Session,
+    "before_flush",
+    invalidate_noneditable_change
+)
 
 
 def get_custom_roles_for(object_type):
