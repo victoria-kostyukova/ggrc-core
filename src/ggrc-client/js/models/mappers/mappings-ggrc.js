@@ -20,6 +20,7 @@ import {
   scopingObjects,
   snapshotableObjects,
   roleableObjects,
+  ggrcqDirectiveObjects,
 } from '../../plugins/models-types-collections';
 
 /*
@@ -38,6 +39,8 @@ import {
 
   <map> - models that can be mapped to source object directly
     using object mapper
+  <externalMap> - models that can be mapped only through external system
+    not locally
   <indirectMappings> - models which cannot be directly mapped to object
     through Relationship but linked by another way. Currently used for Mapping
     Filter in Object mapper and Global Search
@@ -67,11 +70,14 @@ new Mappings({
       'Workflow'],
   },
   Contract: {
-    map: _.difference(businessObjects, ['Assessment', 'Contract']),
+    map: _.difference(businessObjects, ['Assessment', 'Contract', 'Control']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
-    map: _.difference(businessObjects, ['Assessment']),
+    map: _.difference(businessObjects,
+      ['Assessment', ...scopingObjects, ...ggrcqDirectiveObjects]),
+    externalMap: [...scopingObjects, ...ggrcqDirectiveObjects],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
@@ -79,16 +85,19 @@ new Mappings({
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Policy: {
-    map: _.difference(businessObjects, ['Assessment', 'Policy']),
+    map: _.difference(businessObjects, ['Assessment', 'Control', 'Policy']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
-    map: _.difference(businessObjects, ['Assessment']),
+    map: _.difference(businessObjects, ['Assessment', 'Control']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Regulation: {
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Regulation']),
+      [...scopingObjects, 'Assessment', 'Control', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -98,7 +107,8 @@ new Mappings({
   },
   Standard: {
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Standard']),
+      [...scopingObjects, 'Assessment', 'Control', 'Standard']),
+    externalMap: ['Control'],
     indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -110,19 +120,22 @@ new Mappings({
   // Scoping objects
   AccessGroup: {
     map: _.difference(businessObjects,
-      ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
+      ['Assessment', 'AccessGroup', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   DataAsset: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Facility: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
@@ -134,61 +147,71 @@ new Mappings({
   },
   Market: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Metric: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   OrgGroup: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Process: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Product: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   ProductGroup: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Project: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   System: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   TechnologyEnvironment: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   Vendor: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },

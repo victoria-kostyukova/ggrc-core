@@ -48,7 +48,9 @@ export default can.Construct.extend({
     }
 
     let allowedToMap = this.getAllowedToMapModels(type);
-    return _.keys(allowedToMap);
+    let externalMap = this.getExternalMapModels(type);
+
+    return _.keys(Object.assign({}, allowedToMap, externalMap));
   },
   /**
    * Determine if two types of models can be mapped
@@ -180,8 +182,9 @@ export default can.Construct.extend({
   getAvailableMappings(type) {
     let allowedToMap = this.getAllowedToMapModels(type);
     let related = this.getIndirectlyMappedModels(type);
+    let externalMap = this.getExternalMapModels(type);
 
-    return Object.assign({}, allowedToMap, related);
+    return Object.assign({}, allowedToMap, related, externalMap);
   },
   /**
    * Return grouped types.
@@ -323,6 +326,14 @@ export default can.Construct.extend({
   */
   getIndirectlyMappedModels(object) {
     return this._getModelsFromConfig(object, 'indirectMappings');
+  },
+  /**
+   * Returns object with models which can be mapped externally only
+   * @param {string} object model name
+   * @return {Object} allowed for external mapping models
+   */
+  getExternalMapModels(object) {
+    return this._getModelsFromConfig(object, 'externalMap');
   },
 }, {
   init: function (definitions) {

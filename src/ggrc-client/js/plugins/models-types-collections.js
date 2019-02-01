@@ -33,6 +33,13 @@ export const scopingObjects = [
 ];
 
 /**
+ * GGRCQ Directives
+ */
+export const ggrcqDirectiveObjects = [
+  'Regulation', 'Standard',
+];
+
+/**
  * Snapshotable objects
  */
 export const snapshotableObjects = GGRC.config.snapshotable_objects;
