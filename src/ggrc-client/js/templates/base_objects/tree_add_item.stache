@@ -6,7 +6,7 @@
 {{#is_allowed_to_map parent_instance model.model_singular}}
   {{^if parent_instance.archived}}
       <a
-        class="btn btn-mini action-button map-button"
+        class="btn btn-small btn-darkBlue"
         href="javascript://"
         rel="tooltip"
         data-placement="left"

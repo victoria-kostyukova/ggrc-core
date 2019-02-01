@@ -6,7 +6,7 @@
 {{#if_instance_of parent_instance 'Program'}}
     {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
-         class="section-create action-button create-button"
+         class="btn btn-small btn-darkBlue"
          rel="tooltip" data-placement="left"
          data-original-title="Create {{model.title_singular}}"
          data-toggle="modal-ajax-form"
@@ -32,7 +32,7 @@
 {{else}}
     {{#is_allowed_to_map parent_instance model.model_singular}}
       <a
-        class="section-add btn btn-mini action-button map-button"
+        class="btn btn-small btn-darkBlue"
         href="javascript://"
         rel="tooltip"
         data-placement="left"

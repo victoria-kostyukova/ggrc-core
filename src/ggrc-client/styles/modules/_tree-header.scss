@@ -133,30 +133,10 @@
       }
 
       .tree-action-list {
-        height: 32px;
-
         .open {
           .fa-share-alt {
             @include opacity(1);
             color: #2196f3;
-          }
-        }
-
-        .map-button {
-          line-height: 22px;
-          background: $createBtn;
-          color: $white;
-          padding: 0 16px;
-          border: 1px solid transparent;
-
-          &:hover,
-          &:focus,
-          &:active {
-            background: mix($white, $createBtn, 30%);
-
-            &[disabled] {
-              background: $blue;
-            }
           }
         }
 
@@ -175,7 +155,6 @@
         li {
           position: relative;
           overflow: visible;
-          line-height: 32px;
           vertical-align: top;
           .counter {
             @include opacity(1);
@@ -217,66 +196,7 @@
               }
             }
           }
-          .dropdown-menu2 {
-            @include border-radius(0);
-            right: -12px;
-            left: auto;
-            top: 20px;
-            padding: 14px 30px 20px 30px;
-            min-width: 680px;
-            text-align: left;
-            h5 {
-              font-size: 16px;
-              font-weight: normal;
-              text-transform: none;
-              line-height: 24px;
-              vertical-align: top;
-            }
-            label {
-              font-size: 12px;
-            }
-            .model-list {
-              margin-top: 11px;
-              margin-bottom: 14px;
-              li {
-                margin: 0;
-                text-transform: none;
-                label {
-                  @extend %oneline;
-                  display: inline-block;
-                  cursor: pointer;
-                }
-                &.disabled {
-                  color: $gray;
-                  label {
-                    cursor: not-allowed;
-                  }
-                }
-              }
-            }
-            .select-clear-all {
-              margin-bottom: 5px;
-              li {
-                margin: 0;
-                text-transform: none;
-                float: right;
-                width: 15%;
-                clear: none;
-                font-size: 11px;
-                a {
-                  margin: 0;
-                  text-decoration: underline;
-                  text-align: right;
-                  cursor: pointer;
-                  color: #505050;
-                  &:hover {
-                    text-decoration: none;
-                    background-color: #eeeeee;
-                  }
-                }
-              }
-            }
-          }
+
           .dropdown-menu.tree-action-list-items {
             & > li,
             & > * > li{
@@ -334,9 +254,6 @@
                 }
               }
             }
-          }
-          .action-button {
-            vertical-align: top;
           }
           .details-wrap > a {
             padding-top: 8px;

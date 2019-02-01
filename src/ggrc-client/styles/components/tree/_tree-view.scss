@@ -43,19 +43,6 @@ tree-widget-container {
   .tree-action {
     display: flex;
     justify-content: flex-end;
-
-    .map-button {
-      line-height: 26px;
-      background: $createBtn;
-      color: $white;
-      padding: 0 16px;
-      border: 1px solid transparent;
-      &:hover,
-      &:focus,
-      &:active {
-        background: mix($white, $createBtn, 30%);
-      }
-    }
   }
 
   .details-wrap {

@@ -6,7 +6,7 @@
 {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
   {{^if_recurring_workflow parent_instance}}
     <a
-      class="section-add action-button create-button"
+      class="btn btn-small btn-darkBlue"
       href="javascript://"
       rel="tooltip"
       data-placement="left"

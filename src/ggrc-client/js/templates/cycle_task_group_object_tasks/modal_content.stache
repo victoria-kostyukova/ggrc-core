@@ -67,7 +67,7 @@
           <div style="clear:both">
             <br>
             {{^if_in instance.status "Finished,Verified"}}
-            <a class="section-add section-sticky btn btn-small btn-white"
+            <a class="btn btn-small btn-white"
               href="javascript://"
               {{data "deferred_to"}}
               data-placement="left"

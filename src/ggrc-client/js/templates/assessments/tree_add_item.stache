@@ -7,7 +7,7 @@
     {{^if instance.archived}}
     {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
-         class="section-create action-button create-button"
+         class="btn btn-small btn-darkBlue"
          rel="tooltip"
          data-placement="left"
          data-original-title="Create {{model.model_singular}}"
@@ -21,7 +21,7 @@
     {{else}}
       {{#is_auditor}}
         <a href="javascript://"
-           class="section-create action-button create-button"
+           class="btn btn-small btn-darkBlue"
            rel="tooltip"
            data-placement="left"
            data-original-title="Create {{model.model_singular}}"

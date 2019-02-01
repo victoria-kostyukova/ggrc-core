@@ -26,7 +26,7 @@
   {{#drawRelatedAssessments}}
   <div class="related-assessments-button">
     <button type="button"
-            class="btn btn-mini action-button btn-lightBlue"
+            class="btn btn-mini btn-lightBlue"
             can-click="showRelatedAssessments"
             title="Show Related Assessments">
       Assessments

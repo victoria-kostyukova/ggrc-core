@@ -167,7 +167,7 @@
                 <map-button-using-assessment-type
                   {{data "deferred_to"}}
                   {instance}="instance">
-                      <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
+                      <a class="btn btn-small btn-white assessment-map-btn"
                         href="javascript://"
                         data-placement="left"
                         data-deferred="true"

@@ -9,7 +9,7 @@
       <a
         href="javascript://"
         rel="tooltip"
-        class="section-create action-button create-button"
+        class="btn btn-small btn-darkBlue"
         data-placement="left"
         data-original-title="Create {{model.title_singular}}"
         data-toggle="modal-ajax-form"
@@ -25,7 +25,7 @@
     {{#is_allowed_to_map parent_instance model.model_singular}}
       <a
         href="javascript://"
-        class="action-button create-button"
+        class="btn btn-small btn-darkBlue"
         rel="tooltip"
         data-toggle="modal-ajax-form"
         data-modal-reset="reset"

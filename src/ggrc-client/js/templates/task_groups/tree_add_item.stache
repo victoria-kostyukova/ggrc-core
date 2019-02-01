@@ -10,7 +10,7 @@
       rel="tooltip"
       data-placement="left"
       data-original-title="Create Task Group"
-      class="section-create action-button create-button"
+      class="btn btn-small btn-darkBlue"
       data-toggle="modal-ajax-form"
       data-modal-reset="reset"
       data-modal-class="modal-wide"

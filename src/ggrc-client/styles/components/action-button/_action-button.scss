@@ -3,56 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.action-button {
-  box-sizing: border-box;
-  cursor: pointer;
-  padding: 0 16px;
-  line-height: 22px;
-  text-align: center;
-  display: inline-block;
-  font-size: 11px;
-  text-transform: none;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  min-width: 52px;
-
-  &[disabled] {
-    opacity: 0.47;
-  }
-}
-
-.create-button {
-  background: $createBtn;
-  color: $white;
-  border-radius: 2px;
-  line-height: 26px;
-
-  &:hover {
-    background: $link;
-    color: $white;
-    text-decoration: none;
-
-    &[disabled] {
-      background: $createBtn;
-    }
-  }
-
-}
-
-.map-button {
-  background: $white;
-  font-weight: normal;
-  border: 1px solid $widgetBorder;
-  color: $black;
-  border-radius: 2px;
-
-  &:hover,
-  &:focus,
-  &:active {
-    border-color: $widgetBorder;
-  }
-}
-
 .btn {
   background: $white;
   color: $black;
@@ -67,6 +17,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-transform: none !important;
 
   &[disabled], &.disabled {
     opacity: 0.25;

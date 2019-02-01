@@ -6,7 +6,7 @@
 {{#is_allowed 'update' parent_instance context='for'}}
     {{^if parent_instance.archived}}
       <assessment-template-clone-button
-        {class}="'action-button create-button'"
+        {class}="'btn btn-small btn-darkBlue'"
         (refresh-tree)="loadItems()"
         {object-type}="model.model_singular"
         {parent-id}="parent_instance.id"
