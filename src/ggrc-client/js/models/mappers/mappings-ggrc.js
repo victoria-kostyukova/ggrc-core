@@ -19,9 +19,9 @@ import {
   coreObjects,
   scopingObjects,
   snapshotableObjects,
-  roleableObjects,
   ggrcqDirectiveObjects,
 } from '../../plugins/models-types-collections';
+import {getRoleableModels} from '../../plugins/utils/models-utils';
 
 /*
   To configure a new mapping, use the following format :
@@ -46,6 +46,9 @@ import {
     Filter in Object mapper and Global Search
   <mappers> - custom mappings
 */
+
+const roleableObjects = getRoleableModels()
+  .map((model) => model.model_singular);
 
 new Mappings({
   Person: {

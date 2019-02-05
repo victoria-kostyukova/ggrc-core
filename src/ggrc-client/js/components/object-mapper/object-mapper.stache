@@ -126,6 +126,17 @@
 </div>
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
+{{#if isMappableExternally}}
+  <div class="external-map">
+    <p class="external-map__content">Please click the button below to map {{lowercase model.title_plural}} 
+      for this {{lowercase parentInstance.constructor.title_singular}} in new frontend.</p>
+    <questionnaire-mapping-link
+      {instance}="parentInstance"
+      {destination-model}="model">
+      Open in new frontend
+    </questionnaire-mapping-link>
+  </div>
+{{else}}
   <collapsible-panel {soft-mode}="true" {title-text}="'Search Results ({{*totalObjects}})'" {(expanded)}="showResults">
     <div class="search-results">
       <mapper-results
@@ -172,4 +183,5 @@
       </div>
     </div>
   </collapsible-panel>
+{{/if}}
 </div>

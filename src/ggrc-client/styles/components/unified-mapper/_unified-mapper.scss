@@ -540,6 +540,19 @@ mapper-results-columns-configuration {
       .control-buttons {
         margin-top: 20px;
       }
+
+      .external-map {
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &__content {
+          margin-bottom: 20px;
+          color: #999;
+        }
+      }
     }
   }
 

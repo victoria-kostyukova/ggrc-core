@@ -10,6 +10,7 @@ import '../../components/advanced-search/advanced-search-wrapper';
 import '../../components/unified-mapper/mapper-results';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/mapping-controls/mapping-type-selector';
+import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
 import template from './object-mapper.stache';
 
@@ -120,6 +121,7 @@ export default can.Component.extend({
        * @property {boolean}
        */
       deferred: false,
+      isMappableExternally: false,
       allowedToCreate: function () {
         // Don't allow to create new instances for "Audit Scope" Objects that
         // are snapshots
@@ -156,8 +158,17 @@ export default can.Component.extend({
       },
       onSubmit: function () {
         this.updateFreezedConfigToLatest();
-        // calls base version
-        this._super(...arguments);
+
+        let source = this.attr('object');
+        let destination = this.attr('type');
+        if (Mappings.shouldBeMappedExternally(source, destination)) {
+          this.attr('isMappableExternally', true);
+          return;
+        } else {
+          this.attr('isMappableExternally', false);
+          // calls base version
+          this._super(...arguments);
+        }
       },
     });
   },
@@ -210,7 +221,7 @@ export default can.Component.extend({
         this.viewModel.attr('deferred_list', deferredToList);
       }
 
-      self.viewModel.attr('submitCbs').fire();
+      self.viewModel.onSubmit();
     },
     map(model) {
       const viewModel = this.viewModel;

@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  ggrcqDirectiveObjects,
+  scopingObjects,
+} from '../../plugins/models-types-collections';
+
 /**
  * Util methods for integration with GGRCQ.
  */
@@ -36,6 +41,7 @@ function isChangeableExternally(instance) {
  * @param {String} options.path - The questionnaire path
  * @param {String} options.slug - The model slug
  * @param {String} options.view - The view path
+ * @param {String} options.params - Additional url params
  * @return {String} Url to questions
  */
 function getUrl({model, path, slug, view, params}) {
@@ -156,6 +162,61 @@ function getChangeLogUrl(instance) {
   });
 }
 
+/**
+ * Get url to mapping view
+ * @param {Object} instance - The model instance
+ * @param {Object} destinationModel - The destination model
+ * @return {String} Url to mapping view
+ * */
+function getMappingUrl(instance, destinationModel) {
+  if (instance.type === 'Control') {
+    return getMapObjectToControlUrl(instance, destinationModel);
+  } else if (destinationModel.title_singular === 'Control') {
+    return getMapControlToObjectUrl(instance, destinationModel);
+  }
+
+  return '';
+}
+
+
+function getMapObjectToControlUrl(instance, destinationModel) {
+  let view = '';
+  if (ggrcqDirectiveObjects. includes(destinationModel.model_singular)) {
+    view = 'directives';
+  } else if (scopingObjects.includes(destinationModel.model_singular)) {
+    view = 'scope';
+  }
+
+  let params = 'mappingStatus=in_progress,not_in_scope,reviewed&types=' +
+    destinationModel.table_singular;
+
+  return getUrl({
+    path: 'control',
+    model: instance.constructor.table_singular,
+    slug: instance.slug,
+    view,
+    params,
+  });
+}
+
+function getMapControlToObjectUrl(instance) {
+  let path = '';
+  let type = instance.constructor.model_singular;
+  if (ggrcqDirectiveObjects.includes(type)) {
+    path = 'directives';
+  } else if (scopingObjects.includes(type)) {
+    path = 'questionnaires';
+  }
+
+  return getUrl({
+    path,
+    model: instance.constructor.table_singular,
+    slug: instance.slug,
+    view: 'controls',
+    params: 'mappingStatus=in_progress,not_in_scope,reviewed',
+  });
+}
+
 export {
   hasQuestions,
   isChangeableExternally,
@@ -164,6 +225,7 @@ export {
   getImportUrl,
   getInfoUrl,
   getReviewUrl,
+  getMappingUrl,
   getUrl,
   getProposalsUrl,
   getChangeLogUrl,

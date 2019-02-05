@@ -335,6 +335,10 @@ export default can.Construct.extend({
   getExternalMapModels(object) {
     return this._getModelsFromConfig(object, 'externalMap');
   },
+  shouldBeMappedExternally(source, destination) {
+    let externalMappings = this.getExternalMapModels(source);
+    return _.keys(externalMappings).includes(destination);
+  },
 }, {
   init: function (definitions) {
     if (this.constructor.config) {
