@@ -49,21 +49,35 @@
                 </div>
               </a>
             {{else}}
-              <a href="{{urlPath}}{{ internav_href }}"
-                {{#canMapObject model.model_singular}}
-                  {{^if_equals model.model_singular 'Assessment'}}
-                    data-clickable="true"
-                    data-toggle="unified-mapper"
-                    data-join-option-type="{{model.model_singular}}"
-                    data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.model_singular}}"
-                  {{/if_equals}}
-                {{/canMapObject}}>
-                <div class="oneline">
-                  <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
-                  {{internav_display}}
-                </div>
-              </a>
+              {{#isMappableExternally instance model.model_singular}}
+                <questionnaire-mapping-link 
+                  class="external-link"
+                  {instance}="instance"
+                  {destination-model}="model">                  
+                    <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
+                    <span class="external-link__content">
+                      {{internav_display}}
+                      <i class="fa fa-external-link"></i>
+                    </span>
+                  </questionnaire-mapping-link>
+                </a>
+              {{else}}
+                <a href="{{urlPath}}{{ internav_href }}"
+                  {{#canMapObject model.model_singular}}
+                    {{^if_equals model.model_singular 'Assessment'}}
+                      data-clickable="true"
+                      data-toggle="unified-mapper"
+                      data-join-option-type="{{model.model_singular}}"
+                      data-join-object-id="{{instance.id}}"
+                      data-join-object-type="{{instance.class.model_singular}}"
+                    {{/if_equals}}
+                  {{/canMapObject}}>
+                  <div class="oneline">
+                    <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
+                    {{internav_display}}
+                  </div>
+                </a>
+              {{/isMappableExternally}}
             {{/shouldCreateObject}}
           </div>
       {{/filteredWidgets}}

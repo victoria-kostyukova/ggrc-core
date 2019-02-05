@@ -642,6 +642,25 @@ p {
       column-count: 1;
       width: 160px;
     }
+
+    .external-link {
+      &__content {
+        color: $link;
+
+        .fa {
+          font-size: 9px;
+          color: $link;
+        }
+
+        &:hover {
+          color: $darkBlue;
+
+          .fa {
+            color: $darkBlue;
+          }
+        }
+      }
+    }
   }
 }
 

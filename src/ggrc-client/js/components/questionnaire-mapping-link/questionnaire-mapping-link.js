@@ -21,5 +21,6 @@ export default can.Component.extend({
     },
     instance: null,
     destinationModel: null,
+    cssClasses: '',
   },
 });

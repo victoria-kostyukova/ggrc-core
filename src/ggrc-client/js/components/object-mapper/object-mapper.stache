@@ -131,6 +131,7 @@
     <p class="external-map__content">Please click the button below to map {{lowercase model.title_plural}} 
       for this {{lowercase parentInstance.constructor.title_singular}} in new frontend.</p>
     <questionnaire-mapping-link
+      {css-classes}="'btn btn-small btn-white'"
       {instance}="parentInstance"
       {destination-model}="model">
       Open in new frontend

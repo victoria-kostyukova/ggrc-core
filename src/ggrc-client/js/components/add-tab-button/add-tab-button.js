@@ -11,6 +11,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
 import Mappings from '../../models/mappers/mappings';
+import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
 const viewModel = can.Map.extend({
   define: {
@@ -111,6 +112,14 @@ export default can.Component.extend({
     },
     canMapObject(modelShortName, options) {
       if (this.isAllowedToMap(modelShortName())) {
+        return options.fn(options.contexts);
+      }
+      return options.inverse(options.contexts);
+    },
+    isMappableExternally(instance, modelShortName, options) {
+      let source = instance().type;
+      let destination = modelShortName();
+      if (Mappings.shouldBeMappedExternally(source, destination)) {
         return options.fn(options.contexts);
       }
       return options.inverse(options.contexts);
