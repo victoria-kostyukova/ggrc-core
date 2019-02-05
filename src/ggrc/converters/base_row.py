@@ -20,6 +20,7 @@ from ggrc.models import all_models
 from ggrc.models import cache
 from ggrc.models.exceptions import StatusValidationError
 from ggrc.models.mixins import issue_tracker
+from ggrc.models.mixins import synchronizable
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.snapshotter import create_snapshots
@@ -248,6 +249,7 @@ class ImportRowConverter(RowConverter):
 
   def process_row(self):
     """Parse, set, validate and commit data specified in self.row."""
+    self._check_object_class()
     self._handle_raw_data()
     self._check_mandatory_fields()
     if self.ignore:
@@ -266,6 +268,11 @@ class ImportRowConverter(RowConverter):
     self.flush_object()
     self.setup_secondary_objects()
     self.commit_object()
+
+  def _check_object_class(self):
+    """Validate if object class is importable model."""
+    if issubclass(self.object_class, synchronizable.Synchronizable):
+      self.add_error(errors.EXTERNAL_MODEL_IMPORT_RESTRICTION)
 
   def _check_object(self):
     """Check object if it has any pre commit checks.

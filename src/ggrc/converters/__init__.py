@@ -36,7 +36,6 @@ GGRC_IMPORTABLE = {
     "audit": all_models.Audit,
     "contract": all_models.Contract,
     "control assessment": all_models.Assessment,
-    "control": all_models.Control,
     "data asset": all_models.DataAsset,
     "data_asset": all_models.DataAsset,
     "dataasset": all_models.DataAsset,
@@ -77,6 +76,7 @@ GGRC_IMPORTABLE = {
 
 GGRC_EXPORTABLE = {
     "snapshot": all_models.Snapshot,
+    "control": all_models.Control,
 }
 
 

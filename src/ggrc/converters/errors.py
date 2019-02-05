@@ -202,3 +202,6 @@ NO_VERIFIER_WARNING = (u"Line {line}: Assessment without verifier cannot "
                        u"The value will be ignored.")
 
 UNEXPECTED_ERROR = u"Unexpected error on import."
+
+EXTERNAL_MODEL_IMPORT_RESTRICTION = (u"Line {line}: Trying to import external "
+                                     u"model entry.")
