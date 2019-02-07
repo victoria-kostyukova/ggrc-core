@@ -22,12 +22,15 @@
         <div class="simple-modal__header-text mapped-controls-info__header-text flex-size-1">
             <div class="mapped-controls-info__title">
                 <span class="mapped-controls-info__title-text">{{assessmentType}}:</span>
-                <a target="_blank" href="{{instance.originalLink}}" title="{{instance.title}}">{{instance.title}}</a>
+                {{instance.title}}
             </div>
             <span class="mapped-controls-info__title-state state-value snapshot">
                 {{instnace.type}} version as on {{dateTime instance.updated_at}}
             </span>
         </div>
+        <a target="_blank" class="btn btn-white btn-small" href="{{instance.originalLink}}">
+            Open Original {{instance.class.title_singular}}
+        </a>
         <button type="button" class="btn btn-small btn-icon" can-click="hide">
             <i class="fa fa-times black"></i>
         </button>
@@ -35,6 +38,11 @@
     <div class="simple-modal__body mapped-controls-info__body {{#if isLoading}}loading{{/if}}">
         <spinner {toggle}="isLoading" class="spinner-wrapper active"
                  extra-css-class="grid-spinner"></spinner>
+
+        <questionnaire-link {instance}="instance" {view-type}="'button'">
+            Open {{instance.class.title_singular}} in new frontend
+        </questionnaire-link>
+
         {{^if withoutDetails}}
         <collapsible-panel title-text="{{assessmentType}} Info"
                            expanded="true">

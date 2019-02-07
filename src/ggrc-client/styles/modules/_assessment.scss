@@ -129,7 +129,6 @@
     text-overflow: ellipsis;
     margin-right: 8px;
     font-size: 13px;
-    color: $link;
   }
 
   &__title-text {
@@ -168,6 +167,10 @@
       .people-group {
         margin-right: 0;
       }
+    }
+
+    .questionnaire-link {
+      margin-top: 23px;
     }
   }
 
