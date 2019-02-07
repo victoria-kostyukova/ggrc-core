@@ -38,7 +38,7 @@ function isChangeableExternally(instance) {
  * @param {String} options.view - The view path
  * @return {String} Url to questions
  */
-function getUrl({model, path, slug, view}) {
+function getUrl({model, path, slug, view, params}) {
   let url = GGRC.GGRC_Q_INTEGRATION_URL;
   if (!url) {
     return '';
@@ -51,8 +51,9 @@ function getUrl({model, path, slug, view}) {
   path = path.toLowerCase();
   slug = slug.toLowerCase();
   view = view ? `/${view}` : '';
+  params = params ? `?${params}` : '';
 
-  return `${url}${path}/${model}=${slug}${view}`;
+  return `${url}${path}/${model}=${slug}${view}${params}`;
 }
 
 /**
@@ -92,7 +93,22 @@ function getCommentFormUrl(instance) {
     model: instance.constructor.table_singular,
     path: instance.constructor.table_singular,
     slug: instance.slug,
-    view: 'comment',
+    view: 'info',
+    params: 'comments=open',
+  });
+}
+
+/**
+ * Get url to review view
+ * @param {Object} instance - The model instance
+ * @return {String} Url to review view
+ */
+function getReviewUrl(instance) {
+  return getUrl({
+    model: instance.constructor.table_singular,
+    path: instance.constructor.table_singular,
+    slug: instance.slug,
+    view: 'review',
   });
 }
 
@@ -102,5 +118,6 @@ export {
   getCommentFormUrl,
   getQuestionsUrl,
   getInfoUrl,
+  getReviewUrl,
   getUrl,
 };

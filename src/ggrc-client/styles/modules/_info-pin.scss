@@ -122,3 +122,30 @@
       font-size: 13px;
     }
 }
+
+.questionnaire-link {
+  display: flex;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.questionnaire-link__icon {
+  font-size: 16px;
+}
+
+.questionnaire-link_type_button {
+  margin-right: 10px;
+
+  .questionnaire-link__icon {
+    margin-right: 5px;
+    font-size: 14px;
+
+    &_position_right {
+      margin-right: 0;
+      margin-left: 5px;
+      order: 1;
+    }
+  }
+}

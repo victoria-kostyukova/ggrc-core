@@ -4,10 +4,12 @@
 */
 
 import {
+  getCommentFormUrl,
   getInfoUrl,
+  getReviewUrl,
   isChangeableExternally,
 } from '../../plugins/utils/ggrcq-utils';
-import template from './questionnaire-link.mustache';
+import template from './questionnaire-link.stache';
 
 export default can.Component.extend({
   tag: 'questionnaire-link',
@@ -15,12 +17,20 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: {
     define: {
-      infoUrl: {
+      url: {
         type: String,
         get: function () {
           const instance = this.attr('instance');
+          const linkType = this.attr('linkType');
 
-          return getInfoUrl(instance);
+          switch (linkType) {
+            case 'comment':
+              return getCommentFormUrl(instance);
+            case 'review':
+              return getReviewUrl(instance);
+            default:
+              return getInfoUrl(instance);
+          }
         },
       },
       isChangeableExternally: {
@@ -33,5 +43,9 @@ export default can.Component.extend({
       },
     },
     instance: null,
+    iconPosition: 'left',
+    linkType: 'info',
+    showIcon: false,
+    viewType: 'link',
   },
 });
