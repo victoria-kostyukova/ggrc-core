@@ -23,7 +23,9 @@
                 </li>
               {{/if}}
               {{^if instance.archived}}
-                {{> /static/templates/base_objects/edit_object_link.stache}}
+                {{^if instance.class.isChangeableExternally}}
+                  {{> /static/templates/base_objects/edit_object_link.stache}}
+                {{/if}}
               {{/if}}
 
               {{#if instance.class.is_clonable}}
@@ -98,19 +100,29 @@
               {{/if}}
             {{/is_info_pin}}
 
+            {{#if instance.class.isChangeableExternally}}
+              <li>
+                <questionnaire-link {instance}="instance" {show-icon}="true">
+                  Open {{instance.class.title_singular}} in new frontend
+                </questionnaire-link>
+              </li>
+            {{/if}}
+
             {{#is_allowed 'delete' instance}}
               {{^if instance.archived}}
-                <li>
-                  <a data-test-id="dropdown_settings_delete_6a62eaaf"
-                     data-toggle="modal-ajax-deleteform"
-                     data-object-plural="{{model.table_plural}}"
-                     data-object-singular="{{model.model_singular}}"
-                     data-modal-reset="reset" data-modal-class="modal"
-                     data-object-id="{{instance.id}}" href="javascript://">
-                    <i class="fa fa-trash"></i>
-                    Delete
-                  </a>
-                </li>
+                {{^if instance.class.isChangeableExternally}}
+                  <li>
+                    <a data-test-id="dropdown_settings_delete_6a62eaaf"
+                      data-toggle="modal-ajax-deleteform"
+                      data-object-plural="{{model.table_plural}}"
+                      data-object-singular="{{model.model_singular}}"
+                      data-modal-reset="reset" data-modal-class="modal"
+                      data-object-id="{{instance.id}}" href="javascript://">
+                      <i class="fa fa-trash"></i>
+                      Delete
+                    </a>
+                  </li>
+                {{/if}}
               {{/if}}
             {{/is_allowed}}
 
