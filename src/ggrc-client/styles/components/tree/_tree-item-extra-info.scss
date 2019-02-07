@@ -196,13 +196,18 @@ tree-item-extra-info {
         &:hover {
           background-color: $lightGray !important;
 
-          > a, show-related-assessments-button > a,
-          tree-item-map > a, sub-tree-models > a {
+          > a,
+          show-related-assessments-button > a,
+          tree-item-map > a,
+          sub-tree-models > a {
             color: $black !important;
           }
         }
-        > a, show-related-assessments-button > a,
-        tree-item-map > a, sub-tree-models > a {
+        > a,
+        show-related-assessments-button > a,
+        tree-item-map > a,
+        sub-tree-models > a,
+        questionnaire-link > a {
           line-height: 30px;
           color: $black;
           display: block;
@@ -216,6 +221,10 @@ tree-item-extra-info {
             width: 16px;
             font-size: 13px;
           }
+        }
+
+        questionnaire-link > a {
+          padding-right: 5px;
         }
 
         .openclose {

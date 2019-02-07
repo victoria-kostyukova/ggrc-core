@@ -33,6 +33,16 @@
             {{/unless}}
           {{/if}}
 
+          {{#if instance.class.isChangeableExternally}}
+            {{^if isSnapshot}}
+              <li>
+                <questionnaire-link {instance}="instance" {show-icon}="true">
+                  Open {{instance.class.title_singular}} in new frontend
+                </questionnaire-link>
+              </li>
+            {{/if}}
+          {{/if}}
+
           {{#if isAllowedToMap}}
             <li>
               <tree-item-map {instance}="instance"></tree-item-map>
@@ -40,6 +50,7 @@
           {{/if}}
 
           {{#if isAllowedToEdit}}
+            {{^if instance.class.isChangeableExternally}}
               <li>
                 <a href="javascript://"
                   data-link-purpose="open-edit-modal"
@@ -53,6 +64,7 @@
                   Edit object
                 </a>
               </li>
+            {{/if}}
           {{/if}}
 
           <li>
