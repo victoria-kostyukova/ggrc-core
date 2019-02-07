@@ -18,4 +18,12 @@
     {is-loading}="isLoading"
     {show-no-items-text}="isDeniedToAddComment">
   </mapped-comments>
+  {{#if isAllowedToAddCommentExternally}}
+    <questionnaire-link {instance}="instance"
+      {link-type}="'comment'"
+      {show-icon}="true"
+      {view-type}="'button'">
+      Add Comment
+    </questionnaire-link>
+  {{/if}}
 </comment-data-provider>

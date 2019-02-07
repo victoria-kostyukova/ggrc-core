@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import template from './comments-section.stache';
 import './comment-data-provider';
 import './comment-add-form';
@@ -20,8 +21,18 @@ export default can.Component.extend({
       },
       isDeniedToAddComment: {
         get() {
-          return !Permission.is_allowed_for('update', this.attr('instance'))
-            || this.attr('instance.archived');
+          const instance = this.attr('instance');
+
+          return !Permission.is_allowed_for('update', instance)
+            || instance.attr('archived')
+            || isChangeableExternally(instance);
+        },
+      },
+      isAllowedToAddCommentExternally: {
+        get() {
+          const instance = this.attr('instance');
+
+          return isChangeableExternally(instance);
         },
       },
     },
