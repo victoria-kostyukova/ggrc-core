@@ -5,9 +5,17 @@
 
 <div class="info-pane-utility">
     <questions-link {instance}="instance">
-      Questionnaire
-      <i class="fa fa-external-link"></i>
+        Questionnaire
+        <i class="fa fa-external-link"></i>
     </questions-link>
+    {{^if instance.snapshot}}
+        <questionnaire-link {instance}="instance"
+            {link-type}="'review'"
+            {show-icon}="true"
+            {view-type}="'button'">
+            {{instance.class.title_singular}} Review Details
+        </questionnaire-link>
+    {{/if}}
     <show-related-assessments-button instance="instance" extra-btn-css="btn-small"></show-related-assessments-button>
     {{#if instance.snapshot}}
         {{> /static/templates/snapshots/dropdown_menu.stache}}
