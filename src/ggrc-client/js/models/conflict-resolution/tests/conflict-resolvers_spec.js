@@ -7,7 +7,6 @@ import {
   buildChangeDescriptor,
   simpleFieldResolver,
   customAttributeResolver,
-  objectListResolver,
 } from '../conflict-resolvers';
 
 describe('conflict resolvers', () => {
@@ -454,77 +453,6 @@ describe('conflict resolvers', () => {
 
         expect(hasConflict).toBe(true);
       });
-    });
-  });
-
-  describe('objectListResolver', () => {
-    let baseAttrs;
-    let attrs;
-    let remoteAttrs;
-    let container;
-
-    beforeEach(() => {
-      baseAttrs = [];
-      attrs = [];
-      remoteAttrs = [];
-      container = new can.List();
-    });
-
-    it('resolves server change', () => {
-      baseAttrs = [{id: 1}, {id: 2}];
-      attrs = [{id: 1}, {id: 2}];
-      remoteAttrs = [{id: 2}, {id: 3}];
-
-      let hasConflict = objectListResolver(
-        baseAttrs,
-        attrs,
-        remoteAttrs,
-        container);
-
-      expect(hasConflict).toBe(false);
-    });
-
-    it('resolves local change', () => {
-      baseAttrs = [{id: 1}, {id: 2}];
-      attrs = [{id: 2}, {id: 3}];
-      remoteAttrs = [{id: 1}, {id: 2}];
-
-      let hasConflict = objectListResolver(
-        baseAttrs,
-        attrs,
-        remoteAttrs,
-        container);
-
-      expect(hasConflict).toBe(false);
-    });
-
-    it('resolves the same server and local change', () => {
-      baseAttrs = [{id: 1}, {id: 2}];
-      attrs = [{id: 2}, {id: 3}];
-      remoteAttrs = [{id: 2}, {id: 3}];
-
-      let hasConflict = objectListResolver(
-        baseAttrs,
-        attrs,
-        remoteAttrs,
-        container);
-
-      expect(hasConflict).toBe(false);
-      expect(container.attr()).toEqual([{id: 2}, {id: 3}]);
-    });
-
-    it('does not resolve different server and local change', () => {
-      baseAttrs = [{id: 1}, {id: 2}];
-      attrs = [{id: 2}, {id: 3}];
-      remoteAttrs = [{id: 1}, {id: 3}];
-
-      let hasConflict = objectListResolver(
-        baseAttrs,
-        attrs,
-        remoteAttrs,
-        container);
-
-      expect(hasConflict).toBe(true);
     });
   });
 });

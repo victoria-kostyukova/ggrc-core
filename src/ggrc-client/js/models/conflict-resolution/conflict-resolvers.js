@@ -85,23 +85,3 @@ export function customAttributeResolver(
   return conflict;
 }
 
-export function objectListResolver(
-  previousValue = [],
-  currentValue = [],
-  remoteValue = [],
-  container = new can.List()) {
-  let previousIds = previousValue.map(({id}) => id).sort();
-  let currentIds = currentValue.map(({id}) => id).sort();
-  let remoteIds = remoteValue.map(({id}) => id).sort();
-
-  let {hasConflict, isChangedLocally} = buildChangeDescriptor(
-    previousIds,
-    currentIds,
-    remoteIds);
-
-  if (isChangedLocally) {
-    container.replace(currentValue);
-  }
-
-  return hasConflict;
-}
