@@ -5,6 +5,7 @@
 
 import '../tree/tree-item-custom-attribute';
 import '../tree/tree-field-wrapper';
+import '../tree/tree-field';
 import '../tree/tree-item-attr';
 import template from './templates/mapper-results-item-attrs.stache';
 

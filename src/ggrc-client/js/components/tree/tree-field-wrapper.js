@@ -3,23 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/tree-field.stache';
 import RefreshQueue from '../../models/refresh_queue';
-import {getTruncatedList} from '../../plugins/ggrc_utils';
 
 const viewModel = can.Map.extend({
-  define: {
-    tooltipContent: {
-      get() {
-        return getTruncatedList(this.attr('items'));
-      },
-    },
-  },
   field: 'title',
   source: null,
   type: null,
   items: [],
-  showTooltip: true,
   init: function () {
     this.refreshItems();
   },
@@ -70,7 +60,6 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'tree-field-wrapper',
-  template,
   leakScope: true,
   viewModel,
   events: {

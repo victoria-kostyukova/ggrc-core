@@ -8,13 +8,13 @@
     rel="tooltip"
     data-original-title="{{tooltipContent}}"
   >
-    {{#items}}
+    {{#source}}
       <div class="tree-field__item">{{.}}</div>
-    {{/items}}
+    {{/source}}
   </div>
 {{else}}
-  {{#items}}
+  {{#source}}
     <div class="tree-field__item">{{.}}</div>
-  {{/items}}
+  {{/source}}
 {{/if}}
 

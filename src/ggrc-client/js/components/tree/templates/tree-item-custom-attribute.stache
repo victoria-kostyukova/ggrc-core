@@ -7,6 +7,8 @@
     {{! because the object can currently only be a
     person there is no need to switch }}
     <model-loader {path}="'business-models/person'">
-        <tree-field-wrapper {source}="object" {type}="loadedModel" {field}="'email'"/>
+        <tree-field-wrapper {source}="object" {type}="loadedModel" {field}="'email'">
+          <tree-field {source}="items"/>
+        </tree-field-wrapper>
     </model-loader>
 {{/getCustomAttrValue}}
