@@ -22,7 +22,7 @@ import '../components/snapshotter/revisions-comparer';
 import '../components/snapshotter/snapshot-comparer-config';
 import '../components/revision-history/restore-revision';
 import '../components/unarchive_link';
-import '../components/sort/sort-by';
+import '../components/sort/sort';
 import '../components/object-review/object-review';
 import '../components/review-state/review-state';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';

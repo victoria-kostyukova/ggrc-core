@@ -74,23 +74,15 @@
   {{/case}}
 
   {{#case 'assertions'}}
-    <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
-      <model-loader {path}="'service-models/control-assertion'">
-        <tree-field-wrapper {source}="sortedItems" {type}="loadedModel" {field}="'name'">
-          <tree-field {source}="items"/>
-        </tree-field-wrapper>
-      </model-loader>
-    </sort-by>
+    <sort {items}="instance.assertions">
+      <tree-field {source}="sortedItems"/>
+    </sort>
   {{/case}}
 
   {{#case 'categories'}}
-    <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
-      <model-loader {path}="'service-models/control-category'">
-        <tree-field-wrapper {source}="sortedItems" {type}="loadedModel" {field}="'name'">
-          <tree-field {source}="items"/>
-        </tree-field-wrapper>
-      </model-loader>
-    </sort-by>
+    <sort {items}="instance.categories">
+      <tree-field {source}="sortedItems"/>
+    </sort>
   {{/case}}
 
   {{#case 'status'}}
