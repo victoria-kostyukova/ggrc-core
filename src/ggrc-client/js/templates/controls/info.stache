@@ -9,7 +9,7 @@
       {{> /static/templates/base_objects/general-page-header.stache}}
 
       <tab-container {instance}="instance">
-        <tab-panel {(panels)}="panels" title-text="Attributes">
+        <tab-panel {(panels)}="panels" {title-text}="'Attributes'">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
               <object-review {instance}="instance"></object-review>
@@ -183,26 +183,24 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
-          <tab-panel
-            warning-text="Some proposals are pending approval"
-            title-text="Change Proposals"
-            extra-classes="proposal proposal__tab-warning"
-            tab-id="tab-related-proposals"
+          <tab-link
+            {instance}="instance"
             {(panels)}="panels"
-            {parent-instance}="instance"
-            {can-display-warning}="true"
-            {pre-render-content}="true">
-            <related-proposals
-              (update-proposals-warning)="updateWarningState(%event)"
-              {base-instance}="instance">
-            </related-proposals>
-          </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Version History">
-              <related-revisions {instance}="instance"></related-revisions>
-          </tab-panel>
-          <tab-panel tab-id="change-log" {(panels)}="panels" title-text="Change Log">
-              <revision-log {instance}="instance" {options}="tabOptions"></revision-log>
-          </tab-panel>
+            {title-text}="'Change Proposals'"
+            {type}="'proposals'"
+          ></tab-link>
+          <tab-link
+            {instance}="instance"
+            {(panels)}="panels"
+            {title-text}="'Version History'"
+            {type}="'change-log'"
+          ></tab-link>
+          <tab-link
+            {instance}="instance"
+            {(panels)}="panels"
+            {title-text}="'Change Log'"
+            {type}="'change-log'"
+          ></tab-link>
         {{/if}}
       </tab-container>
     </div><!-- tier-content end -->

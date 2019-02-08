@@ -19,7 +19,6 @@
   .tab-content {
     overflow: inherit;
   }
-
 }
 
 .nav-tabs {
@@ -27,7 +26,8 @@
   border-bottom: 1px solid darken($itemBorder,10%);
   li {
     margin-right: -1px;
-    a {
+
+    .nav-tabs__panel {
       @include border-radius(0);
       border: 1px solid darken($itemBorder,10%);
       background: $itemBorder;
@@ -38,8 +38,27 @@
         border: 1px solid darken($itemBorder,10%);
       }
     }
+
+    .nav-tabs__link {
+      border: none;
+      color: $blue;
+      margin: 0 0 0 20px;
+      padding: 4px 0;
+
+      &-icon {
+        color: $blue;
+        padding-left: 4px;
+        font-size: 13px;
+      }
+
+      &:hover {
+        text-decoration: underline;
+        background-color: transparent;
+      }
+    }
+
     &.active {
-      a {
+      .nav-tabs__panel {
         background: $white;
         border: 1px solid darken($itemBorder,10%);
         border-bottom-color: transparent;

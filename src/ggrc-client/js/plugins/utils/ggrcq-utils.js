@@ -128,6 +128,24 @@ function getImportUrl() {
   });
 }
 
+function getProposalsUrl(instance) {
+  return getUrl({
+    model: instance.constructor.table_singular,
+    path: instance.constructor.table_singular,
+    slug: instance.slug,
+    view: 'proposals',
+  });
+}
+
+function getChangeLogUrl(instance) {
+  return getUrl({
+    model: instance.constructor.table_singular,
+    path: instance.constructor.table_singular,
+    slug: instance.slug,
+    view: 'change-log',
+  });
+}
+
 export {
   hasQuestions,
   isChangeableExternally,
@@ -137,4 +155,6 @@ export {
   getInfoUrl,
   getReviewUrl,
   getUrl,
+  getProposalsUrl,
+  getChangeLogUrl,
 };
