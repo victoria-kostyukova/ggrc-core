@@ -38,9 +38,6 @@ export default Cacheable.extend({
   attributes: {
     context: Stub,
     modified_by: Stub,
-    kind: Stub,
-    means: Stub,
-    verify_frequency: Stub,
   },
   defaults: {
     selected: false,
@@ -80,8 +77,7 @@ export default Cacheable.extend({
       },
       {
         attr_title: 'Frequency',
-        attr_name: 'frequency',
-        attr_sort_field: 'verify_frequency',
+        attr_name: 'verify_frequency',
       },
       {attr_title: 'Assertions', attr_name: 'assertions'},
       {attr_title: 'Categories', attr_name: 'categories'},

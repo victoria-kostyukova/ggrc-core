@@ -28,13 +28,7 @@
   {{/case}}
 
   {{#case 'kind'}}
-    {{#if_instance_of instance 'Document|Evidence'}}
-      {{instance.kindTitle}}
-    {{else}}
-      <model-loader {path}="'service-models/option'">
-        <tree-field {source}="instance.kind" {type}="loadedModel" {show-tooltip}="false"/>
-      </model-loader>
-    {{/if_instance_of}}
+    {{firstnonempty instance.kindTitle instance.kind}}
   {{/case}}
 
   {{#case 'type'}}
@@ -64,18 +58,6 @@
   {{#case 'assignee'}}
     <model-loader {path}="'business-models/person'">
       <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
-    </model-loader>
-  {{/case}}
-
-  {{#case 'means'}}
-    <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.means" {type}="loadedModel" {show-tooltip}="false"/>
-    </model-loader>
-  {{/case}}
-
-  {{#case 'frequency'}}
-    <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.verify_frequency" {type}="loadedModel" {show-tooltip}="false"/>
     </model-loader>
   {{/case}}
 

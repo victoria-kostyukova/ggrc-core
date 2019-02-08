@@ -55,9 +55,7 @@
                       <h6>Kind/Nature</h6>
                       {{#if kind}}
                         <p>
-                          {{#using kind=kind}}
-                            {{kind.title}}
-                          {{/using}}
+                          {{kind}}
                         </p>
                       {{else}}
                         <span class="empty-message">None</span>
@@ -97,9 +95,7 @@
                       <h6>Type/Means</h6>
                       {{#if means}}
                         <p>
-                          {{#using means=means}}
-                            {{means.title}}
-                          {{/using}}
+                          {{means}}
                         </p>
                       {{else}}
                         <span class="empty-message">None</span>
@@ -131,9 +127,7 @@
                       <h6>Frequency</h6>
                       {{#if verify_frequency}}
                         <p>
-                          {{#using verify_frequency=verify_frequency}}
-                            {{verify_frequency.title}}
-                          {{/using}}
+                          {{verify_frequency}}
                         </p>
                       {{else}}
                         <span class="empty-message">None</span>
