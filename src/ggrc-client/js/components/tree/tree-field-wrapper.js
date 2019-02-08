@@ -69,7 +69,7 @@ const viewModel = can.Map.extend({
 });
 
 export default can.Component.extend({
-  tag: 'tree-field',
+  tag: 'tree-field-wrapper',
   template,
   leakScope: true,
   viewModel,

@@ -23,7 +23,7 @@
 
   {{#case 'network_zone'}}
     <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.network_zone" {type}="loadedModel"/>
+      <tree-field-wrapper {source}="instance.network_zone" {type}="loadedModel"/>
     </model-loader>
   {{/case}}
 
@@ -33,38 +33,38 @@
 
   {{#case 'type'}}
     <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.kind" {type}="loadedModel"/>
+      <tree-field-wrapper {source}="instance.kind" {type}="loadedModel"/>
     </model-loader>
   {{/case}}
 
   {{#case 'modified_by'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
     </model-loader>
   {{/case}}
 
   {{#case 'ra_manager'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'"/>
     </model-loader>
   {{/case}}
 
   {{#case 'ra_counsel'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'"/>
     </model-loader>
   {{/case}}
 
   {{#case 'assignee'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
     </model-loader>
   {{/case}}
 
   {{#case 'assertions'}}
     <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
       <model-loader {path}="'service-models/control-assertion'">
-        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+        <tree-field-wrapper {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
       </model-loader>
     </sort-by>
   {{/case}}
@@ -72,7 +72,7 @@
   {{#case 'categories'}}
     <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
       <model-loader {path}="'service-models/control-category'">
-        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+        <tree-field-wrapper {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
       </model-loader>
     </sort-by>
   {{/case}}

@@ -19,7 +19,7 @@ import './tree-filter-input';
 import './tree-status-filter';
 import './tree-item-status-for-workflow';
 import './tree-no-results';
-import './tree-field';
+import './tree-field-wrapper';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';

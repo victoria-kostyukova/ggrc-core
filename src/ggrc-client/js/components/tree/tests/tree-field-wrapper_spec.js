@@ -4,9 +4,9 @@
 */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../tree-field';
+import Component from '../tree-field-wrapper';
 
-describe('tree-field component', () => {
+describe('tree-field-wrapper component', () => {
   let vm;
 
   beforeEach(() => {
