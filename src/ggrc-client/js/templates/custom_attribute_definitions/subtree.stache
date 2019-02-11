@@ -12,15 +12,17 @@
   <td>{{title}}</td>
   <td>{{attribute_type}}</td>
   <td>{{#if mandatory}}Yes{{else}}No{{/mandatory}}</td>
-  <td>
-    <ul class="tree-action-list">
-      <li>
-        <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-object-singular="{{class.model_singular}}" data-object-plural="{{class.table_plural}}" data-object-id="{{id}}">
-          <i class="fa fa-pencil-square-o"></i>
-          Edit
-        </a>
-      </li>
-    </ul>
-  </td>
+  {{^if parent_instance.isChangeableExternally}}
+    <td>
+      <ul class="tree-action-list">
+        <li>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-object-singular="{{class.model_singular}}" data-object-plural="{{class.table_plural}}" data-object-id="{{id}}">
+            <i class="fa fa-pencil-square-o"></i>
+            Edit
+          </a>
+        </li>
+      </ul>
+    </td>
+  {{/if}}
   {{/instance}}
 </tr>
