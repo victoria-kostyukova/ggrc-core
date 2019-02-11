@@ -15,7 +15,6 @@ from ggrc import db
 from ggrc.login import is_external_app_user
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
-from ggrc.models.mixins import ScopeObject
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 
@@ -182,18 +181,37 @@ class Relationship(base.ContextRBAC, Base, db.Model):
           'External application can create only external relationships.')
     return value
 
-  # pylint:disable=unused-argument
   @staticmethod
-  def validate_delete(mapper, connection, target):
+  def _check_relation_types_group(type1, type2, group1, group2):
+    """Checks if 2 types belong to 2 groups
+
+    Args:
+      type1: name of model 1
+      type2: name of model 2
+      group1: Collection of model names which belong to group 1
+      group1: Collection of model names which belong to group 2
+    Return:
+      True if types belong to different groups, else False
+    """
+
+    if (type1 in group1 and type2 in group2) or (type2 in group1 and
+                                                 type1 in group2):
+      return True
+
+    return False
+
+  # pylint:disable=unused-argument
+  @classmethod
+  def validate_delete(cls, mapper, connection, target):
     """Validates is delete of Relationship is allowed."""
-    Relationship.validate_relation_by_type(target.source_type,
-                                           target.destination_type)
+    cls.validate_relation_by_type(target.source_type,
+                                  target.destination_type)
     if is_external_app_user() and not target.is_external:
       raise ValidationError(
           'External application can delete only external relationships.')
 
-  @staticmethod
-  def validate_relation_by_type(source_type, destination_type):
+  @classmethod
+  def validate_relation_by_type(cls, source_type, destination_type):
     """Checks if a mapping is allowed between given types."""
     if is_external_app_user():
       # external users can map and unmap scoping objects
@@ -201,16 +219,28 @@ class Relationship(base.ContextRBAC, Base, db.Model):
       return
 
     from ggrc.models import all_models
-    scoping_models_names = [m.__name__ for m in all_models.all_models
-                            if issubclass(m, ScopeObject)]
-    if source_type in scoping_models_names and \
-       destination_type in ("Regulation", "Standard") or \
-       destination_type in scoping_models_names and \
-       source_type in ("Regulation", "Standard"):
+    scoping_models_names = all_models.get_scope_model_names()
+
+    # Check Regulation and Standard
+    if cls._check_relation_types_group(source_type, destination_type,
+                                       scoping_models_names,
+                                       ("Regulation", "Standard")):
       raise ValidationError(
           u"You do not have the necessary permissions to map and unmap "
           u"scoping objects to directives in this application. Please "
           u"contact your administrator if you have any questions.")
+
+    # Check Control
+    control_external_only_mappings = set(scoping_models_names)
+    control_external_only_mappings.update(("Regulation", "Standard"))
+    if cls._check_relation_types_group(source_type, destination_type,
+                                       control_external_only_mappings,
+                                       ("Control", )):
+      raise ValidationError(
+          u"You do not have the necessary permissions to map and unmap "
+          u"controls to scoping objects, standards and regulations in this "
+          u"application. Please contact your administrator "
+          u"if you have any questions.")
 
 
 class Relatable(object):

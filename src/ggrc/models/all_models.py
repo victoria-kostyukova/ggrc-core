@@ -77,6 +77,8 @@ from ggrc.models.technology_environment import TechnologyEnvironment
 from ggrc.models.threat import Threat
 from ggrc.models.vendor import Vendor
 from ggrc.models.review import Review
+from ggrc.models.mixins import ScopeObject as _ScopeObject
+
 
 all_models = [  # pylint: disable=invalid-name
     # data platform models
@@ -190,3 +192,21 @@ def unregister_model(model):
     all_models.remove(model)
   if model.__name__ in __all__:
     __all__.remove(model.__name__)
+
+
+def get_scope_models():
+  """Return all usable scope model classes"""
+  ret = list(m for m in all_models
+             if issubclass(m, _ScopeObject))
+
+  # SystemOrProcess is abstract model which represents models System & Process
+  # We have to exclude it from the list, as cannot be used directly
+  ret.remove(SystemOrProcess)
+
+  return ret
+
+
+def get_scope_model_names():
+  # type: () -> List[str]
+  """Return list of names of usable scope models"""
+  return list(model.__name__ for model in get_scope_models())

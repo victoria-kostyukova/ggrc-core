@@ -15,7 +15,7 @@ from ggrc import db
 from ggrc.converters import get_exportables, errors
 from ggrc.login import get_current_user
 from ggrc.models import all_models
-from ggrc.models.mixins import ScopeObject
+from ggrc.models.exceptions import ValidationError
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 
@@ -544,13 +544,13 @@ class MappingColumnHandler(ColumnHandler):
   def _is_allowed_mapping_by_type(self, source_type, destination_type):
     # pylint: disable=no-self-use
     """Checks if a mapping is allowed between given types."""
-    scoping_models_names = [m.__name__ for m in all_models.all_models
-                            if issubclass(m, ScopeObject)]
+    try:
+      all_models.Relationship.validate_relation_by_type(source_type,
+                                                        destination_type)
+    except ValidationError:
+      return False
 
-    return not (source_type in scoping_models_names and
-                destination_type in ("Regulation", "Standard") or
-                destination_type in scoping_models_names and
-                source_type in ("Regulation", "Standard"))
+    return True
 
   def _add_mapping_warning(self, source, destination):
     """Add warning if we have changes mappings """
