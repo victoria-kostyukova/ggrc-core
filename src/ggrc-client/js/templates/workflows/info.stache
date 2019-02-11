@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        {{> /static/templates/controls/contacts.stache}}
+        {{> /static/templates/base_objects/contacts.stache}}
 
         <div class="row-fluid wrap-row">
           <div class="span6">
