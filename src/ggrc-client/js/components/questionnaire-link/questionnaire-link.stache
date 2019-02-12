@@ -5,7 +5,7 @@
 
 {{#if isChangeableExternally}}
   <a
-    class="questionnaire-link {{#if_equals viewType 'button'}}questionnaire-link_type_button btn btn-white btn-small{{/if}}"
+    class="questionnaire-link {{linkClass}}"
     href="{{url}}"
     target="_blank">
       {{#if showIcon}}

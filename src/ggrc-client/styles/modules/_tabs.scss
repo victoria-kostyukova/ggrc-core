@@ -39,24 +39,6 @@
       }
     }
 
-    .nav-tabs__link {
-      border: none;
-      color: $blue;
-      margin: 0 0 0 20px;
-      padding: 4px 0;
-
-      &-icon {
-        color: $blue;
-        padding-left: 4px;
-        font-size: 13px;
-      }
-
-      &:hover {
-        text-decoration: underline;
-        background-color: transparent;
-      }
-    }
-
     &.active {
       .nav-tabs__panel {
         background: $white;

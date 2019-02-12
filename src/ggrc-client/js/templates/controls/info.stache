@@ -187,19 +187,19 @@
             {instance}="instance"
             {(panels)}="panels"
             {title-text}="'Change Proposals'"
-            {type}="'proposals'"
+            {link-type}="'proposals'"
           ></tab-link>
           <tab-link
             {instance}="instance"
             {(panels)}="panels"
             {title-text}="'Version History'"
-            {type}="'change-log'"
+            {link-type}="'change-log'"
           ></tab-link>
           <tab-link
             {instance}="instance"
             {(panels)}="panels"
             {title-text}="'Change Log'"
-            {type}="'change-log'"
+            {link-type}="'change-log'"
           ></tab-link>
         {{/if}}
       </tab-container>

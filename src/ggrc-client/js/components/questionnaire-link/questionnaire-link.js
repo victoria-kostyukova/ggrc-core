@@ -7,6 +7,8 @@ import {
   getCommentFormUrl,
   getInfoUrl,
   getReviewUrl,
+  getChangeLogUrl,
+  getProposalsUrl,
   isChangeableExternally,
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questionnaire-link.stache';
@@ -28,6 +30,10 @@ export default can.Component.extend({
               return getCommentFormUrl(instance);
             case 'review':
               return getReviewUrl(instance);
+            case 'proposals':
+              return getProposalsUrl(instance);
+            case 'change-log':
+              return getChangeLogUrl(instance);
             default:
               return getInfoUrl(instance);
           }
@@ -39,6 +45,18 @@ export default can.Component.extend({
           const instance = this.attr('instance');
 
           return isChangeableExternally(instance);
+        },
+      },
+      linkClass: {
+        get() {
+          switch (this.attr('viewType')) {
+            case 'button':
+              return 'questionnaire-link_type_button btn btn-white btn-small';
+            case 'tab':
+              return 'questionnaire-link_type_tab';
+            default:
+              return '';
+          }
         },
       },
     },

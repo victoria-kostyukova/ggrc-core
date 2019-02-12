@@ -8,10 +8,15 @@
     {{#each panels}}
       {{#if isTabLink}}
         <li>
-          <a class="nav-tabs__link" target="_blank" href="{{link}}">
-            {{titleText}}
-            <span class="fa fa-external-link nav-tabs__link-icon"></span>
-          </a>
+          <questionnaire-link
+            {instance}="instance"
+            {show-icon}="true"
+            {icon-position}="'right'"
+            {link-type}="linkType"
+            {view-type}="'tab'"
+          >
+            <span>{{titleText}}</span>
+          </questionnaire-link>
         </li>
       {{else}}
         <li class="{{extraClasses}} {{#if active}}active{{/if}}">

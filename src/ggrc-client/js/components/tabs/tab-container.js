@@ -6,6 +6,7 @@
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
 import './tab-link/tab-link';
+import '../questionnaire-link/questionnaire-link';
 import template from './tab-container.stache';
 
 export default can.Component.extend({
