@@ -30,12 +30,22 @@
 {{else}}
   {{#isAllowedToUnmap}}
     <li class="border">
-      <unmap-button
-        {source}="parentInstance"
-        {destination}="instance"
-        class="unmap-link">
-          <i class="fa fa-ban"></i>Unmap
-      </unmap-button>
+      {{^if isMappableExternally}}
+        <unmap-button
+          {source}="page_instance"
+          {destination}="instance"
+          class="unmap-link">
+            <i class="fa fa-ban"></i>Unmap
+        </unmap-button>
+      {{else}}
+        <questionnaire-mapping-link 
+          {instance}="page_instance" 
+          {destination-model}="instance.class" 
+          {type}="'unmap'">
+            <i class="fa fa-fw fa-external-link"></i>
+            Unmap in new frontend
+        </questionnaire-mapping-link>
+      {{/if}}
     </li>
   {{/isAllowedToUnmap}}
 {{/if}}

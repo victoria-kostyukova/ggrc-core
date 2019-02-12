@@ -4,6 +4,7 @@
 */
 
 import './issue-unmap';
+import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import template from './issue-unmap-dropdown-item.stache';
 import Mappings from '../../models/mappers/mappings';
 import {
@@ -46,6 +47,14 @@ export default can.Component.extend({
             && !isSnapshotParent(instance.type)
             && !(isAllObjects() || isMyWork())
             && options.attr('isDirectlyRelated');
+        },
+      },
+      isMappableExternally: {
+        get() {
+          let source = this.attr('page_instance.type');
+          let destination = this.attr('instance.type');
+
+          return Mappings.shouldBeMappedExternally(source, destination);
         },
       },
     },

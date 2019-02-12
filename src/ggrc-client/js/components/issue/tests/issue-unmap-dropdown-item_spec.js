@@ -34,33 +34,33 @@ describe('issue-unmap-dropdown-item component', function () {
         });
     });
 
-    describe('denyUnmap get() method', function () {
+    describe('denyIssueUnmap get() method', function () {
       it('returns true if page_instance.type equals to "Audit" and' +
       'instance.allow_unmap_from_audit is false', function () {
         viewModel.attr('page_instance.type', 'Audit');
         viewModel.attr('instance.allow_unmap_from_audit', false);
-        expect(viewModel.attr('denyUnmap')).toBe(true);
+        expect(viewModel.attr('denyIssueUnmap')).toBe(true);
       });
 
       it('returns true if instance.type equals to "Audit" and ' +
       'page_instance.allow_unmap_from_audit is false', function () {
         viewModel.attr('instance.type', 'Audit');
         viewModel.attr('page_instance.allow_unmap_from_audit', false);
-        expect(viewModel.attr('denyUnmap')).toBe(true);
+        expect(viewModel.attr('denyIssueUnmap')).toBe(true);
       });
 
       it('returns false if instance.allow_unmap_from_audit and ' +
       'page_instance.allow_unmap_from_audit are both true', function () {
         viewModel.attr('instance.allow_unmap_from_audit', true);
         viewModel.attr('page_instance.allow_unmap_from_audit', true);
-        expect(viewModel.attr('denyUnmap')).toBe(false);
+        expect(viewModel.attr('denyIssueUnmap')).toBe(false);
       });
 
       it('returns false if instnace.type and page_instnace.type do not equal' +
       'to "Audit"', function () {
         viewModel.attr('instance.type', 'Type');
         viewModel.attr('page_instance', 'Type');
-        expect(viewModel.attr('denyUnmap')).toBe(false);
+        expect(viewModel.attr('denyIssueUnmap')).toBe(false);
       });
     });
   });

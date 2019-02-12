@@ -4,7 +4,10 @@
  */
 
 import template from './questionnaire-mapping-link.stache';
-import {getMappingUrl} from '../../plugins/utils/ggrcq-utils';
+import {
+  getMappingUrl,
+  getUnmappingUrl,
+} from '../../plugins/utils/ggrcq-utils';
 
 export default can.Component.extend({
   tag: 'questionnaire-mapping-link',
@@ -15,12 +18,21 @@ export default can.Component.extend({
         get() {
           let instance = this.attr('instance');
           let destination = this.attr('destinationModel');
-          return getMappingUrl(instance, destination);
+
+          switch (this.attr('type')) {
+            case 'map': {
+              return getMappingUrl(instance, destination);
+            }
+            case 'unmap': {
+              return getUnmappingUrl(instance, destination);
+            }
+          }
         },
       },
     },
     instance: null,
     destinationModel: null,
     cssClasses: '',
+    type: 'map',
   },
 });

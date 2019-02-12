@@ -169,17 +169,31 @@ function getChangeLogUrl(instance) {
  * @return {String} Url to mapping view
  * */
 function getMappingUrl(instance, destinationModel) {
+  const statuses = 'in_progress,not_in_scope,reviewed';
+
   if (instance.type === 'Control') {
-    return getMapObjectToControlUrl(instance, destinationModel);
+    return getMapObjectToControlUrl(instance, destinationModel, statuses);
   } else if (destinationModel.title_singular === 'Control') {
-    return getMapControlToObjectUrl(instance, destinationModel);
+    return getMapControlToObjectUrl(instance, statuses);
+  }
+
+  return '';
+}
+
+function getUnmappingUrl(instance, destinationModel) {
+  const statuses = 'in_progress,reviewed';
+
+  if (instance.type === 'Control') {
+    return getMapObjectToControlUrl(instance, destinationModel, statuses);
+  } else if (destinationModel.title_singular === 'Control') {
+    return getMapControlToObjectUrl(instance, statuses);
   }
 
   return '';
 }
 
 
-function getMapObjectToControlUrl(instance, destinationModel) {
+function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   let view = '';
   if (ggrcqDirectiveObjects. includes(destinationModel.model_singular)) {
     view = 'directives';
@@ -187,8 +201,8 @@ function getMapObjectToControlUrl(instance, destinationModel) {
     view = 'scope';
   }
 
-  let params = 'mappingStatus=in_progress,not_in_scope,reviewed&types=' +
-    destinationModel.table_singular;
+  let destinationType = destinationModel.table_singular;
+  let params = `mappingStatus=${statuses}&types=${destinationType}`;
 
   return getUrl({
     path: 'control',
@@ -199,7 +213,7 @@ function getMapObjectToControlUrl(instance, destinationModel) {
   });
 }
 
-function getMapControlToObjectUrl(instance) {
+function getMapControlToObjectUrl(instance, statuses) {
   let path = '';
   let type = instance.constructor.model_singular;
   if (ggrcqDirectiveObjects.includes(type)) {
@@ -213,7 +227,7 @@ function getMapControlToObjectUrl(instance) {
     model: instance.constructor.table_singular,
     slug: instance.slug,
     view: 'controls',
-    params: 'mappingStatus=in_progress,not_in_scope,reviewed',
+    params: `mappingStatus=${statuses}`,
   });
 }
 
@@ -226,6 +240,7 @@ export {
   getInfoUrl,
   getReviewUrl,
   getMappingUrl,
+  getUnmappingUrl,
   getUrl,
   getProposalsUrl,
   getChangeLogUrl,

@@ -6,6 +6,7 @@
 import {
   getUrl,
   getMappingUrl,
+  getUnmappingUrl,
 } from '../utils/ggrcq-utils';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Cacheable from '../../models/cacheable';
@@ -140,6 +141,72 @@ describe('GGRCQ utils', () => {
 
       expect(getUrl(options))
         .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}import`);
+    });
+  });
+
+  describe('getUnmappingUrl util', () => {
+    it('should return empty string ' +
+      'if neither source not destination is Control', () => {
+      let instance = makeFakeInstance({model: Cacheable})();
+      let model = Cacheable;
+
+      let url = getUnmappingUrl(instance, model);
+      expect(url).toBe('');
+    });
+
+    it('should return url to unmap control from directive', () => {
+      let instance = makeFakeInstance({model: Control, instanceProps: {
+        type: 'Control',
+        slug: 'CONTROL-1',
+      }})();
+      let model = Standard;
+
+      let result = getUnmappingUrl(instance, model);
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'control/control=control-1/directives' +
+        '?mappingStatus=in_progress,reviewed&types=standard';
+      expect(result).toBe(expected);
+    });
+
+    it('should return url to unmap control from scope object', () => {
+      let instance = makeFakeInstance({model: Control, instanceProps: {
+        type: 'Control',
+        slug: 'CONTROL-1',
+      }})();
+
+      let model = TechnologyEnvironment;
+
+      let result = getUnmappingUrl(instance, model);
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'control/control=control-1/scope' +
+        '?mappingStatus=in_progress,reviewed&types=technology_environment';
+      expect(result).toBe(expected);
+    });
+
+    it('should return url to unmap directive from control', () => {
+      let instance = makeFakeInstance({model: Standard})({
+        type: 'Standard',
+        slug: 'STANDARD-1',
+      });
+      let model = Control;
+      let result = getUnmappingUrl(instance, model);
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'directives/standard=standard-1/controls' +
+        '?mappingStatus=in_progress,reviewed';
+      expect(result).toBe(expected);
+    });
+
+    it('should return url to unmap directive from control', () => {
+      let instance = makeFakeInstance({model: TechnologyEnvironment})({
+        type: 'TechnologyEnvironment',
+        slug: 'TechnologyEnvironment-1',
+      });
+      let model = Control;
+      let result = getUnmappingUrl(instance, model);
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'questionnaires/technology_environment=technologyenvironment-1' +
+        '/controls?mappingStatus=in_progress,reviewed';
+      expect(result).toBe(expected);
     });
   });
 });
