@@ -5,6 +5,15 @@
 
 import './issue-unmap';
 import template from './issue-unmap-dropdown-item.stache';
+import Mappings from '../../models/mappers/mappings';
+import {
+  isAuditScopeModel,
+  isSnapshotParent,
+} from '../../plugins/utils/snapshot-utils';
+import {
+  isAllObjects,
+  isMyWork,
+} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'issue-unmap-dropdown-item',
@@ -18,12 +27,25 @@ export default can.Component.extend({
             this.attr('instance.type') === 'Issue';
         },
       },
-      denyUnmap: {
+      denyIssueUnmap: {
         get: function () {
           return (this.attr('page_instance.type') === 'Audit'
               && !this.attr('instance.allow_unmap_from_audit'))
             || (this.attr('instance.type') === 'Audit'
               && !this.attr('page_instance.allow_unmap_from_audit'));
+        },
+      },
+      isAllowedToUnmap: {
+        get() {
+          let pageInstance = this.attr('page_instance');
+          let instance = this.attr('instance');
+          let options = this.attr('options');
+
+          return Mappings.allowedToMap(pageInstance, instance)
+            && !isAuditScopeModel(instance.type)
+            && !isSnapshotParent(instance.type)
+            && !(isAllObjects() || isMyWork())
+            && options.attr('isDirectlyRelated');
         },
       },
     },

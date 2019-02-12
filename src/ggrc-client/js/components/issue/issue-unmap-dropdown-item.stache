@@ -4,7 +4,7 @@
 }}
 
 {{#if issueUnmap}}
-  {{#unless denyUnmap}}
+  {{#unless denyIssueUnmap}}
     {{#is page_instance.type "Issue"}}
       <issue-unmap
         {issue-instance}="page_instance"
@@ -28,5 +28,14 @@
     {{/is}}
   {{/unless}}
 {{else}}
-  <content></content>
+  {{#isAllowedToUnmap}}
+    <li class="border">
+      <unmap-button
+        {source}="parentInstance"
+        {destination}="instance"
+        class="unmap-link">
+          <i class="fa fa-ban"></i>Unmap
+      </unmap-button>
+    </li>
+  {{/isAllowedToUnmap}}
 {{/if}}

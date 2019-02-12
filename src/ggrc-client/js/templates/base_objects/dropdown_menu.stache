@@ -83,12 +83,7 @@
               <issue-unmap-dropdown-item
                 {page_instance}="page_instance"
                 {instance}="instance"
-                {options}="options">
-                  {{#is_allowed_to_map page_instance instance}}
-                    {{#isNotAuditScopeModel instance.type}}
-                      {{> /static/templates/base_objects/unmap.stache}}
-                    {{/isNotAuditScopeModel}}
-                  {{/is_allowed_to_map}}
+                {options}="options">  
               </issue-unmap-dropdown-item>
               {{#if instance.viewLink}}
                 <li>

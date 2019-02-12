@@ -5,10 +5,6 @@
 
 import Spinner from 'spin.js';
 import {
-  isAuditScopeModel,
-  isSnapshotParent,
-} from './plugins/utils/snapshot-utils';
-import {
   isAdmin,
   getPageInstance,
 } from './plugins/utils/current-page-utils';
@@ -902,15 +898,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   }
   value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
   return toLowerCase ? value.toLowerCase() : value;
-});
-
-Mustache.registerHelper('isNotAuditScopeModel', function (modelName, options) {
-  let isAuditScope;
-  modelName = _.isFunction(modelName) ? modelName() : modelName;
-  isAuditScope = isAuditScopeModel(modelName);
-  // Temporary Modification to remove possibility to unmap Audit
-  isAuditScope = isAuditScope || isSnapshotParent(modelName);
-  return isAuditScope ? options.inverse(this) : options.fn(this);
 });
 
 Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
