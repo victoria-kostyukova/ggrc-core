@@ -8,13 +8,12 @@ import json
 import ddt
 
 from ggrc.models import all_models
-from ggrc.models.inflector import get_model
-from ggrc.models.mixins import ScopeObject
 from ggrc.models.exceptions import ValidationError
 
-from integration.ggrc import TestCase
+from integration.ggrc import TestCase, READONLY_MAPPING_PAIRS
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
+from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
@@ -121,14 +120,17 @@ class TestExternalRelationship(TestCase):
   def setUp(self):
     """Init API helper"""
     super(TestExternalRelationship, self).setUp()
+    self.object_generator = ObjectGenerator()
     self.api = api_helper.Api()
     with factories.single_commit():
       editor_role = all_models.Role.query.filter(
           all_models.Role.name == "Editor").first()
       self.person_ext = factories.PersonFactory(
           email="external_app@example.com")
+      self.person_ext_id = self.person_ext.id
       self.person = factories.PersonFactory(
           email="regular_user@example.com")
+      self.person_id = self.person.id
       rbac_factories.UserRoleFactory(
           role=editor_role, person=self.person)
 
@@ -139,11 +141,6 @@ class TestExternalRelationship(TestCase):
       "X-appengine-inbound-appid": "test_external_app",
   }
   REL_URL = "/api/relationships"
-  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
-                          if issubclass(m, ScopeObject) and
-                          not issubclass(m, all_models.SystemOrProcess)]
-  SCOPING_OBJECT_FACTORIES = [
-      factories.get_model_factory(name) for name in SCOPING_MODELS_NAMES]
 
   @staticmethod
   def build_relationship_json(source, destination, is_external):
@@ -312,83 +309,62 @@ class TestExternalRelationship(TestCase):
     relationship = all_models.Relationship.query.get(rel.id)
     self.assertIsNone(relationship)
 
-  SCOPING_MAPPINGS = [(scoping_factory, directive_factory)
-                      for scoping_factory in SCOPING_OBJECT_FACTORIES
-                      for directive_factory in (factories.StandardFactory,
-                                                factories.RegulationFactory)]
-
-  @ddt.data(*SCOPING_MAPPINGS)
+  @ddt.data(*READONLY_MAPPING_PAIRS)
   @ddt.unpack
-  def text_local_delete_relationship_scoping_directive(
-      self, scoping_factory, directive_factory
-  ):
-    """Test that deleteion of relationship disabled for local users."""
+  def test_local_delete_relationship_scoping_directive(self, model1, model2):
+    """Test deletion of relationship between {0.__name__} and {1.__name__}"""
+
     # Set up relationships
-    self.api.set_user(self.person_ext)
-    with factories.single_commit():
-      scoping_object = scoping_factory()
-      directive = directive_factory()
-    mappings = [(scoping_object, directive), (directive, scoping_object)]
-    relationship_ids = []
-    for source, destination in mappings:
-      rel = self.create_relationship(source, destination,
-                                     True, self.person_ext)
-      relationship_ids.append(rel.id)
+    with self.object_generator.api.as_external():
+      _, obj1 = self.object_generator.generate_object(model1)
+      _, obj2 = self.object_generator.generate_object(model2)
 
-    self.api.set_user(self.person)
-    for rel_id in relationship_ids:
-      relationship = all_models.Relationship.query.get(rel_id)
-      response = self.api.delete(relationship)
-      self.assert400(response)
+      _, rel = self.object_generator.generate_relationship(
+          obj1, obj2, is_external=True)
 
-      # relationship allowed to be deleted when source or
-      # destination objects are deleted
-      directive_model = get_model(relationship.destination_type)
-      directive = directive_model.query.get(relationship.destination_id)
-      self.assertIsNone(directive)
-      response = self.api.delete(directive)
-      self.assert200(response)
-      relationship = all_models.Relationship.query.get(rel.id)
-      self.assertIsNone(relationship)
+    # check that relationship cannot be deleted by regular user
+    self.api.set_user(all_models.Person.query.get(self.person_id))
+    relationship = all_models.Relationship.query.get(rel.id)
+    response = self.api.delete(relationship)
+    self.assert400(response)
 
-  @ddt.data(*SCOPING_MAPPINGS)
+  @ddt.data(*READONLY_MAPPING_PAIRS)
   @ddt.unpack
-  def text_local_create_relationship_scoping_directive(
-      self, scoping_factory, directive_factory
-  ):
-    """Test that creation of relationship disabled for local users."""
-    self.api.set_user(self.person)
-    with factories.single_commit():
-      scoping_object = scoping_factory()
-      directive = directive_factory()
-    mappings = [(scoping_object, directive), (directive, scoping_object)]
-    for source, destination in mappings:
-      with self.assertRaises(ValidationError):
-        self.api.set_user(self.person)
-        factories.RelationshipFactory(source=source,
-                                      destination=destination)
+  def test_local_create_relationship_scoping_directive(self, model1, model2):
+    """Test creation of relationship between {0.__name__} and {1.__name__}"""
+    # Set up relationships
+    with self.object_generator.api.as_external():
+      _, obj1 = self.object_generator.generate_object(model1)
+      _, obj2 = self.object_generator.generate_object(model2)
 
-  @ddt.data(*SCOPING_MAPPINGS)
+    self.object_generator.api.set_user(
+        all_models.Person.query.get(self.person_id))
+
+    response, _ = self.object_generator.generate_relationship(
+        obj1, obj2, is_external=True)
+
+    self.assert400(response)
+
+  @ddt.data(*READONLY_MAPPING_PAIRS)
   @ddt.unpack
   def test_ext_create_delete_relationship_scoping_directive(
-      self, scoping_factory, directive_factory
+      self, model1, model2
   ):
-    """Test that creation and deletion of relationship allowed
-       for external users."""
-    self.api.set_user(self.person_ext)
-    with factories.single_commit():
-      scoping_object = scoping_factory()
-      directive = directive_factory()
-    mappings = [(scoping_object, directive), (directive, scoping_object)]
-    for source, destination in mappings:
-      response = self.api.client.post(
-          self.REL_URL,
-          data=self.build_relationship_json(source, destination, True),
-          headers=self.HEADERS)
-      self.assert200(response)
-      rel = all_models.Relationship.query.get(
-          response.json[0][-1]["relationship"]["id"])
-      response = self.api.delete(rel)
-      self.assert200(response)
-      relationship = all_models.Relationship.query.get(rel.id)
-      self.assertIsNone(relationship)
+    """Test ext user and relationship between {0.__name__} and {1.__name__}"""
+
+    # Set up relationships
+    with self.object_generator.api.as_external():
+      _, obj1 = self.object_generator.generate_object(model1)
+      _, obj2 = self.object_generator.generate_object(model2)
+
+      _, rel = self.object_generator.generate_relationship(
+          obj1, obj2, is_external=True)
+
+      self.assertIsNotNone(rel)
+
+    # check that external relationship can be deleted by external user
+    self.api.set_user(all_models.Person.query.get(self.person_ext_id))
+    relationship = all_models.Relationship.query.get(rel.id)
+    response = self.api.delete(relationship)
+    print response.json
+    self.assert200(response)

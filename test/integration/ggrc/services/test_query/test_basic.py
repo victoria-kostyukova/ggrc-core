@@ -8,9 +8,10 @@
 """Tests for /query api endpoint."""
 import random
 import unittest
-
 from datetime import datetime
 from operator import itemgetter
+import mock
+
 import ddt
 from flask import json
 from ggrc import app
@@ -771,8 +772,16 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     with factories.single_commit():
       query_data = []
       for relevant_obj in relevant_objects:
-        factories.RelationshipFactory(source=base_obj,
-                                      destination=relevant_obj)
+        if base_type is all_models.Control and isinstance(relevant_obj,
+                                                          all_models.Market):
+          with mock.patch('ggrc.models.relationship.is_external_app_user',
+                          return_value=True):
+            factories.RelationshipFactory(source=base_obj,
+                                          destination=relevant_obj,
+                                          is_external=True)
+        else:
+          factories.RelationshipFactory(source=base_obj,
+                                        destination=relevant_obj)
 
         query_data.append(self._make_query_dict(
             relevant_obj.type,

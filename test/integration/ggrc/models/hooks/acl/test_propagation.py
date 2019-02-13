@@ -11,6 +11,7 @@
 import itertools
 from collections import defaultdict
 from collections import OrderedDict
+import mock
 
 import ddt
 import flask
@@ -343,7 +344,13 @@ class TestPropagation(BaseTestPropagation):
       normal_objects = [control, regulation, objective]
 
       for obj1, obj2 in itertools.combinations(normal_objects, 2):
-        factories.RelationshipFactory(source=obj1, destination=obj2)
+        if control in (obj1, obj2):
+          with mock.patch('ggrc.models.relationship.is_external_app_user',
+                          return_value=True):
+            factories.RelationshipFactory(source=obj1, destination=obj2,
+                                          is_external=True)
+        else:
+          factories.RelationshipFactory(source=obj1, destination=obj2)
 
       assessment = factories.AssessmentFactory()
       assessment_2 = factories.AssessmentFactory(audit=assessment.audit)

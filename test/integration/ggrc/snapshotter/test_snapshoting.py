@@ -4,6 +4,7 @@
 """Test for snapshoter"""
 
 import collections
+import mock
 
 import sqlalchemy as sa
 
@@ -635,13 +636,18 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     total_reg_count = 5
     unmapped_reg_count = 2
     with factories.single_commit():
-      program = factories.ProgramFactory()
-      control = factories.ControlFactory()
-      factories.RelationshipFactory(source=control, destination=program)
-      for _ in xrange(total_reg_count):
-        regulation = factories.RegulationFactory()
-        factories.RelationshipFactory(source=control, destination=regulation)
-        factories.RelationshipFactory(source=regulation, destination=program)
+      with mock.patch('ggrc.models.relationship.is_external_app_user',
+                      return_value=True):
+        program = factories.ProgramFactory()
+        control = factories.ControlFactory()
+        factories.RelationshipFactory(source=control, destination=program,
+                                      is_external=True)
+        for _ in xrange(total_reg_count):
+          regulation = factories.RegulationFactory()
+          factories.RelationshipFactory(source=control, destination=regulation,
+                                        is_external=True)
+          factories.RelationshipFactory(source=regulation, destination=program,
+                                        is_external=True)
 
     audit = self.create_audit(program)
 
@@ -651,15 +657,17 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     ).all()
     removed_reg_rels = []
     keep_reg_rels = []
-    for num, rel in enumerate(rels):
-      if num < unmapped_reg_count:
-        # We know that source is the same Control
-        removed_reg_rels.append((rel.destination_type, rel.destination_id))
-        # Unmap Regulation object from Control
-        db.session.delete(rel)
-      else:
-        keep_reg_rels.append((rel.destination_type, rel.destination_id))
-    db.session.commit()
+    with mock.patch('ggrc.models.relationship.is_external_app_user',
+                    return_value=True):
+      for num, rel in enumerate(rels):
+        if num < unmapped_reg_count:
+          # We know that source is the same Control
+          removed_reg_rels.append((rel.destination_type, rel.destination_id))
+          # Unmap Regulation object from Control
+          db.session.delete(rel)
+        else:
+          keep_reg_rels.append((rel.destination_type, rel.destination_id))
+      db.session.commit()
 
     snap_mappings = self.collect_snapshot_mappings(removed_reg_rels)
     self.assertEqual(snap_mappings.count(), unmapped_reg_count)

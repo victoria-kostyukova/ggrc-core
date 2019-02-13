@@ -39,8 +39,14 @@ class IsAllowedMappingByTypeTestCase(MappingColumnHandlerTestCase):
   def test_returns_true_for_other_types(self):
     """The method should return True if destination is other."""
     # pylint: disable=protected-access
-    result = self.handler._is_allowed_mapping_by_type('Product', 'Control')
+    result = self.handler._is_allowed_mapping_by_type('Product', 'Requirement')
     self.assertTrue(result)
+
+  def test_returns_false_for_product_control(self):
+    """The method should return False if destination is other."""
+    # pylint: disable=protected-access
+    result = self.handler._is_allowed_mapping_by_type('Product', 'Control')
+    self.assertFalse(result)
 
 
 class AddMappingWarningTestCase(MappingColumnHandlerTestCase):

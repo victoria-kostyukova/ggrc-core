@@ -9,6 +9,7 @@ import logging
 import os
 import tempfile
 import csv
+import itertools
 from StringIO import StringIO
 from mock import patch
 
@@ -35,6 +36,21 @@ logging.disable(logging.CRITICAL)
 
 
 THIS_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+
+# Test relationship between Standard/Regulation and scope objects
+_SCOPING_MODELS = all_models.get_scope_models()
+READONLY_MAPPING_PAIRS = list(
+    # make a list of object combinations from 1st and 2nd iterables
+    # itertools.product("AB", "CD") is ["AC", "AD", "BC", "BD"]
+    itertools.product(_SCOPING_MODELS, (all_models.Standard,
+                                        all_models.Regulation))
+)
+# Test relationship for Control and Scope objects, Standard and Regulation
+READONLY_MAPPING_PAIRS.extend(
+    (all_models.Control, m) for m in itertools.chain(_SCOPING_MODELS,
+                                                     (all_models.Standard,
+                                                      all_models.Regulation))
+)
 
 
 def read_imported_file(file_data):  # pylint: disable=unused-argument
