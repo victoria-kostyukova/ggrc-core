@@ -26,7 +26,7 @@
 
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      <div class="table-wrap">
+      <div class="table-wrap {{#if instance.isChangeableExternally}}table-wrap_type_readonly{{/if}}">
         <table class="table">
           <colgroup>
             <col style="width: 40%"/>
@@ -49,34 +49,36 @@
           </tbody>
           {{/child_options.0}}
           <!-- Custom attribute definitions here -->
-          <tfoot class="add-item">
-            <tr>
-              <td colspan="5" class="tree-item tree-item-add">
-                <div class="row-fluid">
-                  <div class="span12">
-                    <a
-                      href="javascript://"
-                      data-toggle="modal-ajax-form"
-                      class="btn btn-small btn-draft"
-                      rel="tooltip"
-                      data-placement="right"
-                      data-object-title="{{instance.title_singular}}"
-                      data-object-singular="AccessControlRole"
-                      data-object-plural="access_control_roles"
-                      data-object-params='{
-                        "parent_type": "{{instance.model_singular}}",
-                        "modal_title": "Add Custom Role to type {{instance.title_singular}}"
-                      }'
-                      data-original-title="Add Custom Role">
-                      <i class="fa fa-plus-circle"
-                         data-test-id="button_add-86eaf948">
-                      </i>
-                    </a>
+          {{^if instance.isChangeableExternally}}
+            <tfoot class="add-item">
+              <tr>
+                <td colspan="5" class="tree-item tree-item-add">
+                  <div class="row-fluid">
+                    <div class="span12">
+                      <a
+                        href="javascript://"
+                        data-toggle="modal-ajax-form"
+                        class="btn btn-small btn-draft"
+                        rel="tooltip"
+                        data-placement="right"
+                        data-object-title="{{instance.title_singular}}"
+                        data-object-singular="AccessControlRole"
+                        data-object-plural="access_control_roles"
+                        data-object-params='{
+                          "parent_type": "{{instance.model_singular}}",
+                          "modal_title": "Add Custom Role to type {{instance.title_singular}}"
+                        }'
+                        data-original-title="Add Custom Role">
+                        <i class="fa fa-plus-circle"
+                          data-test-id="button_add-86eaf948">
+                        </i>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </td>
-            </tr>
-          </tfoot>
+                </td>
+              </tr>
+            </tfoot>
+          {{/if}}
         </table>
       </div>
     </div>

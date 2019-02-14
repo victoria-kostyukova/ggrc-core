@@ -231,6 +231,11 @@
 // Table
 .table-wrap {
   padding-top: 20px;
+
+  &_type_readonly {
+    padding-bottom: 2px;
+  }
+
   .tree-action-list {
     float: none;
     clear: both;
