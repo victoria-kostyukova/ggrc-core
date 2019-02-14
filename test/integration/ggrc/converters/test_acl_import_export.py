@@ -293,7 +293,6 @@ class TestACLImportExport(TestCase):
       "Market": {"role name": set(_random_emails[:2])},
       "Facility": {"role name": set(_random_emails[2:])},
   }, {
-      "Control": {"role name": set(_random_emails[:3])},
       "Market": {"role name": set(_random_emails[2:])},
       "System": {"role name": set(_random_emails)},
       "KeyReport": {"role name": set(_random_emails)},

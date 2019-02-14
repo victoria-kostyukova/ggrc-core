@@ -99,6 +99,7 @@ class TestExportSingleObject(TestCase):
     }
 
   def test_simple_export_query(self):
+    """Test simple export query."""
     response = self._import_file("data_for_export_testing_program.csv")
     self._check_csv_response(response, {})
     data = [{
@@ -140,6 +141,7 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_and_export_query(self):
+    """Test export query with AND clause."""
     response = self._import_file("data_for_export_testing_program.csv")
     self._check_csv_response(response, {})
     data = [{
@@ -533,7 +535,7 @@ class TestExportMultipleObjects(TestCase):
         },
         "fields": ["slug", "title", "description"],
     }, {
-        "object_name": "Control",  # control-3, control-4, control-5
+        "object_name": "Risk",  # risk-3, risk-4, risk-5
         "filters": {
             "expression": {
                 "left": {
@@ -617,7 +619,6 @@ class TestExportMultipleObjects(TestCase):
       "Regulation",
       "Standard",
       "Contract",
-      "Control",
       "Requirement",
       "Objective",
       "Product",
@@ -656,8 +657,6 @@ class TestExportMultipleObjects(TestCase):
           ("Start Date", ""),
           ("End Date", ""),
       ]))
-      if model == "Control":
-        import_queries[-1]["Assertions"] = "Privacy"
       if model == "Risk":
         import_queries[-1]["Risk Type"] = "Risk type"
       if model.replace(" ", "") in self.SCOPING_MODELS_NAMES:

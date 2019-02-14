@@ -606,7 +606,7 @@ class TestClonable(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit.id,
     )
 
-    self.assertEqual(snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(snapshots.count(), len(Types.all - Types.external) * 3)
 
     self._check_csv_response(self._import_file("snapshotter_update.csv"), {})
 
@@ -630,7 +630,8 @@ class TestClonable(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit_copy.id,
     )
 
-    self.assertEqual(clones_snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(clones_snapshots.count(),
+                     len(Types.all - Types.external) * 3)
 
     original_revisions = {
         (snapshot.child_type, snapshot.child_id): snapshot.revision_id

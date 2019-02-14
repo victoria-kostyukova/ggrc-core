@@ -324,16 +324,16 @@ class TestExportSnapshots(TestCase):
     that is being exported.
     """
     # pylint: disable=too-many-locals
-    self._create_cads("control")
-    self.import_file("control_snapshot_data_multiple.csv")
+    self._create_cads("risk")
+    self.import_file("risk_snapshot_data_multiple.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    self.import_file("control_snapshot_data_multiple.csv")
+    self.import_file("risk_snapshot_data_multiple.csv")
 
-    controls = models.Control.query.all()
+    risks = models.Risk.query.all()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, controls)
+      snapshots = self._create_snapshots(audit, risks)
       count = len(snapshots)
       assessments = [factories.AssessmentFactory() for _ in range(count)]
       issues = [factories.IssueFactory() for _ in range(count)]
@@ -350,20 +350,20 @@ class TestExportSnapshots(TestCase):
                   "left": {
                       "left": "child_type",
                       "op": {"name": "="},
-                      "right": "Control",
+                      "right": "Risk",
                   },
                   "op": {"name": "AND"},
                   "right": {
                       "left": "Code",
                       "op": {"name": "="},
-                      "right": "Control 1",
+                      "right": "Risk 1",
                   },
               },
           },
           "fields": ["mappings"],
       }]
       self.assertEqual(
-          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          len(self.export_parsed_csv(search_request)["Risk Snapshot"]),
           1,
       )
       single_query_count = counter.get
@@ -375,13 +375,13 @@ class TestExportSnapshots(TestCase):
               "expression": {
                   "left": "child_type",
                   "op": {"name": "="},
-                  "right": "Control",
+                  "right": "Risk",
               },
           },
           "fields": ["mappings"],
       }]
       self.assertEqual(
-          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          len(self.export_parsed_csv(search_request)["Risk Snapshot"]),
           5,
       )
       multiple_query_count = counter.get

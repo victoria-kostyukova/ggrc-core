@@ -518,14 +518,14 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     ref_list = [u'smotko@example.com', u'sec.con@example.com']
     self.assertItemsEqual(user_list, ref_list)
 
-  def test_filter_control_by_key_control(self):
-    """Test correct filtering by SIGNIFICANCE field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["significance", "=", "non-key"]),
-        "Control",
+  def test_filter_risk_by_vulnerability(self):
+    """Test correct filtering by vulnerability field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["vulnerability", "=", "non-key"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 2)
+    self.assertEqual(risks["count"], 2)
 
   def test_order_control_by_key_control(self):
     """Test correct ordering and by SIGNIFICANCE field"""
@@ -548,14 +548,14 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_fraud_related(self):
-    """Test correct filtering by fraud_related field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["fraud related", "=", "yes"]),
-        "Control",
+  def test_filter_risk_by_threat_event(self):
+    """Test correct filtering by threat_event field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["threat_event", "=", "yes"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 2)
+    self.assertEqual(risks["count"], 2)
 
   def test_order_control_by_fraud_related(self):
     """Test correct ordering and by fraud_related field"""
@@ -577,14 +577,14 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_assertions(self):
-    """Test correct filtering by assertions field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["assertions", "=", "privacy"]),
-        "Control",
+  def test_filter_risk_by_risk_type(self):
+    """Test correct filtering by risk_type field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["risk_type", "=", "privacy"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 3)
+    self.assertEqual(risks["count"], 3)
 
   @ddt.data("assertions", "categories")
   def test_order_control_by_category(self, key):
@@ -615,15 +615,15 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_categories(self):
-    """Test correct filtering by categories field"""
-    controls = self._get_first_result_set(
+  def test_filter_risk_by_threat_source(self):
+    """Test correct filtering by threat_source field"""
+    risks = self._get_first_result_set(
         self._make_query_dict(
-            "Control",
-            expression=["categories", "=", "Physical Security"]),
-        "Control",
+            "Risk",
+            expression=["threat_source", "=", "Corrective"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 3)
+    self.assertEqual(risks["count"], 3)
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
@@ -922,14 +922,11 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     self._generate_special_assessments()
-    self.import_file("sorting_assessment_with_ca_setup.csv")
     self.client.get("/login")
 
   @staticmethod
   def _generate_special_assessments():
     """Generate two Assessments for two local CADs with same name."""
-    assessment_with_date = None
-    assessment_with_text = None
     audit = factories.AuditFactory(
         slug="audit"
     )
@@ -943,20 +940,42 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
         slug="ASMT-SPECIAL-TEXT",
         audit=audit,
     )
-    # local CADs for the Assessments
-    for title in ["Date or arbitrary text", "Date or text styled as date"]:
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=assessment_with_date.id,
-          attribute_type="Date",
-      )
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=assessment_with_text.id,
-          attribute_type="Text",
-      )
+    cad_with_date_1 = factories.CustomAttributeDefinitionFactory(
+        title="Date or arbitrary text",
+        definition_type="assessment",
+        definition_id=assessment_with_date.id,
+        attribute_type="Date",
+    )
+    cad_with_text_1 = factories.CustomAttributeDefinitionFactory(
+        title="Date or arbitrary text",
+        definition_type="assessment",
+        definition_id=assessment_with_text.id,
+        attribute_type="Text",
+    )
+    cad_with_date_2 = factories.CustomAttributeDefinitionFactory(
+        title="Date or text styled as date",
+        definition_type="assessment",
+        definition_id=assessment_with_date.id,
+        attribute_type="Date",
+    )
+    cad_with_text_2 = factories.CustomAttributeDefinitionFactory(
+        title="Date or text styled as date",
+        definition_type="assessment",
+        definition_id=assessment_with_text.id,
+        attribute_type="Text",
+    )
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_date_1,
+                                          attributable=assessment_with_date,
+                                          attribute_value="10/31/2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_text_1,
+                                          attributable=assessment_with_text,
+                                          attribute_value="Some text 2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_date_2,
+                                          attributable=assessment_with_date,
+                                          attribute_value="11/09/2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_text_2,
+                                          attributable=assessment_with_text,
+                                          attribute_value="11/09/2016")
 
   # pylint: disable=invalid-name
   def test_ca_query_different_types_local_ca(self):
@@ -1187,6 +1206,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
     return data
 
+  # pylint: disable=arguments-differ
   def _get_first_result_set(self, *args, **kwargs):
     """Call this method from super and flatten CAVs additionally."""
     return self._flatten_cav(

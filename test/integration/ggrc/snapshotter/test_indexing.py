@@ -52,9 +52,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
-    control = db.session.query(models.Control).filter(
-        models.Control.slug == "control-3"
-    ).one()
     access_group = db.session.query(models.AccessGroup).filter(
         models.AccessGroup.slug == "ag-2"
     ).one()
@@ -66,11 +63,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     ).one()
     custom_attribute_defs = self.create_custom_attribute_definitions()
     custom_attribute_values = [
-        {
-            "custom_attribute": custom_attribute_defs["control"],
-            "attributable": control,
-            "attribute_value": "control value 1",
-        },
         {
             "custom_attribute": custom_attribute_defs["objective"],
             "attributable": objective,
@@ -118,13 +110,10 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
              for s in snapshots}
         ))
 
-    self.assertEqual(records.count(), 69)
+    self.assertEqual(records.count(), 66)
 
     # At this point all objects are no longer in the session and we have to
     # manually refresh them from the database
-    control = db.session.query(models.Control).filter(
-        models.Control.slug == "control-3"
-    ).one()
     access_group = db.session.query(models.AccessGroup).filter(
         models.AccessGroup.slug == "ag-2"
     ).one()
@@ -136,7 +125,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     ).one()
 
     custom_attributes = [
-        (control, "control text field 1", "control value 1"),
         (objective, "objective rich field 1", "objective value 1"),
         (process, "process date field 1", "07/12/2016"),
         (access_group, "access group text field 2",
@@ -273,7 +261,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
              for s in snapshots}
         ))
 
-    self.assertEqual(records.count(), 69)
+    self.assertEqual(records.count(), 66)
 
     custom_attributes = [
         (objective,
@@ -332,7 +320,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     records = get_records(audit, snapshots)
 
-    self.assertEqual(records.count(), 66)
+    self.assertEqual(records.count(), 63)
 
     delete_records({s.id for s in snapshots})
 
@@ -343,7 +331,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     records = get_records(audit, snapshots)
 
-    self.assertEqual(records.count(), 66)
+    self.assertEqual(records.count(), 63)
 
   def assert_indexed_fields(self, obj, search_property, values):
     """Assert index content in full text search table."""

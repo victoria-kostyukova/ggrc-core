@@ -57,6 +57,10 @@ class Types(object):
       "Person"
   }
 
+  external = {
+      "Control",
+  }
+
 
 class Rules(object):
   """Returns a dictionary of rules

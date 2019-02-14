@@ -290,6 +290,7 @@ class TestBasicCsvImport(TestCase):
     })
 
   def test_policy_unique_title(self):
+    """Test import of existing policy."""
     filename = "policy_sample1.csv"
     response_json = self.import_file(filename)
 
@@ -414,13 +415,15 @@ class TestBasicCsvImport(TestCase):
   def test_import_code_validation(self):
     """Test validation of 'Code' column during import"""
     response = self.import_data(OrderedDict([
-        ("object_type", "Control"),
-        ("Code*", "*CONTROL-1"),
+        ("object_type", "Risk"),
+        ("Code*", "*RISK-1"),
         ("Admin", "user@example.com"),
-        ("Title", "Control_1")
+        ("Title", "Risk_1"),
+        ("Description", "Description"),
+        ("Risk type", "Type 1"),
     ]))
     self._check_csv_response(response, {
-        "Control": {
+        "Risk": {
             "row_errors": {
                 "Line 3: Field 'Code' validation failed with the following "
                 "reason: Field 'Code' contains unsupported symbol '*'. "

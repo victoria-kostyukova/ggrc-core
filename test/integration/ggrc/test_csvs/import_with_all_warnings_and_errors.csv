@@ -1,6 +1,6 @@
 Object type,Test duplicate column error.,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,Notes,Assessment Procedure,Admin*,Effective Date,Notes,Assessment Procedure,TITLE,,,,,,
-,,A,B,C,D,user@example.com,,E,,,,,,,,
+Risk,Code*,Title*,Description,Risk type,Admin*,Effective Date,Description,Risk type,TITLE,,,,,,,
+,,A,B,C,user@example.com,,Description,E,,,,,,,,
 ,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,
 program,code*,title*,description,Program Managers,state,,,effective date,last deprecated date,notes,reference url,,,,,
@@ -57,8 +57,8 @@ Market,code*,title*,description,admin,assignee,verifier,Launch Status,,,,,,,,,
 ,mkt-3,mkt-3,Market for Request testing 3,user5@a.com,user5@a.com,user5@a.com,Active,,,,,,,,,
 ,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,
-control,code*,title*,description,admin,state,notes,,,effective date,last deprecated date,reference url,Assessment Procedure,,,Assertions,Categories
-,control-1,control-1,test,user@example.com,Draft,this is a note,,,7/1/2015,7/15/2015,google.com,plan for control 1,,,Privacy,Data Centers
-,control-2,control-2,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,plan for control 2,,,Security,Disaster Recovery
-,control-3,control 3,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,plan for control 3,,,Availability,Logical Access/Access Control
-,control-4,control-4,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,plan for control 4,,,Integrity,Sites
+Risk,code*,title*,description,admin,effective date,last deprecated date,,,,,reference url,Assessment Procedure,,,Assertions,Categories
+,risk-1,risk-1,test,user@example.com,7/1/2015,7/15/2015,,,,,google.com,plan for control 1,,,Privacy,Data Centers
+,risk-2,risk-2,test,user@example.com,7/1/2015,7/15/2015,,,,,google.com,plan for control 2,,,Security,Disaster Recovery
+,risk-2,risk-2,test,user@example.com,7/1/2015,7/15/2015,,,,,google.com,plan for control 3,,,Availability,Logical Access/Access Control
+,risk-2,risk-2,test,user@example.com,7/1/2015,7/15/2015,,,,,google.com,plan for control 4,,,Integrity,Sites

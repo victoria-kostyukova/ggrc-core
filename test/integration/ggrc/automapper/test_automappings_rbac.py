@@ -149,8 +149,15 @@ class TestAutomappings(TestCase):
     issued_admin_role_id = self.issue_admin_role.id
 
     program = all_models.Program.query.first()
-    control = all_models.Control.query.first()
-    control_id = control.id
+    with factories.single_commit():
+      assertion = factories.ControlAssertionFactory(name="Security")
+      control = factories.ControlFactory(
+          slug="control-1",
+          title="control-1",
+          description="descr",
+          assertions=[assertion]
+      )
+      control_id = control.id
     factories.RelationshipFactory(
         source=program,
         destination=control,

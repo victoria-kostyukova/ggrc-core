@@ -65,19 +65,15 @@ class TestOrder(TestCase, WithQueryApi):
     self._check_ordering("Assessment", sorted_titles, role)
 
   @ddt.data("Admin",
-            "Control Operators",
-            "Control Owners",
-            "Principal Assignees",
-            "Secondary Assignees",
-            "Other Contacts",
-            )
-  def test_control_roles(self, role):
-    """Control roles ordering"""
+            "Primary Contacts",
+            "Secondary Contacts")
+  def test_risk_roles(self, role):
+    """Risk roles ordering"""
     sorted_titles = [
         title for title, in
-        db.session.query(all_models.Control.title).filter(
-            all_models.AccessControlList.object_type == "Control",
-            all_models.AccessControlList.object_id == all_models.Control.id,
+        db.session.query(all_models.Risk.title).filter(
+            all_models.AccessControlList.object_type == "Risk",
+            all_models.AccessControlList.object_id == all_models.Risk.id,
             (all_models.AccessControlList.ac_role_id ==
              all_models.AccessControlRole.id),
             all_models.AccessControlRole.name == role,
@@ -85,7 +81,7 @@ class TestOrder(TestCase, WithQueryApi):
              all_models.AccessControlList.id),
             all_models.Person.id == all_models.AccessControlPerson.person_id)
         .order_by(all_models.Person.email)]
-    self._check_ordering("Control", sorted_titles, role)
+    self._check_ordering("Risk", sorted_titles, role)
 
   def test_task_group_assignee(self):
     """Task Group assignee ordering"""

@@ -14,7 +14,6 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 COMMENTABLE_MODELS = [
-    all_models.Control,
     all_models.Objective,
     all_models.Requirement,
     all_models.Issue,

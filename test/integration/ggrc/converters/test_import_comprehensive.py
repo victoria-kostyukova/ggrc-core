@@ -40,7 +40,7 @@ class TestComprehensiveSheets(TestCase):
     indexed = {r["name"]: r for r in response}
 
     expected = {
-        "Control": {
+        "Risk": {
             "created": 14,
             "ignored": 2,
             "row_errors": 2,
@@ -247,10 +247,34 @@ class TestComprehensiveSheets(TestCase):
     response = self.import_file("import_with_all_warnings_and_errors.csv",
                                 safe=False)
     expected_errors = {
-        "Control": {
+        "Risk": {
             "block_errors": {
                 errors.DUPLICATE_COLUMN.format(
-                    line=1, duplicates="title, assessment procedure, notes"),
+                    line=1, duplicates="risk type, description, title"),
+            },
+            "block_warnings": {
+                errors.UNKNOWN_COLUMN.format(
+                    line=54, column_name="assertions"),
+                errors.UNKNOWN_COLUMN.format(
+                    line=54, column_name="categories")
+            },
+            "row_errors": {
+                errors.MISSING_COLUMN.format(
+                    line=55, s="", column_names="Risk Type"),
+                errors.MISSING_COLUMN.format(
+                    line=56, s="", column_names="Risk Type"),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line=57, column_name="Code",
+                    value="risk-2", processed_line=56),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line=57, column_name="Title",
+                    value="risk-2", processed_line=56),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line=58, column_name="Code",
+                    value="risk-2", processed_line=56),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line=58, column_name="Title",
+                    value="risk-2", processed_line=56),
             },
             "row_warnings": {
                 errors.EXPORT_ONLY_WARNING.format(
@@ -309,7 +333,7 @@ class TestComprehensiveSheets(TestCase):
   def create_custom_attributes(self):
     """Generate custom attributes needed for comprehensive sheet."""
     gen = self.generator.generate_custom_attribute
-    gen("control", title="my custom text", mandatory=True)
+    gen("risk", title="my custom text", mandatory=True)
     gen("program", title="my_text", mandatory=True)
     gen("program", title="my_date", attribute_type="Date")
     gen("program", title="my_checkbox", attribute_type="Checkbox")
@@ -321,7 +345,7 @@ class TestComprehensiveSheets(TestCase):
     """Test that mapping with case sensitive slugs work."""
     response = self.import_file("case_sensitive_slugs.csv", safe=False)
     expected_errors = {
-        "Control": {
+        "Risk": {
             "row_errors": {
                 errors.DUPLICATE_VALUE_IN_CSV.format(
                     line="4",

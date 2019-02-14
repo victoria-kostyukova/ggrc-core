@@ -557,7 +557,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     # Verify that all objects got imported correctly.
-    for _type in Types.all:
+    for _type in Types.all - Types.external:
       self.assertEqual(
           db.session.query(getattr(models.all_models, _type)).count(),
           3)
@@ -576,14 +576,15 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit.id,
     )
 
-    self.assertEqual(snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(snapshots.count(),
+                     (len(Types.all - Types.external)) * 3)
 
     type_count = collections.defaultdict(int)
     for snapshot in snapshots:
       type_count[snapshot.child_type] += 1
 
     missing_types = set()
-    for snapshottable_type in Types.all:
+    for snapshottable_type in Types.all - Types.external:
       if type_count[snapshottable_type] != 3:
         missing_types.add(snapshottable_type)
 
@@ -607,7 +608,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit.id,
     )
 
-    self.assertEqual(snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(snapshots.count(),
+                     (len(Types.all) - len(Types.external)) * 3)
 
     audit = self.refresh_object(audit)
     self.api.modify_object(audit, {

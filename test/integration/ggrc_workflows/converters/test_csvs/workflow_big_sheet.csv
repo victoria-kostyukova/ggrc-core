@@ -41,28 +41,28 @@ contract,Title,Description,Notes,Admin,Reference URL,Code,Effective Date,State,,
 ,con 40,bah 111145,really this is lame,user@example.com,http://i.imgur.com/VjicYvY.webm,contract-32,2/18/2016,active,,
 ,,,,,,,,,,
 Object type,,,,,,,,,,
-control,Title,Description,Assessment Procedure,Admin,Reference URL,Code,Type/Means,State,Assertions*,
-,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-1,manual,Draft,Privacy,
-,Startupsum 116,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-2,automated,Draft,Privacy,
-,Startupsum 117,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-3,manual,Draft,Privacy,
-,Startupsum 118,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 114,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-4,automated,Draft,Privacy,
-,Startupsum 119,,success 115,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,control-5,manual,Draft,Privacy,
+risk,Title,Description,Risk type,Admin,Reference URL,Code,,,,
+,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,risk-1,,,,
+,Startupsum 116,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,risk-2,,,,
+,Startupsum 117,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,risk-3,,,,
+,Startupsum 118,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 114,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,risk-4,,,,
+,Startupsum 119,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 115,Urbon.S@example.com,http://i.imgur.com/aP8UU5I.jpg,risk-5,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
 Object type,,,,,,,,,,
-objective,Title,Description,Notes,Admin,Reference URL,Code,State,map:control,,
+objective,Title,Description,Notes,Admin,Reference URL,Code,State,map:risk,,
 ,Startupsum 155,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,"zidar@example.com
-user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-1,Active,"control-1
-control-3",,
+user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-1,Active,"risk-1
+risk-3",,
 ,Startupsum 156,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,"zidar@example.com
-user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-2,Active,"control-1
-control-3",,
+user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-2,Active,"risk-1
+risk-3",,
 ,Startupsum 157,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,"zidar@example.com
-user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-3,Active,"control-1
-control-3",,
+user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-3,Active,"risk-1
+risk-3",,
 ,Startupsum 158,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 114,"zidar@example.com
-user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-4,Active,"control-1
-control-3",,
+user@example.com",http://i.imgur.com/SiuyNdp.jpg,objective-4,Active,"risk-1
+risk-3",,
 ,,,,,,,,,,
 Object type,,,,,,,,,,
 Task Group,code*,Summary*,details,assignee,workflow*,Objects,,,,
@@ -97,3 +97,4 @@ Task,code*,summary*,task group,task description,Task Assignees*,task type,start 
 ,task-9,Monthly 9,tg-3,test,user1@ggrc.com,aaaa,7/3/2017,7/4/2017,,
 ,task-10,Quarterly A,tg-4,test,user1@ggrc.com,,7/3/2017,7/4/2017,,
 ,task-11,Quarterly B,tg-4,test,user1@ggrc.com,,7/3/2017,7/4/2017,,
+,,,,,,,,,,

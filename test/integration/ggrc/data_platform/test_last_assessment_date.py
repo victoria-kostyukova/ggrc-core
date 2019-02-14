@@ -24,7 +24,6 @@ Corner cases:
 
 """
 
-import collections
 import datetime
 import itertools
 
@@ -32,7 +31,6 @@ import freezegun
 
 from ggrc import models
 from ggrc.data_platform import computed_attributes
-from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
@@ -240,34 +238,6 @@ class TestLastAssessmentDate(TestCase):
       else:
         f_date = ""
       self.assertEqual(control["Last Assessment Date"], f_date)
-
-  def test_import_lad_field(self):
-    """Test Last Assessment Date field read only on import."""
-    finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
-    with freezegun.freeze_time(finish_date):
-      asmt = models.Assessment.query.filter_by(title="Assessment_0").first()
-      self.api.put(asmt, {"status": "Completed"})
-    resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Control"),
-        ("code", "Control_1"),
-        ("Last Assessment Date", "06/06/2017"),
-    ]))
-    self._check_csv_response(resp, {
-        "Control": {
-            "row_warnings": {
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=3, column_name="Last Assessment Date"
-                )
-            }
-        }
-    })
-
-    control = models.Control.query.filter(
-        models.Control.slug == "Control_1"
-    ).one()
-    self.assertEqual(1, len(resp))
-    self.assertEqual(1, resp[0]["updated"])
-    self.assertEqual(control.last_assessment_date, finish_date)
 
   def test_handling_rel_revisions(self):
     """Test handling of relationship revisions."""

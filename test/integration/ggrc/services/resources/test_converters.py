@@ -469,22 +469,22 @@ class TestImportExports(TestImportExportBase):
       "ggrc.gdrive.file_actions.get_gdrive_file_data",
       new=lambda x: (x, None, '')
   )
-  def test_import_control_revisions(self):
+  def test_import_risk_revisions(self):
     """Test if new revisions created during import."""
-    data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*,Assertions*\n" \
-           ",,Test control,user@example.com,Privacy"
+    data = "Object type,,,,,\n" \
+           "Risk,Code*,Title*,Description*,Risk Type*,Admin*\n" \
+           ",,Test risk,Description,Risk type,D,user@example.com"
 
     user = all_models.Person.query.first()
 
     response = self.run_full_import(user, data)
     self.assert200(response)
 
-    control = all_models.Control.query.filter_by(title="Test control").first()
-    self.assertIsNotNone(control)
+    risk = all_models.Risk.query.filter_by(title="Test risk").first()
+    self.assertIsNotNone(risk)
     revision_actions = db.session.query(all_models.Revision.action).filter(
-        all_models.Revision.resource_type == "Control",
-        all_models.Revision.resource_id == control.id
+        all_models.Revision.resource_type == "Risk",
+        all_models.Revision.resource_id == risk.id
     )
     self.assertEqual({"created"}, {a[0] for a in revision_actions})
 
@@ -494,22 +494,22 @@ class TestImportExports(TestImportExportBase):
   )
   def test_import_snapshot(self):
     """Test if snapshots can be created from imported objects."""
-    data = "Object type,,,\n" \
-           "Control,Code*,Title*,Admin*,Assertions*\n" \
-           ",,Control1,user@example.com,Privacy\n" \
-           ",,Control2,user@example.com,Privacy\n" \
-           ",,Control3,user@example.com,Privacy"
+    data = "Object type,,,,,\n" \
+           "Risk,Code*,Title*,Description*,Risk Type*,Admin*\n" \
+           ",,Risk1,Description,Risk type,user@example.com\n" \
+           ",,Risk2,Description,Risk type,user@example.com\n" \
+           ",,Risk3,Description,Risk type,user@example.com"
 
     user = all_models.Person.query.first()
 
     response = self.run_full_import(user, data)
     self.assert200(response)
 
-    controls = all_models.Control.query
-    self.assertEqual(3, controls.count())
+    risks = all_models.Risk.query
+    self.assertEqual(3, risks.count())
 
     audit = factories.AuditFactory()
-    snapshots = self._create_snapshots(audit, controls.all())
+    snapshots = self._create_snapshots(audit, risks.all())
     self.assertEqual(3, len(snapshots))
 
   def test_import_map_objectives(self):

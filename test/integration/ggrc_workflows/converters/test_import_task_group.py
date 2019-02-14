@@ -110,7 +110,6 @@ class TestTaskGroupImport(WorkflowTestCase):
       (all_models.Standard.__name__, True),
       (all_models.Contract.__name__, True),
       (all_models.Requirement.__name__, True),
-      (all_models.Control.__name__, True),
       (all_models.Objective.__name__, True),
       (all_models.Issue.__name__, True),
       (all_models.Risk.__name__, True),

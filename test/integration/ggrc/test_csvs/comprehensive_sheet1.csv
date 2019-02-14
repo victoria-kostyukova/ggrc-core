@@ -18,29 +18,24 @@ Person,name,email,company,non-existent-attribute,role,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,"options:
 yearly
 monthly
-daily","options:
-reactive
-preventive
-detective
-administrative
-",,required cutom attribute. contain text,,,,,
-control,code*,title*,description ,frequency,kind/nature,admin,my custom text*,non-existent-attribute,Assertions*,,,
-,control-1,control-1,desc 1b,daily,administrative,user1@ggrc.com,1,,Privacy,,,
-,control-2,control-2,desc 2,monthly,detective,user1@ggrc.com,2,,Privacy,,,
-,control-3,control 3,desc 3,,,user1@ggrc.com,3,,Privacy,,,
-,control-4,control-4,desc 4,yearly,reactive,someone.else@ggrc.com,4,,Privacy,,,
-,control-5,control-5,desc 4,daily,reactive,user1@ggrc.com,6,,Privacy,,,
-,control-6,control-6,desc 1b,daily,administrative,someone.else@ggrc.com,1,,Privacy,,,
-,control-7,control-7,desc 2,monthly,detective,user1@ggrc.com,4,,Privacy,,,
-,control-8,control 8,desc 3,,,someone.else@ggrc.com,5,,Privacy,,,
-,control-9,control-9,desc 4,yearly,reactive,user1@ggrc.com,6,,Privacy,,,
-,control-10,control-10,desc 4,daily,reactive,user1@ggrc.com,66,,Privacy,,,
-,control-no-owner,control-no-owner,desc 2,monthly,detective,,3,,Privacy,,,
-,control-invalid-owner,control-invalid-owner,desc 3,yearly,administrative,nonexist@nonexist.com,6,,Privacy,,,
-,control-invalid-attribute,control-invalid-attribute,desc 4,daily,non-existent,user1@ggrc.com,6,,Privacy,,,
-,ctrl-dup-title,control-1,desc 1b,daily,administrative,user1@ggrc.com,6,,Privacy,,,
-,ctrl-req-attr-missing,,desc 1b,daily,administrative,user1@ggrc.com,45,,Privacy,,,
-,ctrl-req-custom-attr-missing,ctrl-req-custom-attr-missing,desc 1b,daily,administrative,user1@ggrc.com,4,,Privacy,,,
+daily",,required cutom attribute. contain text,,,,,,
+risk,code*,title*,description,risk type*,frequency,admin,my custom text*,non-existent-attribute,,,,
+,risk-1,risk-1,desc 1b,risk-1,daily,user1@ggrc.com,1,,,,,
+,risk-2,risk-2,desc 2,risk-2,monthly,user1@ggrc.com,2,,,,,
+,risk-3,risk-3,desc 3,risk-3,,user1@ggrc.com,3,,,,,
+,risk-4,risk-4,desc 4,risk-4,yearly,someone.else@ggrc.com,4,,,,,
+,risk-5,risk-5,desc 4,risk-5,daily,user1@ggrc.com,6,,,,,
+,risk-6,risk-6,desc 1b,risk-6,daily,someone.else@ggrc.com,1,,,,,
+,risk-7,risk-7,desc 2,risk-7,monthly,user1@ggrc.com,4,,,,,
+,risk-8,risk-8,desc 3,risk-8,,someone.else@ggrc.com,5,,,,,
+,risk-9,risk-9,desc 4,risk-9,yearly,user1@ggrc.com,6,,,,,
+,risk-10,risk-10,desc 4,risk-10,daily,user1@ggrc.com,66,,,,,
+,risk-no-owner,risk-no-owner,desc 2,risk-no-owner,monthly,,3,,,,,
+,risk-invalid-owner,risk-invalid-owner,desc 3,risk-invalid-owner,yearly,nonexist@nonexist.com,6,,,,,
+,risk-invalid-attribute,risk-invalid-attribute,desc 4,risk-invalid-attribute,daily,user1@ggrc.com,6,,,,,
+,risk-dup-title,risk-1,desc 1b,risk-dup-title,daily,user1@ggrc.com,6,,,,,
+,risk-req-attr-missing,,desc 1b,risk-req-attr-missing,daily,user1@ggrc.com,45,,,,,
+,risk-req-custom-attr-missing,risk-req-custom-attr-missing,desc 1b,risk-req-custom-attr-missing,daily,user1@ggrc.com,4,,,,,
 ,,,,,,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,,"options are:
 draft
@@ -69,7 +64,7 @@ a
 b
 c
 d",MM/DD/YYYY,,,
-program,code*,title*,description ,Program Managers,state,,my_text*,my_dropdown,my_date,my_checkbox,non-existent-attribute,
+program,code*,title*,description,Program Managers,state,,my_text*,my_dropdown,my_date,my_checkbox,non-existent-attribute,
 ,prog-1,program 1,test,user1@ggrc.com,Draft,,test,,12/12/2015,yes,,
 ,prog-2,program 2,test,user1@ggrc.com,Draft,,test,,12/12/2015,no,,
 ,prog-3,program 3,test,user1@ggrc.com,Draft,FALSE,test,,12/12/2015,yes,,

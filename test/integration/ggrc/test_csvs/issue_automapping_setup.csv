@@ -11,10 +11,6 @@ Program,code,title,Program Managers,,,,
 Reader_and_ProgramManager@example.com",,,,
 ,,,,,,,
 Object type,,,,,,,
-Control,code*,title*,description,frequency,kind/nature,admin,reference url,Assertions*
-,control-1,control-1,descr,monthly,detective,Creator_and_ProgramManager@example.com,,Security
-,,,,,,,
-Object type,,,,,,,
 Audit,code,title,Audit Captains,state,program,Auditors,
 ,audit,audit,Creator_and_ProgramManager@example.com,In progress,program,Creator_and_Auditor@example.com,
 ,,,,,,,

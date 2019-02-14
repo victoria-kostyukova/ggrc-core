@@ -1,9 +1,10 @@
 Object type,Test duplicate column error.,,,,
-Control,Code*,Title*,Admin*,Assertions*,
-,a,a,user@example.com,Privacy,
-,A,A,user@example.com,Privacy,
+Risk,Code*,Title*,Admin*,Description*,Risk type*
+,a,a,user@example.com,a,a
+,A,A,user@example.com,A,A
 ,,,,,
 Object type,,,,,
-Person,Name,Email*,Company,Role,map: Control
+Person,Name,Email*,Company,Role,map:Risk
 ,Person,person@gmail.com,no company,reader,"a
 A"
+,,,,,

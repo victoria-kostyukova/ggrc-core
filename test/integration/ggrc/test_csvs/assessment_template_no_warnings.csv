@@ -17,11 +17,11 @@ Audit,Code*,Program*,Title*,Audit Captains*,State,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,
-control,code*,title*,description,admin,state,notes,,,effective date,reference url,Assessment Procedure,,,Assertions,Categories
-,control-1,control-1,test,user@example.com,Draft,this is a note,,,7/1/2015,google.com,plan for control 1,,,Privacy,Data Centers
-,control-2,control-2,test,user@example.com,Active,this is a note,,,7/1/2015,google.com,plan for control 2,,,Security,Disaster Recovery
-,control-3,control 3,test,user@example.com,Active,this is a note,,,7/1/2015,google.com,plan for control 3,,,Availability,Logical Access/Access Control
-,control-4,control-4,test,user@example.com,Active,this is a note,,,7/1/2015,google.com,plan for control 4,,,Integrity,Sites
+risk,code*,title*,description,admin,risk type,,,,,,,,,,
+,risk-1,risk-1,test,user@example.com,1,,,,,,,,,,
+,risk-2,risk-2,test,user@example.com,2,,,,,,,,,,
+,risk-3,risk 3,test,user@example.com,3,,,,,,,,,,
+,risk-4,risk-4,test,user@example.com,4,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 Object type,,,,,Only works if object under assessment is Control.,,,,"List of custom attributes for the assessment template
 One attribute per line. fields are separated by commas,
@@ -46,3 +46,4 @@ user1@a.com",,,,,,,
 mandatory dropdown, my second dropdown, value1, value2
 Dropdown, dropdown with mandatory attachments and comments, (a) value1, (a)(c) value 2, (c)  (a)  value3, (c) value cc, valueeee",,,,,,
 ,T-4,Audit,Template 3,Org Group,yes,Control test plan value will be ignored,principal assignees,primary contacts,,,,,,,
+,,,,,,,,,,,,,,,
