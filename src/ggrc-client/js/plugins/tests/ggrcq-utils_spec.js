@@ -40,5 +40,14 @@ describe('GGRCQ utils', () => {
       expect(getUrl(options))
         .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}questionnaires/control=control-1`);
     });
+
+    it('should return url with path only', () => {
+      const options = {
+        path: 'import',
+      };
+
+      expect(getUrl(options))
+        .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}import`);
+    });
   });
 });

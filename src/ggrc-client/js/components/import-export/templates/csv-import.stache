@@ -167,6 +167,11 @@
       </show-more>
     {{/isImportStopped}}
 
+    <div class="import-section import-notice">
+      Please notice! Import for Control object is not available in GGRC system anymore.
+      <a class="import-notice__external-link" href="{{externalImportUrl}}" target="_blank">Go to new frontend to perform import there.</a>
+    </div>
+
     {{{quickTips}}}
   </div>
 

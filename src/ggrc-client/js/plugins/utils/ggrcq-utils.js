@@ -47,13 +47,19 @@ function getUrl({model, path, slug, view, params}) {
     url += '/';
   }
 
-  model = model.toLowerCase();
-  path = path.toLowerCase();
-  slug = slug.toLowerCase();
+  let modelParams = '';
+
+  if (model && slug) {
+    model = model.toLowerCase();
+    slug = slug.toLowerCase();
+    modelParams = `/${model}=${slug}`;
+  }
+
+  path = path ? path.toLowerCase() : '';
   view = view ? `/${view}` : '';
   params = params ? `?${params}` : '';
 
-  return `${url}${path}/${model}=${slug}${view}${params}`;
+  return `${url}${path}${modelParams}${view}${params}`;
 }
 
 /**
@@ -112,11 +118,22 @@ function getReviewUrl(instance) {
   });
 }
 
+/**
+ * Get url to import page
+ * @return {String} Url to import page
+ */
+function getImportUrl() {
+  return getUrl({
+    path: 'import',
+  });
+}
+
 export {
   hasQuestions,
   isChangeableExternally,
   getCommentFormUrl,
   getQuestionsUrl,
+  getImportUrl,
   getInfoUrl,
   getReviewUrl,
   getUrl,

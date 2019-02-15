@@ -30,6 +30,7 @@ import {
   gapiClient,
 } from '../../plugins/ggrc-gapi-client';
 import {getPickerElement} from '../../plugins/ggrc_utils';
+import {getImportUrl} from '../../plugins/utils/ggrcq-utils';
 import errorTemplate from './templates/import-error.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {
@@ -82,6 +83,11 @@ export default can.Component.extend({
             jobStatuses.ANALYSIS,
             jobStatuses.IN_PROGRESS,
           ].includes(this.attr('state'));
+        },
+      },
+      externalImportUrl: {
+        get() {
+          return getImportUrl();
         },
       },
     },
