@@ -14,6 +14,7 @@ import {
   getPageModel,
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models';
+import {getCreateObjectUrl} from '../plugins/utils/ggrcq-utils';
 
 export default can.Control.extend({
   defaults: {
@@ -63,11 +64,15 @@ export default can.Control.extend({
     displayPrefix = displayPrefix || '';
     return _.filter(_.map(itemNames, function (name) {
       if (name in businessModels) {
+        let model = businessModels[name];
         return {
-          model_name: businessModels[name].model_singular,
-          model_lowercase: businessModels[name].table_singular,
-          model_plural: businessModels[name].table_plural,
-          display_name: displayPrefix + businessModels[name].title_singular,
+          model_name: model.model_singular,
+          model_lowercase: model.table_singular,
+          model_plural: model.table_plural,
+          display_name: displayPrefix + model.title_singular,
+          isChangeableExternally: model.isChangeableExternally,
+          externalLink:
+            model.isChangeableExternally && getCreateObjectUrl(model),
         };
       }
     }));

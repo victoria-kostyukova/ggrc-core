@@ -648,18 +648,21 @@ p {
         color: $link;
 
         .fa {
-          font-size: 9px;
+          opacity: 1;
+          font-size: 13px;
           color: $link;
         }
+      }
 
-        &:hover {
+      &:hover {
+        .external-link__content {
           color: $darkBlue;
 
           .fa {
             color: $darkBlue;
           }
         }
-      }
+      } 
     }
   }
 }

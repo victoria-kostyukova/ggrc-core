@@ -52,14 +52,24 @@
         {{#object_menu}}
           {{#is_allowed 'create' model_name context='any'}}
           <div class="inner-nav-item">
-            <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
-            data-object-singular="{{model_name}}" data-object-plural="{{model_plural}}"
-            data-modal-reset="reset" data-form-target="redirect">
-              <div class="oneline">
+            {{#if isChangeableExternally}} 
+              <a href="{{externalLink}}" target="_blank" class="external-link">
                 <i class="fa fa-fw fa-{{model_lowercase}} color"></i>
-                {{display_name}}
-              </div>
-            </a>
+                <span class="external-link__content">
+                  {{display_name}}
+                  <i class="fa fa-external-link"></i>
+                </span>
+              </a>
+            {{else}}
+              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
+              data-object-singular="{{model_name}}" data-object-plural="{{model_plural}}"
+              data-modal-reset="reset" data-form-target="redirect">
+                <div class="oneline">
+                  <i class="fa fa-fw fa-{{model_lowercase}} color"></i>
+                  {{display_name}}
+                </div>
+              </a>
+            {{/if}}
           </div>
           {{/is_allowed}}
         {{/object_menu}}
