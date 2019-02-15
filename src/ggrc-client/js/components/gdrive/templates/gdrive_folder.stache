@@ -20,7 +20,7 @@
   {{/if}}
 
   {{#if current_folder}}
-    <action-toolbar class="action-toolbar">
+    <div class="action-toolbar">
       <div class="mapped-folder__folder-info">
         <div class="mapped-folder__link" rel="tooltip"
           data-original-title="{{current_folder.title}}">
@@ -58,10 +58,10 @@
           {{/if}}
         </div>
       </div>
-    </action-toolbar>
+    </div>
     {{else}}
       {{#if folder_error}}
-        <action-toolbar class="action-toolbar">
+        <div class="action-toolbar">
           <small>
             <strong>Warning:</strong> You need permission to access {{instance.class.title_singular}} folder. <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">Request access.</a>
           </small>
@@ -82,7 +82,7 @@
               {{/if}}
             {{/if}}
           </div>
-        </action-toolbar>
+        </div>
       {{else}}
         {{#if showAssignFolder}}
         <a href="javascript://"
