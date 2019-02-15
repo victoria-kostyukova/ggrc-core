@@ -160,3 +160,31 @@
   margin: 0;
   width: 100%;
 }
+
+%editable-control-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 28px;
+  border-radius: 50%;
+  background: #444;
+  cursor: pointer;
+
+  &:hover {
+    background: darken(#444, 10%);
+  }
+
+  .fa {
+    color: $white;
+    font-size: 18px;
+    height: 28px;
+    line-height: 28px;
+    width: 28px;
+    display: inline-flex;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    text-align: center;
+  }
+}

@@ -1,0 +1,15 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<a
+  class="proposable-control__link"
+  href="{{link}}"
+  target="_blank"
+  rel="tooltip"
+  data-placement="bottom"
+  data-original-title="Propose changes in new frontend"
+>
+  <i class="fa fa-pencil"></i>
+</a>

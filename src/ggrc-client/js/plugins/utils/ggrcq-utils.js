@@ -261,6 +261,22 @@ function getCreateObjectUrl(model) {
   });
 }
 
+/**
+* Get url to instance's attribute
+* @param {Object} instance - The model instance
+* @param {String} attributeName - Name of attribute
+* @return {String} Url to attribute
+*/
+function getProposalAttrUrl(instance, attributeName) {
+  return getUrl({
+    model: instance.constructor.table_singular,
+    path: instance.constructor.table_singular,
+    slug: instance.slug,
+    view: 'info',
+    params: `proposal=${attributeName}`,
+  });
+}
+
 export {
   hasQuestions,
   isChangeableExternally,
@@ -275,4 +291,5 @@ export {
   getUrl,
   getProposalsUrl,
   getChangeLogUrl,
+  getProposalAttrUrl,
 };

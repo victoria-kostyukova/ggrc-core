@@ -1,0 +1,12 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+.proposable-control__link {
+  @extend %editable-control-item;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
