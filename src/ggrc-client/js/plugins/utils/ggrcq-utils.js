@@ -195,7 +195,7 @@ function getUnmappingUrl(instance, destinationModel) {
 
 function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   let view = '';
-  if (ggrcqDirectiveObjects. includes(destinationModel.model_singular)) {
+  if (ggrcqDirectiveObjects.includes(destinationModel.model_singular)) {
     view = 'directives';
   } else if (scopingObjects.includes(destinationModel.model_singular)) {
     view = 'scope';
@@ -231,6 +231,18 @@ function getMapControlToObjectUrl(instance, statuses) {
   });
 }
 
+/**
+ * Get url to create new object
+ * @param {Object} model - The object model
+ * @return {String} Url to create new object
+ */
+function getCreateObjectUrl(model) {
+  return getUrl({
+    path: model.table_plural,
+    params: 'action=create',
+  });
+}
+
 export {
   hasQuestions,
   isChangeableExternally,
@@ -241,6 +253,7 @@ export {
   getReviewUrl,
   getMappingUrl,
   getUnmappingUrl,
+  getCreateObjectUrl,
   getUrl,
   getProposalsUrl,
   getChangeLogUrl,

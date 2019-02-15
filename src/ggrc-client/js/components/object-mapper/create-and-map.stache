@@ -16,9 +16,18 @@
       </create-document-button>
 
   {{else}}
-    
+
       Map existing object or
-      <a class="btn btn-link create-control"
+
+      {{#if destinationModel.isChangeableExternally}} 
+
+        <button class="btn btn-link" ($click)="createExternally()">
+          Create and map new object
+        </button>
+
+      {{else}}
+
+        <button class="btn btn-link create-control"
           ($click)="resetEntries()"
           href="javascript://"
           data-toggle="modal-ajax-form"
@@ -28,7 +37,9 @@
           data-unique-id="{{source.id}}"
           data-join-object-id="{{source.id}}">
           Create and map new object
-      </a>
+        </button>
+
+      {{/if}}
 
   {{/if_equals}}
 

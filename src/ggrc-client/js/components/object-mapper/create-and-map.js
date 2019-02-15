@@ -13,6 +13,13 @@ import {
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
+import Mappings from '../../models/mappers/mappings';
+import {
+  confirm,
+} from '../../plugins/utils/modals';
+import {
+  getCreateObjectUrl,
+} from '../../plugins/utils/ggrcq-utils';
 
 export default can.Component.extend({
   tag: 'create-and-map',
@@ -52,10 +59,36 @@ export default can.Component.extend({
           return result;
         },
       },
+      isMappableExternally: {
+        get() {
+          let sourceType = this.attr('sourceType');
+          let destinationType = this.attr('destinationType');
+          return Mappings.shouldBeMappedExternally(sourceType, destinationType);
+        },
+      },
     },
     source: null,
     destinationModel: null,
     newEntries: [],
+    getCreateAndMapExternallyText() {
+      let destinationModel = this.attr('destinationModel');
+
+      return `${destinationModel.title_singular} creation and mapping 
+        ${destinationModel.title_plural.toLowerCase()} to scope, standards and 
+        regulations flows are currently disabled. </br> </br> Please click 
+        “Proceed in the new tab” button to go to the new interface and complete 
+        these actions there.`;
+    },
+    getCreateAndReturnBackText() {
+      let sourceModel = this.attr('source').constructor;
+      let destinationModel = this.attr('destinationModel');
+
+      return `Redirecting to Controls Library in the new interface to 
+        create a ${destinationModel.title_singular.toLowerCase()}. </br> </br>
+        Until transition to the new UI is complete, you will need to come back 
+        here after creation and reopen this window to complete mapping to this 
+        ${sourceModel.title_singular.toLowerCase()}`;
+    },
     resetEntries() {
       this.attr('newEntries', []);
     },
@@ -66,8 +99,37 @@ export default can.Component.extend({
           objects: this.attr('newEntries'),
         });
     },
+    createExternally() {
+      let destinationModel = this.attr('destinationModel');
+
+      confirm({
+        modal_title: 'Warning',
+        modal_description: this.attr('isMappableExternally')
+          ? this.getCreateAndMapExternallyText()
+          : this.getCreateAndReturnBackText(),
+        button_view:
+          `${GGRC.templates_path}/modals/link-button.stache`,
+        modalConfirmLink: getCreateObjectUrl(destinationModel),
+        modalConfirmButton: 'Proceed in the new tab',
+      }, () => {
+        // close object mapper
+        this.attr('element').trigger('mapExternally');
+      }, () => this.cancel())
+        .on('keyup', (ev) => {
+          // handle esc key
+          if (ev.which === 27 && $(ev.target).closest('.modal').length) {
+            this.cancel();
+          }
+        });
+    },
+    cancel() {
+      this.attr('element').trigger('canceled');
+    },
   },
   events: {
+    inserted() {
+      this.viewModel.attr('element', this.element);
+    },
     // clicked Save & Close button in Create modal
     '.create-control modal:success': function (el, ev, model) {
       this.viewModel.attr('newEntries').push(model);
