@@ -5,26 +5,10 @@
 
 export default can.Component.extend({
   tag: 'action-toolbar-control',
-  template: '<div class="action-toolbar__controls-item {{disabledCss}}">' +
+  template: '<div class="action-toolbar__controls-item">' +
   '<content></content>' +
   '</div>',
   leakScope: true,
-  viewModel: {
-    define: {
-      disabled: {
-        type: 'htmlbool',
-        value: false,
-      },
-      disabledCss: {
-        type: 'string',
-        value: '',
-        get: function () {
-          return this.attr('disabled') ?
-            'action-toolbar__controls-item-disabled' :
-            '';
-        },
-      },
-    },
-  },
+  viewModel: {},
 });
 
