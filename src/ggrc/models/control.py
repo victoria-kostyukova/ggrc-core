@@ -4,6 +4,7 @@
 """Module for Control model."""
 
 from sqlalchemy import orm
+from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models.comment import Commentable
@@ -11,7 +12,7 @@ from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.mixins import base, categorizable
 from ggrc.models.mixins import synchronizable
-from ggrc.models import mixins, review
+from ggrc.models import mixins
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_person import Personable
@@ -20,12 +21,12 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext import attributes
 from ggrc.models import reflection
 from ggrc.models import proposal
+from ggrc.models.exceptions import ValidationError
 
 
 class Control(synchronizable.Synchronizable,
               categorizable.Categorizable,
               WithLastAssessmentDate,
-              review.Reviewable,
               synchronizable.RoleableSynchronizable,
               Relatable,
               mixins.CustomAttributable,
@@ -54,6 +55,9 @@ class Control(synchronizable.Synchronizable,
   kind = deferred(db.Column(db.String), "Control")
   means = deferred(db.Column(db.String), "Control")
   verify_frequency = deferred(db.Column(db.String), "Control")
+  review_status = deferred(db.Column(db.String, nullable=True), "Control")
+  review_status_display_name = deferred(db.Column(db.String, nullable=True),
+                                        "Control")
 
   # REST properties
   _api_attrs = reflection.ApiAttributes(
@@ -66,6 +70,8 @@ class Control(synchronizable.Synchronizable,
       'means',
       'verify_frequency',
       'version',
+      'review_status',
+      'review_status_display_name'
   )
 
   _fulltext_attrs = [
@@ -84,6 +90,7 @@ class Control(synchronizable.Synchronizable,
       'means',
       'verify_frequency',
       'version',
+      'review_status_display_name',
   ]
 
   _sanitize_html = [
@@ -125,6 +132,10 @@ class Control(synchronizable.Synchronizable,
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
       "test_plan": "Assessment Procedure",
+      "review_status_display_name": {
+          "display_name": "Review State",
+          "mandatory": False
+      },
   }
 
   @classmethod
@@ -140,3 +151,21 @@ class Control(synchronizable.Synchronizable,
     if self.directive:
       out_json["mapped_directive"] = self.directive.display_name
     return out_json
+
+  @validates('review_status')
+  def validate_review_status(self, _, value):  # pylint: disable=no-self-use
+    """Add explicit non-nullable validation."""
+    if value is None:
+      raise ValidationError("Review status for the object is not specified")
+
+    return value
+
+  @validates('review_status_display_name')
+  def validate_review_status_display_name(self, _, value):
+    """Add explicit non-nullable validation."""
+    # pylint: disable=no-self-use
+
+    if value is None:
+      raise ValidationError("Review status for the object is not specified")
+
+    return value
