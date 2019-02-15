@@ -11,13 +11,13 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/mapping-controls/mapping-type-selector';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
+import './create-and-map';
 
 import template from './object-mapper.stache';
 
 import tracker from '../../tracker';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import {
-  isAuditScopeModel,
   isSnapshotModel,
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
@@ -122,34 +122,23 @@ export default can.Component.extend({
        */
       deferred: false,
       isMappableExternally: false,
-      allowedToCreate: function () {
-        // Don't allow to create new instances for "Audit Scope" Objects that
-        // are snapshots
-        let isAuditScopeSrc = isAuditScopeModel(this.attr('object'));
-
-        return !isAuditScopeSrc ||
-          (isAuditScopeSrc && !isSnapshotModel(this.attr('type')));
-      },
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
           return true;
         }
         return false;
       },
-      showWarning: function () {
-        let isAuditScopeSrc = isAuditScopeModel(this.attr('object'));
+      isSnapshotMapping: function () {
         let isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
         let isSnapshotParentDst = isSnapshotParent(this.attr('type'));
         let isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
         let isSnapshotModelDst = isSnapshotModel(this.attr('type'));
 
         let result =
-          // Dont show message if source is auditScope model, for example Assessment.
-          !isAuditScopeSrc &&
           // Show message if source is snapshotParent and destination is snapshotable.
-          ((isSnapshotParentSrc && isSnapshotModelDst) ||
+          (isSnapshotParentSrc && isSnapshotModelDst) ||
           // Show message if destination is snapshotParent and source is snapshotable.
-          (isSnapshotParentDst && isSnapshotModelSrc));
+          (isSnapshotParentDst && isSnapshotModelSrc);
 
         return result;
       },
@@ -175,34 +164,21 @@ export default can.Component.extend({
 
   events: {
     [`{parentInstance} ${MAP_OBJECTS.type}`](instance, event) {
-      this.mapObjects(event.objects);
+      // this event is called when objects just created and should be mapped
+      // so object-mapper modal should be closed and removed from DOM
+      this.closeModal();
+
+      if (event.objects && event.objects.length) {
+        this.map(event.objects);
+      }
     },
-    '.create-control modal:success': function (el, ev, model) {
-      this.map(model);
-    },
-    '.create-control modal:added': function (el, ev, model) {
-      this.viewModel.attr('newEntries').push(model);
-    },
-    '.create-control click': function () {
-      // reset new entries
-      this.viewModel.attr('newEntries', []);
+    // hide object-mapper modal when create new object button clicked
+    'create-and-map click'() {
       this.element.trigger('hideModal');
     },
-    '.create-control modal:dismiss'() {
-      this.closeModal();
-    },
-    '{window} modal:dismiss': function (el, ev, options) {
-      let joinObjectId = this.viewModel.attr('join_object_id');
-
-      // mapper sets uniqueId for modal-ajax.
-      // we can check using unique id which modal-ajax is closing
-      if (options && options.uniqueId &&
-        joinObjectId === options.uniqueId &&
-        this.viewModel.attr('newEntries').length > 0) {
-        this.mapObjects(this.viewModel.attr('newEntries'));
-      } else {
-        this.element.trigger('showModal');
-      }
+    // reopen object-mapper if create modal was dismissed
+    '{window} modal:dismiss'() {
+      this.element.trigger('showModal');
     },
     inserted: function () {
       let self = this;
@@ -223,19 +199,17 @@ export default can.Component.extend({
 
       self.viewModel.onSubmit();
     },
-    map(model) {
+    map(models) {
       const viewModel = this.viewModel;
-      const newEntries = viewModel.attr('newEntries');
 
       viewModel.updateFreezedConfigToLatest();
-      newEntries.push(model);
 
       if (this.viewModel.attr('deferred')) {
         // postpone map operation unless target object is saved
-        this.deferredSave(newEntries);
+        this.deferredSave(models);
       } else {
         // map objects immediately
-        this.mapObjects(newEntries);
+        this.mapObjects(models);
       }
     },
     closeModal: function () {

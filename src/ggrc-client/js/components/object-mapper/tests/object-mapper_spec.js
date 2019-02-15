@@ -148,9 +148,6 @@ describe('object-mapper component', function () {
     let spyObj;
 
     beforeEach(function () {
-      viewModel.attr({
-        newEntries: [],
-      });
       handler = events['map'];
       spyObj = jasmine.createSpy();
     });
@@ -164,42 +161,35 @@ describe('object-mapper component', function () {
       handler.call({
         viewModel: viewModel,
         mapObjects: spyObj,
-      }, 'model');
+      }, []);
       expect(viewModel.updateFreezedConfigToLatest).toHaveBeenCalled();
-    });
-
-    it('adds model to newEntries', function () {
-      viewModel.attr('newEntries', []);
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-      }, 'model');
-      expect(viewModel.attr('newEntries').length).toEqual(1);
-      expect(viewModel.attr('newEntries')[0]).toEqual('model');
     });
 
     it('calls mapObjects to map results', function () {
       handler.call({
         viewModel: viewModel,
         mapObjects: spyObj,
-      }, 'model');
-      expect(spyObj).toHaveBeenCalledWith(viewModel.attr('newEntries'));
+      }, []);
+      expect(spyObj).toHaveBeenCalledWith([]);
+    });
+
+    it('calls deferredSave to map results and mapper is deferred', function () {
+      viewModel.attr('deferred', true);
+      handler.call({
+        viewModel: viewModel,
+        deferredSave: spyObj,
+      }, []);
+      expect(spyObj).toHaveBeenCalledWith([]);
     });
   });
 
-  describe('".create-control click" event', function () {
+  describe('"create-and-map click" event', function () {
     let element = {};
 
     beforeEach(function () {
       viewModel.attr({});
-      handler = events['.create-control click'];
+      handler = events['create-and-map click'];
       element.trigger = jasmine.createSpy();
-    });
-
-    it('sets empty array to newEntries', function () {
-      handler.call({viewModel: viewModel, element: element});
-      expect(viewModel.attr('newEntries').length)
-        .toEqual(0);
     });
 
     it('triggers "hideModal" event', function () {
@@ -208,97 +198,18 @@ describe('object-mapper component', function () {
     });
   });
 
-  describe('".create-control modal:added" event', function () {
-    beforeEach(function () {
-      viewModel.attr({newEntries: []});
-      handler = events['.create-control modal:added'];
-    });
-
-    it('adds model to newEntries', function () {
-      handler.call({viewModel: viewModel}, {}, {}, 'model');
-      expect(viewModel.attr('newEntries').length).toEqual(1);
-      expect(viewModel.attr('newEntries')[0]).toEqual('model');
-    });
-  });
-
   describe('"{window} modal:dismiss" event', function () {
-    let options;
-    let spyObj;
     let element = {};
 
     beforeEach(function () {
-      viewModel.attr({
-        join_object_id: 123,
-        newEntries: [1],
-      });
       handler = events['{window} modal:dismiss'];
-      spyObj = jasmine.createSpy();
       element.trigger = jasmine.createSpy();
     });
 
-    it('calls mapObjects from mapper-results' +
-    'if there are newEntries and ids are equal', function () {
-      options = {
-        uniqueId: 123,
-      };
+    it('triggers "showModal"', function () {
       handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-      }, {}, {}, options);
-      expect(spyObj).toHaveBeenCalled();
-    });
-
-    it('does not call mapObjects from mapper-results' +
-      'if there are newEntries and ids are not equal', function () {
-      options = {
-        uniqueId: 321,
-      };
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-        element: element,
-      }, {}, {}, options);
-      expect(spyObj).not.toHaveBeenCalled();
-    });
-
-    it('triggers "showModel event"' +
-      'if there are newEntries and ids are not equal', function () {
-      options = {
-        uniqueId: 321,
-      };
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-        element: element,
-      }, {}, {}, options);
-      expect(element.trigger).toHaveBeenCalledWith('showModal');
-    });
-
-    it('does not calls mapObjects from mapper-results' +
-    'if there are no newEntries', function () {
-      viewModel.attr('newEntries', []);
-      options = {
-        uniqueId: 123,
-      };
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-        element: element,
-      }, {}, {}, options);
-      expect(spyObj).not.toHaveBeenCalled();
-    });
-
-    it('triggers "showModal"' +
-    'if there are no newEntries', function () {
-      viewModel.attr('newEntries', []);
-      options = {
-        uniqueId: 123,
-      };
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-        element: element,
-      }, {}, {}, options);
+        element,
+      });
       expect(element.trigger).toHaveBeenCalledWith('showModal');
     });
   });
@@ -512,46 +423,7 @@ describe('object-mapper component', function () {
     });
   });
 
-  describe('allowedToCreate() method', function () {
-    let originalVM;
-
-    beforeAll(function () {
-      originalVM = viewModel.attr();
-    });
-
-    afterAll(function () {
-      viewModel.attr(originalVM);
-    });
-
-    it('returns true if it is not an audit-scope model',
-      function () {
-        let result;
-        spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
-        result = viewModel.allowedToCreate();
-        expect(result).toEqual(true);
-      });
-
-    it('returns true if it is an audit-scope model but mapped type is not ' +
-    'snapshotable',
-    function () {
-      let result;
-      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
-      result = viewModel.allowedToCreate();
-      expect(result).toEqual(true);
-    });
-
-    it('returns false if it is an audit-scope model and mapped type is ' +
-    'snapshotable',
-    function () {
-      let result;
-      viewModel.attr('type', 'Control');
-      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
-      result = viewModel.allowedToCreate();
-      expect(result).toEqual(false);
-    });
-  });
-
-  describe('showWarning() method', function () {
+  describe('isSnapshotMapping() method', function () {
     let originalVM;
 
     beforeAll(function () {
@@ -565,7 +437,7 @@ describe('object-mapper component', function () {
     it('returns false if is an audit-scope model', function () {
       let result;
       spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
-      result = viewModel.showWarning();
+      result = viewModel.isSnapshotMapping();
       expect(result).toEqual(false);
     });
 
@@ -575,7 +447,7 @@ describe('object-mapper component', function () {
       spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
       viewModel.attr('object', 'Audit');
       viewModel.attr('type', 'Control');
-      result = viewModel.showWarning();
+      result = viewModel.isSnapshotMapping();
       expect(result).toEqual(true);
     });
 
@@ -588,7 +460,7 @@ describe('object-mapper component', function () {
       });
       viewModel.attr('object', 'o');
       viewModel.attr('type', 'Control');
-      result = viewModel.showWarning();
+      result = viewModel.isSnapshotMapping();
       expect(result).toEqual(true);
     });
   });

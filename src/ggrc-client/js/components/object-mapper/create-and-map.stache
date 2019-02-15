@@ -1,0 +1,37 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#allowedToCreate}}
+
+  <span class="create-new-object">
+
+  {{#if_equals destinationType 'Document'}}
+    
+      Do you want to search for an existing document or
+      <create-document-button class="create-control"
+        {parent-instance}="source">
+        Attach new
+      </create-document-button>
+
+  {{else}}
+    
+      Map existing object or
+      <a class="btn btn-link create-control"
+          ($click)="resetEntries()"
+          href="javascript://"
+          data-toggle="modal-ajax-form"
+          data-modal-class="modal-wide"
+          data-object-singular="{{destinationModel.model_singular}}"
+          data-object-plural="{{destinationModel.table_plural}}"
+          data-unique-id="{{source.id}}"
+          data-join-object-id="{{source.id}}">
+          Create and map new object
+      </a>
+
+  {{/if_equals}}
+
+  </span>
+
+{{/allowedToCreate}}
