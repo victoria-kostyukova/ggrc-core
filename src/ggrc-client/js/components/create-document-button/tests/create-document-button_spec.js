@@ -205,75 +205,45 @@ describe('create-document-button component', () => {
           });
       });
     });
-
-    describe('refreshPermissionsAndMap() method', () => {
-      it('should close object-mapper if there are nothing to map', () => {
-        let element = {
-          trigger: jasmine.createSpy(),
-        };
-        viewModel.attr('element', element);
-
-        viewModel.refreshPermissionsAndMap([]);
-
-        expect(element.trigger).toHaveBeenCalledWith('modal:dismiss');
-      });
-    });
   });
 
-  describe('events', () => {
-    let events;
+  describe('openPicker() method', () => {
+    let uploadFilesDfd;
 
-    beforeAll(() => {
-      events = Component.prototype.events;
+    beforeEach(() => {
+      uploadFilesDfd = $.Deferred();
+      spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
+      spyOn(viewModel, 'mapDocuments');
+      spyOn(viewModel, 'dispatch');
     });
 
-    describe('.pick-file click handler', () => {
-      let handler;
-      let uploadFilesDfd;
+    it('should call uploadFiles method', () => {
+      viewModel.openPicker();
 
-      beforeEach(() => {
-        let context = {
-          viewModel,
-          attach: jasmine.createSpy(),
-        };
-        handler = events['.pick-file click'].bind(context);
+      expect(pickerUtils.uploadFiles).toHaveBeenCalled();
+    });
 
-        uploadFilesDfd = $.Deferred();
-        spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
-        spyOn(viewModel, 'mapDocuments');
-      });
+    it('should call mapDocuments method if file is picked', (done) => {
+      let file = {};
+      let files = [file];
 
-      it('should call uploadFiles method', () => {
-        handler();
+      viewModel.openPicker();
 
-        expect(pickerUtils.uploadFiles).toHaveBeenCalled();
-      });
+      uploadFilesDfd.resolve(files)
+        .then(() => {
+          expect(viewModel.mapDocuments).toHaveBeenCalledWith([file]);
+          done();
+        });
+    });
 
-      it('should call mapDocuments method if file is picked', (done) => {
-        let file = {};
-        let files = [file];
+    it('should trigger "cancel" event if file is not picked', (done) => {
+      viewModel.openPicker();
 
-        handler();
-
-        uploadFilesDfd.resolve(files)
-          .then(() => {
-            expect(viewModel.mapDocuments).toHaveBeenCalledWith([file]);
-            done();
-          });
-      });
-
-      it('should trigger modal:dismiss event if file is not picked', (done) => {
-        spyOn($.prototype, 'trigger');
-        handler();
-
-        uploadFilesDfd.reject()
-          .fail(() => {
-            expect($.prototype.trigger).toHaveBeenCalledWith('modal:dismiss');
-            expect($.prototype.trigger.calls.mostRecent().object[0])
-              .toEqual(window);
-            done();
-          });
-      });
+      uploadFilesDfd.reject()
+        .fail(() => {
+          expect(viewModel.dispatch).toHaveBeenCalledWith('cancel');
+          done();
+        });
     });
   });
 });

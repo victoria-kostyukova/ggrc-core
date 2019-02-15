@@ -125,6 +125,7 @@ describe('create-and-map component', () => {
       });
 
       spyOn(viewModel, 'mapObjects');
+      spyOn(viewModel, 'cancel');
 
       handler = Component.prototype.events['{window} modal:dismiss']
         .bind({viewModel});
@@ -136,6 +137,7 @@ describe('create-and-map component', () => {
       };
       handler({}, {}, options);
       expect(viewModel.mapObjects).toHaveBeenCalled();
+      expect(viewModel.cancel).not.toHaveBeenCalled();
     });
 
     it('does not call mapObjects if there are newEntries and ids are not equal',
@@ -145,6 +147,7 @@ describe('create-and-map component', () => {
         };
         handler({}, {}, options);
         expect(viewModel.mapObjects).not.toHaveBeenCalled();
+        expect(viewModel.cancel).toHaveBeenCalled();
       });
 
     it('does not calls mapObjects if there are no newEntries', () => {
@@ -154,6 +157,7 @@ describe('create-and-map component', () => {
       };
       handler({}, {}, options);
       expect(viewModel.mapObjects).not.toHaveBeenCalled();
+      expect(viewModel.cancel).toHaveBeenCalled();
     });
   });
 });

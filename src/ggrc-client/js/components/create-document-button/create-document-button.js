@@ -21,6 +21,15 @@ import Context from '../../models/service-models/context';
 
 const viewModel = can.Map.extend({
   parentInstance: null,
+  openPicker() {
+    uploadFiles()
+      .then((files) => {
+        this.mapDocuments(files);
+      }, () => {
+        // event handler in object-mapper will open mapper again
+        this.dispatch('cancel');
+      });
+  },
   mapDocuments(files) {
     return this.checkDocumentsExist(files)
       .then((statuses) => {
@@ -98,24 +107,18 @@ const viewModel = can.Map.extend({
       });
   },
   refreshPermissionsAndMap(documents) {
-    if (!documents.length) {
-      // handler in object-mapper will close mapper permanently
-      // if it still exists and removes html from the dom
-      if (this.attr('element')) {
-        this.attr('element').trigger('modal:dismiss');
-      }
+    let dfd = $.Deferred().resolve();
 
-      return $.Deferred().resolve();
+    if (documents.length) {
+      dfd = Permission.refresh();
     }
 
-    return Permission.refresh()
-      .then(function () {
-        this.attr('parentInstance')
-          .dispatch({
-            ...MAP_OBJECTS,
-            objects: documents,
-          });
-      }.bind(this));
+    dfd.then(function () {
+      this.dispatch({
+        ...MAP_OBJECTS,
+        objects: documents,
+      });
+    }.bind(this));
   },
   showConfirm(documents) {
     let confirmation = $.Deferred();
@@ -142,18 +145,4 @@ export default can.Component.extend({
   template,
   leakScope: true,
   viewModel,
-  events: {
-    inserted() {
-      this.viewModel.attr('element', this.element);
-    },
-    '.pick-file click'() {
-      uploadFiles()
-        .then((files) => {
-          this.viewModel.mapDocuments(files);
-        }, () => {
-          // event handler in object-mapper will open mapper again
-          $(window).trigger('modal:dismiss');
-        });
-    },
-  },
 });

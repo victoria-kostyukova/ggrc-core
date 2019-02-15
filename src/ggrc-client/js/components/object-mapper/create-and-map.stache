@@ -10,8 +10,10 @@
   {{#if_equals destinationType 'Document'}}
     
       Do you want to search for an existing document or
-      <create-document-button class="create-control"
-        {parent-instance}="source">
+      <create-document-button
+        {parent-instance}="source"
+        (map-objects)="mapObjects(%event.objects)"
+        (cancel)="cancel()">
         Attach new
       </create-document-button>
 

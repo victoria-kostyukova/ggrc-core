@@ -93,11 +93,11 @@ export default can.Component.extend({
     resetEntries() {
       this.attr('newEntries', []);
     },
-    mapObjects() {
+    mapObjects(objects) {
       if (this.attr('isMappableExternally')) {
         this.attr('element').trigger('mapExternally'); // close mapper
 
-        if (this.attr('newEntries').length) {
+        if (objects.length) {
           this.mapExternally();
         }
 
@@ -107,7 +107,7 @@ export default can.Component.extend({
       this.attr('source')
         .dispatch({
           ...MAP_OBJECTS,
-          objects: this.attr('newEntries'),
+          objects,
         });
     },
     createExternally() {
@@ -166,7 +166,7 @@ export default can.Component.extend({
     // clicked Save & Close button in Create modal
     '.create-control modal:success': function (el, ev, model) {
       this.viewModel.attr('newEntries').push(model);
-      this.viewModel.mapObjects();
+      this.viewModel.mapObjects(this.viewModel.attr('newEntries'));
     },
     // clicked Save & Add another button in Create modal
     '.create-control modal:added': function (el, ev, model) {
@@ -174,7 +174,7 @@ export default can.Component.extend({
     },
     // clicked Discard button in Discard Changes modal
     '.create-control modal:dismiss'() {
-      this.viewModel.mapObjects();
+      this.viewModel.mapObjects(this.viewModel.attr('newEntries'));
     },
     // clicked Esc or close btn in Create modal and modal closed without Discard changes modal
     '{window} modal:dismiss'(el, ev, options) {
@@ -184,7 +184,7 @@ export default can.Component.extend({
       // we can check using unique id which modal-ajax is closing
       if (options && options.uniqueId && source.id === options.uniqueId
         && this.viewModel.attr('newEntries').length) {
-        this.viewModel.mapObjects();
+        this.viewModel.mapObjects(this.viewModel.attr('newEntries'));
       } else {
         this.viewModel.cancel();
       }
