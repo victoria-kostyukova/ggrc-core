@@ -179,10 +179,7 @@ export default can.Component.extend({
     // close mapper as mapping will be handled externally
     'create-and-map mapExternally': 'closeModal',
     // reopen object-mapper if creating was canceled
-    'create-and-map canceled': 'showModal',
-    // reopen object-mapper if create modal was dismissed
-    '{window} modal:dismiss': 'showModal',
-    showModal() {
+    'create-and-map canceled'() {
       this.element.trigger('showModal');
     },
     inserted: function () {

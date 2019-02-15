@@ -198,11 +198,11 @@ describe('object-mapper component', function () {
     });
   });
 
-  describe('"{window} modal:dismiss" event', function () {
+  describe('"create-and-map canceled" event', function () {
     let element = {};
 
     beforeEach(function () {
-      handler = events['{window} modal:dismiss'];
+      handler = events['create-and-map canceled'];
       element.trigger = jasmine.createSpy();
     });
 

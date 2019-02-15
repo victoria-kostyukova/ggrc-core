@@ -19,6 +19,7 @@ import {
 } from '../../plugins/utils/modals';
 import {
   getCreateObjectUrl,
+  getMappingUrl,
 } from '../../plugins/utils/ggrcq-utils';
 
 export default can.Component.extend({
@@ -93,6 +94,16 @@ export default can.Component.extend({
       this.attr('newEntries', []);
     },
     mapObjects() {
+      if (this.attr('isMappableExternally')) {
+        this.attr('element').trigger('mapExternally'); // close mapper
+
+        if (this.attr('newEntries').length) {
+          this.mapExternally();
+        }
+
+        return;
+      }
+
       this.attr('source')
         .dispatch({
           ...MAP_OBJECTS,
@@ -107,8 +118,7 @@ export default can.Component.extend({
         modal_description: this.attr('isMappableExternally')
           ? this.getCreateAndMapExternallyText()
           : this.getCreateAndReturnBackText(),
-        button_view:
-          `${GGRC.templates_path}/modals/link-button.stache`,
+        button_view: `${GGRC.templates_path}/modals/link-button.stache`,
         modalConfirmLink: getCreateObjectUrl(destinationModel),
         modalConfirmButton: 'Proceed in the new tab',
       }, () => {
@@ -124,6 +134,29 @@ export default can.Component.extend({
     },
     cancel() {
       this.attr('element').trigger('canceled');
+    },
+    mapExternally() {
+      let sourceModel = this.attr('source').constructor;
+      let destinationModel = this.attr('destinationModel');
+      let isMany = this.attr('newEntries').length > 1;
+      let modelName = isMany
+        ? destinationModel.title_plural
+        : destinationModel.title_singular;
+
+      confirm({
+        modal_title: 'Warning',
+        modal_description: `Your ${modelName.toLowerCase()} 
+          ${isMany ? 'were': 'was'} successfully created.
+          ${isMany ? 'They' : 'It'} will appear in the new frontend in few
+          minutes. </br> </br>
+          You are allowed to map new object${isMany ? 's' : ''} to this 
+          ${sourceModel.title_singular.toLowerCase()} only in the 
+          new frontend. By clicking "Proceed in the new tab" you'll be 
+          redirected to the new page where you can create mapping.</p>`,
+        button_view: `${GGRC.templates_path}/modals/link-button.stache`,
+        modalConfirmButton: 'Proceed in the new tab',
+        modalConfirmLink: getMappingUrl(this.attr('source'), destinationModel),
+      });
     },
   },
   events: {
@@ -152,6 +185,8 @@ export default can.Component.extend({
       if (options && options.uniqueId && source.id === options.uniqueId
         && this.viewModel.attr('newEntries').length) {
         this.viewModel.mapObjects();
+      } else {
+        this.viewModel.cancel();
       }
     },
   },
