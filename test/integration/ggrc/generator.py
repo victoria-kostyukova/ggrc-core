@@ -12,6 +12,7 @@ import names
 from ggrc import db
 from ggrc import models
 from ggrc.app import app
+from ggrc.models import all_models
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.services import common
 from ggrc_basic_permissions import models as permissions_models
@@ -195,7 +196,9 @@ class ObjectGenerator(Generator):
             "context": None,
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
-            "assertions": '["test assertion"]'
+            "assertions": '["test assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         }
     }
 

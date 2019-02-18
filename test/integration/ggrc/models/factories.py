@@ -140,6 +140,8 @@ class ControlFactory(TitledFactory):
   recipients = ""
   external_id = factory.LazyAttribute(lambda m:
                                       SynchronizableExternalId.next())
+  review_status = all_models.Review.STATES.UNREVIEWED
+  review_status_display_name = "some status"
 
 
 class IssueFactory(TitledFactory):

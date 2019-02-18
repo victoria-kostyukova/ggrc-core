@@ -65,6 +65,8 @@ class TestAccessControlList(TestCase):
             ],
             "assertions": '["{}"]'.format(assertion),
             "external_id": factories.SynchronizableExternalId.next(),
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         },
     }
     with self.api.as_external():

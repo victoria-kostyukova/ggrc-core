@@ -105,6 +105,8 @@ class TestExternalPermissions(TestCase):
     if model_plural == "controls":
       model_data["assertions"] = '["test assertion"]'
       model_data["external_id"] = factories.SynchronizableExternalId.next()
+      model_data["review_status"] = all_models.Review.STATES.UNREVIEWED
+      model_data["review_status_display_name"] = "some status"
 
     response = self._post(
         "api/{}".format(model_plural),

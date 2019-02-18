@@ -100,6 +100,8 @@ class TestSyncServiceControl(TestCase):
         "verify_frequency": "test frequency",
         "assertions": '["test assertion"]',
         "categories": '["test category"]',
+        "review_status": all_models.Review.STATES.UNREVIEWED,
+        "review_status_display_name": "some status",
     }
 
   def normilize_field(self, field):
@@ -279,7 +281,9 @@ class TestSyncServiceControl(TestCase):
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
             "external_id": factories.SynchronizableExternalId.next(),
-            "assertions": '["test assertion"]'
+            "assertions": '["test assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         }
     })
 
@@ -320,7 +324,9 @@ class TestSyncServiceControl(TestCase):
             "recipients": recipients,
             "send_by_default": send_by_default,
             "external_id": factories.SynchronizableExternalId.next(),
-            "assertions": '["test assertion"]'
+            "assertions": '["test assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         },
     })
     self.assertEqual(response.status_code, 201)
@@ -382,6 +388,8 @@ class TestSyncServiceControl(TestCase):
     control = factories.ControlFactory()
     response = self.api.put(control, {"external_id": None})
     self.assert400(response)
+    self.assertEqual(response.json["message"],
+                     "External ID for the object is not specified")
 
     control = db.session.query(all_models.Control).get(control.id)
     self.assertIsNotNone(control.external_id)
@@ -394,6 +402,85 @@ class TestSyncServiceControl(TestCase):
 
     control = db.session.query(all_models.Control).get(control.id)
     self.assertEquals(control.external_id, new_value)
+
+  # pylint: disable=invalid-name
+  def test_create_without_review_status(self):
+    """Check control creation without review_status"""
+
+    request = self.prepare_control_request_body()
+    del request['review_status']
+    response = self.api.post(all_models.Control, request)
+    self.assert400(response)
+
+  # pylint: disable=invalid-name
+  def test_create_with_empty_review_status(self):
+    """Check control creation with empty review_status"""
+
+    request = self.prepare_control_request_body()
+    request['review_status'] = None
+    response = self.api.post(all_models.Control, request)
+
+    self.assert400(response)
+
+  def test_update_review_status_to_null(self):
+    """Test review_status is not set to None"""
+    control = factories.ControlFactory()
+    response = self.api.put(control, {"review_status": None})
+    self.assert400(response)
+    self.assertEqual(response.json["message"],
+                     "Review status for the object is not specified")
+
+    control = db.session.query(all_models.Control).get(control.id)
+    self.assertIsNotNone(control.external_id)
+
+  def test_update_review_status(self):
+    """Test review_status is updated"""
+    control = factories.ControlFactory()
+    new_value = all_models.Review.STATES.REVIEWED
+    self.api.put(control, {"review_status": new_value})
+
+    control = db.session.query(all_models.Control).get(control.id)
+    self.assertEquals(control.review_status, new_value)
+
+  # pylint: disable=invalid-name
+  def test_create_without_review_status_display_name(self):
+    """Check control creation without review_status_display_name"""
+
+    request = self.prepare_control_request_body()
+    del request['review_status_display_name']
+    response = self.api.post(all_models.Control, request)
+    print response.json
+    self.assert400(response)
+
+  # pylint: disable=invalid-name
+  def test_create_with_empty_review_status_display_name(self):
+    """Check control creation with empty review_status_display_name"""
+
+    request = self.prepare_control_request_body()
+    request['review_status_display_name'] = None
+    response = self.api.post(all_models.Control, request)
+
+    self.assert400(response)
+
+  def test_update_review_status_display_name_to_null(self):
+    """Test review_status_display_name is not set to None"""
+    control = factories.ControlFactory()
+    response = self.api.put(control, {"review_status_display_name": None})
+    self.assert400(response)
+    self.assertEqual(response.json["message"],
+                     "Review status for the object is not specified")
+
+    control = db.session.query(all_models.Control).get(control.id)
+    self.assertIsNotNone(control.external_id)
+
+  def test_update_review_status_display_name(self):
+    """Test review_status_display_name is updated"""
+    control = factories.ControlFactory()
+    new_value = "value12345"
+    self.api.put(control, {"review_status_display_name": new_value})
+
+    control = db.session.query(all_models.Control).get(control.id)
+    self.assertEquals(control.review_status_display_name, new_value)
 
   @ddt.data(
       ("kind", ["1", "2", "3"], "2"),
@@ -638,6 +725,8 @@ class TestSyncServiceControl(TestCase):
             "context": None,
             "access_control_list": access_control_list,
             "assertions": '["test assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         }
     })
     self.assert400(response)
