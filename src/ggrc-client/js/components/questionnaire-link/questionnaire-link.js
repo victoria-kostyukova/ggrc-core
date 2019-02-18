@@ -49,17 +49,21 @@ export default can.Component.extend({
       },
       linkClass: {
         get() {
+          const cssClasses = this.attr('cssClasses');
+
           switch (this.attr('viewType')) {
             case 'button':
-              return 'questionnaire-link_type_button btn btn-white btn-small';
+              return 'questionnaire-link_type_button btn btn-white btn-small ' +
+                cssClasses;
             case 'tab':
-              return 'questionnaire-link_type_tab';
+              return 'questionnaire-link_type_tab ' + cssClasses;
             default:
-              return '';
+              return cssClasses;
           }
         },
       },
     },
+    cssClasses: '',
     instance: null,
     iconPosition: 'left',
     linkType: 'info',

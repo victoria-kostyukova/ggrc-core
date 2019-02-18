@@ -6,9 +6,13 @@
 
   <div class="row-fluid">
     <div class="span12">
-      <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
-        {{title}}
-      </a>
+      {{^if class.isChangeableExternally}}
+        <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+          {{title}}
+        </a>
+      {{else}}
+        <h5 class="main-title oneline">{{title}}</h5>
+      {{/if}}
     </div>
   </div>
 
@@ -60,11 +64,20 @@
 
   <div class="links">
     <div class="row-fluid">
-      <div class="span6">
-        <a class="secondary" href="{{viewLink}}">
-          View {{class.title_singular}}
-        </a>
-      </div>
+        {{^if class.isChangeableExternally}}
+          <div class="span6">
+            <a class="secondary" href="{{viewLink}}">
+              View {{class.title_singular}}
+            </a>
+          </div>
+        {{else}}
+          <a class="secondary" href="{{viewLink}}">
+            Open Original {{class.title_singular}}
+          </a>
+          <questionnaire-link {instance}="instance" {css-classes}="'secondary'">
+            Open {{class.title_singular}} in new frontend
+          </questionnaire-link>
+        {{/if}}
     </div>
   </div>
 
