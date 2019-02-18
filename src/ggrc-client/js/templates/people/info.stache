@@ -16,7 +16,7 @@
                 <div class="span12">
                   <h6>Name</h6>
                   {{#if name}}
-                    <h3>{{name}}
+                    <h3 class="pane-header__title-name">{{name}}
                       {{#if_equals system_wide_role 'No Access'}}
                         <span class="user-disabled">
                           (Inactive user)

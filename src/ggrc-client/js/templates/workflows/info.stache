@@ -12,17 +12,17 @@
       {{#instance}}
           <div class="pane-header__title">
             {{#is_info_pin}}
-              <h6>Title</h6>
+              <h6 class="pane-header__title">Title</h6>
             {{/is_info_pin}}
             <div class="pane-header__title-details">
-              <h3>{{title}}</h3>
-              <span>
+              <h3 class="pane-header__title-name">{{title}}</h3>
+              <span class="pane-header__title-item">
                 <span class="state-value {{addclass 'state' status}}">{{status}}</span>
               </span>
               {{#instance.next_cycle_start_date}}
                 {{#if instance.unit}}
                   {{^if instance.recurrences}}
-                    <span>
+                    <span class="pane-header__title-item">
                       <span class="state-value state-archived">Archived</span>
                     </span>
                   {{/if}}

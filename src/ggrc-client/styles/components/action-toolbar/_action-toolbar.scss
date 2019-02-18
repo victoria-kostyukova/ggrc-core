@@ -27,6 +27,11 @@
 
   @include action-toolbar-controls;
 
+  & &__header {
+    padding: 0;
+    line-height: 28px;
+  }
+
   &__controls {
     display: none;
     flex-direction: row;

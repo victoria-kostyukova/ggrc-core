@@ -5,7 +5,7 @@
 
 <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
   <div class="tier-content">
-    {{> /static/templates/base_objects/general-page-header.stache}}
+    <general-page-header {instance}="instance"></general-page-header>
 
     <tab-container>
       <tab-panel {(panels)}="panels" title-text="Attributes">

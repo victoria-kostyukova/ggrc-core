@@ -13,16 +13,10 @@
               <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
             {{/is_info_pin}}
             <div class="pane-header__title-details">
-              <h3>{{title}}</h3>
+              <h3 class="pane-header__title-name">{{title}}</h3>
               {{#if status}}
-                <span>
+                <span class="pane-header__title-item">
                   <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
-                </span>
-              {{/if}}
-              {{^if isSnapshot}}
-                <span class="proposal">
-                  <create-proposal-button {instance}="instance">
-                  </create-proposal-button>
                 </span>
               {{/if}}
             </div>

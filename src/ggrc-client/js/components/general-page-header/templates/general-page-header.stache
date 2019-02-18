@@ -11,21 +11,48 @@
           <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
         {{/is_info_pin}}
         <div class="pane-header__title-details">
-          <h3>{{title}}</h3>
-
+          <div class="action-toolbar">
+            <h3 class="action-toolbar__header">{{title}}</h3>
+            {{#if redirectionEnabled}}
+            <div class="action-toolbar__controls">
+              <div class="action-toolbar__controls-item">
+                <proposable-control
+                  {instance}="instance"
+                  {attr-name}="'title'"
+                ></proposable-control>
+              </div>
+            </div>
+            {{/if}}
+          </div>
           {{#if snapshot}}
-            <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{dateTime instance.updated_at}}</span>
-          {{/if}}
-          {{#if status}}
-            <span>
-              <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+            <span class="pane-header__title-item">
+              <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{dateTime instance.updated_at}}</span>
             </span>
           {{/if}}
+          {{#if status}}
+            <div class="action-toolbar">
+              <span class="pane-header__title-item">
+                <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+              </span>
+              {{#if redirectionEnabled}}
+              <div class="action-toolbar__controls">
+                <div class="action-toolbar__controls-item">
+                  <proposable-control
+                    {instance}="instance"
+                    {attr-name}="'status'"
+                  ></proposable-control>
+                </div>
+              </div>
+              {{/if}}
+            </div>
+          {{/if}}
           {{#if_helpers '\n #if' instance.archived '\n or #if' snapshot.archived}}
-            <span class="state-value state-archived">Archived</span> 
+            <span class="pane-header__title-item">
+              <span class="state-value state-archived">Archived</span>
+            </span>
           {{/if_helpers}}
           {{^if isSnapshot}}
-            <span class="proposal">
+            <span class="pane-header__title-item proposal">
               <create-proposal-button {instance}="instance">
               </create-proposal-button>
             </span>

@@ -10,7 +10,7 @@
         <div class="pane-header__container">
           <div class="pane-header__title">
             <h6>Title</h6>
-            <h3>{{instance.title}}</h3>
+            <h3 class="pane-header__title-name">{{instance.title}}</h3>
           </div>
 
           <div class="pane-header__toolbar">
