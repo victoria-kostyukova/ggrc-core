@@ -7,6 +7,7 @@ import {
   externalDirectiveObjects,
   scopingObjects,
 } from '../../plugins/models-types-collections';
+import {isSnapshot} from './snapshot-utils';
 
 /**
  * Util methods for integration with GGRCQ.
@@ -32,6 +33,16 @@ function isChangeableExternally(instance) {
   return instance &&
     instance.constructor &&
     instance.constructor.isChangeableExternally;
+}
+
+/**
+ * Determine whether redirectable proposable controls for instance
+ * should be shown.
+ * @param {*} instance the model instance
+ * @return {Boolean} true or false
+ */
+function showInfoProposalControls(instance) {
+  return isChangeableExternally(instance) && !isSnapshot(instance);
 }
 
 /**
@@ -292,4 +303,5 @@ export {
   getProposalsUrl,
   getChangeLogUrl,
   getProposalAttrUrl,
+  showInfoProposalControls,
 };

@@ -18,14 +18,25 @@
   {{#if required}}
     <i class="fa fa-asterisk"></i>
   {{/if}}
-  {{#if canEdit}}
-    {{#unless editableMode}}
+  {{#if redirectionEnabled}}
+    <div class="action-toolbar__controls">
+      <div class="action-toolbar__controls-item">
+        <role-attr-names-provider {role-name}="title">
+          <proposable-control
+            {instance}="instance"
+            {attr-name}="linkAttrName"
+          ></proposable-control>
+        </role-attr-names-provider>
+      </div>
+    </div>
+  {{else}}
+    {{#if showEditToolbar}}
       <div class="action-toolbar__controls">
         <action-toolbar-control>
-          <i class="fa fa-pencil set-editable-group" ($click)="openEditMode()"></i>
+          <i class="fa fa-pencil" ($click)="openEditMode()"></i>
         </action-toolbar-control>
       </div>
-    {{/unless}}
+    {{/if}}
   {{/if}}
 </label>
 {{#if singleUserRole}}

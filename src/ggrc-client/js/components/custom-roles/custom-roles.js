@@ -7,6 +7,7 @@ import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/editable-people-group';
 import template from './templates/custom-roles.stache';
+import {showInfoProposalControls} from '../../plugins/utils/ggrcq-utils';
 
 export default can.Component.extend({
   tag: 'custom-roles',
@@ -23,6 +24,11 @@ export default can.Component.extend({
 
           let readonly = this.attr('readOnly');
           return instance.class.isProposable || readonly;
+        },
+      },
+      redirectionEnabled: {
+        get() {
+          return showInfoProposalControls(this.attr('instance'));
         },
       },
     },

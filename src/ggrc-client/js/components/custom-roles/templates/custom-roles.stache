@@ -48,6 +48,7 @@
                     {updatable-group-id}="updatableGroupId">
                       <editable-people-group-header
                         {editable-mode}="editableMode"
+                        {redirection-enabled}="redirectionEnabled"
                         {is-loading}="isLoading"
                         {can-edit}="canEdit"
                         {required}="required"
