@@ -15,7 +15,6 @@ from alembic import op
 import sqlalchemy as sa
 
 from ggrc.migrations import utils
-from ggrc.models import all_models
 
 
 # revision identifiers, used by Alembic.
@@ -25,28 +24,46 @@ down_revision = '8b0a23af6c55'
 
 DEFAULT_ASSERTION = 'Security'
 
+CATEGORIES_TABLE = sa.sql.table(
+    "categories",
+    sa.sql.column('id', sa.Integer),
+    sa.sql.column('name', sa.String),
+    sa.sql.column('type', sa.String),
+)
+
+CATEGORIZATIONS_TABLE = sa.sql.table(
+    "categorizations",
+    sa.sql.column('id', sa.Integer),
+    sa.sql.column('categorizable_id', sa.Integer),
+    sa.sql.column('categorizable_type', sa.String),
+    sa.sql.column('category_type', sa.String),
+    sa.sql.column('created_at', sa.DATETIME),
+)
+
+CONTROLS_TABLE = sa.sql.table(
+    "controls",
+    sa.sql.column('id', sa.Integer),
+)
+
 
 def get_default_assertion_id(conn):
   """Gets id of default assertion."""
-  categories = all_models.CategoryBase.__table__
-  statement = sa.sql.select([categories.c.id]).where(
-      sa.and_(categories.c.type == 'ControlAssertion',
-              categories.c.name == DEFAULT_ASSERTION)
+  statement = sa.sql.select([CATEGORIES_TABLE.c.id]).where(
+      sa.and_(CATEGORIES_TABLE.c.type == 'ControlAssertion',
+              CATEGORIES_TABLE.c.name == DEFAULT_ASSERTION)
   )
   return conn.execute(statement).fetchone().id
 
 
 def get_controls_without_assertion(conn):
   """Gets list of ids of controls without assertions."""
-  categorizations = all_models.Categorization.__table__
-  controls = all_models.Control.__table__
-  statement = sa.sql.select([controls.c.id]).select_from(
-      controls.outerjoin(categorizations, sa.and_(
-          categorizations.c.categorizable_id == controls.c.id,
-          categorizations.c.categorizable_type == 'Control',
-          categorizations.c.category_type == 'ControlAssertion'
+  statement = sa.sql.select([CONTROLS_TABLE.c.id]).select_from(
+      CONTROLS_TABLE.outerjoin(CATEGORIZATIONS_TABLE, sa.and_(
+          CATEGORIZATIONS_TABLE.c.categorizable_id == CONTROLS_TABLE.c.id,
+          CATEGORIZATIONS_TABLE.c.categorizable_type == 'Control',
+          CATEGORIZATIONS_TABLE.c.category_type == 'ControlAssertion'
       ))
-  ).where(categorizations.c.categorizable_id.is_(None))
+  ).where(CATEGORIZATIONS_TABLE.c.categorizable_id.is_(None))
 
   control_ids = conn.execute(statement).fetchall()
   return [int(i) for i, in control_ids]
@@ -67,11 +84,11 @@ def create_default_assertions(conn, migrator_id, default_assertion_id,
       )
       for control_id in controls_ids
   ]
-  categorizations = all_models.Categorization.__table__
-  op.bulk_insert(categorizations, assertions)
+  op.bulk_insert(CATEGORIZATIONS_TABLE, assertions)
 
-  statement = sa.sql.select([categorizations.c.id]).order_by(
-      categorizations.c.created_at.desc()).limit(len(assertions))
+  statement = sa.sql.select([CATEGORIZATIONS_TABLE.c.id]).order_by(
+      CATEGORIZATIONS_TABLE.c.created_at.desc()
+  ).limit(len(assertions))
   assertion_ids = conn.execute(statement).fetchall()
   return [int(i) for i, in assertion_ids]
 
