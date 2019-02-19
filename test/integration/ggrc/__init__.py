@@ -130,7 +130,6 @@ class TestCase(BaseTestCase, object):
       order in then incorrect.
     """
     ignore_tables = (
-        "categories",
         "notification_types",
         "object_types",
         "options",

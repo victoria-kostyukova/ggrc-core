@@ -32,7 +32,6 @@ class TestAccessControlList(TestCase):
         object_type="Control", read=True
     )
     self.control = factories.ControlFactory()
-    self.assertion = factories.ControlAssertionFactory()
     factories.AccessControlPersonFactory(
         ac_list=self.control.acr_acl_map[self.acr],
         person=self.person,
@@ -53,7 +52,7 @@ class TestAccessControlList(TestCase):
         "Access control list does not include person id {}".format(acl[0])
     )
 
-  def _post_control(self, acr_id, person_id, assertion_id, collection=False):
+  def _post_control(self, acr_id, person_id, assertion, collection=False):
     """Helper function for posting a control"""
     title = factories.random_str(prefix="Control - ")
     control = {
@@ -64,9 +63,7 @@ class TestAccessControlList(TestCase):
             "access_control_list": [
                 acl_helper.get_acl_json(acr_id, person_id)
             ],
-            "assertions": [{
-                "id": assertion_id
-            }],
+            "assertions": '["{}"]'.format(assertion),
             "external_id": factories.SynchronizableExternalId.next(),
         },
     }
@@ -103,16 +100,14 @@ class TestAccessControlList(TestCase):
   def test_post_object_roles(self):
     """Test if roles are stored correctly when POSTed with the object"""
     acr_id, person_id = self.acr.id, self.person.id
-    assertion_id = self.assertion.id
-    response = self._post_control(acr_id, person_id, assertion_id)
+    response = self._post_control(acr_id, person_id, "test assertion")
     acl = response["control"]["access_control_list"]
     self._acl_asserts(acl, acr_id, person_id)
 
   def test_acl_revision_content(self):
     """Test if the access control list is added to revisions"""
     acr_id, person_id = self.acr.id, self.person.id
-    assertion_id = self.assertion.id
-    response = self._post_control(acr_id, person_id, assertion_id)
+    response = self._post_control(acr_id, person_id, "test assertion")
     control_id = response["control"]["id"]
     rev = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control_id,
@@ -167,8 +162,7 @@ class TestAccessControlList(TestCase):
   def test_acl_indexing_on_post(self):
     """Test if roles are stored correctly when POSTed with the object"""
     acr_id, person_id = self.acr.id, self.person.id
-    assertion_id = self.assertion.id
-    response = self._post_control(acr_id, person_id, assertion_id)
+    response = self._post_control(acr_id, person_id, "test assertion")
     control = response["control"]
     res = mysql.MysqlRecordProperty.query.filter(
         mysql.MysqlRecordProperty.type == "Control",
@@ -195,9 +189,8 @@ class TestAccessControlList(TestCase):
   def test_acl_revision_count(self):
     """Test if acl revision is created when object POSTed and PUTed"""
     acr_id, person_id = self.acr.id, self.person.id
-    assertion_id = self.assertion.id
 
-    response = self._post_control(acr_id, person_id, assertion_id)
+    response = self._post_control(acr_id, person_id, "test assertion")
     # One ACL and Control created in setUp and on by POST
     self.assertEqual(
         all_models.Revision.query.filter_by(

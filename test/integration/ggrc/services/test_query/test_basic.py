@@ -588,28 +588,22 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   @ddt.data("assertions", "categories")
   def test_order_control_by_category(self, key):
-    """Test correct ordering and by category."""
+    """Test correct ordering by {}."""
+    with factories.single_commit():
+      for val in ("a", "b", "c"):
+        factories.ControlFactory(**{key: '["{}"]'.format(val)})
+
     controls_unordered = self._get_first_result_set(
         self._make_query_dict("Control",),
-        "Control", "values"
+        "Control",
+        "values"
     )
-
     controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": key},
-                                        {"name": "id"}]),
-        "Control", "values"
+        self._make_query_dict("Control", order_by=[{"name": key}]),
+        "Control",
+        "values"
     )
-    categories = {c.id: c.name for c in models.CategoryBase.query}
-
-    def sort_key(val):
-      """Util sort key function."""
-      ctrl_key = val.get(key)
-      if isinstance(ctrl_key, list) and ctrl_key:
-        return (categories.get(ctrl_key[0]["id"]), val["id"])
-      return (None, val["id"])
-
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    controls_ordered_2 = sorted(controls_unordered, key=lambda c: c.get(key))
     self.assertListEqual(
         self._sort_sublists(controls_ordered_1),
         self._sort_sublists(controls_ordered_2),

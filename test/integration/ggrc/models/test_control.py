@@ -27,17 +27,6 @@ class TestControl(TestCase):
     super(TestControl, self).setUp()
     self.api = api_helper.Api()
 
-  def test_simple_categorization(self):
-    """Check category append to control."""
-    category = factories.ControlCategoryFactory()
-    control = factories.ControlFactory()
-    control.categories.append(category)
-    db.session.commit()
-    self.assertIn(category, control.categories)
-    # be really really sure
-    control = db.session.query(all_models.Control).get(control.id)
-    self.assertIn(category, control.categories)
-
   def test_create_control(self):
     """Test control update with internal user."""
     response = self.api.post(all_models.Control, {"title": "new-title"})
@@ -97,8 +86,6 @@ class TestSyncServiceControl(TestCase):
     """Create payload for control creation."""
     created_at = datetime(2018, 1, 1)
     updated_at = datetime(2018, 1, 2)
-    category = factories.ControlCategoryFactory()
-    assertion = factories.ControlAssertionFactory()
 
     return {
         "id": 123,
@@ -111,18 +98,8 @@ class TestSyncServiceControl(TestCase):
         "kind": "test kind",
         "means": "test means",
         "verify_frequency": "test frequency",
-        "categories": [
-            {
-                "id": category.id,
-                "type": "ControlCategory"
-            }
-        ],
-        "assertions": [
-            {
-                "id": assertion.id,
-                "type": "ControlAssertion",
-            }
-        ]
+        "assertions": '["test assertion"]',
+        "categories": '["test category"]',
     }
 
   def normilize_field(self, field):
@@ -214,8 +191,20 @@ class TestSyncServiceControl(TestCase):
     self.assertEqual(ext_user.modified_by_id, app_user.id)
     self.assertEqual(control.modified_by_id, ext_user.id)
 
+    expected_assertions = control_body.pop("assertions")
+    expected_categories = control_body.pop("categories")
+    self.assertEqual(
+        response.json["control"].get("assertions"),
+        json.loads(expected_assertions)
+    )
+    self.assertEqual(
+        response.json["control"].get("categories"),
+        json.loads(expected_categories)
+    )
     self.assert_response_fields(response.json.get("control"), control_body)
     self.assert_object_fields(control, control_body)
+    self.assertEqual(control.assertions, expected_assertions)
+    self.assertEqual(control.categories, expected_categories)
 
     revision = db.session.query(all_models.Revision).filter(
         all_models.Revision.resource_type == "Control",
@@ -245,14 +234,31 @@ class TestSyncServiceControl(TestCase):
         "kind": "test kind",
         "means": "test means",
         "verify_frequency": "test frequency",
+        "assertions": '["test assertions"]',
+        "categories": '["test categories"]',
     })
-    self.api.client.put(api_link,
-                        data=json.dumps(response.json),
-                        headers=self.api.headers)
+    response = self.api.client.put(
+        api_link,
+        data=json.dumps(response.json),
+        headers=self.api.headers,
+    )
 
+    expected_assertions = control_body.pop("assertions")
+    expected_categories = control_body.pop("categories")
+    self.assertEqual(
+        response.json["control"].get("assertions"),
+        json.loads(expected_assertions)
+    )
+    self.assertEqual(
+        response.json["control"].get("categories"),
+        json.loads(expected_categories)
+    )
     self.assert_response_fields(response.json["control"], control_body)
+
     control = all_models.Control.query.get(control.id)
     self.assert_object_fields(control, control_body)
+    self.assertEqual(control.assertions, expected_assertions)
+    self.assertEqual(control.categories, expected_categories)
 
     revision = db.session.query(all_models.Revision).filter(
         all_models.Revision.resource_type == "Control",
@@ -264,28 +270,8 @@ class TestSyncServiceControl(TestCase):
     ).one()
     self.assertIsNotNone(revision)
 
-  def test_create_without_assertions(self):
-    """Check control creation without assertions fail"""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "title": "Control title",
-            "context": None,
-            "recipients": "Admin,Control Operators,Control Owners",
-            "send_by_default": 0,
-            "external_id": factories.SynchronizableExternalId.next(),
-            "assertions": []
-        }
-    })
-
-    self.assert400(response)
-    control = all_models.Control.query.first()
-    self.assertIsNone(control)
-
   def test_create_with_assertions(self):
     """Check control creation with assertions pass"""
-    with factories.single_commit():
-      assertion = factories.ControlAssertionFactory()
-
     response = self.api.post(all_models.Control, {
         "control": {
             "title": "Control title",
@@ -293,16 +279,14 @@ class TestSyncServiceControl(TestCase):
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
             "external_id": factories.SynchronizableExternalId.next(),
-            "assertions": [{
-                "id": assertion.id
-            }]
+            "assertions": '["test assertion"]'
         }
     })
 
     self.assertEqual(response.status_code, 201)
     control = all_models.Control.query.first()
     self.assertIsNotNone(control)
-    self.assertEqual(assertion.id, control.assertions[0].id)
+    self.assertEqual('["test assertion"]', control.assertions)
 
   def test_has_test_plan(self):
     """Check test plan setup to control."""
@@ -327,8 +311,6 @@ class TestSyncServiceControl(TestCase):
 
   def test_create_commentable(self):
     """Test if commentable fields are set on creation"""
-    with factories.single_commit():
-      assertion = factories.ControlAssertionFactory()
     recipients = "Admin,Control Operators,Control Owners"
     send_by_default = 0
     response = self.api.post(all_models.Control, {
@@ -338,9 +320,7 @@ class TestSyncServiceControl(TestCase):
             "recipients": recipients,
             "send_by_default": send_by_default,
             "external_id": factories.SynchronizableExternalId.next(),
-            "assertions": [{
-                "id": assertion.id
-            }]
+            "assertions": '["test assertion"]'
         },
     })
     self.assertEqual(response.status_code, 201)
@@ -418,10 +398,10 @@ class TestSyncServiceControl(TestCase):
   @ddt.data(
       ("kind", ["1", "2", "3"], "2"),
       ("means", ["1", "1", "1"], "1"),
-      ("verify_frequency", ["3", "2", "3"], "3")
+      ("verify_frequency", ["3", "2", "3"], "3"),
   )
   @ddt.unpack
-  def test_control_query(self, field, possible_values, search_value):
+  def test_control_query_string(self, field, possible_values, search_value):
     """Test querying '{0}' field for control."""
     with factories.single_commit():
       for val in possible_values:
@@ -456,11 +436,63 @@ class TestSyncServiceControl(TestCase):
     actual_values = [val.get(field) for val in response_data.get("values")]
     self.assertEqual(expected_values, actual_values)
 
-  @ddt.data("kind", "means", "verify_frequency")
-  def test_new_revision(self, field):
+  @ddt.data(
+      ("assertions", ['["a", "b", "c"]', '["1", "2", "3"]'], "c"),
+      ("categories", ['["a"]', '["1", "2", "3"]'], "1"),
+      ("assertions", ['["a", "b"]', '["1", "2"]'], "3"),
+  )
+  @ddt.unpack
+  def test_control_query_json(self, field, possible_values, search_value):
+    """Test querying '{0}' field for control."""
+    with factories.single_commit():
+      for val in possible_values:
+        factories.ControlFactory(**{field: val})
+
+    request_data = [{
+        "fields": [],
+        "object_name": "Control",
+        "type": "values",
+        "filters": {
+            "expression": {
+                "left": field,
+                "op": {"name": "="},
+                "right": search_value,
+            },
+        },
+    }]
+    response = self.api.send_request(
+        self.api.client.post,
+        data=request_data,
+        api_link="/query"
+    )
+    self.assert200(response)
+    response_data = response.json[0]["Control"]
+
+    model_field = getattr(all_models.Control, field)
+    expected_controls = all_models.Control.query.filter(
+        model_field.like("%{}%".format(search_value))
+    )
+    self.assertEqual(expected_controls.count(), response_data.get("count"))
+
+    expected_values = [
+        json.loads(getattr(i, field)) for i in expected_controls
+    ]
+    actual_values = [val.get(field) for val in response_data.get("values")]
+    self.assertEqual(expected_values, actual_values)
+
+  @ddt.data(
+      ("kind", factories.random_str()),
+      ("means", factories.random_str()),
+      ("verify_frequency", factories.random_str()),
+      ("assertions", ["assertion1", "assertion2"]),
+      ("assertions", []),
+      ("categories", ["c1", "c2", "c3"]),
+      ("categories", []),
+  )
+  @ddt.unpack
+  def test_new_revision(self, field, value):
     """Test if content of new revision is correct for Control '{0}' field."""
-    field_value = factories.random_str()
-    control = factories.ControlFactory(**{field: field_value})
+    control = factories.ControlFactory(**{field: value})
 
     response = self.api.client.get(
         "/api/revisions"
@@ -469,10 +501,10 @@ class TestSyncServiceControl(TestCase):
     self.assert200(response)
     revisions = response.json["revisions_collection"]["revisions"]
     self.assertEqual(len(revisions), 1)
-    self.assertEqual(revisions[0].get("content", {}).get(field), field_value)
+    self.assertEqual(revisions[0].get("content", {}).get(field), value)
 
   @ddt.data("kind", "means", "verify_frequency")
-  def test_old_revision(self, field):
+  def test_old_option_revision(self, field):
     """Test if old revision content is correct for Control '{0}' field."""
     field_value = factories.random_str()
     control = factories.ControlFactory(**{field: field_value})
@@ -480,11 +512,13 @@ class TestSyncServiceControl(TestCase):
         resource_type=control.type,
         resource_id=control.id
     ).one()
-    control_revision.content[field] = {
+    revision_content = control_revision.content
+    revision_content[field] = {
         "id": "123",
         "title": "some title",
         "type": "Option",
     }
+    control_revision.content = revision_content
     db.session.commit()
 
     response = self.api.client.get(
@@ -494,7 +528,63 @@ class TestSyncServiceControl(TestCase):
     self.assert200(response)
     revisions = response.json["revisions_collection"]["revisions"]
     self.assertEqual(len(revisions), 1)
-    self.assertEqual(revisions[0].get("content", {}).get(field), field_value)
+    self.assertEqual(revisions[0].get("content", {}).get(field), "some title")
+
+  @ddt.data(
+      (
+          "assertions",
+          [
+              {
+                  "name": "Availability",
+                  "type": "ControlAssertion",
+                  "id": 39,
+              },
+              {
+                  "name": "Security",
+                  "type": "ControlAssertion",
+                  "id": 40,
+              },
+          ],
+          ["Availability", "Security"]
+      ),
+      (
+          "categories",
+          [
+              {
+                  "name": "Authentication",
+                  "type": "ControlCategory",
+                  "id": 49,
+              },
+              {
+                  "name": "Monitoring",
+                  "type": "ControlCategory",
+                  "id": 55,
+              },
+          ],
+          ["Authentication", "Monitoring"]
+      ),
+  )
+  @ddt.unpack
+  def test_old_category_revision(self, field, new_value, expected):
+    """Test if old revision content is correct for Control '{0}' field."""
+    control = factories.ControlFactory()
+    control_revision = all_models.Revision.query.filter_by(
+        resource_type=control.type,
+        resource_id=control.id
+    ).one()
+    revision_content = control_revision.content
+    revision_content[field] = new_value
+    control_revision.content = revision_content
+    db.session.commit()
+
+    response = self.api.client.get(
+        "/api/revisions"
+        "?resource_type={}&resource_id={}".format(control.type, control.id)
+    )
+    self.assert200(response)
+    revisions = response.json["revisions_collection"]["revisions"]
+    self.assertEqual(len(revisions), 1)
+    self.assertEqual(revisions[0].get("content", {}).get(field), expected)
 
   @staticmethod
   def setup_people(access_control_list):
@@ -540,8 +630,6 @@ class TestSyncServiceControl(TestCase):
   )
   def test_invalid_acl_format(self, access_control_list):
     """Test creation of new object with acl in invalid format."""
-    assertion = factories.ControlAssertionFactory()
-
     response = self.api.post(all_models.Control, {
         "control": {
             "id": 123,
@@ -549,11 +637,7 @@ class TestSyncServiceControl(TestCase):
             "title": "new_control",
             "context": None,
             "access_control_list": access_control_list,
-            "assertions": [
-                {
-                    "id": assertion.id
-                },
-            ]
+            "assertions": '["test assertion"]',
         }
     })
     self.assert400(response)

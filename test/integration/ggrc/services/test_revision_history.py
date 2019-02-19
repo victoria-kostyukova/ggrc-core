@@ -261,7 +261,7 @@ class TestRevisionHistory(TestCase):
     self.assertItemsEqual(fields, mandatory_meta["fields"])
 
   @ddt.data(
-      {"factory": factories.ControlFactory, "fields": ["assertions"]},
+      {"factory": factories.ControlFactory, "fields": []},
       {"factory": factories.RiskFactory, "fields": []},
       {"factory": factories.AssessmentFactory, "fields": []},
   )

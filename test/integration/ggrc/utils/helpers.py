@@ -56,7 +56,7 @@ def parse_export_data(data):
     for row in rows:
       values = row.split(",")
       for id_, val in enumerate(values):
-        field_values[field_names[id_]].append(val)
+        field_values[field_names[id_]].append(val.strip('"'))
   except (IndexError, AttributeError):
     pass
   return field_values

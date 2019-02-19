@@ -14,28 +14,6 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc.review import generate_review_object
 
 
-def get_assertions_data():
-  return [
-      {
-          "id":
-          all_models.CategoryBase.query.filter_by(
-              name="Availability", type="ControlAssertion"
-          ).one().id
-      }
-  ]
-
-
-def get_categories_data():
-  return [
-      {
-          "id":
-          all_models.CategoryBase.query.filter_by(
-              name="Data Centers", type="ControlCategory"
-          ).one().id
-      }
-  ]
-
-
 @ddt.ddt
 class TestReviewStatusUpdate(TestCase):
   """Base TestCase class automatic review status update."""

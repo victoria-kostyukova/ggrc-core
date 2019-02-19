@@ -816,10 +816,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
       program = factories.ProgramFactory()
       program_id = program.id
 
-      category = factories.ControlCategoryFactory()
-      category_id = category.id
-      control = factories.ControlFactory()
-      control.categories.append(category)
+      control = factories.ControlFactory(categories='["test category"]')
       control_id = control.id
       factories.RelationshipFactory(source=program, destination=control)
       revision = all_models.Revision.query.filter(
@@ -830,15 +827,14 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
 
     program = models.Program.query.filter_by(id=program_id).one()
     self._create_audit(program=program, title="some title")
-    category = models.ControlCategory.query.get(category_id)
     control_result = self._get_first_result_set(
         self._make_snapshot_query_dict(
             "Control",
-            expression=["categories", "=", "{}".format(category.name)]
+            expression=["categories", "=", "test category"]
         ),
         "Snapshot",
     )
     self.assertEqual(control_result["count"], 1)
     snapshot_categories = \
         control_result["values"][0]["revision"]["content"]["categories"]
-    self.assertEqual(category.name, snapshot_categories[0]["display_name"])
+    self.assertEqual(["test category"], snapshot_categories)

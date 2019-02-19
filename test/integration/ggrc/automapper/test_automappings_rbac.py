@@ -150,12 +150,11 @@ class TestAutomappings(TestCase):
 
     program = all_models.Program.query.first()
     with factories.single_commit():
-      assertion = factories.ControlAssertionFactory(name="Security")
       control = factories.ControlFactory(
           slug="control-1",
           title="control-1",
           description="descr",
-          assertions=[assertion]
+          assertions='["Security"]'
       )
       control_id = control.id
     factories.RelationshipFactory(

@@ -3,6 +3,7 @@
 
 """Tests for snapshot export."""
 import collections
+import json
 import unittest
 
 from ggrc import models, db
@@ -124,8 +125,8 @@ class TestExportSnapshots(TestCase):
                                         control.documents_file),
             "Reference URL": u"\n".join(c.link for c in
                                         control.documents_reference_url),
-            "Assertions": u"\n".join(c.name for c in control.assertions),
-            "Categories": u"\n".join(c.name for c in control.categories),
+            "Assertions": u",".join(json.loads(control.assertions)),
+            "Categories": u",".join(json.loads(control.categories)),
             "Folder": u"",
             "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
@@ -251,7 +252,7 @@ class TestExportSnapshots(TestCase):
             "person": u"",
 
             # Fields that are not included in snapshots - Known bugs.
-            "Assertions": u",".join(a.name for a in control.assertions),
+            "Assertions": u",".join(json.loads(control.assertions)),
             "Categories": u"",
             "Document File": u"",
             "Admin": u"",
@@ -451,7 +452,7 @@ class TestExportSnapshots(TestCase):
           "Title": control.title,
           "Type/Means": u"",
           "Audit": audit.slug,
-          "Assertions": u",".join(a.name for a in control.assertions),
+          "Assertions": u",".join(json.loads(control.assertions)),
           "Categories": u"",
           "Document File": u"",
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),

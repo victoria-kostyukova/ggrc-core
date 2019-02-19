@@ -103,8 +103,7 @@ class TestExternalPermissions(TestCase):
       model_data["risk_type"] = "some text"
 
     if model_plural == "controls":
-      assertion = factories.ControlAssertionFactory()
-      model_data["assertions"] = [{"id": assertion.id}]
+      model_data["assertions"] = '["test assertion"]'
       model_data["external_id"] = factories.SynchronizableExternalId.next()
 
     response = self._post(

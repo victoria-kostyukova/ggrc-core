@@ -135,7 +135,7 @@ class ControlFactory(TitledFactory):
   class Meta:
     model = all_models.Control
 
-  assertions = factory.LazyAttribute(lambda m: [ControlAssertionFactory(), ])
+  assertions = factory.LazyAttribute(lambda _: '["{}"]'.format(random_str()))
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
   recipients = ""
   external_id = factory.LazyAttribute(lambda m:
@@ -163,40 +163,6 @@ class AssessmentFactory(TitledFactory):
     model = all_models.Assessment
 
   audit = factory.LazyAttribute(lambda m: AuditFactory())
-
-
-class ControlAssertionFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.ControlAssertion
-
-  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
-  lft = None
-  rgt = None
-  depth = None
-  required = None
-
-
-class ControlCategoryFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.ControlCategory
-
-  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
-  lft = None
-  rgt = None
-  depth = None
-  required = None
-
-
-class CategorizationFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.Categorization
-
-  category_id = None
-  categorizable_id = None
-  categorizable_type = None
 
 
 class ContextFactory(ModelFactory):

@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for task group task specific export."""
+import json
+
 import ddt
 
 from ggrc import db
@@ -80,8 +82,8 @@ class TestExportControls(TestCase):
       ("verify_frequency", "Frequency"),
   )
   @ddt.unpack
-  def test_control_fields_export(self, field, alias):
-    """Test export several controls."""
+  def test_option_fields_export(self, field, alias):
+    """Test export several controls with option fields."""
     with factories.single_commit():
       expected_values = []
       for _ in range(3):
@@ -89,6 +91,38 @@ class TestExportControls(TestCase):
         field_val = factories.random_str(prefix=field).title()
         setattr(obj, field, field_val)
         expected_values.append(field_val)
+
+    data = [{
+        "object_name": "Control",
+        "filters": {
+            "expression": {
+                "left": field,
+                "op": {"name": "~"},
+                "right": field,
+            }
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+    self.assert200(response)
+    self.assertIn(alias, response.data)
+
+    exported_values = helpers.parse_export_data(response.data)
+    self.assertEqual(exported_values[alias], expected_values)
+
+  @ddt.data(
+      ("assertions", "Assertions*"),
+      ("categories", "Categories"),
+  )
+  @ddt.unpack
+  def test_category_fields_export(self, field, alias):
+    """Test export several controls with category fields."""
+    with factories.single_commit():
+      expected_values = []
+      for _ in range(3):
+        field_vals = [factories.random_str(prefix=field) for _ in range(3)]
+        factories.ControlFactory(**{field: json.dumps(field_vals)})
+        expected_values.append("\n".join(field_vals))
 
     data = [{
         "object_name": "Control",

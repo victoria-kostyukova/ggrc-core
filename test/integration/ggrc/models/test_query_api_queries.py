@@ -30,7 +30,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Audit': 14,
       'Comment': 8,
       'Contract': 15,
-      'Control': 18,
+      'Control': 16,
       'Cycle': 9,
       'CycleTaskGroup': 10,
       'CycleTaskGroupObjectTask': 14,

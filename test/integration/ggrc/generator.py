@@ -195,9 +195,7 @@ class ObjectGenerator(Generator):
             "context": None,
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
-            "assertions": [{
-                "id": factories.ControlAssertionFactory().id
-            }]
+            "assertions": '["test assertion"]'
         }
     }
 

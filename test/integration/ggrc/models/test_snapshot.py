@@ -32,7 +32,6 @@ class TestSnapshotQueryApi(TestCase):
       "kind_id",
 
       "means",
-      "means_id",
 
       "meta_kind",
 
@@ -41,11 +40,6 @@ class TestSnapshotQueryApi(TestCase):
 
       "verify_frequency",
       "verify_frequency_id",
-
-      "assertions",
-      "categories",
-      "categorizations",
-      "categorized_assertions",
 
       # special fields not needed for snapshots.
       "display_name",
