@@ -31,7 +31,11 @@ export default can.Component.extend({
           let status = this.attr('review.status') ||
             this.attr('instance.review_status');
 
-          return status.toLowerCase();
+          if (status) {
+            return status.toLowerCase();
+          } else {
+            return '';
+          }
         },
       },
       isReviewed: {
