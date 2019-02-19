@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ This module collect all custom full text attributes classes"""
-
+import json
 from logging import getLogger
 from collections import defaultdict
 
@@ -261,6 +261,23 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
           results[sub_key] = None
     if self.is_sortable and results:
       results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
+    return {self.get_attribute_name(instance): results}
+
+
+class JsonListFullTextAttr(FullTextAttr):
+  """Custom fulltext index attribute class for json list values."""
+
+  def get_property_for(self, instance):
+    """Collect property for sent instance."""
+    json_value = self.get_value_for(instance)
+    if not json_value:
+      return {}
+    values = json.loads(json_value)
+    results = {}
+    for value in values:
+      results[value] = value
+    if self.is_sortable and results:
+      results["__sort__"] = u":".join(sorted(results.values()))
     return {self.get_attribute_name(instance): results}
 
 

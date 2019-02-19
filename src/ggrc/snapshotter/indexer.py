@@ -266,6 +266,25 @@ def get_display_name_data(rec, category_item, subproperty_name):
   yield newrec
 
 
+def get_list_sort_subprop(rec, values):
+  """Get string values from list for sorting."""
+  newrec = rec.copy()
+  newrec.update({
+      "content": ":".join(sorted(values)),
+      "subproperty": "__sort__",
+  })
+  yield newrec
+
+
+def get_list_data(rec, value):
+  """Get string values from list for fulltext indexing."""
+  newrec = rec.copy()
+  newrec.update({
+      "content": value,
+      "subproperty": "{}".format(value)})
+  yield newrec
+
+
 def get_properties(snapshot):
   """Return properties for sent revision dict and pair object."""
   properties = snapshot["revision"].copy()
@@ -328,16 +347,15 @@ def get_record_value(prop, val, rec, options):
 
 def get_list_record_value(prop, rec, val):
   """Return itearble object with record as element of that object. val->list"""
-  if val and all([p.get("type") == "Person" for p in val]):
+  if all(isinstance(i, (str, unicode)) for i in val):
+    sort_getter = get_list_sort_subprop
+    item_getter = partial(get_list_data)
+  elif val and all([p.get("type") == "Person" for p in val]):
     sort_getter = get_person_sort_subprop
     item_getter = get_person_data
   elif prop == "access_control_list":
     sort_getter = get_access_control_sort_subprop
     item_getter = get_access_control_role_data
-  elif prop in ("assertions", "categories"):
-    sort_getter = get_display_name_sort_subprop
-    item_getter = partial(get_display_name_data,
-                          subproperty_name="category")
   elif prop == "documents_reference_url":
     sort_getter = get_display_name_sort_subprop
     item_getter = partial(get_display_name_data,
