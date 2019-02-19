@@ -5,8 +5,14 @@
 
 {{#is_allowed 'create' model.model_singular context='any'}}
 <li class="add-new oneline" data-ui-autocomplete-item="">
-  <a data-object-plural="{{model.table_plural}}" data-test-id="button_lhn_create_new_program_522c563f" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset">
-    + Create
-  </a>
+  {{#if model.isChangeableExternally}} 
+    <questionnaire-create-link {model}="model">
+      + Create
+    </questionnaire-create-link>
+  {{else}}
+    <a data-object-plural="{{model.table_plural}}" data-test-id="button_lhn_create_new_program_522c563f" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset">
+      + Create
+    </a>
+  {{/if}}
 </li>
 {{/is_allowed}}

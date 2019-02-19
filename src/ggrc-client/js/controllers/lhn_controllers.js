@@ -17,6 +17,7 @@ import {
 import * as businessModels from '../models/business-models';
 import Relationship from '../models/service-models/relationship';
 import '../components/recently-viewed/recently-viewed';
+import '../components/questionnaire-create-link/questionnaire-create-link';
 import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 
 const LhnControl = can.Control.extend({}, {

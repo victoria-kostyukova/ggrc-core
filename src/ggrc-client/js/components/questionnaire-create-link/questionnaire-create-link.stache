@@ -1,0 +1,11 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<a class="external-link {{cssClasses}}" target="_blank" href="{{externalUrl}}">
+  <span class="external-link__content">
+    <content></content>
+    <i class="fa fa-external-link"></i>
+  </span>
+</a>
