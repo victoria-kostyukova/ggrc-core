@@ -11,10 +11,6 @@ description = """
   """
 
 owner_base = [
-    "Categorization",
-    "Category",
-    "ControlCategory",
-    "ControlAssertion",
     "Option",
     "CustomAttributeDefinition",
     "CustomAttributeValue",
@@ -136,10 +132,6 @@ permissions = {
             "condition": "is_workflow_admin",
             "terms": {},
         },
-        "Categorization",
-        "Category",
-        "ControlCategory",
-        "ControlAssertion",
         "Control",
         "Comment",
         {
