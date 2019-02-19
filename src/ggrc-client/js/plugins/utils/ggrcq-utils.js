@@ -128,6 +128,11 @@ function getImportUrl() {
   });
 }
 
+/**
+ * Get url to proposals view
+ * @param {Object} instance - The model instance
+ * @return {String} Url to proposals view
+ */
 function getProposalsUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
@@ -137,6 +142,11 @@ function getProposalsUrl(instance) {
   });
 }
 
+/**
+ * Get url to change log view
+ * @param {Object} instance - The model instance
+ * @return {String} Url to change log view
+ */
 function getChangeLogUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
