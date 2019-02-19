@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Defines a Revision model for storing snapshots."""
+import json
 
 from ggrc import builder
 from ggrc import db
@@ -412,22 +413,20 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     return {u"documents_file": document_evidence}
 
   def populate_categoies(self, key_name):
-    """Fix revision logger.
-
-    On controls in category field was loged categorization instances."""
+    """Return names of categories."""
     if self.resource_type != "Control":
       return {}
     result = []
-    for categorization in self._content.get(key_name) or []:
-      if "category_id" in categorization:
-        result.append({
-            "id": categorization["category_id"],
-            "type": categorization["category_type"],
-            "name": categorization["display_name"],
-            "display_name": categorization["display_name"],
-        })
-      else:
-        result.append(categorization)
+    categories = self._content.get(key_name)
+    if isinstance(categories, (str, unicode)) and categories:
+      result = json.loads(categories)
+    elif isinstance(categories, list):
+      for category in categories:
+        if isinstance(category, dict):
+          result.append(category.get("name"))
+        elif isinstance(category, (str, unicode)):
+          result.append(category)
+
     return {key_name: result}
 
   def _get_cavs(self):
