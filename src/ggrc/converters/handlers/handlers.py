@@ -1,7 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Generic handlers for imports and exports."""
-
+import json
 import re
 from logging import getLogger
 from datetime import date
@@ -902,78 +902,6 @@ class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
     self.dry_run = True
 
 
-class CategoryColumnHandler(ColumnHandler):
-  """"Base class for column handler with category."""
-
-  def parse_item(self):
-    """Parse cell item."""
-    names = [v.strip() for v in self.raw_value.split("\n")]
-    names = [name for name in names if name != ""]
-    categories = all_models.CategoryBase.query.filter(
-        and_(
-            all_models.CategoryBase.name.in_(names),
-            all_models.CategoryBase.type == self.category_base_type
-        )
-    ).all()
-    category_names = set([c.name.strip() for c in categories])
-    for name in names:
-      if name not in category_names:
-        self.add_warning(
-            errors.WRONG_MULTI_VALUE, column_name=self.display_name, value=name
-        )
-    if not categories:
-      if self.row_converter.is_new and self.mandatory:
-        self.add_error(
-            errors.MISSING_VALUE_ERROR, column_name=self.display_name
-        )
-      return None
-    return categories
-
-  def _is_assertions_same(self):
-    """Compare current and previous assertions state."""
-    current_assertions = getattr(self.row_converter.obj, self.key)
-    assertion_names = [
-        assertion.name
-        for assertion in current_assertions
-    ]
-    assertion_new_names = [
-        assertion.name
-        for assertion in self.value
-    ]
-
-    return set(assertion_names) == set(assertion_new_names)
-
-  def set_obj_attr(self):
-    """Set object attribute."""
-    if self.value is None:
-      return
-    elif self.key == "assertions" and self._is_assertions_same():
-      return
-    setattr(self.row_converter.obj, self.key, self.value)
-
-  def get_value(self):
-    """Get value in string representation."""
-    categories = getattr(self.row_converter.obj, self.key, self.value)
-    categorie_names = [c.name for c in categories]
-    return "\n".join(categorie_names)
-
-
-class ControlCategoryColumnHandler(CategoryColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.category_base_type = "ControlCategory"
-    super(ControlCategoryColumnHandler,
-          self).__init__(row_converter, key, **options)
-
-
-class ControlAssertionColumnHandler(CategoryColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.category_base_type = "ControlAssertion"
-    super(ControlAssertionColumnHandler,
-          self).__init__(row_converter, key, **options)
-
-
 class DocumentsColumnHandler(ColumnHandler):
 
   def get_value(self):
@@ -1077,3 +1005,21 @@ class ReviewersColumnHandler(ExportOnlyColumnHandler):
     return '\n'.join(sorted(
         reviewer.email for reviewer in reviewers
     ))
+
+
+class JsonListColumnHandler(ColumnHandler):
+  """Handler for fields with json list values."""
+
+  def get_value(self):
+    json_values = getattr(self.row_converter.obj, self.key, "[]")
+    values = []
+    try:
+      if json_values:
+        values = json.loads(json_values)
+    except ValueError:
+      logger.error(
+          "Failed to convert {} field for {} {}".format(
+              self.key, self.row_converter.obj.type, self.row_converter.obj.id
+          )
+      )
+    return "\n".join(values)
