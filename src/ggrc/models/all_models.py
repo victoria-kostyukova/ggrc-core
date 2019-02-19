@@ -25,13 +25,9 @@ from ggrc.models.background_operation_type import BackgroundOperationType
 from ggrc.models.background_task import BackgroundTask
 from ggrc.models.background_operation import BackgroundOperation
 from ggrc.models.calendar_event import CalendarEvent
-from ggrc.models.categorization import Categorization
-from ggrc.models.category import CategoryBase
 from ggrc.models.comment import Comment
 from ggrc.models.context import Context
 from ggrc.models.control import Control
-from ggrc.models.control import ControlAssertion
-from ggrc.models.control import ControlCategory
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.data_asset import DataAsset
@@ -106,14 +102,10 @@ all_models = [  # pylint: disable=invalid-name
     BackgroundOperation,
     BackgroundOperationType,
     CalendarEvent,
-    Categorization,
-    CategoryBase,
     Comment,
     Context,
     Contract,
     Control,
-    ControlAssertion,
-    ControlCategory,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,
