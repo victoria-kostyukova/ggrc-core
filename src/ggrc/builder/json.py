@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.models.reflection import AttributeInfo
+from ggrc.models.reflection import SerializableAttribute
 from ggrc.models.types import JsonType
 from ggrc.models.utils import PolymorphicRelationship
 from ggrc.utils import referenced_objects
@@ -116,6 +117,7 @@ class UpdateAttrHandler(object):
     equivalent in ``obj`` and ``json_obj``.
     """
     class_attr = getattr(obj.__class__, attr)
+    attr_reflection = AttributeInfo.get_attr(obj.__class__, "_api_attrs", attr)
     update_raw = attr in AttributeInfo.gather_update_raw(obj.__class__)
     if update_raw:
       # The attribute has a special setter that can handle raw json fields
@@ -123,6 +125,12 @@ class UpdateAttrHandler(object):
       # values
       attr_name = attr
       value = json_obj.get(attr_name)
+    elif isinstance(attr_reflection, SerializableAttribute):
+      attr_name = attr
+      value = json_obj.get(attr)
+
+      if value:
+        value = attr_reflection.deserialize(value)
     elif hasattr(attr, '__call__'):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value

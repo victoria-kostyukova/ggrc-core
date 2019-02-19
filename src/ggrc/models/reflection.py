@@ -52,6 +52,45 @@ class Attribute(object):
     self.read = read
 
 
+# pylint: disable=too-few-public-methods
+class SerializableAttribute(Attribute):
+  """Base attribute class with serializer."""
+
+  # pylint: disable=unused-argument,no-self-use
+  def deserialize(self, value):
+    """Deserialize json respresentation to internal value."""
+    raise NotImplementedError
+
+
+# pylint: disable=too-few-public-methods
+class ExternalUserAttribute(SerializableAttribute):
+  """Attribute class for deserialization of external user."""
+
+  def __init__(self, attr, force_create=False, **kwargs):
+    super(ExternalUserAttribute, self).__init__(attr, **kwargs)
+
+    self.force_create = force_create
+
+  def deserialize(self, value):
+    """Deserialize json representation to Person object.
+
+    Creates non existing person if force_create attribute is True.
+    """
+    from ggrc.utils import user_generator
+
+    email = value.get("email")
+    name = value.get("name")
+
+    if not email:
+      raise ValueError("Missing mandatory \"email\" field in %s attribute" %
+                       self.attr)
+
+    if self.force_create:
+      return user_generator.find_or_create_external_user(email, name)
+
+    return user_generator.find_user_by_email(email)
+
+
 class HybridAttribute(Attribute):
   """Class for attributes which are hybrid_properties on models."""
 

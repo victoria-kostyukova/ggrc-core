@@ -49,15 +49,18 @@ class Synchronizable(ChangesSynchronized,
   """Mixin that identifies models that will be used by SyncService."""
 
   external_id = db.Column(db.Integer, nullable=True, unique=True)
+  external_slug = db.Column(db.String, nullable=True, unique=True)
 
   _api_attrs = reflection.ApiAttributes(
       'external_id',
+      'external_slug',
   )
 
   @staticmethod
   def _extra_table_args(_):
     return (
         db.UniqueConstraint('external_id', name='uq_external_id'),
+        db.UniqueConstraint('external_slug', name='uq_external_slug'),
     )
 
   @validates('external_id')
@@ -65,6 +68,14 @@ class Synchronizable(ChangesSynchronized,
     """Add explicit non-nullable validation."""
     if value is None:
       raise ValidationError("External ID for the object is not specified")
+
+    return value
+
+  @validates('external_slug')
+  def validate_external_slug(self, _, value):  # pylint: disable=no-self-use
+    """Add explicit non-nullable validation."""
+    if value is None:
+      raise ValidationError("External slug for the object is not specified")
 
     return value
 

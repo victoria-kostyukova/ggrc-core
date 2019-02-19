@@ -65,6 +65,7 @@ class TestAccessControlList(TestCase):
             ],
             "assertions": '["{}"]'.format(assertion),
             "external_id": factories.SynchronizableExternalId.next(),
+            "external_slug": factories.random_str(),
             "review_status": all_models.Review.STATES.UNREVIEWED,
             "review_status_display_name": "some status",
         },

@@ -3,6 +3,7 @@
 
 """Utils for ggrc models."""
 
+from ggrc import db
 from ggrc.utils import referenced_objects
 
 from ggrc.models.exceptions import ValidationError
@@ -102,3 +103,14 @@ class FasadeProperty(object):  # pylint: disable=too-few-public-methods
 
   def __set__(self, obj, value):
     setattr(obj, self.FIELD_NAME, value)
+
+
+def person_relationship(model_name, field_name):
+  """Return relationship attribute between Person model and provided model."""
+  return db.relationship(
+      "Person",
+      primaryjoin="{0}.{1} == Person.id".format(model_name, field_name),
+      foreign_keys="{0}.{1}".format(model_name, field_name),
+      remote_side="Person.id",
+      uselist=False,
+  )

@@ -80,9 +80,12 @@ class TestSnapshotQueryApi(TestCase):
       "contact_id",
       "secondary_contact_id",
 
+      "created_by_id",
       "modified_by_id",
 
       "attribute_object_id",
+      "last_submitted_by",
+      "last_verified_by",
 
       # revisions require complete data for documents,
       # while api returns only basic data in stubs
@@ -225,7 +228,8 @@ class TestSnapshotQueryApi(TestCase):
 
     The content in the revision (that is set by log_json) must match closely to
     what the api returns for a get request. This ensures that when a model is
-    created from a snapshot on the fronend, it will have all the needed fields.
+    created from a snapshot on the frontend, it will have all the needed
+    fields.
     """
     self.client.get("/login")
     test_models = get_snapshottable_models()

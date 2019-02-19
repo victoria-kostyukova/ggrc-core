@@ -4,6 +4,7 @@
 """Module for Control model."""
 
 from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -12,7 +13,7 @@ from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.mixins import base, categorizable
 from ggrc.models.mixins import synchronizable
-from ggrc.models import mixins
+from ggrc.models import mixins, utils
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_person import Personable
@@ -59,6 +60,34 @@ class Control(synchronizable.Synchronizable,
   review_status_display_name = deferred(db.Column(db.String, nullable=True),
                                         "Control")
 
+  # GGRCQ attributes
+  due_date = db.Column(db.Date, nullable=True)
+  created_by_id = db.Column(db.Integer, nullable=False)
+
+  # pylint: disable=no-self-argument
+  @declared_attr
+  def created_by(cls):
+    """Relationship to user referenced by created_by_id."""
+    return utils.person_relationship(cls.__name__, "created_by_id")
+
+  last_submitted_at = db.Column(db.DateTime, nullable=True)
+  last_submitted_by = db.Column(db.Integer, nullable=True)
+
+  # pylint: disable=no-self-argument
+  @declared_attr
+  def last_owner_reviewer(cls):
+    """Relationship to user referenced by last_submitted_by."""
+    return utils.person_relationship(cls.__name__, "last_submitted_by")
+
+  last_verified_at = db.Column(db.DateTime, nullable=True)
+  last_verified_by = db.Column(db.Integer, nullable=True)
+
+  # pylint: disable=no-self-argument
+  @declared_attr
+  def last_compliance_reviewer(cls):
+    """Relationship to user referenced by last_verified_by."""
+    return utils.person_relationship(cls.__name__, "last_verified_by")
+
   # REST properties
   _api_attrs = reflection.ApiAttributes(
       'active',
@@ -71,7 +100,16 @@ class Control(synchronizable.Synchronizable,
       'verify_frequency',
       'version',
       'review_status',
-      'review_status_display_name'
+      'review_status_display_name',
+      'due_date',
+      reflection.ExternalUserAttribute('created_by',
+                                       force_create=True),
+      'last_submitted_at',
+      reflection.ExternalUserAttribute('last_owner_reviewer',
+                                       force_create=True),
+      'last_verified_at',
+      reflection.ExternalUserAttribute('last_compliance_reviewer',
+                                       force_create=True),
   )
 
   _fulltext_attrs = [
@@ -147,6 +185,9 @@ class Control(synchronizable.Synchronizable,
 
   def log_json(self):
     out_json = super(Control, self).log_json()
+    out_json["created_by"] = self.created_by
+    out_json["last_owner_reviewer"] = self.last_owner_reviewer
+    out_json["last_compliance_reviewer"] = self.last_compliance_reviewer
     # so that event log can refer to deleted directive
     if self.directive:
       out_json["mapped_directive"] = self.directive.display_name

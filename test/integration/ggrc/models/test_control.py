@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for control model."""
-from datetime import datetime
+from datetime import datetime, date
 import json
 
 import ddt
@@ -14,6 +14,7 @@ from sqlalchemy.orm import collections
 from ggrc import db, settings
 from ggrc.models import all_models
 from ggrc.models.mixins import synchronizable
+from ggrc.utils import user_generator
 from integration.ggrc import TestCase, generator
 from integration.ggrc.models import factories
 from integration.ggrc import api_helper
@@ -58,6 +59,7 @@ class TestControl(TestCase):
     self.assertIsNotNone(control.title)
 
 
+# pylint: disable=too-many-public-methods
 @ddt.ddt
 class TestSyncServiceControl(TestCase):
   """Tests for control model using sync service."""
@@ -84,17 +86,15 @@ class TestSyncServiceControl(TestCase):
   @staticmethod
   def prepare_control_request_body():
     """Create payload for control creation."""
-    created_at = datetime(2018, 1, 1)
-    updated_at = datetime(2018, 1, 2)
-
     return {
         "id": 123,
         "title": "new_control",
         "context": None,
-        "created_at": created_at,
-        "updated_at": updated_at,
+        "created_at": datetime(2018, 1, 1),
+        "updated_at": datetime(2018, 1, 2),
         "slug": "CONTROL-01",
         "external_id": factories.SynchronizableExternalId.next(),
+        "external_slug": factories.random_str(),
         "kind": "test kind",
         "means": "test means",
         "verify_frequency": "test frequency",
@@ -102,19 +102,40 @@ class TestSyncServiceControl(TestCase):
         "categories": '["test category"]',
         "review_status": all_models.Review.STATES.UNREVIEWED,
         "review_status_display_name": "some status",
+        "due_date": datetime(2018, 1, 3),
+        "created_by": {
+            "email": "creator@example.com",
+            "name": "External Creator",
+        },
+        "last_submitted_at": datetime(2018, 1, 4),
+        "last_owner_reviewer": {
+            "email": "owner@example.com",
+            "name": "External Owner",
+        },
+        "last_verified_at": datetime(2018, 1, 5),
+        "last_compliance_reviewer": {
+            "email": "compliance@example.com",
+            "name": "External Compliance",
+        }
     }
 
   def normilize_field(self, field):
     """Convert field from date/db.Model/query to string value."""
     # pylint: disable=protected-access
     normilized_field = field
+
     if isinstance(normilized_field, datetime):
-      normilized_field = str(normilized_field.date())
+      normilized_field = self.normilize_field(normilized_field.date())
+    elif isinstance(normilized_field, date):
+      normilized_field = str(normilized_field)
     elif isinstance(normilized_field, db.Model):
       normilized_field = {
           "type": normilized_field.type,
           "id": normilized_field.id
       }
+    elif isinstance(normilized_field, dict) and "email" in normilized_field:
+      user = user_generator.find_user_by_email(normilized_field["email"])
+      normilized_field = self.normilize_field(user)
     elif isinstance(normilized_field, dict):
       normilized_field.pop("context_id", None)
       normilized_field.pop("href", None)
@@ -281,6 +302,7 @@ class TestSyncServiceControl(TestCase):
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
             "external_id": factories.SynchronizableExternalId.next(),
+            "external_slug": factories.random_str(),
             "assertions": '["test assertion"]',
             "review_status": all_models.Review.STATES.UNREVIEWED,
             "review_status_display_name": "some status",
@@ -324,6 +346,7 @@ class TestSyncServiceControl(TestCase):
             "recipients": recipients,
             "send_by_default": send_by_default,
             "external_id": factories.SynchronizableExternalId.next(),
+            "external_slug": factories.random_str(),
             "assertions": '["test assertion"]',
             "review_status": all_models.Review.STATES.UNREVIEWED,
             "review_status_display_name": "some status",
@@ -721,6 +744,7 @@ class TestSyncServiceControl(TestCase):
         "control": {
             "id": 123,
             "external_id": factories.SynchronizableExternalId.next(),
+            "external_slug": factories.random_str(),
             "title": "new_control",
             "context": None,
             "access_control_list": access_control_list,
