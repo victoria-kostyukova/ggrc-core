@@ -34,6 +34,7 @@ export default can.Component.extend({
     required: false,
     redirectionEnabled: false,
     people: [],
+    title: '',
     openEditMode: function () {
       this.dispatch('editPeopleGroup');
     },

@@ -51,6 +51,7 @@
                         {redirection-enabled}="redirectionEnabled"
                         {is-loading}="isLoading"
                         {can-edit}="canEdit"
+                        {title}="title"
                         {required}="required"
                         {people}="people"
                         {single-user-role}="singleUserRole"
