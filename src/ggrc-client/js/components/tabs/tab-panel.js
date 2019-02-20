@@ -48,6 +48,7 @@ export default can.Component.extend({
         value: {},
       },
     },
+    tabType: 'panel',
     active: false,
     titleText: '@',
     tabId: '@', // used in REFRESH_TAB_CONTENT event handler

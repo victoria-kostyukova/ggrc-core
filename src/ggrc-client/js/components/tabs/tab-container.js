@@ -29,17 +29,6 @@ export default can.Component.extend({
     selectedTabIndex: 0,
     panels: [],
     /**
-     * Activate currently selected panel
-     *
-     * @param {Object} scope - current item value from `viewModel.panels`
-     * @param {jQuery.Element} el - clicked element
-     * @param {Object} ev - click event handler
-     */
-    setActive: function (scope, el, ev) {
-      ev.preventDefault();
-      this.setActivePanel(scope.attr('tabIndex'));
-    },
-    /**
      * Update Panels List setting all panels except selected to inactive state
      * @param {Number} tabIndex - id of activated panel
      */

@@ -4,7 +4,7 @@
  */
 
 const viewModel = can.Map.extend({
-  isTabLink: true,
+  tabType: 'link',
   instance: null,
   titleText: '',
   linkType: '',
