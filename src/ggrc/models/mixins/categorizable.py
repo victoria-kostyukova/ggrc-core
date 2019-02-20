@@ -58,10 +58,7 @@ class Categorizable(object):
       "categories",
   )
   _aliases = {
-      "assertions": {
-          "display_name": "Assertions",
-          "mandatory": True,
-      },
+      "assertions": "Assertions",
       "categories": "Categories",
   }
   _custom_publish = {
@@ -93,3 +90,10 @@ class Categorizable(object):
       raise exceptions.BadRequest(self.WRONG_FORMAT_ERR.format(key))
 
     return categories
+
+  def log_json(self):
+    """Convert string categories to lists."""
+    results = super(Categorizable, self).log_json()
+    results["assertions"] = build_assertions(self)
+    results["categories"] = build_categories(self)
+    return results
