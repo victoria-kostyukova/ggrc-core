@@ -111,7 +111,7 @@ class TestExportControls(TestCase):
     self.assertEqual(exported_values[alias], expected_values)
 
   @ddt.data(
-      ("assertions", "Assertions*"),
+      ("assertions", "Assertions"),
       ("categories", "Categories"),
   )
   @ddt.unpack

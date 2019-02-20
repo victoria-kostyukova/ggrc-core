@@ -664,7 +664,6 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     # Control has additional mandatory field - Assertions
     control_expected = deepcopy(self.COMMON_EXPECTED)
-    control_expected["mandatory"].add("Assertions")
     self._test_single_object(all_models.Control, names, control_expected)
 
   def test_objective_definitions(self):
