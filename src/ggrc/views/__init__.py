@@ -27,12 +27,11 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
 from ggrc.rbac import permissions
-from ggrc.services import common as services_common
+from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
 from ggrc.views import converters, cron, filters, notifications, registry, \
-    utils
-
+    utils, serializers
 
 logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
@@ -1078,3 +1077,67 @@ def generate_wf_tasks_notifs():
   return bg_task.make_response(
       app.make_response(("scheduled %s" % bg_task.name, 200,
                         [('Content-Type', 'text/html')])))
+
+
+class UnmapObjectsView(flask.views.MethodView):
+  """View for unmaping objects by deletion of relationships."""
+
+  # pylint: disable=arguments-differ
+  @classmethod
+  def as_view(cls, *args, **kwargs):
+    """Override as_view to decorate with "login_required"."""
+    view = super(UnmapObjectsView, cls).as_view(*args, **kwargs)
+    return login.login_required(view)
+
+  def dispatch_request(self, *args, **kwargs):
+    """Handle validation errors."""
+    if not login.is_external_app_user():
+      raise exceptions.Forbidden()
+
+    try:
+      return super(UnmapObjectsView, self).dispatch_request(*args, **kwargs)
+    except ValueError as exc:
+      raise exceptions.BadRequest(exc.message)
+
+  @property
+  def request(self):
+    """Property to access request with "self.request"."""
+    return flask.request
+
+  def post(self):
+    """Unmap objects by deleting relationship."""
+    serializer = serializers.RelationshipSerializer(self.request.json)
+    serializer.clean()
+
+    deleted = 0
+
+    for relationship in serializer.as_query():
+      self.delete_relationship(relationship)
+      deleted += 1
+
+    db.session.commit()
+
+    return flask.jsonify({"count": deleted})
+
+  def delete_relationship(self, relationship):
+    """Send post deletion signals."""
+    db.session.delete(relationship)
+
+    signals.Restful.model_deleted.send(
+        models.Relationship, obj=relationship, service=self)
+    modified_objects = services_common.get_modified_objects(db.session)
+    event = log_event.log_event(db.session, relationship)
+    cache_utils.update_memcache_before_commit(
+        self.request, modified_objects,
+        services_common.CACHE_EXPIRY_COLLECTION)
+
+    db.session.flush()
+
+    services_common.update_snapshot_index(modified_objects)
+    cache_utils.update_memcache_after_commit(flask.request)
+    signals.Restful.model_deleted_after_commit.send(
+        models.Relationship, obj=relationship, service=self, event=event)
+    services_common.send_event_job(event)
+
+app.add_url_rule('/api/relationships/unmap',
+                 view_func=UnmapObjectsView.as_view('unmap_objects'))
