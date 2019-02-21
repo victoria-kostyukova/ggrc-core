@@ -180,6 +180,12 @@ function getMappingUrl(instance, destinationModel) {
   return '';
 }
 
+/**
+ * Get url to unmapping view
+ * @param {Object} instance - The model instance
+ * @param {Object} destinationModel - The destination model
+ * @return {String} Url to unmapping view
+ */
 function getUnmappingUrl(instance, destinationModel) {
   const statuses = 'in_progress,reviewed';
 
@@ -192,7 +198,13 @@ function getUnmappingUrl(instance, destinationModel) {
   return '';
 }
 
-
+/**
+ * Get url to mapping view for Control object
+ * @param {Object} instance - The model instance
+ * @param {Object} destinationModel - The destination model
+ * @param {String} statuses - Required statuses list (comma separated)
+ * @return {String} Url
+ */
 function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   let view = '';
   if (ggrcqDirectiveObjects.includes(destinationModel.model_singular)) {
@@ -213,6 +225,12 @@ function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   });
 }
 
+/**
+ * Get url to Control mapping view for selected object
+ * @param {Object} instance - The model instance
+ * @param {String} statuses - Required statuses list (comma separated)
+ * @return {String} Url
+ */
 function getMapControlToObjectUrl(instance, statuses) {
   let path = '';
   let type = instance.constructor.model_singular;
