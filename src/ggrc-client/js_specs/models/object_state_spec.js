@@ -76,9 +76,10 @@ describe('Model "status" attr test', function () {
 });
 
 describe('Model review state test', function () {
-  const reviewObjects = ['Contract', 'Control', 'Objective',
+  const reviewObjects = ['Contract', 'Objective',
     'Policy', 'Program', 'Regulation', 'Risk', 'Requirement', 'Standard',
     'Threat'];
+  const externalReviewObjects = ['Control'];
   const objectsWithoutReview = ['AccessGroup', 'Assessment',
     'AssessmentTemplate', 'Audit', 'DataAsset', 'Facility', 'Issue',
     'KeyReport', 'Market', 'Metric', 'OrgGroup', 'Process', 'Product',
@@ -93,6 +94,20 @@ describe('Model review state test', function () {
       expect(_.map(attrList, 'attr_name'))
         .toContain('review_status', 'for object ' + object);
     });
+  });
+
+  externalReviewObjects.forEach(function (object) {
+    it('checks if ' + object + ' has external review status in attr_list',
+      () => {
+        const attrList = businessModels[object].tree_view_options.attr_list;
+
+        let attr = attrList.
+          find((attr) => attr.attr_name === 'external_review_status');
+
+        expect(attr).not.toBeNull();
+        expect(attr.attr_title).toBe('Review Status');
+        expect(attr.attr_sort_field).toBe('review_status_display_name');
+      });
   });
 
   objectsWithoutReview.forEach(function (object) {
