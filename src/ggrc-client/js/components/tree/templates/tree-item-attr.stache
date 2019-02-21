@@ -99,6 +99,12 @@
     </review-state>
   {{/case}}
 
+  {{#case 'external_review_status'}}
+    {{#if review_status}}
+      <span class="state-value-dot review-status {{addclass 'state' review_status}}">{{review_status_display_name}}</span>
+    {{/if}}
+  {{/case}}
+
   {{#case 'issue_url'}}
     {{#if instance.issue_tracker.issue_url}}
       <span class="reference-urls-list__item">

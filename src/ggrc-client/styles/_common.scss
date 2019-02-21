@@ -802,10 +802,19 @@ p {
     }
   }
 
+  &.review-status {
+    color: $status-draft;
+
+    &:before {
+      background: $status-draft;
+    }
+  }
+
   &.state-notstarted,
   &.state-draft,
   &.state-assigned,
-  &.state-planned {
+  &.state-planned,
+  &.state-review_needed {
     color: $status-draft;
 
     &:before {
@@ -813,7 +822,8 @@ p {
     }
   }
   &.state-inprogress,
-  &.state-active {
+  &.state-active,
+  &.state-reviewed_by_owner {
     color: $status-inprogress;
 
     &:before {
@@ -829,8 +839,10 @@ p {
     }
   }
   &.state-verified,
+  &.state-reviewed,
   &.state-readyforexternalreview,
-  &.state-fixedandverified {
+  &.state-fixedandverified,
+  &.state-reviewed_by_compliance {
     color: $status-verified;
 
     &:before {
@@ -854,7 +866,8 @@ p {
     }
   }
   &.state-declined,
-  &.state-reworkneeded {
+  &.state-reworkneeded,
+  &.state-re_review_needed {
     color: $status-declined;
 
     &:before {

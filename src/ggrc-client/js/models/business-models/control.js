@@ -94,8 +94,9 @@ export default Cacheable.extend({
         attr_name: 'test_plan',
         disable_sorting: true,
       }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
+        attr_title: 'Review Status',
+        attr_name: 'external_review_status',
+        attr_sort_field: 'review_status_display_name',
         order: 80,
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',
