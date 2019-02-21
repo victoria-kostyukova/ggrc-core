@@ -12,7 +12,16 @@
         <tab-panel {(panels)}="panels" {title-text}="'Attributes'">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              <object-review {instance}="instance"></object-review>
+            
+              {{#if review_status}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Review Status</h6>
+                    <span class="state-value-dot review-status {{addclass 'state' review_status}}">{{review_status_display_name}}</span>
+                  </div>
+                </div>
+              {{/if}}
+
               {{> /static/templates/base_objects/description.stache}}
               {{> /static/templates/base_objects/test_plan.stache}}
               {{> /static/templates/base_objects/notes.stache}}
