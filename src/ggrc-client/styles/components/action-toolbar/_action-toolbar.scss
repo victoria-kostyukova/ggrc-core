@@ -13,11 +13,6 @@
 
 .action-toolbar-container {
   @include action-toolbar-controls;
-
-  .read-more__controls {
-    position: absolute;
-    bottom: -30px;
-  }
 }
 
 .action-toolbar {
