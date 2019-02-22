@@ -14,10 +14,10 @@ import ddt
 from ggrc import utils
 from ggrc import models
 from ggrc import builder
-from ggrc import settings
 from ggrc.models import all_models
 from ggrc.models.mixins import customattributable
 
+from integration.ggrc.api_helper import Api
 from integration.ggrc.services import TestCase
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
@@ -105,6 +105,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
   @ddt.unpack
   def test_create_from_ggrcq(self, definition_type, title):
     """Test create definition only for GGRCQ."""
+    api = Api()
     payload = [
         {
             "custom_attribute_definition": {
@@ -119,13 +120,10 @@ class TestGlobalCustomAttributes(ProductTestCase):
             }
         }
     ]
-    response = self.client.post(
-        "/api/custom_attribute_definitions",
-        content_type='application/json',
-        data=utils.as_json(payload),
-        headers={'X-Requested-By': settings.GGRC_Q_ACTION_HEADER}
-    )
-    self.assertEqual(response.status_code, 200)
+
+    with api.as_external():
+      response = api.post(all_models.CustomAttributeDefinition, payload)
+      self.assertEqual(response.status_code, 200)
 
   @ddt.data(
       ("control", "Control title")
@@ -133,6 +131,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
   @ddt.unpack
   def test_create_from_ggrc(self, definition_type, title):
     """Test create definition not allowed for GGRC."""
+    api = Api()
     payload = [
         {
             "custom_attribute_definition": {
@@ -147,12 +146,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
             }
         }
     ]
-    response = self.client.post(
-        "/api/custom_attribute_definitions",
-        content_type='application/json',
-        data=utils.as_json(payload),
-        headers={'X-Requested-By': 'GGRC'}
-    )
+    response = api.post(all_models.CustomAttributeDefinition, payload)
     self.assertEqual(response.status_code, 405)
 
   def test_custom_attribute_put_add(self):

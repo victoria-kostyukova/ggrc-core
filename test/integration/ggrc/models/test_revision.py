@@ -156,6 +156,7 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
           title="test_name",
           definition_type="control",
       )
+      cad_id = cad.id
       if is_add_cav:
         factories.CustomAttributeValueFactory(
             custom_attribute=cad,
@@ -168,7 +169,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
           ggrc.models.Revision.resource_type == control.type,
       ).order_by(ggrc.models.Revision.id.desc()).first().id
 
-    self.api_helper.delete(cad)
+    with self.api_helper.as_external():
+      self.api_helper.delete(cad, cad_id)
 
     control = ggrc.models.Control.query.first()
 
@@ -201,7 +203,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
             attribute_value="test")
 
     user = self.gen.generate_person(
-        data={"name": "test_admin"}, user_role="Administrator")[1]
+        data={"name": "test_admin", "email": "external_app@example.com"},
+        user_role="Administrator")[1]
     self.api_helper.set_user(user)
     self.client.get("/login")
 

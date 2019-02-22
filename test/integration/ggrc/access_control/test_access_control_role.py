@@ -6,7 +6,6 @@ from collections import OrderedDict, defaultdict
 
 import ddt
 
-from ggrc import settings
 from ggrc.access_control.role import AccessControlRole
 from ggrc.converters import errors
 from ggrc.models import all_models
@@ -53,16 +52,16 @@ class TestAccessControlRole(TestCase):
 
   def test_create_after_objects(self):
     """Test eager creation of ACLs on existing objects with new ACR."""
-    control_id = factories.ControlFactory().id
+    risk_id = factories.RiskFactory().id
     role_name = "New Custom Role"
-    self._post_role(name=role_name)
-    control = all_models.Control.query.get(control_id)
-    self.assertIn(role_name, control.acr_name_acl_map.keys())
-    self.assertIsNotNone(control.acr_name_acl_map[role_name])
+    self._post_role(name=role_name, object_type="Risk")
+    risk = all_models.Risk.query.get(risk_id)
+    self.assertIn(role_name, risk.acr_name_acl_map.keys())
+    self.assertIsNotNone(risk.acr_name_acl_map[role_name])
 
   def test_create(self):
     """Test Access Control Role creation"""
-    response = self._post_role()
+    response = self._post_role(object_type="Risk")
     assert response.status_code == 201, \
         "Failed to create a new access control role, response was {}".format(
             response.status)
@@ -159,11 +158,9 @@ class TestAccessControlRole(TestCase):
   @ddt.data("Control")
   def test_create_from_ggrcq(self, object_type):
     """Test that create action only for GGRCQ."""
-    self.api.headers.update(
-        {"X-Requested-By": settings.GGRC_Q_ACTION_HEADER}
-    )
-    response = self._post_role(object_type=object_type)
-    self.assertEqual(response.status_code, 201)
+    with self.api.as_external():
+      response = self._post_role(object_type=object_type)
+      self.assertEqual(response.status_code, 201)
 
   @ddt.data("Control")
   def test_create_from_ggrc(self, object_type):

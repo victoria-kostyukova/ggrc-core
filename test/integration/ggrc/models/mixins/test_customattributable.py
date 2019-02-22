@@ -397,7 +397,9 @@ class TestCustomAttributableMixin(TestCase):
 class TestCreateRevisionAfterDeleteCAD(TestCase):
   """Test cases for creating new revision after delete CAD"""
   def setUp(self):
+    super(TestCreateRevisionAfterDeleteCAD, self).setUp()
     self.api_helper = api_helper.Api()
+    self.api_helper.login_as_external()
 
   @ddt.data(True, False)
   def test_latest_revision_delete_cad(self, is_add_cav):

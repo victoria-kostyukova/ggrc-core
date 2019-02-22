@@ -42,7 +42,6 @@ class Control(synchronizable.Synchronizable,
               Indexed,
               mixins.Folderable,
               proposal.Proposalable,
-              mixins.ReadOnlyGGRC,
               db.Model):
   """Control model definition."""
   __tablename__ = 'controls'
