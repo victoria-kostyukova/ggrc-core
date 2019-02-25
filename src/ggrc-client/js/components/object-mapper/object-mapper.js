@@ -168,7 +168,7 @@ export default can.Component.extend({
       // so object-mapper modal should be closed and removed from DOM
       this.closeModal();
 
-      if (event.objects && event.objects.length) {
+      if (event.objects.length) {
         this.map(event.objects);
       }
     },
@@ -177,7 +177,9 @@ export default can.Component.extend({
       this.element.trigger('hideModal');
     },
     // close mapper as mapping will be handled externally
-    'create-and-map mapExternally': 'closeModal',
+    'create-and-map mapExternally'() {
+      this.closeModal();
+    },
     // reopen object-mapper if creating was canceled
     'create-and-map canceled'() {
       this.element.trigger('showModal');
@@ -201,17 +203,17 @@ export default can.Component.extend({
 
       self.viewModel.onSubmit();
     },
-    map(models) {
+    map(objects) {
       const viewModel = this.viewModel;
 
       viewModel.updateFreezedConfigToLatest();
 
       if (this.viewModel.attr('deferred')) {
         // postpone map operation unless target object is saved
-        this.deferredSave(models);
+        this.deferredSave(objects);
       } else {
         // map objects immediately
-        this.mapObjects(models);
+        this.mapObjects(objects);
       }
     },
     closeModal: function () {

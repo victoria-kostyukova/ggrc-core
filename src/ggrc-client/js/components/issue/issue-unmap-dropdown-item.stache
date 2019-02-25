@@ -40,7 +40,7 @@
       {{else}}
         <questionnaire-mapping-link 
           {instance}="page_instance" 
-          {destination-model}="instance.class" 
+          {destination-model}="instance.constructor" 
           {type}="'unmap'">
             <i class="fa fa-fw fa-external-link"></i>
             Unmap in new frontend

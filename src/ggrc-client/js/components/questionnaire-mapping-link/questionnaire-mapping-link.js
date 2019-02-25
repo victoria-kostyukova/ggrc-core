@@ -12,6 +12,7 @@ import {
 export default can.Component.extend({
   tag: 'questionnaire-mapping-link',
   template,
+  leakScope: false,
   viewModel: {
     define: {
       externalUrl: {

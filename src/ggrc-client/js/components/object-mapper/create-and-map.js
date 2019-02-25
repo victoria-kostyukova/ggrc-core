@@ -88,7 +88,7 @@ export default can.Component.extend({
         create a ${destinationModel.title_singular.toLowerCase()}. </br> </br>
         Until transition to the new UI is complete, you will need to come back 
         here after creation and reopen this window to complete mapping to this 
-        ${sourceModel.title_singular.toLowerCase()}`;
+        ${sourceModel.title_singular.toLowerCase()}.`;
     },
     resetEntries() {
       this.attr('newEntries', []);
@@ -152,7 +152,7 @@ export default can.Component.extend({
           You are allowed to map new object${isMany ? 's' : ''} to this 
           ${sourceModel.title_singular.toLowerCase()} only in the 
           new frontend. By clicking "Proceed in the new tab" you'll be 
-          redirected to the new page where you can create mapping.</p>`,
+          redirected to the new page where you can create mapping.`,
         button_view: `${GGRC.templates_path}/modals/link-button.stache`,
         modalConfirmButton: 'Proceed in the new tab',
         modalConfirmLink: getMappingUrl(this.attr('source'), destinationModel),
@@ -164,12 +164,12 @@ export default can.Component.extend({
       this.viewModel.attr('element', this.element);
     },
     // clicked Save & Close button in Create modal
-    '.create-control modal:success': function (el, ev, model) {
+    '.create-control modal:success'(el, ev, model) {
       this.viewModel.attr('newEntries').push(model);
       this.viewModel.mapObjects(this.viewModel.attr('newEntries'));
     },
     // clicked Save & Add another button in Create modal
-    '.create-control modal:added': function (el, ev, model) {
+    '.create-control modal:added'(el, ev, model) {
       this.viewModel.attr('newEntries').push(model);
     },
     // clicked Discard button in Discard Changes modal
