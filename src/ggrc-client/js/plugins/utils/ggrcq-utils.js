@@ -4,7 +4,7 @@
  */
 
 import {
-  ggrcqDirectiveObjects,
+  externalDirectiveObjects,
   scopingObjects,
 } from '../../plugins/models-types-collections';
 
@@ -207,7 +207,7 @@ function getUnmappingUrl(instance, destinationModel) {
  */
 function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   let view = '';
-  if (ggrcqDirectiveObjects.includes(destinationModel.model_singular)) {
+  if (externalDirectiveObjects.includes(destinationModel.model_singular)) {
     view = 'directives';
   } else if (scopingObjects.includes(destinationModel.model_singular)) {
     view = 'scope';
@@ -234,7 +234,7 @@ function getMapObjectToControlUrl(instance, destinationModel, statuses) {
 function getMapControlToObjectUrl(instance, statuses) {
   let path = '';
   let type = instance.constructor.model_singular;
-  if (ggrcqDirectiveObjects.includes(type)) {
+  if (externalDirectiveObjects.includes(type)) {
     path = 'directives';
   } else if (scopingObjects.includes(type)) {
     path = 'questionnaires';

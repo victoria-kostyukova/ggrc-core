@@ -19,7 +19,7 @@ import {
   coreObjects,
   scopingObjects,
   snapshotableObjects,
-  ggrcqDirectiveObjects,
+  externalDirectiveObjects,
 } from '../../plugins/models-types-collections';
 import {getRoleableModels} from '../../plugins/utils/models-utils';
 
@@ -79,8 +79,8 @@ new Mappings({
   },
   Control: {
     map: _.difference(businessObjects,
-      ['Assessment', ...scopingObjects, ...ggrcqDirectiveObjects]),
-    externalMap: [...scopingObjects, ...ggrcqDirectiveObjects],
+      ['Assessment', ...scopingObjects, ...externalDirectiveObjects]),
+    externalMap: [...scopingObjects, ...externalDirectiveObjects],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {

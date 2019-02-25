@@ -33,7 +33,7 @@ export const scopingObjects = [
 /**
  * GGRCQ Directives
  */
-export const ggrcqDirectiveObjects = [
+export const externalDirectiveObjects = [
   'Regulation', 'Standard',
 ];
 
