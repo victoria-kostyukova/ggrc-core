@@ -644,7 +644,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Categories",
         "State",
         "Last Assessment Date",
-        "Review State",
+        "Review Status",
         "Document File",
         "Delete",
         "Control Operators",

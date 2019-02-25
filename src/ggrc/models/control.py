@@ -170,8 +170,13 @@ class Control(synchronizable.Synchronizable,
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
       "test_plan": "Assessment Procedure",
-      "review_status_display_name": {
+      "review_status": {
           "display_name": "Review State",
+          "mandatory": False,
+          "filter_only": True
+      },
+      "review_status_display_name": {
+          "display_name": "Review Status",
           "mandatory": False
       },
   }
@@ -204,7 +209,7 @@ class Control(synchronizable.Synchronizable,
   @validates('review_status_display_name')
   def validate_review_status_display_name(self, _, value):
     """Add explicit non-nullable validation."""
-    # pylint: disable=no-self-use
+    # pylint: disable=no-self-use,invalid-name
 
     if value is None:
       raise ValidationError("Review status for the object is not specified")

@@ -234,6 +234,53 @@ class TestCheckPopulatedContent(unittest.TestCase):
     self.assertEqual(revision.populate_review_status(), expected_content)
 
   @ddt.data(
+      [
+          {"review_status": "a"},
+          {"review_status": "a", "review_status_display_name": "a"},
+          "Control"
+      ],
+      [
+          {"review_status": "a", "review_status_display_name": "b"},
+          {"review_status": "a", "review_status_display_name": "b"},
+          "Control"
+      ],
+      [
+          {"review_status": "a", "review_status_display_name": None},
+          {"review_status": "a", "review_status_display_name": None},
+          "Control"
+      ],
+      [
+          {"review_status": "a"},
+          {"review_status": "a"},
+          "Issue"
+      ],
+      [
+          {"xx": "q"},
+          {},
+          "Facility"
+      ],
+  )
+  @ddt.unpack
+  def test_populated_review_status_display_name(self, content,
+                                                expected_result,
+                                                resource_type):
+    """Populated from '{0}' to '{1}' for {2}"""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = resource_type
+
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+
+    # emulate situation when review_status is already populated if exists
+    populated = dict()
+    if 'review_status' in content:
+      populated['review_status'] = content['review_status']
+
+    # ensure that correct review_status_display_name is added for Control
+    revision.populate_review_status_display_name(populated)
+    self.assertEqual(populated, expected_result)
+
+  @ddt.data(
       ({}, {}),
       ({"document_evidence": []}, {"documents_file": []}),
       (

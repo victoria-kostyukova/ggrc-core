@@ -167,6 +167,7 @@ class AttributeInfo(object):
       "status",
       "labels",
       "review_status",
+      "review_status_display_name",
       "reviewers",
       "assertions",
       "categories",
