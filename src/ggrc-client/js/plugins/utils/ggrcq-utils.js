@@ -173,7 +173,7 @@ function getMappingUrl(instance, destinationModel) {
 
   if (instance.type === 'Control') {
     return getMapObjectToControlUrl(instance, destinationModel, statuses);
-  } else if (destinationModel.title_singular === 'Control') {
+  } else if (destinationModel.model_singular === 'Control') {
     return getMapControlToObjectUrl(instance, statuses);
   }
 
@@ -191,7 +191,7 @@ function getUnmappingUrl(instance, destinationModel) {
 
   if (instance.type === 'Control') {
     return getMapObjectToControlUrl(instance, destinationModel, statuses);
-  } else if (destinationModel.title_singular === 'Control') {
+  } else if (destinationModel.model_singular === 'Control') {
     return getMapControlToObjectUrl(instance, statuses);
   }
 
