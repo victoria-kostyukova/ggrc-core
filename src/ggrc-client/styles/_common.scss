@@ -802,6 +802,13 @@ p {
     }
   }
 
+  tree-item-attr & {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   &.review-status {
     color: $status-draft;
 
