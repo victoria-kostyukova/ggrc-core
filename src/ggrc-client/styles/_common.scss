@@ -629,7 +629,7 @@ p {
 
 .hidden-widgets-list {
   .dropdown-menu {
-    width: 400px;
+    width: 420px;
     column-count: 2;
     column-gap: 0;
 
@@ -646,10 +646,14 @@ p {
     .external-link {
       &__content {
         color: $link;
+        display: inline-flex;
+        align-items: center;
 
         .fa {
+          margin-left: 5px;
+          margin-top: 0;
           opacity: 1;
-          font-size: 13px;
+          font-size: 14px;
           color: $link;
         }
       }
