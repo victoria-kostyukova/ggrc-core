@@ -18,7 +18,6 @@
 .action-toolbar {
   position: relative;
   display: flex;
-  min-width: 0;
 
   @include action-toolbar-controls;
 

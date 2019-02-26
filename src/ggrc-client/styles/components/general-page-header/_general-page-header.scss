@@ -1,0 +1,20 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.general-page-header {
+  &__title-details {
+    display: flex;
+    padding-right: 10px;
+  }
+
+  &__title-wrapper {
+    overflow: hidden;
+  }
+
+  & &__title-value {
+    padding-top: 2px;
+    line-height: 23px;
+  }
+}

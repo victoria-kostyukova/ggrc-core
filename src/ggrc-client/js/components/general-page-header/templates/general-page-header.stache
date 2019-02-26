@@ -4,15 +4,15 @@
 }}
 
 {{#instance}}
-  <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
+  <div class="general-page-header pane-header {{#if snapshot}}snapshot{{/if}}" >
     <div class="pane-header__container">
       <div class="pane-header__title" data-test-id="title_0ad9fbaf">
         {{#is_info_pin}}
           <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
         {{/is_info_pin}}
-        <div class="pane-header__title-details">
-          <div class="action-toolbar">
-            <h3 class="action-toolbar__header">{{title}}</h3>
+        <div class="general-page-header__title-details">
+          <div class="action-toolbar general-page-header__title-wrapper">
+            <h3 class="action-toolbar__header general-page-header__title-value">{{title}}</h3>
             {{#if redirectionEnabled}}
             <div class="action-toolbar__controls">
               <div class="action-toolbar__controls-item">
