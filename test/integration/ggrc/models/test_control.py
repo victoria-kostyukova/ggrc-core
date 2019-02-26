@@ -527,7 +527,7 @@ class TestSyncServiceControl(TestCase):
     response = self.api.put(control, {"review_status": None})
     self.assert400(response)
     self.assertEqual(response.json["message"],
-                     "Review status for the object is not specified")
+                     "review_status for the object is not specified")
 
     control = db.session.query(all_models.Control).get(control.id)
     self.assertIsNotNone(control.external_id)
@@ -567,7 +567,8 @@ class TestSyncServiceControl(TestCase):
     response = self.api.put(control, {"review_status_display_name": None})
     self.assert400(response)
     self.assertEqual(response.json["message"],
-                     "Review status for the object is not specified")
+                     "review_status_display_name for the object "
+                     "is not specified")
 
     control = db.session.query(all_models.Control).get(control.id)
     self.assertIsNotNone(control.external_id)

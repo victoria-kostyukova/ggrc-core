@@ -192,7 +192,7 @@ class Control(synchronizable.Synchronizable,
   def validate_review_status(self, _, value):  # pylint: disable=no-self-use
     """Add explicit non-nullable validation."""
     if value is None:
-      raise ValidationError("Review status for the object is not specified")
+      raise ValidationError("review_status for the object is not specified")
 
     return value
 
@@ -203,6 +203,7 @@ class Control(synchronizable.Synchronizable,
     # pylint: disable=no-self-use,invalid-name
 
     if value is None:
-      raise ValidationError("Review status for the object is not specified")
+      raise ValidationError(
+          "review_status_display_name for the object is not specified")
 
     return value
