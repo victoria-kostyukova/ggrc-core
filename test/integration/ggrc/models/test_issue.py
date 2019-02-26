@@ -289,10 +289,6 @@ class TestIssueUnmap(TestCase):
     super(TestIssueUnmap, self).setUp()
     self.generator = generator.ObjectGenerator(fail_no_json=False)
 
-    # TODO: replace this hack with a special test util
-    from ggrc.login import noop
-    noop.login()  # this is needed to pass the permission checks in automapper
-
     with factories.single_commit():
       audit = factories.AuditFactory()
       self.audit_id = audit.id

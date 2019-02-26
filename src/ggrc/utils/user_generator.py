@@ -108,7 +108,7 @@ def create_users_with_role(email_names, role_name="Creator"):
 
   created_people = set(load_people_with_emails(email_names.keys()))
 
-  role_id = basic_roles._find_basic(role_name).id
+  role_id = basic_roles.find_basic(role_name).id
   ur_inserter = all_models.UserRole.__table__.insert().prefix_with("IGNORE")
   db.session.execute(
       ur_inserter.values([

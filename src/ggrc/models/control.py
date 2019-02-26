@@ -206,6 +206,7 @@ class Control(synchronizable.Synchronizable,
 
     return value
 
+  # pylint: disable=invalid-name
   @validates('review_status_display_name')
   def validate_review_status_display_name(self, _, value):
     """Add explicit non-nullable validation."""
