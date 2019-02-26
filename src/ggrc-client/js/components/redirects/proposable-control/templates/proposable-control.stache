@@ -4,7 +4,7 @@
 }}
 
 <a
-  class="proposable-control__link"
+  class="proposable-control"
   href="{{link}}"
   target="_blank"
   rel="tooltip"
