@@ -3,13 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 import template from './templates/proposable-attribute.stache';
-import {showInfoProposalControls} from '../../../plugins/utils/ggrcq-utils';
+import {isProposableExternally} from '../../../plugins/utils/ggrcq-utils';
 
 const viewModel = can.Map.extend({
   define: {
     showToolbarControls: {
       get() {
-        return showInfoProposalControls(this.attr('instance'));
+        return isProposableExternally(this.attr('instance'));
       },
     },
   },

@@ -4,7 +4,6 @@
 */
 
 import '../components/comment/comments-section';
-import '../components/proposal/create-proposal-button';
 import '../components/related-objects/proposals/related-proposals';
 import '../components/related-objects/proposals/related-proposals-item';
 import '../components/related-objects/revisions/related-revisions';

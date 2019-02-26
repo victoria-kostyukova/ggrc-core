@@ -4,13 +4,27 @@
 */
 
 import template from './templates/general-page-header.stache';
-import {showInfoProposalControls} from '../../plugins/utils/ggrcq-utils';
+import {
+  isProposableExternally,
+  isChangeableExternally,
+} from '../../plugins/utils/ggrcq-utils';
+import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
 const viewModel = can.Map.extend({
   define: {
     redirectionEnabled: {
       get() {
-        return showInfoProposalControls(this.attr('instance'));
+        return isProposableExternally(this.attr('instance'));
+      },
+    },
+    showProposalButton: {
+      get() {
+        const instance = this.attr('instance');
+        return (
+          instance.class.isProposable &&
+          !isChangeableExternally(instance) &&
+          !isSnapshot(instance)
+        );
       },
     },
   },

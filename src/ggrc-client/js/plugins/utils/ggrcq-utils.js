@@ -36,13 +36,16 @@ function isChangeableExternally(instance) {
 }
 
 /**
- * Determine whether redirectable proposable controls for instance
- * should be shown.
+ * Determine whether instance is proposable externally.
  * @param {*} instance the model instance
  * @return {Boolean} true or false
  */
-function showInfoProposalControls(instance) {
-  return isChangeableExternally(instance) && !isSnapshot(instance);
+function isProposableExternally(instance) {
+  return (
+    instance.constructor.isProposable &&
+    isChangeableExternally(instance) &&
+    !isSnapshot(instance)
+  );
 }
 
 /**
@@ -303,5 +306,5 @@ export {
   getProposalsUrl,
   getChangeLogUrl,
   getProposalAttrUrl,
-  showInfoProposalControls,
+  isProposableExternally,
 };

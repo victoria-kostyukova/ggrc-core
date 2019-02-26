@@ -7,7 +7,7 @@ import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/editable-people-group';
 import template from './templates/custom-roles.stache';
-import {showInfoProposalControls} from '../../plugins/utils/ggrcq-utils';
+import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 
 export default can.Component.extend({
   tag: 'custom-roles',
@@ -28,7 +28,7 @@ export default can.Component.extend({
       },
       redirectionEnabled: {
         get() {
-          return showInfoProposalControls(this.attr('instance'));
+          return isProposableExternally(this.attr('instance'));
         },
       },
     },
