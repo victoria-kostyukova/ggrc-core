@@ -8,6 +8,7 @@ import {
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import Permission from '../../permission';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
+import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 
 /**
  * Global Custom Attributes is a component representing custom attributes.
@@ -18,8 +19,13 @@ export default can.Component.extend({
   viewModel: {
     isAttributesDisabled: false,
     define: {
+      redirectionEnabled: {
+        get() {
+          return isProposableExternally(this.attr('instance'));
+        },
+      },
       /**
-       * Indicates whether custome attributes can be edited.
+       * Indicates whether custom attributes can be edited.
        * @type {boolean}
        */
       isEditDenied: {

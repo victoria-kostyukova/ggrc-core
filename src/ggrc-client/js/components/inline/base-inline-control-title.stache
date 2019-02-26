@@ -7,11 +7,23 @@
   <!-- header (laber/h1-6) -->
   <content></content>
 
-  {{#if isEditIconAllowed}}
+  {{#if redirectionEnabled}}
     <div class="action-toolbar__controls">
-      <action-toolbar-control>
-        <i class="fa fa-pencil inline-edit-icon"></i>
-      </action-toolbar-control>
+      <div class="action-toolbar__controls-item">
+        <proposable-control
+          {instance}="instance"
+          {attr-name}="redirectionAttrName"
+        >
+        </proposable-control>
+      </div>
     </div>
+  {{else}}
+    {{#if isEditIconAllowed}}
+      <div class="action-toolbar__controls">
+        <action-toolbar-control>
+          <i class="fa fa-pencil inline-edit-icon"></i>
+        </action-toolbar-control>
+      </div>
+    {{/if}}
   {{/if}}
  </div>

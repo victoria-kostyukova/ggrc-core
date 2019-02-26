@@ -23,7 +23,9 @@
             {mandatory}="mandatory"
             with-read-more="true">
               <base-inline-control-title
+                {title}="title"
                 {edit-mode}="editMode"
+                {redirection-enabled}="redirectionEnabled"
                 {is-edit-icon-denied}="isEditIconDenied"
                 (set-edit-mode-inline)="setEditModeInline(%event)">
                   <div class="info-pane__section-title {{#if mandatory}}form-label form-label__extended{{/if}}">
