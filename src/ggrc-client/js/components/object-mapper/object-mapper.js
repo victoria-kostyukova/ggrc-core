@@ -122,6 +122,7 @@ export default can.Component.extend({
        */
       deferred: false,
       isMappableExternally: false,
+      searchModel: null,
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
           return true;
@@ -147,6 +148,7 @@ export default can.Component.extend({
       },
       onSubmit: function () {
         this.updateFreezedConfigToLatest();
+        this.attr('searchModel', this.attr('model'));
 
         let source = this.attr('object');
         let destination = this.attr('type');
