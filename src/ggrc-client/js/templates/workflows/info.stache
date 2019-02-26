@@ -12,7 +12,7 @@
       {{#instance}}
           <div class="pane-header__title">
             {{#is_info_pin}}
-              <h6 class="pane-header__title">Title</h6>
+              <h6>Title</h6>
             {{/is_info_pin}}
             <div class="pane-header__title-details">
               <h3 class="pane-header__title-name">{{title}}</h3>
