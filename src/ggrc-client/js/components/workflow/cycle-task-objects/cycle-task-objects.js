@@ -5,28 +5,79 @@
 
 import template from './cycle-task-objects.stache';
 import Mappings from '../../../models/mappers/mappings';
+import {
+  loadObjectsByStubs,
+  loadObjectsByTypes,
+} from '../../../plugins/utils/query-api-utils';
+import {
+  DEFERRED_MAPPED_UNMAPPED,
+  OBJECTS_MAPPED_VIA_MAPPER,
+} from '../../../events/eventTypes';
+import {mapObjects} from '../../../plugins/utils/mapper-utils';
+
+const fields = ['id', 'type', 'title', 'viewLink'];
 
 const viewModel = can.Map.extend({
-  parentInstance: null,
+  instance: null,
   mappedObjects: [],
+  convertToMappedObjects(objects) {
+    return objects.map((object) => ({
+      object,
+      iconClass: `fa-${_.snakeCase(object.type)}`,
+    }));
+  },
+  async initMappedObjects() {
+    const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
+    const rawMappedObjects = await loadObjectsByTypes(
+      this.attr('instance'),
+      mappingTypes,
+      fields,
+    );
+    this.attr('mappedObjects').replace(this.convertToMappedObjects(
+      rawMappedObjects
+    ));
+  },
+  async includeLoadedObjects(objects) {
+    const loadedObjects = await loadObjectsByStubs(objects, fields);
+    this.attr('mappedObjects').push(...this.convertToMappedObjects(
+      loadedObjects
+    ));
+  },
+  excludeObjects(objects) {
+    const mappedObjects = this.attr('mappedObjects');
+    const withoutExcludedFilter = ({object: mappedObject}) => (
+      _.findIndex(objects, (object) => (
+        mappedObject.id === object.id &&
+        mappedObject.type === object.type
+      )) === -1
+    );
+    const objectsWithoutExcluded = mappedObjects.filter(withoutExcludedFilter);
+
+    mappedObjects.replace(objectsWithoutExcluded);
+  },
 });
 
-const init = function (element) {
-  const binding = Mappings
-    .getBinding(
-      'info_related_objects',
-      this.viewModel.parentInstance
-    );
+const init = function () {
+  this.viewModel.initMappedObjects();
+};
 
-  binding.refresh_instances()
-    .then((mappedObjects) => {
-      this.viewModel.attr('mappedObjects').replace(mappedObjects);
+const events = {
+  // When objects are mapped or/and unmapped via edit modal
+  [`{viewModel.instance} ${DEFERRED_MAPPED_UNMAPPED.type}`](el, {
+    mapped,
+    unmapped,
+  }) {
+    const viewModel = this.viewModel;
+    viewModel.excludeObjects(unmapped);
+    viewModel.includeLoadedObjects(mapped);
+  },
+  [`{viewModel.instance} ${OBJECTS_MAPPED_VIA_MAPPER.type}`](el, {objects}) {
+    const viewModel = this.viewModel;
+
+    mapObjects(viewModel.attr('instance'), objects).then(() => {
+      viewModel.includeLoadedObjects(objects);
     });
-
-  // We are tracking binding changes, so mapped items update accordingly
-  binding.list.on('change', () => {
-    this.viewModel.attr('mappedObjects').replace(binding.list);
-  });
+  },
 };
 
 export default can.Component.extend({
@@ -35,4 +86,5 @@ export default can.Component.extend({
   leakScope: true,
   viewModel,
   init,
+  events,
 });

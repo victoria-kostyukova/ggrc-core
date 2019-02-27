@@ -5,6 +5,7 @@
 
 import Mappings from '../../../models/mappers/mappings';
 import * as businessModels from '../../../models/business-models';
+import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
 
 /**
  * @typedef {Object} Stub
@@ -31,14 +32,10 @@ const viewModel = can.Map.extend({
       businessModels[stub.type].findInCacheById(stub.id)
     );
   },
-  async loadMappedObjects() {
-    const mappedObjectsBindings = await Mappings
-      .getBinding('info_related_objects', this.attr('instance'))
-      .refresh_instances();
-    return mappedObjectsBindings.map((binding) =>
-      binding.instance ||
-      binding
-    );
+  loadMappedObjects() {
+    const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
+    const fields = ['id', 'type', 'title'];
+    return loadObjectsByTypes(this.attr('instance'), mappingTypes, fields);
   },
   async init() {
     this.attr('preMappedObjects', this.loadPreMappedObjects());

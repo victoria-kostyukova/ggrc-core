@@ -11,6 +11,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
   DEFERRED_MAP_OBJECTS,
+  DEFERRED_MAPPED_UNMAPPED,
 } from '../events/eventTypes';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import {reify, isReifiable} from '../plugins/utils/reify-utils';
@@ -79,11 +80,18 @@ export default can.Component.extend({
 
       return pendingUnmap;
     },
-    afterDeferredUpdate(objects) {
+    afterDeferredUpdate(objectsToMap, objectsToUnmap) {
+      const objects = objectsToMap.concat(objectsToUnmap);
       const instance = this.attr('instance');
       const objectTypes = _.uniq(objects
         .map((object) => object.type)
       );
+
+      instance.dispatch({
+        ...DEFERRED_MAPPED_UNMAPPED,
+        mapped: objectsToMap,
+        unmapped: objectsToUnmap,
+      });
 
       objectTypes.forEach((objectType) => {
         instance.dispatch({
@@ -109,13 +117,18 @@ export default can.Component.extend({
     async deferredUpdate() {
       const instance = this.attr('instance');
       const pendingJoins = instance.attr('_pendingJoins');
+
+      // If there are no objects for mapping/unmapping
+      if (!pendingJoins.length) {
+        return;
+      }
+
       const objectsToMap =
         _.filter(pendingJoins, ({how}) => how === 'map')
           .map(({what}) => what);
       const objectsToUnmap =
         _.filter(pendingJoins, ({how}) => how === 'unmap')
           .map(({what}) => what);
-
 
       await Promise.all([
         this.performMapActions(instance, objectsToMap),
@@ -124,8 +137,7 @@ export default can.Component.extend({
 
       instance.attr('_pendingJoins', []);
 
-      const objects = objectsToMap.concat(objectsToUnmap);
-      this.afterDeferredUpdate(objects);
+      this.afterDeferredUpdate(objectsToMap, objectsToUnmap);
     },
     _indexOfPendingJoin(object, action) {
       return _.findIndex(this.attr('instance._pendingJoins'),

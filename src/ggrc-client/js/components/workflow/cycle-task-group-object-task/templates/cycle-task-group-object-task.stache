@@ -140,7 +140,7 @@
             <div class="span12">
               <h6>Mapped objects</h6>
 
-              <cycle-task-objects parentInstance:from="instance">
+              <cycle-task-objects instance:from="instance">
               </cycle-task-objects>
 
               {{#if showMapObjectsButton}}

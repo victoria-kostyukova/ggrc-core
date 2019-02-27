@@ -4,7 +4,7 @@
 }}
 
 <ul class="tree-structure new-tree mapped-objects-tree">
-  {{#mappedObjects}}
+  {{#each mappedObjects}}
     <li class="tree-item task-item">
       <div class="item-main">
         <div class="item-wrap">
@@ -14,9 +14,9 @@
               <div class="row-fluid">
                 <div class="span8">
                   <div class="cycle-task-objects__content">
-                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
-                    <a href="{{instance.viewLink}}" target="_blank" class="cycle-task-objects__object-link">
-                      {{firstexist instance.name instance.title instance.description}}
+                    <i class="fa {{iconClass}} color"></i>
+                    <a href="{{object.viewLink}}" target="_blank" class="cycle-task-objects__object-link">
+                      {{object.title}}
                     </a>
                   </div>
                 </div>
@@ -26,5 +26,5 @@
         </div>
       </div>
     </li>
-  {{/mappedObjects}}
+  {{/each}}
 </ul>
