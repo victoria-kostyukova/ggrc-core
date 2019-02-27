@@ -31,7 +31,10 @@
                     {attr-name}="'description'"
                   >
                     <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
-                      <read-more {text}="description"></read-more>
+                      <read-more
+                        {text}="description"
+                        {handle-markdown}="instance.class.isChangeableExternally">
+                      </read-more>
                     </div>
                   </proposable-attribute>
                 </div>
@@ -45,7 +48,10 @@
                     {attr-name}="'test_plan'"
                   >
                     <div class="rtf-block">
-                      <read-more {text}="test_plan"></read-more>
+                      <read-more
+                        {text}="test_plan"
+                        {handle-markdown}="instance.class.isChangeableExternally">
+                      </read-more>
                     </div>
                   </proposable-attribute>
                 </div>
@@ -59,7 +65,10 @@
                     {attr-name}="'notes'"
                   >
                     <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
-                      <read-more {text}="notes"></read-more>
+                      <read-more
+                        {text}="notes"
+                        {handle-markdown}="instance.class.isChangeableExternally">
+                      </read-more>
                     </div>
                   </proposable-attribute>
                 </div>

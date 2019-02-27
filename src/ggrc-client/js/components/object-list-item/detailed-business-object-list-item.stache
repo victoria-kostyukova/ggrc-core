@@ -5,11 +5,17 @@
 
 <div class="mapped-object-info__item">
     <h6>Description</h6>
-    <read-more text="itemData.description"></read-more>
+    <read-more
+      text="itemData.description"
+      {handle-markdown}="instance.class.isChangeableExternally">
+    </read-more>
 </div>
 <div class="mapped-object-info__item">
     <h6>Notes</h6>
-    <read-more text="itemData.notes"></read-more>
+    <read-more
+      text="itemData.notes"
+      {handle-markdown}="instance.class.isChangeableExternally">
+    </read-more>
 </div>
 <div class="mapped-object-info__attributes">
     <div class="mapped-object-info__item">

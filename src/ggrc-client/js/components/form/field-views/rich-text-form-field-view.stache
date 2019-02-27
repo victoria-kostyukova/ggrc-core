@@ -5,7 +5,10 @@
 
 <div class="view-wrapper">
   {{#if value}}
-    <read-more {text}="value"></read-more>
+    <read-more
+      {text}="value"
+      {handle-markdown}="instance.class.isChangeableExternally">
+    </read-more>
   {{else}}
     <span class="empty-message">None</span>
   {{/if}}

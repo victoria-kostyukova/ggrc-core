@@ -22,11 +22,17 @@
       </div>
       <div class="mapped-object-info__item">
           <h6>Description</h6>
-          <read-more text="description"></read-more>
+          <read-more
+            text="description"
+            {handle-markdown}="instance.class.isChangeableExternally">
+          </read-more>
       </div>
       <div class="mapped-object-info__item">
           <h6>Notes</h6>
-          <read-more text="notes"></read-more>
+          <read-more
+            text="notes"
+            {handle-markdown}="instance.class.isChangeableExternally">
+          </read-more>
       </div>
 
       <div class="mapped-object-info__attributes">

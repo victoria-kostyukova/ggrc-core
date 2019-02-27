@@ -19,7 +19,10 @@
               <div class="row-fluid wrap-row">
                 <div class="span12">
                   <h6>Risk Type</h6>
-                  <read-more {text}="risk_type"></read-more>
+                  <read-more
+                    {text}="risk_type"
+                    {handle-markdown}="instance.class.isChangeableExternally">
+                  </read-more>
                 </div>
               </div>
 
@@ -27,7 +30,10 @@
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Threat Source</h6>
-                    <read-more {text}="threat_source"></read-more>
+                    <read-more
+                      {text}="threat_source"
+                      {handle-markdown}="instance.class.isChangeableExternally">
+                    </read-more>
                   </div>
                 </div>
               {{/if_helpers}}
@@ -36,7 +42,10 @@
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Threat Event</h6>
-                    <read-more {text}="threat_event"></read-more>
+                    <read-more
+                      {text}="threat_event"
+                      {handle-markdown}="instance.class.isChangeableExternally">
+                    </read-more>
                   </div>
                 </div>
               {{/if_helpers}}
@@ -45,7 +54,10 @@
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Vulnerability</h6>
-                    <read-more {text}="vulnerability"></read-more>
+                    <read-more
+                      {text}="vulnerability"
+                      {handle-markdown}="instance.class.isChangeableExternally">
+                    </read-more>
                   </div>
                 </div>
               {{/if_helpers}}

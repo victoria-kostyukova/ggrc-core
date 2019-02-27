@@ -18,7 +18,10 @@
               <div class="span12">
                 <h6>Notes</h6>
                 <div class="rtf-block">
-                  <read-more {text}="instance.notes"></read-more>
+                  <read-more
+                    {text}="instance.notes"
+                    {handle-markdown}="instance.class.isChangeableExternally">
+                  </read-more>
                 </div>
               </div>
             </div>

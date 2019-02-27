@@ -32,7 +32,11 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                         </a>
                     </div>
                     <div class="flex-size-3">
-                        <read-more {text}="instance.description" max-lines-number="2"></read-more>
+                        <read-more
+                          {text}="instance.description"
+                          max-lines-number="2"
+                          {handle-markdown}="instance.class.isChangeableExternally">
+                        </read-more>
                     </div>
                 </div>
             </object-list>

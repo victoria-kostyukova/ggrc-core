@@ -146,7 +146,11 @@
                       {{#if instanceUpdated}}
                         <business-object-list-item {instance}="instance">
                           <div class="description">
-                            <read-more {text}="itemData.description" max-lines-number="1"></read-more>
+                            <read-more
+                              {text}="itemData.description"
+                              max-lines-number="1"
+                              {handle-markdown}="instance.class.isChangeableExternally">
+                            </read-more>
                           </div>
                         </business-object-list-item>
                       {{/if}}

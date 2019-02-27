@@ -36,6 +36,9 @@
       <div class="comment-list__ca-description">{{customAttributeData}}</div>
     {{/if}}
     <div class="comment-object-item__text">
-      <read-more {text}="commentText"></read-more>
+      <read-more
+        {text}="commentText"
+        {handle-markdown}="instance.class.isChangeableExternally">
+      </read-more>
     </div>
 </div>

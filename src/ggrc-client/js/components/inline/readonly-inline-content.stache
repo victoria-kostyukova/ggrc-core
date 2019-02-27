@@ -48,7 +48,10 @@
   {{#default}}
     {{#if withReadMore}}
       <div class="inline-edit__text">
-        <read-more {text}="value"></read-more>
+        <read-more
+          {text}="value"
+          {handle-markdown}="instance.class.isChangeableExternally">
+        </read-more>
       </div>
     {{else}}
       <div class="inline-edit__text">
