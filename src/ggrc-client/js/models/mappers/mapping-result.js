@@ -122,13 +122,6 @@
       });
     },
 
-    //  `get_mappings`, `mappings_compute`, and `get_mappings_compute`
-    //  - Returns a list of first-level mapping instances, even if they're
-    //    several levels down due to virtual mappers like Multi
-    //  - "First-level mappings" are the objects whose existence causes the
-    //    `binding.instance` to be in the current `binding.list`.  (E.g.,
-    //    if any of the "first-level mappings" exist, the instance will
-    //    appear in the list.
     get_mappings: function () {
       let self = this;
       let mappings = [];
@@ -162,12 +155,6 @@
       });
     },
 
-    //  `walk_instances`
-    //  - `binding.mappings` can have several "virtual" levels due to mappers
-    //    like `Multi` and `Filter` -- e.g., mappers which just
-    //    aggregate or filter results of other mappers.  `walk_instances`
-    //    iterates over these "virtual" levels to emit instances only once
-    //    per time they appear in a traversal path of `binding.mappings`.
     walk_instances: function (fn, lastInstance, depth) {
       let i;
       if (!depth) {

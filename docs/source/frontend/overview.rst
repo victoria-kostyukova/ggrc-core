@@ -487,17 +487,10 @@ Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
 Types of Mappings
 ^^^^^^^^^^^^^^^^^
 
-There are 8 types of mappings. The types of mappings are defined with
+There are 2 types of mappings. The types of mappings are defined with
 Mappers. Mappers are defined in :src:`ggrc-client/js/models/mappers/models/index.js`
 
 Each type of mapping is defined below:
-
--  **Proxy** :src:`ggrc-client/js/models/mappers/proxy-list-loader.js`:
-   A proxy mapping is a relationship where one model
-   references another through another “join” or “proxy” model.  E.g.,
-   Programs reference Controls via the ProgramControl join/proxy model.
-    The Proxy mapping specifies the attributes and models involved in
-   the relationship, e.g.:
 
 -  **Direct** :src:`ggrc-client/js/models/mappers/direct-list-loader.js`:
    A direct mapping is a relationship where one model
@@ -513,16 +506,3 @@ Each type of mapping is defined below:
    search function is run at attach time and also when a new object of
    any type is created, so it is recommended to use this mapper
    sparingly in the system if it makes a number of large AJAX calls.
-
--  **Multi** :src:`ggrc-client/js/models/mappers/multi-list-loader.js`:
-   Constructs a mapping which is the union of zero or more
-   other mappings.  Specifically, the set of ``result.instance`` values
-   is the union of ``result.instance`` from the contributing mappings.
-
--  **CustomFilter** :src:`ggrc-client/js/models/mappers/custom-filtered-list-loader.js`:
-   A custom filtered mapping runs a filter function on
-   every result coming from a source mapping and returns all results
-   where the function returns either a truthy value or a deferred that
-   resolves to a truthy value. The filter function is re-run whenever an
-   instance in the source mapping changes, and adds and removes a
-   mapping to that instance accordingly.

@@ -4,11 +4,8 @@
 */
 
 import {
-  Proxy,
   Direct,
   Search,
-  Multi,
-  CustomFilter,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
@@ -30,10 +27,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
       unmap : [ <object name>, ...]
       indirectMappings: [ <object name>, ...]
       mappers : {
-        <mapping name> : Proxy(...) | Direct(...)
-                      | Multi(...)
-                      | CustomFilter(...),
-      ...
+        <mapping name>: Direct(...) | Search()
       }
     }
   }
@@ -247,48 +241,6 @@ new Mappings({
     map: [...coreObjects, 'Audit', 'Program'],
     unmap: [...coreObjects, 'Audit', 'Program'],
     indirectMappings: ['Person', 'Workflow'],
-
-    mappers: {
-      // Needed for related_objects mapper
-      related_objects_as_source: Proxy(
-        null,
-        'destination', 'Relationship',
-        'source', 'related_destinations'
-      ),
-      // Needed for related_objects mapper
-      related_objects_as_destination: Proxy(
-        null,
-        'source', 'Relationship',
-        'destination', 'related_sources'
-      ),
-      // Needed to show mapped objects for CycleTaskGroupObjectTask
-      related_objects: Multi(
-        ['related_objects_as_source', 'related_objects_as_destination']
-      ),
-      /**
-       * "cycle" mapper is needed for mapped objects under
-       * CycleTaskGroupObjectTask into cycle-task-objects component.
-       */
-      cycle: Direct(
-        'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-      /**
-       * This mapping name is needed for objects mapped to CTGOT.
-       * It helps to filter results of objects mapped to CTGOT.
-       * We can just remove some objects from results.
-       */
-      info_related_objects: CustomFilter(
-        'related_objects',
-        function (relatedObjects) {
-          return !_.includes([
-            'CycleTaskGroup',
-            'Comment',
-            'Document',
-            'Person',
-          ],
-          relatedObjects.instance.type);
-        }
-      ),
-    },
   },
 
   // Other
