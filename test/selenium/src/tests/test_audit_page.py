@@ -24,9 +24,8 @@ class TestAuditPage(base.Test):
 
   @pytest.fixture(scope="function")
   def create_and_clone_audit_w_params_to_update(
-      self, request, new_program_rest, new_control_rest,
-      map_new_program_rest_to_new_control_rest, new_audit_rest,
-      new_assessment_rest, new_assessment_template_rest, new_issue_rest,
+      self, request, program, control_mapped_to_program,
+      audit, assessment, assessment_template_rest, issue_mapped_to_audit,
       selenium
   ):
     """Create Audit with clonable and non clonable objects via REST API and
@@ -43,23 +42,24 @@ class TestAuditPage(base.Test):
       if isinstance(request.param, tuple):
         fixture, params_to_update = request.param
         # fixtures which are objects
-        if fixture in request.fixturenames and fixture.startswith("new_"):
+        if fixture in request.fixturenames and (
+            fixture == "audit" or "assessment_template"):
           fixture = locals().get(fixture)
           (get_cls_rest_service(objects.get_plural(fixture.type))().
            update_obj(obj=fixture, **params_to_update))
     expected_audit = entities_factory.AuditsFactory.clone(
-        audit=new_audit_rest)[0]
+        audit=audit)[0]
     expected_asmt_tmpl = entities_factory.AssessmentTemplatesFactory.clone(
-        asmt_tmpl=new_assessment_template_rest)[0]
+        asmt_tmpl=assessment_template_rest)[0]
     actual_audit = (webui_service.AuditsService(selenium).
-                    clone_via_info_page_and_get_obj(audit_obj=new_audit_rest))
+                    clone_via_info_page_and_get_obj(audit_obj=audit))
     return {
-        "audit": new_audit_rest, "expected_audit": expected_audit,
-        "actual_audit": actual_audit, "assessment": new_assessment_rest,
-        "issue": new_issue_rest,
-        "assessment_template": new_assessment_template_rest,
+        "audit": audit, "expected_audit": expected_audit,
+        "actual_audit": actual_audit, "assessment": assessment,
+        "issue": issue_mapped_to_audit,
+        "assessment_template": assessment_template_rest,
         "expected_assessment_template": expected_asmt_tmpl,
-        "control": new_control_rest, "program": new_program_rest
+        "control": control_mapped_to_program, "program": program
     }
 
   @pytest.mark.smoke_tests
@@ -79,8 +79,7 @@ class TestAuditPage(base.Test):
     self.general_equal_assert(audit, actual_audit, "custom_attributes")
 
   @pytest.mark.smoke_tests
-  def test_asmt_tmpl_creation(self, new_program_rest, new_audit_rest,
-                              selenium):
+  def test_asmt_tmpl_creation(self, program, audit, selenium):
     """Check if Assessment Template can be created from Audit page via
     Assessment Templates widget.
     Preconditions:
@@ -90,12 +89,12 @@ class TestAuditPage(base.Test):
         entities_factory.AssessmentTemplatesFactory().create())
     asmt_tmpls_ui_service = webui_service.AssessmentTemplatesService(selenium)
     asmt_tmpls_ui_service.create_obj_via_tree_view(
-        src_obj=new_audit_rest, obj=expected_asmt_tmpl)
+        src_obj=audit, obj=expected_asmt_tmpl)
     actual_asmt_tmpls_tab_count = (
-        asmt_tmpls_ui_service.get_count_objs_from_tab(src_obj=new_audit_rest))
+        asmt_tmpls_ui_service.get_count_objs_from_tab(src_obj=audit))
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
     actual_asmt_tmpls = asmt_tmpls_ui_service.get_list_objs_from_tree_view(
-        src_obj=new_audit_rest)
+        src_obj=audit)
     # 'expected_asmt_tmpls': modified_by (None) *factory
     # 'actual_asmt_tmpls': assignees, verifiers, template_object_type (None)
     self.general_equal_assert(
@@ -166,17 +165,15 @@ class TestAuditPage(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_objects",
-      [None, "new_assessment_template_rest",
-       "new_assessment_template_with_cas_rest"],
+      "obj",
+      [None, "assessment_template_rest",
+       "assessment_template_with_all_cas_rest"],
       ids=["Assessments generation without Assessment Template",
            "Assessments generation based on Assessment Template without LCAs",
            "Assessments generation based on Assessment Template with LCAs"],
       indirect=True)
   def test_asmts_generation(
-      self, new_program_rest, new_controls_rest,
-      map_new_program_rest_to_new_controls_rest, new_audit_rest,
-      dynamic_objects, selenium
+      self, program, controls_mapped_to_program, audit, obj, selenium
   ):
     """Check if Assessments can be generated from Audit page via Assessments
     widget using Assessment template and Controls.
@@ -188,33 +185,34 @@ class TestAuditPage(base.Test):
     - 'dynamic_objects'.
     """
     expected_asmts = (entities_factory.AssessmentsFactory().generate(
-        mapped_objects=new_controls_rest, audit=new_audit_rest,
-        asmt_tmpl=dynamic_objects))
+        mapped_objects=controls_mapped_to_program, audit=audit,
+        asmt_tmpl=obj))
     expected_asmts = [
         expected_asmt.repr_ui() for expected_asmt in expected_asmts]
     asmts_ui_service = webui_service.AssessmentsService(selenium)
     asmts_ui_service.generate_objs_via_tree_view(
-        src_obj=new_audit_rest, objs_under_asmt=new_controls_rest,
-        asmt_tmpl_obj=dynamic_objects)
+        src_obj=audit, objs_under_asmt=controls_mapped_to_program,
+        asmt_tmpl_obj=obj)
     actual_asmts_tab_count = asmts_ui_service.get_count_objs_from_tab(
-        src_obj=new_audit_rest)
+        src_obj=audit)
     assert len(expected_asmts) == actual_asmts_tab_count
     actual_asmts = asmts_ui_service.get_list_objs_from_info_panels(
-        src_obj=new_audit_rest, objs=expected_asmts)
+        src_obj=audit, objs=expected_asmts)
     # 'expected_asmt': slug, custom_attributes (None) *factory
     # 'actual_asmt': audit (None)
     self.general_equal_assert(
-        expected_asmts, actual_asmts, "slug", "custom_attributes", "audit")
+        expected_asmts, actual_asmts, "slug", "custom_attributes", "audit",
+        "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
   @pytest.mark.parametrize(
       "create_and_clone_audit_w_params_to_update",
-      [("new_audit_rest", {"status": object_states.PLANNED}),
-       ("new_audit_rest", {"status": object_states.IN_PROGRESS}),
-       ("new_audit_rest", {"status": object_states.MANAGER_REVIEW}),
-       ("new_audit_rest", {"status": object_states.READY_FOR_EXT_REVIEW}),
-       ("new_audit_rest", {"status": object_states.COMPLETED})],
+      [("audit", {"status": object_states.PLANNED}),
+       ("audit", {"status": object_states.IN_PROGRESS}),
+       ("audit", {"status": object_states.MANAGER_REVIEW}),
+       ("audit", {"status": object_states.READY_FOR_EXT_REVIEW}),
+       ("audit", {"status": object_states.COMPLETED})],
       ids=["Audit statuses: 'Planned' - 'Planned'",
            "Audit statuses: 'In Progress' - 'Planned'",
            "Audit statuses: 'Manager Review' - 'Planned'",
@@ -238,7 +236,7 @@ class TestAuditPage(base.Test):
     # 'actual_audit': program (None)
     self.general_equal_assert(
         expected_audit, actual_audit,
-        "created_at", "updated_at", "slug", "program")
+        "created_at", "updated_at", "slug", "program", "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -269,9 +267,9 @@ class TestAuditPage(base.Test):
   @pytest.mark.cloning
   @pytest.mark.parametrize(
       "create_and_clone_audit_w_params_to_update",
-      [("new_assessment_template_rest", {"status": object_states.DRAFT}),
-       ("new_assessment_template_rest", {"status": object_states.DEPRECATED}),
-       ("new_assessment_template_rest", {"status": object_states.ACTIVE})],
+      [("assessment_template", {"status": object_states.DRAFT}),
+       ("assessment_template", {"status": object_states.DEPRECATED}),
+       ("assessment_template", {"status": object_states.ACTIVE})],
       ids=["Assessment Template's statuses: 'Draft' - 'Draft'",
            "Assessment Template's' statuses: 'Deprecated' - 'Deprecated'",
            "Assessment Template's statuses: 'Active' - 'Active'"],
@@ -302,7 +300,7 @@ class TestAuditPage(base.Test):
     exclude_attrs = (
         Representation.tree_view_attrs_to_exclude +
         ("slug", "modified_by", "audit", "assignees", "verifiers",
-         "template_object_type"))
+         "template_object_type", "custom_attributes"))
     self.general_equal_assert(
         expected_asmt_tmpl, actual_asmt_tmpls, *exclude_attrs)
 
@@ -336,7 +334,7 @@ class TestAuditPage(base.Test):
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  def test_dashboard_gca(self, new_control_rest, selenium):
+  def test_dashboard_gca(self, program, selenium):
     # pylint: disable=anomalous-backslash-in-string
     """Check Dashboard Tab is exist if 'Dashboard' GCA filled
     with right value. Possible values match to regexp r"^https?://[^\s]+$".
@@ -352,19 +350,19 @@ class TestAuditPage(base.Test):
             "ftp://something.com/"]
     cads_rest_service = rest_service.CustomAttributeDefinitionsService()
     gca_defs = (cads_rest_service.create_dashboard_gcas(
-        new_control_rest.type, count=len(urls)))
-    control_rest_service = rest_service.ControlsService()
-    control_rest_service.update_obj(
-        obj=new_control_rest, custom_attributes=dict(
+        program.type, count=len(urls)))
+    program_rest_service = rest_service.ProgramsService()
+    program_rest_service.update_obj(
+        obj=program, custom_attributes=dict(
             zip([gca_def.id for gca_def in gca_defs], urls)))
     expected_dashboards_items = dict(zip(
         [gca_def.title.replace(aliases.DASHBOARD + "_", "")
          for gca_def in gca_defs], urls[:3]))
-    controls_ui_service = webui_service.ControlsService(selenium)
+    programs_ui_service = webui_service.ProgramsService(selenium)
     is_dashboard_tab_exist = (
-        controls_ui_service.is_dashboard_tab_exist(new_control_rest))
+        programs_ui_service.is_dashboard_tab_exist(program))
     assert is_dashboard_tab_exist
     actual_dashboards_items = (
-        controls_ui_service.get_items_from_dashboard_widget(new_control_rest))
+        programs_ui_service.get_items_from_dashboard_widget(program))
     assert expected_dashboards_items == actual_dashboards_items
     cads_rest_service.delete_objs(gca_defs)

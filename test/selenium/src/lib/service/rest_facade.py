@@ -5,8 +5,8 @@ Reasons for a facade:
 * It is not very convenient to use
 * More high level functions are often needed
 """
-from lib import factory
-from lib.constants import roles
+from lib import factory, decorator
+from lib.constants import roles, objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.service import rest_service
@@ -22,9 +22,17 @@ def create_objective(program=None, **attrs):
   return _create_obj_in_program_scope("Objectives", program, **attrs)
 
 
-def create_control(program=None, **attrs):
+@decorator.work_by_external_user
+def create_control(**attrs):
+  """Create an control."""
+  return _create_obj_in_program_scope("Controls", None, **attrs)
+
+
+def create_control_mapped_to_program(program, **attrs):
   """Create a control (optionally map to a `program`)"""
-  return _create_obj_in_program_scope("Controls", program, **attrs)
+  control = create_control(**attrs)
+  map_objs(program, control)
+  return control
 
 
 def create_audit(program, **attrs):
@@ -40,26 +48,42 @@ def create_asmt(audit, **attrs):
   return rest_service.AssessmentsService().create_obj(factory_params=attrs)
 
 
-def create_asmt_template(audit, **attrs):
+def create_asmt_template(audit, all_cad_types=False, **attrs):
   """Create assessment template."""
+  from lib.constants.element import AdminWidgetCustomAttributes
   obj_attrs, cad_attrs = _split_attrs(
       attrs, ["cad_type", "dropdown_types_list"])
+  cads = []
+  if all_cad_types:
+    for cad_type in AdminWidgetCustomAttributes.ALL_CA_TYPES:
+      cads.append(entities_factory.AssessmentTemplatesFactory.generate_cad(
+          cad_type=cad_type))
   if "cad_type" in cad_attrs:
     cads = [entities_factory.AssessmentTemplatesFactory.generate_cad(
         **cad_attrs)]
-    obj_attrs["custom_attribute_definitions"] = cads
+  obj_attrs["custom_attribute_definitions"] = cads
   obj_attrs["audit"] = audit.__dict__
   return rest_service.AssessmentTemplatesService().create_obj(
       factory_params=obj_attrs)
 
 
-def create_asmt_from_template(audit, asmt_template, obj_to_map):
-  """Create an assessment from template"""
-  snapshots = [Representation.convert_repr_to_snapshot(
-      objs=obj_to_map, parent_obj=audit)]
+def convert_cntrl_to_snapshot(audit, obj):
+  """Convert control to snapshot."""
+  return Representation.convert_repr_to_snapshot(
+      objs=obj, parent_obj=audit)
+
+
+def create_asmt_from_template(audit, asmt_template, objs_to_map):
+  """Create an assessment from template."""
+  return create_asmts_from_template(audit, asmt_template, objs_to_map)[0]
+
+
+def create_asmts_from_template(audit, asmt_template, objs_to_map):
+  """Create assessments from template."""
+  snapshots = [convert_cntrl_to_snapshot(audit, obj_to_map) for obj_to_map
+               in objs_to_map]
   return rest_service.AssessmentsFromTemplateService().create_assessments(
-      audit=audit, template=asmt_template, snapshots=snapshots
-  )[0]
+      audit=audit, template=asmt_template, snapshots=snapshots)
 
 
 def create_gcad(**attrs):
@@ -68,12 +92,26 @@ def create_gcad(**attrs):
       factory_params=attrs)
 
 
-def create_issue(program=None):
-  """Create a issue (optionally map to a `program`)"""
+@decorator.work_by_external_user
+def create_gcad_for_control():
+  """Creates global CADs for all types."""
+  from lib.constants import element
+  return [create_gcad(definition_type="control",
+                                  attribute_type=ca_type)
+          for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
+
+
+def create_issue(obj=None):
+  """Create a issue (optionally map to a `obj`)"""
   issue = rest_service.IssuesService().create_obj()
-  if program:
-    map_objs(program, issue)
+  if obj:
+    map_objs(obj, issue)
   return issue
+
+
+def create_risk(**attrs):
+  """Create an risk."""
+  return _create_obj_in_program_scope("Risks", None, **attrs)
 
 
 def create_user():
@@ -98,7 +136,7 @@ def create_access_control_role(**attrs):
 
 def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
-  rest_service.RelationshipsService().map_objs(
+  return rest_service.RelationshipsService().map_objs(
       src_obj=src_obj, dest_objs=dest_obj)
 
 
@@ -141,3 +179,29 @@ def _split_attrs(attrs, second_part_keys=None):
   dict_1 = {k: v for k, v in attrs.iteritems() if k not in second_part_keys}
   dict_2 = {k: v for k, v in attrs.iteritems() if k in second_part_keys}
   return dict_1, dict_2
+
+
+@decorator.work_by_external_user
+def update_control(control, **attrs):
+  if attrs is None:
+    attrs["title"] = "EDITED_" + control.title
+    return (factory.get_cls_rest_service(
+        objects.get_plural(control.type))().update_obj(
+        obj=control,
+        title=attrs["title"]))
+  else:
+    return (factory.get_cls_rest_service(
+      objects.get_plural(control.type))().update_obj(
+      obj=control, **attrs))
+
+
+@decorator.work_by_external_user
+def delete_control(control):
+  return (factory.get_cls_rest_service(
+      objects.get_plural(control.type))().delete_objs(control))
+
+
+@decorator.work_by_external_user
+def delete_control_cas(cas):
+  from lib.service.rest_service import CustomAttributeDefinitionsService
+  return (CustomAttributeDefinitionsService().delete_objs(cas))

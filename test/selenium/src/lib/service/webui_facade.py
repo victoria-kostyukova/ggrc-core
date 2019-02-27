@@ -4,13 +4,25 @@
 import copy
 import re
 
-from lib import users, base
+from lib import users, base, decorator
 from lib.constants import objects, element
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
+from lib.service.webui_service import ControlsService
 from lib.utils import selenium_utils, ui_utils, string_utils
 
 from lib.entities import entities_factory
+
+
+@decorator.work_by_external_user
+def create_control_in_program_scope(selenium, program):
+  """Create control via UI."""
+  controls_service = webui_service.ControlsService(selenium)
+  controls_service.open_widget_of_mapped_objs(
+    program).tree_view.open_map().click_create_and_map_obj()
+  control = entities_factory.ControlsFactory().create()
+  controls_service.submit_obj_modal(control)
+  return control
 
 
 def create_asmt(selenium, audit):
@@ -50,7 +62,8 @@ def assert_can_view(selenium, obj):
   obj_copy = copy.deepcopy(obj)
   # Code for working with custom attributes appears to be buggy
   base.Test.general_equal_assert(
-      obj_copy.repr_ui(), actual_obj, "audit", "custom_attributes", "program")
+      obj_copy.repr_ui(), actual_obj, "audit", "custom_attributes",
+      "program", "external_slug", "external_id")
 
 
 def assert_cannot_view(obj):
@@ -72,6 +85,17 @@ def assert_can_edit(selenium, obj, can_edit):
     _assert_title_editable(obj, selenium, info_page)
 
 
+def assert_can_edit_control(selenium, cntrl, can_edit):
+  """Assert that current user cannot edit control via UI."""
+  info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
+  els_shown_for_editor = info_page.els_shown_for_editor()
+  exp_list = [can_edit] * (len(els_shown_for_editor))
+  exp_list[0] = True #Add comment btn exists on all control pages
+  assert [item.exists for item in els_shown_for_editor] == exp_list
+  if info_page.three_bbs.exists:
+    assert info_page.three_bbs.edit_option.exists is False
+
+
 def assert_can_delete(selenium, obj, can_delete):
   """If `can_delete` is True, assert that current user can delete object via UI
   otherwise check that user cannot delete object via UI
@@ -82,6 +106,13 @@ def assert_can_delete(selenium, obj, can_delete):
     info_page.three_bbs.select_delete().confirm_delete()
     selenium_utils.open_url(obj.url)
     assert ui_utils.is_error_404()
+
+
+def assert_cannot_delete_control(selenium, cntrl):
+  """Assert that current user cannot delete control via UI."""
+  cntrl_info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
+  if cntrl_info_page.three_bbs.exists:
+    assert cntrl_info_page.three_bbs.delete_option.exists is False
 
 
 def _get_ui_service(selenium, obj):

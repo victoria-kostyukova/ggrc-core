@@ -123,11 +123,11 @@ class TestEventLogTabDestructive(base.Test):
   def tested_events(self, selenium):
     """Create events to verify events functionality:
     0. Save event log count before test data creation,
-    1. Create control editor role, create 2 users with global creator role
+    1. Create objective editor role, create 2 users with global creator role
     under admin
-    2. Create control#1 under global creator#1 and set global creator#2 to
-    newly created control editor role
-    3. Create control#2 under global creator#2 and map it control#1
+    2. Create objective#1 under global creator#1 and set global creator#2 to
+    newly created objective editor role
+    3. Create objective#2 under global objective#2 and map it objective#1
     """
     if not self.__class__._data:
       # generate enough data, so test can be executed independently
@@ -135,73 +135,73 @@ class TestEventLogTabDestructive(base.Test):
         rest_facade.create_user_with_role(roles.READER)
 
       initial_count = self.get_event_tab().tab_events.count
-      ctrl1_creator = rest_facade.create_user_with_role(roles.CREATOR)
-      ctrl2_creator = rest_facade.create_user_with_role(roles.CREATOR)
-      ctrl_editor_role = rest_facade.create_access_control_role(
-          object_type="Control", read=True, update=True, delete=True)
+      objctv1_creator = rest_facade.create_user_with_role(roles.CREATOR)
+      objctv2_creator = rest_facade.create_user_with_role(roles.CREATOR)
+      objctv_editor_role = rest_facade.create_access_control_role(
+          object_type="Objective", read=True, update=True, delete=True)
       admin = users.current_user()
-      users.set_current_user(ctrl1_creator)
-      ctrl_custom_roles = [
-          (ctrl_editor_role.name, ctrl_editor_role.id, [ctrl2_creator])
+      users.set_current_user(objctv1_creator)
+      objctv_custom_roles = [
+          (objctv_editor_role.name, objctv_editor_role.id, [objctv2_creator])
       ]
-      ctrl1 = rest_facade.create_control(custom_roles=ctrl_custom_roles)
+      objctv1 = rest_facade.create_objective(custom_roles=objctv_custom_roles)
       # wait until notification and acl will assigned by background task
-      rest_facade.get_obj(ctrl1)
+      rest_facade.get_obj(objctv1_creator)
 
-      users.set_current_user(ctrl2_creator)
-      ctrl2 = rest_facade.create_control()
-      rest_facade.map_objs(ctrl1, ctrl2)
+      users.set_current_user(objctv2_creator)
+      objctv2 = rest_facade.create_objective()
+      rest_facade.map_objs(objctv1, objctv2)
 
       users.set_current_user(admin)
       # generate expected event data
       acl_roles_len = 7
       exp_event_data = [
           {"actions": sorted(
-              [ctrl1_creator.email + " created", u"PersonProfile created"]),
+              [objctv1_creator.email + " created", u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
-               ctrl1_creator.updated_at)},
-          {"actions": ["Creator linked to " + ctrl1_creator.email],
+              objctv1_creator.updated_at)},
+          {"actions": ["Creator linked to " + objctv1_creator.email],
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
-           ctrl1_creator.updated_at)},
+              objctv1_creator.updated_at)},
           {"actions": sorted(
-              [ctrl2_creator.email + " created", u"PersonProfile created"]),
+              [objctv2_creator.email + " created", u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
-               ctrl2_creator.updated_at)},
-          {"actions": ["Creator linked to " + ctrl2_creator.email],
+              objctv2_creator.updated_at)},
+          {"actions": ["Creator linked to " + objctv2_creator.email],
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
-               ctrl2_creator.updated_at)},
-          {"actions": [ctrl_editor_role.name + " created"],
+              objctv2_creator.updated_at)},
+          {"actions": [objctv_editor_role.name + " created"],
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
-               ctrl_editor_role.updated_at)},
+              objctv_editor_role.updated_at)},
           {"actions": [u"AccessControlList created"] * acl_roles_len +
                       [u"AccessControlPerson created"] * 2 +
-                      [ctrl1.title + " created",
+                      [objctv1.title + " created",
                        u"Security created"],
-           "user_email": ctrl1_creator.email,
-           "time": date_utils.iso8601_to_local_datetime(ctrl1.updated_at)},
+           "user_email": objctv1_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(objctv1.updated_at)},
           {"actions": [u"AccessControlList created"] * acl_roles_len +
                       [u"AccessControlPerson created",
-                       ctrl2.title + " created",
+                       objctv2.title + " created",
                        u"Security created"],
-           "user_email": ctrl2_creator.email,
-           "time": date_utils.iso8601_to_local_datetime(ctrl2.updated_at)},
+           "user_email": objctv2_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(objctv2.updated_at)},
           {"actions": [u"Control:{id2} linked to Control:{id1}".format(
-              id1=ctrl1.id, id2=ctrl2.id)],
-           "user_email": ctrl2_creator.email,
-           "time": date_utils.iso8601_to_local_datetime(ctrl2.updated_at)}
+              id1=objctv1.id, id2=objctv2.id)],
+           "user_email": objctv2_creator.email,
+           "time": date_utils.iso8601_to_local_datetime(objctv2.updated_at)}
       ]
       exp_event_data.reverse()
       self.__class__._data = {
-          "ctrl1_creator": ctrl1_creator,
-          "ctrl2_creator": ctrl2_creator,
-          "ctrl_editor_role": ctrl_editor_role,
-          "ctrl1": ctrl1,
-          "ctrl2": ctrl2,
+          "objctv1_creator": objctv1_creator,
+          "objctv2_creator": objctv2_creator,
+          "objctv_editor_role": objctv_editor_role,
+          "objctv1": objctv1,
+          "objctv2": objctv2,
           "exp_added_events": exp_event_data,
           "initial_count": initial_count
       }

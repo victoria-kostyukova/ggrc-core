@@ -22,18 +22,18 @@ class TestMyWorkPage(base.Test):
   """Tests My Work page, part of smoke tests, section 2."""
 
   @pytest.mark.smoke_tests
-  def test_destructive_horizontal_nav_bar_tabs(self, new_controls_rest,
+  def test_destructive_horizontal_nav_bar_tabs(self, programs,
                                                my_work_dashboard, selenium):
     """Tests that several objects in widget can be deleted sequentially.
     Preconditions:
     - Controls created via REST API.
     """
-    controls_tab = my_work_dashboard.select_controls()
-    for _ in xrange(controls_tab.member_count):
-      counter = controls_tab.get_items_count()
-      (controls_tab.select_member_by_num(0).
+    programs_tab = my_work_dashboard.select_programs()
+    for _ in xrange(programs_tab.member_count):
+      counter = programs_tab.get_items_count()
+      (programs_tab.select_member_by_num(0).
        three_bbs.select_delete().confirm_delete())
-      controls_tab.wait_member_deleted(counter)
+      programs_tab.wait_member_deleted(counter)
     controls_generic_widget = generic_widget.Controls(
         selenium, objects.CONTROLS)
     expected_widget_members = []
@@ -118,7 +118,7 @@ class TestMyWorkPage(base.Test):
     webui_facade.check_user_menu_has_icons(user_menu)
 
   @pytest.mark.smoke_tests
-  def test_lhn_info_popup(self, header_dashboard, new_program_rest):
+  def test_lhn_info_popup(self, header_dashboard, program):
     """Tests LHN item info popup."""
     programs = (header_dashboard.open_lhn_menu().select_all_objects().
                 select_programs())
@@ -127,47 +127,45 @@ class TestMyWorkPage(base.Test):
         program_title).title.text
 
   @pytest.mark.smoke_tests
-  def test_info_panel_close_button(self, my_work_dashboard, new_program_rest):
+  def test_info_panel_close_button(self, my_work_dashboard, program):
     """Tests My Work Info panel close button."""
     info_panel = (my_work_dashboard.select_programs().tree_view.
-                  select_member_by_title(new_program_rest.title).panel)
+                  select_member_by_title(program.title).panel)
     info_panel.button_close.js_click()
     selenium_utils.wait_for_doc_is_ready(my_work_dashboard._driver)
     assert info_panel.is_opened is False
 
   @pytest.mark.smoke_tests
-  def test_info_panel_minimize_button(self, my_work_dashboard,
-                                      new_program_rest):
+  def test_info_panel_minimize_button(self, my_work_dashboard, program):
     """Tests My Work Info panel minimize button."""
     program_info_panel = (my_work_dashboard.select_programs().tree_view.
-                          select_member_by_title(new_program_rest.title).panel)
+                          select_member_by_title(program.title).panel)
     btn_minimize = program_info_panel.button_minimize
     btn_minimize.js_click()
     assert program_info_panel.is_minimized is True
 
   @pytest.mark.smoke_tests
-  def test_info_panel_maximize_button(self, my_work_dashboard,
-                                      new_program_rest):
+  def test_info_panel_maximize_button(self, my_work_dashboard, program):
     """Tests My Work Info panel maximize button."""
     program_info_panel = (my_work_dashboard.select_programs().tree_view.
-                          select_member_by_title(new_program_rest.title).panel)
+                          select_member_by_title(program.title).panel)
     program_info_panel.button_minimize.js_click()
     btn_maximize = program_info_panel.button_maximize
     btn_maximize.js_click()
     assert program_info_panel.is_maximized is True
 
   @pytest.mark.smoke_tests
-  def test_info_panel_content(self, my_work_dashboard, new_program_rest):
+  def test_info_panel_content(self, my_work_dashboard, program):
     """Tests My Work Info panel content."""
-    assert new_program_rest.title == (
+    assert program.title == (
         my_work_dashboard.select_programs().tree_view.
-        select_member_by_title(new_program_rest.title).panel.title)
+        select_member_by_title(program.title).panel.title)
 
   @pytest.mark.smoke_tests
-  def test_info_panel_3bbs(self, my_work_dashboard, new_program_rest):
+  def test_info_panel_3bbs(self, my_work_dashboard, program):
     """Tests My Work Info panel."""
     panel_three_bbs = (my_work_dashboard.select_programs().tree_view.
-                       select_member_by_title(new_program_rest.title).
+                       select_member_by_title(program.title).
                        three_bbs)
     assert panel_three_bbs.exists is True
 

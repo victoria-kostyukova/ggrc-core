@@ -233,6 +233,12 @@ class IssuesService(BaseRestService):
     super(IssuesService, self).__init__(url.ISSUES)
 
 
+class RisksService(BaseRestService):
+  """Service for working with Risks entities."""
+  def __init__(self):
+    super(RisksService, self).__init__(url.RISKS)
+
+
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
   def __init__(self):

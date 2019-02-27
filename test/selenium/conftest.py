@@ -5,6 +5,7 @@
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
+import copy
 import logging
 import os
 import urlparse
@@ -177,6 +178,14 @@ def set_superuser_as_current_user():
   users.set_current_user(entities_factory.PeopleFactory.superuser)
 
 
+@pytest.fixture()
+def set_external_user_as_current_user():
+  """Set super user as a current user"""
+  # pylint: disable=protected-access
+  users._current_user = users.EXTERNAL_APP_USER
+  users.set_current_user(entities_factory.PeopleFactory.external_app_user)
+
+
 @pytest.fixture(autouse=True)
 def reset_state(request):
   """Reset caches of logged in users and requests sessions.
@@ -331,35 +340,35 @@ def new_assessment_template_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
-@pytest.fixture(scope="function")
-def new_assessment_template_with_cas_rest(request):
-  """Create new Assessment Template with CAs under Audit object via REST API.
-  Return: lib.entities.entity.AssessmentTemplateEntity
-  """
-  yield _common_fixtures(request.fixturename)
+# @pytest.fixture(scope="function")
+# def new_assessment_template_with_cas_rest(request):
+#   """Create new Assessment Template with CAs under Audit object via REST API.
+#   Return: lib.entities.entity.AssessmentTemplateEntity
+#   """
+#   yield _common_fixtures(request.fixturename)
 
 
-@pytest.fixture(scope="function")
-def new_assessments_from_template_rest(request, new_audit_rest):
-  """Create new Assessments based on Assessment Template via REST API.
-  Return: [lib.entities.entity.AssessmentEntity, ...]
-  """
-  dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
-  control_snapshots = dynamic_fixtures.get_fixture_from_dict_fixtures(
-      "new_controls_rest_snapshot")
-  template = None
-  for fixture_name in dict_executed_fixtures:
-    if fixture_name.startswith("new_assessment_template"):
-      template = dict_executed_fixtures[fixture_name][0]
-  if not template:
-    raise ValueError("Assessment template was not created")
-  assessments_service = rest_service.AssessmentsFromTemplateService()
-  assessments = assessments_service.create_assessments(
-      audit=new_audit_rest,
-      template=template,
-      snapshots=control_snapshots
-  )
-  return assessments
+# @pytest.fixture(scope="function")
+# def new_assessments_from_template_rest(request, new_audit_rest):
+#   """Create new Assessments based on Assessment Template via REST API.
+#   Return: [lib.entities.entity.AssessmentEntity, ...]
+#   """
+#   dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
+#   control_snapshots = dynamic_fixtures.get_fixture_from_dict_fixtures(
+#       "new_controls_rest_snapshot")
+#   template = None
+#   for fixture_name in dict_executed_fixtures:
+#     if fixture_name.startswith("new_assessment_template"):
+#       template = dict_executed_fixtures[fixture_name][0]
+#   if not template:
+#     raise ValueError("Assessment template was not created")
+#   assessments_service = rest_service.AssessmentsFromTemplateService()
+#   assessments = assessments_service.create_assessments(
+#       audit=new_audit_rest,
+#       template=template,
+#       snapshots=control_snapshots
+#   )
+#   return assessments
 
 
 @pytest.fixture(scope="function")
@@ -380,29 +389,80 @@ def new_cas_for_controls_rest(request):
 
 
 @pytest.fixture(scope="function")
-def create_audit_with_control(request):
+def create_audit_with_control(
+    request, program, control_mapped_to_program, audit
+):
   """Create Program and Control, map Control to Program, create Audit
   under Program via REST API and return dictionary of executed fixtures.
   """
-  yield _snapshots_fixtures(request.fixturename)
+  return {"program": program,
+          "control": control_mapped_to_program,
+          "audit": audit}
+  # yield _snapshots_fixtures(request.fixturename)
 
 
 @pytest.fixture(scope="function")
-def create_audit_with_control_and_update_control(request):
+def create_audit_with_control_and_update_control(
+    request, program, control_mapped_to_program, audit
+):
   """Create Program and Control, map Control to Program, create Audit
   under Program, update Control via REST API and return dictionary of executed
   fixtures.
   """
-  yield _snapshots_fixtures(request.fixturename)
+  return {"program": program,
+          "control": copy.deepcopy(control_mapped_to_program),
+          "audit": audit,
+          "updated_control": rest_facade.update_control(
+              control_mapped_to_program)}
 
 
 @pytest.fixture(scope="function")
-def create_audit_with_control_and_delete_control(request):
+def create_audit_with_control_and_delete_control(
+    request, program, control_mapped_to_program, audit
+):
   """Create Program and Control, map Control to Program, create Audit
   under Program, delete Control via REST API and return dictionary of executed
   fixtures.
   """
-  yield _snapshots_fixtures(request.fixturename)
+  return {"program": program,
+          "control": copy.deepcopy(control_mapped_to_program),
+          "audit": audit,
+          "deleted_control": rest_facade.delete_control(
+              control_mapped_to_program)}
+
+
+@pytest.fixture(scope="function")
+def create_audit_with_control_with_cas_and_update_control_cav(
+  program, gcads_for_control, control_mapped_to_program, audit
+):
+  """Create Program, GCAs for Control and Control, map Control to Program,
+  create Audit under Program, update Control via REST API and return
+  dictionary of executed fixtures.
+  """
+  from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
+  cavs = [cav.__dict__ for cav
+          in CustomAttributeDefinitionsFactory.generate_cavs(
+        cads=gcads_for_control)]
+  return {"program": program,
+          "control": copy.deepcopy(control_mapped_to_program),
+          "audit": audit,
+          "updated_control": rest_facade.update_control(
+            control_mapped_to_program, custom_attribute_values=cavs)}
+
+
+@pytest.fixture(scope="function")
+def create_audit_with_control_with_cas_and_delete_cas_for_controls(
+    program, gcads_for_control, control_mapped_to_program, audit
+):
+  """Create Program and Control, map Control to Program, create Audit
+  under Program, delete Control via REST API and return dictionary of executed
+  fixtures.
+  """
+  [rest_facade.delete_control_cas(gca) for gca in gcads_for_control]
+  return {"program": program,
+          "control": copy.deepcopy(control_mapped_to_program),
+          "audit": audit,
+          "updated_control": rest_facade.get_obj(control_mapped_to_program)}
 
 
 @pytest.fixture(scope="function")
@@ -419,17 +479,17 @@ def map_new_control_rest_to_new_objectives_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
-@pytest.fixture(scope="function")
-def map_new_control_rest_to_new_programs_rest(request):
-  """Map Programs to Control objects via REST API return response from server.
-  """
-  yield _common_fixtures(request.fixturename)
+# @pytest.fixture(scope="function")
+# def map_new_control_rest_to_new_programs_rest(request):
+#   """Map Programs to Control objects via REST API return response from server.
+#   """
+#   yield _common_fixtures(request.fixturename)
 
 
-@pytest.fixture(scope="function")
-def map_new_control_rest_to_new_assessments_rest(request):
-  """Map Assessments to Control via REST API return response from server."""
-  yield _common_fixtures(request.fixturename)
+# @pytest.fixture(scope="function")
+# def map_new_control_rest_to_new_assessments_rest(request):
+#   """Map Assessments to Control via REST API return response from server."""
+#   yield _common_fixtures(request.fixturename)
 
 
 @pytest.fixture(scope="function")
@@ -446,11 +506,11 @@ def map_new_program_rest_to_new_control_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
-@pytest.fixture(scope="function")
-def map_new_program_rest_to_new_controls_rest(request):
-  """Map Controls to Program object via REST API return response from server.
-  """
-  yield _common_fixtures(request.fixturename)
+# @pytest.fixture(scope="function")
+# def map_new_program_rest_to_new_controls_rest(request):
+#   """Map Controls to Program object via REST API return response from server.
+#   """
+#   yield _common_fixtures(request.fixturename)
 
 
 @pytest.fixture(scope="function")
@@ -461,10 +521,12 @@ def map_new_assessment_rest_to_new_issue_rest(request):
 
 
 @pytest.fixture(scope="function")
-def map_new_assessment_rest_to_new_control_rest_snapshot(request):
-  """Map Objectives to Control object via REST API return response from server.
+def map_new_assessment_rest_to_new_control_rest_snapshot(
+    request, assessment, control_mapped_to_program):
+  """Map Assessment to Control object via REST API return response from server.
   """
-  yield _common_fixtures(request.fixturename)
+  return rest_facade.map_objs(assessment, control_mapped_to_program)
+  # yield _common_fixtures(request.fixturename)
 
 
 def _common_request_param(request):
@@ -539,21 +601,56 @@ def program():
 
 
 @pytest.fixture()
+def programs():
+  """Create a program"""
+  return [rest_facade.create_program() for _ in xrange(2)]
+
+
+@pytest.fixture()
+def issue():
+  """Create an issue mapped to the program"""
+  return rest_facade.create_issue(obj=None)
+
+
+@pytest.fixture()
 def issue_mapped_to_program(program):
   """Create an issue mapped to the program"""
   return rest_facade.create_issue(program)
 
 
 @pytest.fixture()
+def issue_mapped_to_audit(audit):
+  """Create an issue mapped to the program"""
+  return rest_facade.create_issue(audit)
+
+
+@pytest.fixture()
+def control():
+  """Create a control."""
+  return rest_facade.create_control()
+
+
+@pytest.fixture()
+def controls():
+  """Create 2 controls."""
+  return [rest_facade.create_control() for _ in xrange(2)]
+
+
+@pytest.fixture()
 def control_mapped_to_program(program):
   """Create a control mapped to the program"""
-  return rest_facade.create_control(program)
+  control = rest_facade.create_control()
+  rest_facade.map_objs(program, control)
+  return control
 
 
 @pytest.fixture()
 def controls_mapped_to_program(program):
   """Create 2 controls mapped to the program"""
-  return [rest_facade.create_control(program) for _ in xrange(2)]
+  controls = [rest_facade.create_control() for _ in xrange(2)]
+  for control in controls:
+    rest_facade.map_objs(program, control)
+  return controls
 
 
 @pytest.fixture()
@@ -581,9 +678,44 @@ def audits(program):
 
 
 @pytest.fixture()
+def assessment_template_rest(audit):
+  """Create asmt template with all ca types."""
+  return rest_facade.create_asmt_template(
+      audit, assessment_type="Control")
+
+
+@pytest.fixture()
+def assessment_template_with_all_cas_rest(audit):
+  """Create asmt template with all ca types."""
+  return rest_facade.create_asmt_template(
+      audit, all_cad_types=True, assessment_type="Control")
+
+
+@pytest.fixture()
+def assessment_from_template(
+    audit, assessment_template_with_all_cas_rest, control_mapped_to_program):
+  return rest_facade.create_asmt_from_template(
+      audit, assessment_template_with_all_cas_rest,
+      [control_mapped_to_program])
+
+
+@pytest.fixture()
+def assessments_from_template(
+    audit, assessment_template_with_all_cas_rest, controls_mapped_to_program):
+  return rest_facade.create_asmts_from_template(
+      audit, assessment_template_with_all_cas_rest, controls_mapped_to_program)
+
+
+@pytest.fixture()
 def assessment(audit):
   """Creates an assessment within audit."""
   return rest_facade.create_asmt(audit)
+
+
+@pytest.fixture()
+def assessments(audit):
+  """Creates an assessment within audit."""
+  return [rest_facade.create_asmt(audit) for _ in xrange(2)]
 
 
 @pytest.fixture()
@@ -595,11 +727,18 @@ def gcads_for_asmt():
 
 
 @pytest.fixture()
+def gcads_for_control():
+  """Creates GCADs of all types for Control."""
+  return rest_facade.create_gcad_for_control()
+
+
+@pytest.fixture()
 def obj(request):
   """A fixture that calls any other fixture when parametrization
   with indirect is used.
   """
-  return request.getfixturevalue(request.param)
+  if hasattr(request, "param") and request.param:
+    return request.getfixturevalue(request.param)
 
 
 # New fixtures

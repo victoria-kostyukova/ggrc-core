@@ -23,10 +23,15 @@ class ControlFactory(_base.BaseFactory):
   def _default_attrs(self):
     """See superclass."""
     from lib.rest_services import control_rest_service
+    from lib.constants.element import ReviewStates
     return {
         "title": self._obj_title,
         "admins": [users.current_person()],
-        "assertions": [control_rest_service.assertion_with_name("Security")]
+        "assertions": [control_rest_service.assertion_with_name("security")],
+        "review_status_display_name": ReviewStates.UNREVIEWED,
+        "review_status": ReviewStates.UNREVIEWED,
+        "external_id": self.generate_external_id(),
+        "external_slug": self.generate_external_slug()
     }
 
 

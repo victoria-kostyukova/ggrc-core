@@ -16,9 +16,12 @@ class ControlRestService(base_rest_service.ObjectRestService):
     return dict(
         title=obj.title,
         access_control_list=rest_convert.build_access_control_list(obj),
-        assertions=[rest_convert.to_basic_rest_obj(assertion)
-                    for assertion in obj.assertions],
-        context=rest_convert.default_context()
+        assertions=[assertion for assertion in obj.assertions],
+        context=rest_convert.default_context(),
+        review_status=obj.review_status,
+        review_status_display_name = obj.review_status_display_name,
+        external_id = obj.external_id,
+        external_slug = obj.external_slug,
     )
 
 
@@ -35,13 +38,9 @@ class ControlAssertionRestService(base_rest_service.ObjectRestService):
     )
 
 
-@decorator.memoize
-def all_control_assertions():
-  """Returns all control assertions."""
-  return ControlAssertionRestService().get_collection()
-
-
 def assertion_with_name(name):
   """Returns a control assertion by name."""
-  return next(assertion for assertion in all_control_assertions()
-              if assertion.name == name)
+  all_control_assertions = ["Confidentiality", "Integrity", "Availability",
+                            "Security", "Privacy"]
+  return next(assertion for assertion in all_control_assertions
+              if assertion == name.title())

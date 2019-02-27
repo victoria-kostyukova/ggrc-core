@@ -9,7 +9,7 @@ import pytest
 from lib import base, users
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
-from lib.service import webui_service, rest_facade
+from lib.service import webui_service, rest_facade, webui_facade
 
 
 class TestProgramPage(base.Test):
@@ -17,7 +17,7 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_destructive_mapping_controls_to_program_via_unified_mapper(
-      self, new_program_rest, new_controls_rest, selenium
+      self, program, controls, selenium
   ):
     """Check if Controls can be mapped to Program from Controls widget under
     Program page via unified mapper.
@@ -25,21 +25,27 @@ class TestProgramPage(base.Test):
     - Program, Controls created via REST API.
     """
     expected_controls = [
-        expected_control.repr_ui() for expected_control in new_controls_rest]
+        expected_control.repr_ui() for expected_control
+        in controls]
     controls_ui_service = webui_service.ControlsService(selenium)
     controls_ui_service.map_objs_via_tree_view(
-        src_obj=new_program_rest, dest_objs=expected_controls)
+        src_obj=program, dest_objs=expected_controls)
     actual_controls_tab_count = controls_ui_service.get_count_objs_from_tab(
-        src_obj=new_program_rest)
+        src_obj=program)
     assert len(expected_controls) == actual_controls_tab_count
     actual_controls = controls_ui_service.get_list_objs_from_tree_view(
-        src_obj=new_program_rest)
+        src_obj=program)
     # 'actual_controls': created_at, updated_at, custom_attributes (None)
     self.general_equal_assert(
         sorted(expected_controls), sorted(actual_controls),
         *Representation.tree_view_attrs_to_exclude)
 
-  def test_create_and_map_control(self, program, selenium):
+  @pytest.mark.smoke_tests
+  @pytest.mark.skip(reason="External application can create only external "
+                           "relationships.")
+  def test_create_and_map_control(
+      self, set_external_user_as_current_user, program, selenium
+  ):
     """Test that control can be created and mapped using Unified mapper."""
     controls_service = webui_service.ControlsService(selenium)
     controls_service.open_widget_of_mapped_objs(

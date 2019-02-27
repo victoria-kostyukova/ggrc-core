@@ -58,7 +58,7 @@ class TestProgramPage(base.Test):
         modified_by=users.current_user(),
         slug=rest_program.slug,
         url=rest_program.url).repr_ui()
-    self.general_equal_assert(program, actual_program, "custom_attributes")
+    self.general_equal_assert(program, actual_program)
 
   @pytest.mark.smoke_tests
   def test_edit_program(self, program, selenium):

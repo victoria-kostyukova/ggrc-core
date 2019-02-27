@@ -66,3 +66,14 @@ class BaseFactory(object):
   def _obj_name(cls):
     """Returns object name for app entity."""
     return string_utils.remove_from_end(cls.__name__, "Factory")
+
+  @classmethod
+  def generate_external_id(cls):
+    """Generates external id."""
+    import random
+    return random.randint(10000, 99999)
+
+  def generate_external_slug(self):
+    """Generates external id."""
+    import random
+    return self._obj_name() + str(random.randint(10000, 99999))

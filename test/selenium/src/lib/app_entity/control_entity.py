@@ -12,6 +12,10 @@ class Control(_base.Base, _base.WithTitleAndCode):
   admins = attr.ib()
   assertions = attr.ib()
   comments = attr.ib()
+  review_status = attr.ib()
+  review_status_display_name = attr.ib()
+  external_id = attr.ib()
+  external_slug = attr.ib()
 
 
 @attr.s

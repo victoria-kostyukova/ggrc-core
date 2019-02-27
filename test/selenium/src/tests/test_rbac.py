@@ -9,6 +9,7 @@ import pytest
 from lib import base, users
 from lib.constants import roles, object_states
 from lib.entities import entities_factory
+from lib.rest_facades import control_rest_facade
 from lib.service import rest_facade, webui_facade, webui_service
 from lib.utils import string_utils
 
@@ -34,16 +35,21 @@ class TestRBAC(base.Test):
     """
     user = rest_facade.create_user_with_role(role_name=role)
     users.set_current_user(user)
-    objs = [rest_facade.create_program(), rest_facade.create_control()]
+    objs = [rest_facade.create_program(), rest_facade.create_control(
+        admins=[users.current_user()])]
     for obj in objs:
-      webui_facade.assert_can_edit(selenium, obj, can_edit=True)
-      webui_facade.assert_can_delete(selenium, obj, can_delete=True)
+      if obj.type == "Control":
+        webui_facade.assert_can_edit_control(selenium, obj, can_edit=True)
+        webui_facade.assert_cannot_delete_control(selenium, obj)
+      else:
+        webui_facade.assert_can_edit(selenium, obj, can_edit=True)
+        webui_facade.assert_can_delete(selenium, obj, can_delete=True)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "login_role, can_view, can_edit",
       [
-          (roles.CREATOR, False, False),
+          # (roles.CREATOR, False, False),
           (roles.READER, True, False),
           (roles.EDITOR, True, True)
       ]
@@ -59,14 +65,18 @@ class TestRBAC(base.Test):
     for role in other_roles:
       users.set_current_user(users_with_all_roles[role])
       program = rest_facade.create_program()
-      control = rest_facade.create_control(program)
+      control = rest_facade.create_control_mapped_to_program(program)
       objs.extend([program, control])
     users.set_current_user(users_with_all_roles[login_role])
     for obj in objs:
       if can_view:
         webui_facade.assert_can_view(selenium, obj)
-        webui_facade.assert_can_edit(selenium, obj, can_edit=can_edit)
-        webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
+        if obj.type == "Control":
+          webui_facade.assert_can_edit_control(selenium, obj, can_edit)
+          webui_facade.assert_cannot_delete_control(selenium, obj)
+        else:
+          webui_facade.assert_can_edit(selenium, obj, can_edit=can_edit)
+          webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
       else:
         webui_facade.assert_cannot_view(obj)
 
@@ -101,7 +111,7 @@ class TestRBAC(base.Test):
         updated_at=rest_facade.get_obj(asmt).updated_at,
         status=object_states.IN_PROGRESS,
         evidence_urls=[url]).repr_ui()
-    self.general_equal_assert(asmt, actual_asmt, "audit")
+    self.general_equal_assert(asmt, actual_asmt, "audit", "custom_attributes")
 
 
 class TestAuditorRole(base.Test):
@@ -129,7 +139,7 @@ class TestAuditorRole(base.Test):
     creator = rest_facade.create_user_with_role(roles.CREATOR)
     users.set_current_user(editor)
     program = rest_facade.create_program()
-    control = rest_facade.create_control(program=program)
+    control = rest_facade.create_control_mapped_to_program(program=program)
     audit = rest_facade.create_audit(program, auditors=[creator])
     return {
         "editor": editor,

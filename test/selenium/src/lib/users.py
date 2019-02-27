@@ -5,7 +5,8 @@ from lib.entities import entity
 
 DEFAULT_EMAIL_DOMAIN = "example.com"
 MIGRATOR_USER_EMAIL = "migrator@" + DEFAULT_EMAIL_DOMAIN
-
+EXTERNAL_APP_USER = entity.PersonEntity(
+    email="external_app@" + DEFAULT_EMAIL_DOMAIN)
 FAKE_SUPER_USER = entity.PersonEntity(email="user@" + DEFAULT_EMAIL_DOMAIN)
 
 UI_USER = "UI user"

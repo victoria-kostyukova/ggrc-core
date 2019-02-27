@@ -55,10 +55,24 @@ class WithAssignFolder(base.WithBrowser):
 class WithObjectReview(base.WithBrowser):
   """A mixin for object reviews"""
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(WithObjectReview, self).__init__(driver)
-    self.request_review_btn = self._browser.button(text="Request Review")
-    self.mark_reviewed_btn = self._browser.element(text="Mark Reviewed")
+
+  @property
+  def _review_root(self):
+    return self._browser.element(class_name="object-review")
+
+  @property
+  def request_review_btn(self):
+    return self._review_root.button(text="Request Review")
+
+  @property
+  def mark_reviewed_btn(self):
+    return self._review_root.element(text="Mark Reviewed")
+
+  @property
+  def review_status(self):
+    return self._review_root.element(class_name="state-value")
 
   def open_submit_for_review_popup(self):
     """Open submit for control popup by clicking on corresponding button."""
@@ -68,3 +82,11 @@ class WithObjectReview(base.WithBrowser):
   def click_approve_review(self):
     """Click approve review button."""
     self.mark_reviewed_btn.click()
+
+  def has_review(self):
+    """Check if review section exists."""
+    return self._review_root.exists
+
+  def get_review_status(self):
+    """Get review status."""
+    return self.review_status.text.title()

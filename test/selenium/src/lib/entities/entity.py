@@ -18,7 +18,8 @@ class Representation(object):
   # pylint: disable=too-many-public-methods
   diff_info = None  # {"equal": {"atr7": val7, ...}, "diff": {"atr3": val3}}
   tree_view_attrs_to_exclude = (
-      "created_at", "updated_at", "custom_attributes", "assertions")
+      "created_at", "updated_at", "custom_attributes", "assertions",
+      "external_slug", "external_id")
   people_attrs_names = [
       "creators", "assignees", "verifiers", "admins", "primary_contacts",
       "secondary_contacts", "audit_captains", "auditors",
@@ -98,6 +99,10 @@ class Representation(object):
         "DESCRIPTION": "description",
         "EVIDENCE_URLS": "evidence_urls",
         "ASSERTIONS": "assertions",
+        "EXTERNAL_SLUG": "external_slug",
+        "EXTERNAL_ID": "external_id",
+        "REVIEW_STATUS": "review_status",
+        "REVIEW_STATUS_DISPLAY_NAME": "review_status_display_name",
         "PRIMARY_CONTACTS": "primary_contacts",
         "CONTROL_OPERATORS": "control_operators",
         "CONTROL_OWNERS": "control_owners",
@@ -627,7 +632,7 @@ class Entity(Representation):
         "primary_contacts", "secondary_contacts", "status",
         "comments", "custom_attribute_definitions", "custom_attribute_values",
         "custom_attributes", "created_at", "updated_at", "modified_by",
-        "object_review_txt", "description", **attrs)
+        "description", **attrs)
 
   @staticmethod
   def all_entities_classes():
@@ -731,8 +736,9 @@ class ProgramEntity(Entity):
 
 class ControlEntity(Entity):
   """Class that represent model for Control entity."""
-  ASSERTIONS = {"Confidentiality": 37, "Integrity": 38,
-                "Availability": 39, "Security": 40, "Privacy": 41}
+  ASSERTIONS = {"confidentiality": "Confidentiality", "integrity": "Integrity",
+                "availability": "Availability", "security": "Security",
+                "privacy": "Privacy"}
   __hash__ = None
 
   def __init__(self, **attrs):
@@ -741,8 +747,9 @@ class ControlEntity(Entity):
         "primary_contacts", "secondary_contacts")
     self.set_attrs(
         "control_operators", "control_owners", "principal_assignees",
-        "secondary_assignees", "program",
-        "assertions", **attrs)
+        "secondary_assignees", "program", "assertions",
+        "external_slug", "external_id", "review_status",
+        "review_status_display_name", **attrs)
 
 
 class ObjectiveEntity(Entity):

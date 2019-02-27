@@ -8,6 +8,7 @@
 from lib import base
 from lib.element import page_elements
 from lib.entities import entity
+from lib.page.error_popup import ErrorPopup
 from lib.page.modal import unified_mapper, delete_object
 from lib.page.modal.repeat_workflow_modal import RepeatWorkflowModal
 from lib.utils import ui_utils
@@ -54,6 +55,7 @@ class BaseObjectModal(base.WithBrowser):
     self.state_select = self._root.select(can_value="instance.status")
     self.code_field = self._root.text_field(name="slug")
     self._fields = ["title", "description", "status", "slug"]
+    self.close_btn = self._root.element(class_name="modal-dismiss")
 
   def submit_obj(self, obj):
     """Submits form with `obj`."""
@@ -71,6 +73,18 @@ class BaseObjectModal(base.WithBrowser):
   def save_and_close(self):
     """Clicks Save & Close button and waits for changes to happen."""
     self._root.link(data_toggle="modal-submit", text="Save & Close").click()
+    self._wait_for_submit_changes()
+
+  def click_save_btn_causes_error_alert(self):
+    """Clicks Save & Close button and wait until error popup appears."""
+    self._root.link(data_toggle="modal-submit", text="Save & Close").click()
+    ErrorPopup().close_popup()
+
+  def close_and_discard(self):
+    """Clicks close button, discards changes on Discard Changes Modal and
+    waits until first modal is closed."""
+    self.close_btn.wait_until(lambda e: e.exists).click()
+    DiscardChangesModal().discard_and_close()
     self._wait_for_submit_changes()
 
   def delete(self):
@@ -108,6 +122,25 @@ class BaseObjectModal(base.WithBrowser):
   def click_propose(self):
     """Click propose button."""
     self._root.link(text="Propose").click()
+    self._wait_for_submit_changes()
+
+
+class DiscardChangesModal(BaseObjectModal):
+  """Represents discard changes modal."""
+
+  def __init__(self, _driver=None):
+    super(DiscardChangesModal, self).__init__()
+    self._root = self._browser.element(
+        text="Discard Changes").parent(class_name="undefined")
+
+  def wait_until_present(self):
+    """Wait until modal is present."""
+    self._root.wait_until(lambda e: e.present)
+
+  def discard_and_close(self):
+    """Clicks Discard button and wait for modal is closed."""
+    self.wait_until_present()
+    self._root.link(text="Discard").click()
     self._wait_for_submit_changes()
 
 

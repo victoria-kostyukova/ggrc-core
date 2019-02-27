@@ -12,7 +12,7 @@ import random
 from lib import factory, users
 from lib.constants import (
     objects, roles, value_aliases, messages, object_states)
-from lib.constants.element import AdminWidgetCustomAttributes
+from lib.constants.element import AdminWidgetCustomAttributes, ReviewStates
 from lib.decorator import lazy_property
 from lib.entities import entity
 from lib.entities.entity import (
@@ -53,6 +53,10 @@ class EntitiesFactory(object):
     obj = self._set_attrs(is_add_rest_attrs, **attrs)
     if "custom_roles" in attrs:
       self._acl_roles.extend(attrs["custom_roles"])
+    elif "admins" in attrs:
+      for acr_name, role_id, default_list in self._acl_roles:
+        if acr_name == "admins":
+          default_list.extend(attrs["admins"])
     for acr_name, role_id, default_list in self._acl_roles:
       if acr_name in attrs:
         people_list = attrs[acr_name]
@@ -77,6 +81,11 @@ class EntitiesFactory(object):
     return unicode("{first_part}_{uuid}_{rand_str}".format(
         first_part=first_part, uuid=StringMethods.random_uuid(),
         rand_str=StringMethods.random_string(chars=allowed_chars)))
+
+  @classmethod
+  def generate_external_id(cls):
+    """Generate external id."""
+    return random.randint(10000, 99999)
 
   @classmethod
   def generate_slug(cls):
@@ -121,6 +130,13 @@ class PeopleFactory(EntitiesFactory):
       from lib.service import rest_service
       return rest_service.ObjectsInfoService().get_person(
           users.FAKE_SUPER_USER.email)
+
+    @lazy_property
+    def external_app_user(cls):
+      """Return Person instance for default system external app user."""
+      from lib.service import rest_service
+      return rest_service.ObjectsInfoService().get_person(
+          users.EXTERNAL_APP_USER.email)
 
   @staticmethod
   def extract_people_emails(people):
@@ -365,31 +381,21 @@ class ControlsFactory(EntitiesFactory):
     """Create random object's instance, if 'is_add_rest_attrs' then add
     attributes for REST, if 'attrs' then update attributes accordingly.
     """
-    assertions = attrs.get("assertions", ["Security"])
+    import time
+    assertions = attrs.get("assertions", ["security"])
     obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        assertions=self._generate_assertions(assertions),
-        status=unicode(object_states.DRAFT), **attrs)
+        assertions=[ControlEntity.ASSERTIONS[name] for name in assertions],
+        status=unicode(object_states.DRAFT),
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id(),
+        review_status=ReviewStates.UNREVIEWED,
+        review_status_display_name=ReviewStates.UNREVIEWED, **attrs)
     if is_add_rest_attrs:
       obj.update_attrs(recipients=",".join((
           unicode(roles.ADMIN), unicode(roles.CONTROL_OPERATORS),
           unicode(roles.CONTROL_OWNERS))))
     return obj
-
-  @classmethod
-  def _generate_assertions(cls, assertion_names):
-    """Generate assertions for control obj."""
-    assertion_dict_pattern = {"context_id": None,
-                              "href": "", "id": "",
-                              "type": "ControlAssertion"}
-    assertion_list = []
-    for name in assertion_names:
-      assertion_dict = copy.deepcopy(assertion_dict_pattern)
-      assertion_dict["id"] = ControlEntity.ASSERTIONS[name]
-      assertion_dict["href"] = (
-          "/api/control_assertions/" + str(assertion_dict["id"]))
-      assertion_list.append(assertion_dict)
-    return assertion_list
 
 
 class ObjectivesFactory(EntitiesFactory):
