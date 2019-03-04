@@ -10,7 +10,8 @@ DEFAULT_ISSUETRACKER_VALUES = {
     'issue_severity': 'S2',
     'issue_type': 'PROCESS',
     'component_id': 188208,
-    'hotlist_id': 864697,
+    'issue_hotlist_id': 864697,
+    'hotlist_id': 766459,
 }
 
 INITIAL_COMMENT_TMPL = (

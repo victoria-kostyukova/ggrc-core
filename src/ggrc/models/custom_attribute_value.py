@@ -265,7 +265,11 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
 
   def _validate_mandatory_mapping(self):
     """Validate mandatory mapping attribute"""
-    if self.custom_attribute.mandatory and not self.attribute_object_id:
+    if (
+        self.custom_attribute.is_gca and
+        self.custom_attribute.mandatory and
+        not self.attribute_object_id
+    ):
       raise ValueError('Missing mandatory attribute: %s' %
                        self.custom_attribute.title)
 

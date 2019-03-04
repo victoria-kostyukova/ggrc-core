@@ -101,7 +101,7 @@ def assert_can_delete(selenium, obj, can_delete):
   otherwise check that user cannot delete object via UI
   """
   info_page = _get_ui_service(selenium, obj=obj).open_info_page_of_obj(obj)
-  assert info_page.three_bbs.exists == can_delete
+  assert info_page.three_bbs.delete_option.exists == can_delete
   if can_delete:
     info_page.three_bbs.select_delete().confirm_delete()
     selenium_utils.open_url(obj.url)

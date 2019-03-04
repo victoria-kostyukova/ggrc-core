@@ -1364,7 +1364,10 @@ class AssessmentTrackerHandler(object):
             "component_id",
             constants.DEFAULT_ISSUETRACKER_VALUES["component_id"]
         ),
-        "hotlist_id": audit_src.get("hotlist_id"),
+        "hotlist_id": audit_src.get(
+            "hotlist_id",
+            constants.DEFAULT_ISSUETRACKER_VALUES["hotlist_id"],
+        ),
         "issue_type": audit_src.get(
             "issue_type",
             constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"]

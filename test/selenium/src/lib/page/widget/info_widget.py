@@ -365,7 +365,7 @@ class Programs(InfoWidget):
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
     return [self.request_review_btn,
-            self.three_bbs,
+            self.three_bbs.edit_option,
             self.comment_area.add_section,
             self.reference_urls.add_button] + list(self.inline_edit_controls)
 

@@ -30,13 +30,7 @@
             <div class="info-pane-utility">
               {{#using workflow=instance.workflow}}
               <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
-                <div class="details-wrap">
-                  <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                  </a>
-                  <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+                <three-dots-menu>
                     {{#if workflow.viewLink}}
                       <li>
                         <a href="{{workflow.viewLink}}">
@@ -48,8 +42,7 @@
                     <li>
                       <permalink {instance}="instance"/>
                     </li>
-                  </ul>
-                </div>
+                </three-dots-menu>
               {{/using}}
             </div>
           </div>

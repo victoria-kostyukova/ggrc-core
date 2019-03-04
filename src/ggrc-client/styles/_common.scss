@@ -1016,20 +1016,6 @@ p {
   }
 }
 
-.three-dots-list {
-  & > li {
-    a,
-    .unmap-link {
-      color: #000 !important;
-    }
-
-    .fa {
-      color: #000 !important;
-      opacity: 0.7 !important;
-    }
-  }
-}
-
 .alert.alert-nomargin {
     margin-top: 0px;
     margin-bottom: 0px;

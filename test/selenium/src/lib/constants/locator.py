@@ -986,8 +986,7 @@ class CommonDropdown3bbsInfoWidget(CommonDropdownMenu):
   """
   _INFO_3BBS_DD_XPATH = (
       Common.INFO_WIDGET_XPATH +
-      "//*[contains(@class,'three-dots-list') or "  # old style
-      "contains(@class, 'tree-action-list-items')]")  # new style
+      "//*[contains(@class, 'tree-action-list-items')]")
   INFO_WDG_3BBS_DD_XPATH = (By.XPATH, _INFO_3BBS_DD_XPATH)
 
 

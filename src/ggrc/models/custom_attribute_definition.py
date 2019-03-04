@@ -94,6 +94,18 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       self.definition_type = ''
     return setattr(self, self.definition_attr, value)
 
+  @property
+  def is_lca(self):
+    """Check if CAD is Local CAD"""
+    created_via_template = getattr(self, 'definition', None)
+    created_via_post = self.definition_id
+    return created_via_post or created_via_template
+
+  @property
+  def is_gca(self):
+    """Check if CAD is Global CAD"""
+    return not self.is_lca
+
   _extra_table_args = (
       UniqueConstraint('definition_type', 'definition_id', 'title',
                        name='uq_custom_attribute'),

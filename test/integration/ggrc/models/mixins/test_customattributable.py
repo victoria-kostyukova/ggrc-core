@@ -532,3 +532,28 @@ class TestCADUpdate(TestCase):
         definition_id=template.id,
     )
     self.assertEqual(cads_query.count(), cads_count)
+
+  def test_lcad_empty_no_update(self):
+    """Test that empty mandatory LCA does not prevent put requests."""
+    assessment = factories.AssessmentFactory()
+    cad1 = factories.CustomAttributeDefinitionFactory(
+        definition_type="assessment",
+        mandatory=True,
+        definition_id=assessment.id,
+        attribute_type="Map:Person",
+        title="CA 1",
+    )
+    empty_cav_data = {
+        "custom_attribute_values": [{
+            "assessment": 26340,
+            "attributable_type": "Assessment",
+            "attributeType": None,
+            "attribute_object": None,
+            "attribute_object_id": None,
+            "attribute_value": None,
+            "context": None,
+            "custom_attribute_id": cad1.id,
+        }]
+    }
+    response = self.api.put(assessment, data=empty_cav_data)
+    self.assert200(response)

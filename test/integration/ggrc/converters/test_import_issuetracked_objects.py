@@ -297,8 +297,6 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.data(
       ("component_id", "Component ID", ""),
       ("component_id", "Component ID", "sss"),
-      ("hotlist_id", "Hotlist ID", ""),
-      ("hotlist_id", "Hotlist ID", "aaa"),
       ("issue_priority", "Priority", ""),
       ("issue_priority", "Priority", "P6"),
       ("issue_severity", "Severity", ""),
@@ -329,6 +327,29 @@ class TestIssueTrackedImport(ggrc.TestCase):
     issue = all_models.Issue.query.one()
     self.assertEqual(str(issue.issue_tracker[missed_field]),
                      str(default_values[missed_field]))
+
+  @ddt.data("", "aaa")
+  def test_default_hotlist_for_issue(self, value):
+    """Test correct default hotlist was set to Issue during import."""
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Hotlist ID")
+    )
+    expected_messages = {
+        "Issue": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "ISSUE-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Issue Title"),
+        ("Hotlist ID", value),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    issue = all_models.Issue.query.one()
+    self.assertEqual(str(issue.issue_tracker["hotlist_id"]),
+                     str(default_values["issue_hotlist_id"]))
 
   @ddt.data(
       ("component_id", "Component ID", ""),

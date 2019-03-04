@@ -20,13 +20,7 @@
 
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance}}
-                <div class="details-wrap">
-                  <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                  </a>
-                  <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+                <three-dots-menu>
                     {{#using workflow=instance.workflow}}
                       {{^if_equals workflow.status 'Inactive'}}
                         {{> /static/templates/base_objects/edit_object_link.stache}}
@@ -40,8 +34,7 @@
                           Clone Task Group
                         </a>
                       </task-group-clone>
-                    </li>
-                  </ul>
+                  </three-dots-menu>
                 </div>
               {{/is_allowed}}
             </div>

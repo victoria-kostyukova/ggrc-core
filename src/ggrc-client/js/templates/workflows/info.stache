@@ -38,13 +38,7 @@
 
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance context='for'}}
-                <div class="details-wrap">
-                  <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                  </a>
-                  <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+                <three-dots-menu>
                     {{^is_info_pin}}
                         <li>
                           <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
@@ -107,9 +101,7 @@
                         </li>
                       {{/if}}
                     {{/is_info_pin}}
-
-                  </ul>
-                </div>
+                </three-dots-menu>
               {{/is_allowed}}
             </div>
           </div>

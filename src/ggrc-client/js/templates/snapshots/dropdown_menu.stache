@@ -67,13 +67,13 @@
     {{/is_info_pin}}
     {{^if instance.snapshot.archived}}
       {{#if_instance_of page_instance "Audit"}}
-        {{#is_allowed_to_map page_instance instance.snapshot}}
+        {{#is_allowed 'delete' instance.snapshot}}
           <li>
             <delete-button
               {instance}="instance.snapshot">
             </delete-button>
           </li>
-        {{/is_allowed_to_map}}
+        {{/is_allowed}}
       {{/if_instance_of}}
     {{/if}}
 </three-dots-menu>

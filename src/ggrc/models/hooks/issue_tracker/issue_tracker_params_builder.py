@@ -11,14 +11,13 @@ import logging
 import html2text
 
 from ggrc import utils as ggrc_utils
-from ggrc.integrations import issues
-from ggrc.integrations import integrations_errors
 from ggrc.integrations import constants
-from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
-    default_values
+from ggrc.integrations import integrations_errors
+from ggrc.integrations import issues
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,13 +77,14 @@ class BaseIssueTrackerParamsBuilder(object):
 
   def handle_issue_tracker_info(self, obj, issue_tracker_info):
     """Handle issue tracker information."""
+    default_values = constants.DEFAULT_ISSUETRACKER_VALUES
     issue_component_id = issue_tracker_info.get("component_id")
     self.params.component_id = issue_component_id or \
         default_values["component_id"]
 
     issue_hotlist_id = issue_tracker_info.get("hotlist_id")
     self.params.hotlist_id = issue_hotlist_id or \
-        default_values["hotlist_id"]
+        default_values["issue_hotlist_id"]
 
     issue_type = issue_tracker_info.get("issue_type")
     self.params.issue_type = issue_type or \

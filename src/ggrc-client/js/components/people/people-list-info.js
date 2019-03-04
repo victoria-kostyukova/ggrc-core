@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../three-dots-menu/three-dots-menu';
+
 import template from './people-list-info.stache';
 import '../../models/service-models/role';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';

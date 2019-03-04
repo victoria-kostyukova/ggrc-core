@@ -40,6 +40,11 @@ class InfoWidgetThreeBbbs(object):
     """Returns `Unmap` option."""
     return self._three_bbs.option_by_text("Unmap")
 
+  @property
+  def delete_option(self):
+    """Returns `Delete` option."""
+    return self._three_bbs.option_by_text("Delete")
+
   def select_delete(self):
     """Selects `Delete` option.
     Return: modal.delete_object.DeleteObjectModal
