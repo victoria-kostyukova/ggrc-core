@@ -92,6 +92,14 @@ class ACLRolesIDsMetaClass(type):
         break
     return role_id
 
+  def object_roles(cls, object_type):
+    """Get role ids by `object_type`."""
+    roles = []
+    for role in cls.roles():
+      if role["object_type"] == object_type:
+        roles.append(role)
+    return roles
+
   def id_of_role(cls, object_type, name):
     """Get id of the role by `object_type` and `name`."""
     role_id = cls._role_id_from_list(cls.standard_roles, object_type, name)

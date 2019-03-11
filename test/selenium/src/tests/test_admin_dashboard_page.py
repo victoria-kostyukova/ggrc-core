@@ -154,7 +154,9 @@ class TestEventLogTabDestructive(base.Test):
 
       users.set_current_user(admin)
       # generate expected event data
-      acl_roles_len = 7
+      from lib.constants.roles import ACLRolesIDs
+      # 3 predefined program roles and 1 predefined reviewer role
+      acl_roles_len = len(ACLRolesIDs.object_roles(objctv1.type)) - 4
       exp_event_data = [
           {"actions": sorted(
               [objctv1_creator.email + " created", u"PersonProfile created"]),
@@ -180,18 +182,17 @@ class TestEventLogTabDestructive(base.Test):
               objctv_editor_role.updated_at)},
           {"actions": [u"AccessControlList created"] * acl_roles_len +
                       [u"AccessControlPerson created"] * 2 +
-                      [objctv1.title + " created",
-                       u"Security created"],
+                      [objctv1.title + " created"],
            "user_email": objctv1_creator.email,
            "time": date_utils.iso8601_to_local_datetime(objctv1.updated_at)},
           {"actions": [u"AccessControlList created"] * acl_roles_len +
                       [u"AccessControlPerson created",
-                       objctv2.title + " created",
-                       u"Security created"],
+                       objctv2.title + " created"],
            "user_email": objctv2_creator.email,
            "time": date_utils.iso8601_to_local_datetime(objctv2.updated_at)},
-          {"actions": [u"Control:{id2} linked to Control:{id1}".format(
-              id1=objctv1.id, id2=objctv2.id)],
+          {"actions": [u"{type2}:{id2} linked to {type1}:{id1}".format(
+              id1=objctv1.id, id2=objctv2.id, type1=objctv1.type,
+              type2=objctv2.type)],
            "user_email": objctv2_creator.email,
            "time": date_utils.iso8601_to_local_datetime(objctv2.updated_at)}
       ]
@@ -248,7 +249,6 @@ class TestEventLogTabDestructive(base.Test):
         messages.AssertionMessages.
         format_err_msg_equal(events_on_1st_page, events_on_prev_page))
 
-  @pytest.mark.skip("Need to correct exp_act_events.")
   def test_events_data_wo_datetime(self, exp_act_events):
     """Verify that last data in event log represent performed actions."""
     keys = ["actions", "user_email"]
@@ -303,7 +303,6 @@ class TestPeopleAdministration(base.Test):
     self.general_equal_assert(ppl_data["exp_person"], ppl_data["act_person"])
 
   @pytest.mark.xfail(reason="GGRC-6528 Issue in app.")
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_destructive_tab_count_increased(self, ppl_data):
     """Check that tab count will be increased correctly."""
     assert ppl_data["exp_ppl_count"] == ppl_data["act_ppl_count"]
