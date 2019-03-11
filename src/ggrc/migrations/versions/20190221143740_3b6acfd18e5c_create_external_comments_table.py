@@ -66,18 +66,16 @@ def create_external_comments_table():
 def move_old_comments():
   """Move comments for Control to external comments table."""
   connection = op.get_bind()
-  migrator_id = utils.get_migration_user_id(connection)
-
   connection.execute(
       sa.text("""
           INSERT INTO external_comments(
               id, description, assignee_type, created_at, updated_at,
               modified_by_id
           )
-          SELECT id, description, assignee_type, NOW(), NOW(), :migrator_id
+          SELECT id, description, assignee_type, NOW(), NOW(), modified_by_id
           FROM
           (
-              SELECT c.id, c.description, c.assignee_type
+              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.source_type = 'Comment' AND
                   r.source_id = c.id AND
@@ -85,14 +83,13 @@ def move_old_comments():
 
               UNION
 
-              SELECT c.id, c.description, c.assignee_type
+              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.destination_type = 'Comment' AND
                   r.destination_id = c.id AND
                   r.source_type = 'Control'
           ) tmp;
       """),
-      migrator_id=migrator_id
   )
 
 
