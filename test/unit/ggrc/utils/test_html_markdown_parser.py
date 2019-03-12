@@ -20,26 +20,6 @@ class TestHTML2MarkdownParser(unittest.TestCase):
     super(TestHTML2MarkdownParser, self).setUp()
     self.parser = html_markdown_parser.HTML2MarkdownParser()
 
-  def test_multiple_url(self):
-    """Test parsing multiple urls in one html data."""
-    data = (
-        u'<p><a href="http://localhost:8080/sdfas">sdfas</a> '
-        u'<a href="http://localhost:8080/adasdfasf">adasdfasf</a>'
-        u' fsfasfae    '
-        u'<a href="http://localhost:8080/sdfadf">sdfadf</a></p>'
-        u'<ol><li>t4st</li><li>test</li></ol>'
-        u'<p><br></p><p><br></p><p>TRTRTRT</p>'
-    )
-    expected_data = (
-        u'[sdfas](http://localhost:8080/sdfas) '
-        u'[adasdfasf](http://localhost:8080/adasdfasf) '
-        u'fsfasfae    '
-        u'[sdfadf](http://localhost:8080/sdfadf)'
-        u'- t4st\n- test\n\n\nTRTRTRT'
-    )
-    self.parser.feed(data)
-    self.assertEquals(self.parser.get_data(), expected_data)
-
   @ddt.data(
       (u'<a href="https://www.google.com/">some url</a>',
        u'[some url](https://www.google.com/)'),
@@ -49,6 +29,11 @@ class TestHTML2MarkdownParser(unittest.TestCase):
        u'[link](https://www.google.com/)'),
       (u'<a href="https://www.google.com/">Some text</a>',
        u'[Some text](https://www.google.com/)'),
+      (u'<p><a href="http://localhost:8080/abc">abc</a> '
+       u'<a href="http://localhost:8080/qwerty">qwerty</a></p>',
+       u'[abc](http://localhost:8080/abc) '
+       u'[qwerty](http://localhost:8080/qwerty)'),
+      (u'qwerty</a>', u'qwerty'),
   )
   @ddt.unpack
   def test_parse_url(self, html_data, markdown_data):
@@ -60,22 +45,41 @@ class TestHTML2MarkdownParser(unittest.TestCase):
       (u'<img src="https://www.google.com/"/>',
        u'https://www.google.com/'),
       (u'<img src=""/>', u''),
-      (u'plain text <>', u'plain text <>'),
-      (u'<strong>some </strong>text</br><tag> 111</tag>', u'some text\n 111'),
-      (u'<h1>some text</h1><h2></h2><p> text</p>', u'some text text'),
   )
   @ddt.unpack
-  def test_parse_html_tags(self, html_data, markdown_data):
+  def test_parse_image_tag(self, html_data, markdown_data):
     """Tests parsing html tags."""
     self.parser.feed(html_data)
     self.assertEquals(self.parser.get_data(), markdown_data)
 
+  @ddt.data('strong', 'i', 'b', 'div', 'p', 'dl', 'dt')
+  def test_replace_html_tags_spaces(self, html_tag):
+    """Test replacing html tags with spaces."""
+    html_data = "here<{tag}>some</{tag}>text".format(tag=html_tag)
+    markdown_data = "here some text"
+    self.parser.feed(html_data)
+    self.assertEquals(self.parser.get_data(), markdown_data)
+
+  @ddt.data('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'br')
+  def test_replace_html_tags_newlines(self, html_tag):
+    """Test replacing html tags with spaces."""
+    html_data = "here<{tag}>some</{tag}>text".format(tag=html_tag)
+    markdown_data = "here\nsome\ntext"
+    self.parser.feed(html_data)
+    self.assertEquals(self.parser.get_data(), markdown_data)
+
   @ddt.data(
-      (u'<ul><li>1</li><li>2</li></ul>', u'- 1\n- 2\n'),
-      (u'<ol><li>1</li><li>2</li></ol>', u'- 1\n- 2\n'),
+      (u'<ul><li>1</li><li>2</li></ul>', u'- 1\n- 2'),
+      (u'<ol><li>1</li><li>2</li></ol>', u'- 1\n- 2'),
   )
   @ddt.unpack
   def test_parse_html_list(self, html_data, markdown_data):
     """Tests parsing html lists."""
     self.parser.feed(html_data)
     self.assertEquals(self.parser.get_data(), markdown_data)
+
+  def test_unicode(self):
+    """Test parsing string with unicode chars."""
+    html_data = u"• one <br>• two <br>"
+    self.parser.feed(html_data)
+    self.assertEquals(self.parser.get_data(), u'\u2022 one \n\u2022 two')

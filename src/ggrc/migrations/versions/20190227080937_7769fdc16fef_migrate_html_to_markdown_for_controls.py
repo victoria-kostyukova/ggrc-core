@@ -23,7 +23,7 @@ revision = '7769fdc16fef'
 down_revision = '57b14cb4a7b4'
 
 
-REGEX_HTML = r' "(<[a-zA-Z]+>)+|(<\/[a-zA-Z]+>)+"'
+REGEX_HTML = r"(<[a-zA-Z]+>)+|(<\/[a-zA-Z]+>)+"
 
 
 def parse_html(value):
@@ -35,21 +35,24 @@ def parse_html(value):
 
 def update_comments(connection):
   """Parse comments from html to markdown."""
-  comments_data = connection.execute("""
-      SELECT c.id, c.description
-      FROM comments as c
-      JOIN relationships as r
-      ON r.source_type = "Comment" and r.source_id = c.id
-        and r.destination_type = "Control"
-      WHERE c.description REGEXP {}
-      UNION
-      SELECT c.id, c.description
-      FROM comments as c
-      JOIN relationships as r
-      ON r.destination_type = "Comment" and r.destination_id = c.id
-        and r.source_type = "Control"
-      where c.description REGEXP {}
-  """.format(REGEX_HTML, REGEX_HTML)).fetchall()
+  comments_data = connection.execute(
+      sa.text("""
+          SELECT c.id, c.description
+          FROM comments as c
+          JOIN relationships as r
+          ON r.source_type = "Comment" and r.source_id = c.id
+            and r.destination_type = "Control"
+          WHERE c.description REGEXP :reg_exp
+          UNION
+          SELECT c.id, c.description
+          FROM comments as c
+          JOIN relationships as r
+          ON r.destination_type = "Comment" and r.destination_id = c.id
+            and r.source_type = "Control"
+          where c.description REGEXP :reg_exp
+      """),
+      reg_exp=REGEX_HTML
+  ).fetchall()
   comments_ids = [c_id for c_id, _ in comments_data]
   comments_table = sa.sql.table(
       'comments',
@@ -69,14 +72,17 @@ def update_comments(connection):
 
 def update_control_cavs(connection):
   """Parse cavs from html to markdown."""
-  cavs_data = connection.execute("""
-      select cav.id, cav.attribute_value, cav.attributable_id
-      from custom_attribute_values cav
-      join custom_attribute_definitions cad
-        on cad.id = cav.custom_attribute_id
-      where cad.definition_type = "control"
-        and attribute_value REGEXP
-  """ + REGEX_HTML).fetchall()
+  cavs_data = connection.execute(
+      sa.text("""
+          select cav.id, cav.attribute_value, cav.attributable_id
+          from custom_attribute_values cav
+          join custom_attribute_definitions cad
+            on cad.id = cav.custom_attribute_id
+          where cad.definition_type = "control"
+            and attribute_value REGEXP :reg_exp
+      """),
+      reg_exp=REGEX_HTML
+  ).fetchall()
   controls_ids = {data[2] for data in cavs_data}
   cavs_ids = {data[0] for data in cavs_data}
   cavs_table = sa.sql.table(
@@ -99,12 +105,15 @@ def update_control_cavs(connection):
 def update_control_attr(connection):
   """Parse Control attributes from html to markdown."""
   controls_data = connection.execute(
-      u"SELECT id, title, description, test_plan, notes"
-      u" FROM controls"
-      u" WHERE title REGEXP " + REGEX_HTML +
-      u" OR description REGEXP " + REGEX_HTML +
-      u" OR test_plan REGEXP " + REGEX_HTML +
-      u" OR notes REGEXP " + REGEX_HTML
+      sa.text("""
+          SELECT id, title, description, test_plan, notes
+          FROM controls
+          WHERE title REGEXP :reg_exp
+          OR description REGEXP :reg_exp
+          OR test_plan REGEXP :reg_exp
+          OR notes REGEXP :reg_exp
+      """),
+      reg_exp=REGEX_HTML
   ).fetchall()
   controls_ids = {data[0] for data in controls_data}
 
