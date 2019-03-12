@@ -37,7 +37,10 @@ CATEGORIZATIONS_TABLE = sa.sql.table(
     sa.sql.column('categorizable_id', sa.Integer),
     sa.sql.column('categorizable_type', sa.String),
     sa.sql.column('category_type', sa.String),
+    sa.sql.column('category_id', sa.Integer),
     sa.sql.column('created_at', sa.DATETIME),
+    sa.sql.column('updated_at', sa.DATETIME),
+    sa.sql.column('modified_by_id', sa.Integer),
 )
 
 CONTROLS_TABLE = sa.sql.table(
