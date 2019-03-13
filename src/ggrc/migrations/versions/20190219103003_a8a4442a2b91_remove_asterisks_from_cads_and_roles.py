@@ -18,7 +18,7 @@ from ggrc.models import all_models
 
 # revision identifiers, used by Alembic.
 revision = 'a8a44ea42a2b91'
-down_revision = '57b14cb4a7b4'
+down_revision = '7769fdc16fef'
 
 roles_table = all_models.AccessControlRole.__tablename__
 attributes_table = all_models.CustomAttributeDefinition.__tablename__
