@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for control model."""
+# pylint: disable=too-many-lines
+
 from datetime import datetime, date
 import json
 
@@ -890,3 +892,228 @@ class TestSyncServiceControl(TestCase):
         "control": control_2
     })
     self.assertEqual(response.status_code, 201)
+
+  def test_external_comment_acl(self):
+    """Test automatic assigning current user to ExternalComment Admin."""
+    response = self.api.post(all_models.ExternalComment, {
+        "external_comment": {
+            "id": 1,
+            "external_id": 1,
+            "external_slug": factories.random_str(),
+            "description": "test comment",
+            "context": None,
+            "access_control_list": {
+                "Admin": [
+                    {
+                        "email": "user1@example.com",
+                        "name": "user1",
+                    },
+                ],
+            },
+        }
+    })
+    self.assertEqual(response.status_code, 201)
+    comment = all_models.ExternalComment.query.get(1)
+    comment_admin = comment.get_persons_for_rolename("Admin")
+    self.assertEqual(
+        [i.email for i in comment_admin],
+        ["user1@example.com"]
+    )
+
+  @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
+  @ddt.data(
+      {
+          "Admin": [
+              {
+                  "email": "user1@example.com",
+                  "name": "user1",
+              },
+          ],
+      },
+      {
+          "Admin": [
+              {
+                  "email": "user1@example.com",
+                  "name": "user1",
+              },
+              {
+                  "email": "user2@example.com",
+                  "name": "user2",
+              },
+          ],
+          "Principal Assignees": [
+              {
+                  "email": "user2@example.com",
+                  "name": "user2",
+              },
+              {
+                  "email": "user3@example.com",
+                  "name": "user3",
+              },
+          ]
+      },
+      {}
+  )
+  def test_control_acl_create(self, access_control_list):
+    """Test creation of control with non empty acl."""
+    self.setup_people(access_control_list)
+
+    response = self.api.post(all_models.Control, {
+        "control": {
+            "id": 123,
+            "title": "new_control",
+            "context": None,
+            "access_control_list": access_control_list,
+            "assertions": '["test assertion"]',
+            "review_status": "Unreviewed",
+            "external_id": "123",
+            "external_slug": "Control-123",
+            "review_status_display_name": "some name",
+        }
+    })
+
+    self.assertEqual(201, response.status_code)
+
+    control = all_models.Control.query.get(123)
+    self.assert_obj_acl(control, access_control_list)
+
+  def test_acl_new_people_create(self):
+    """Test creation of control with acl which contain new people."""
+    access_control_list = {
+        "Admin": [
+            {
+                "email": "user1@example.com",
+                "name": "user1",
+            },
+            {
+                "email": "user2@example.com",
+                "name": "user2",
+            },
+        ]
+    }
+    response = self.api.post(all_models.Control, {
+        "control": {
+            "id": 123,
+            "title": "new_control",
+            "context": None,
+            "access_control_list": access_control_list,
+            "assertions": '["test assertion"]',
+            "review_status": "Unreviewed",
+            "external_id": "123",
+            "external_slug": "Control-123",
+            "review_status_display_name": "some name",
+        }
+    })
+    self.assertEqual(201, response.status_code)
+
+    for expected_person in access_control_list["Admin"]:
+      user = all_models.Person.query.filter_by(
+          email=expected_person["email"]
+      ).one()
+      self.assertEqual(user.name, expected_person["name"])
+      self.assertEqual([ur.role.name for ur in user.user_roles], ["Creator"])
+
+    control = all_models.Control.query.get(123)
+    self.assert_obj_acl(control, access_control_list)
+
+  def test_control_acl_update(self):
+    """Test updating of control with non empty acl."""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      person = factories.PersonFactory()
+      control.add_person_with_role_name(person, "Admin")
+
+    access_control_list = {
+        "Admin": [
+            {
+                "email": "user1@example.com",
+                "name": "user1",
+            },
+            {
+                "email": "user2@example.com",
+                "name": "user2",
+            },
+        ]
+    }
+    self.setup_people(access_control_list)
+
+    response = self.api.put(control, {
+        "access_control_list": access_control_list,
+    })
+    self.assert200(response)
+    control = all_models.Control.query.get(control.id)
+    self.assert_obj_acl(control, access_control_list)
+
+  def test_acl_new_people_update(self):
+    """Test updating of control with acl which contain new people."""
+    person = self.generator.generate_person(user_role="Creator")[1]
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      control.add_person_with_role_name(person, "Admin")
+
+    access_control_list = {
+        "Admin": [
+            {
+                "email": person.email,
+                "name": person.name,
+            }
+        ],
+        "Principal Assignees": [
+            {
+                "email": person.email,
+                "name": person.name,
+            },
+            {
+                "email": "user2@example.com",
+                "name": "user2",
+            },
+            {
+                "email": "user3@example.com",
+                "name": "user3",
+            },
+        ]
+    }
+    response = self.api.put(control, {
+        "access_control_list": access_control_list,
+    })
+    self.assert200(response)
+
+    for expected_person in access_control_list["Admin"]:
+      user = all_models.Person.query.filter_by(
+          email=expected_person["email"]
+      ).one()
+      self.assertEqual(user.name, expected_person["name"])
+      self.assertEqual([ur.role.name for ur in user.user_roles], ["Creator"])
+
+    control = all_models.Control.query.get(control.id)
+    self.assert_obj_acl(control, access_control_list)
+
+  def test_wrong_role_acl_update(self):
+    """Test updating of control with non empty acl."""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      person = factories.PersonFactory(name="user1", email="user1@example.com")
+      control.add_person_with_role_name(person, "Admin")
+
+    access_control_list = {
+        "Non-existing role": [
+            {
+                "email": "user2@example.com",
+                "name": "user2",
+            },
+        ]
+    }
+
+    response = self.api.put(control, {
+        "access_control_list": access_control_list,
+    })
+    self.assert400(response)
+    self.assertEqual(
+        response.json["message"],
+        "Role 'Non-existing role' does not exist"
+    )
+    control = all_models.Control.query.get(control.id)
+    self.assert_obj_acl(
+        control,
+        {"Admin": [{"name": "user1", "email": "user1@example.com"}]}
+    )
