@@ -90,7 +90,7 @@ def get_external_app_user(request):
   app_user = find_or_create_ext_app_user()
 
   if app_user.id is None:
-    db.session.commit()
+    db.session.flush()
 
   external_user_email = parse_user_email(
       request, "X-external-user", mandatory=False
@@ -114,6 +114,5 @@ def create_external_user(app_user, external_user_email):
   if external_user and external_user.id is None:
     db.session.flush()
     log_event(db.session, external_user, app_user.id)
-    db.session.commit()
 
   return external_user

@@ -253,7 +253,10 @@ def find_user(email, modifier=None):
     return find_or_create_user_by_email(email, email, modifier)
 
   if settings.INTEGRATION_SERVICE_URL:
-    name = search_user(email)
+    if is_request_from_external_app():
+      name = get_username_from_header()
+    else:
+      name = search_user(email)
     if not name:
       return None
     return find_or_create_user_by_email(email, name, modifier)
@@ -334,3 +337,38 @@ def is_external_app_user_email(email):
     return False
 
   return external_app_user_email == email
+
+
+def is_external_app_user(request):
+  """Checks if user in header is external_app"""
+  if "X-ggrc-user" in request.headers:
+    user_dict = json.loads(request.headers["X-ggrc-user"])
+    email = user_dict["email"]
+    return is_external_app_user_email(email)
+  return False
+
+
+def get_username_from_header():
+  """Extract username from header
+
+  External app sets user on behalf of whom request should be performed in
+  X-external-user header
+  """
+  request = flask.request
+  if "X-external-user" in request.headers:
+    user_dict = json.loads(request.headers["X-external-user"])
+    return user_dict.get("user", "")
+  return ""
+
+
+def is_request_from_external_app():
+  """Checks if request from external_app by headers
+
+  X-Appengine-Inbound-Appid -> is request from app
+  X-ggrc-user -> is request from external user
+  """
+  request = flask.request
+  inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
+  return (
+      inbound_appid and inbound_appid in settings.ALLOWED_QUERYAPI_APP_IDS
+  ) and is_external_app_user(request)

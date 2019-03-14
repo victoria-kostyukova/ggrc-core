@@ -15,20 +15,10 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 
-def _mock_post(*args, **kwargs):
-  """IntegrationService post mock."""
-  # pylint: disable=unused-argument
-  res = []
-  for name in kwargs["payload"]["usernames"]:
-    res.append({'firstName': name, 'lastName': name, 'username': name})
-  return {'persons': res}
-
-
 @ddt.ddt
 @mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id')
 @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
 @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-@mock.patch('ggrc.integrations.client.PersonClient._post', _mock_post)
 class TestExternalPermissions(TestCase):
   """Tests for external permissions and modified by."""
   _external_app_user = ''
@@ -44,7 +34,10 @@ class TestExternalPermissions(TestCase):
         "X-requested-by": "GGRC",
         "X-appengine-inbound-appid": "ggrcq-id",
         "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
-        "X-external-user": json.dumps({"email": "new_ext_user@example.com"})
+        "X-external-user": json.dumps({
+            "email": "new_ext_user@example.com",
+            "user": "John Doe",
+        })
     }
     self.client.get("/login", headers=self.headers)
 
@@ -219,3 +212,42 @@ class TestExternalPermissions(TestCase):
         }),
         headers=self.headers)
     self.assertEqual(response.status_code, 400)
+
+
+class TestExternalAppRequest(TestCase):
+  """Clean tests to emulate external app request"""
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='google.com')
+  @mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id')
+  def test_external_user_creation(self):
+    """Test creation of external user and its role."""
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-requested-by": "GGRC",
+        "X-appengine-inbound-appid": "ggrcq-id",
+        "X-ggrc-user": json.dumps({"email": "external_app@example.com"}),
+        "X-external-user": json.dumps({
+            "email": "anatseuski@google.com",
+            "user": "Aleh Natseuski"
+        })
+    }
+
+    response = self.client.post(
+        "api/{}".format("markets"),
+        data=json.dumps({
+            "market": {
+                "title": "some market",
+                "context": 0
+            }
+        }),
+        headers=headers)
+
+    self.assertEqual(response.status_code, 201)
+
+    ext_person = all_models.Person.query.filter_by(
+        email="anatseuski@google.com",
+        name="Aleh Natseuski"
+    ).one()
+    self.assertEqual(ext_person.system_wide_role, "Creator")
