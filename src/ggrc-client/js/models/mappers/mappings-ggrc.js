@@ -73,8 +73,7 @@ new Mappings({
       'Workflow'],
   },
   Contract: {
-    map: _.difference(businessObjects, ['Assessment', 'Contract', 'Control']),
-    externalMap: ['Control'],
+    map: _.difference(businessObjects, ['Assessment', 'Contract']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
@@ -88,13 +87,11 @@ new Mappings({
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Policy: {
-    map: _.difference(businessObjects, ['Assessment', 'Control', 'Policy']),
-    externalMap: ['Control'],
+    map: _.difference(businessObjects, ['Assessment', 'Policy']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
-    map: _.difference(businessObjects, ['Assessment', 'Control']),
-    externalMap: ['Control'],
+    map: _.difference(businessObjects, ['Assessment']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Regulation: {
