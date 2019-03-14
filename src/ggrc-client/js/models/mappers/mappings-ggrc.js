@@ -144,7 +144,8 @@ new Mappings({
   },
   KeyReport: {
     map: _.difference(businessObjects,
-      ['Assessment', 'Standard', 'Regulation']),
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
