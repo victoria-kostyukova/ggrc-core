@@ -72,10 +72,12 @@ def move_old_comments():
               id, description, assignee_type, created_at, updated_at,
               modified_by_id
           )
-          SELECT id, description, assignee_type, NOW(), NOW(), modified_by_id
+          SELECT id, description, assignee_type, created_at, updated_at,
+                modified_by_id
           FROM
           (
-              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
+              SELECT c.id, c.description, c.assignee_type,
+                    c.created_at, c.updated_at, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.source_type = 'Comment' AND
                   r.source_id = c.id AND
@@ -83,7 +85,8 @@ def move_old_comments():
 
               UNION
 
-              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
+              SELECT c.id, c.description, c.assignee_type,
+                    c.created_at, c.updated_at, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.destination_type = 'Comment' AND
                   r.destination_id = c.id AND
