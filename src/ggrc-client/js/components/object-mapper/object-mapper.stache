@@ -13,9 +13,10 @@
 
   <create-and-map
     {source}="parentInstance"
+    {source-type}="object"
     {destination-model}="model"
   ></create-and-map>
-  
+
 </div>
 <div class="modal-filter modal-body">
   {{#if isSnapshotMapping}}
@@ -105,7 +106,7 @@
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
 {{#if isMappableExternally}}
   <div class="external-map">
-    <p class="external-map__content">Please click the button below to map {{lowercase searchModel.title_plural}} 
+    <p class="external-map__content">Please click the button below to map {{lowercase searchModel.title_plural}}
       for this {{lowercase parentInstance.constructor.title_singular}} in new frontend.</p>
     <questionnaire-mapping-link
       {css-classes}="'btn btn-small btn-white'"

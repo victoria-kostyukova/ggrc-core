@@ -38,6 +38,7 @@ describe('create-and-map component', () => {
       'destination is snapshotable', () => {
       spyOn(Permission, 'is_allowed_any').and.returnValue(true);
 
+      viewModel.attr('sourceType', AuditScopeModel.model_singular);
       viewModel.attr('source', makeFakeInstance({model: AuditScopeModel})());
       viewModel.attr('destinationModel', SnapshotableModel);
 
@@ -60,6 +61,7 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'is_allowed_any').and.returnValue(true);
 
+        viewModel.attr('sourceType', 'Audit');
         viewModel.attr('source', makeFakeInstance({model: Audit})());
         viewModel.attr('destinationModel', SnapshotableModel);
 
@@ -82,6 +84,7 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'is_allowed_any').and.returnValue(true);
 
+        viewModel.attr('sourceType', SnapshotableModel.model_singular);
         viewModel.attr('source',
           makeFakeInstance({model: SnapshotableModel})());
         viewModel.attr('destinationModel', Audit);

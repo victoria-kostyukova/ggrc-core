@@ -28,11 +28,6 @@ export default can.Component.extend({
   leakScope: false,
   viewModel: {
     define: {
-      sourceType: {
-        get() {
-          return this.attr('source').constructor.model_singular;
-        },
-      },
       destinationType: {
         get() {
           return this.attr('destinationModel').model_singular;
@@ -69,25 +64,31 @@ export default can.Component.extend({
       },
     },
     source: null,
+    /**
+     * Source type can be used via source.constructor.model_singular. But,
+     * when Create and Map button is used for create modal, source is null.
+     * Because of this, source type should be passed additionally.
+     */
+    sourceType: '',
     destinationModel: null,
     newEntries: [],
     getCreateAndMapExternallyText() {
       let destinationModel = this.attr('destinationModel');
 
-      return `${destinationModel.title_singular} creation and mapping 
-        ${destinationModel.title_plural.toLowerCase()} to scope, standards and 
-        regulations flows are currently disabled. </br> </br> Please click 
-        “Proceed in the new tab” button to go to the new interface and complete 
+      return `${destinationModel.title_singular} creation and mapping
+        ${destinationModel.title_plural.toLowerCase()} to scope, standards and
+        regulations flows are currently disabled. </br> </br> Please click
+        “Proceed in the new tab” button to go to the new interface and complete
         these actions there.`;
     },
     getCreateAndReturnBackText() {
       let sourceModel = this.attr('source').constructor;
       let destinationModel = this.attr('destinationModel');
 
-      return `Redirecting to Controls Library in the new interface to 
+      return `Redirecting to Controls Library in the new interface to
         create a ${destinationModel.title_singular.toLowerCase()}. </br> </br>
-        Until transition to the new UI is complete, you will need to come back 
-        here after creation and reopen this window to complete mapping to this 
+        Until transition to the new UI is complete, you will need to come back
+        here after creation and reopen this window to complete mapping to this
         ${sourceModel.title_singular.toLowerCase()}.`;
     },
     resetEntries() {
@@ -145,13 +146,13 @@ export default can.Component.extend({
 
       confirm({
         modal_title: 'Warning',
-        modal_description: `Your ${modelName.toLowerCase()} 
+        modal_description: `Your ${modelName.toLowerCase()}
           ${isMany ? 'were': 'was'} successfully created.
           ${isMany ? 'They' : 'It'} will appear in the new frontend in few
           minutes. </br> </br>
-          You are allowed to map new object${isMany ? 's' : ''} to this 
-          ${sourceModel.title_singular.toLowerCase()} only in the 
-          new frontend. By clicking "Proceed in the new tab" you'll be 
+          You are allowed to map new object${isMany ? 's' : ''} to this
+          ${sourceModel.title_singular.toLowerCase()} only in the
+          new frontend. By clicking "Proceed in the new tab" you'll be
           redirected to the new page where you can create mapping.`,
         button_view: `${GGRC.templates_path}/modals/link-button.stache`,
         modalConfirmButton: 'Proceed in the new tab',
