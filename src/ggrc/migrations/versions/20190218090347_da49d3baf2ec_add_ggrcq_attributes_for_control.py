@@ -28,12 +28,12 @@ def upgrade():
   op.add_column("controls",
                 sa.Column("last_submitted_at", sa.DateTime, nullable=True))
   op.add_column("controls",
-                sa.Column("last_submitted_by", sa.Integer, nullable=True))
+                sa.Column("last_submitted_by_id", sa.Integer, nullable=True))
   op.add_column("controls",
                 sa.Column("last_verified_at", sa.DateTime,
                           nullable=True))
   op.add_column("controls",
-                sa.Column("last_verified_by", sa.Integer,
+                sa.Column("last_verified_by_id", sa.Integer,
                           nullable=True))
   op.add_column("controls",
                 sa.Column("external_slug", sa.String(250), nullable=True))

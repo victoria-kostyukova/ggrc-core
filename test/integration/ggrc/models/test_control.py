@@ -74,7 +74,9 @@ class TestSyncServiceControl(TestCase):
     self.generator = generator.ObjectGenerator()
 
     self.app_user_email = "external_app@example.com"
-    self.ext_user_email = 'external@example.com'
+    self.ext_user_email = "external@example.com"
+    self.ext_owner_email = "owner@example.com"
+    self.ext_compliance_email = "compliance@example.com"
 
     settings.EXTERNAL_APP_USER = self.app_user_email
 
@@ -111,12 +113,12 @@ class TestSyncServiceControl(TestCase):
             "name": "External Creator",
         },
         "last_submitted_at": datetime(2018, 1, 4),
-        "last_owner_reviewer": {
+        "last_submitted_by": {
             "email": "owner@example.com",
             "name": "External Owner",
         },
         "last_verified_at": datetime(2018, 1, 5),
-        "last_compliance_reviewer": {
+        "last_verified_by": {
             "email": "compliance@example.com",
             "name": "External Compliance",
         }
@@ -213,9 +215,16 @@ class TestSyncServiceControl(TestCase):
         all_models.Person.email == self.app_user_email).one()
     ext_user = db.session.query(all_models.Person).filter(
         all_models.Person.email == self.ext_user_email).one()
+    ext_owner_user = db.session.query(all_models.Person).filter(
+        all_models.Person.email == self.ext_owner_email).one()
+    ext_compliance_user = db.session.query(all_models.Person).filter(
+        all_models.Person.email == self.ext_compliance_email).one()
 
     self.assertEqual(ext_user.modified_by_id, app_user.id)
     self.assertEqual(control.modified_by_id, ext_user.id)
+
+    self.assertEqual(control.last_submitted_by_id, ext_owner_user.id)
+    self.assertEqual(control.last_verified_by_id, ext_compliance_user.id)
 
     expected_assertions = control_body.pop("assertions")
     expected_categories = control_body.pop("categories")

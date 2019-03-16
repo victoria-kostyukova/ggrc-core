@@ -71,22 +71,22 @@ class Control(synchronizable.Synchronizable,
     return utils.person_relationship(cls.__name__, "created_by_id")
 
   last_submitted_at = db.Column(db.DateTime, nullable=True)
-  last_submitted_by = db.Column(db.Integer, nullable=True)
+  last_submitted_by_id = db.Column(db.Integer, nullable=True)
 
   # pylint: disable=no-self-argument
   @declared_attr
-  def last_owner_reviewer(cls):
-    """Relationship to user referenced by last_submitted_by."""
-    return utils.person_relationship(cls.__name__, "last_submitted_by")
+  def last_submitted_by(cls):
+    """Relationship to user referenced by last_submitted_by_id."""
+    return utils.person_relationship(cls.__name__, "last_submitted_by_id")
 
   last_verified_at = db.Column(db.DateTime, nullable=True)
-  last_verified_by = db.Column(db.Integer, nullable=True)
+  last_verified_by_id = db.Column(db.Integer, nullable=True)
 
   # pylint: disable=no-self-argument
   @declared_attr
-  def last_compliance_reviewer(cls):
-    """Relationship to user referenced by last_verified_by."""
-    return utils.person_relationship(cls.__name__, "last_verified_by")
+  def last_verified_by(cls):
+    """Relationship to user referenced by last_verified_by_id."""
+    return utils.person_relationship(cls.__name__, "last_verified_by_id")
 
   _title_uniqueness = False
 
@@ -107,10 +107,10 @@ class Control(synchronizable.Synchronizable,
       reflection.ExternalUserAttribute('created_by',
                                        force_create=True),
       'last_submitted_at',
-      reflection.ExternalUserAttribute('last_owner_reviewer',
+      reflection.ExternalUserAttribute('last_submitted_by',
                                        force_create=True),
       'last_verified_at',
-      reflection.ExternalUserAttribute('last_compliance_reviewer',
+      reflection.ExternalUserAttribute('last_verified_by',
                                        force_create=True),
   )
 
@@ -183,8 +183,8 @@ class Control(synchronizable.Synchronizable,
   def log_json(self):
     out_json = super(Control, self).log_json()
     out_json["created_by"] = self.created_by
-    out_json["last_owner_reviewer"] = self.last_owner_reviewer
-    out_json["last_compliance_reviewer"] = self.last_compliance_reviewer
+    out_json["last_submitted_by"] = self.last_submitted_by
+    out_json["last_verified_by"] = self.last_verified_by
     # so that event log can refer to deleted directive
     if self.directive:
       out_json["mapped_directive"] = self.directive.display_name
