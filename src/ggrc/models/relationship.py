@@ -9,7 +9,6 @@ import collections
 import sqlalchemy as sa
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.login import is_external_app_user
@@ -172,15 +171,6 @@ class Relationship(base.ContextRBAC, Base, db.Model):
             .format(self.type, self.source_type, self.destination_type)
         )
 
-  # pylint:disable=unused-argument
-  @validates("is_external")
-  def validate_is_external(self, key, value):
-    """Validates is change of is_external column value allowed."""
-    if is_external_app_user() and (not value or self.is_external is False):
-      raise ValidationError(
-          'External application can create only external relationships.')
-    return value
-
   @staticmethod
   def _check_relation_types_group(type1, type2, group1, group2):
     """Checks if 2 types belong to 2 groups
@@ -206,16 +196,12 @@ class Relationship(base.ContextRBAC, Base, db.Model):
     """Validates is delete of Relationship is allowed."""
     cls.validate_relation_by_type(target.source_type,
                                   target.destination_type)
-    if is_external_app_user() and not target.is_external:
-      raise ValidationError(
-          'External application can delete only external relationships.')
 
   @classmethod
   def validate_relation_by_type(cls, source_type, destination_type):
     """Checks if a mapping is allowed between given types."""
     if is_external_app_user():
       # external users can map and unmap scoping objects
-      # check that relationship is external is done in a separate validator
       return
 
     from ggrc.models import all_models
