@@ -214,16 +214,16 @@ class TestExternalPermissions(TestCase):
     self.assertEqual(response.status_code, 400)
 
 
+@mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+@mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='google.com')
+@mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id')
 class TestExternalAppRequest(TestCase):
   """Clean tests to emulate external app request"""
 
-  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
-  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='google.com')
-  @mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id')
-  def test_external_user_creation(self):
-    """Test creation of external user and its role."""
-
-    headers = {
+  def setUp(self):
+    """Set up request mock and mock dependencies."""
+    super(TestExternalAppRequest, self).setUp()
+    self.headers = {
         "Content-Type": "application/json",
         "X-requested-by": "GGRC",
         "X-appengine-inbound-appid": "ggrcq-id",
@@ -234,6 +234,8 @@ class TestExternalAppRequest(TestCase):
         })
     }
 
+  def test_external_user_creation(self):
+    """Test creation of external user and its role."""
     response = self.client.post(
         "api/{}".format("markets"),
         data=json.dumps({
@@ -242,7 +244,7 @@ class TestExternalAppRequest(TestCase):
                 "context": 0
             }
         }),
-        headers=headers)
+        headers=self.headers)
 
     self.assertEqual(response.status_code, 201)
 
@@ -251,3 +253,45 @@ class TestExternalAppRequest(TestCase):
         name="Aleh Natseuski"
     ).one()
     self.assertEqual(ext_person.system_wide_role, "Creator")
+
+  @mock.patch('ggrc.settings.ALLOWED_QUERYAPI_APP_IDS', new='ggrcq-id-updated')
+  def test_external_wrong_appid(self):
+    """Requests with wrong appid handled as regular request
+
+    If user not exists -> bad request
+    """
+
+    self.headers["X-ggrc-user"] = json.dumps({"email": "some@google.com"})
+
+    response = self.client.post(
+        "api/{}".format("markets"),
+        data=json.dumps({
+            "market": {
+                "title": "some market",
+                "context": 0
+            }
+        }),
+        headers=self.headers)
+
+    self.assertEqual(response.status_code, 400)
+
+  def test_external_wrong_ggrc_user(self):
+    """Requests with wrong ggrc_user
+
+    If X-ggrc-user not in configured as external -> handled as regular request
+    If user not exists -> bad request
+    """
+
+    self.headers["X-ggrc-user"] = json.dumps({"email": "some@google.com"})
+
+    response = self.client.post(
+        "api/{}".format("markets"),
+        data=json.dumps({
+            "market": {
+                "title": "some market",
+                "context": 0
+            }
+        }),
+        headers=self.headers)
+
+    self.assertEqual(response.status_code, 400)

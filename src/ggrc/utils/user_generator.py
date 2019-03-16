@@ -245,6 +245,11 @@ def find_user(email, modifier=None):
 
   If Integration Server is specified not found in DB user is generated
   with Creator role.
+
+  If request come from external app like sync service, this app provides
+  username in the request header. Thus we don't need to search user in
+  the integration service. User generated based on provided info
+  with Creator role.
   """
   if is_external_app_user_email(email):
     return find_or_create_ext_app_user()
@@ -341,9 +346,8 @@ def is_external_app_user_email(email):
 
 def is_external_app_user(request):
   """Checks if user in header is external_app"""
-  if "X-ggrc-user" in request.headers:
-    user_dict = json.loads(request.headers["X-ggrc-user"])
-    email = user_dict["email"]
+  email = parse_user_email(request, "X-ggrc-user", mandatory=False)
+  if email:
     return is_external_app_user_email(email)
   return False
 
