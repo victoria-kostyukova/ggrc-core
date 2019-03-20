@@ -1,6 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Settings for testing."""
+
 import os
 
 DEBUG = True
@@ -17,4 +19,5 @@ LOGIN_MANAGER = 'ggrc.login.noop'
 # SQLALCHEMY_ECHO = True
 MEMCACHE_MECHANISM = False
 EXTERNAL_APP_USER = 'External App <external_app@example.com>'
+ALLOWED_QUERYAPI_APP_IDS = "ggrc-id"
 ENABLE_RELEASE_NOTES = False

@@ -31,7 +31,8 @@ class WorkflowFactory(_base.BaseFactory):
         "title": self._obj_title,
         "admins": [users.current_person()],
         "is_archived": False,
-        "recurrences_started": False
+        "recurrences_started": False,
+        "type": self._obj_name()
     }
 
   def _post_obj_init(self, obj):
@@ -48,7 +49,8 @@ class TaskGroupFactory(_base.BaseFactory):
   def _empty_attrs(self):
     """See superclass."""
     return {
-        "task_group_tasks": []
+        "task_group_tasks": [],
+        "type": self._obj_name()
     }
 
   @property
@@ -56,7 +58,8 @@ class TaskGroupFactory(_base.BaseFactory):
     """See superclass."""
     return {
         "title": self._obj_title,
-        "assignee": users.current_person()
+        "assignee": users.current_person(),
+        "type": self._obj_name()
     }
 
   def _post_obj_init(self, obj):
@@ -88,7 +91,8 @@ class TaskGroupTaskFactory(_base.BaseFactory):
         "title": self._obj_title,
         "assignees": [users.current_person()],
         "start_date": start_date,
-        "due_date": start_date + datetime.timedelta(days=14)
+        "due_date": start_date + datetime.timedelta(days=14),
+        "type": self._obj_name()
     }
 
   def _post_obj_init(self, obj):
@@ -103,6 +107,13 @@ class WorkflowCycleFactory(_base.BaseFactory):
   """Factory for WorflowCycle entities."""
   _entity_cls = workflow_entity.WorkflowCycle
 
+  @property
+  def _default_attrs(self):
+    """See superclass."""
+    return {
+        "type": self._obj_name()
+    }
+
   def _post_obj_init(self, obj):
     """Set WorkflowCycle for each associated CycleTaskGroup."""
     for cycle_task_group in obj.cycle_task_groups:
@@ -112,6 +123,13 @@ class WorkflowCycleFactory(_base.BaseFactory):
 class CycleTaskGroupFactory(_base.BaseFactory):
   """Factory for CycleTaskGroup entities."""
   _entity_cls = workflow_entity.CycleTaskGroup
+
+  @property
+  def _default_attrs(self):
+    """See superclass."""
+    return {
+        "type": self._obj_name()
+    }
 
   def _post_obj_init(self, obj):
     """Add CycleTaskGroup to associated WorkflowCycle.
@@ -132,6 +150,13 @@ class CycleTaskFactory(_base.BaseFactory):
     """See superclass."""
     return {
         "comments": []
+    }
+
+  @property
+  def _default_attrs(self):
+    """See superclass."""
+    return {
+        "type": self._obj_name()
     }
 
   def _post_obj_init(self, obj):

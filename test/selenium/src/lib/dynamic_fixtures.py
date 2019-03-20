@@ -29,7 +29,7 @@ def get_fixture_from_dict_fixtures(fixture):
     parent_obj = get_fixture_from_dict_fixtures("new_audit_rest")[0]
     dict_executed_fixtures.update(
         {fixture: Representation.convert_repr_to_snapshot(
-            objs=origin_obj, parent_obj=parent_obj)})
+            obj=origin_obj, parent_obj=parent_obj)})
   return {k: v for k, v in dict_executed_fixtures.iteritems()
           if k == fixture}[fixture]
 

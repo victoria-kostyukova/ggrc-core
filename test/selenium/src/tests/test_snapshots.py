@@ -48,6 +48,8 @@ class TestSnapshots(base.Test):
         controls_ui_service.get_list_objs_from_tree_view(src_obj=src_obj))
     assert len([exp_controls]) == actual_controls_tab_count
     # 'actual_controls': created_at, updated_at, custom_attributes (None)
+    [actual_control.repr_snapshot(
+        src_obj) for actual_control in actual_controls]
     cls.general_equal_assert(exp_controls, actual_controls,
                              *Representation.tree_view_attrs_to_exclude)
 
@@ -157,19 +159,18 @@ class TestSnapshots(base.Test):
     # 'actual_control': created_at, updated_at, modified_by (None)
     self.general_equal_assert(
         expected_control, actual_control, "modified_by", "slug",
-        "review_status_display_name",
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
-      ("obj", "control", "expected_control"),
-      [("create_audit_with_control_and_update_control", "control",
-        "updated_control"),
-       ("create_audit_with_control_with_cas_and_update_control_cav",
-        "control", "updated_control"),
-       ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-        "control", "updated_control")
+      "obj",
+      ["create_audit_with_control_and_update_control",
+       "create_audit_with_control_with_cas_and_update_control_cav",
+       pytest.param(
+           "create_audit_with_control_with_cas_and_delete_cas_for_controls",
+           marks=pytest.mark.xfail(
+               reason="External user can remove only external relationships.")
+       )
        ],
       ids=["Update snapshotable Control to latest ver "
            "after updating Control",
@@ -179,7 +180,7 @@ class TestSnapshots(base.Test):
            "after deleting CAs for Controls"],
       indirect=["obj"])
   def test_destructive_update_snapshotable_control_to_latest_ver(
-      self, obj, control, expected_control, selenium
+      self, obj, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Update snapshotable Control to latest ver after updating Control.
@@ -196,8 +197,8 @@ class TestSnapshots(base.Test):
     """
     audit_with_one_control = obj
     audit = audit_with_one_control["audit"]
-    control = audit_with_one_control[control]
-    expected_control = audit_with_one_control[expected_control].repr_ui()
+    control = audit_with_one_control["control"]
+    expected_control = audit_with_one_control["updated_control"].repr_ui()
     controls_ui_service = webui_service.ControlsService(selenium)
     actual_controls_tab_count = controls_ui_service.get_count_objs_from_tab(
         src_obj=audit)
@@ -217,11 +218,9 @@ class TestSnapshots(base.Test):
     self.general_equal_assert(
         expected_control, actual_control,
         "created_at", "updated_at", "modified_by", "slug",
-        "review_status_display_name",
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_mapped_to_program_controls_does_not_added_to_existing_audit(
       self, create_audit_and_update_first_of_two_original_controls, selenium
   ):
@@ -248,7 +247,6 @@ class TestSnapshots(base.Test):
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_bulk_update_audit_objects_to_latest_ver(
       self, create_audit_and_update_first_of_two_original_controls, selenium
   ):
@@ -279,19 +277,12 @@ class TestSnapshots(base.Test):
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
+  @pytest.mark.parametrize("tab_name", [Lhn.ALL_OBJS, Lhn.MY_OBJS])
   @pytest.mark.parametrize(
-      "version_of_ctrl, is_found, tab_name",
-      [("control", False, Lhn.ALL_OBJS),
-       ("control", False, Lhn.MY_OBJS),
-       ("updated_control", True, Lhn.ALL_OBJS),
-       # updated control is not shown on Lhn.MY_OBJS as it was created by
-       # external app user
-       ("updated_control", False, Lhn.MY_OBJS)],
-      ids=["Snapshoted version is not found on all objects tab",
-           "Snapshoted version is not found on my objects tab",
-           "Actual snapshotable control is presented on all objects tab",
-           "Actual snapshotable control is not presented on my objects tab"])
+      "version_of_ctrl, is_found",
+      [("control", False), ("updated_control", True)],
+      ids=["Snapshoted version is not found",
+           "Actual snapshotable control is presented"])
   def test_destructive_search_snapshots_in_lhn(
       self, create_audit_with_control_and_update_control, version_of_ctrl,
       is_found, tab_name, lhn_menu
@@ -309,7 +300,6 @@ class TestSnapshots(base.Test):
             expected_control_title, actual_controls_titles))
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "version_of_ctrl, is_found",
       [("control", True), ("updated_control", False)],
@@ -339,7 +329,6 @@ class TestSnapshots(base.Test):
             expected_control, actual_controls))
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "control_for_mapper, control_for_tree_view, obj, "
       "expected_map_statuses, expected_is_found",
@@ -415,10 +404,10 @@ class TestSnapshots(base.Test):
               [expected_control_from_tree_view],
               actual_controls_from_tree_view,
               *Representation.tree_view_attrs_to_exclude))
-    assert (
-        expected_is_found
-        is (expected_controls_from_mapper[0] in actual_controls_from_mapper)
-        is (expected_map_status in actual_map_status)) == (
+    assert (expected_is_found
+            is (expected_controls_from_mapper[0] in
+                actual_controls_from_mapper)
+            is (expected_map_status in actual_map_status)) == (
         (expected_controls_from_tree_view[0] in actual_controls_from_tree_view)
         if expected_control_from_tree_view else
         expected_controls_from_tree_view ==
@@ -494,7 +483,6 @@ class TestSnapshots(base.Test):
             is is_mappable_on_tree_view_item is is_unmappable_on_info_panel)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "is_via_tw_map_btn_not_item, expected_snapshoted_control, obj",
       [(True, "control", "assessment_w_mapped_control_w_issue"),
@@ -561,15 +549,15 @@ class TestSnapshots(base.Test):
   @pytest.mark.xfail(raises=IOError)
   @pytest.mark.parametrize(
       "obj",
-      [pytest.mark.skip(
-          reason="Will be fixed")(
-          None),
-       pytest.mark.skip(
-          reason="Issue has another mapping flow to control")(
-          "assessment_w_mapped_control_w_issue"),
-       pytest.mark.skip(
-          reason="Will be fixed")(
-          "assessment_w_mapped_control_wo_issue")],
+      [pytest.param(
+          None, marks=pytest.mark.skip(reason="TBD")),
+       pytest.param(
+          "assessment_w_mapped_control_w_issue",
+          marks=pytest.mark.skip(
+              reason="Issue has another mapping flow to control")),
+       pytest.param(
+           "assessment_w_mapped_control_wo_issue",
+           marks=pytest.mark.skip(reason="TBD"))],
       ids=["Export of snapshoted Control from Audit's Info Page "
            "via mapped Controls' Tree View",
            "Export of snapshoted Control from Issue's Info Page "
@@ -607,7 +595,6 @@ class TestSnapshots(base.Test):
     #                    custom_attributes (GGRC-2344) (None)
     self.general_equal_assert(
         [expected_control], actual_controls,
-        "review_status", "review_status_display_name",
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.fixture()
@@ -643,7 +630,6 @@ class TestSnapshots(base.Test):
             "expected_state": object_states.DRAFT}
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "obj",
       ["assessment_wo_mapped_control_wo_issue",
@@ -689,7 +675,6 @@ class TestSnapshots(base.Test):
     self.general_equal_assert([expected_obj], actual_objs, *exclude_attrs)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "obj, object_state",
       [("assessment", object_states.NOT_STARTED),
@@ -734,7 +719,6 @@ class TestSnapshots(base.Test):
     assert [] == actual_controls
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "obj",
       ["assessment", "issue"],

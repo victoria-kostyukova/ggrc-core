@@ -31,10 +31,6 @@ class ControlFactory(_base.BaseFactory):
         "review_status_display_name": ReviewStates.UNREVIEWED,
         "review_status": ReviewStates.UNREVIEWED,
         "external_id": self.generate_external_id(),
-        "external_slug": self.generate_external_slug()
+        "external_slug": self.generate_external_slug(),
+        "type": self._obj_name()
     }
-
-
-class ControlAssertionFactory(_base.BaseFactory):
-  """Factory for Control Assertions."""
-  _entity_cls = control_entity.ControlAssertion

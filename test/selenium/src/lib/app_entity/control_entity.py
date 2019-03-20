@@ -16,6 +16,7 @@ class Control(_base.Base, _base.WithTitleAndCode):
   review_status_display_name = attr.ib()
   external_id = attr.ib()
   external_slug = attr.ib()
+  type = attr.ib()
 
 
 @attr.s

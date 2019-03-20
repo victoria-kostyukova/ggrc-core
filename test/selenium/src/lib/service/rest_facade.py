@@ -22,7 +22,6 @@ def create_objective(program=None, **attrs):
   return _create_obj_in_program_scope("Objectives", program, **attrs)
 
 
-@decorator.work_by_external_user
 def create_control(**attrs):
   """Create an control."""
   return _create_obj_in_program_scope("Controls", None, **attrs)
@@ -68,10 +67,10 @@ def create_asmt_template(audit, all_cad_types=False, **attrs):
       factory_params=obj_attrs)
 
 
-def convert_cntrl_to_snapshot(audit, obj):
-  """Convert control to snapshot."""
+def convert_obj_to_snapshot(audit, obj):
+  """Convert object to snapshot."""
   return Representation.convert_repr_to_snapshot(
-      objs=obj, parent_obj=audit)
+      obj=obj, parent_obj=audit)
 
 
 def create_asmt_from_template(audit, asmt_template, objs_to_map):
@@ -81,7 +80,7 @@ def create_asmt_from_template(audit, asmt_template, objs_to_map):
 
 def create_asmts_from_template(audit, asmt_template, objs_to_map):
   """Create assessments from template."""
-  snapshots = [convert_cntrl_to_snapshot(audit, obj_to_map) for obj_to_map
+  snapshots = [convert_obj_to_snapshot(audit, obj_to_map) for obj_to_map
                in objs_to_map]
   return rest_service.AssessmentsFromTemplateService().create_assessments(
       audit=audit, template=asmt_template, snapshots=snapshots)
@@ -182,11 +181,10 @@ def _split_attrs(attrs, second_part_keys=None):
   return dict_1, dict_2
 
 
-@decorator.work_by_external_user
 def update_control(control, **attrs):
   """Update control."""
   # pylint: disable=no-else-return
-  if attrs is None:
+  if not attrs:
     attrs["title"] = "EDITED_" + control.title
     return (factory.get_cls_rest_service(
         objects.get_plural(control.type))().update_obj(
@@ -198,14 +196,12 @@ def update_control(control, **attrs):
         obj=control, **attrs))
 
 
-@decorator.work_by_external_user
 def delete_control(control):
   """Delete control."""
   return (factory.get_cls_rest_service(
       objects.get_plural(control.type))().delete_objs(control))
 
 
-@decorator.work_by_external_user
 def delete_control_cas(cas):
   """Delete control cas."""
   from lib.service.rest_service import CustomAttributeDefinitionsService

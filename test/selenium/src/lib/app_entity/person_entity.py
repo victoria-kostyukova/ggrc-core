@@ -12,6 +12,7 @@ class Person(_base.Base):
   name = attr.ib()
   email = attr.ib()
   global_role_name = attr.ib()
+  type = attr.ib()
 
 
 @attr.s

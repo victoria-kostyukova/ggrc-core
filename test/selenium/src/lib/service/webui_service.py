@@ -125,7 +125,10 @@ class BaseWebUiService(object):
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     # todo fix freezing when navigate through tabs by URLs and using driver.get
     selenium_utils.open_url(generic_widget_url, is_via_js=True)
-    return self.generic_widget_cls(self.driver, self.obj_name)
+    return self.generic_widget_cls(
+        self.driver, self.obj_name, self.is_versions_widget) if hasattr(
+        self, "is_versions_widget") else self.generic_widget_cls(
+        self.driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):
     """Navigate to info page URL of object according to URL of object and
@@ -149,6 +152,8 @@ class BaseWebUiService(object):
     """Get and return list of objects from Tree View."""
     self.set_list_objs_scopes_representation_on_tree_view(src_obj)
     list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
+    for index in xrange(len(list_objs_scopes)):
+      self.add_review_status_if_not_in_control_scope(list_objs_scopes[index])
     return self._create_list_objs(entity_factory=self.entities_factory_cls,
                                   list_scopes=list_objs_scopes)
 
@@ -159,9 +164,23 @@ class BaseWebUiService(object):
     list_objs_scopes, mapping_statuses = (
         self._search_objs_via_tree_view(src_obj, dest_objs))
     self._get_unified_mapper(src_obj).close_modal()
+    for index in xrange(len(list_objs_scopes)):
+      self.add_review_status_if_not_in_control_scope(list_objs_scopes[index])
     return self._create_list_objs(
         entity_factory=self.entities_factory_cls,
         list_scopes=list_objs_scopes), mapping_statuses
+
+  def add_review_status_if_not_in_control_scope(self, scope):
+    """Add review status when getting control from panel or tree view."""
+    # pylint: disable=invalid-name
+    from lib.constants.element import ReviewStates
+    if (
+        self.obj_name == objects.CONTROLS and
+        "REVIEW_STATUS" not in scope and
+        "REVIEW_STATUS_DISPLAY_NAME" not in scope
+    ):
+      scope["REVIEW_STATUS"] = ReviewStates.UNREVIEWED
+      scope["REVIEW_STATUS_DISPLAY_NAME"] = ReviewStates.UNREVIEWED
 
   def get_obj_from_info_page(self, obj):
     """Gets and returns object from Info page."""
@@ -173,7 +192,9 @@ class BaseWebUiService(object):
     objects' titles ('objs' can be list of objects or one object).
     """
     def get_obj_from_info_panel(src_obj, obj):
+      """Get obj from info panel."""
       scope = self.get_scope_from_info_panel(src_obj, obj)
+      self.add_review_status_if_not_in_control_scope(scope)
       return self._create_list_objs(
           entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
     return ([get_obj_from_info_panel(src_obj, obj) for obj in objs] if
@@ -192,6 +213,9 @@ class BaseWebUiService(object):
     obj_name_from_dict = objects.get_plural(
         StringMethods.get_first_word_from_str(dict_key))
     if self.obj_name == obj_name_from_dict:
+      if self.obj_name == objects.CONTROLS:
+        dict_list_objs_scopes[dict_key][0]["REVIEW_STATUS_DISPLAY_NAME"] = (
+            dict_list_objs_scopes[dict_key][0]["Review Status"])
       return self._create_list_objs(
           entity_factory=self.entities_factory_cls,
           list_scopes=dict_list_objs_scopes[dict_key])

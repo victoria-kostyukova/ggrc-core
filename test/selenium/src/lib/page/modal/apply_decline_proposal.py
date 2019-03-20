@@ -46,4 +46,4 @@ class CompareApplyDeclineModal(base.Modal):
     selenium_utils.wait_for_js_to_load(self._driver)
     self.modal.button(text=btn_text).click()
     self.modal.wait_until_not(
-        method=lambda e: e.present, timeout=ux.MAX_USER_WAIT_SECONDS)
+        method=lambda e: e.present, timeout=ux.MAX_USER_WAIT_SECONDS * 2)

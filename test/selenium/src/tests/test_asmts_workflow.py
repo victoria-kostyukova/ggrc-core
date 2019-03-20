@@ -46,8 +46,7 @@ def _assert_asmt(asmts_ui_service, exp_asmt):
   # "audit" not shown in UI
   actual_asmt = asmts_ui_service.get_obj_from_info_page(exp_asmt)
   exp_asmt.repr_ui()
-  base.Test().general_equal_assert(exp_asmt, actual_asmt, "audit",
-                                   "custom_attributes")
+  base.Test().general_equal_assert(exp_asmt, actual_asmt, "audit")
 
 
 class TestAssessmentsWorkflow(base.Test):
@@ -55,7 +54,6 @@ class TestAssessmentsWorkflow(base.Test):
   info_service = rest_service.ObjectsInfoService
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_add_comment_to_asmt_via_info_panel(
       self, program, audit, assessment, selenium
   ):
@@ -87,8 +85,7 @@ class TestAssessmentsWorkflow(base.Test):
         status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(obj=expected_asmt)
     # 'actual_asmt': audit (None)
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit",
-                              "custom_attributes")
+    self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   def test_asmt_logs(
@@ -194,8 +191,7 @@ class TestAssessmentsWorkflow(base.Test):
             obj=expected_asmt).updated_at).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(expected_asmt)
     # 'actual_asmt': audit (None)
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit",
-                              "custom_attributes")
+    self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -226,7 +222,7 @@ class TestAssessmentsWorkflow(base.Test):
         updated_at=rest_facade.get_obj(asmt).updated_at,
         status=end_state,
         verified=(True if action == "verify_assessment" else False)).repr_ui()
-    self.general_equal_assert(asmt, actual_asmt, "audit", "custom_attributes")
+    self.general_equal_assert(asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
@@ -388,8 +384,7 @@ class TestAssessmentsWorkflow(base.Test):
         mapped_objects=[obj],
         updated_at=rest_facade.get_obj(assessment).updated_at).repr_ui()
     actual_asmt = asmts_ui_service.get_obj_from_info_page(assessment)
-    self.general_equal_assert(assessment, actual_asmt, "audit",
-                              "custom_attributes")
+    self.general_equal_assert(assessment, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -490,8 +485,7 @@ class TestAssessmentsWorkflow(base.Test):
     actual_asmt = asmt_service.get_obj_from_info_page(obj=expected_asmt)
     actual_comment_texts = [
         comment["description"] for comment in actual_asmt.comments]
-    self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments",
-                              "custom_attributes")
+    self.general_equal_assert(expected_asmt, actual_asmt, "audit", "comments")
     assert actual_comment_texts == [comment_text]
 
   @pytest.mark.smoke_tests
@@ -561,7 +555,6 @@ class TestAssessmentsWorkflow(base.Test):
     _assert_asmt(asmts_ui_service, asmt)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize("attr_type",
                            AdminWidgetCustomAttributes.ALL_CA_TYPES)
   def test_fill_asmt_gcas_inline(
@@ -603,10 +596,9 @@ class TestAssessmentsWorkflow(base.Test):
         status=object_states.IN_PROGRESS,
         updated_at=self.info_service().get_obj(obj=asmt).updated_at,
         evidence_urls=[url]).repr_ui()
-    self.general_equal_assert(asmt, actual_asmt, "audit", "custom_attributes")
+    self.general_equal_assert(asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_add_person_to_acl_list(self, program, audit, selenium):
     """Test that an assessment assignee can add a person to ACL"""
     assignee = rest_facade.create_user_with_role(roles.CREATOR)

@@ -1,6 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Pool to hold requests sessions."""
+import json
 
 import requests
 
@@ -11,24 +12,42 @@ BASIC_HEADERS = {"X-Requested-By": "GGRC",
                  "Content-Type": "application/json",
                  "Accept-Encoding": "gzip, deflate, br"}
 
+
+EXTERNAL_HEADERS = {
+    'X-ggrc-user': {'email': 'external_app@example.com'},
+    'Content-Type': 'application/json',
+    'X-Requested-By': 'GGRC',
+    "X-Appengine-Inbound-Appid": "ggrc-id",
+    'X-external-user': {'email': None, 'user': None}}
+
+
 _sessions = {}  # pylint: disable=invalid-name
 
 
-def get_session(user):
+def get_session(user, is_external=False):
   """Returns a requests Session for the `user`."""
   try:
     value = _sessions[user.email]
   except KeyError:
-    value = _create_session(user)
+    value = create_session(user, is_external=is_external)
     _sessions[user.email] = value
   return value
 
 
-def _create_session(user):
+def create_session(user, is_external=False):
   """Creates a new requests Session for the `user`."""
+  import copy
   session = requests.Session()
-  session.headers = BASIC_HEADERS
-  _set_login_cookie(session, user)
+  if is_external:
+    session.headers = copy.deepcopy(EXTERNAL_HEADERS)
+    session.headers["X-external-user"]["email"] = user.email
+    session.headers["X-external-user"]["user"] = user.name
+    session.headers["X-external-user"] = json.dumps(
+        session.headers["X-external-user"])
+    session.headers["X-ggrc-user"] = json.dumps(session.headers["X-ggrc-user"])
+  else:
+    session.headers = copy.deepcopy(BASIC_HEADERS)
+    _set_login_cookie(session, user)
   return session
 
 

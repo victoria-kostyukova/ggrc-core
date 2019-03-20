@@ -15,7 +15,8 @@ class PersonFactory(_base.BaseFactory):
     """See superclass."""
     return {
         "name": self._obj_title,
-        "email": random_utils.get_email()
+        "email": random_utils.get_email(),
+        "type": self._obj_name()
     }
 
 

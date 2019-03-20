@@ -17,6 +17,7 @@ class Workflow(_base.Base, _base.WithTitleAndCode):
   repeat_every = attr.ib()
   task_groups = attr.ib()
   recurrences_started = attr.ib()
+  type = attr.ib()
 
 
 @attr.s
@@ -25,6 +26,7 @@ class TaskGroup(_base.Base, _base.WithTitleAndCode):
   assignee = attr.ib()
   workflow = attr.ib()
   task_group_tasks = attr.ib()
+  type = attr.ib()
 
 
 @attr.s
@@ -34,6 +36,7 @@ class TaskGroupTask(_base.Base, _base.WithTitleAndCode):
   start_date = attr.ib()
   due_date = attr.ib()
   task_group = attr.ib()
+  type = attr.ib()
 
 
 @attr.s
@@ -46,6 +49,7 @@ class WorkflowCycle(_base.Base):
   due_date = attr.ib()
   cycle_task_groups = attr.ib()
   workflow = attr.ib()
+  type = attr.ib()
 
 
 @attr.s
@@ -56,6 +60,7 @@ class CycleTaskGroup(_base.Base):
   cycle_tasks = attr.ib()
   workflow_cycle = attr.ib()
   task_group = attr.ib()
+  type = attr.ib()
 
 
 @attr.s
@@ -68,3 +73,4 @@ class CycleTask(_base.Base):
   comments = attr.ib()
   cycle_task_group = attr.ib()
   task_group_task = attr.ib()
+  type = attr.ib()

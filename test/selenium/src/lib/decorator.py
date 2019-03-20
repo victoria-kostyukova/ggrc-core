@@ -113,3 +113,15 @@ def work_by_external_user(fun):
     users.set_current_user(user)
     return result
   return wrapper
+
+
+def check_that_obj_is_created(fun):
+  """Decorator to check if object is created."""
+  def wrapper(*args, **kwargs):
+    "Wrapper."
+    from lib.service import rest_service
+    result = fun(*args, **kwargs)
+    # need to wait when creation background job is finished
+    rest_service.ObjectsInfoService().get_obj(result)
+    return result
+  return wrapper

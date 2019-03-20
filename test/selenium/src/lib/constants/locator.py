@@ -146,8 +146,7 @@ class LhnMenu(object):
     def get_create_new_button(label):
       return (
           By.CSS_SELECTOR,
-          '[data-model-name="{}"] [data-test-id='
-          '"button_lhn_create_new_program_522c563f"]'.format(label))
+          '[data-model-name="{}"] [class="add-new oneline"]'.format(label))
 
     @staticmethod
     def get_accordion_count(label):

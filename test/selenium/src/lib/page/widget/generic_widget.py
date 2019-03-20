@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Widgets other than Info widget."""
@@ -14,10 +15,17 @@ from lib.utils import selenium_utils
 class Widget(base.Widget):
   """All widgets with Tree View and Filters."""
   # pylint: disable=too-many-instance-attributes
-  def __init__(self, driver, obj_name):
+  def __init__(self, driver, obj_name, is_versions_widget=False):
     self.obj_name = obj_name
     self._locators_filter = locator.BaseWidgetGeneric
-    self._locators_widget = factory.get_locator_widget(self.obj_name.upper())
+    self._locators_widget = factory.get_locator_widget(
+        self.obj_name.upper())
+    if is_versions_widget:
+      locator_parts = self._locators_widget[1].split("\"")
+      locator_parts[1] += "_version"
+      self._locators_widget = (self._locators_widget[0], "\"".join(
+          locator_parts))
+      objects.get_singular(self.obj_name) + "_version".upper()
     self.info_widget_cls = factory.get_cls_widget(
         object_name=obj_name, is_info=True)
     # Filter

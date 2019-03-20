@@ -10,3 +10,4 @@ from lib.app_entity import _base
 class Comment(_base.Base):
   """Represents Comment entity."""
   description = attr.ib()
+  type = attr.ib()

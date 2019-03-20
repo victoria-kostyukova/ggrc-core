@@ -111,8 +111,8 @@ class Representation(object):
         "REVIEWERS": "reviewers"
     }
     csv_remap_items = {
-        csv.REVISION_DATE: "updated_at", "REVIEW_STATUS": "review_status",
-        "REVIEW_STATUS_DISPLAY_NAME": "review_status"
+        csv.REVISION_DATE: "updated_at", "REVIEW STATUS": "review_status",
+        "REVIEW_STATUS_DISPLAY_NAME": "review_status_display_name"
     }
     result_remap_items.update(ui_remap_items)
     result_remap_items.update(csv_remap_items)
@@ -274,7 +274,7 @@ class Representation(object):
   def repr_snapshot(self, parent_obj):
     """Convert entity's attributes values to Snapshot representation."""
     return (self.convert_repr_to_snapshot(
-        objs=self, parent_obj=parent_obj))
+        obj=self, parent_obj=parent_obj))
 
   def repr_min_dict(self):
     """Get and return entity's minimal dictionary representation w/
@@ -284,7 +284,7 @@ class Representation(object):
             "id": getattr(self, "id")}
 
   @classmethod  # noqa: ignore=C901
-  def convert_repr_to_snapshot(cls, objs, parent_obj):
+  def convert_repr_to_snapshot(cls, obj, parent_obj):
     """Convert object's or objects' attributes values to Snapshot
     representation.
     Retrieved values will be used for: 'id'.
@@ -301,7 +301,7 @@ class Representation(object):
           {k: v for k, v in snapshoted_obj.__dict__.iteritems()})
       return origin_obj
     return help_utils.execute_method_according_to_plurality(
-        objs=objs, types=Entity.all_entities_classes(),
+        obj=obj, types=Entity.all_entities_classes(),
         method_name=convert_repr_to_snapshot, parent_obj=parent_obj)
 
   def update_attrs(self, is_replace_attrs=True, is_allow_none=True,

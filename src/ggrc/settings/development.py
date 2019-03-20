@@ -1,6 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Settings for development."""
+
 import os
 
 DEBUG = True
@@ -25,3 +27,5 @@ LOGGING_FORMATTER = {
     "()": "colorlog.ColoredFormatter",
     "format": "%(log_color)s%(name)s %(message)s",
 }
+EXTERNAL_APP_USER = 'External App <external_app@example.com>'
+ALLOWED_QUERYAPI_APP_IDS = "ggrc-id"

@@ -335,7 +335,7 @@ class ObjectsInfoService(HelpRestService):
     'paren_obj'.
     """
 
-    def get_response():
+    def get_snapshoted_obj_response():
       """Get response from query."""
       return self.client.create_object(
           type=self.endpoint,
@@ -345,23 +345,41 @@ class ObjectsInfoService(HelpRestService):
               parent_type=paren_obj.type,
               parent_id=paren_obj.id))
 
-    def get_response_values():
+    def get_snapshoted_obj_response_values():
       """Get values fom responese."""
+      # pylint: disable=invalid-name
       return json.loads(
-          get_response().text, encoding="utf-8")[0]["Snapshot"]["values"]
+          get_snapshoted_obj_response().text,
+          encoding="utf-8")[0]["Snapshot"]["values"]
 
     test_utils.wait_for(
-        get_response_values,
+        get_snapshoted_obj_response_values,
         constants.ux.MAX_USER_WAIT_SECONDS * 2)
     snapshoted_obj_dict = (
-        BaseRestService.get_items_from_resp(get_response()).get("values")[0])
+        BaseRestService.get_items_from_resp(
+            get_snapshoted_obj_response()).get("values")[0])
     return Representation.repr_dict_to_obj(snapshoted_obj_dict)
 
   def get_obj(self, obj):
     """Get and return object according to 'obj.type' and 'obj.id'."""
-    obj_dict = (BaseRestService.get_items_from_resp(self.client.create_object(
-        type=self.endpoint, object_name=unicode(obj.type),
-        filters=query.Query.expression_get_obj_by_id(obj.id))).get(
+
+    def get_obj_response():
+      """Get response from query."""
+      obj_id = obj.id if "id" in obj.__dict__ else obj.obj_id
+      return self.client.create_object(
+          type=self.endpoint, object_name=unicode(obj.type),
+          filters=query.Query.expression_get_obj_by_id(obj_id))
+
+    def get_obj_response_values():
+      """Get values fom responese."""
+      return json.loads(
+          get_obj_response().text,
+          encoding="utf-8")[0][obj.type]["values"]
+
+    test_utils.wait_for(
+        get_obj_response_values,
+        constants.ux.MAX_USER_WAIT_SECONDS * 2)
+    obj_dict = (BaseRestService.get_items_from_resp(get_obj_response()).get(
         "values")[0])
     return Representation.repr_dict_to_obj(obj_dict)
 
@@ -371,14 +389,29 @@ class ObjectsInfoService(HelpRestService):
     even comments have the same descriptions query return selection w/ latest
     created datetime.
     """
+
+    def get_obj_response():
+      """Get response from query."""
+      return self.client.create_object(
+          type=self.endpoint,
+          object_name=objects.get_obj_type(objects.COMMENTS),
+          filters=query.Query.expression_get_comment_by_desc(
+              parent_type=paren_obj.type, parent_id=paren_obj.id,
+              comment_desc=comment_description),
+          order_by=[{"name": "created_at", "desc": True}])
+
+    def get_obj_response_values():
+      """Get values fom responese."""
+      return json.loads(
+          get_obj_response().text,
+          encoding="utf-8")[0]["Comment"]["values"]
+
+    test_utils.wait_for(
+        get_obj_response_values,
+        constants.ux.MAX_USER_WAIT_SECONDS * 2)
     comment_obj_dict = (
-        BaseRestService.get_items_from_resp(self.client.create_object(
-            type=self.endpoint,
-            object_name=objects.get_obj_type(objects.COMMENTS),
-            filters=query.Query.expression_get_comment_by_desc(
-                parent_type=paren_obj.type, parent_id=paren_obj.id,
-                comment_desc=comment_description),
-            order_by=[{"name": "created_at", "desc": True}])).get("values")[0])
+        BaseRestService.get_items_from_resp(get_obj_response()).get(
+            "values")[0])
     return Representation.repr_dict_to_obj(comment_obj_dict)
 
   def get_person(self, email):

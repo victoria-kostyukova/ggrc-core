@@ -90,7 +90,12 @@ def assert_can_edit_control(selenium, cntrl, can_edit):
   info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
   els_shown_for_editor = info_page.els_shown_for_editor()
   exp_list = [can_edit] * (len(els_shown_for_editor))
-  exp_list[0] = True  # Add comment btn exists on all control pages
+  # Add comment btn exists on all control pages
+  exp_list[0] = True
+  # Request review button doesn't exist on all control pages
+  exp_list[1] = False
+  # Edit button doesn't exist on all control pages
+  exp_list[2] = False
   assert [item.exists for item in els_shown_for_editor] == exp_list
   if info_page.three_bbs.exists:
     assert info_page.three_bbs.edit_option.exists is False
