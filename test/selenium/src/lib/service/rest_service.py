@@ -121,9 +121,16 @@ class BaseRestService(object):
         if isinstance(resp_text, dict) and len(resp_text) == 1:
           # {key: {value}} to {value}
           resp_text = resp_text.itervalues().next()
-          return (dict(resp_text.items() +
-                       ({}.items() if is_query_resp else
-                        get_extra_items(resp_text).items())))
+          try:
+            return (dict(resp_text.items() +
+                         ({}.items() if is_query_resp else
+                          get_extra_items(resp_text).items())))
+          except AttributeError:
+            print str(resp)
+            print resp.headers
+            print resp_text
+            raise requests.exceptions.RequestException(
+                messages.ExceptionsMessages.err_server_resp.format(resp))
         else:
           resp_code, resp_message = resp_text[0]
           raise requests.exceptions.ContentDecodingError(

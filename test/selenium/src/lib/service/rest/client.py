@@ -67,11 +67,19 @@ class RestClient(object):
         self.is_api and self.is_external_user_needed(
             json.loads(create_obj_req_body))
     ):
+      print "client.create_object"
+      print self.endpoint_url
+      print create_obj_req_body
+      print self.get_session(json.loads(create_obj_req_body)).headers
       return requests.post(
           url=self.endpoint_url,
           data=create_obj_req_body,
           headers=self.get_session(json.loads(create_obj_req_body)).headers)
     else:
+      print "client.create_object"
+      print self.endpoint_url
+      print create_obj_req_body
+      print self.get_session(json.loads(create_obj_req_body)).headers
       return self.get_session(json.loads(create_obj_req_body)).post(
           url=self.endpoint_url, data=create_obj_req_body)
 
