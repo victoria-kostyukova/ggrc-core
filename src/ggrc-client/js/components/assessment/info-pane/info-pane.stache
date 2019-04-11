@@ -94,7 +94,7 @@
                     <div class="assessment-controls__extra-controls">
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner-component class="info-pane__section-title-icon" toggle:from="isUpdatingFiles"></spinner-component>
+                                <spinner-component class="info-pane__loading-icon" toggle:from="isUpdatingFiles"></spinner-component>
                                 Evidence file
                             </div>
                             <object-list items:from="files" emptyMessage:from="noItemsText">
@@ -126,7 +126,7 @@
                         </div>
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner-component class="info-pane__section-title-icon" toggle:from="isUpdatingUrls"></spinner-component>
+                                <spinner-component class="info-pane__loading-icon" toggle:from="isUpdatingUrls"></spinner-component>
                                 Evidence URL
                             </div>
                             <object-list items:from="urls" emptyMessage:from="noItemsText">

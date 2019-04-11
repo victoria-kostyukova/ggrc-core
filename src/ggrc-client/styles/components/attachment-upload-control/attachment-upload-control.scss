@@ -20,11 +20,7 @@
     display: block;
   }
   &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
+    @extend %field-controllable;
     top: 0;
   }
   &__icon__error {

@@ -3,6 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<div class="action-toolbar">
+  <spinner-component
+    class="action-toolbar__loading-icon"
+    toggle:from="isLoading">
+  </spinner-component>
+  <h6 class="action-toolbar__header">
+      Mapped objects
+  </h6>
+</div>
+
 <ul class="tree-structure new-tree mapped-objects-tree">
   {{#each mappedObjects}}
     <li class="tree-item task-item">

@@ -3,10 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 form-validation-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
+  @extend %field-controllable;
   height: 24px;
 
   .form-validation-icon {

@@ -53,13 +53,7 @@
     }
 
     .people-group__title-spinner {
-      position: absolute;
-      width: 28px;
-      height: 28px;
-      left: -28px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      @extend %field-spinnerable;
     }
 
     &__count {
@@ -116,7 +110,7 @@
       &:hover {
         .fa {
           opacity: 1;
-        }    
+        }
       }
     }
 

@@ -13,13 +13,15 @@ import {
   DEFERRED_MAPPED_UNMAPPED,
   OBJECTS_MAPPED_VIA_MAPPER,
 } from '../../../events/eventTypes';
-import {mapObjects} from '../../../plugins/utils/mapper-utils';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
+import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const fields = ['id', 'type', 'title', 'viewLink'];
 
 const viewModel = can.Map.extend({
   instance: null,
   mappedObjects: [],
+  isLoading: false,
   convertToMappedObjects(objects) {
     return objects.map((object) => ({
       object,
@@ -28,17 +30,39 @@ const viewModel = can.Map.extend({
   },
   async initMappedObjects() {
     const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
-    const rawMappedObjects = await loadObjectsByTypes(
-      this.attr('instance'),
-      mappingTypes,
-      fields,
-    );
+    let rawMappedObjects;
+
+    this.attr('isLoading', true);
+    try {
+      rawMappedObjects = await loadObjectsByTypes(
+        this.attr('instance'),
+        mappingTypes,
+        fields,
+      );
+    } catch (xhr) {
+      notifier('error', getAjaxErrorInfo(xhr).details);
+      return;
+    } finally {
+      this.attr('isLoading', false);
+    }
+
     this.attr('mappedObjects').replace(this.convertToMappedObjects(
       rawMappedObjects
     ));
   },
   async includeLoadedObjects(objects) {
-    const loadedObjects = await loadObjectsByStubs(objects, fields);
+    let loadedObjects;
+
+    this.attr('isLoading', true);
+    try {
+      loadedObjects = await loadObjectsByStubs(objects, fields);
+    } catch (xhr) {
+      notifier('error', getAjaxErrorInfo(xhr).details);
+      return;
+    } finally {
+      this.attr('isLoading', false);
+    }
+
     this.attr('mappedObjects').push(...this.convertToMappedObjects(
       loadedObjects
     ));
@@ -72,11 +96,7 @@ const events = {
     viewModel.includeLoadedObjects(mapped);
   },
   [`{viewModel.instance} ${OBJECTS_MAPPED_VIA_MAPPER.type}`](el, {objects}) {
-    const viewModel = this.viewModel;
-
-    mapObjects(viewModel.attr('instance'), objects).then(() => {
-      viewModel.includeLoadedObjects(objects);
-    });
+    this.viewModel.includeLoadedObjects(objects);
   },
 };
 

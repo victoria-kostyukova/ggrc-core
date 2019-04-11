@@ -32,8 +32,8 @@
         <label class="form-label">
           Selection Response Options (Comma Separated)
         </label>
-          <textarea-array array:bind="instance.response_options" 
-                          className:from="'span12 double'" 
+          <textarea-array array:bind="instance.response_options"
+                          className:from="'span12 double'"
                           placeholder:from="'Enter Description'" tabindex="2">
           </textarea-array>
       {{/is}}
@@ -48,7 +48,12 @@
           mappedObjects:from="mappedObjects"
           preMappedObjects:from="preMappedObjects"
         >
-        <h6>Object(s) mapped to task</h6>
+        <div class="action-toolbar">
+          <h6 class="action-toolbar__header">
+            Object(s) mapped to task
+          </h6>
+          <spinner-component class="control-offset" toggle:from="isLoading"></spinner-component>
+        </div>
         {{#each list}}
           <div class="oneline">
             <a
@@ -61,9 +66,11 @@
             </a>
           </div>
         {{/each}}
-        {{^list.length}}
+        {{^if isLoading}}
+        {{^if list.length}}
           <span class="gray"><em>No mapped objects</em></span>
-        {{/list.length}}
+        {{/if}}
+        {{/if}}
         <div class="objective-selector">
           <div style="clear:both">
             <br>

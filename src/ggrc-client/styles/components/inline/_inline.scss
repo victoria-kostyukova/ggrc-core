@@ -18,13 +18,7 @@ inline-edit-control {
       }
 
       .inline__header-spinner {
-        position: absolute;
-        width: 28px;
-        height: 28px;
-        left: -28px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        @extend %field-spinnerable;
       }
     }
 

@@ -138,8 +138,6 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              <h6>Mapped objects</h6>
-
               <cycle-task-objects instance:from="instance">
               </cycle-task-objects>
 
