@@ -24,8 +24,8 @@
 
           <div class="pane-header__toolbar">
             {{#is_info_pin}}
-              <info-pin-buttons {maximized}="{maximized}" 
-                                {on-change-maximized-state}="{@onChangeMaximizedState}" 
+              <info-pin-buttons {maximized}="{maximized}"
+                                {on-change-maximized-state}="{@onChangeMaximizedState}"
                                 {on-close}="{@onClose}">
               </info-pin-buttons>
             {{/is_info_pin}}
@@ -66,7 +66,7 @@
           </custom-roles>
           <div class="row-fluid wrap-row">
             <div class="span6">
-              <ggrc-gdrive-folder-picker 
+              <ggrc-gdrive-folder-picker
                 {instance}="{loadedObject}"
                 {placeholder}="'If selected, all workflow attachments go here.''"
                 {{^is_allowed 'update' loadedObject}}{readonly}="{true}"{{/is_allowed}}>
@@ -74,7 +74,7 @@
             </div>
             <div class="span6">
               <h6>Repeat Cycle</h6>
-              <repeat-on-summary {unit}="{loadedObject.unit}" 
+              <repeat-on-summary {unit}="{loadedObject.unit}"
                                  {repeat-every}="{loadedObject.repeat_every}"
                                  {hide-repeat-off}="{false}">
               </repeat-on-summary>
@@ -83,6 +83,6 @@
         {{/if}}
       </object-loader>
     </div>
-  
+
   </div>
 </section>

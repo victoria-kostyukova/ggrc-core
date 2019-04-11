@@ -25,8 +25,8 @@
         </div>
 
         <div class="pane-header__toolbar">
-          <info-pin-buttons {maximized}="{maximized}" 
-                            {on-change-maximized-state}="{@onChangeMaximizedState}" 
+          <info-pin-buttons {maximized}="{maximized}"
+                            {on-change-maximized-state}="{@onChangeMaximizedState}"
                             {on-close}="{@onClose}">
           </info-pin-buttons>
           <div class="info-pane-utility">

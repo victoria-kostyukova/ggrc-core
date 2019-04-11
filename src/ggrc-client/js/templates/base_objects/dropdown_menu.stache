@@ -48,7 +48,7 @@
     {{/is_allowed}}
     {{^if_instance_of instance "TaskGroup|TaskGroupTask"}}
     <li>
-      <permalink {instance}="{instance}"/>
+      <permalink-component {instance}="{instance}"/>
     </li>
     {{/if_instance_of}}
     {{#if_instance_of instance "Assessment"}}

@@ -71,7 +71,7 @@
   </li>
 
   <li>
-    <permalink {instance}="{instance}"/>
+    <permalink-component {instance}="{instance}"/>
   </li>
 
   {{#is_info_pin}}
