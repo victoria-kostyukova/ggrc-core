@@ -105,7 +105,7 @@
                 </div>
                 {{#if charts.Assessment.isLoading}}
                     <div class="span12 centered">
-                        <spinner {toggle}="{charts.Assessment.isLoading}"></spinner>
+                        <spinner-component {toggle}="{charts.Assessment.isLoading}"></spinner-component>
                     </div>
                 {{else}}
                     {{#if charts.Assessment.any}}

@@ -57,7 +57,7 @@
   {{else}}
     {{#if isLoading}}
       <div class="no-items-spinner-wrapper">
-        <spinner {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner>
+        <spinner-component {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner-component>
       </div>
     {{else}}
       <div class="well well-small">No {{getDisplayModel.title_plural}} were found</div>

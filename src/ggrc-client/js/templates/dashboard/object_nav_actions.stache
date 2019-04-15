@@ -22,7 +22,7 @@
     {{/if}}
     {{#if canEdit}}
       <workflow-activate {instance}="{instance}">
-        <spinner {toggle}="{waiting}"></spinner>
+        <spinner-component {toggle}="{waiting}"></spinner-component>
 
         {{^if waiting}}
           {{#is(instance.status, "Draft")}}

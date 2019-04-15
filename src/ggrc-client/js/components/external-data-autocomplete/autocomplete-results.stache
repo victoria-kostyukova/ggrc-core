@@ -22,6 +22,6 @@
   </ul>
   {{/if}}
   <div class="autocomplete-results__spinner">
-    <spinner {toggle}="{loading}"></spinner>
+    <spinner-component {toggle}="{loading}"></spinner-component>
   </div>
 </div>

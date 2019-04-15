@@ -10,7 +10,7 @@
 
 {{#if_instance_of instance 'CycleTaskGroupObjectTask'}}
   <div class="flex-box item-actions{{#if disabled}} disabled{{/if}}">
-    <spinner {toggle}="{disabled}" {size}="'medium'"></spinner>
+    <spinner-component {toggle}="{disabled}" {size}="'medium'"></spinner-component>
       {{#if isShowActionButtons}}
           <div class="request-control">
             {{#is(instance.status, "Assigned")}}

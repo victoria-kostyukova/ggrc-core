@@ -11,7 +11,7 @@
        ($blur)="{closeResults}"
        placeholder="{{placeholder}}">
 </input>
-<spinner {extra-css-class}="'saving'" {toggle}="{saving}"></spinner>
+<spinner-component {extra-css-class}="'saving'" {toggle}="{saving}"></spinner-component>
 
 {{#if renderResults}}
 <external-data-provider {type}="{type}"

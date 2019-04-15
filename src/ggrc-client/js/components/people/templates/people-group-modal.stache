@@ -27,7 +27,7 @@
         Add person
       </p>
       {{#if isLoading}}
-        <spinner {toggle}="{isLoading}"></spinner>
+        <spinner-component {toggle}="{isLoading}"></spinner-component>
       {{else}}
         {{#if_config_exist 'external_services.Person'}}
           <external-data-autocomplete {type}="'Person'"

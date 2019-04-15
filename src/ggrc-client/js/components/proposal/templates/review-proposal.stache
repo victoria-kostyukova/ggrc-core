@@ -6,7 +6,7 @@
 {{#if canReview}}
   <div class="object-history__actions">
     <div class="object-history__action">
-      <spinner class="revision-history__spinner" {toggle}="{isLoading}"></spinner>
+      <spinner-component class="revision-history__spinner" {toggle}="{isLoading}"></spinner-component>
       <button
         type="button"
         ($click)="prepareComparerConfig()"

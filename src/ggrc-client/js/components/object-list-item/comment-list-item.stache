@@ -28,7 +28,7 @@
         {{#if commentCreationDate}}
           {{dateTime commentCreationDate}}
         {{else}}
-          <spinner {toggle}="{true}"></spinner>
+          <spinner-component {toggle}="{true}"></spinner-component>
         {{/if}}
       </div>
     </div>

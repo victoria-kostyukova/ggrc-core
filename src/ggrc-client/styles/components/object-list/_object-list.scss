@@ -23,7 +23,7 @@ object-list {
     position: relative;
     min-height: 28px;
 
-    > spinner {
+    > spinner-component {
       display: flex;
       opacity: 0;
 
@@ -49,7 +49,7 @@ object-list {
     &.spinner-section_grid {
       min-height: 58px;
 
-      > spinner .grid-spinner {
+      > spinner-component .grid-spinner {
         justify-content: center;
 
         .fa {

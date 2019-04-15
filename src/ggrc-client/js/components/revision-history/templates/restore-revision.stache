@@ -5,7 +5,7 @@
 
 <div class="ggrc-form revision-history">
   <div class="revision-history__restore-button">
-    <spinner class="revision-history__spinner" {toggle}="{loading}"></spinner>
+    <spinner-component class="revision-history__spinner" {toggle}="{loading}"></spinner-component>
     <a class="btn btn-small btn-green {{#if loading}}disabled{{/if}}"
        ($click)="restore(%element)">
       Restore Version

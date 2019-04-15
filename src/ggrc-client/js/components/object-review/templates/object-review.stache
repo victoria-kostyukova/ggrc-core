@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="object-review__header-spinner">
-      <spinner {toggle}="{loading}"></spinner>
+      <spinner-component {toggle}="{loading}"></spinner-component>
     </div>
   </div>
   {{^if isSnapshot}}

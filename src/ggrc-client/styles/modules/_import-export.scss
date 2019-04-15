@@ -193,7 +193,7 @@ $historyBlockWidth: 350px;
     margin-left: 10px;
   }
 
-  > spinner {
+  > spinner-component {
     position: absolute;
     left: 10px;
     top: 5px;
@@ -319,7 +319,7 @@ $historyBlockWidth: 350px;
     &__actions {
       align-items: center;
 
-      spinner {
+      spinner-component {
         margin-left: 10px;
       }
     }
@@ -472,7 +472,7 @@ $historyBlockWidth: 350px;
       @include opacity(0.5);
       pointer-events: none;
 
-      spinner {
+      spinner-component {
         margin: 6px 0 0 0;
       }
     }

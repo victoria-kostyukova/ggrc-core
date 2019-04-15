@@ -40,8 +40,8 @@
         </button>
     </div>
     <div class="simple-modal__body mapped-controls-info__body {{#if isLoading}}loading{{/if}}">
-        <spinner {toggle}="{isLoading}" class="spinner-wrapper active"
-                 {extra-css-class}="'grid-spinner'"></spinner>
+        <spinner-component {toggle}="{isLoading}" class="spinner-wrapper active"
+                 {extra-css-class}="'grid-spinner'"></spinner-component>
 
         <questionnaire-link {instance}="{instance}" {view-type}="'button'">
             Open {{instance.class.title_singular}} in new frontend

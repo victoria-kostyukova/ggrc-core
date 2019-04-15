@@ -17,5 +17,5 @@
 <tree-no-results {show}="{notResult}"></tree-no-results>
 
 <div class="tree-spinner">
-  <spinner {toggle}="{loading}" {size}="'large'"></spinner>
+  <spinner-component {toggle}="{loading}" {size}="'large'"></spinner-component>
 </div>

@@ -29,7 +29,7 @@
         {{#switch status}}
           {{#case 'In Progress'}}
             Export in Progress:
-            <spinner {toggle}="{true}"></spinner>
+            <spinner-component {toggle}="{true}"></spinner-component>
             <button type="button" class="btn btn-white btn-small btn-stop" ($click)="stop(id)">
               Cancel Export
             </button>
@@ -45,7 +45,7 @@
               Write to Sheet
             </button>
             {{#isDisabled id}}
-              <spinner {toggle}="{true}"></spinner>
+              <spinner-component {toggle}="{true}"></spinner-component>
             {{/isDisabled}}
           {{/case}}
         {{/switch}}

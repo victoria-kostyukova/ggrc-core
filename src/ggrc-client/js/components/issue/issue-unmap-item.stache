@@ -43,9 +43,9 @@
                 Related Snapshots
             </div>
             <div class="modal-mapped-objects">
-                <spinner {toggle}="{isLoading}" class="spinner-wrapper active"
+                <spinner-component {toggle}="{isLoading}" class="spinner-wrapper active"
                          {extra-css-class}="'grid-spinner'">
-                </spinner>
+                </spinner-component>
                 <object-list {items}="{relatedSnapshots}">
                     <div class="modal-mapped-objects-item">
                         <div class="modal-mapped-objects-item__details">

@@ -52,7 +52,7 @@
                       {{#if required}}
                         <i class="fa fa-asterisk"></i>
                       {{/if}}
-                      <spinner class="lhn-people-group__spinner" {toggle}="{denyUnmap}"></spinner>
+                      <spinner-component class="lhn-people-group__spinner" {toggle}="{denyUnmap}"></spinner-component>
                     </label>
                 </deletable-people-group>
               </div>

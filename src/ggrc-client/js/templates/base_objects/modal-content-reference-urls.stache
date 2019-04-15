@@ -6,9 +6,9 @@
 <div data-id="reference_url_hidden" class="span12">
   <deferred-mapper
     {instance}="{instance}">
-    <related-documents 
-      {instance}="{instance}" 
-      {kind}="'REFERENCE_URL'" 
+    <related-documents
+      {instance}="{instance}"
+      {kind}="'REFERENCE_URL'"
       {autorefresh}="{false}"
       (add-mappings)="{addMappings(%event.objects)}"
       (remove-mappings)="{removeMappings(%event.object)}">
@@ -24,7 +24,7 @@
         <label>
           Reference URL
           <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
-          <spinner {toggle}="{isDisabled}"></spinner>
+          <spinner-component {toggle}="{isDisabled}"></spinner-component>
         </label>
         <a data-id="hide_reference_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </related-urls>

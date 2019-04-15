@@ -141,7 +141,7 @@
       </div>
       <div class="span7">
         <div class="confirm-buttons">
-          <spinner {toggle}="{is_saving}"></spinner>
+          <spinner-component {toggle}="{is_saving}"></spinner-component>
           <span class="confirm-buttons__objects-count">
             {{selected.length}}
             object(s) selected

@@ -13,7 +13,7 @@
         {{#if itemCreationDate}}
             <span class="date">{{localize_date itemCreationDate}}</span>
         {{else}}
-            <spinner {toggle}="{true}"></spinner>
+            <spinner-component {toggle}="{true}"></spinner-component>
         {{/if}}
     </div>
 </div>

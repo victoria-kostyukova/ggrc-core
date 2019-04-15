@@ -4,7 +4,7 @@
 }}
 
 <section class="assessment-module info info-pane{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
-  <spinner {toggle}="{isLoading}" class="spinner-wrapper active"></spinner>
+  <spinner-component {toggle}="{isLoading}" class="spinner-wrapper active"></spinner-component>
   <inline-form-control {instance}="{instance}" {deferred-save}="{deferredSave}">
     <div class="tier-content">
       {{> /static/templates/assessments/header.stache}}
@@ -94,7 +94,7 @@
                     <div class="assessment-controls__extra-controls">
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner class="info-pane__section-title-icon" {toggle}="{isUpdatingFiles}"></spinner>
+                                <spinner-component class="info-pane__section-title-icon" {toggle}="{isUpdatingFiles}"></spinner-component>
                                 Evidence file
                             </div>
                             <object-list {items}="{files}" {empty-message}="{noItemsText}">
@@ -126,7 +126,7 @@
                         </div>
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner class="info-pane__section-title-icon" {toggle}="{isUpdatingUrls}"></spinner>
+                                <spinner-component class="info-pane__section-title-icon" {toggle}="{isUpdatingUrls}"></spinner-component>
                                 Evidence URL
                             </div>
                             <object-list {items}="{urls}" {empty-message}="{noItemsText}">

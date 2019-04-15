@@ -7,7 +7,7 @@
   <div class="people-group__title-content">
     <div class="people-group__title">
       {{#unless editableMode}}
-        <spinner class="people-group__title-spinner" {toggle}="{isLoading}"></spinner>
+        <spinner-component class="people-group__title-spinner" {toggle}="{isLoading}"></spinner-component>
       {{/unless}}
       {{title}}
     </div>

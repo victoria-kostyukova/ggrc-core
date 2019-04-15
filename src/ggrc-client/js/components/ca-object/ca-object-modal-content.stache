@@ -27,7 +27,7 @@
         {{#if evidence}}
             <div class="simple-modal__section">
                 <div class="simple-modal__section-title">Evidence file
-                    <spinner class="simple-modal__section-title-icon" {toggle}="{isUpdatingEvidences}"></spinner>
+                    <spinner-component class="simple-modal__section-title-icon" {toggle}="{isUpdatingEvidences}"></spinner-component>
                 </div>
                 <object-list {items}="{evidences}" {empty-message}="{noItemsText}">
                     <editable-document-object-list-item {document}="{.}">

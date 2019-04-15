@@ -17,7 +17,7 @@
           (createUrl)="{createRelatedDocument(%event.payload)}"
           (removeUrl)="{removeRelatedDocument(%event.payload)}">
           <div class="related-urls__heading">
-            <spinner class="related-urls__spinner" {toggle}="{isLoading}"></spinner>
+            <spinner-component class="related-urls__spinner" {toggle}="{isLoading}"></spinner-component>
             <h6 class="related-urls__title">Reference URL</h6>
           </div>
         </related-urls>

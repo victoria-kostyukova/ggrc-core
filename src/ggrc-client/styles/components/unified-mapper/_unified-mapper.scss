@@ -116,7 +116,7 @@ mapper-results {
       }
 
       > .object-list__item:first-child,
-      spinner + .object-list__item {
+      spinner-component + .object-list__item {
         border-top: 1px solid $items-separator-color;
       }
     }

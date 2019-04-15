@@ -23,8 +23,8 @@ export default can.Control.extend({
         $wrapper.css('height', '40px');
       }
 
-      let view = '<spinner {extra-css-class}="\'tree-items\'"' +
-      ' {toggle}="{showMe}" {size}="\'large\'"></spinner>';
+      let view = '<spinner-component {extra-css-class}="\'tree-items\'"' +
+      ' {toggle}="{showMe}" {size}="\'large\'"></spinner-component>';
       let renderer = can.stache(view);
       let spinner = renderer({showMe: true});
 

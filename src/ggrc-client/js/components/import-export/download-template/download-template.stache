@@ -52,7 +52,7 @@
               ($click)="downloadSheet">
         Download Sheet
       </button>
-      {{#if isLoading}}<spinner {toggle}="{true}"></spinner>{{/if}}
+      {{#if isLoading}}<spinner-component {toggle}="{true}"></spinner-component>{{/if}}
     </div>
   </div>
 </simple-modal>

@@ -60,7 +60,7 @@
                 </deletable-people-group>
                 <div>
                   {{#if isUpdating}}
-                    <spinner {toggle}="{isUpdating}"></spinner>
+                    <spinner-component {toggle}="{isUpdating}"></spinner-component>
                   {{else}}
                     {{#if canEdit}}
                       {{^if_config_exist 'external_services.Person'}}

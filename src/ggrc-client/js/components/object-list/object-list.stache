@@ -5,9 +5,9 @@
 {{#if showSpinner}}
   <div class="spinner-section {{#if isGrid}}spinner-section_grid{{/if}}">
     {{#if isGrid}}
-      <spinner {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner>
+      <spinner-component {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner-component>
     {{else}}
-      <spinner {toggle}="{isLoading}" class="spinner-wrapper active"></spinner>
+      <spinner-component {toggle}="{isLoading}" class="spinner-wrapper active"></spinner-component>
     {{/if}}
   </div>
 {{else}}
