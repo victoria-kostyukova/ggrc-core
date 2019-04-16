@@ -13,7 +13,8 @@ describe('dropdown component', function () {
     let template;
 
     beforeAll(function () {
-      template = can.stache('<dropdown {options-list}="{list}"></dropdown>');
+      template = can.stache(
+        '<dropdown-component {options-list}="{list}"></dropdown-component>');
     });
 
     it('when input is an array of strings', function () {

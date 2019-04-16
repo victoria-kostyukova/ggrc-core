@@ -196,12 +196,12 @@
            title="Indicates the status of this object."></i>
       </label>
       <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <dropdown {options-list}="{model.statuses}"
+      <dropdown-component {options-list}="{model.statuses}"
                 {no-value}="{true}"
                 {no-value-label}="'---'"
                 {name}="'instance.status'"
                 tabindex="23">
-      </dropdown>
+      </dropdown-component>
     </div>
   </div>
 

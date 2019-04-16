@@ -17,10 +17,10 @@
       <i class="fa fa-trash" ($click)="{removeFilter(%element, @index)}"></i>
     {{/readOnly}}
     {{#if @index}}
-      <dropdown {options-list}="{operators}"
+      <dropdown-component {options-list}="{operators}"
                 {name}="'operator'"
                 class="inline-block">
-      </dropdown>
+      </dropdown-component>
     {{/if}}
     Mapped to:
     <select class="filter-type-selector select-filter{{@index}}"

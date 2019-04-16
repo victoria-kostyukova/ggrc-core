@@ -9,9 +9,9 @@
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__multiple-row">
         <label class="form-label ggrc-form-item__label">State</label>
-        <dropdown {options-list}="{model.statuses}"
+        <dropdown-component {options-list}="{model.statuses}"
                   {name}="'instance.status'">
-        </dropdown>
+        </dropdown-component>
       </div>
       <div class="ggrc-form-item__multiple-row">
         <label class="form-label ggrc-form-item__label">Evidence Type</label>

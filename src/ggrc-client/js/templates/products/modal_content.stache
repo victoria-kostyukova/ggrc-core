@@ -99,12 +99,12 @@
         <div data-id="kind_type_dd" tabindex="8">
           <model-loader {path}="'service-models/option'">
             <dropdown-wrapper {model-constructor}="{loadedModel}"
-                              {(value)}="{instance.kind}" 
+                              {(value)}="{instance.kind}"
                               {role}="'product_type'">
-              <dropdown {options-list}="{options}"
+              <dropdown-component {options-list}="{options}"
                         ($change)="{selectedChanged}" {name}="'selected'"
                         {no-value}="{true}" {no-value-label}="'---'">
-              </dropdown>
+              </dropdown-component>
             </dropdown-wrapper>
           </model-loader>
         </div>
@@ -120,10 +120,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
         </label>
         <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <dropdown {options-list}="{model.statuses}"
+        <dropdown-component {options-list}="{model.statuses}"
                   {name}="'instance.status'"
                   tabindex="23">
-        </dropdown>
+        </dropdown-component>
       </div>
     </div>
   </div>

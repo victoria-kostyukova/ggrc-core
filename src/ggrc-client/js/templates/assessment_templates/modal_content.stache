@@ -18,12 +18,12 @@
         <assessment-object-type-dropdown
           {instance}="{instance}"
           {(assessment-type)}="{instance.template_object_type}">
-          <dropdown
+          <dropdown-component
             class="input-medium pull-left"
             {options-groups}="{objectTypes}"
             {is-grouped-dropdown}="{true}"
             {name}="'assessmentType'">
-          </dropdown>
+          </dropdown-component>
         </assessment-object-type-dropdown>
 
         <label class="inline-check pull-left">
@@ -141,10 +141,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
         </label>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <dropdown {options-list}="{model.statuses}"
+        <dropdown-component {options-list}="{model.statuses}"
                   {name}="'instance.status'"
                   tabindex="23">
-        </dropdown>
+        </dropdown-component>
       </div>
     </div>
 

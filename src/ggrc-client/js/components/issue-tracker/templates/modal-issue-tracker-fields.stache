@@ -17,9 +17,9 @@
       {{/if}}
     </div>
     <div class="ggrc-form-item__multiple-row">
-      <dropdown {options-list}="{instance.class.issue_tracker_enable_options}"
+      <dropdown-component {options-list}="{instance.class.issue_tracker_enable_options}"
                 {name}="'isIntegrationEnabled'">
-      </dropdown>
+      </dropdown-component>
     </div>
   </div>
 </div>
@@ -93,18 +93,18 @@
       <label class="ggrc-form-item__label">
         Ticket Priority
       </label>
-      <dropdown {options-list}="{instance.class.issue_tracker_priorities}"
+      <dropdown-component {options-list}="{instance.class.issue_tracker_priorities}"
                 {name}="'instance.issue_tracker.issue_priority'">
-      </dropdown>
+      </dropdown-component>
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
         Ticket Severity
       </label>
-      <dropdown {instance}="{instance}"
+      <dropdown-component {instance}="{instance}"
                 {options-list}="{instance.class.issue_tracker_severities}"
                 {name}="'instance.issue_tracker.issue_severity'">
-      </dropdown>
+      </dropdown-component>
     </div>
 
     {{#if setIssueTitle}}

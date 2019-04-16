@@ -48,10 +48,10 @@
         </label>
         <a data-id="hide_status_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div tabindex="4">
-            <dropdown {options-list}="{model.statuses}"
+            <dropdown-component {options-list}="{model.statuses}"
                       {name}="'instance.status'"
                       tabindex="23">
-            </dropdown>
+            </dropdown-component>
         </div>
       </div>
     </div>

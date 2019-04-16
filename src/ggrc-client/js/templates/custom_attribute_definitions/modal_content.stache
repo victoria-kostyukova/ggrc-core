@@ -29,10 +29,10 @@
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
-        <dropdown {options-list}="{model.attributeTypes}"
+        <dropdown-component {options-list}="{model.attributeTypes}"
                   {name}="'instance.attribute_type'"
                   {data-purpose}="'ca-type'">
-        </dropdown>
+        </dropdown-component>
     </div>
     <div class="span2">
       <label>

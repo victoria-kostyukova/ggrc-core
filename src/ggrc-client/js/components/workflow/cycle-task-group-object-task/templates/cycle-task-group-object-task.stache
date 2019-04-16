@@ -172,11 +172,11 @@
                 <h6>Response Options</h6>
                 {{! here we need to start a quick form or other component}}
                 <ggrc-quick-update {instance}="{instance}">
-                  <dropdown {name}="'instance.selected_response_options.0'"
+                  <dropdown-component {name}="'instance.selected_response_options.0'"
                             {class-name}="'noop'" {{! to not use default from component}}
                             {options-list}="{instance.response_options}"
                             {is-disabled}="{{#if instance.responseOptionsEditable}}{false}{{else}}{true}{{/if}}">
-                  </dropdown>
+                  </dropdown-component>
                 </ggrc-quick-update>
               {{/is}}
               {{#is(instance.task_type, "checkbox")}}

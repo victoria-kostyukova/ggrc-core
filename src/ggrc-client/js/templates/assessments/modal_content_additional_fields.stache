@@ -69,12 +69,12 @@
         <em>Is this control design effective?</em>
       </small>
     </div>
-    <dropdown {options-list}="{model.conclusions}"
+    <dropdown-component {options-list}="{model.conclusions}"
               {no-value}="{true}"
               {no-value-label}="'---'"
               {name}="'instance.design'"
               tabindex="17">
-    </dropdown>
+    </dropdown-component>
   </div>
   <div class="ggrc-form-item__multiple-row">
     <label class="ggrc-form-item__label">
@@ -85,12 +85,12 @@
         <em>Is this control design effective?</em>
       </small>
     </div>
-    <dropdown {options-list}="{model.conclusions}"
+    <dropdown-component {options-list}="{model.conclusions}"
               {no-value}="{true}"
               {no-value-label}="'---'"
               {name}="'instance.operationally'"
               tabindex="18">
-    </dropdown>
+    </dropdown-component>
   </div>
 </div>
 

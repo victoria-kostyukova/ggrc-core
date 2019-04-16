@@ -7,7 +7,7 @@ dropdown-form-field {
   display: block;
 
   .input-wrapper {
-    dropdown {
+    dropdown-component {
       select {
         width: 100%;
         font-size: 13px;
@@ -35,7 +35,7 @@ dropdown-form-field {
 
   &.inline__content-input {
     .input-wrapper {
-      dropdown {
+      dropdown-component {
         select {
           &:focus {
             border-color: #ccc;

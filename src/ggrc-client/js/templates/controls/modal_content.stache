@@ -123,12 +123,12 @@
         <div data-id="kind_nature_dd" tabindex="7">
           <model-loader {path}="'service-models/option'">
             <dropdown-wrapper {model-constructor}="{loadedModel}"
-                              {(value)}="{instance.kind}" 
+                              {(value)}="{instance.kind}"
                               {role}="'control_kind'">
-              <dropdown {options-list}="{options}"
+              <dropdown-component {options-list}="{options}"
                         ($change)="{selectedChanged()}" {name}="'selected'"
                         {no-value}="{true}" {no-value-label}="'---'">
-              </dropdown>
+              </dropdown-component>
             </dropdown-wrapper>
           </model-loader>
         </div>
@@ -142,13 +142,13 @@
         <a data-id="hide_fraud_related_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <boolean-dropdown-wrapper class="input-block-level"
           {(selected)}="{instance.fraud_related}">
-          <dropdown {options-list}="{model.fraudRelatedOptions}"
+          <dropdown-component {options-list}="{model.fraudRelatedOptions}"
                     {name}="'selectedInternal'"
                     {no-value}="{true}"
                     {no-value-label}="'---'"
                     ($change)="{onChange}"
                     {tab-index}="8">
-          </dropdown>
+          </dropdown-component>
           </boolean-dropdown-wrapper>
       </div>
       <div data-test-id="control_significance_18f15545" data-id="significance_hidden" class="span3 hidable">
@@ -159,13 +159,13 @@
         <a data-id="hide_significance_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <boolean-dropdown-wrapper class="input-block-level"
           {(selected)}="{instance.key_control}">
-          <dropdown {options-list}="{model.keyControlOptions}"
+          <dropdown-component {options-list}="{model.keyControlOptions}"
                     {name}="'selectedInternal'"
                     {no-value}="{true}"
                     {no-value-label}="'---'"
                     ($change)="{onChange}"
                     {tab-index}="9">
-          </dropdown>
+          </dropdown-component>
           </boolean-dropdown-wrapper>
       </div>
       <div data-test-id="control_type_means_2ffa1b64" data-id="type_means_hidden" class="span3 hidable">
@@ -179,10 +179,10 @@
             <dropdown-wrapper {model-constructor}="{loadedModel}"
                               {(value)}="{instance.means}"
                               {role}="'control_means'">
-              <dropdown {options-list}="{options}" 
+              <dropdown-component {options-list}="{options}"
                         ($change)="{selectedChanged}" {name}="'selected'"
                         {no-value}="{true}" {no-value-label}="'---'">
-              </dropdown>
+              </dropdown-component>
             </dropdown-wrapper>
           </model-loader>
         </div>
@@ -206,10 +206,10 @@
             <dropdown-wrapper {model-constructor}="{loadedModel}"
                               {(value)}="{instance.verify_frequency}"
                               {role}="'verify_frequency'">
-              <dropdown {options-list}="{options}"
+              <dropdown-component {options-list}="{options}"
                         ($change)="{selectedChanged}" {name}="'selected'"
                         {no-value}="{true}" {no-value-label}="'---'">
-              </dropdown>
+              </dropdown-component>
             </dropdown-wrapper>
           </model-loader>
         </div>
@@ -264,10 +264,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
         </label>
         <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <dropdown {options-list}="{model.statuses}"
+        <dropdown-component {options-list}="{model.statuses}"
                   {name}="'instance.status'"
                   tab-index="14">
-        </dropdown>
+        </dropdown-component>
       </div>
     </div>
   </div>

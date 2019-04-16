@@ -24,21 +24,21 @@
                   <label class="{{#unless repeatEnabled}}disabled{{/unless}}">
                       Repeats
                   </label>
-                  <dropdown id="repeats-select"
+                  <dropdown-component id="repeats-select"
                             {options-list}="{unitOptions}"
                             {name}="'state.result.unit'"
                             {is-disabled}="{repeatDisabled}">
-                  </dropdown>
+                  </dropdown-component>
               </div>
               <div class="span5">
                   <label class="{{#unless repeatEnabled}}disabled{{/unless}}">
                       Repeat Every
                   </label>
-                  <dropdown id="repeat-every-select"
+                  <dropdown-component id="repeat-every-select"
                             {options-list}="{repeatOptions}"
                             {name}="'state.result.repeatEvery'"
                             {is-disabled}="{repeatDisabled}">
-                  </dropdown>
+                  </dropdown-component>
               </div>
           </div>
         </div>

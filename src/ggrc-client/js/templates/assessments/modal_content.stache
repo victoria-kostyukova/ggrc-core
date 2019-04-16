@@ -30,11 +30,11 @@
           <assessment-object-type-dropdown class="input-medium"
                                            {instance}="{instance}"
                                             {(assessment-type)}="{instance.assessment_type}">
-            <dropdown
+            <dropdown-component
               {options-groups}="{objectTypes}"
               {is-grouped-dropdown}="{true}"
               {name}="'assessmentType'">
-            </dropdown>
+            </dropdown-component>
           </assessment-object-type-dropdown>
         </div>
         <div class="ggrc-form-item__multiple-row multi-select-label-container">

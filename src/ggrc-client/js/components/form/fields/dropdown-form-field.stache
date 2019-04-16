@@ -4,12 +4,12 @@
 }}
 
 <div class="input-wrapper {{#if isNoneSelected}}none-selected{{/if}}">
-  <dropdown {name}="'inputValue'"
+  <dropdown-component {name}="'inputValue'"
             {is-disabled}="{disabled}"
             {options-list}="{options}"
             {is-grouped-dropdown}="{isGroupedDropdown}"
             {options-groups}="{dropdownOptionsGroups}"
             {no-value}="{noValue}"
             {control-id}="'form-field-{{fieldId}}'">
-  </dropdown>
+  </dropdown-component>
 </div>
