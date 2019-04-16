@@ -54,7 +54,7 @@
     {{#if_instance_of instance "Assessment"}}
       {{#if_config_exist 'ASSESSMENT_SHORT_URL_PREFIX'}}
         <li>
-          <shortlink {instance}="{instance}"/>
+          <shortlink-component {instance}="{instance}"/>
         </li>
       {{/if_config_exist}}
     {{/if_instance_of}}

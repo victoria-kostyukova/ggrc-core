@@ -6,7 +6,7 @@
 import './clipboard-link';
 
 export default can.Component.extend({
-  tag: 'shortlink',
+  tag: 'shortlink-component',
   template: can.stache(
     '<clipboard-link {text}="{text}">' +
     '<i class="fa fa-google"/>Get Short Url</clipboard-link>'
