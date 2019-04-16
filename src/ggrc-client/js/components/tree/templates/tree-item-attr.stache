@@ -78,15 +78,15 @@
   {{/case}}
 
   {{#case 'assertions'}}
-    <sort {items}="{instance.assertions}">
+    <sort-component {items}="{instance.assertions}">
       <tree-field {source}="{sortedItems}"/>
-    </sort>
+    </sort-component>
   {{/case}}
 
   {{#case 'categories'}}
-    <sort {items}="{instance.categories}">
+    <sort-component {items}="{instance.categories}">
       <tree-field {source}="{sortedItems}"/>
-    </sort>
+    </sort-component>
   {{/case}}
 
   {{#case 'status'}}

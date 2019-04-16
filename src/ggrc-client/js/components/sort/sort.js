@@ -4,7 +4,7 @@
 */
 
 export default can.Component.extend({
-  tag: 'sort',
+  tag: 'sort-component',
   leakScope: true,
   viewModel: {
     sortedItems: [],

@@ -239,11 +239,11 @@
                       >
                         {{#if assertions.length}}
                           <ul>
-                            <sort {items}="{assertions}">
+                            <sort-component {items}="{assertions}">
                               {{#sortedItems}}
                                 <li>{{.}}</li>
                               {{/sortedItems}}
-                            </sort>
+                            </sort-component>
                           </ul>
                         {{else}}
                           <span class="empty-message">None</span>
@@ -258,11 +258,11 @@
                       >
                         {{#if categories.length}}
                           <ul>
-                            <sort {items}="{categories}">
+                            <sort-component {items}="{categories}">
                               {{#sortedItems}}
                                 <li>{{.}}</li>
                               {{/sortedItems}}
-                            </sort>
+                            </sort-component>
                           </ul>
                         {{else}}
                           <span class="empty-message">None</span>
