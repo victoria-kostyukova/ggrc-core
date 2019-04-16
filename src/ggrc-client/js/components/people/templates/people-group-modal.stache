@@ -36,10 +36,10 @@
                                       (item-selected)="{personSelected(%event.selectedItem)}">
           </external-data-autocomplete>
         {{else}}
-          <autocomplete {search-items-type}="'Person'"
+          <autocomplete-component {search-items-type}="'Person'"
                         (item-selected)="{personSelected(%event.selectedItem)}"
                         {placeholder}="'Type person'">
-          </autocomplete>
+          </autocomplete-component>
         {{/if_config_exist}}
       {{/if}}
     </div>

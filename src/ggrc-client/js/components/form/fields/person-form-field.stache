@@ -13,11 +13,11 @@
     </div>
   {{else}}
     {{^if_config_exist 'external_services.Person'}}
-    <autocomplete {search-items-type}="'Person'"
+    <autocomplete-component {search-items-type}="'Person'"
                   (item-selected)="{setPerson(%event)}"
                   {placeholder}="'Select person'"
                   {{#if disabled}}disabled{{/if}}>
-    </autocomplete>
+    </autocomplete-component>
     {{else}}
     <external-data-autocomplete {type}="'Person'"
                                 {placeholder}="'Select person'"

@@ -19,10 +19,10 @@
   <label>&nbsp;</label>
   {{#is(selectedValue, "other")}}
     {{^if_config_exist 'external_services.Person'}}
-      <autocomplete {search-items-type}="'Person'"
+      <autocomplete-component {search-items-type}="'Person'"
                     (item-selected)="{personAdded(%event)}"
                     {placeholder}="'Enter text to search for {{listName}}'"
-      ></autocomplete>
+      ></autocomplete-component>
     {{else}}
       <external-data-autocomplete {type}="'Person'"
                                   {placeholder}="'Enter text to search for {{listName}}'"
