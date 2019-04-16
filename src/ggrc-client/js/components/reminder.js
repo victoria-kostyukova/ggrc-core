@@ -6,7 +6,7 @@
 import {confirm} from '../plugins/utils/modals';
 
 export default can.Component.extend({
-  tag: 'reminder',
+  tag: 'reminder-component',
   leakScope: true,
   viewModel: {
     instance: null,
