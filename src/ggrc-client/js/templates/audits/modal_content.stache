@@ -108,19 +108,19 @@
     <div class="row-fluid">
       <div data-id="planned_start_date_hidden" class="span3 hidable">
         <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <datepicker {(date)}="{start_date}"
+        <datepicker-component {(date)}="{start_date}"
                     {label}="'Planned Start Date'"
                     {set-max-date}="{end_date}"
                     tabindex="20">
-        </datepicker>
+        </datepicker-component>
       </div>
       <div data-id="planned_end_date_hidden" class="span3 hidable">
         <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <datepicker {(date)}="{end_date}"
+        <datepicker-component {(date)}="{end_date}"
                     {set-min-date}="{start_date}"
                     {label}="'Planned End Date'"
                     tabindex="21">
-        </datepicker>
+        </datepicker-component>
         <label>
       </div>
     </div>
@@ -133,15 +133,15 @@
         <a data-id="hide_planned_report_period_from_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div class="row-fluid">
           <div class="span6">
-            <datepicker {(date)}="{report_start_date}"
+            <datepicker-component {(date)}="{report_start_date}"
                         {set-max-date}="{report_end_date}"
                         tabindex="22">
-            </datepicker>
+            </datepicker-component>
           </div>
           <div class="span6">
-            <datepicker {(date)}="{report_end_date}"
+            <datepicker-component {(date)}="{report_end_date}"
                         {set-min-date}="{report_start_date}">
-            </datepicker>
+            </datepicker-component>
           </div>
         </div>
       </div>

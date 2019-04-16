@@ -61,7 +61,7 @@ custom-attributes {
 
       input,
       .rich-text__wrapper,
-      date-form-field .input-wrapper datepicker .datepicker__input-wrapper input[readonly] {
+      date-form-field .input-wrapper datepicker-component .datepicker__input-wrapper input[readonly] {
         border: 1px solid #ccc;
         box-shadow: none;
         outline: none;
@@ -71,7 +71,7 @@ custom-attributes {
     &.invalid-field input,
     &.invalid-field select,
     &.invalid-field .rich-text__wrapper,
-    &.invalid-field date-form-field .input-wrapper datepicker .datepicker__input-wrapper input[readonly] {
+    &.invalid-field date-form-field .input-wrapper datepicker-component .datepicker__input-wrapper input[readonly] {
       border-color: $red;
     }
 

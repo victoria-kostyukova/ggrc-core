@@ -19,18 +19,18 @@
   <div class="row-fluid">
     <div class="span3">
       <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <datepicker {label}="'Effective Date'"
+      <datepicker-component {label}="'Effective Date'"
                   {(date)}="{instance.start_date}"
                   {set-max-date}="{instance.end_date}"
                   {required}="{true}">
-      </datepicker>
+      </datepicker-component>
     </div>
     <div class="span3">
       <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <datepicker {label}="'End Date'"
+      <datepicker-component {label}="'End Date'"
                   {(date)}="{instance.end_date}"
                   {required}="{true}">
-      </datepicker>
+      </datepicker-component>
     </div>
     <div class="span3 hidable">
       <object-loader {path}="instance.ra_manager">

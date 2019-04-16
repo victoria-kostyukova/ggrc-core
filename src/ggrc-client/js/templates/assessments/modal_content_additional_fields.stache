@@ -50,7 +50,7 @@
     <label class="ggrc-form-item__label">
       Due Date
     </label>
-    <datepicker
+    <datepicker-component
       tabindex="15"
       {(date)}="{start_date}"
       {set-max-date}="{end_date}"

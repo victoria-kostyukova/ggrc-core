@@ -115,25 +115,25 @@
                   Start Date
                   <i class="fa fa-asterisk"></i>
               </label>
-              <datepicker id="repeate-start-date"
+              <datepicker-component id="repeate-start-date"
                           {(date)}="{instance.start_date}"
                           {required}="{true}"
                           {no-weekends}="{true}"
                           {readonly}="{true}">
-              </datepicker>
+              </datepicker-component>
             </label>
             <label class="smaller">
               <label class="form-label">
                   Due Date
                   <i class="fa fa-asterisk"></i>
               </label>
-              <datepicker id="repeate-end-date"
+              <datepicker-component id="repeate-end-date"
                           {set-min-date}="{instance.start_date}"
                           {(date)}="{instance.end_date}"
                           {required}="{true}"
                           {no-weekends}="{true}"
                           {readonly}="{true}">
-              </datepicker>
+              </datepicker-component>
             </label>
           </div>
         </object-loader>

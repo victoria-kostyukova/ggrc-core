@@ -115,7 +115,7 @@
       <div class="span4 hidable">
         <div data-id="due_date_hidden">
           <a data-id="hide_due_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          <datepicker
+          <datepicker-component
               tabindex="21"
               {label}="'Due Date'"
               {(date)}="{instance.due_date}"
