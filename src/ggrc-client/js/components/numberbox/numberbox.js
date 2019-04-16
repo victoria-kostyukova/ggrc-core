@@ -10,7 +10,7 @@ const INT_NUMBER_PATTERN = '([0-9]+)';
 const NEGATIVE_NUMBER_PATTERN = '([-]{0,1})';
 
 export default can.Component.extend({
-  tag: 'numberbox',
+  tag: 'numberbox-component',
   template: can.stache(template),
   leakScope: true,
   viewModel: {

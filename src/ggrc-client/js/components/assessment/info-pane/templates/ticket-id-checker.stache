@@ -24,10 +24,10 @@
             </p>
         </div>
         <div class="simple-modal__section {{^isValid}} field-failure {{/isValid}}">    
-          <numberbox
+          <numberbox-component
             {placeholder}="'Enter Ticket ID'"
             {(value)}="{ticketId}">
-          </numberbox>
+          </numberbox-component>
           {{^isValid}}<label class="help-inline warning">Please fill in the Ticket ID.</label>{{/isValid}}
         </div>
     </div>

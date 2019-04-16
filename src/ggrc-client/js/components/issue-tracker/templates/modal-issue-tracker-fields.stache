@@ -40,11 +40,11 @@
           </div>
         </div>
         <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_issue_id}}field-failure{{/instance.computed_errors.issue_tracker_issue_id}}">
-          <numberbox {attr-data-id}="'code_txtbx'"
+          <numberbox-component {attr-data-id}="'code_txtbx'"
                      {additional-class}="'input-block-level'"
                      {placeholder}="'Enter Ticket ID'"
                      {(value)}="{instance.issue_tracker.issue_id}">
-          </numberbox>
+          </numberbox-component>
           {{#instance.computed_errors.issue_tracker_issue_id}}
             <label class="help-inline warning">{{this}}</label>
           {{/instance.computed_errors.issue_tracker_issue_id}}
@@ -58,22 +58,22 @@
       <label class="ggrc-form-item__label">
         Hotlist ID
       </label>
-      <numberbox {attr-data-id}="'code_txtbx'"
+      <numberbox-component {attr-data-id}="'code_txtbx'"
                  {additional-class}="'input-block-level'"
                  {placeholder}="'Enter Hotlist ID'"
                  {(value)}="{instance.issue_tracker.hotlist_id}">
-      </numberbox>
+      </numberbox-component>
     </div>
     <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_component_id}}field-failure{{/instance.computed_errors.issue_tracker_component_id}}">
       <label class="form-label ggrc-form-item__label form-label__extended">
         Component ID
         <i class="fa fa-asterisk"></i>
       </label>
-      <numberbox {attr-data-id}="'code_txtbx'"
+      <numberbox-component {attr-data-id}="'code_txtbx'"
                  {additional-class}="'input-block-level'"
                  {placeholder}="'Enter Component ID'"
                  {(value)}="{instance.issue_tracker.component_id}">
-      </numberbox>
+      </numberbox-component>
       {{#instance.computed_errors.issue_tracker_component_id}}
         <label class="help-inline warning">{{this}}</label>
       {{/instance.computed_errors.issue_tracker_component_id}}
