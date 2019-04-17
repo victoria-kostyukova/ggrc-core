@@ -6,6 +6,7 @@
 # pylint: disable=unused-argument
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
 # pylint: disable=redefined-outer-name
 # pylint: disable=duplicate-code
 
@@ -218,8 +219,10 @@ class TestAssessmentsWorkflow(base.Test):
     asmt_service = webui_service.AssessmentsService(selenium)
     getattr(asmt_service, action)(asmt)
     actual_asmt = asmt_service.get_obj_from_info_page(asmt)
+    rest_asmt_obj = rest_facade.get_obj(asmt)
     asmt.update_attrs(
-        updated_at=rest_facade.get_obj(asmt).updated_at,
+        updated_at=rest_asmt_obj.updated_at,
+        modified_by=rest_asmt_obj.modified_by,
         status=end_state,
         verified=(True if action == "verify_assessment" else False)).repr_ui()
     self.general_equal_assert(asmt, actual_asmt, "audit")
@@ -425,11 +428,13 @@ class TestAssessmentsWorkflow(base.Test):
     asmt_service = webui_service.AssessmentsService(selenium)
     asmt_service.choose_and_fill_dropdown_lca(
         expected_asmt, dropdown, url=url)
+    rest_asmt_obj = self.info_service().get_obj(expected_asmt)
     expected_asmt.update_attrs(
         custom_attributes={
             dropdown.title.upper(): dropdown.multi_choice_options
         },
-        updated_at=self.info_service().get_obj(expected_asmt).updated_at,
+        updated_at=rest_asmt_obj.updated_at,
+        modified_by=rest_asmt_obj.modified_by,
         evidence_urls=[url],
         mapped_objects=[control_mapped_to_program.title],
         status=object_states.IN_PROGRESS)
@@ -475,11 +480,13 @@ class TestAssessmentsWorkflow(base.Test):
     asmt_service = webui_service.AssessmentsService(selenium)
     asmt_service.choose_and_fill_dropdown_lca(
         expected_asmt, dropdown, comment=comment_text)
+    rest_asmt_obj = self.info_service().get_obj(obj=expected_asmt)
     expected_asmt.update_attrs(
         custom_attributes={
             dropdown.title.upper(): dropdown.multi_choice_options
         },
-        updated_at=self.info_service().get_obj(obj=expected_asmt).updated_at,
+        updated_at=rest_asmt_obj.updated_at,
+        modified_by=rest_asmt_obj.modified_by,
         mapped_objects=[control_mapped_to_program.title],
         status=object_states.IN_PROGRESS).repr_ui()
     actual_asmt = asmt_service.get_obj_from_info_page(obj=expected_asmt)
@@ -551,6 +558,7 @@ class TestAssessmentsWorkflow(base.Test):
     act_asmt = rest_facade.get_obj(asmt)
     asmt.update_attrs(
         updated_at=act_asmt.updated_at, status=act_asmt.status,
+        modified_by=act_asmt.modified_by,
         custom_attributes=custom_attributes)
     _assert_asmt(asmts_ui_service, asmt)
 

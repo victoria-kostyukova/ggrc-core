@@ -105,8 +105,10 @@ class TestRBAC(base.Test):
     asmt_service = webui_service.AssessmentsService(selenium)
     asmt_service.add_evidence_urls(asmt, [url])
     actual_asmt = asmt_service.get_obj_from_info_page(obj=asmt)
+    rest_asmt_obj = rest_facade.get_obj(asmt)
     asmt.update_attrs(
-        updated_at=rest_facade.get_obj(asmt).updated_at,
+        updated_at=rest_asmt_obj.updated_at,
+        modified_by=rest_asmt_obj.modified_by,
         status=object_states.IN_PROGRESS,
         evidence_urls=[url]).repr_ui()
     self.general_equal_assert(asmt, actual_asmt, "audit")
