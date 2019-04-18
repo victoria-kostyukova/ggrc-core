@@ -339,11 +339,15 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
 
   def generate_ca_title(self, first_part):
     """Generate title of custom attribute
-    (same as usual title but without a star as it's disallowed, see GGRC-4954)
+    (same as usual title but
+    - without a star as it's disallowed, see GGRC-4954, GGRC-7024
+    - replacing : with _ in the first part as map:, unmap:, delete are
+    disallowed, see GGRC-5635)
     """
     chars = StringMethods.ALLOWED_CHARS.replace(string_utils.Symbols.STAR,
                                                 string_utils.Symbols.BLANK)
-    return self.generate_string(first_part, allowed_chars=chars)
+    return self.generate_string(
+        first_part.replace(':', '_'), allowed_chars=chars)
 
 
 class ProgramsFactory(EntitiesFactory):

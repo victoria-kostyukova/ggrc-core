@@ -259,6 +259,7 @@ class TestActivateWorkflow(base.Test):
     assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in
             test_data["assignee_email"].due_soon_tasks)
 
+  @pytest.mark.xfail(reason="TODO Implement another email format.")
   def test_destructive_new_wf_cycle_notification(
       self, selenium, test_data
   ):
