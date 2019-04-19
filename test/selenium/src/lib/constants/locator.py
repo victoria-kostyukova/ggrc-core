@@ -521,7 +521,7 @@ class ModalCustomAttribute(object):
       By.CSS_SELECTOR, Common.MODAL_BODY + " div:nth-child(1)>label")
   ATTR_TYPE_CSS = (By.CSS_SELECTOR, Common.MODAL_HEADER + " h2")
   ATTR_TYPE_SELECTOR_DD_CSS = (
-      By.CSS_SELECTOR, Common.MODAL_BODY + " dropdown select")
+      By.CSS_SELECTOR, Common.MODAL_BODY + " dropdown-component select")
   MANDATORY_LBL_CSS = (By.CSS_SELECTOR, Common.MODAL_BODY + " .span2 label")
   MANDATORY_CB_CSS = (
       By.CSS_SELECTOR, Common.MODAL_BODY + ' [type="checkbox"]')
@@ -1094,7 +1094,7 @@ class UnifiedMapperTreeView(TreeView):
   SHOW_FIELDS_BTN_CSS = (By.CSS_SELECTOR, HEADER + " .fa-bars")
   NO_RESULTS_MSG_CSS = (By.CSS_SELECTOR, ".well-small:not(.hidden)")
   MAPPER_TREE_SPINNER_NO_RESULT = (
-      By.CSS_SELECTOR, ".no-items-spinner-wrapper spinner")
+      By.CSS_SELECTOR, ".no-items-spinner-wrapper spinner-component")
   MAPPER_TREE_SPINNER_ITEMS = (
       By.CSS_SELECTOR, ".spinner-section.spinner-section_grid  .spinner-icon")
 
