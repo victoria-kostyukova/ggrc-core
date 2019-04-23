@@ -28,7 +28,9 @@ def build_reviewer_acl(acr_id=None, user_id=None):
 def generate_review_object(
         instance,
         state=all_models.Review.STATES.UNREVIEWED,
-        notification_type=all_models.Review.NotificationTypes.EMAIL_TYPE):
+        notification_type=all_models.Review.NotificationTypes.EMAIL_TYPE,
+        email_message="",
+):
   """
   Generates Review for model.
 
@@ -36,6 +38,7 @@ def generate_review_object(
       instance: Factory instance
       state: Review state, unreviewed by default
       notification_type: Notification type, email by default
+      email_message: Emal message of the review, empty by default
 
   Returns:
     Response and Review
@@ -52,5 +55,6 @@ def generate_review_object(
           "notification_type": notification_type,
           "status": state,
           "access_control_list": build_reviewer_acl(),
+          "email_message": email_message,
       },
   )

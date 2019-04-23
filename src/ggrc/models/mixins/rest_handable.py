@@ -27,6 +27,24 @@ class WithPutHandable(object):
       model.handle_put(kwargs["obj"])
 
 
+class WithPutAfterCommitHandable(object):
+  """Mixin that adds PUT after commit handler."""
+  __lazy_init__ = True
+
+  def handle_put_after_commit(self, event):
+    """PUT after commit handler."""
+    raise NotImplementedError
+
+  @classmethod
+  def init(cls, model):
+    """Init handlers."""
+    # pylint: disable=unused-variable,unused-argument
+    @signals.Restful.model_put_after_commit.connect_via(model)
+    def model_put_after_commit(*args, **kwargs):
+      """PUT after commit handler."""
+      model.handle_put_after_commit(kwargs["obj"], kwargs["event"])
+
+
 class WithDeleteHandable(object):
   """Mixin that adds DELETE handler"""
   __lazy_init__ = True
@@ -61,6 +79,24 @@ class WithPostHandable(object):
     def model_posted(*args, **kwargs):
       """POST handler"""
       model.handle_post(kwargs["obj"])
+
+
+class WithPostAfterCommitHandable(object):
+  """Mixin that adds POST after commit handler."""
+  __lazy_init__ = True
+
+  def handle_posted_after_commit(self, event):
+    """POST after commit handler."""
+    raise NotImplementedError
+
+  @classmethod
+  def init(cls, model):
+    """Init handlers."""
+    # pylint: disable=unused-variable,unused-argument
+    @signals.Restful.model_posted_after_commit.connect_via(model)
+    def model_posted_after_commit(*args, **kwargs):
+      """POST after commit handler."""
+      model.handle_posted_after_commit(kwargs["obj"], kwargs["event"])
 
 
 class WithRelationshipsHandable(object):

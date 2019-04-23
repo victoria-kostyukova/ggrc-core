@@ -1,12 +1,18 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Defines a Revision model for storing snapshots."""
+"""Defines a Proposal model and Proposalable mixin."""
+
+import datetime
 
 import sqlalchemy as sa
+from sqlalchemy import inspect
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import login
+from ggrc.access_control import roleable
+from ggrc.models import comment
 from ggrc.models import inflector
 from ggrc.models import mixins
 from ggrc.models import reflection
@@ -15,11 +21,13 @@ from ggrc.models import types
 from ggrc.models import utils
 from ggrc.models.mixins import base
 from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import rest_handable
+from ggrc.models.mixins import with_comment_created
 from ggrc.fulltext import mixin as ft_mixin
+from ggrc.services import signals
 from ggrc.utils import referenced_objects
-from ggrc.access_control import roleable
 from ggrc.utils.revisions_diff import builder
-from ggrc.models import comment
+
 
 # pylint: disable=too-few-public-methods
 
@@ -62,6 +70,11 @@ class FullInstanceContentFased(utils.FasadeProperty):
 class Proposal(mixins.person_relation_factory("applied_by"),
                mixins.person_relation_factory("declined_by"),
                mixins.person_relation_factory("proposed_by"),
+               rest_handable.WithPostHandable,
+               rest_handable.WithPutHandable,
+               rest_handable.WithPutAfterCommitHandable,
+               rest_handable.WithPostAfterCommitHandable,
+               with_comment_created.WithCommentCreated,
                comment.CommentInitiator,
                mixins.Stateful,
                roleable.Roleable,
@@ -183,6 +196,82 @@ class Proposal(mixins.person_relation_factory("applied_by"),
       raise ValueError("Trying to create proposal for external model.")
 
     return instance_type
+
+  def _add_comment_about(self, reason, txt):
+    """Create comment about proposal for reason with required text."""
+    if not isinstance(self.instance, comment.Commentable):
+      return
+
+    txt = txt or ""
+    txt = txt.strip()
+    if txt.startswith("<p>"):
+      txt = txt[3:]
+      if txt.endswith("</p>"):
+        txt = txt[:-4]
+    txt = txt.strip()
+
+    self.add_comment(
+        self.build_comment_text(reason, txt, self.proposed_by),
+        source=self.instance,
+        initiator_object=self
+    )
+
+  def is_status_changed_to(self, required_status):
+    """Checks whether the status of proposal has changed."""
+    return (inspect(self).attrs.status.history.has_changes() and
+            self.status == required_status)
+
+  def handle_post(self):
+    """POST handler."""
+    # pylint: disable=attribute-defined-outside-init
+    self.proposed_by = login.get_current_user()
+    # pylint: enable=attribute-defined-outside-init
+    self._add_comment_about(self.STATES.PROPOSED, self.agenda)
+    relationship.Relationship(
+        source=self.instance,
+        destination=self
+    )
+
+  def _apply_proposal(self):
+    """Apply proposal procedure hook."""
+    from ggrc.utils.revisions_diff import applier
+
+    current_user = login.get_current_user()
+    now = datetime.datetime.utcnow()
+    # pylint: disable=attribute-defined-outside-init
+    self.applied_by = current_user
+    # pylint: enable=attribute-defined-outside-init
+    self.apply_datetime = now
+    if applier.apply_action(self.instance, self.content):
+      self.instance.modified_by = current_user
+      self.instance.updated_at = now
+    self._add_comment_about(self.STATES.APPLIED, self.apply_reason)
+    # notify proposalable instance that proposal applied
+    signals.Proposal.proposal_applied.send(self.instance.__class__,
+                                           instance=self.instance)
+
+  def _decline_proposal(self):
+    """Decline proposal procedure hook."""
+    # pylint: disable=attribute-defined-outside-init
+    self.declined_by = login.get_current_user()
+    # pylint: enable=attribute-defined-outside-init
+    self.decline_datetime = datetime.datetime.utcnow()
+    self._add_comment_about(self.STATES.DECLINED, self.decline_reason)
+
+  def handle_put(self):
+    """PUT handler."""
+    if self.is_status_changed_to(self.STATES.APPLIED):
+      self._apply_proposal()
+    elif self.is_status_changed_to(self.STATES.DECLINED):
+      self._decline_proposal()
+
+  def handle_posted_after_commit(self, event):
+    """Handle POST after commit."""
+    self.apply_mentions_comment(obj=self.instance, event=event)
+
+  def handle_put_after_commit(self, event):
+    """Handle POST after commit."""
+    self.apply_mentions_comment(obj=self.instance, event=event)
 
 
 class Proposalable(object):  # pylint: disable=too-few-public-methods

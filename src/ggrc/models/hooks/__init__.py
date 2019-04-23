@@ -12,7 +12,6 @@ from ggrc.models.hooks import issue
 from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
 from ggrc.models.hooks import acl
-from ggrc.models.hooks import proposal
 from ggrc.models.hooks import access_control_role
 
 
@@ -30,7 +29,6 @@ ALL_HOOKS = [
     # Keep IssueTracker at the end of list to make sure that all other hooks
     # are already executed and all data is final.
     issue_tracker,
-    proposal,
 ]
 
 

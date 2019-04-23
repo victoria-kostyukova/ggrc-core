@@ -7,11 +7,13 @@ import datetime
 from collections import OrderedDict
 from urlparse import urljoin
 
+import ddt
 import mock
 from freezegun import freeze_time
 
 from integration.ggrc import TestCase, api_helper
 from integration.ggrc.models import factories
+from integration.ggrc.review import generate_review_object
 from integration.ggrc_workflows.models import factories as wf_factories
 
 from ggrc import settings
@@ -21,6 +23,7 @@ from ggrc.notifications import people_mentions
 from ggrc.utils import get_url_root
 
 
+@ddt.ddt
 class TestPeopleMentions(TestCase):
   """Test people mentions notifications."""
 
@@ -336,3 +339,42 @@ class TestPeopleMentions(TestCase):
     ).first()
     self.assertIsNotNone(person)
     send_email_mock.assert_called_once()
+
+  @mock.patch("ggrc.notifications.common.send_email")
+  @ddt.data(
+      all_models.Standard,
+      all_models.Program,
+      all_models.Regulation,
+      all_models.Contract,
+      all_models.Policy,
+      all_models.Threat,
+      all_models.Objective,
+  )
+  def test_review_posted(self, model, send_email_mock):
+    """Test mentions in request review comment {}."""
+    with factories.single_commit():
+      factories.PersonFactory(email="some_user@example.com")
+      obj = factories.get_model_factory(model.__name__)()
+      url = urljoin(get_url_root(), utils.view_url_for(obj))
+
+    with freeze_time("2018-01-10 07:31:42"):
+      resp, _ = generate_review_object(
+          obj,
+          email_message=u"Test <a href=\"mailto:some_user@example.com\"></a>",
+      )
+    self.assertEqual(201, resp.status_code)
+
+    expected_title = (u"user@example.com mentioned you on "
+                      u"a comment within {title}").format(title=obj.title)
+    expected_body = (
+        u"user@example.com mentioned you on a comment within {title} "
+        u"at 01/09/2018 23:31:42 PST:\n"
+        u"<p>Review requested with a comment: "
+        u"Test <a href=\"mailto:some_user@example.com\"></a></p>\n"
+    ).format(title=obj.title)
+    body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
+        "comments": [expected_body],
+        "url": url,
+    })
+    send_email_mock.assert_called_once_with(u"some_user@example.com",
+                                            expected_title, body)
