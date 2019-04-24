@@ -5,13 +5,13 @@
 
 import Component from '../deferred-mapper';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
-
 import * as ReifyUtils from '../../plugins/utils/reify-utils';
 import * as MapperUtils from '../../plugins/utils/mapper-utils';
 import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
   DEFERRED_MAP_OBJECTS,
+  DEFERRED_MAPPED_UNMAPPED,
 } from '../../events/eventTypes';
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
 import * as SnapshotUtils from '../../plugins/utils/snapshot-utils';
@@ -173,7 +173,7 @@ describe('deferred-mapper component', function () {
       });
   });
 
-  describe('afterDeferredUpdate(objects) method', () => {
+  describe('afterDeferredUpdate(objectsToMap, objectsToUnmap) method', () => {
     let instance;
     let pageInstance;
 
@@ -193,6 +193,20 @@ describe('deferred-mapper component', function () {
         .and.returnValue(pageInstance);
     });
 
+    it('dispatches DEFERRED_MAPPED_UNMAPPED event with mapped and unmapped ' +
+      'objects', () => {
+      vm.afterDeferredUpdate(
+        [{type: 'Type1'}, {type: 'Type2'}],
+        [{type: 'Type3'}, {type: 'Type4'}],
+      );
+
+      expect(instance.dispatch).toHaveBeenCalledWith({
+        ...DEFERRED_MAPPED_UNMAPPED,
+        mapped: [{type: 'Type1'}, {type: 'Type2'}],
+        unmapped: [{type: 'Type3'}, {type: 'Type4'}],
+      });
+    });
+
     it('dispatches REFRESH_MAPPING event once for each type of objects',
       () => {
         const objects = [
@@ -210,7 +224,7 @@ describe('deferred-mapper component', function () {
           .map((object) => object.type)
         );
 
-        vm.afterDeferredUpdate(objects);
+        vm.afterDeferredUpdate(objects, []);
 
         objectTypes.forEach((objectType) => {
           let callsArgs = instance.dispatch.calls.allArgs()
@@ -224,13 +238,13 @@ describe('deferred-mapper component', function () {
       });
 
     it('dispatches REFRESH_SUB_TREE event on instance', () => {
-      vm.afterDeferredUpdate([]);
+      vm.afterDeferredUpdate([], []);
 
       expect(instance.dispatch).toHaveBeenCalledWith(REFRESH_SUB_TREE);
     });
 
     it('dispatches REFRESH_MAPPING event on pageInstance', () => {
-      vm.afterDeferredUpdate([pageInstance]);
+      vm.afterDeferredUpdate([pageInstance], []);
 
       expect(pageInstance.dispatch).toHaveBeenCalledWith({
         ...REFRESH_MAPPING,
@@ -240,7 +254,7 @@ describe('deferred-mapper component', function () {
 
     it('does not dispatch REFRESH_MAPPING event on pageInstance ' +
     'if it is not in "objects"', () => {
-      vm.afterDeferredUpdate([{}]);
+      vm.afterDeferredUpdate([{}], []);
 
       expect(pageInstance.dispatch).not.toHaveBeenCalledWith({
         ...REFRESH_MAPPING,
@@ -266,6 +280,16 @@ describe('deferred-mapper component', function () {
       spyOn(vm, 'performMapActions').and.returnValue(Promise.resolve());
       spyOn(vm, 'performUnmapActions').and.returnValue(Promise.resolve());
       spyOn(vm, 'afterDeferredUpdate');
+    });
+
+    it('doesn\'t perform map/unmap handling when there are no pending ' +
+    'operations', () => {
+      vm.attr('instance._pendingJoins', []);
+
+      vm.deferredUpdate();
+
+      expect(vm.performMapActions).not.toHaveBeenCalled();
+      expect(vm.performUnmapActions).not.toHaveBeenCalled();
     });
 
     it('calls performMapActions for objects pending mapping', async (done) => {
@@ -305,12 +329,27 @@ describe('deferred-mapper component', function () {
     });
 
     it('calls afterDeferredUpdate for all pending objects', async (done) => {
-      const objects = _.map(vm.attr('instance._pendingJoins'),
-        ({what}) => what);
+      const expectedMapped = [
+        new can.Map({type: 'Type1'}),
+        new can.Map({type: 'Type3'}),
+      ];
+      const expectedUnmapped = [
+        new can.Map({type: 'Type2'}),
+        new can.Map({type: 'Type4'}),
+      ];
+
+      vm.attr('instance._pendingJoins', [
+        ...expectedMapped.map((what) => ({what, how: 'map'})),
+        ...expectedUnmapped.map((what) => ({what, how: 'unmap'})),
+      ]);
 
       await vm.deferredUpdate();
 
-      expect(vm.afterDeferredUpdate).toHaveBeenCalledWith(objects);
+      expect(vm.afterDeferredUpdate).toHaveBeenCalledWith(
+        expectedMapped,
+        expectedUnmapped,
+      );
+
       done();
     });
   });
