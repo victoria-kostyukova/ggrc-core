@@ -17,6 +17,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const viewModel = can.Map.extend({
   instance: null,
+  isNewInstance: false,
   /**
   * @type {Cacheable[]}
   */
@@ -42,6 +43,10 @@ const viewModel = can.Map.extend({
   },
   async init() {
     this.attr('preMappedObjects', this.loadPreMappedObjects());
+
+    if (this.attr('isNewInstance')) {
+      return;
+    }
 
     this.attr('isLoading', true);
     try {

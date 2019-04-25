@@ -4,6 +4,7 @@
 }}
 
 <cycle-task-modal instance:from="instance"
+                  isNewInstance:from="new_object_form"
                   preMappedStubs:from="object_params.pre_mapped_objects">
 <form action="javascript://" class="form">
   <div class="row-fluid">
