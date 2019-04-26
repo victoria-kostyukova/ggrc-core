@@ -93,7 +93,7 @@
                     </div>
                     <div class="assessment-controls__extra-controls">
                         <div>
-                            <div class="info-pane__section-title">
+                            <div class="info-pane__section-title_spinnerable">
                                 <spinner-component class="info-pane__loading-icon" toggle:from="isUpdatingFiles"></spinner-component>
                                 Evidence file
                             </div>
@@ -125,7 +125,7 @@
                             </confirm-edit-action>
                         </div>
                         <div>
-                            <div class="info-pane__section-title">
+                            <div class="info-pane__section-title_spinnerable">
                                 <spinner-component class="info-pane__loading-icon" toggle:from="isUpdatingUrls"></spinner-component>
                                 Evidence URL
                             </div>
