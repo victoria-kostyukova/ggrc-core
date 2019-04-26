@@ -227,8 +227,8 @@ const OBJECTS_MAPPED_VIA_MAPPER = {
  * @event deferredMappedUnmapped
  * @type {object}
  * @property {string} type - Event name.
- * @property {can.Model.Cacheable[]} mapped - Mapped objects.
- * @property {can.Model.Cacheable[]} unmapped - Unmapped objects.
+ * @property {Cacheable[]} mapped - Mapped objects.
+ * @property {Cacheable[]} unmapped - Unmapped objects.
  */
 const DEFERRED_MAPPED_UNMAPPED = {
   type: 'deferredMappedUnmapped',
