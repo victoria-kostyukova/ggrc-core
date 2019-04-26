@@ -67,15 +67,17 @@ const viewModel = can.Map.extend({
       loadedObjects
     ));
   },
+  withoutExcludedFilter: (objects, {object: mappedObject}) => {
+    return _.findIndex(objects, (object) => (
+      mappedObject.id === object.id &&
+      mappedObject.type === object.type
+    )) === -1;
+  },
   excludeObjects(objects) {
     const mappedObjects = this.attr('mappedObjects');
-    const withoutExcludedFilter = ({object: mappedObject}) => (
-      _.findIndex(objects, (object) => (
-        mappedObject.id === object.id &&
-        mappedObject.type === object.type
-      )) === -1
-    );
-    const objectsWithoutExcluded = mappedObjects.filter(withoutExcludedFilter);
+    const objectsWithoutExcluded = mappedObjects
+      .filter((mappedObject) =>
+        this.withoutExcludedFilter(objects, mappedObject));
 
     mappedObjects.replace(objectsWithoutExcluded);
   },
