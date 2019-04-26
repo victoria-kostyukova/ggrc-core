@@ -102,6 +102,10 @@ export default can.Component.extend({
     );
 
     return ObjectOperationsBaseVM.extend({
+      isRefreshCountsNeeded:
+        (parentViewModel.attr('is_refresh_counts_needed') !== undefined)
+          ? parentViewModel.attr('is_refresh_counts_needed')
+          : true,
       join_object_id: resolvedConfig.isNew ? null :
         resolvedConfig['join-object-id'] ||
         (getPageInstance() && getPageInstance().id),
@@ -349,8 +353,10 @@ export default can.Component.extend({
           });
           instance.dispatch(REFRESH_SUB_TREE);
 
-          // This Method should be modified to event
-          refreshCounts();
+          if (viewModel.attr('isRefreshCountsNeeded')) {
+            // This Method should be modified to event
+            refreshCounts();
+          }
         })
         .catch((response, message) => {
           $('body').trigger('ajax:flash', {error: message});

@@ -147,6 +147,7 @@
                   href="javascript://"
                   data-placement="right"
                   data-toggle="unified-mapper"
+                  data-is-refresh-counts-needed="false"
                   data-join-object-id="{{instance.id}}"
                   data-join-object-type="{{instance.class.model_singular}}">
                   Map Objects
