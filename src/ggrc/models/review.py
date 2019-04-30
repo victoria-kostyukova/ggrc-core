@@ -292,9 +292,8 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
   def _add_comment_about(self, text):
     """Create comment about proposal for reason with required text."""
-    # Uncomment only if Programs become Commentable
-    # if not isinstance(self.reviewable, comment.Commentable):
-    #   return
+    if not isinstance(self.reviewable, comment.Commentable):
+      return
     comment_text = u"<p>Review requested with a comment: {text}</p>".format(
         text=text
     )
