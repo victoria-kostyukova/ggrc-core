@@ -30,42 +30,36 @@ const viewModel = can.Map.extend({
   },
   async initMappedObjects() {
     const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
-    let rawMappedObjects;
 
     this.attr('isLoading', true);
     try {
-      rawMappedObjects = await loadObjectsByTypes(
+      const rawMappedObjects = await loadObjectsByTypes(
         this.attr('instance'),
         mappingTypes,
         fields,
       );
+      this.attr('mappedObjects').replace(this.convertToMappedObjects(
+        rawMappedObjects
+      ));
     } catch (xhr) {
       notifier('error', getAjaxErrorInfo(xhr).details);
-      return;
     } finally {
       this.attr('isLoading', false);
     }
-
-    this.attr('mappedObjects').replace(this.convertToMappedObjects(
-      rawMappedObjects
-    ));
   },
   async includeLoadedObjects(objects) {
-    let loadedObjects;
-
     this.attr('isLoading', true);
     try {
-      loadedObjects = await loadObjectsByStubs(objects, fields);
+      const loadedObjects = await loadObjectsByStubs(objects, fields);
+
+      this.attr('mappedObjects').push(...this.convertToMappedObjects(
+        loadedObjects
+      ));
     } catch (xhr) {
       notifier('error', getAjaxErrorInfo(xhr).details);
-      return;
     } finally {
       this.attr('isLoading', false);
     }
-
-    this.attr('mappedObjects').push(...this.convertToMappedObjects(
-      loadedObjects
-    ));
   },
   withoutExcludedFilter: (objects, {object: mappedObject}) => {
     return _.findIndex(objects, (object) => (
