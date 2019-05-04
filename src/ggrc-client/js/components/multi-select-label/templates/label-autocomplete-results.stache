@@ -5,32 +5,32 @@
 
 {{#if showResults}}
   <div class="autocomplete-result-wrapper">
-  <div class="autocomplete-result">
-    {{#if items.length}}
-      <div class="header">
-        Suggestions
-      </div>
-    {{/if}}
-
-    <ul>
-      {{#each _items}}
-        <li class="autocomplete-item" on:el:click="selectItem({{_index}})">
-          {{name}}
-        </li>
-      {{/each}}
-    </ul>
-
-    {{#if showNewValue}}
-      <div class="add-new-item" on:el:click="addNewItem()">
-        {{currentValue}} (New Label)
-      </div>
-    {{else}}
-      {{^if items.length}}
+    <div class="autocomplete-result">
+      {{#if items.length}}
         <div class="header">
-          <i>No Matches</i>
+          Suggestions
         </div>
       {{/if}}
-    {{/if}}
+
+      <ul>
+        {{#each _items}}
+          <li class="autocomplete-item" on:el:click="selectItem({{_index}})">
+            {{name}}
+          </li>
+        {{/each}}
+      </ul>
+
+      {{#if showNewValue}}
+        <div class="add-new-item" on:el:click="addNewItem()">
+          {{currentValue}} (New Label)
+        </div>
+      {{else}}
+        {{^if items.length}}
+          <div class="header">
+            <i>No Matches</i>
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
   </div>
-  <div>
 {{/if}}

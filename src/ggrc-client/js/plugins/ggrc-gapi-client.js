@@ -16,7 +16,7 @@ let showGapiModal = function ({scopes, onAccept, onDecline}) {
       '../controllers/modals/gapi-modal'
     )
       .then((module) => {
-        const modal = $('<div class="modal hide">').modal_form();
+        const modal = $('<div class="modal hide"></div>').modal_form();
         modal.appendTo(document.body);
 
         new module.default(modal, {
@@ -300,8 +300,8 @@ class GGRCGapiClient {
         if (user.email.toLowerCase().trim() !==
         GGRC.current_user.email.toLowerCase().trim()) {
           notifier('warning', `
-            You are signed into GGRC as ${GGRC.current_user.email} 
-            and into Google Apps as ${user.email}. 
+            You are signed into GGRC as ${GGRC.current_user.email}
+            and into Google Apps as ${user.email}.
             You may experience problems uploading evidence.`);
         }
       });

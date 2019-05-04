@@ -5,14 +5,14 @@
 
 {{#if showResults}}
   <div class="autocomplete-result-wrapper">
-  <div class="autocomplete-result">
-    <ul>
-      {{#each _items}}
-        <li class="autocomplete-item {{extraCls}}" on:el:click="selectItem({{_index}})">
-          {{email}}
-        </li>
-      {{/each}}
-    </ul>
+    <div class="autocomplete-result">
+      <ul>
+        {{#each _items}}
+          <li class="autocomplete-item {{extraCls}}" on:el:click="selectItem({{_index}})">
+            {{email}}
+          </li>
+        {{/each}}
+      </ul>
+    </div>
   </div>
-  <div>
 {{/if}}

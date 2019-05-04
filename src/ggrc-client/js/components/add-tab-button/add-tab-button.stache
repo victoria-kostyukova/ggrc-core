@@ -58,8 +58,7 @@
                       {{title}}
                       <i class="fa fa-external-link"></i>
                     </span>
-                  </questionnaire-mapping-link>
-                </a>
+                </questionnaire-mapping-link>
               {{else}}
 
                 {{#is_allowed_to_map instance model.model_singular}}
