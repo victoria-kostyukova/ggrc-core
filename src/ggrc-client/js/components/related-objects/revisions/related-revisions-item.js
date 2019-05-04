@@ -19,16 +19,16 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     define: {
       revision: {
-        set(newValue, setValue) {
+        set(newValue) {
           if (!newValue) {
-            return;
+            return this.attr('revision');
           }
 
           getPersonInfo(newValue.modified_by).then((person) => {
             this.attr('modifiedBy', person);
           });
 
-          setValue(newValue);
+          return newValue;
         },
       },
       isCreated: {

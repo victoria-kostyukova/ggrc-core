@@ -23,15 +23,16 @@ export default can.Component.extend({
     _date: null, // the internal value of the text input field
     define: {
       date: {
-        set(newValue, setValue, onError, oldValue) {
+        set(newValue) {
+          const oldValue = this.attr('date');
           if (newValue === oldValue) {
-            return;
+            return oldValue;
           }
 
           if (this.attr('picker')) {
             this.attr('picker').datepicker('setDate', newValue);
           }
-          setValue(newValue);
+          return newValue;
         },
       },
       readonly: {
