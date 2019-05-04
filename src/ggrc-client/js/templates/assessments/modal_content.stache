@@ -144,7 +144,7 @@
                         <div class="description">
                           <read-more
                             text:from="itemData.description"
-                            maxLinesNumber:from=1
+                            maxLinesNumber:from="1"
                             handleMarkdown:from="instance.class.isChangeableExternally">
                           </read-more>
                         </div>

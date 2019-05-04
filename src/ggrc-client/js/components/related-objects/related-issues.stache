@@ -33,7 +33,7 @@
                     <div class="flex-size-3">
                         <read-more
                           text:from="instance.description"
-                          maxLinesNumber:from=2
+                          maxLinesNumber:from="2"
                           handleMarkdown:from="instance.class.isChangeableExternally">
                         </read-more>
                     </div>
