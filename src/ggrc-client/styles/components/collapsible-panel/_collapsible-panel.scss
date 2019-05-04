@@ -49,10 +49,14 @@ collapsible-panel-header {
     display: inline-block;
   }
 
-  collapse-panel-click-area {
+  .collapsible-panel-header__toggle-button {
     cursor: pointer;
     display: flex;
+    align-items: center;
     max-width: 70%;
+    background: none;
+    border: none;
+    padding: 0;
   }
 
   &:after {
