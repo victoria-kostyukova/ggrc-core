@@ -3,6 +3,9 @@
    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+// Temporary add to hide unneeded logs
+import '../plugins/console-interceptor';
+
 import 'jquery';
 import 'lodash';
 import 'components-jqueryui/ui/widgets/autocomplete';
@@ -48,8 +51,5 @@ import 'can-validate-legacy/shims/validatejs';
 import 'can-map-define';
 import 'can-jquery';
 import 'can-jquery/legacy';
-
-// Temporary add to hide unneeded logs
-import '../plugins/console-interceptor';
 
 window.can = can3;
