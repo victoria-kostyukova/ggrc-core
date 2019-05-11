@@ -202,13 +202,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     if not isinstance(self.instance, comment.Commentable):
       return
 
-    txt = txt or ""
-    txt = txt.strip()
-    if txt.startswith("<p>"):
-      txt = txt[3:]
-      if txt.endswith("</p>"):
-        txt = txt[:-4]
-    txt = txt.strip()
+    txt = self.clear_text(txt)
 
     self.add_comment(
         self.build_comment_text(reason, txt, self.proposed_by),

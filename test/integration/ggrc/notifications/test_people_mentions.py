@@ -369,8 +369,10 @@ class TestPeopleMentions(TestCase):
     expected_body = (
         u"user@example.com mentioned you on a comment within {title} "
         u"at 01/09/2018 23:31:42 PST:\n"
-        u"<p>Review requested with a comment: "
-        u"Test <a href=\"mailto:some_user@example.com\"></a></p>\n"
+        u"<p>Review requested from</p>"
+        u"<p>user@example.com</p>"
+        u"<p>with a comment:</p>"
+        u"<p>Test <a href=\"mailto:some_user@example.com\"></a></p>\n"
     ).format(title=obj.title)
     body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
         "comments": [expected_body],

@@ -12,8 +12,19 @@ from ggrc.models import revision
 class WithCommentCreated(object):
   """Mixin for creating a comment on signals."""
 
-  def add_comment(self, comment_text, source, initiator_object=None):
-    # pylint: disable=no-self-use
+  @staticmethod
+  def clear_text(text):
+    """Cleans leading and trailing paragraph tag."""
+    txt = text or ""
+    txt = txt.strip()
+    if txt.startswith("<p>"):
+      txt = txt[3:]
+      if txt.endswith("</p>"):
+        txt = txt[:-4]
+    return txt.strip()
+
+  @staticmethod
+  def add_comment(comment_text, source, initiator_object=None):
     """Adds comment into the session.
 
       Args:
@@ -31,8 +42,8 @@ class WithCommentCreated(object):
         destination=created_comment
     )
 
-  def apply_mentions_comment(self, event, obj):
-    # pylint: disable=no-self-use
+  @staticmethod
+  def apply_mentions_comment(event, obj):
     """Send people mentions in proposal comment.
 
       Args:

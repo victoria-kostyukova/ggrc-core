@@ -38,7 +38,7 @@ def generate_review_object(
       instance: Factory instance
       state: Review state, unreviewed by default
       notification_type: Notification type, email by default
-      email_message: Emal message of the review, empty by default
+      email_message: Email message of the review, empty by default
 
   Returns:
     Response and Review

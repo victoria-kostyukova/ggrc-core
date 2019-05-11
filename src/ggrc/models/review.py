@@ -294,8 +294,18 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     """Create comment about proposal for reason with required text."""
     if not isinstance(self.reviewable, comment.Commentable):
       return
-    comment_text = u"<p>Review requested with a comment: {text}</p>".format(
-        text=text
+
+    text = self.clear_text(text)
+
+    existing_people = set(acp.person.email
+                          for acl in self._access_control_list
+                          for acp in acl.access_control_people)
+    comment_text = (
+        u"<p>Review requested from</p><p>{people}</p>"
+        u"<p>with a comment:</p><p>{text}</p>"
+    ).format(
+        text=text,
+        people=', '.join(existing_people),
     )
     self.add_comment(
         comment_text,
@@ -304,6 +314,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     )
 
   def handle_post(self):
+    """Handle POST request."""
     self._add_comment_about(self.email_message)
     self._create_relationship()
     self._update_new_reviewed_by()
@@ -313,6 +324,8 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
       add_notification(self, Review.NotificationObjectTypes.REVIEW_CREATED)
 
   def handle_put(self):
+    """Handle PUT request."""
+    self._add_comment_about(self.email_message)
     self._update_reviewed_by()
 
   def handle_posted_after_commit(self, event):
