@@ -35,5 +35,38 @@ class TestCommentsForReview(TestCase):
     obj = model.query.get(obj_id)
     comments = list(obj.related_objects(_types=["Comment"]))
     self.assertEqual(1, len(comments))
-    self.assertEqual(u"<p>Review requested with a comment: Test message</p>",
-                     comments[0].description)
+    self.assertEqual(
+        u"<p>Review requested from</p><p>user@example.com</p>"
+        u"<p>with a comment: Test message</p>",
+        comments[0].description
+    )
+
+  @ddt.data(
+      all_models.Standard,
+      all_models.Contract,
+      all_models.Regulation,
+      all_models.Policy,
+      all_models.Program,
+      all_models.Threat,
+      all_models.Objective,
+  )
+  def test_put_comment_empty_text(self, model):
+    """Test update review comment for {}."""
+    obj = factories.get_model_factory(model.__name__)()
+    obj_id = obj.id
+    resp, _ = generate_review_object(obj, email_message="Test1")
+    self.assertEqual(201, resp.status_code)
+    resp, _ = generate_review_object(obj, email_message="")
+    self.assertEqual(201, resp.status_code)
+    obj = model.query.get(obj_id)
+    comments = list(obj.related_objects(_types=["Comment"]))
+    self.assertEqual(2, len(comments))
+    comments = sorted(comments, key=lambda comment: comment.id)
+
+    self.assertEqual(
+        u"<p>Review requested from</p><p>user@example.com</p>"
+        u"<p>with a comment: Test1</p>",
+        comments[0].description
+    )
+    self.assertEqual(u"<p>Review requested from</p><p>user@example.com</p>",
+                     comments[1].description)

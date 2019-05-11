@@ -297,16 +297,21 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
     text = self.clear_text(text)
 
+    # pylint: disable=not-an-iterable
     existing_people = set(acp.person.email
                           for acl in self._access_control_list
                           for acp in acl.access_control_people)
     comment_text = (
         u"<p>Review requested from</p><p>{people}</p>"
-        u"<p>with a comment:</p><p>{text}</p>"
     ).format(
-        text=text,
         people=', '.join(existing_people),
     )
+    if text:
+      comment_text += (
+          u"<p>with a comment: {text}</p>"
+      ).format(
+          text=text,
+      )
     self.add_comment(
         comment_text,
         source=self.reviewable,
@@ -330,6 +335,10 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
   def handle_posted_after_commit(self, event):
     """Handle POST after commit."""
+    self.apply_mentions_comment(obj=self.reviewable, event=event)
+
+  def handle_put_after_commit(self, event):
+    """Handle PUT after commit."""
     self.apply_mentions_comment(obj=self.reviewable, event=event)
 
   def _create_relationship(self):

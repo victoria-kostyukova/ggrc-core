@@ -264,7 +264,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     self.apply_mentions_comment(obj=self.instance, event=event)
 
   def handle_put_after_commit(self, event):
-    """Handle POST after commit."""
+    """Handle PUT after commit."""
     self.apply_mentions_comment(obj=self.instance, event=event)
 
 
