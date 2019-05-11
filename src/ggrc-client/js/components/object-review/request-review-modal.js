@@ -4,7 +4,11 @@
  */
 
 import template from './templates/request-review-modal.stache';
-import {createReviewInstance, saveReview} from '../../plugins/utils/object-review-utils';
+import {
+  createReviewInstance,
+  saveReview,
+} from '../../plugins/utils/object-review-utils';
+import {REFRESH_COMMENTS} from '../../events/eventTypes';
 
 export default can.Component.extend({
   tag: 'request-review-modal',
@@ -62,6 +66,7 @@ export default can.Component.extend({
             type: 'reviewersUpdated',
             review,
           });
+          this.attr('parentInstance').dispatch(REFRESH_COMMENTS);
         })
         .always(() => {
           this.attr('loading', false);
