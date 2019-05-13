@@ -89,6 +89,7 @@ class WorkflowCycleRestService(base_rest_service.ObjectRestService):
   def _map_to_rest_for_create_obj(obj):
     """See superclass."""
     return dict(
+        title=obj.title,
         autogenerate=True,
         context=obj.rest_context,
         workflow=rest_convert.to_basic_rest_obj(obj.workflow)
