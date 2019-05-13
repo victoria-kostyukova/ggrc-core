@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Conversions from UI dicts to App entities."""
 from lib.app_entity_factory import (
-    person_entity_factory, workflow_entity_factory, entity_factory_common)
+    person_entity_factory, workflow_entity_factory, entity_factory_common,
+    threat_entity_factory)
 from lib.utils import date_utils
 
 
@@ -10,7 +11,8 @@ def ui_to_app(obj_name, ui_dict):
   """Converts ui_dict to app_entity."""
   method_name = {
       "workflow": workflow_ui_to_app,
-      "cycle_task": cycle_task_ui_to_app
+      "cycle_task": cycle_task_ui_to_app,
+      "threat": threat_ui_to_app
   }[obj_name]
   return method_name(ui_dict)
 
@@ -64,6 +66,23 @@ def cycle_task_ui_to_app(ui_dict):
       assignees=emails_to_app_people(ui_dict.get("assignees")),
       due_date=str_to_date(ui_dict["due_date"]),
       comments=comment_dicts_to_entities(ui_dict["comments"])
+  )
+
+
+def threat_ui_to_app(ui_dict):
+  """Converts Threat ui dict to App entity."""
+  return threat_entity_factory.ThreatFactory().create_empty(
+      admins=emails_to_app_people(ui_dict["admins"]),
+      code=ui_dict["code"],
+      comments=ui_dict["comments"],
+      created_at=date_utils.ui_str_with_zone_to_datetime(
+          ui_dict["created_at"]),
+      modified_by=email_to_app_person(ui_dict["last_updated_by"]),
+      obj_id=int(ui_dict["id"]),
+      title=ui_dict["title"],
+      state=ui_dict["state"],
+      updated_at=date_utils.ui_str_with_zone_to_datetime(
+          ui_dict["updated_at"])
   )
 
 

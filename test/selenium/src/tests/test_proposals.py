@@ -12,6 +12,7 @@ from lib.constants import roles, object_states
 from lib.service import rest_facade, proposal_ui_facade, proposal_rest_service
 
 
+@pytest.mark.skipif(reason="Proposals are temporarily unavailable.")
 class TestProposalsDestructive(base.Test):
   """Tests for Proposals"""
   _data = None

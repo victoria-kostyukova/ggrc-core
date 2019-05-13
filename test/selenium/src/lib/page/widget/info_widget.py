@@ -64,7 +64,7 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     # for overridable methods
     if (self.__class__ in
         [Controls, Programs, Regulations, Objectives, Contracts,
-         Policies, Risks, Standards, Threats, Requirements]):
+         Policies, Risks, Standards, Threat, Requirements]):
       if self.is_info_page:
         self.tabs.ensure_tab(self._attributes_tab_name)
     self.comment_area = self._comment_area()
@@ -1012,12 +1012,16 @@ class Risks(InfoWidget):
     return related_proposals.RelatedProposals()
 
 
-class Threats(InfoWidget):
+class Threat(InfoWidget):
   """Model for Threat object Info pages and Info panels."""
   _locators = locator.WidgetInfoThreat
 
-  def __init__(self, driver):
-    super(Threats, self).__init__(driver)
+  def __init__(self, driver=None):
+    super(Threat, self).__init__(driver)
+
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(admins=self.admins.get_people_emails())
 
 
 class People(base.Widget):
