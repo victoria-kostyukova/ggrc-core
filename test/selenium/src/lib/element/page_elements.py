@@ -160,7 +160,8 @@ class AssessmentEvidenceUrls(object):
 
   def __init__(self, container):
     self._root = container.element(
-        class_name="info-pane__section-title", text="Evidence URL").parent()
+        class_name="info-pane__section-title_spinnerable",
+        text="Evidence URL").parent()
 
   def add_url(self, url):
     """Add url"""

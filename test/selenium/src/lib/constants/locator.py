@@ -1202,10 +1202,6 @@ class MultiInputItem(object):
 
 class CommentsPanel(object):
   """Locators for comments' panel."""
-  HEADER_LBL_CSS = (By.CSS_SELECTOR, ".info-pane__section-title")
-  INPUT_TXT_CSS = (By.CSS_SELECTOR, ".ql-editor")
-  CB_SEND_CSS = (By.CSS_SELECTOR, ".comment-add-form__toolbar-item")
-  ADD_BTN_CSS = (By.CSS_SELECTOR, "comment-add-button")
   ITEMS_CSS = (By.CSS_SELECTOR, "comment-list-item")
 
 
