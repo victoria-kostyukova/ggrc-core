@@ -266,7 +266,8 @@ class CommonModalUnifiedMapper(object):
   MODAL_CSS = (By.CSS_SELECTOR, MODAL)
   MODAL_FILTER = Common.MODAL_FILTER
   FILTER_TOGGLE_CSS = (By.CSS_SELECTOR,
-                       MODAL_FILTER + " collapse-panel-click-area")
+                       MODAL_FILTER +
+                       " button.collapsible-panel-header__toggle-button")
   FILTER_ADD_ATTRIBUTE_BTN = (By.XPATH, "//button[text()='Add Attribute']")
   FILTER_ROW_CSS = (By.CSS_SELECTOR, ".filter-container__attribute")
   FILTER_OPERATOR = (By.CSS_SELECTOR, ".filter-operator__content select")
@@ -288,7 +289,7 @@ class CommonModalUnifiedMapper(object):
   BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
                          " .btn-map")
   RESULT_TOGGLE_CSS = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
-                       " collapse-panel-click-area")
+                       " button.collapsible-panel-header__toggle-button")
   CLOSE_BTN_CSS = (By.CSS_SELECTOR,
                    MODAL + Common.MODAL_HEADER + " a.modal-dismiss")
 
@@ -314,8 +315,6 @@ class ModalCloneOrCreateAssessmentTemplates(CommonModalUnifiedMapper):
   """Locators for clone or create Assessment Templates modal."""
   MODAL = Common.MODAL_MAPPER
   CREATE_ASMT_TMPL_BTN_CSS = (By.CSS_SELECTOR, MODAL + " .create-control")
-  RESULT_TOGGLE_CSS = (By.CSS_SELECTOR, MODAL +
-                       " .modal-footer--trailed collapse-panel-click-area")
 
 
 class BaseModalCreateNew(object):
