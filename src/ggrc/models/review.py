@@ -6,6 +6,7 @@
 import datetime
 
 import sqlalchemy as sa
+from sqlalchemy import inspect
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -303,15 +304,11 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
                           for acp in acl.access_control_people)
     comment_text = (
         u"<p>Review requested from</p><p>{people}</p>"
+        u"<p>with a comment: {text}</p>"
     ).format(
         people=', '.join(existing_people),
+        text=text,
     )
-    if text:
-      comment_text += (
-          u"<p>with a comment: {text}</p>"
-      ).format(
-          text=text,
-      )
     self.add_comment(
         comment_text,
         source=self.reviewable,
@@ -320,7 +317,8 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
 
   def handle_post(self):
     """Handle POST request."""
-    self._add_comment_about(self.email_message)
+    if self.email_message:
+      self._add_comment_about(self.email_message)
     self._create_relationship()
     self._update_new_reviewed_by()
     if (self.notification_type == Review.NotificationTypes.EMAIL_TYPE and
@@ -328,9 +326,16 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
             not isinstance(self.reviewable, synchronizable.Synchronizable)):
       add_notification(self, Review.NotificationObjectTypes.REVIEW_CREATED)
 
+  def is_status_changed_to(self, required_status):
+    """Checks whether the status has changed."""
+    return (inspect(self).attrs.status.history.has_changes() and
+            self.status == required_status)
+
   def handle_put(self):
     """Handle PUT request."""
-    self._add_comment_about(self.email_message)
+    if (not self.is_status_changed_to(Review.STATES.REVIEWED) and
+       self.email_message):
+      self._add_comment_about(self.email_message)
     self._update_reviewed_by()
 
   def handle_posted_after_commit(self, event):

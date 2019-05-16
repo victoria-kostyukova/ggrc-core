@@ -60,13 +60,9 @@ class TestCommentsForReview(TestCase):
     self.assertEqual(201, resp.status_code)
     obj = model.query.get(obj_id)
     comments = list(obj.related_objects(_types=["Comment"]))
-    self.assertEqual(2, len(comments))
-    comments = sorted(comments, key=lambda comment: comment.id)
-
+    self.assertEqual(1, len(comments))
     self.assertEqual(
         u"<p>Review requested from</p><p>user@example.com</p>"
         u"<p>with a comment: Test1</p>",
         comments[0].description
     )
-    self.assertEqual(u"<p>Review requested from</p><p>user@example.com</p>",
-                     comments[1].description)
