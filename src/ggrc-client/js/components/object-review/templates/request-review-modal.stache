@@ -35,7 +35,7 @@
               <rich-text
                 hiddenToolbar:from="true"
                 placeholder:from="'Enter comment'"
-                content:bind="review.email_message"
+                content:bind="reviewEmailMessage"
                 withMentions:from="true">
               </rich-text>
             </div>

@@ -30,6 +30,7 @@ export default can.Component.extend({
     parentInstance: null,
     loading: false,
     review: null,
+    reviewEmailMessage: null,
     modalState: {
       open: false,
     },
@@ -58,10 +59,12 @@ export default can.Component.extend({
 
       this.attr('loading', true);
       review.attr('status', 'Unreviewed');
+      review.attr('email_message', this.attr('reviewEmailMessage'));
 
       saveReview(review, this.attr('parentInstance'))
         .then((review) => {
           this.attr('modalState.open', false);
+          this.attr('reviewEmailMessage', null);
           this.dispatch({
             type: 'reviewersUpdated',
             review,
