@@ -4,6 +4,7 @@
  */
 
 import '../../dropdown/dropdown-component';
+import '../../dropdown/dropdown-wrap-text';
 import template from './dropdown-form-field.stache';
 
 export default can.Component.extend({

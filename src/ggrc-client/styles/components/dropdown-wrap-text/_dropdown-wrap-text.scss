@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+$dropdown-body-border-color: rgba(0, 0, 0, 0.2);
+
+dropdown-wrap-text {
+  .dropdown-wrap-text__input {
+    @extend %form-field-dropdown-input;
+    cursor: pointer;
+    user-select: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  }
+
+  .dropdown-wrap-text__body-wrapper {
+    position: relative;
+    display: none;
+
+    &.open {
+      display: block;
+    }
+  }
+
+  .dropdown-wrap-text__body {
+    background-color: $dropdown-list-background;
+    position: absolute;
+    top: -1px !important;
+    z-index: 2000;
+    border-radius: 4px;
+    border: 1px solid $dropdown-body-border-color;
+    box-shadow: 0 5px 10px $dropdown-body-border-color;
+    box-sizing: border-box;
+
+    overflow-y: auto;
+    max-height: 310px;
+
+    width: max-content;
+    max-width: 600px;
+    min-width: 100%;
+  }
+
+  .dropdown-wrap-text__element {
+    padding: 6px 14px 6px 8px;
+    display: flex;
+
+    &:hover {
+      background-color: $dropdown-elemet-hover;
+      color: #fff;
+    }
+
+    .dropdown-wrap-text__element-selected-icon {
+      width: 8px;
+      padding-right: 8px;
+      align-self: center;
+    }
+
+    .dropdown-wrap-text__element-title {
+      width: 100%;
+    }
+  }
+}

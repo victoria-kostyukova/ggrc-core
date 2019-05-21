@@ -1,0 +1,31 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<input
+  readonly="readonly"
+  tabindex="{{tabIndex}}"
+  class="dropdown-wrap-text__input input-block-level {{#if isDisabled}}disabled{{/if}}"
+  {{#if controlId}}
+    id="{{controlId}}"
+  {{/if}}
+  on:el:click="onInputClick"
+  el:value:from="selected.title"/>
+
+<div class="dropdown-wrap-text__body-wrapper {{#if isOpen}}open{{/if}}">
+  <div class="dropdown-wrap-text__body">
+    {{#options}}
+      <div class="dropdown-wrap-text__element" on:el:click="onSelectOption">
+        <div class="dropdown-wrap-text__element-selected-icon">
+          {{#if isSelectedOption}}
+            ✓
+          {{/if}}
+        </div>
+        <div class="dropdown-wrap-text__element-title">
+          {{title}}
+        </div>
+      </div>
+    {{/options}}
+  </div>
+</div>
