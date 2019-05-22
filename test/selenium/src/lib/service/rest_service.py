@@ -400,7 +400,11 @@ class ObjectsInfoService(HelpRestService):
       return self.get_obj_dict(objects.get_obj_type(objects.COMMENTS),
                                filters=filters, order_by=order_by)
 
-    return Representation.repr_dict_to_obj(get_obj_comment_response_values[0])
+    comment = entities_factory.CommentsFactory().create()
+    comment.__dict__.update(
+        {k: v for k, v in get_obj_comment_response_values[0].iteritems()
+         if v and k not in ["type", ]})
+    return comment
 
   def get_person(self, email):
     """Get and return person object by email"""

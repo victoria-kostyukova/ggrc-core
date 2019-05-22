@@ -153,8 +153,10 @@ class Common(object):
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   OTHERS = "Others"
   OBJECT_REVIEW = "Object review"
-  APPROVED_DATE_REGEX = r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M " \
-                        r"(\+|\-)\d{2}:\d{2}"
+  REVIEW_COMMENT_PATTERN = (
+      "Review requested from\n{email}\nwith a comment: {comment}")
+  APPROVED_DATE_REGEX = (
+      r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M (\+|\-)\d{2}:\d{2}")
 
 
 class CommonModalCreate(object):

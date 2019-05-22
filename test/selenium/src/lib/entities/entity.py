@@ -661,6 +661,13 @@ class CommentEntity(Representation):
   def __lt__(self, other):
     return self.description < other.description
 
+  def repr_ui(self):
+    """Represents UI view of comment."""
+    ui_attrs = copy.deepcopy(self.attrs_names_to_repr)
+    ui_attrs.remove("type")
+    return dict(
+        zip(ui_attrs, [getattr(self, ui_attr) for ui_attr in ui_attrs]))
+
 
 class PersonEntity(Entity):
   """Class that represent model for Person entity."""

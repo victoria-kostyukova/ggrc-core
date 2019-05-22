@@ -197,14 +197,21 @@ def check_user_menu_has_icons(user_menu):
 def submit_obj_for_review(selenium, obj, reviewer):
   """Submit object for review scenario.
   Returns obj with assigned review."""
+  review_comment = string_utils.StringMethods.random_string()
   _get_ui_service(selenium, obj).submit_for_review(
-      obj, reviewer.email, string_utils.StringMethods.random_string())
+      obj, reviewer.email, review_comment)
   exp_review = entities_factory.ReviewsFactory().create(
       is_add_rest_attrs=True,
       reviewers=reviewer,
       status=element.ReviewStates.UNREVIEWED)
   obj.review = exp_review.convert_review_to_dict()
   obj.review_status = exp_review.status
+  exp_comment = entities_factory.CommentsFactory().create(
+      description=element.Common.REVIEW_COMMENT_PATTERN.format(
+          email=reviewer.email, comment=review_comment))
+  exp_comment.created_at = rest_service.ObjectsInfoService().get_comment_obj(
+      paren_obj=obj, comment_description=review_comment).created_at
+  obj.comments = [exp_comment.repr_ui()]
   return obj
 
 
