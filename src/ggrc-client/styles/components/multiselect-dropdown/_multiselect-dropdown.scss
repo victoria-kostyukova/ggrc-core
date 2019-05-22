@@ -27,7 +27,7 @@
     cursor: pointer;
     user-select: none;
     text-overflow: ellipsis;
-    background-color: white;
+    background-color: $dropdown-list-background;
     border-radius: 2px;
     color: rgb(85, 85, 85);
     font-size: 12px;
@@ -94,7 +94,7 @@
 
     &__element {
       &:hover {
-        background-color: #4599FE;
+        background-color: $dropdown-elemet-hover;
       }
     }
 
