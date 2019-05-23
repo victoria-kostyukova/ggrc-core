@@ -4,12 +4,23 @@
 }}
 
 <div class="input-wrapper {{#if isNoneSelected}}none-selected{{/if}}">
-  <dropdown-component name:bind="inputValue"
-            isDisabled:from="disabled"
-            optionsList:from="options"
-            isGroupedDropdown:from="isGroupedDropdown"
-            optionsGroups:from="dropdownOptionsGroups"
-            noValue:from="noValue"
-            controlId:from="'form-field-{{fieldId}}'">
-  </dropdown-component>
+  {{#if isLocalCa}}
+    <dropdown-wrap-text
+      value:bind="inputValue"
+      isDisabled:from="disabled"
+      optionsList:from="options"
+      noValue:from="noValue"
+      controlId:from="'form-field-{{fieldId}}'"
+    >
+    </dropdown-wrap-text>
+  {{else}}
+    <dropdown-component name:bind="inputValue"
+      isDisabled:from="disabled"
+      optionsList:from="options"
+      isGroupedDropdown:from="isGroupedDropdown"
+      optionsGroups:from="dropdownOptionsGroups"
+      noValue:from="noValue"
+      controlId:from="'form-field-{{fieldId}}'">
+    </dropdown-component>
+  {{/if}}
 </div>
