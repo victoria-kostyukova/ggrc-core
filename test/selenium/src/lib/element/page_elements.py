@@ -495,25 +495,31 @@ class MultiselectCAActionsStrategy(CAActionsStrategy):
 class DropdownCAActionsStrategy(CAActionsStrategy):
   """Actions for Dropown CA."""
 
-  def __init__(self, *args):
-    super(DropdownCAActionsStrategy, self).__init__(*args)
-    self._input = self._root.select(class_name="input-block-level")
+  def _gcas_input(self):
+    """Gets global custom attribute input element."""
+    return self._root.select(class_name="input-block-level")
+
+  def _lcas_input(self):
+    """Gets local custom attribute input element."""
+    return self._root.input(class_name="dropdown-wrap-text__input")
 
   def get_gcas_from_inline(self):
     """Gets value of inline GCA field."""
-    return self._input.value
+    return self._gcas_input().value
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    return self._input.value
+    return self._lcas_input().value
 
   def set_lcas_from_inline(self, value):
     """Sets value of inline LCA field."""
-    self._input.select(value)
+    dropdown = self._root.element(tag_name="dropdown-wrap-text")
+    dropdown.click()
+    dropdown.div(text=value).click()
 
   def _fill_input_field(self, value):
     """Fills input field."""
-    self._input.select(value)
+    self._gcas_input().select(value)
 
 
 class PersonCAActionsStrategy(CAActionsStrategy):

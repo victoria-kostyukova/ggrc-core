@@ -722,22 +722,15 @@ class Assessments(InfoWidget):
     base.Button(self.info_widget_elem,
                 WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
 
-  def choose_and_fill_dropdown_lca(self, dropdown_id, option_title, **kwargs):
+  def choose_and_fill_dropdown_lca(self, dropdown, **kwargs):
     """Choose and fill comment or url for Assessment dropdown."""
-    self.select_ca_dropdown_option(dropdown_id, option_title)
+    self.fill_ca_values({dropdown.title: dropdown.multi_choice_options},
+                        is_global=False,
+                        is_inline=True)
     set_value_for_asmt_ca.SetValueForAsmtDropdown(
         self._driver).fill_dropdown_lca(**kwargs)
     selenium_utils.get_when_clickable(
         self._driver, WidgetInfoAssessment.BUTTON_COMPLETE)
-
-  def select_ca_dropdown_option(self, dropdown_id, option_value):
-    """Select custom attribute dropdown option."""
-    dropdown_locator = (
-        By.CSS_SELECTOR, "#form-field-{}".format(dropdown_id))
-    selenium_utils.get_when_clickable(
-        self.info_widget_elem, dropdown_locator)
-    base.DropdownStatic(self.info_widget_elem,
-                        dropdown_locator).select(option_value)
 
   def edit_answers(self):
     """Click to Edit Answers and Confirm"""

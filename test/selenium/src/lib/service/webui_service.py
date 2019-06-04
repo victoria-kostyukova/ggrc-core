@@ -709,8 +709,7 @@ class AssessmentsService(BaseWebUiService):
   def choose_and_fill_dropdown_lca(self, asmt, dropdown, **kwargs):
     """Fill dropdown LCA for Assessment."""
     asmt_info = self.open_info_page_of_obj(asmt)
-    asmt_info.choose_and_fill_dropdown_lca(
-        dropdown.id, dropdown.multi_choice_options, **kwargs)
+    asmt_info.choose_and_fill_dropdown_lca(dropdown, **kwargs)
 
 
 class ControlsService(SnapshotsWebUiService):
