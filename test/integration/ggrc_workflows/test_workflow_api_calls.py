@@ -67,7 +67,8 @@ class TestWorkflowsApiPost(TestCase):
         all_models.AccessControlList.object_type == "BackgroundTask"
     ).count()
 
-    all_acl_count = all_models.AccessControlList.query.count()
+    all_acl_count = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type != 'PersonProfile').count()
     self.assertEqual(all_acl_count - bg_task_count, exp_acl_count)
 
   def test_acl_on_object_deletion(self):
@@ -101,7 +102,8 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.delete(workflow)
     self.assert200(response)
 
-    acl_count = all_models.AccessControlList.query.count()
+    acl_count = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type != 'PersonProfile').count()
     bg_acl_count = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.object_type == "BackgroundTask"
     ).count()
@@ -173,7 +175,7 @@ class TestWorkflowsApiPost(TestCase):
     ac_people = all_models.AccessControlPerson.query.filter(
         all_models.AccessControlPerson.person_id == task_group.contact_id,
     ).all()
-    self.assertEqual(len(ac_people), 1)
+    self.assertEqual(len(ac_people), 2)
 
     actual = {
         (acp.ac_list.object_type, acp.ac_list.object_id)

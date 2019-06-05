@@ -39,6 +39,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         description=''
     )
 
+    self.profile.add_person_with_role_name(self, "Admin")
+
   __tablename__ = 'people'
 
   email = deferred(db.Column(db.String, nullable=False), 'Person')

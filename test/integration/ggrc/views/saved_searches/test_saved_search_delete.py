@@ -33,35 +33,36 @@ class TestSavedSearchDelete(TestCase):
 
     super(TestSavedSearchDelete, cls).setUpClass()
 
-    cls._person_0 = Person(
-        name="Aniki",
-        email="aniki_baniki_{}@test.com".format(random()),
-    )
-    db.session.add(cls._person_0)
-    db.session.flush()
+    with app.app_context():
+      cls._person_0 = Person(
+          name="Aniki",
+          email="aniki_baniki_{}@test.com".format(random()),
+      )
+      db.session.add(cls._person_0)
+      db.session.flush()
 
-    saved_search = SavedSearch(
-        name="test_ss_1",
-        query=[{
-            "object_name": "Assessment",
-            "filters": {"expression": {}},
-            "limit": [0, 10],
-            "order_by":[{"name": "updated_at", "desc": True}]
-        }],
-        object_type="Assessment",
-        user=cls._person_0,
-    )
-    cls._person_0.saved_searches.append(saved_search)
-    db.session.flush()
+      saved_search = SavedSearch(
+          name="test_ss_1",
+          query=[{
+              "object_name": "Assessment",
+              "filters": {"expression": {}},
+              "limit": [0, 10],
+              "order_by":[{"name": "updated_at", "desc": True}]
+          }],
+          object_type="Assessment",
+          user=cls._person_0,
+      )
+      cls._person_0.saved_searches.append(saved_search)
+      db.session.flush()
 
-    cls._user_role = setup_user_role(cls._person_0)
-    db.session.commit()
+      cls._user_role = setup_user_role(cls._person_0)
+      db.session.commit()
 
-    cls._client, cls._headers = get_client_and_headers(
-        app, cls._person_0,
-    )
+      cls._client, cls._headers = get_client_and_headers(
+          app, cls._person_0,
+      )
 
-    cls._saved_search_id = saved_search.id
+      cls._saved_search_id = saved_search.id
 
   def setUp(self):
     self._client.get("/login", headers=self._headers)

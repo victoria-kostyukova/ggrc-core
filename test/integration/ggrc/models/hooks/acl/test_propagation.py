@@ -75,10 +75,10 @@ class TestPropagation(BaseTestPropagation):
 
     acl_entries = [acl.id for acl in audit.program._access_control_list]
 
-    self.assertEqual(all_models.AccessControlList.query.count(), 7)
+    self.assertEqual(all_models.AccessControlList.query.count(), 9)
     propagation._handle_acl_step(acl_entries, self.user_id)
     db.session.commit()
-    self.assertEqual(all_models.AccessControlList.query.count(), 13)
+    self.assertEqual(all_models.AccessControlList.query.count(), 15)
 
   @ddt.data(0, 2, 3)
   def test_single_acl_to_multiple(self, count):
@@ -122,14 +122,15 @@ class TestPropagation(BaseTestPropagation):
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
-        11  # 5 program roles, 6 audit roles
+        12  # 5 program roles, 6 audit roles 1 person_profile role
     )
     propagation._handle_acl_step(acl_ids, self.user_id)
 
     self.assertEqual(
         all_models.AccessControlList.query.count(),
-        11 + 3 * 3 * 2
+        11 + 1 + 3 * 3 * 2
         # 11 previous roles
+        # 1 person_profile role
         # 3 audits
         # 3 program propagated roles
         # 2 propagations per audit (audit + relationship)
@@ -275,7 +276,7 @@ class TestPropagation(BaseTestPropagation):
 
       db.session.commit()
 
-      self.assertEqual(all_models.AccessControlList.query.count(), 13)
+      self.assertEqual(all_models.AccessControlList.query.count(), 14)
 
   def test_propagate_all(self):
     """Test clean propagation of all ACL entries."""
@@ -290,9 +291,9 @@ class TestPropagation(BaseTestPropagation):
     acl_ids = [acl.id for acl in audit.program._access_control_list]
 
     propagation._propagate(acl_ids, self.user_id)
-    self.assertEqual(all_models.AccessControlList.query.count(), 17)
+    self.assertEqual(all_models.AccessControlList.query.count(), 18)
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 25)
+    self.assertEqual(all_models.AccessControlList.query.count(), 27)
 
   def test_creating_missing_acl_entries(self):
     """Test clean propagation of all ACL entries."""
@@ -302,12 +303,13 @@ class TestPropagation(BaseTestPropagation):
       factories.RelationshipFactory(source=audit, destination=audit.program)
 
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 25)
+    self.assertEqual(all_models.AccessControlList.query.count(), 27)
+    all_models.AccessControlPerson.query.delete()
     all_models.AccessControlList.query.delete()
     db.session.commit()
     self.assertEqual(all_models.AccessControlList.query.count(), 0)
     propagation.propagate_all()
-    self.assertEqual(all_models.AccessControlList.query.count(), 25)
+    self.assertEqual(all_models.AccessControlList.query.count(), 27)
 
   def test_complex_propagation_count(self):
     """Test multiple object ACL propagation.

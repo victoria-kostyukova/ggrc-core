@@ -199,7 +199,7 @@ class TestAccessControlList(TestCase):
         all_models.Revision.query.filter_by(
             resource_type="AccessControlPerson"
         ).count(),
-        2
+        3
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
@@ -221,7 +221,7 @@ class TestAccessControlList(TestCase):
         all_models.Revision.query.filter_by(
             resource_type="AccessControlPerson"
         ).count(),
-        3
+        4
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(

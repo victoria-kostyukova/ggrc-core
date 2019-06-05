@@ -267,8 +267,8 @@ class TestAssessment(TestAssessmentBase):
     assignee_acl = all_models.AccessControlPerson.query.filter_by(
         person_id=person_ids[0]
     )
-    # All roles for first person should be removed
-    self.assertEqual(assignee_acl.count(), 0)
+    # All roles for first person should be removed except person_profile
+    self.assertEqual(assignee_acl.count(), 1)
     db.session.add(audit)
     for ac_role in self.assignee_roles.keys():
       self.assert_mapped_role(ac_role, person_email, assessment)

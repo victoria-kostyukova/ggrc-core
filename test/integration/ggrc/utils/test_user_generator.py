@@ -148,8 +148,10 @@ class TestUserGenerator(TestCase):
 
     # checks person profile was created successfully
     emails = ['aturing@example.com', ]
+    acp_person_ids = [user.id]
     self.assert_person_profile_created(emails)
     self.assert_profiles_restrictions()
+    self.assert_acp_created(acp_person_ids)
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')

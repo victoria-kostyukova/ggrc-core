@@ -39,16 +39,17 @@ class TestSavedSearchPost(TestCase):
     }]
 
     email_0 = "aniki_baniki_{}@test.com".format(random())
-    cls._person_0 = Person(name="Aniki", email=email_0)
-    db.session.add(cls._person_0)
-    db.session.flush()
+    with app.app_context():
+      cls._person_0 = Person(name="Aniki", email=email_0)
+      db.session.add(cls._person_0)
+      db.session.flush()
 
-    cls._user_role = setup_user_role(cls._person_0)
-    db.session.commit()
+      cls._user_role = setup_user_role(cls._person_0)
+      db.session.commit()
 
-    cls._client, cls._headers = get_client_and_headers(
-        app, cls._person_0,
-    )
+      cls._client, cls._headers = get_client_and_headers(
+          app, cls._person_0,
+      )
 
   def setUp(self):
     self._client.get("/login", headers=self._headers)

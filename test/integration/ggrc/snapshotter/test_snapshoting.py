@@ -149,7 +149,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.assertEqual(snapshot_revision_content["child_type"], "Control")
     self.assertEqual(snapshot_revision_content["child_id"], control.id)
 
-    self.assertEqual(models.AccessControlPerson.query.count(), 7)
+    self.assertEqual(models.AccessControlPerson.query.count(), 15)
 
   def test_snapshot_update(self):
     """Test snapshot update with a simple change"""
