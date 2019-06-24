@@ -81,15 +81,17 @@
   </div>
 
     <div class="row-fluid">
-      <div class="span4 hidable">
-        <label>
-          Code
-          <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-        </label>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input {{^if new_object_form}} disabled {{/if}} tabindex="6" class="input-block-level" name="slug" placeholder="VENDOR-XXX" type="text" value="{{slug}}">
-      </div>
-      <div class="span4 hidable">
+      {{^if new_object_form}}
+        <div class="span4 hidable">
+          <label>
+            Code
+            <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+          </label>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          <input disabled tabindex="6" class="input-block-level" name="slug" placeholder="VENDOR-XXX" type="text" value="{{slug}}">
+        </div>
+      {{/if}}
+      <div class="span4 hidable input-block-level">
         <effective-dates instance:from="instance"/>
       </div>
     </div>

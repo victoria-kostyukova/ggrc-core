@@ -68,18 +68,20 @@
         <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
         <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
       </div>
-      <div class="row-fluid">
-        <div class="span6 hidable">
-          <div class="form-header-container">
-            <label class="form-label">
-              Code
-              <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-            </label>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      {{^if new_object_form}}
+        <div class="row-fluid">
+          <div class="span6 hidable">
+            <div class="form-header-container">
+              <label class="form-label">
+                Code
+                <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+              </label>
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            </div>
+            <input disabled tabindex="8" class="input-block-level" name="slug" placeholder="TASK-XXX" type="text" value="{{instance.slug}}">
           </div>
-          <input {{^if new_object_form}} disabled {{/if}} tabindex="8" class="input-block-level" name="slug" placeholder="TASK-XXX" type="text" value="{{instance.slug}}">
         </div>
-      </div>
+      {{/if}}
     </div>
     <div class="span4">
       <access-control-list-roles-helper instance:from="instance"

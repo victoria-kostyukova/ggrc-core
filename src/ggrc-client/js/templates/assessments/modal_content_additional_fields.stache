@@ -34,18 +34,20 @@
 </div>
 
 <div class="ggrc-form-item">
-  <div class="ggrc-form-item__multiple-row">
-    <label class="ggrc-form-item__label">
-      Code
-    </label>
-    <input {{^if new_object_form}} disabled {{/if}}
-      tabindex="14"
-      class="input-block-level"
-      name="slug"
-      placeholder="ASSESSMENT-XXX"
-      type="text"
-      value:from="slug">
-  </div>
+  {{^if new_object_form}}
+    <div class="ggrc-form-item__multiple-row">
+      <label class="ggrc-form-item__label">
+        Code
+      </label>
+      <input disabled
+        tabindex="14"
+        class="input-block-level"
+        name="slug"
+        placeholder="ASSESSMENT-XXX"
+        type="text"
+        value:from="slug">
+    </div>
+  {{/if}}
   <div class="ggrc-form-item__multiple-row">
     <label class="ggrc-form-item__label">
       Due Date

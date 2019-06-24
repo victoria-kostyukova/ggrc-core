@@ -100,18 +100,20 @@
 
   <div>
     <div class="row-fluid">
-      <div class="span4 hidable">
-        <label>
-          Code
-          <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-        </label>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input {{^if new_object_form}} disabled {{/if}} tabindex="7" class="input-block-level" name="slug" placeholder="ISSUE-XXX" type="text" value="{{slug}}">
-      </div>
-      <div class="span4 hidable">
+      {{^if new_object_form}}
+        <div class="span4 hidable">
+          <label>
+            Code
+            <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+          </label>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          <input disabled tabindex="7" class="input-block-level" name="slug" placeholder="ISSUE-XXX" type="text" value="{{slug}}">
+        </div>
+      {{/if}}
+      <div class="span4 hidable input-block-level">
         <effective-dates instance:from="instance"></effective-dates>
       </div>
-      <div class="span4 {{#instance.computed_errors.due_date}}field-failure{{/instance.computed_errors.due_date}}">
+      <div class="span4 input-block-level {{#instance.computed_errors.due_date}}field-failure{{/instance.computed_errors.due_date}}">
         <datepicker-component id="issue-due-date" date:bind="instance.due_date" 
                               label:from="'Due Date'" required:from="true" tabindex="21">
         </datepicker-component>

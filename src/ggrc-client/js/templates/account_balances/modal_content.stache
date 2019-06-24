@@ -82,17 +82,19 @@
     </div>
   </div>
 
-  <!-- Code & network block -->
-  <div class="row-fluid">
-    <div class="span6 hidable">
-      <label>
+  {{^if new_object_form}}
+    <!-- Code & network block -->
+    <div class="row-fluid">
+      <div class="span6 hidable">
+        <label>
         Code
         <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
       </label>
       <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <input {{^if new_object_form}} disabled {{/if}} tabindex="7" class="input-block-level" name="slug" placeholder="ACCOUNTBALANCE-XXX" type="text" value="{{slug}}">
+      <input disabled tabindex="7" class="input-block-level" name="slug" placeholder="ACCOUNTBALANCE-XXX" type="text" value="{{slug}}">
+      </div>
     </div>
-  </div>
+  {{/if}}
 
   <div class="row-fluid">
     <div class="span4 hidable">

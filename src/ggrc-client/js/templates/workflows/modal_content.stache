@@ -121,19 +121,21 @@
       </div>
     </div>
 
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__multiple-row">
-        <label class="ggrc-form-item__label">
-          Code
-        </label>
-        <input
-          {{^if new_object_form}} disabled {{/if}}
-          tabindex="8"
-          class="input-block-level"
-          placeholder="WORKFLOW-XXX"
-          type="text"
-          value:bind="instance.slug">
+    {{^if new_object_form}}
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__multiple-row">
+          <label class="ggrc-form-item__label">
+            Code
+          </label>
+          <input
+            disabled
+            tabindex="8"
+            class="input-block-level"
+            placeholder="WORKFLOW-XXX"
+            type="text"
+            value:bind="instance.slug">
+        </div>
       </div>
-    </div>
+    {{/if}}
   </form>
 </div>
