@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifference from 'lodash/difference';
 import moment from 'moment';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -43,7 +44,7 @@ describe('tree-item-extra-info component', function () {
 
   describe('is not active if', function () {
     let allModels = Object.keys(TreeViewConfig.attr('base_widgets_by_type'));
-    let notActiveModels = _.difference(allModels, activeModel);
+    let notActiveModels = loDifference(allModels, activeModel);
 
     it('workflow_state is not defined', function () {
       viewModel.attr('instance', {title: 'FooBar'});

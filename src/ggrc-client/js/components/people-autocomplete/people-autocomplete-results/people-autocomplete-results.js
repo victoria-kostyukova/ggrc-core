@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFindIndex from 'lodash/findIndex';
 import canStache from 'can-stache';
 import canComponent from 'can-component';
 import baseAutocompleteResults from '../../custom-autocomplete/autocomplete-results';
@@ -41,7 +42,7 @@ export default canComponent.extend({
     },
     '{viewModel} selectActive'() {
       const items = $(this.element).find('.autocomplete-item');
-      const activeIndex = _.findIndex(items,
+      const activeIndex = loFindIndex(items,
         (item) => $(item).hasClass('active'));
       this.viewModel.selectItem(activeIndex);
     },
@@ -68,7 +69,7 @@ export default canComponent.extend({
     '{viewModel} highlightPrevious'() {
       const items = $(this.element).find('.autocomplete-item');
 
-      const activeIndex = _.findIndex(items,
+      const activeIndex = loFindIndex(items,
         (item) => $(item).hasClass('active'));
 
       if (activeIndex && activeIndex > 0) {

@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loConstant from 'lodash/constant';
+import loIsEmpty from 'lodash/isEmpty';
+import loAssign from 'lodash/assign';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
 import Spinner from 'spin.js';
 import {
   warning,
@@ -57,7 +62,7 @@ let handlers = {
     };
 
     if (hasWarningType(instance)) {
-      modalSettings = _.assign(
+      modalSettings = loAssign(
         modalSettings,
         warning.settings,
         {
@@ -72,8 +77,8 @@ let handlers = {
 
     warning(
       modalSettings,
-      _.constant({}),
-      _.constant({}), {
+      loConstant({}),
+      loConstant({}), {
         controller: DeleteModalControl,
         target: $target,
       });
@@ -190,7 +195,7 @@ let handlers = {
         // (present in the DOM) if we want event handlers to be invoked.
         if (!document.contains($trigger[0])) {
           $trigger = $('[data-link-purpose="open-edit-modal"]');
-          if (_.isEmpty($trigger)) {
+          if (loIsEmpty($trigger)) {
             console.warn(WARN_MSG);
             return;
           }
@@ -431,7 +436,7 @@ $.fn.modal.Constructor.prototype.show = function () {
 
   // prevent form submissions when descendant elements are also modals.
   let keypressEvents = $._data($el[0], 'events').keypress;
-  let hasPreventDblSubmitEvent = _.find(keypressEvents, (el) => {
+  let hasPreventDblSubmitEvent = loFind(keypressEvents, (el) => {
     return el.namespace.indexOf('preventdoublesubmit') > -1;
   });
 
@@ -451,7 +456,7 @@ $.fn.modal.Constructor.prototype.show = function () {
   }
 
   let keyupEvents = $._data($el[0], 'events').keyup;
-  let hasPreventDblEscEvent = _.find(keyupEvents, (el) => {
+  let hasPreventDblEscEvent = loFind(keyupEvents, (el) => {
     return el.namespace.indexOf('preventdoubleescape') > -1;
   });
 
@@ -595,7 +600,7 @@ function registerModalHook(toggle, launchFn) {
 }
 
 $(function () {
-  _.forEach({
+  loForEach({
     '': handlers.modal,
     form: handlers.form,
     deleteform: handlers.deleteform,

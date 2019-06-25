@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loGet from 'lodash/get';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -82,7 +83,7 @@ function saveObject() {
 function createNestedProps(prefs, keyArgs) {
   let object = prefs;
   keyArgs.forEach(function (arg) {
-    let value = _.get(object, arg);
+    let value = loGet(object, arg);
     if (!value) {
       value = new canMap();
       object.attr(arg, value);
@@ -99,7 +100,7 @@ function createNestedProps(prefs, keyArgs) {
 function getObject(...args) {
   let prefs = getPreferences();
 
-  let object = _.get(prefs, args) || {};
+  let object = loGet(prefs, args) || {};
   return new canMap(object);
 }
 

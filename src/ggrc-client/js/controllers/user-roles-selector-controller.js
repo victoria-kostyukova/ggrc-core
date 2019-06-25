@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSortBy from 'lodash/sortBy';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
@@ -95,7 +96,7 @@ const userRolesModalSelector = canControl.extend({
     return Role.findAll(
       params,
       (options) => {
-        options = makeArray(_.sortBy(options, 'role_order'));
+        options = makeArray(loSortBy(options, 'role_order'));
         const description =
           'This role allows a user access to the MyWork dashboard and ' +
           'applications Help files.';

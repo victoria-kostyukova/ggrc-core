@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loHead from 'lodash/head';
+import loIndexOf from 'lodash/indexOf';
+import loIncludes from 'lodash/includes';
+import loSome from 'lodash/some';
+import loTrim from 'lodash/trim';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -20,7 +27,7 @@ export default canComponent.extend({
       isDisplayValues: {
         get() {
           let type = this.attr('selected.type');
-          return _.includes(multiChoiceable, type);
+          return loIncludes(multiChoiceable, type);
         },
       },
     },
@@ -40,8 +47,8 @@ export default canComponent.extend({
     addField() {
       let fields = this.attr('fields');
       let selected = this.attr('selected');
-      let title = _.trim(selected.title);
-      let type = _.trim(selected.type);
+      let title = loTrim(selected.title);
+      let type = loTrim(selected.type);
       let values = _.splitTrim(selected.values, {
         unique: true,
       }).join(',');
@@ -65,7 +72,7 @@ export default canComponent.extend({
         attribute_type: type,
         multi_choice_options: values,
       });
-      _.forEach(['title', 'values', 'multi_choice_options'],
+      loForEach(['title', 'values', 'multi_choice_options'],
         (type) => {
           selected.attr(type, '');
         });
@@ -102,7 +109,7 @@ export default canComponent.extend({
     init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
-        this.viewModel.attr('selected.type', _.head(types).attr('type'));
+        this.viewModel.attr('selected.type', loHead(types).attr('type'));
       }
     },
   },
@@ -114,7 +121,7 @@ export default canComponent.extend({
      */
     placeholder(options) {
       let types = this.attr('types');
-      let item = _.find(types, {
+      let item = loFind(types, {
         type: this.attr('selected.type'),
       });
       if (item) {
@@ -129,7 +136,7 @@ const isEqualTitle = (title, attr) => {
 };
 
 const isDublicateTitle = (fields, selectedTitle) => {
-  let duplicateField = _.some(fields, (item) => {
+  let duplicateField = loSome(fields, (item) => {
     return item.title.toLowerCase() === selectedTitle.toLowerCase() &&
       !item._pending_delete;
   });
@@ -145,7 +152,7 @@ const isEmptyTitle = (selectedTitle) => {
 };
 
 const isInvalidTitle = (title) => {
-  if (_.indexOf(title, '*') !== -1) {
+  if (loIndexOf(title, '*') !== -1) {
     return 'A custom attribute title cannot contain *';
   }
   return '';

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loSet from 'lodash/set';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -232,7 +233,7 @@ describe('tree-widget-container component', function () {
       beforeEach(function () {
         let modelName = 'Model';
         spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          _.set({}, modelName, 123)
+          loSet({}, modelName, 123)
         );
         vm.attr({
           options: {
@@ -266,7 +267,7 @@ describe('tree-widget-container component', function () {
           total: 123,
         });
         spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          _.set({}, modelName, 123)
+          loSet({}, modelName, 123)
         );
       });
 
@@ -294,7 +295,7 @@ describe('tree-widget-container component', function () {
           total: 123,
         });
         spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          _.set({}, modelName, 123)
+          loSet({}, modelName, 123)
         );
       });
 
@@ -324,7 +325,7 @@ describe('tree-widget-container component', function () {
           total: 123,
         });
         spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          _.set({}, modelName, 124)
+          loSet({}, modelName, 124)
         );
       });
 

@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsNull from 'lodash/isNull';
+import loUniq from 'lodash/uniq';
+import loMap from 'lodash/map';
+import loFilter from 'lodash/filter';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -93,7 +97,7 @@ export default canComponent.extend({
 
       this._results = null;
       que.enqueue(list).trigger().then(function (items) {
-        let results = _.map(items, function (item) {
+        let results = loMap(items, function (item) {
           let id = options.assessmentTemplate.split('-')[0];
           return this.generateModel(item, id);
         }.bind(this));
@@ -109,7 +113,7 @@ export default canComponent.extend({
               window.location.reload();
               return;
             }
-            ids = _.uniq(_.map(arguments, function (task) {
+            ids = loUniq(loMap(arguments, function (task) {
               return task.id;
             }));
             this.updateStatus(ids[0], 0);
@@ -156,11 +160,11 @@ export default canComponent.extend({
       if (!this._results) {
         return;
       }
-      success = _.filter(this._results, function (assessment) {
-        return !_.isNull(assessment) &&
+      success = loFilter(this._results, function (assessment) {
+        return !loIsNull(assessment) &&
           !(assessment.state && assessment.state() === 'rejected');
       }).length;
-      errors = _.filter(this._results, function (assessment) {
+      errors = loFilter(this._results, function (assessment) {
         return assessment.state && assessment.state() === 'rejected';
       }).length;
 

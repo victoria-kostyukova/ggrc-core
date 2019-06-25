@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -79,7 +80,7 @@ export default canComponent.extend({
         // Sometimes BE does not return newly created proposal through Query API
         // because of reindexing job. New proposal is added
         // on FE to the proposals list in this case to not confuse user.
-        let proposal = _.find(proposals,
+        let proposal = loFind(proposals,
           (proposal) => proposal.instance.id === newProposal.id);
 
         if (!proposal) {

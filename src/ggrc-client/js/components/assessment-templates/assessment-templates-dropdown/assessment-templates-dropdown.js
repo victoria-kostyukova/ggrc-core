@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loToArray from 'lodash/toArray';
+import loForEach from 'lodash/forEach';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -29,7 +31,7 @@ export default canComponent.extend({
         title: 'No template',
         value: '',
       };
-      _.forEach(responses, function (instance) {
+      loForEach(responses, function (instance) {
         let type;
         type = instance.template_object_type;
         if (!result[type]) {
@@ -43,7 +45,7 @@ export default canComponent.extend({
           value: instance.id + '-' + type,
         });
       });
-      return [noValue].concat(_.toArray(result));
+      return [noValue].concat(loToArray(result));
     },
     /**
      * Set the initial Assessment Template to be selected in the relevant

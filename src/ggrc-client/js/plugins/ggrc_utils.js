@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loValues from 'lodash/values';
+import loFind from 'lodash/find';
 /**
  * A module containing various utility functions.
  */
@@ -80,7 +82,7 @@ function inViewport(el) {
 }
 
 function getPickerElement(picker) {
-  return _.find(_.values(picker), function (val) {
+  return loFind(loValues(picker), function (val) {
     if (val instanceof Node) {
       return /picker-dialog/.test(val.className);
     }

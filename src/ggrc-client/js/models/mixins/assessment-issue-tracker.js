@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loGet from 'lodash/get';
 import canMap from 'can-map';
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
@@ -84,7 +85,7 @@ export default Mixin.extend(
         }, ['id', 'title', 'type', 'context', 'issue_tracker']);
 
         batchRequests(param).then((response) => {
-          this.audit = _.get(response, 'Audit.values[0]');
+          this.audit = loGet(response, 'Audit.values[0]');
           dfd.resolve(this.audit);
         });
       }

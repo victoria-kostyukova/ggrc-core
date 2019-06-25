@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loToArray from 'lodash/toArray';
+import loReduce from 'lodash/reduce';
 import {ggrcAjax} from './plugins/ajax_extensions';
 import canCompute from 'can-compute';
 import canConstruct from 'can-construct';
@@ -26,7 +28,7 @@ let _CONDITIONS_MAP = {
   },
   is: function (instance, args) {
     let value = Permission._resolve_permission_variable(args.value);
-    let propertyValue = _.reduce(args.property_name.split('.'),
+    let propertyValue = loReduce(args.property_name.split('.'),
       function (obj, key) {
         let value = obj.attr(key);
         if (value instanceof Stub) {
@@ -129,7 +131,7 @@ const Permission = canConstruct.extend({
       let i;
       let condition;
       if (this._permission_match(permissions, permission)) {
-        conditions = _.toArray(_.exists(permissions,
+        conditions = loToArray(_.exists(permissions,
           permission.action,
           permission.resource_type,
           'conditions',

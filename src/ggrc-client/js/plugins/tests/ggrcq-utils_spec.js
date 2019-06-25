@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDifference from 'lodash/difference';
 import {
   getUrl,
   getMappingUrl,
@@ -60,7 +61,7 @@ describe('GGRCQ utils', () => {
 
     it('should return False if map scope object to any non-directive', () => {
       scopingObjects.forEach((source) => {
-        _.difference(businessObjects, externalDirectiveObjects).forEach(
+        loDifference(businessObjects, externalDirectiveObjects).forEach(
           (destination) => {
             const srcModel = {model_singular: source};
             const dstModel = {model_singular: destination};
@@ -72,7 +73,7 @@ describe('GGRCQ utils', () => {
 
     it('should return False if map directive object to any non-scope', () => {
       externalDirectiveObjects.forEach((source) => {
-        _.difference(businessObjects, scopingObjects).forEach(
+        loDifference(businessObjects, scopingObjects).forEach(
           (destination) => {
             const srcModel = {model_singular: source};
             const dstModel = {model_singular: destination};

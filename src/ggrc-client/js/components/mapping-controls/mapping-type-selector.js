@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -26,7 +27,7 @@ export default canComponent.extend({
 
     groups.forEach(function (name) {
       let groupItems = types.attr(name + '.items');
-      values = values.concat(_.map(groupItems, 'value'));
+      values = values.concat(loMap(groupItems, 'value'));
     });
     if (values.indexOf(selectedType) < 0) {
       this.viewModel.attr('selectedType', values[0]);

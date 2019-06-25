@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loGroupBy from 'lodash/groupBy';
+import loIsNumber from 'lodash/isNumber';
+import loMap from 'lodash/map';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
@@ -48,7 +51,7 @@ function batchRequests(params) {
   let dfd = $.Deferred();
   batchQueue.push({dfd: dfd, params: params});
 
-  if (_.isNumber(batchTimeout)) {
+  if (loIsNumber(batchTimeout)) {
     clearTimeout(batchTimeout);
   }
 
@@ -116,7 +119,7 @@ function buildParam(objName, page, relevant, fields, filters) {
       last += page.buffer;
     }
     params.limit = [first, last];
-  } else if (_.isNumber(page.first) && _.isNumber(page.last)) {
+  } else if (loIsNumber(page.first) && loIsNumber(page.last)) {
     params.limit = [page.first, page.last];
   }
 
@@ -296,7 +299,7 @@ async function loadObjectsByTypes(relevant, types, fields) {
 }
 
 function _buildAllMappedObjectsRequest(relevant, types, fields) { // eslint-disable-line
-  return _.map(types, (type) =>
+  return loMap(types, (type) =>
     batchRequests(buildParam(
       type,
       {},
@@ -308,9 +311,9 @@ function _buildAllMappedObjectsRequest(relevant, types, fields) { // eslint-disa
 }
 
 function _buildMappedObjectsRequest(stubs, fields) { // eslint-disable-line
-  const groupedStubsByType = _.groupBy(stubs, 'type');
+  const groupedStubsByType = loGroupBy(stubs, 'type');
 
-  return _.map(groupedStubsByType, (stubs, objectsType) =>
+  return loMap(groupedStubsByType, (stubs, objectsType) =>
     batchRequests(buildParam(
       objectsType,
       {},

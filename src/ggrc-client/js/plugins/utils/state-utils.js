@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifference from 'lodash/difference';
 import {
   isMyAssessments,
   isMyWork,
@@ -143,7 +144,7 @@ function getBulkStatesForModel(model) {
 function buildStatusFilter(statuses, modelName, inverse) {
   if (inverse) {
     let allStatuses = getStatesForModel(modelName);
-    statuses = _.difference(allStatuses, statuses);
+    statuses = loDifference(allStatuses, statuses);
   }
 
   let filter = modelName === 'Assessment' ?

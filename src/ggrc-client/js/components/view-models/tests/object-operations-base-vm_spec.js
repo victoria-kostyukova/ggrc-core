@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loEvery from 'lodash/every';
 import canMap from 'can-map';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import * as Mappings from '../../../models/mappers/mappings';
@@ -157,7 +158,7 @@ describe('object-operations-base viewModel', function () {
 
       allArgs = vm.attr.calls.allArgs();
 
-      expect(_.every(allArgs, function (args) {
+      expect(loEvery(allArgs, function (args) {
         return args.length === 1;
       })).toBe(true);
     });

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import QueryParser from '../../js/generated/ggrc_filter_query_parser';
 
 describe('QueryParser', function () {
@@ -334,7 +335,7 @@ describe('QueryParser', function () {
         'title ~ "test\\""',
       ];
 
-      _.forEach(queries, function (query) {
+      loForEach(queries, function (query) {
         let value = query.split('~')[1].trim().replace(/^"|"$/g, '');
         let result = QueryParser.parse(query);
 
@@ -350,7 +351,7 @@ describe('QueryParser', function () {
         'title ~ test\\"',
       ];
 
-      _.forEach(queries, function (query) {
+      loForEach(queries, function (query) {
         let value = query.split('~')[1].trim();
         let result = QueryParser.parse(query);
 

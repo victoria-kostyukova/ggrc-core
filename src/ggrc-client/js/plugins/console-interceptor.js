@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFilter from 'lodash/filter';
 /* eslint-disable */
 const originalWarn = console.warn;
 const originalLog = console.log;
@@ -18,7 +19,7 @@ const hideTemplates = [
 ];
 
 const isHidden = function (text) {
-  let matched = _.filter(
+  let matched = loFilter(
     hideTemplates,
     (template) => text.includes && text.includes(template)
   );

@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loThrottle from 'lodash/throttle';
+import loIsFunction from 'lodash/isFunction';
+import loAssign from 'lodash/assign';
 import {ggrcAjax, ggrcGet} from '../../plugins/ajax_extensions';
 import Cacheable from '../cacheable';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
@@ -197,7 +200,7 @@ export default Cacheable.extend({
       oldModel = this.findInCacheById(id);
     }
 
-    let model = oldModel && _.isFunction(oldModel.attr) ?
+    let model = oldModel && loIsFunction(oldModel.attr) ?
       oldModel.attr(attributes) :
       new this(attributes);
 
@@ -206,7 +209,7 @@ export default Cacheable.extend({
     // In this case we have to update backup to solve isDirty issues.
     let backup = model._backupStore();
     if (backup) {
-      _.assign(backup, attributes);
+      loAssign(backup, attributes);
     }
 
     // This is a temporary solution
@@ -346,7 +349,7 @@ export default Cacheable.extend({
     if (!this._pending_refresh) {
       this._pending_refresh = {
         dfd: $.Deferred(),
-        fn: _.throttle(() => {
+        fn: loThrottle(() => {
           let dfd = this._pending_refresh.dfd;
           ggrcAjax({
             url: href,

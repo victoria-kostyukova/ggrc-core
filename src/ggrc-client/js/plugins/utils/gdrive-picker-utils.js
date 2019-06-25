@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loKeyBy from 'lodash/keyBy';
 import {gapiClient} from '../ggrc-gapi-client';
 import {getPickerElement} from '../ggrc_utils';
 
@@ -85,7 +86,7 @@ export function uploadFiles(opts = {}) {
       // NB: picker file object have different format then GDrive file objects
       // "name" <=> "title", "url" <=> "alternateLink"
       // RefreshQueue converts picker file objects into GDrive file objects
-      let pickedFilesById = _.keyBy(pickedFiles, 'id');
+      let pickedFilesById = loKeyBy(pickedFiles, 'id');
       let refreshDfds = pickedFiles.map((file) => findGDriveItemById(file.id));
       $.when(...refreshDfds).then((...files) => {
         // adding a newUpload flag so we can later distinguish newly

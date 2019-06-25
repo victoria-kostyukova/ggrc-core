@@ -3,7 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loRemove from 'lodash/remove';
+import loKeys from 'lodash/keys';
+import loGroupBy from 'lodash/groupBy';
+import loUnion from 'lodash/union';
+import loFindIndex from 'lodash/findIndex';
 import canMap from 'can-map';
+
 // #region ACL
 const buildAclObject = (person, roleId) => {
   return {
@@ -32,15 +38,15 @@ const buildRoleACL = (modifiedRoleId, currentRoleACL, modifiedRole) => {
   modifiedRoleACL = currentRoleACL.slice();
 
   shouldBeAdded = modifiedRole.added.filter((person) =>
-    _.findIndex(currentRoleACL, {person_id: person.id}) === -1
+    loFindIndex(currentRoleACL, {person_id: person.id}) === -1
   ).map((person) => buildAclObject(person, modifiedRoleId));
 
   // add new people
   modifiedRoleACL.push(...shouldBeAdded);
 
   // remove existed people
-  _.remove(modifiedRoleACL, (aclItem) =>
-    _.findIndex(modifiedRole.deleted, {id: aclItem.person_id}) > -1
+  loRemove(modifiedRoleACL, (aclItem) =>
+    loFindIndex(modifiedRole.deleted, {id: aclItem.person_id}) > -1
   );
 
   return modifiedRoleACL;
@@ -57,9 +63,9 @@ const buildModifiedACL = (instance, modifiedRoles) => {
     return instance.access_control_list;
   }
 
-  aclRoles = _.groupBy(instance.access_control_list, 'ac_role_id');
-  allRoles = _.union(
-    _.keys(aclRoles).map((key) => Number(key)),
+  aclRoles = loGroupBy(instance.access_control_list, 'ac_role_id');
+  allRoles = loUnion(
+    loKeys(aclRoles).map((key) => Number(key)),
     modifiedRolesKeys
   );
 
@@ -89,7 +95,7 @@ const buildModifiedListField = (currentField, modifiedItem) => {
   modifiedField = currentField.slice();
 
   modifiedItem.added.forEach((item) => {
-    const index = _.findIndex(modifiedField, {id: item.id});
+    const index = loFindIndex(modifiedField, {id: item.id});
 
     if (!item.hasOwnProperty('display_name')) {
       item.display_name = item.title || item.name;
@@ -104,8 +110,8 @@ const buildModifiedListField = (currentField, modifiedItem) => {
   });
 
   // remove deleted items
-  _.remove(modifiedField, (item) =>
-    _.findIndex(modifiedItem.deleted, {id: item.id}) > -1);
+  loRemove(modifiedField, (item) =>
+    loFindIndex(modifiedItem.deleted, {id: item.id}) > -1);
 
   return modifiedField;
 };
@@ -147,7 +153,7 @@ const buildModifiedAttValues = (values, definitions, modifiedAttrs) => {
   // convert to string.
   const valueKeys = values.map((val) => `${val.custom_attribute_id}`);
   const caKeys = canMap.keys(modifiedAttrs);
-  const modifiedValues = _.union(valueKeys, caKeys).map((attrId) => {
+  const modifiedValues = loUnion(valueKeys, caKeys).map((attrId) => {
     let attr;
     let modifiedAttr;
     attrId = Number(attrId);

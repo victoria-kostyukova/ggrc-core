@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loCapitalize from 'lodash/capitalize';
 import * as businessModels from '../../models/business-models';
 
 /**
@@ -52,7 +53,7 @@ function getMegaObjectConfig(modelName) {
     name: originalModelName,
     originalModelName,
     widgetId: modelName,
-    widgetName: `${_.capitalize(relation)} ${modelTitle}`,
+    widgetName: `${loCapitalize(relation)} ${modelTitle}`,
     relation: relation,
     isMegaObject: true,
   };

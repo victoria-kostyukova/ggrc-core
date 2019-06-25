@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMerge from 'lodash/merge';
+import loIsEqual from 'lodash/isEqual';
 import {
   simpleFieldResolver,
   customAttributeResolver,
@@ -42,13 +44,13 @@ export function tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj) {
 }
 
 export default function resolveConflict(xhr, obj, remoteAttrs) {
-  let attrs = _.merge({}, obj.attr());
-  let baseAttrs = _.merge({}, obj._backupStore()) || {};
+  let attrs = loMerge({}, obj.attr());
+  let baseAttrs = loMerge({}, obj._backupStore()) || {};
 
-  if (_.isEqual(remoteAttrs, attrs)) {
+  if (loIsEqual(remoteAttrs, attrs)) {
     // current state is same as server state -- do nothing.
     return obj;
-  } else if (_.isEqual(remoteAttrs, baseAttrs)) {
+  } else if (loIsEqual(remoteAttrs, baseAttrs)) {
     // base state matches server state -- no incorrect expectations -- save.
     return obj.save();
   }

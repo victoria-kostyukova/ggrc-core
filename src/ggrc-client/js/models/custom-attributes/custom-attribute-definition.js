@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loCompact from 'lodash/compact';
+import loUniq from 'lodash/uniq';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
@@ -58,12 +60,12 @@ export default Cacheable.extend({
         return 'At least one possible value required.';
       }
 
-      const nonBlanks = _.compact(choices);
+      const nonBlanks = loCompact(choices);
       if (nonBlanks.length < choices.length) {
         return 'Blank values not allowed.';
       }
 
-      const uniques = _.uniq(nonBlanks);
+      const uniques = loUniq(nonBlanks);
       if (uniques.length < nonBlanks.length) {
         return 'Duplicate values found.';
       }

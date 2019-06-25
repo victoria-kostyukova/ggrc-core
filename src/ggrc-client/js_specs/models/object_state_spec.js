@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import Audit from '../../js/models/business-models/audit';
 import Assessment from '../../js/models/business-models/assessment';
 import Issue from '../../js/models/business-models/issue';
@@ -53,8 +54,8 @@ describe('Model "status" attr test', function () {
     it(`checks if ${object} has State in attr_list`, () => {
       const attrList = businessModels[object].tree_view_options.attr_list;
 
-      expect(_.map(attrList, 'attr_title')).toContain('State');
-      expect(_.map(attrList, 'attr_name')).toContain('status');
+      expect(loMap(attrList, 'attr_title')).toContain('State');
+      expect(loMap(attrList, 'attr_name')).toContain('status');
     });
   });
 
@@ -62,8 +63,8 @@ describe('Model "status" attr test', function () {
     it(`checks if ${object} has Launch Status in attr_list`, () => {
       const attrList = businessModels[object].tree_view_options.attr_list;
 
-      expect(_.map(attrList, 'attr_title')).toContain('Launch Status');
-      expect(_.map(attrList, 'attr_name')).toContain('status');
+      expect(loMap(attrList, 'attr_title')).toContain('Launch Status');
+      expect(loMap(attrList, 'attr_name')).toContain('status');
     });
   });
 
@@ -71,8 +72,8 @@ describe('Model "status" attr test', function () {
     const attrList = businessModels['CycleTaskGroupObjectTask']
       .tree_view_options.attr_list;
 
-    expect(_.map(attrList, 'attr_title')).toContain('Task State');
-    expect(_.map(attrList, 'attr_name')).toContain('status');
+    expect(loMap(attrList, 'attr_title')).toContain('Task State');
+    expect(loMap(attrList, 'attr_name')).toContain('status');
   });
 });
 
@@ -90,9 +91,9 @@ describe('Model review state test', function () {
     it('checks if ' + object + ' has review status in attr_list', () => {
       const attrList = businessModels[object].tree_view_options.attr_list;
 
-      expect(_.map(attrList, 'attr_title'))
+      expect(loMap(attrList, 'attr_title'))
         .toContain('Review State', 'for object ' + object);
-      expect(_.map(attrList, 'attr_name'))
+      expect(loMap(attrList, 'attr_name'))
         .toContain('review_status', 'for object ' + object);
     });
   });
@@ -115,7 +116,7 @@ describe('Model review state test', function () {
     it('checks if ' + object + ' has not review status in attr_list', () => {
       const attrList = businessModels[object].tree_view_options.attr_list;
 
-      expect(_.map(attrList, 'attr_name')).not.toContain('review_status');
+      expect(loMap(attrList, 'attr_name')).not.toContain('review_status');
     });
   });
 });

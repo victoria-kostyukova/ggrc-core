@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loTrim from 'lodash/trim';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import {
@@ -28,8 +29,8 @@ const sortByNameEmail = (list) => {
   return new list.constructor(makeArray(list).sort(function (a, b) {
     a = a.person || a;
     b = b.person || b;
-    a = (_.trim(a.name) || _.trim(a.email)).toLowerCase();
-    b = (_.trim(b.name) || _.trim(b.email)).toLowerCase();
+    a = (loTrim(a.name) || loTrim(a.email)).toLowerCase();
+    b = (loTrim(b.name) || loTrim(b.email)).toLowerCase();
     if (a > b) {
       return 1;
     }

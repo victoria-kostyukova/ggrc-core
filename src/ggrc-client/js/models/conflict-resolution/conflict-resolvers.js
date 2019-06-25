@@ -3,16 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loGet from 'lodash/get';
+import loKeyBy from 'lodash/keyBy';
+import loIsEqual from 'lodash/isEqual';
 export function buildChangeDescriptor(
   previousValue,
   currentValue,
   remoteValue) {
   // The object attribute was changed on the server
-  let isChangedOnServer = !_.isEqual(previousValue, remoteValue);
+  let isChangedOnServer = !loIsEqual(previousValue, remoteValue);
   // The object attribute was changed on the client
-  let isChangedLocally = !_.isEqual(previousValue, currentValue);
+  let isChangedLocally = !loIsEqual(previousValue, currentValue);
   // The change on the server was not the same as the change on the client
-  let isDifferent = !_.isEqual(currentValue, remoteValue);
+  let isDifferent = !loIsEqual(currentValue, remoteValue);
 
   let hasConflict = (isChangedOnServer && isChangedLocally && isDifferent);
 
@@ -29,9 +32,9 @@ export function simpleFieldResolver(
   container,
   key,
   rootKey) {
-  let previousValue = _.get(baseAttrs, key);
-  let currentValue = _.get(attrs, key);
-  let remoteValue = _.get(remoteAttrs, key);
+  let previousValue = loGet(baseAttrs, key);
+  let currentValue = loGet(attrs, key);
+  let remoteValue = loGet(remoteAttrs, key);
 
   let {hasConflict, isChangedLocally} = buildChangeDescriptor(
     previousValue,
@@ -40,7 +43,7 @@ export function simpleFieldResolver(
 
   if (isChangedLocally) {
     let path = rootKey || key;
-    let currentRoot = _.get(attrs, path);
+    let currentRoot = loGet(attrs, path);
     container.attr(path, currentRoot);
   }
 
@@ -53,9 +56,9 @@ export function customAttributeResolver(
   currentValue = [],
   remoteValue = [],
   container = []) {
-  let currentValuesById = _.keyBy(currentValue, 'custom_attribute_id');
-  let remoteValuesById = _.keyBy(remoteValue, 'custom_attribute_id');
-  let containerValuesById = _.keyBy(container, 'custom_attribute_id');
+  let currentValuesById = loKeyBy(currentValue, 'custom_attribute_id');
+  let remoteValuesById = loKeyBy(remoteValue, 'custom_attribute_id');
+  let containerValuesById = loKeyBy(container, 'custom_attribute_id');
 
   let conflict = false;
   previousValue.forEach((previousValueItem) => {

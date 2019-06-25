@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifference from 'lodash/difference';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
+import loMap from 'lodash/map';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -44,7 +48,7 @@ export default canControl.extend({
     }
     if (opts instanceof canMap) {
       this.options = opts;
-      _.forEach(this.constructor.defaults, function (v, k) {
+      loForEach(this.constructor.defaults, function (v, k) {
         if (!that.options.hasOwnProperty(k)) {
           that.options.attr(k, v);
         }
@@ -70,10 +74,10 @@ export default canControl.extend({
   '{instance} custom_attribute_values':
     function (object, ev, newVal, oldVal) {
       function getValues(cav) {
-        return _.map(reify(cav), 'attribute_value');
+        return loMap(reify(cav), 'attribute_value');
       }
       if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
-        _.difference(getValues(oldVal), getValues(newVal)).length)) {
+        loDifference(getValues(oldVal), getValues(newVal)).length)) {
         this.draw_node();
       }
     },
@@ -127,7 +131,7 @@ export default canControl.extend({
       originalChildList = [originalChildList];
     }
 
-    _.forEach(originalChildList, function (data, i) {
+    loForEach(originalChildList, function (data, i) {
       let options = new canMap();
       data.each(function (v, k) {
         options.attr(k, v);
@@ -156,7 +160,7 @@ export default canControl.extend({
   add_child_list: function (item, data) {
     let findParams;
 
-    if (_.isFunction(item.instance[data.property])) {
+    if (loIsFunction(item.instance[data.property])) {
       // Special case for handling mappings which are functions until
       // first requested, then set their name via .attr('...')
       findParams = function () {

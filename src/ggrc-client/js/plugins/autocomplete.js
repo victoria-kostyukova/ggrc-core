@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDefer from 'lodash/defer';
+import loDebounce from 'lodash/debounce';
+import loIsNumber from 'lodash/isNumber';
+import loForEach from 'lodash/forEach';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -31,9 +35,9 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
       $(event.target).trigger('change');
     },
     minLength: 0,
-    source: _.debounce(function (request, response) {
+    source: loDebounce(function (request, response) {
       let queue = new RefreshQueue();
-      let isNextPage = _.isNumber(request.start);
+      let isNextPage = loIsNumber(request.start);
       let dfd;
 
       this.last_request = request;
@@ -118,7 +122,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
         .then(function (searchResult) {
           let objects = [];
 
-          _.forEach(that.options.searchtypes, function (searchtype) {
+          loForEach(that.options.searchtypes, function (searchtype) {
             objects.push(...searchResult.getResultsForType(searchtype));
           });
           return objects;
@@ -261,7 +265,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
           }
 
           context.attr('items_loading', false);
-          _.defer(function () {
+          loDefer(function () {
             context.attr('scroll_op_in_progress', false);
           });
         });

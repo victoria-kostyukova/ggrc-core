@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loCompact from 'lodash/compact';
+import loIsNull from 'lodash/isNull';
+import loUniq from 'lodash/uniq';
+import loTrim from 'lodash/trim';
+import loIsObject from 'lodash/isObject';
+import loIsUndefined from 'lodash/isUndefined';
+import loMap from 'lodash/map';
 _.mixin({
   exists: function (obj, key) {
     let keys;
@@ -17,7 +24,7 @@ _.mixin({
       keys = key.split('.');
     }
     return keys.reduce(function (base, memo) {
-      return (_.isUndefined(base) || _.isNull(base)) ? base : base[memo];
+      return (loIsUndefined(base) || loIsNull(base)) ? base : base[memo];
     }, obj);
   },
   /*
@@ -35,23 +42,23 @@ _.mixin({
     if (!values || !values.length) {
       return [];
     }
-    if (_.isUndefined(splitter)) {
+    if (loIsUndefined(splitter)) {
       splitter = ',';
     }
-    if (_.isObject(splitter)) {
+    if (loIsObject(splitter)) {
       options = splitter;
       splitter = ',';
     }
 
     values = values.split(splitter);
-    values = _.map(values, _.trim);
+    values = loMap(values, loTrim);
 
     options = options || {};
     if (options.unique) {
-      values = _.uniq(values);
+      values = loUniq(values);
     }
     if (options.compact) {
-      values = _.compact(values);
+      values = loCompact(values);
     }
     return values;
   },
@@ -62,7 +69,7 @@ _.mixin({
    * @return {Array} - result of "map" operation without "null" and "undefined" values
    */
   filteredMap: function (items, predicate) {
-    return _.map(items, predicate)
-      .filter((item) => !_.isNull(item) && !_.isUndefined(item));
+    return loMap(items, predicate)
+      .filter((item) => !loIsNull(item) && !loIsUndefined(item));
   },
 });

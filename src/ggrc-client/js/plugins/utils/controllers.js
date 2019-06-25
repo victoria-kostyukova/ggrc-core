@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loEvery from 'lodash/every';
+import loIsEqual from 'lodash/isEqual';
 import {warning} from './modals';
 import {hasQuestions} from './ggrcq-utils';
 
@@ -35,8 +37,8 @@ function becameDeprecated(instance, prevStatus) {
   let status = instance && instance.status;
 
   return (
-    !_.isEqual(status, prevStatus) && // status was changed
-    _.isEqual(status, 'Deprecated')
+    !loIsEqual(status, prevStatus) && // status was changed
+    loIsEqual(status, 'Deprecated')
   );
 }
 
@@ -48,7 +50,7 @@ function hasWarningType(instance) {
 }
 
 function _checkExtraConditions(conditions) {
-  return _.every(conditions, function (condition) {
+  return loEvery(conditions, function (condition) {
     return condition();
   });
 }

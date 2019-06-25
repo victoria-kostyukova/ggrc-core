@@ -3,13 +3,14 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loRange from 'lodash/range';
 const unitOptions = [
   {title: 'Weekday', value: 'day', plural: 'weekdays', singular: 'weekday'},
   {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
   {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'},
 ];
 
-const repeatOptions = _.range(1, 31)
+const repeatOptions = loRange(1, 31)
   .map(function (option) {
     return {
       value: option,

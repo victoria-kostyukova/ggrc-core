@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsEmpty from 'lodash/isEmpty';
+import loIsObject from 'lodash/isObject';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 /**
@@ -44,9 +46,9 @@ export default canComponent.extend({
       let instance = this.attr('instance');
       let path = this.attr('path');
 
-      if (_.isEmpty(item)) {
+      if (loIsEmpty(item)) {
         instance.attr(path, null);
-      } else if (_.isObject(item)) {
+      } else if (loIsObject(item)) {
         instance.attr(path, item);
         this.updateTextValue(item);
       }
@@ -68,7 +70,7 @@ export default canComponent.extend({
      * @param {Can.Map|String} item - The item picked in autocomplete or any string.
      */
     updateTextValue(item) {
-      let text = _.isObject(item) ? item.attr(this.attr('displayProp')) : item;
+      let text = loIsObject(item) ? item.attr(this.attr('displayProp')) : item;
       this.attr('textValue', text);
     },
     /**

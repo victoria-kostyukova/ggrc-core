@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import canModel from 'can-model';
 import canConstruct from 'can-construct';
 import {reify} from '../plugins/utils/reify-utils';
@@ -158,7 +159,7 @@ const RefreshQueue = canConstruct.extend({
       if (deferred) {
         deferred.then(function (refreshedItems) {
           if (nextProps.length) {
-            _.forEach(refreshedItems, function (item) {
+            loForEach(refreshedItems, function (item) {
               let df = new $.Deferred();
               refreshAll(item, nextProps, df);
               dfds.push(df);
@@ -206,7 +207,7 @@ const RefreshQueue = canConstruct.extend({
       return null;
     }
     if (objs.push) {
-      _.forEach(objs, (obj) => {
+      loForEach(objs, (obj) => {
         this.enqueue(obj, force);
       });
       return this;

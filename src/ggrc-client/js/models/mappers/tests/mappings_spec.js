@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifference from 'lodash/difference';
 import canMap from 'can-map';
 import * as Mappings from '../mappings';
 import Permission from '../../../permission';
@@ -71,26 +72,26 @@ describe('Mappings', () => {
     notMappableModels = notMappableModels.concat(modules[module].notMappable);
   });
 
-  const filtered = _.difference(allTypes, notMappableModels);
+  const filtered = loDifference(allTypes, notMappableModels);
 
   const mappingRules = Object.freeze({
-    AccessGroup: _.difference(filtered, ['AccessGroup']),
+    AccessGroup: loDifference(filtered, ['AccessGroup']),
     AccountBalance: filtered,
-    Assessment: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
+    Assessment: loDifference(filtered, ['Audit', 'Person', 'Program', 'Project',
       'Workflow', 'Assessment', 'Document']),
     AssessmentTemplate: [],
-    Audit: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
+    Audit: loDifference(filtered, ['Audit', 'Person', 'Program', 'Project',
       'Workflow', 'Assessment', 'Document']),
-    Contract: _.difference(filtered, ['Contract']),
+    Contract: loDifference(filtered, ['Contract']),
     Control: filtered,
-    CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
+    CycleTaskGroupObjectTask: loDifference(filtered, ['Person',
       'Workflow', 'Assessment', 'Document']),
     DataAsset: filtered,
     Evidence: [],
-    Document: _.difference(filtered,
+    Document: loDifference(filtered,
       ['Audit', 'Assessment', 'Document', 'Person', 'Workflow']),
     Facility: filtered,
-    Issue: _.difference(filtered, [
+    Issue: loDifference(filtered, [
       'Audit', 'Person', 'Workflow', 'Assessment']),
     KeyReport: filtered,
     Market: filtered,
@@ -98,30 +99,30 @@ describe('Mappings', () => {
     Objective: filtered,
     OrgGroup: filtered,
     Person: [],
-    Policy: _.difference(filtered, ['Policy']),
+    Policy: loDifference(filtered, ['Policy']),
     Process: filtered,
     Product: filtered,
     ProductGroup: filtered,
-    Program: _.difference(allTypes,
+    Program: loDifference(allTypes,
       ['Audit', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: filtered,
-    Regulation: _.difference(filtered, ['Regulation']),
+    Regulation: loDifference(filtered, ['Regulation']),
     Risk: filtered,
     Requirement: filtered,
-    Standard: _.difference(filtered, ['Standard']),
+    Standard: loDifference(filtered, ['Standard']),
     System: filtered,
-    TaskGroup: _.difference(filtered, ['Audit', 'Person',
+    TaskGroup: loDifference(filtered, ['Audit', 'Person',
       'Workflow', 'Assessment', 'Document']),
     TechnologyEnvironment: filtered,
     Threat: filtered,
     Vendor: filtered,
-    MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup']),
+    MultitypeSearch: loDifference(allTypes, ['CycleTaskGroup']),
   });
 
   describe('getMappingList() method', () => {
     let types = allTypes.concat('MultitypeSearch');
-    let modelsForTests = _.difference(types, [
+    let modelsForTests = loDifference(types, [
       'TaskGroupTask',
       'CycleTaskGroup',
       'Workflow',

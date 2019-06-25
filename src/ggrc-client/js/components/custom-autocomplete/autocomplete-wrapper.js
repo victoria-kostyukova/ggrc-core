@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSome from 'lodash/some';
 import canMap from 'can-map';
 // Base viewModel for custom autocomplete. Must be extended into component.
 // Provides component-wrapper for custom autocomplete.
@@ -62,7 +63,7 @@ export default canMap.extend({
     let objects = this.attr('objectsToExclude');
 
     result = result.filter((item) => {
-      return !_.some(objects, (object) => item.id === object.id);
+      return !loSome(objects, (object) => item.id === object.id);
     });
 
     return result;
@@ -71,7 +72,7 @@ export default canMap.extend({
     let objects = this.attr('objectsToExclude').concat(result);
     let currentValue = this.attr('currentValue').toLowerCase();
 
-    return !_.some(objects, (object) =>
+    return !loSome(objects, (object) =>
       object.name.toLowerCase() === currentValue);
   },
 });

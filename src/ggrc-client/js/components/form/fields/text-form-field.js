@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loTrim from 'lodash/trim';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -14,7 +15,7 @@ const TEXT_FORM_FIELD_VM = canMap.extend({
       set(newValue) {
         let _value = this.attr('_value');
         if (_value === newValue ||
-          newValue.length && !_.trim(newValue).length) {
+          newValue.length && !loTrim(newValue).length) {
           return;
         }
 

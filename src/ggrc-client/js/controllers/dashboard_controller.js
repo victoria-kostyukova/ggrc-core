@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -162,7 +163,7 @@ const DashboardControl = canControl.extend({
   },
 
   init_default_widgets: function () {
-    _.forEach(this.options.default_widgets, function (name) {
+    loForEach(this.options.default_widgets, function (name) {
       let descriptor = this.options.widget_descriptors[name];
       this.add_dashboard_widget_from_descriptor(descriptor);
     }.bind(this));

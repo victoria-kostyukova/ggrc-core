@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 /**
  * The util allows to perform batch of actions with some delay in a single transaction.
  * @param {function} completeTransaction - The function that allows to submit result of transaction.
@@ -18,20 +19,20 @@ export default function (completeTransaction, timeout) {
   };
 
   function runBatch(batch) {
-    _.forEach(batch, function (actionItem) {
+    loForEach(batch, function (actionItem) {
       actionItem.action();
     });
   }
 
   function resolveBatch(batch, batchDfd, ...result) {
-    _.forEach(batch, function (actionItem) {
+    loForEach(batch, function (actionItem) {
       actionItem.deferred.resolve(...result);
     });
     batchDfd.resolve();
   }
 
   function rejectBatch(batch, batchDfd, ...result) {
-    _.forEach(batch, function (actionItem) {
+    loForEach(batch, function (actionItem) {
       actionItem.deferred.reject(...result);
     });
     batchDfd.resolve();

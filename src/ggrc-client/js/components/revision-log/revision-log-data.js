@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsObject from 'lodash/isObject';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -15,7 +16,7 @@ let viewModel = canMap.extend({
     isObject: {
       type: 'boolean',
       get: function () {
-        return _.isObject(this.attr('data'));
+        return loIsObject(this.attr('data'));
       },
     },
   },

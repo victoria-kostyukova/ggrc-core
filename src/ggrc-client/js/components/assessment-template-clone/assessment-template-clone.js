@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loPick from 'lodash/pick';
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
@@ -26,7 +28,7 @@ export default canComponent.extend({
       },
       extendInstanceData(instance) {
         instance = instance().serialize();
-        let audit = _.pick(instance, ['id', 'type', 'title', 'issue_tracker']);
+        let audit = loPick(instance, ['id', 'type', 'title', 'issue_tracker']);
         let context = {
           id: instance.context.id,
           type: instance.context.type,
@@ -68,7 +70,7 @@ export default canComponent.extend({
         });
     },
     cloneObjects() {
-      let sourceIds = _.map(this.viewModel.attr('selected'), (item) => item.id);
+      let sourceIds = loMap(this.viewModel.attr('selected'), (item) => item.id);
       let destinationId = this.viewModel.attr('join_object_id');
 
       return ggrcPost('/api/assessment_template/clone', [{

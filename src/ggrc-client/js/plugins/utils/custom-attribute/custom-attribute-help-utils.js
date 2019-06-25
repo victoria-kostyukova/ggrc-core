@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFlow from 'lodash/flow';
+import loIsEmpty from 'lodash/isEmpty';
+import loTrim from 'lodash/trim';
 import {getPlainText} from '../../ggrc_utils';
 
 /**
@@ -15,7 +18,7 @@ function hasEmptyValue(caObject) {
   const value = caObject.value;
 
   if (typeof value === 'string') {
-    return _.flow(getPlainText, _.trim, _.isEmpty)(value);
+    return loFlow(getPlainText, loTrim, loIsEmpty)(value);
   }
 
   return Boolean(value) === false;

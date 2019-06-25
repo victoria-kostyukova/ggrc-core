@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loLast from 'lodash/last';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 export default canComponent.extend({
@@ -12,7 +13,7 @@ export default canComponent.extend({
     define: {
       rightRevision: {
         get() {
-          return _.last(this.attr('rightRevisions'));
+          return loLast(this.attr('rightRevisions'));
         },
       },
     },

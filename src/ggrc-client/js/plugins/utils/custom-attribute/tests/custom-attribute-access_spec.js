@@ -3,6 +3,8 @@ Copyright (C) 2019 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loEvery from 'lodash/every';
+import loFind from 'lodash/find';
 import canList from 'can-list';
 import canMap from 'can-map';
 import CustomAttributeAccess from '../custom-attribute-access';
@@ -129,7 +131,7 @@ describe('CustomAttributeAccess module', () => {
           const caObjects = caAccess.read(options);
           expect(caObjects.length).toBe(gcas.length);
           gcas.forEach((gca) => {
-            const caObject = _.find(caObjects,
+            const caObject = loFind(caObjects,
               (caObject) => caObject.customAttributeId === gca.id);
             expect(caObject).not.toBeUndefined();
           });
@@ -389,7 +391,7 @@ describe('CustomAttributeAccess module', () => {
         result = caAccess._getFilteredCaObjects({
           type: CUSTOM_ATTRIBUTE_TYPE.LOCAL,
         });
-        isLocal = _.every(result, (caObject) =>
+        isLocal = loEvery(result, (caObject) =>
           caObject.type === CUSTOM_ATTRIBUTE_TYPE.LOCAL
         );
         expect(result.length).toBe(expectedResult.length);
@@ -575,7 +577,7 @@ describe('CustomAttributeAccess module', () => {
       const caObjects = caAccess._caObjects;
       expect(caObjects.length).toBe(caDefs.length);
       caDefs.forEach((caDef) => {
-        const result = _.find(caObjects, (caObject) =>
+        const result = loFind(caObjects, (caObject) =>
           caObject.customAttributeId === caDef.id
         );
         expect(result).toBeDefined();

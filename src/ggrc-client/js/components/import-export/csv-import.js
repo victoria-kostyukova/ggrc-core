@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSome from 'lodash/some';
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -112,7 +114,7 @@ export default canComponent.extend({
     processLoadedInfo: function (data) {
       let rows = 0;
       let errorLevel = '';
-      this.attr('importDetails', _.map(data, (element) => {
+      this.attr('importDetails', loMap(data, (element) => {
         element.data = [];
 
         rows += element.rows;
@@ -392,7 +394,7 @@ export default canComponent.extend({
         if (data[ACTION] === PICKED) {
           file = data[DOCUMENTS][0];
 
-          if (file && _.some(allowedTypes, function (type) {
+          if (file && loSome(allowedTypes, function (type) {
             return type === file.mimeType;
           })) {
             if (that.attr('jobId')) {

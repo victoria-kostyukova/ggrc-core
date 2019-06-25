@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
 import Mixin from './mixin';
 import {confirm} from '../../plugins/utils/modals';
 
@@ -40,7 +41,7 @@ export default Mixin.extend({}, {
 
     let confirmation = $.Deferred();
 
-    if (_.includes(IGNORED_STATES, this.status)) {
+    if (loIncludes(IGNORED_STATES, this.status)) {
       confirmation.resolve();
     } else {
       confirm({

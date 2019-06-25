@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import * as QueryAPI from './query-api-utils';
 import {getRolesForType} from '../utils/acl-utils';
 
@@ -128,7 +129,7 @@ function getAssigneeType(instance) {
   let roles = getRolesForType(instance.type);
   let userRoles = null;
 
-  _.forEach(roles, function (role) {
+  loForEach(roles, function (role) {
     let aclPerson = instance
       .access_control_list
       .filter((item) => item.ac_role_id === role.id &&

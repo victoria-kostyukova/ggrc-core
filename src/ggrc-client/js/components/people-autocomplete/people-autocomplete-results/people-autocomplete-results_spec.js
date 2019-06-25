@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFindIndex from 'lodash/findIndex';
 import component from './people-autocomplete-results';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -74,7 +75,7 @@ describe('people-autocomplete-results component', () => {
 
         handler(items[0]);
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(0);
       });
@@ -86,7 +87,7 @@ describe('people-autocomplete-results component', () => {
 
         handler(items[0]);
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(1);
       });
@@ -100,7 +101,7 @@ describe('people-autocomplete-results component', () => {
 
       it('calls selectItem of viewModels with index of active item', () => {
         const items = element.find('.autocomplete-item');
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
 
         handler();
@@ -120,7 +121,7 @@ describe('people-autocomplete-results component', () => {
 
         handler([{}], {element: items[2]});
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(2);
 
@@ -140,7 +141,7 @@ describe('people-autocomplete-results component', () => {
 
         handler();
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(2);
 
@@ -155,7 +156,7 @@ describe('people-autocomplete-results component', () => {
         handler();
         handler();
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(0);
 
@@ -175,7 +176,7 @@ describe('people-autocomplete-results component', () => {
 
         handler();
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(0);
 
@@ -190,7 +191,7 @@ describe('people-autocomplete-results component', () => {
         handler();
         handler();
 
-        const activeIndex = _.findIndex(items,
+        const activeIndex = loFindIndex(items,
           (item) => $(item).hasClass('active'));
         expect(activeIndex).toBe(2);
 

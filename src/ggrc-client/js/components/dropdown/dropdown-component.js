@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsString from 'lodash/isString';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -38,7 +39,7 @@ export default canComponent.extend({
           if (!isGroupedDropdown) {
             list = _.filteredMap(
               this.attr('optionsList') || [], (option) => {
-                if (_.isString(option)) {
+                if (loIsString(option)) {
                   return {
                     value: option,
                     title: option,

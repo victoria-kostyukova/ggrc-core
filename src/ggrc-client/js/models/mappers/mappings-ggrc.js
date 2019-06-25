@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDifference from 'lodash/difference';
 import {
   businessObjects,
   coreObjects,
@@ -45,17 +46,17 @@ const createRule = {
 
 const coreObjectConfig = {
   ...createRule,
-  map: _.difference(businessObjects, ['Assessment']),
-  unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+  map: loDifference(businessObjects, ['Assessment']),
+  unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
 const scopingObjectConfig = {
   ...createRule,
-  map: _.difference(businessObjects,
+  map: loDifference(businessObjects,
     ['Assessment', ...externalBusinessObjects, ...externalDirectiveObjects]),
   externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
-  unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+  unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
@@ -90,16 +91,16 @@ export default {
   },
   Contract: {
     ...createRule,
-    map: _.difference(businessObjects, ['Assessment', 'Contract']),
-    unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Contract']),
+    map: loDifference(businessObjects, ['Assessment', 'Contract']),
+    unmap: loDifference(businessObjects, ['Assessment', 'Audit', 'Contract']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
     ...createRule,
-    map: _.difference(businessObjects,
+    map: loDifference(businessObjects,
       ['Assessment', ...scopingObjects, ...externalDirectiveObjects, 'Risk']),
     externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Risk'],
-    unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+    unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
@@ -107,8 +108,8 @@ export default {
   },
   Policy: {
     ...createRule,
-    map: _.difference(businessObjects, ['Assessment', 'Policy']),
-    unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Policy']),
+    map: loDifference(businessObjects, ['Assessment', 'Policy']),
+    unmap: loDifference(businessObjects, ['Assessment', 'Audit', 'Policy']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
@@ -116,30 +117,30 @@ export default {
   },
   Regulation: {
     ...createRule,
-    map: _.difference(businessObjects,
+    map: loDifference(businessObjects,
       [...scopingObjects, 'Assessment', 'Regulation',
         ...externalBusinessObjects]),
     externalMap: [...scopingObjects, ...externalBusinessObjects],
-    unmap: _.difference(businessObjects,
+    unmap: loDifference(businessObjects,
       ['Assessment', 'Audit', 'Regulation']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
     ...createRule,
-    map: _.difference(businessObjects, ['Assessment',
+    map: loDifference(businessObjects, ['Assessment',
       ...scopingObjects,
       ...externalDirectiveObjects, 'Control']),
     externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Control'],
-    unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+    unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Standard: {
     ...createRule,
-    map: _.difference(businessObjects,
+    map: loDifference(businessObjects,
       [...scopingObjects, 'Assessment', 'Standard',
         ...externalBusinessObjects]),
     externalMap: [...scopingObjects, ...externalBusinessObjects],
-    unmap: _.difference(businessObjects,
+    unmap: loDifference(businessObjects,
       ['Assessment', 'Audit', 'Standard']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -150,13 +151,13 @@ export default {
   // Scoping objects
   AccessGroup: {
     ...createRule,
-    map: _.difference(businessObjects,
+    map: loDifference(businessObjects,
       ['Assessment', 'AccessGroup',
         ...externalBusinessObjects,
         ...externalDirectiveObjects,
       ]),
     externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
-    unmap: _.difference(businessObjects,
+    unmap: loDifference(businessObjects,
       ['Assessment', 'AccessGroup', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },

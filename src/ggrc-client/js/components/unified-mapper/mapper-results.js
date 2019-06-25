@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loReduce from 'lodash/reduce';
+import loFindIndex from 'lodash/findIndex';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -315,7 +317,7 @@ export default canComponent.extend({
         let disabledIds;
 
         if (isMegaMapping) {
-          disabledIds = _.reduce(relatedData, (result, val) => {
+          disabledIds = loReduce(relatedData, (result, val) => {
             return result.concat(val[type].ids);
           }, []);
         } else {
@@ -529,7 +531,7 @@ export default canComponent.extend({
     },
     onItemDestroyed({itemId}) {
       const selectedItems = this.attr('selected');
-      const selectedIndex = _.findIndex(selectedItems,
+      const selectedIndex = loFindIndex(selectedItems,
         (item) => item.attr('id') === itemId);
 
       // remove selection of destroyed item

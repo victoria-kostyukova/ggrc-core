@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
 import canConstruct from 'can-construct';
 
 const Mixin = canConstruct.extend({
@@ -34,7 +37,7 @@ const Mixin = canConstruct.extend({
           //   Necessary for "attributes"/"serialize"/"convert"
           // Defaults will always be "after" for functions
           //  and "override" for non-function values
-          if (_.isFunction(oldfn)) {
+          if (loIsFunction(oldfn)) {
             switch (aspect) {
               case 'before':
                 obj[key] = function () {
@@ -62,13 +65,13 @@ const Mixin = canConstruct.extend({
       };
     }
 
-    if (!_.includes(cls._mixins, this)) {
+    if (!loIncludes(cls._mixins, this)) {
       cls._mixins = cls._mixins || [];
       cls._mixins.push(this);
       Object.keys(this).forEach(function (key) {
         setupFns(cls)(this[key], key);
       }.bind(this));
-      _.forEach(this.prototype, setupFns(cls.prototype));
+      loForEach(this.prototype, setupFns(cls.prototype));
     }
   },
 }, {});

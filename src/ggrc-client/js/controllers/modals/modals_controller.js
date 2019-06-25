@@ -3,6 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loReduce from 'lodash/reduce';
+import loIncludes from 'lodash/includes';
+import loIsUndefined from 'lodash/isUndefined';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
+import loFilter from 'lodash/filter';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canModel from 'can-model';
 import canStache from 'can-stache';
@@ -219,7 +225,7 @@ export default canControl.extend({
       instance.attr('_transient', new canMap({}));
     }
 
-    _.reduce(name.slice(0, -1), function (current, next) {
+    loReduce(name.slice(0, -1), function (current, next) {
       current = current + '.' + next;
       if (!instance.attr(current)) {
         instance.attr(current, new canMap({}));
@@ -356,7 +362,7 @@ export default canControl.extend({
 
     if (!this.wasDestroyed()) {
       // Do the fields (re-)setting
-      if (_.isFunction(setFieldsCb)) {
+      if (loIsFunction(setFieldsCb)) {
         setFieldsCb();
       }
       // This is to trigger `focus_first_element` in modal_ajax handling
@@ -516,9 +522,9 @@ export default canControl.extend({
     }
     // if data was populated in a callback, use that data from the instance
     // except if we are editing an instance and some fields are already populated
-    if (!_.isUndefined(el.attr('data-populated-in-callback')) &&
+    if (!loIsUndefined(el.attr('data-populated-in-callback')) &&
       value === '') {
-      if (!_.isUndefined(instance[name])) {
+      if (!loIsUndefined(instance[name])) {
         if (typeof instance[name] === 'object' && instance[name] !== null) {
           this.set_value({name: name, value: instance[name].id});
         } else {
@@ -605,7 +611,7 @@ export default canControl.extend({
       after: 'minDate',
     };
 
-    _.forEach(options, (val, key) => {
+    loForEach(options, (val, key) => {
       let targetEl;
       let isInput;
       let targetDate;
@@ -943,7 +949,7 @@ export default canControl.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      _.includes(saveContactModels, this.options.model.model_singular)) {
+      loIncludes(saveContactModels, this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 
@@ -1043,7 +1049,7 @@ export default canControl.extend({
       !this.options.skip_refresh && !instance.isNew()) {
       if (instance.type === 'AssessmentTemplate') {
         cad = instance.attr('custom_attribute_definitions');
-        cad = _.filter(cad, function (attr) {
+        cad = loFilter(cad, function (attr) {
           return attr.id;
         });
         instance.attr('custom_attribute_definitions', cad);

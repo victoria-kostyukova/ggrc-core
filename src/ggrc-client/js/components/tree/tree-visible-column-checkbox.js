@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsFunction from 'lodash/isFunction';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -16,7 +17,7 @@ export default canComponent.extend({
     column: {},
     viewType: null,
     getTitle(item) {
-      if (_.isFunction(item.title)) {
+      if (loIsFunction(item.title)) {
         // case for person name item
         return item.title(this.viewType);
       } else {

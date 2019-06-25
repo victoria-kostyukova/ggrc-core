@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFilter from 'lodash/filter';
 import canStache from 'can-stache';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../dropdown-component';
@@ -99,7 +100,7 @@ describe('dropdown component', function () {
       let frag = template({
         list: list,
       });
-      let groups = _.filter(list, function (item) {
+      let groups = loFilter(list, function (item) {
         return item.group;
       });
       frag = $(frag);

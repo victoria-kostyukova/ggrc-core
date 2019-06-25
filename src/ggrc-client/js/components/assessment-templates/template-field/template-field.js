@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loZip from 'lodash/zip';
+import loRange from 'lodash/range';
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -56,14 +59,14 @@ export default canComponent.extend({
       if (!isEqualLength && options.length < vals.length) {
         vals.length = options.length;
       } else if (!isEqualLength && options.length > vals.length) {
-        range = _.range(options.length - vals.length);
+        range = loRange(options.length - vals.length);
         range = range.map(function () {
           return '0';
         });
         vals = vals.concat(range);
       }
 
-      return _.zip(options, vals).map(function (zip) {
+      return loZip(options, vals).map(function (zip) {
         let attr = new canMap();
         let val = parseInt(zip[1], 10);
         attr.attr('type', field.attr('attribute_type'));
@@ -96,7 +99,7 @@ export default canComponent.extend({
       const field = this.viewModel.attr('field');
       const denormalized = this.viewModel.denormalizeMandatory(field);
       const types = this.viewModel.attr('types');
-      const item = _.find(types, function (obj) {
+      const item = loFind(types, function (obj) {
         return obj.type === field.attr('attribute_type');
       });
       this.viewModel.field.attr('attribute_name', item.name);

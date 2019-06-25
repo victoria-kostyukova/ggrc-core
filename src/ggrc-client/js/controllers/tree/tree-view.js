@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loReduce from 'lodash/reduce';
+import loIncludes from 'lodash/includes';
+import loForEach from 'lodash/forEach';
+import loMap from 'lodash/map';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canCompute from 'can-compute';
@@ -94,7 +98,7 @@ const TreeViewControl = TreeLoader.extend({
       }
     });
     this.options.attr('child_options', this.options.child_options.slice(0));
-    _.forEach(this.options.child_options, function (options, i) {
+    loForEach(this.options.child_options, function (options, i) {
       this.options.child_options.attr(i,
         new canMap(Object.assign(options.attr(), allowed)));
     }.bind(this));
@@ -221,7 +225,7 @@ const TreeViewControl = TreeLoader.extend({
       v = new TreeViewOptions();
       v.attr('instance', tmp);
       this.options.each(function (val, k) {
-        if (!_.includes(that.constructor.do_not_propagate, k)) {
+        if (!loIncludes(that.constructor.do_not_propagate, k)) {
           v.attr(k, val);
         }
       });
@@ -264,7 +268,7 @@ const TreeViewControl = TreeLoader.extend({
     if (listWindow.length > 0) {
       queue.push(listWindow);
     }
-    finalDfd = _.reduce(queue, function (dfd, listWindow) {
+    finalDfd = loReduce(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         let res = $.Deferred();
         if (that._add_child_lists_id !== opId) {
@@ -300,7 +304,7 @@ const TreeViewControl = TreeLoader.extend({
 
     items = makeArray(optionsList);
 
-    items = _.map(items, function (options) {
+    items = loMap(items, function (options) {
       let elem = document.createElement('li');
       let control = new TreeViewNode(elem, options);
       drawItemsDfds.push(control._draw_node_deferred);

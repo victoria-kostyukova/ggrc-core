@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loCompact from 'lodash/compact';
 import canRoute from 'can-route';
 import canMap from 'can-map';
 const router = new canMap();
@@ -28,7 +29,7 @@ const getUrlParams = (data) => {
 
     // trim first and last slashes if so
     // so canRoute.deparam can parse it
-    let params = _.compact(data.split('/'));
+    let params = loCompact(data.split('/'));
 
     // if params missing 'widget' part
     if (params.length === 2) {

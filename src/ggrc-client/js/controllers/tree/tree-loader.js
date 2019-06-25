@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 export default canControl.extend({
@@ -167,7 +168,7 @@ export default canControl.extend({
     let preppedItems = [];
     let dfd;
 
-    _.forEach(items, function (item) {
+    loForEach(items, function (item) {
       let prepped = that.prepare_child_options(item);
       // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {

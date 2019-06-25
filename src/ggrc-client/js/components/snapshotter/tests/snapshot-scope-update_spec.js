@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loAssign from 'lodash/assign';
 import canMap from 'can-map';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
@@ -36,7 +37,7 @@ describe('snapshot-scope-update component', function () {
         model_singular: 'Control',
       },
     };
-    _.assign(updaterViewModel, {
+    loAssign(updaterViewModel, {
       instance: new canMap({
         title: 'TITLE',
         refresh: jasmine
@@ -111,7 +112,7 @@ describe('snapshot-scope-update component', function () {
 
     it('does not set refresh flag for each tree-widget-container that does ' +
     'not contain snapshots', async function () {
-      _.assign(containerVM.model, {model_singular: 'Something'});
+      loAssign(containerVM.model, {model_singular: 'Something'});
       await method();
       $('tree-widget-container').each(function () {
         let viewModel = $(this).viewModel();

@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loMap from 'lodash/map';
 import {ggrcAjax} from '../ajax_extensions';
 
 const toBulkModel = (instances, targetProps) => {
   let state = targetProps.state;
-  return _.map(instances, (item) => {
+  return loMap(instances, (item) => {
     return {
       id: item.id,
       state: state,

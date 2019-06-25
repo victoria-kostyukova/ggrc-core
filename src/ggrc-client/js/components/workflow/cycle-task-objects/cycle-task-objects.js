@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSnakeCase from 'lodash/snakeCase';
+import loFindIndex from 'lodash/findIndex';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -28,7 +30,7 @@ const viewModel = canMap.extend({
   convertToMappedObjects(objects) {
     return objects.map((object) => ({
       object,
-      iconClass: `fa-${_.snakeCase(object.type)}`,
+      iconClass: `fa-${loSnakeCase(object.type)}`,
     }));
   },
   async initMappedObjects() {
@@ -65,7 +67,7 @@ const viewModel = canMap.extend({
     }
   },
   withoutExcludedFilter: (objects, {object: mappedObject}) => {
-    return _.findIndex(objects, (object) => (
+    return loFindIndex(objects, (object) => (
       mappedObject.id === object.id &&
       mappedObject.type === object.type
     )) === -1;

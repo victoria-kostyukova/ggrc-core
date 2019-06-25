@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import RefreshQueue from '../../models/refresh_queue';
 import {backendGdriveClient} from '../ggrc-gapi-client';
 import Relationship from '../../models/service-models/relationship';
@@ -83,7 +84,7 @@ function getMegaInstance(instance, destination, context, relationsObj) {
 }
 
 function unmapObjects(instance, objects) {
-  const pendingUnmap = _.map(objects, (object) =>
+  const pendingUnmap = loMap(objects, (object) =>
     Relationship.findRelationship(instance, object)
       .then((relationship) => relationship.destroy())
   );

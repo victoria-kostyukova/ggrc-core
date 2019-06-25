@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loAttempt from 'lodash/attempt';
+import loIsError from 'lodash/isError';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../add-issue-button';
 import '../add-issue-button';
@@ -84,7 +86,7 @@ describe('add-issue-button component', function () {
 
     beforeAll(function () {
       isJson = function (str) {
-        return !_.isError(_.attempt(JSON.parse, str));
+        return !loIsError(loAttempt(JSON.parse, str));
       };
     });
 

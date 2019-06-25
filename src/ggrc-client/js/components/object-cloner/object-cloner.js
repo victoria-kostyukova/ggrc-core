@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFilter from 'lodash/filter';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
@@ -18,7 +19,7 @@ export default canComponent.extend({
     includeObjects: {},
     getIncluded: function () {
       let included = this.attr('includeObjects');
-      return _.filter(canMap.keys(included), function (val) {
+      return loFilter(canMap.keys(included), function (val) {
         return included[val];
       });
     },

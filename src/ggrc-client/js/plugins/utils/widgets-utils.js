@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsEmpty from 'lodash/isEmpty';
+import loEach from 'lodash/each';
+import loIsObject from 'lodash/isObject';
 import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
@@ -141,7 +144,7 @@ function initWidgetCounts(widgets, type, id) {
 
     combinedValue = Object.assign({}, baseCounts, combinedValue);
 
-    if (!_.isEmpty(combinedValue)) {
+    if (!loIsEmpty(combinedValue)) {
       getCounts().attr(combinedValue);
     }
   });
@@ -165,7 +168,7 @@ function _initWidgetCounts(widgets, type, id) {
   });
 
   let params = [];
-  _.each(widgetsObject, function (widgetObject) {
+  loEach(widgetsObject, function (widgetObject) {
     let expression = TreeViewUtils.makeRelevantExpression(
       widgetObject.name,
       type,
@@ -230,7 +233,7 @@ function getWidgetConfig(modelName) {
   let objectVersion;
 
   // Workflow approach
-  if (_.isObject(modelName)) {
+  if (loIsObject(modelName)) {
     modelName.widgetName = modelName.name;
     modelName.widgetId = modelName.name;
     return modelName;

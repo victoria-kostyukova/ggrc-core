@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -19,7 +20,7 @@ export default canComponent.extend({
   }),
   init() {
     let objects = getRecentlyViewedObjects();
-    let items = _.map(objects, (obj) => {
+    let items = loMap(objects, (obj) => {
       return {
         viewLink: obj.viewLink,
         title: obj.title,

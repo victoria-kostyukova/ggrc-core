@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component, {KEY_MAP} from '../autocomplete-input';
 
@@ -169,7 +170,7 @@ describe('autocomplete-input component', () => {
       viewModel.attr('isPending', false);
       spyOn(viewModel, 'makeServiceAction');
 
-      _.forEach(KEY_MAP, (value) => {
+      loForEach(KEY_MAP, (value) => {
         event.keyCode = value;
         handler(element, event);
         expect(viewModel.makeServiceAction)
@@ -182,7 +183,7 @@ describe('autocomplete-input component', () => {
       viewModel.attr('isPending', false);
       spyOn(viewModel, 'inputLatency');
 
-      _.forEach(KEY_MAP, (value) => {
+      loForEach(KEY_MAP, (value) => {
         event.keyCode = value;
         handler(element, event);
         expect(viewModel.inputLatency).not.toHaveBeenCalled();

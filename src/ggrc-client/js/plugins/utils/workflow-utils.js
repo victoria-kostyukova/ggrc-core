@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
 import {confirm} from '../../plugins/utils/modals';
 import Permission from '../../permission';
 import Cycle from '../../models/business-models/cycle';
@@ -71,7 +72,7 @@ function generateCycle(workflow) {
   }, (params, option) => {
     let data = {};
 
-    _.forEach(params, function (item) {
+    loForEach(params, function (item) {
       data[item.name] = item.value;
     });
 

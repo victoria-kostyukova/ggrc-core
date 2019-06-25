@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -93,7 +94,7 @@ let viewModel = canMap.extend({
       return;
     }
 
-    states = _.map(selectedStates, 'value');
+    states = loMap(selectedStates, 'value');
 
     this.attr('stateModel.items', states);
   },

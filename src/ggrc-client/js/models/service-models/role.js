@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
 import Cacheable from '../cacheable';
 
 export default Cacheable.extend({
@@ -30,7 +31,7 @@ export default Cacheable.extend({
   allowed: function (operation, objectOrClass) {
     let cls = typeof objectOrClass === 'function' ?
       objectOrClass : objectOrClass.constructor;
-    return _.includes(this.permissions[operation], cls.model_singular);
+    return loIncludes(this.permissions[operation], cls.model_singular);
   },
   not_system_role: function () {
     return this.attr('scope') !== 'System';

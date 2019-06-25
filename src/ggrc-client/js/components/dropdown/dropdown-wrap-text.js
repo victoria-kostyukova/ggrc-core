@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsString from 'lodash/isString';
+import loFilter from 'lodash/filter';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -38,7 +40,7 @@ export default canComponent.extend({
       options: {
         get: function () {
           const optionsList = this.attr('optionsList') || [];
-          const filteredMapPredicate = (option) => _.isString(option) ?
+          const filteredMapPredicate = (option) => loIsString(option) ?
             {
               value: option,
               title: option,
@@ -68,7 +70,7 @@ export default canComponent.extend({
       }
 
       // get first filtered option
-      const option = _.filter(options, (opt) => opt.value === value)[0];
+      const option = loFilter(options, (opt) => opt.value === value)[0];
 
       if (option) {
         this.attr('selected', option);

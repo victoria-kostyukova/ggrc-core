@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 export default canComponent.extend({
@@ -35,7 +36,7 @@ export default canComponent.extend({
     },
     prepareOptions(items) {
       let selected = this.attr('value');
-      let options = _.map(items, (item) => {
+      let options = loMap(items, (item) => {
         return {
           value: item.id,
           title: item.title,

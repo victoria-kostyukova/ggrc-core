@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as loAssignUtil from 'lodash/assign';
 import makeArray from 'can-util/js/make-array/make-array';
 import Assessment from '../assessment';
 import Program from '../program';
@@ -137,11 +138,11 @@ describe('Assessment model', function () {
 
   describe('model() method', function () {
     it('does not update backup if backup was not created', function () {
-      spyOn(_, 'assign');
+      spyOn(loAssignUtil, 'default');
       Assessment.model({data: 'test'}, makeFakeInstance({
         model: Assessment,
       })());
-      expect(_.assign).not.toHaveBeenCalled();
+      expect(loAssignUtil.default).not.toHaveBeenCalled();
     });
 
     it('updates backup if backup was created', function () {

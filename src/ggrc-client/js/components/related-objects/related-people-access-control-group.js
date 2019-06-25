@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFind from 'lodash/find';
+import loFindIndex from 'lodash/findIndex';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
@@ -80,7 +82,7 @@ export default canComponent.extend({
       this.addPerson(args.person, args.groupId);
     },
     addPerson: function (person, groupId) {
-      let exist = _.find(this.attr('people'), {id: person.id});
+      let exist = loFind(this.attr('people'), {id: person.id});
 
       if (exist) {
         console.warn(
@@ -102,7 +104,7 @@ export default canComponent.extend({
     },
     removePerson: function (args) {
       let person = args.person;
-      let idx = _.findIndex(
+      let idx = loFindIndex(
         this.attr('people'),
         {id: person.id});
 

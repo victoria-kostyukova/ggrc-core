@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loMap from 'lodash/map';
 import * as AjaxExtensions from '../../../plugins/ajax_extensions';
 import * as TreeViewUtils from '../../utils/tree-view-utils';
 import * as SnapshotUtils from '../../utils/snapshot-utils';
@@ -422,7 +423,7 @@ describe('GGRC Utils Widgets', function () {
 
           expect(ggrcAjax.calls.count()).toEqual(1);
           reqParams = JSON.parse(ggrcAjax.calls.argsFor(0)[0].data);
-          reqParamNames = _.map(reqParams,
+          reqParamNames = loMap(reqParams,
             function (param) {
               return param.object_name;
             });

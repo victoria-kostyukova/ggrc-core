@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loValues from 'lodash/values';
+import loIsString from 'lodash/isString';
+import loSome from 'lodash/some';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
 import {confirm} from '../plugins/utils/modals';
 import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
 import {navigate} from '../plugins/utils/current-page-utils';
@@ -113,7 +118,7 @@ $.extend(ModalForm.prototype, {
       this._cached_values = cache;
     } else {
       // Otherwise compute a diff to determine whether the form is dirty
-      _.forEach(cache, function (value, key) {
+      loForEach(cache, function (value, key) {
         if (!dirty) {
           dirty = (value !== that._cached_values[key] &&
             (!!value || that._cached_values[key] !== undefined));
@@ -319,7 +324,7 @@ $(function () {
     };
     let textContainer;
     let $html;
-    let gotMessage = _.some(_.values(flash), function (msg) {
+    let gotMessage = loSome(loValues(flash), function (msg) {
       return !!msg;
     });
 
@@ -350,7 +355,7 @@ $(function () {
       }
 
       if (flash[type]) {
-        if (_.isString(flash[type])) {
+        if (loIsString(flash[type])) {
           flash[type] = [flash[type]];
         }
 
@@ -364,7 +369,7 @@ $(function () {
           $html.addClass('alert-autohide');
         }
 
-        if ( _.isFunction(flash[type]) ) {
+        if ( loIsFunction(flash[type]) ) {
           $html.append(flash[type](flash.data || {}));
         } else {
           for (messageI in flash[type]) {
@@ -374,7 +379,7 @@ $(function () {
             message = flash[type][messageI];
             // Skip error codes. To force display use String(...) when
             // triggering the flash.
-            if (_.isString(message)) {
+            if (loIsString(message)) {
               addLink = message.indexOf('{reload_link}') > -1;
               message = message.replace('{reload_link}', '');
               $html.append($(textContainer).text(message));

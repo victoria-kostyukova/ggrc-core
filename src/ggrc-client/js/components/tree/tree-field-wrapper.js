@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
 import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -53,7 +54,7 @@ const viewModel = canMap.extend({
     const rq = new RefreshQueue();
     const Type = this.attr('type');
 
-    _.forEach(items, function (item) {
+    loForEach(items, function (item) {
       rq.enqueue(Type.model(item));
     });
 

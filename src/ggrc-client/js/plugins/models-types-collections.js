@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDifference from 'lodash/difference';
 /**
  * Business objects collection without Workflow objects and specific Audit
  * objects (AssessmentTemplate and Evidence)
@@ -18,7 +19,7 @@ export const businessObjects = [
 /**
  * Business objects without Assessment, Audit, Document and Program
  */
-export const coreObjects = _.difference(businessObjects,
+export const coreObjects = loDifference(businessObjects,
   ['Assessment', 'Audit', 'Document', 'Program']);
 
 /**

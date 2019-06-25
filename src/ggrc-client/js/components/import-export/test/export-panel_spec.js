@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loCloneDeep from 'lodash/cloneDeep';
 import canList from 'can-list';
 import Component from '../export-panel';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -29,7 +30,7 @@ describe('export-panel component', function () {
 
   describe('showAttributes prop', () => {
     it('sets isSelected value to panel attributes', () => {
-      viewModel.attr('item', _.cloneDeep(panel));
+      viewModel.attr('item', loCloneDeep(panel));
 
       viewModel.attr('showAttributes', true);
 
@@ -44,7 +45,7 @@ describe('export-panel component', function () {
 
   describe('showMappings prop', () => {
     it('sets isSelected value to panel mappings', () => {
-      viewModel.attr('item', _.cloneDeep(panel));
+      viewModel.attr('item', loCloneDeep(panel));
 
       viewModel.attr('showMappings', true);
 
@@ -59,7 +60,7 @@ describe('export-panel component', function () {
 
   describe('showLocalAttributes prop', () => {
     it('sets isSelected value to panel local attributes', () => {
-      viewModel.attr('item', _.cloneDeep(panel));
+      viewModel.attr('item', loCloneDeep(panel));
 
       viewModel.attr('showLocalAttributes', true);
 

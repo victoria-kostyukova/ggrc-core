@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loConcat from 'lodash/concat';
+import loDifference from 'lodash/difference';
 import * as Mappings from '../mappings';
 import MappingsConfig from '../mappings-ggrc';
 
@@ -50,18 +52,18 @@ describe('Mappings', () => {
     ],
   };
 
-  const coreObjectsRules = _.concat(modules.core, modules.workflow,
+  const coreObjectsRules = loConcat(modules.core, modules.workflow,
     ['Assessment', 'Audit', 'Document', 'Person', 'Program']);
-  const snapshotableObjects = _.difference(modules.core, ['Project']);
+  const snapshotableObjects = loDifference(modules.core, ['Project']);
 
   const mappingRules = {
-    AccessGroup: _.difference(coreObjectsRules, ['AccessGroup']),
+    AccessGroup: loDifference(coreObjectsRules, ['AccessGroup']),
     AccountBalance: coreObjectsRules,
     Assessment: [...snapshotableObjects, 'Evidence', 'Audit', 'Person'],
     AssessmentTemplate: ['Audit'],
     Audit: [...snapshotableObjects, 'Evidence', 'Assessment',
       'AssessmentTemplate', 'CycleTaskGroupObjectTask', 'Person', 'Program'],
-    Contract: _.difference(coreObjectsRules, ['Contract']),
+    Contract: loDifference(coreObjectsRules, ['Contract']),
     Control: coreObjectsRules,
     CycleTaskGroupObjectTask: [...modules.core, 'Audit', 'Person', 'Program',
       'Workflow'],
@@ -77,17 +79,17 @@ describe('Mappings', () => {
     OrgGroup: coreObjectsRules,
     Person: [...modules.core, 'Assessment', 'Audit', 'CycleTaskGroupObjectTask',
       'Evidence', 'Document', 'Program', 'TaskGroupTask', 'Workflow'],
-    Policy: _.difference(coreObjectsRules, ['Policy']),
+    Policy: loDifference(coreObjectsRules, ['Policy']),
     Process: coreObjectsRules,
     Product: coreObjectsRules,
     ProductGroup: coreObjectsRules,
     Program: [...modules.core, ...modules.workflow, 'Audit', 'Document',
       'Person', 'Program'],
     Project: coreObjectsRules,
-    Regulation: _.difference(coreObjectsRules, ['Regulation']),
+    Regulation: loDifference(coreObjectsRules, ['Regulation']),
     Requirement: coreObjectsRules,
     Risk: coreObjectsRules,
-    Standard: _.difference(coreObjectsRules, ['Standard']),
+    Standard: loDifference(coreObjectsRules, ['Standard']),
     System: coreObjectsRules,
     TaskGroup: [...modules.core, 'Program', 'Workflow'],
     TaskGroupTask: ['Person', 'Workflow'],

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../../inline/base-inline-control-title';
@@ -29,7 +30,7 @@ export default canComponent.extend({
       }.bind(this));
     },
     isInEditableState: function () {
-      return _.includes(EDITABLE_STATES, this.attr('instance.status'));
+      return loIncludes(EDITABLE_STATES, this.attr('instance.status'));
     },
     showConfirm: function () {
       let self = this;

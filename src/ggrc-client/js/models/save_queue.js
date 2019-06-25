@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsNumber from 'lodash/isNumber';
+import loIsUndefined from 'lodash/isUndefined';
+import loForEach from 'lodash/forEach';
+import loMap from 'lodash/map';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canConstruct from 'can-construct';
 import tracker from '../tracker';
@@ -35,7 +39,7 @@ export default canConstruct.extend({
     return function () {
       let size = bucket.background ? bucket.objs.length : that.BATCH_SIZE;
       let objs = bucket.objs.splice(0, size);
-      let body = _.map(objs, function (obj) {
+      let body = loMap(objs, function (obj) {
         let list = {};
         list[bucket.type] = obj.serialize();
         return list;
@@ -98,7 +102,7 @@ export default canConstruct.extend({
           return $.Deferred().resolve(this);
         };
       };
-      _.forEach(objs, function (obj, idx) {
+      loForEach(objs, function (obj, idx) {
         let single = data[idx];
         // Add extra check to avoid possible exceptions
         single = Array.isArray(single) ? single : false;
@@ -115,7 +119,7 @@ export default canConstruct.extend({
 
   _step: function (elem) {
     this._queue.push(elem);
-    if (_.isNumber(this._timeout)) {
+    if (loIsNumber(this._timeout)) {
       clearTimeout(this._timeout);
     }
     this._timeout = setTimeout(() => {
@@ -143,7 +147,7 @@ export default canConstruct.extend({
       bucketName = type + (obj.run_in_background ? '_bg' : '');
       bucket = this._buckets[bucketName];
 
-      if (_.isUndefined(bucket)) {
+      if (loIsUndefined(bucket)) {
         plural = obj.constructor.table_plural;
         bucket = {
           objs: [],

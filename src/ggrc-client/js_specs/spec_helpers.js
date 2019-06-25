@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsFunction from 'lodash/isFunction';
 import canMap from 'can-map';
 // This is primarily useful for passing as the fail case for
 //  promises, since every item passed to it will show up in
@@ -21,7 +22,7 @@ function failAll(done) {
 function getComponentVM(Component) {
   const viewModelConfig = Component.prototype.viewModel;
 
-  if (_.isFunction(viewModelConfig)) {
+  if (loIsFunction(viewModelConfig)) {
     return new viewModelConfig();
   }
   return new (canMap.extend(viewModelConfig));

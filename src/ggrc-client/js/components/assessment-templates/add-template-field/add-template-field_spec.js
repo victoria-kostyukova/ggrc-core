@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIndexOf from 'lodash/indexOf';
+import loIncludes from 'lodash/includes';
 import canMap from 'can-map';
 import Component, * as Validations from './add-template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -251,13 +253,13 @@ describe('add-template-field component', () => {
         .callFake((title) => !title ? 'empty val message' : '');
 
       spyOn(Validations, 'isInvalidTitle').and
-        .callFake((title) => _.indexOf(title, '*') !== -1 ?
+        .callFake((title) => loIndexOf(title, '*') !== -1 ?
           'invalid val message' :
           '');
 
       spyOn(Validations, 'isDublicateTitle').and
         .callFake((fields, title) => {
-          return _.includes(fields, title) ?
+          return loIncludes(fields, title) ?
             'duplicates val message' :
             '';
         });

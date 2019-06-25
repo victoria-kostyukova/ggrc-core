@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsNull from 'lodash/isNull';
+import loForEach from 'lodash/forEach';
 import canBatch from 'can-event/batch/batch';
 import canMap from 'can-map';
 import StateValidator from '../state-validator-utils';
@@ -53,7 +55,7 @@ export default class CustomAttributeObject {
    * Creates CustomAttributeObject instance.
    * @param {canMap} instance - An instance of some object.
    * @param {canMap} caDefinition - A custom attribute definition owned by instance.
-   * @param {canMap=} caValue - A custom attribute value owned by instance.
+   * @param {canMap} caValue - A custom attribute value owned by instance.
    */
   constructor(
     instance,
@@ -172,7 +174,7 @@ export default class CustomAttributeObject {
    */
   get type() {
     const caDef = this._caDefinition;
-    const isGlobalCustomAttribute = _.isNull(caDef.attr('definition_id'));
+    const isGlobalCustomAttribute = loIsNull(caDef.attr('definition_id'));
     return isGlobalCustomAttribute
       ? CUSTOM_ATTRIBUTE_TYPE.GLOBAL
       : CUSTOM_ATTRIBUTE_TYPE.LOCAL;
@@ -266,7 +268,7 @@ export default class CustomAttributeObject {
 
     canBatch.start();
     // set for caValue requiered fields if they were missed
-    _.forEach(requiredDefaultFields, (requiredValue, key) => {
+    loForEach(requiredDefaultFields, (requiredValue, key) => {
       const hasMissedRequieredField = !caValueKeys.includes(key);
       if (hasMissedRequieredField) {
         caValue.attr(key, requiredValue);

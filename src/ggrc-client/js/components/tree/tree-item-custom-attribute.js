@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loHas from 'lodash/has';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -37,7 +38,7 @@ const getCustomAttrValue = (instance, customAttributeId) => {
   let caObject = instance.customAttr(customAttributeId);
 
   if (caObject) {
-    hasHandler = _.has(formatValueMap, caObject.attributeType);
+    hasHandler = loHas(formatValueMap, caObject.attributeType);
     customAttrValue = caObject.value;
   }
 

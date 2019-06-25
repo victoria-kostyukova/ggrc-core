@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loOrderBy from 'lodash/orderBy';
 import Cacheable from '../cacheable';
 import {getCustomAttributableModels} from '../../plugins/utils/models-utils';
 
@@ -15,7 +16,7 @@ import {getCustomAttributableModels} from '../../plugins/utils/models-utils';
 export default Cacheable.extend({
   root_object: 'custom_attributable',
   findAll: function () {
-    let types = _.orderBy(getCustomAttributableModels(),
+    let types = loOrderBy(getCustomAttributableModels(),
       'category', false);
 
     return $.when(_.filteredMap(types, (type, i) => {

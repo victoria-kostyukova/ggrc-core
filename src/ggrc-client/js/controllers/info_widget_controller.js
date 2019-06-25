@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDebounce from 'lodash/debounce';
+import loMap from 'lodash/map';
+import loFilter from 'lodash/filter';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -70,7 +73,7 @@ export default canControl.extend({
 
   generate_menu_items: function (itemNames, displayPrefix) {
     displayPrefix = displayPrefix || '';
-    return _.filter(_.map(itemNames, function (name) {
+    return loFilter(loMap(itemNames, function (name) {
       if (name in businessModels) {
         let model = businessModels[name];
         return {
@@ -131,7 +134,7 @@ export default canControl.extend({
   },
 
   // timeout required to let server correctly calculate changed counts
-  updateCounts: _.debounce((ev, instance) => {
+  updateCounts: loDebounce((ev, instance) => {
     if (/dashboard/.test(window.location)) {
       refreshCounts();
     }

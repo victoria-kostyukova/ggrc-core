@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifference from 'lodash/difference';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -75,7 +76,7 @@ let viewModel = canMap.extend({
   setStatesRoute(states) {
     let allStates = this.attr('allStates');
 
-    if (states.length && _.difference(allStates, states).length) {
+    if (states.length && loDifference(allStates, states).length) {
       router.attr('state', states);
     } else {
       router.removeAttr('state');
@@ -84,7 +85,7 @@ let viewModel = canMap.extend({
   buildSearchQuery(states) {
     let allStates = this.attr('allStates');
     let modelName = this.attr('modelName');
-    let query = (states.length && _.difference(allStates, states).length) ?
+    let query = (states.length && loDifference(allStates, states).length) ?
       StateUtils.buildStatusFilter(states, modelName) :
       null;
     this.attr('options.query', query);
@@ -144,8 +145,8 @@ export default canComponent.extend({
       let currentStates = this.viewModel.attr('currentStates');
       newStatuses = newStatuses || this.viewModel.attr('allStates');
       let isChanged =
-        _.difference(currentStates, newStatuses).length ||
-        _.difference(newStatuses, currentStates).length;
+        loDifference(currentStates, newStatuses).length ||
+        loDifference(newStatuses, currentStates).length;
 
       if (isCurrent && isEnabled && isChanged) {
         this.viewModel.buildSearchQuery(newStatuses);

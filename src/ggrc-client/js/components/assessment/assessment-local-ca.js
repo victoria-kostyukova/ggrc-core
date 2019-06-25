@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFindIndex from 'lodash/findIndex';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
@@ -234,7 +235,7 @@ export default canComponent.extend({
       let field;
       let index;
 
-      index = _.findIndex(this.viewModel.attr('fields'), function (field) {
+      index = loFindIndex(this.viewModel.attr('fields'), function (field) {
         let validation = field.attr('validation');
         return validation.show && !validation.valid;
       });

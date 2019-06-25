@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import canMap from 'can-map';
 import Component from './assessment-template-attributes';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -28,7 +29,7 @@ describe('assessment-template-attributes component', function () {
 
       viewModel.fieldRemoved(deletedField);
 
-      remainingFields = _.map(viewModel.fields, 'title');
+      remainingFields = loMap(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
     });
 
@@ -44,7 +45,7 @@ describe('assessment-template-attributes component', function () {
 
       viewModel.fieldRemoved(deletedField);
 
-      remainingFields = _.map(viewModel.fields, 'title');
+      remainingFields = loMap(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
     });
 
@@ -62,7 +63,7 @@ describe('assessment-template-attributes component', function () {
 
       viewModel.fieldRemoved(deletedField);
 
-      remainingFields = _.map(viewModel.fields, 'title');
+      remainingFields = loMap(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'bar', 'baz']);
       expect(console.warn).toHaveBeenCalled();
     });

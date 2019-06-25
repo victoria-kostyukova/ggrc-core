@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
 import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
 import canList from 'can-list';
@@ -228,7 +229,7 @@ describe('Cacheable model', () => {
       spyOn(DummyModel, 'models').and.callFake(function (items) {
         let ids = _.filteredMap(items, (item) => item.id);
         return _.filteredMap(dummyInsts, (inst) =>
-          _.includes(ids, inst.id) ? inst : undefined);
+          loIncludes(ids, inst.id) ? inst : undefined);
       });
       DummyModel.findAll().then(() => {
         // finally, we show that with the 100ms gap between pushing ids 3 and 4, we force a separate push.

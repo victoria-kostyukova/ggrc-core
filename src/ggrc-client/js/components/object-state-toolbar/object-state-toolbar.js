@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -26,7 +27,7 @@ export default canComponent.extend({
       isCurrentUserVerifier: {
         get: function () {
           let verifiers = this.attr('verifiers');
-          return !!_.find(verifiers, (verifier) =>
+          return !!loFind(verifiers, (verifier) =>
             verifier.id === GGRC.current_user.id);
         },
       },

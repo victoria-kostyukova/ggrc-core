@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loForEach from 'lodash/forEach';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../bulk-update-target-state.js';
 
@@ -31,10 +32,10 @@ describe('bulk-update-target-state component', function () {
           'Declined', 'Deprecated', 'Verified'],
       };
 
-      _.forEach(objectStatesMap, function (states, obj) {
+      loForEach(objectStatesMap, function (states, obj) {
         viewModel.attr('modelName', obj);
 
-        _.forEach(states, function (state) {
+        loForEach(states, function (state) {
           let warning;
           let expected = objectStateToWarningMap[obj][state] || '';
           viewModel.attr('targetState', state);

@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
+import loFilter from 'lodash/filter';
 import canMap from 'can-map';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -51,7 +53,7 @@ describe('advanced-search-filter-state component', function () {
       const result = viewModel.attr('filterStates');
       expect(result.length).toBe(states.length);
 
-      _.forEach(result, (item) => {
+      loForEach(result, (item) => {
         expect(item.checked).toBeFalsy();
       });
     });
@@ -63,7 +65,7 @@ describe('advanced-search-filter-state component', function () {
           items: ['state1'],
         }));
 
-        const selectedItems = _.filter(viewModel.attr('filterStates'),
+        const selectedItems = loFilter(viewModel.attr('filterStates'),
           (it) => it.checked);
         expect(selectedItems.length).toBe(1);
         expect(selectedItems[0].value).toBe('state1');

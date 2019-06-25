@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -63,7 +64,7 @@ export default canComponent.extend({
     },
     navigate(tabId, tabOptions) {
       const panels = this.attr('panels');
-      const panel = _.find(panels, (panel) => panel.tabId === tabId);
+      const panel = loFind(panels, (panel) => panel.tabId === tabId);
 
       if (panel) {
         this.attr('tabOptions', tabOptions);

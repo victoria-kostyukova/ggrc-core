@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFilter from 'lodash/filter';
 import canMap from 'can-map';
 import canEvent from 'can-event';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -100,7 +101,7 @@ describe('multiselect-dropdown component', function () {
     });
 
     it('assigns new list into selected from options', () => {
-      const expectedSelected = _.filter(options, (item) => {
+      const expectedSelected = loFilter(options, (item) => {
         return item.checked;
       });
       viewModel.attr('options', options);

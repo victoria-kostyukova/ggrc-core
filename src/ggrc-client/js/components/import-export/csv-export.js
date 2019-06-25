@@ -3,6 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loReduce from 'lodash/reduce';
+import loFind from 'lodash/find';
+import loFindIndex from 'lodash/findIndex';
+import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -47,7 +51,7 @@ export default canComponent.extend({
             return false;
           }
 
-          return _.reduce(this.attr('panels'), (allowed, panel) => {
+          return loReduce(this.attr('panels'), (allowed, panel) => {
             return allowed && panel.attr('isValidConfiguration');
           }, true);
         },
@@ -156,7 +160,7 @@ export default canComponent.extend({
     onStopExport({id}) {
       stopExportJob(id)
         .then(() => {
-          let exportJob = _.find(this.attr('currentExports'), (job) => {
+          let exportJob = loFind(this.attr('currentExports'), (job) => {
             return job.id === id;
           });
 
@@ -175,7 +179,7 @@ export default canComponent.extend({
     deleteJob(id) {
       deleteExportJob(id)
         .then(() => {
-          let index = _.findIndex(this.attr('currentExports'), {id});
+          let index = loFindIndex(this.attr('currentExports'), {id});
           this.attr('currentExports').splice(index, 1);
         }, () => {
           this.attr(`disabledItems.${id}`, false);
@@ -206,11 +210,11 @@ export default canComponent.extend({
     getObjectsForExport: function () {
       let panels = this.attr('panels');
 
-      return _.map(panels, function (panel, index) {
+      return loMap(panels, function (panel, index) {
         let allItems = panel.attr('attributes')
           .concat(panel.attr('mappings'))
           .concat(panel.attr('localAttributes'));
-        let relevantFilter = _.reduce(panel.attr('relevant'),
+        let relevantFilter = loReduce(panel.attr('relevant'),
           (result, el, filterIndex) => {
             const isPrevious = el.model_name === '__previous__';
             const id = isPrevious ? index - 1 : el.filter.id;
@@ -247,7 +251,7 @@ export default canComponent.extend({
       let targetJobId = router.attr('job_id');
 
       if (targetJobId) {
-        let isJobActive = _.find(this.attr('currentExports'), function (el) {
+        let isJobActive = loFind(this.attr('currentExports'), function (el) {
           return el.id === parseInt(targetJobId);
         });
 

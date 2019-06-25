@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loLast from 'lodash/last';
+import loIsFunction from 'lodash/isFunction';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -59,7 +61,7 @@ export default canComponent.extend({
     onClickHandler: function (scope, el, event) {
       let eventType = this.attr('click_event');
       let handler = this[eventType] || function () {};
-      let confirmation = _.isFunction(this.confirmationCallback) ?
+      let confirmation = loIsFunction(this.confirmationCallback) ?
         this.confirmationCallback() :
         null;
       let args = arguments;
@@ -143,7 +145,7 @@ export default canComponent.extend({
             })
             .fail(function () {
               // This case happens when user have no access to write in audit folder
-              let error = _.last(arguments);
+              let error = loLast(arguments);
 
               stopFn(true);
               if (error && error.code === 403) {

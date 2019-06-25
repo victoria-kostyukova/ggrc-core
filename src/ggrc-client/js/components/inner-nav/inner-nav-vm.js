@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIncludes from 'lodash/includes';
+import loFind from 'lodash/find';
+import loFindIndex from 'lodash/findIndex';
+import loSortBy from 'lodash/sortBy';
+import loMap from 'lodash/map';
 import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -61,10 +66,10 @@ export default canMap.extend({
      */
   handleDescriptors() {
     let descriptors = this.attr('widgetDescriptors');
-    let widgets = _.map(descriptors,
+    let widgets = loMap(descriptors,
       (descriptor) => this.createWidget(descriptor));
 
-    widgets = _.sortBy(widgets, ['order', 'title']);
+    widgets = loSortBy(widgets, ['order', 'title']);
 
     this.attr('widgetList', widgets);
   },
@@ -97,7 +102,7 @@ export default canMap.extend({
       count: 0,
       countsName: !descriptor.uncountable ? countsName : '',
       forceShow: false,
-      inForceShowList: _.includes(forceShowList, title),
+      inForceShowList: loIncludes(forceShowList, title),
     };
 
     return widget;
@@ -133,7 +138,7 @@ export default canMap.extend({
   addToHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
     let hiddenWidget =
-        _.find(hiddenWidgets, (hidden) => hidden.id === widget.id);
+        loFind(hiddenWidgets, (hidden) => hidden.id === widget.id);
 
     if (!hiddenWidget) {
       hiddenWidgets.push(widget);
@@ -145,7 +150,7 @@ export default canMap.extend({
      */
   removeFromHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
-    let index = _.findIndex(hiddenWidgets,
+    let index = loFindIndex(hiddenWidgets,
       (hiddenWidget) => hiddenWidget.id === widget.id);
 
     if (index > -1) {
@@ -177,7 +182,7 @@ export default canMap.extend({
      * @return {canMap} widget
      */
   findWidgetById(widgetId) {
-    return _.find(this.attr('widgetList'),
+    return loFind(this.attr('widgetList'),
       (widget) => widget.id === widgetId);
   },
   /**
@@ -186,7 +191,7 @@ export default canMap.extend({
      * @return {canMap} widget
      */
   findWidgetByCountsName(countsName) {
-    return _.find(this.attr('widgetList'),
+    return loFind(this.attr('widgetList'),
       (widget) => widget.countsName === countsName);
   },
   /**

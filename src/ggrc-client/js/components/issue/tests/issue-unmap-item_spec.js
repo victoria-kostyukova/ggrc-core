@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loAssign from 'lodash/assign';
 import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-unmap-item';
@@ -257,7 +258,7 @@ describe('issue-unmap-item component', () => {
         let oldRelatedObjectType = relatedObject.type;
         let expectedUrl;
 
-        _.assign(relatedObject, {
+        loAssign(relatedObject, {
           type: relatedObjectType,
           child_type: oldRelatedObjectType,
           child_id: 54321,

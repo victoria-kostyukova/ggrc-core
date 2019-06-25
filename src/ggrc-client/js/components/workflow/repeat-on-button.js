@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -79,7 +80,7 @@ export default canComponent.extend({
       let unitOptions = this.attr('unitOptions');
 
       if (this.attr('state.result.unit')) {
-        selectedRepeatEvery = _.find(unitOptions, function (option) {
+        selectedRepeatEvery = loFind(unitOptions, function (option) {
           return option.value === this.attr('state.result.unit');
         }.bind(this));
         repeatOptions.forEach(function (option) {

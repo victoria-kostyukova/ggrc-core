@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   */
 
+import loEvery from 'lodash/every';
 import canList from 'can-list';
 import canMap from 'can-map';
 import {viewModel, events} from '../sub-tree-models';
@@ -230,7 +231,7 @@ describe('sub-tree-models component', function () {
       let result;
 
       vm.selectAll(event);
-      result = _.every(vm.attr('modelsList'), function (item) {
+      result = loEvery(vm.attr('modelsList'), function (item) {
         return item.display === true;
       });
       expect(result).toBe(true);
@@ -240,7 +241,7 @@ describe('sub-tree-models component', function () {
       let result;
 
       vm.selectNone(event);
-      result = _.every(vm.attr('modelsList'), function (item) {
+      result = loEvery(vm.attr('modelsList'), function (item) {
         return item.display === false;
       });
       expect(result).toBe(true);

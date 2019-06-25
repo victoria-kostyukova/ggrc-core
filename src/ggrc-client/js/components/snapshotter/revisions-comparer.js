@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDifferenceBy from 'lodash/differenceBy';
+import loReverse from 'lodash/reverse';
+import loDebounce from 'lodash/debounce';
+import loEach from 'lodash/each';
+import loIsEqual from 'lodash/isEqual';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
@@ -137,7 +142,7 @@ export default canComponent.extend({
         // set correct order of revisions
         const isNeedReverse = revisions[0].id !== currentRevisionID;
         if (isNeedReverse) {
-          revisions = _.reverse(revisions);
+          revisions = loReverse(revisions);
         }
         return new canList(revisions);
       });
@@ -217,7 +222,7 @@ export default canComponent.extend({
      * @param {Object} $target - jQuery object
      * @param {canList} revisions - revisions for comparing
      */
-    highlightDifference: _.debounce(function ($target, revisions) {
+    highlightDifference: loDebounce(function ($target, revisions) {
       this.highlightAttributes($target);
       this.highlightCustomRoles($target);
       this.highlightAttachments($target, revisions);
@@ -269,8 +274,8 @@ export default canComponent.extend({
         const listNew = $value2.find(listSelector);
 
         if (listOld.length || listNew.length) {
-          const diffLeft = _.differenceBy(listOld, listNew, 'innerHTML');
-          const diffRight = _.differenceBy(listNew, listOld, 'innerHTML');
+          const diffLeft = loDifferenceBy(listOld, listNew, 'innerHTML');
+          const diffRight = loDifferenceBy(listNew, listOld, 'innerHTML');
           const diffs = [
             {attr: $value1, list: diffLeft},
             {attr: $value2, list: diffRight},
@@ -349,7 +354,7 @@ export default canComponent.extend({
         const valueNew = Object.assign({},
           right && right instanceof canMap && right.attr() || []);
 
-        return _.isEqual(valueOld, valueNew);
+        return loIsEqual(valueOld, valueNew);
       }
 
       /**
@@ -358,7 +363,7 @@ export default canComponent.extend({
        */
       function highlightValues(selector) {
         const infoPanes = $target.find('.info .tier-content');
-        _.each(infoPanes, (pane) => {
+        loEach(infoPanes, (pane) => {
           $(pane).find(selector).addClass(HIGHLIGHT_CLASS);
         });
       }

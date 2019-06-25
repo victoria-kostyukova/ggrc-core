@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsNull from 'lodash/isNull';
+import loIsUndefined from 'lodash/isUndefined';
+import loAssign from 'lodash/assign';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 import '../../components/assessment-template-clone/assessment-template-clone';
@@ -70,8 +73,8 @@ const ObjectMapper = canControl.extend({
       return;
     }
 
-    if (_.isUndefined(data.join_object_type) ||
-      _.isNull(data.join_object_type)) {
+    if (loIsUndefined(data.join_object_type) ||
+      loIsNull(data.join_object_type)) {
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
@@ -93,11 +96,11 @@ const ObjectMapper = canControl.extend({
         config: getConfigForCommonObjects(data).general,
       }];
 
-      _.assign(config.general, {useSnapshots: true});
-      _.assign(config.special, special);
+      loAssign(config.general, {useSnapshots: true});
+      loAssign(config.special, special);
 
       if (data.is_new) {
-        _.assign(config.general, {
+        loAssign(config.general, {
           object: data.join_object_type,
           type: data.join_option_type,
           isNew: true,
@@ -112,8 +115,8 @@ const ObjectMapper = canControl.extend({
       }
 
       if (
-        _.isUndefined(data.join_object_id) ||
-        _.isNull(data.join_object_id)
+        loIsUndefined(data.join_object_id) ||
+        loIsNull(data.join_object_id)
       ) {
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
@@ -131,7 +134,7 @@ const ObjectMapper = canControl.extend({
         return;
       }
 
-      _.assign(config.general, {
+      loAssign(config.general, {
         object: data.join_object_type,
         'join-object-id': data.join_object_id,
         type: data.join_option_type,
@@ -160,7 +163,7 @@ const ObjectMapper = canControl.extend({
 
       const {relation} = getMegaObjectRelation(data.mega_object_widget);
 
-      _.assign(config.general, {
+      loAssign(config.general, {
         isMegaObject: data.mega_object,
         megaRelation: relation,
       });
@@ -186,7 +189,7 @@ const ObjectMapper = canControl.extend({
     function getConfigForCommonObjects(data) {
       let base = getBaseConfig();
 
-      _.assign(base.general, {
+      loAssign(base.general, {
         object: data.join_object_type,
         type: data.join_option_type,
         'join-object-id': data.join_object_id,

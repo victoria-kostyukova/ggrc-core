@@ -3,6 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loResult from 'lodash/result';
+import loIsNull from 'lodash/isNull';
+import loIncludes from 'lodash/includes';
+import loIsEmpty from 'lodash/isEmpty';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
+import loIsEqual from 'lodash/isEqual';
 import canBatch from 'can-event/batch/batch';
 import canMap from 'can-map';
 import {
@@ -44,16 +51,16 @@ const ObjectOperationsBaseVM = canMap.extend({
    */
   extractConfig: function (type, config) {
     let resultConfig;
-    let special = _.result(
-      _.find(
+    let special = loResult(
+      loFind(
         config.special,
         function (special) {
-          return _.includes(special.types, type);
+          return loIncludes(special.types, type);
         }),
       'config'
     );
 
-    resultConfig = !_.isEmpty(special) ? special : config.general;
+    resultConfig = !loIsEmpty(special) ? special : config.general;
     return resultConfig;
   },
 }, {
@@ -95,7 +102,7 @@ const ObjectOperationsBaseVM = canMap.extend({
         }
 
         configHandler(resultConfig);
-        if (_.isNull(this.attr('freezedConfigTillSubmit'))) {
+        if (loIsNull(this.attr('freezedConfigTillSubmit'))) {
           this.attr('freezedConfigTillSubmit', resultConfig);
         }
 
@@ -169,7 +176,7 @@ const ObjectOperationsBaseVM = canMap.extend({
     canBatch.start();
 
     // do not update fields with the same values in VM and config
-    _.forEach(config, (value, key) => {
+    loForEach(config, (value, key) => {
       let vmValue = this.attr(key);
       let hasSerialize = Boolean(vmValue && vmValue.serialize);
 
@@ -177,7 +184,7 @@ const ObjectOperationsBaseVM = canMap.extend({
         vmValue = vmValue.serialize();
       }
 
-      if (!_.isEqual(vmValue, value)) {
+      if (!loIsEqual(vmValue, value)) {
         this.attr(key, value);
       }
     });

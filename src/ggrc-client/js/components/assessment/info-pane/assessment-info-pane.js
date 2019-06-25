@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loKeyBy from 'lodash/keyBy';
+import loCapitalize from 'lodash/capitalize';
+import loFindIndex from 'lodash/findIndex';
 import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
@@ -284,7 +287,7 @@ export default canComponent.extend({
     requestQuery: function (query, type) {
       let dfd = $.Deferred();
       type = type || '';
-      this.attr('isUpdating' + _.capitalize(type), true);
+      this.attr('isUpdating' + loCapitalize(type), true);
 
       batchRequests(query)
         .done(function (response) {
@@ -296,7 +299,7 @@ export default canComponent.extend({
           dfd.resolve([]);
         })
         .always(function () {
-          this.attr('isUpdating' + _.capitalize(type), false);
+          this.attr('isUpdating' + loCapitalize(type), false);
 
           tracker.stop(this.attr('instance.type'),
             tracker.USER_JOURNEY_KEYS.INFO_PANE,
@@ -318,7 +321,7 @@ export default canComponent.extend({
     },
     updateItems: function () {
       makeArray(arguments).forEach(function (type) {
-        this.attr(type).replace(this['load' + _.capitalize(type)]());
+        this.attr(type).replace(this['load' + loCapitalize(type)]());
       }.bind(this));
     },
     removeItems: function (event, type) {
@@ -326,7 +329,7 @@ export default canComponent.extend({
 
       canBatch.start();
       let resultItems = items.filter((item) => {
-        let newItemIndex = _.findIndex(event.items, (newItem) => {
+        let newItemIndex = loFindIndex(event.items, (newItem) => {
           return newItem === item;
         });
         return newItemIndex < 0;
@@ -337,7 +340,7 @@ export default canComponent.extend({
     },
     addItems: function (event, type) {
       let items = event.items;
-      this.attr('isUpdating' + _.capitalize(type), true);
+      this.attr('isUpdating' + loCapitalize(type), true);
       return this.attr(type).unshift(...makeArray(items));
     },
     getEvidenceAdditionFilter: function (kind) {
@@ -411,7 +414,7 @@ export default canComponent.extend({
         })
         .always(function (assessment) {
           assessment.removeAttr('actions');
-          self.attr('isUpdating' + _.capitalize(type), false);
+          self.attr('isUpdating' + loCapitalize(type), false);
 
           // dispatching event on instance to pass to the auto-save-form
           self.attr('instance').dispatch(RELATED_ITEMS_LOADED);
@@ -429,7 +432,7 @@ export default canComponent.extend({
       };
       let items = self.attr(type);
       let index = items.indexOf(item);
-      this.attr('isUpdating' + _.capitalize(type), true);
+      this.attr('isUpdating' + loCapitalize(type), true);
       items.splice(index, 1);
 
       this.attr('deferredSave').push(function () {
@@ -441,7 +444,7 @@ export default canComponent.extend({
         })
         .always(function (assessment) {
           assessment.removeAttr('actions');
-          self.attr('isUpdating' + _.capitalize(type), false);
+          self.attr('isUpdating' + loCapitalize(type), false);
 
           self.refreshCounts(['Evidence']);
         });
@@ -546,7 +549,7 @@ export default canComponent.extend({
       );
 
       let updatedFormFields = convertValuesToFormFields(cavs);
-      let updatedFieldsIds = _.keyBy(updatedFormFields, 'id');
+      let updatedFieldsIds = loKeyBy(updatedFormFields, 'id');
 
       this.attr('formFields').forEach((field) => {
         let updatedField = updatedFieldsIds[field.attr('id')];
@@ -611,7 +614,7 @@ export default canComponent.extend({
       }
 
       if (doneStatuses.includes(newStatus) && !instance.validateGCAs()) {
-        notifier('error', `Please fill in the required fields at 
+        notifier('error', `Please fill in the required fields at
           'Other Attributes' tab to complete assessment.`);
         return $.Deferred().reject();
       }

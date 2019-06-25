@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loDebounce from 'lodash/debounce';
+import loGet from 'lodash/get';
+import loIsNull from 'lodash/isNull';
+import loFindIndex from 'lodash/findIndex';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -335,9 +339,9 @@ let viewModel = canMap.extend({
     let countsName = this.attr('options.countsName');
     let loaded = this.attr('loaded');
     let total = this.attr('pageInfo.total');
-    let counts = _.get(getCounts(), countsName);
+    let counts = loGet(getCounts(), countsName);
 
-    if (!_.isNull(loaded) && (total !== counts)) {
+    if (!loIsNull(loaded) && (total !== counts)) {
       this.loadItems();
     }
 
@@ -436,7 +440,7 @@ let viewModel = canMap.extend({
     };
 
     // timeout required to let server correctly calculate changed counts
-    const _refreshCounts = _.debounce(() => {
+    const _refreshCounts = loDebounce(() => {
       if (isMyWork() || isAllObjects()) {
         const location = window.location.pathname;
         const widgetModels = getWidgetModels('Person', location);
@@ -547,7 +551,7 @@ let viewModel = canMap.extend({
     let showedItems = this.attr('showedItems');
     let pageInfo = this.attr('pageInfo');
     let startIndex = pageInfo.pageSize * (pageInfo.current - 1);
-    let relativeItemIndex = _.findIndex(showedItems,
+    let relativeItemIndex = loFindIndex(showedItems,
       {id: instance.id, type: instance.type});
     return relativeItemIndex > -1 ?
       startIndex + relativeItemIndex :

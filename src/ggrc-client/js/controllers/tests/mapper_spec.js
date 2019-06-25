@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loOmit from 'lodash/omit';
+import loAssign from 'lodash/assign';
 import canMap from 'can-map';
 import {
   ObjectMapper as Ctrl,
@@ -85,7 +87,7 @@ describe('ObjectMapper', function () {
       it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
       'if data has is_new`, function () {
         let args;
-        method(_.assign(fakeData, {
+        method(loAssign(fakeData, {
           is_new: true,
         }), false);
 
@@ -107,7 +109,7 @@ describe('ObjectMapper', function () {
       it('throws Error with message if data.join_object_id does not exist',
         function () {
           let closure = function () {
-            method(_.omit(fakeData, 'join_object_id'));
+            method(loOmit(fakeData, 'join_object_id'));
           };
 
           expect(closure).toThrowError();
@@ -118,7 +120,7 @@ describe('ObjectMapper', function () {
       let fakeDataForCommon;
 
       beforeEach(function () {
-        fakeDataForCommon = _.assign({}, fakeData, {
+        fakeDataForCommon = loAssign({}, fakeData, {
           toggle: 'unified unified-search',
         });
         spyOn(ObjectSearch, 'launch');
@@ -163,7 +165,7 @@ describe('ObjectMapper', function () {
       let fakeDataForMega;
 
       beforeEach(function () {
-        fakeDataForMega = _.assign({}, fakeData, {
+        fakeDataForMega = loAssign({}, fakeData, {
           mega_object: 'Program',
           mega_object_widget: 'Program_parent',
           toggle: 'unified unified-search',

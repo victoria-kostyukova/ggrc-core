@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIsFunction from 'lodash/isFunction';
 import Cacheable from '../cacheable';
 import tracker from '../../tracker';
 import caUpdate from '../mixins/ca-update';
@@ -42,7 +43,7 @@ export default Cacheable.extend({
       attr_name: 'email',
     }, {
       attr_title(viewType) {
-        viewType = _.isFunction(viewType) ? viewType() : viewType;
+        viewType = loIsFunction(viewType) ? viewType() : viewType;
         if (viewType === 'unified-mapper') {
           return 'System Authorizations';
         }

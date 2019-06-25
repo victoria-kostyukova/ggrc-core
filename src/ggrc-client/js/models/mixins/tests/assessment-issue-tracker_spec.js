@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSet from 'lodash/set';
 import canMap from 'can-map';
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
@@ -92,7 +93,7 @@ describe('assessmentIssueTracker mixin', () => {
         .and.returnValue({ });
 
       let dfd = new $.Deferred();
-      dfd.resolve(_.set({}, 'Audit.values[0]', audit));
+      dfd.resolve(loSet({}, 'Audit.values[0]', audit));
       spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
 
       assessment.attr('audit', null);

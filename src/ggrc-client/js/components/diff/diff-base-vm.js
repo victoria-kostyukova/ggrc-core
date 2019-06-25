@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canMap from 'can-map';
 export default canMap.extend({
   currentInstance: {},
@@ -17,7 +18,7 @@ export default canMap.extend({
       return name;
     }
 
-    displayName = (_.find(attrDefs, (attr) => attr.attr_name === name) || {})
+    displayName = (loFind(attrDefs, (attr) => attr.attr_name === name) || {})
       .display_name;
 
     return displayName || name;

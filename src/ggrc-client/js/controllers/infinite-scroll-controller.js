@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loDebounce from 'lodash/debounce';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canControl from 'can-control';
@@ -94,7 +95,7 @@ const LhnTooltipsControl = canControl.extend({
   '{trigger_selector} mouseleave': 'on_mouseleave',
   '{extended} mouseleave': 'on_mouseleave',
   '{extended} mouseenter': 'on_tooltip_mouseenter',
-  on_mouseenter: _.debounce(function (el) {
+  on_mouseenter: loDebounce(function (el) {
     let instance = el.closest('[data-model]').data('model') ||
         el.closest(':data(model)').data('model');
     let delay = this.options.fade_in_delay;

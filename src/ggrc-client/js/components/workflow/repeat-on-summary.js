@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -19,7 +20,7 @@ export default canComponent.extend({
         get: function () {
           let result = '';
           let repeatEvery = this.attr('repeatEvery');
-          let unit = _.find(workflowUnitOptions, (option) => {
+          let unit = loFind(workflowUnitOptions, (option) => {
             return option.value === this.attr('unit');
           });
 

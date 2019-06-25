@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSnakeCase from 'lodash/snakeCase';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -33,7 +34,7 @@ const viewModel = canMap.extend({
     return {
       stub: new Stub(object),
       title: object.title,
-      iconClass: `fa-${_.snakeCase(object.type)}`,
+      iconClass: `fa-${loSnakeCase(object.type)}`,
       disabled: false,
     };
   },
