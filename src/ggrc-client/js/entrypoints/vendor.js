@@ -7,7 +7,6 @@
 import '../plugins/console-interceptor';
 
 import 'jquery';
-import 'lodash';
 import 'components-jqueryui/ui/widgets/autocomplete';
 import 'components-jqueryui/ui/widgets/datepicker';
 import 'components-jqueryui/ui/widgets/draggable';

@@ -26,7 +26,6 @@ import {
   isAuditor,
 } from './plugins/utils/acl-utils';
 import Permission from './permission';
-import _ from 'lodash';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import {
