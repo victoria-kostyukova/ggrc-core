@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../../../plugins/ggrc_utils';
 import loHead from 'lodash/head';
 import loIndexOf from 'lodash/indexOf';
 import loIncludes from 'lodash/includes';
@@ -49,7 +50,7 @@ export default canComponent.extend({
       let selected = this.attr('selected');
       let title = loTrim(selected.title);
       let type = loTrim(selected.type);
-      let values = _.splitTrim(selected.values, {
+      let values = splitTrim(selected.values, {
         unique: true,
       }).join(',');
       this.attr('selected.invalidValues', false);

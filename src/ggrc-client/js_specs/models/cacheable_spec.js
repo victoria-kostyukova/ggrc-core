@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../../js/plugins/ggrc_utils';
 import loIncludes from 'lodash/includes';
 import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
@@ -227,8 +228,8 @@ describe('Cacheable model', () => {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
-        let ids = _.filteredMap(items, (item) => item.id);
-        return _.filteredMap(dummyInsts, (inst) =>
+        let ids = filteredMap(items, (item) => item.id);
+        return filteredMap(dummyInsts, (inst) =>
           loIncludes(ids, inst.id) ? inst : undefined);
       });
       DummyModel.findAll().then(() => {

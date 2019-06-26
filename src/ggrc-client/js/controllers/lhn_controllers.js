@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../plugins/ggrc_utils';
 import loDebounce from 'lodash/debounce';
 import loForEach from 'lodash/forEach';
 import canCompute from 'can-compute';
@@ -451,7 +452,7 @@ const LhnSearchControl = canControl.extend({
         this.options._hasPendingRefresh = true;
         return;
       }
-      modelNames = _.filteredMap(
+      modelNames = filteredMap(
         this.get_visible_lists(), ($list) => this.get_list_model($list));
       modelName = instance.constructor.model_singular;
 
@@ -839,9 +840,9 @@ const LhnSearchControl = canControl.extend({
     }
 
 
-    models = _.filteredMap(this.get_lists(),
+    models = filteredMap(this.get_lists(),
       ($list) => this.get_list_model($list));
-    extraModels = _.filteredMap(
+    extraModels = filteredMap(
       this.get_lists(), ($list) => this.get_extra_list_model($list));
 
     this.options._hasPendingRefresh = false;
@@ -859,14 +860,14 @@ const LhnSearchControl = canControl.extend({
     let self = this;
     let searchId = this.search_id;
     let lists = this.get_visible_lists();
-    let models = _.filteredMap(lists, ($list) => this.get_list_model($list));
+    let models = filteredMap(lists, ($list) => this.get_list_model($list));
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
       return $.Deferred().resolve();
     }
 
-    models = _.filteredMap(models, (modelName) => {
+    models = filteredMap(models, (modelName) => {
       if (self.options.loaded_lists.indexOf(modelName) === -1) {
         return modelName;
       }
@@ -944,7 +945,7 @@ const LhnSearchControl = canControl.extend({
   },
   get_visible_lists: function () {
     let self = this;
-    return _.filteredMap(this.get_lists(), ($list) => {
+    return filteredMap(this.get_lists(), ($list) => {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
         self.options.list_mid_level_selector].join(',')).hasClass('in')) {

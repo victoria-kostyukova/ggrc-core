@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../../plugins/ggrc_utils';
 import loIsString from 'lodash/isString';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -37,7 +38,7 @@ export default canComponent.extend({
             }];
           let list = [];
           if (!isGroupedDropdown) {
-            list = _.filteredMap(
+            list = filteredMap(
               this.attr('optionsList') || [], (option) => {
                 if (loIsString(option)) {
                   return {

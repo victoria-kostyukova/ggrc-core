@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../../plugins/ggrc_utils';
 import loIdentity from 'lodash/identity';
 import loKeys from 'lodash/keys';
 import loPickBy from 'lodash/pickBy';
@@ -23,7 +24,7 @@ export default canComponent.extend({
     let values = viewModel.attr('instance.' + viewModel.attr('property'));
 
     if (values && loIsString(values)) {
-      loForEach(_.splitTrim(values, ','), function (val) {
+      loForEach(splitTrim(values, ','), function (val) {
         if (val) {
           viewModel.attr('values.' + val, true);
         }

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../../plugins/ggrc_utils';
 import loOrderBy from 'lodash/orderBy';
 import Cacheable from '../cacheable';
 import {getRoleableModels} from '../../plugins/utils/models-utils';
@@ -22,7 +23,7 @@ export default Cacheable.extend({
     // a list of objects in the Custom Roles widget.
     let types = loOrderBy(getRoleableModels(), 'category', false);
 
-    let instances = _.filteredMap(types, (type, i) => {
+    let instances = filteredMap(types, (type, i) => {
       let withId = Object.assign({}, type, {id: i});
       return new this(withId);
     });

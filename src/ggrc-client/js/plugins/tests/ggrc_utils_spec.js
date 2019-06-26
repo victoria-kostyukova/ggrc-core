@@ -6,6 +6,7 @@
 import {
   getTruncatedList,
   getOnlyAnchorTags,
+  splitTrim,
 } from '../ggrc_utils';
 
 describe('getTruncatedList() util', () => {
@@ -64,5 +65,77 @@ describe('getOnlyAnchorTags() util', () => {
 
     expect(result)
       .toBe('sample text');
+  });
+});
+
+describe('splitTrim() method', function () {
+  describe('Given an string with dots and dot splitter', function () {
+    let input = 'a. b. c. d. a. b . . b';
+    let splitter = '.';
+
+    it('return split without spaces', function () {
+      let result = splitTrim(input, splitter);
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'a', 'b', '', 'b']);
+    });
+
+    it('return unique values without spaces', function () {
+      let result = splitTrim(input, splitter, {
+        unique: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd', '']);
+    });
+
+    it('return compact values without spaces', function () {
+      let result = splitTrim(input, splitter, {
+        compact: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'a', 'b', 'b']);
+    });
+
+    it('return compact and uniquee values without spaces', function () {
+      let result = splitTrim(input, splitter, {
+        unique: true,
+        compact: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd']);
+    });
+  });
+
+  describe('Given an string with commas given default splitter', function () {
+    let input = 'a,b,c , d ,c,a  b, , , f';
+
+    it('return values without spaces', function () {
+      let result = splitTrim(input);
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'c', 'a  b', '', '', 'f']);
+    });
+
+    it('return unique split values without spaces', function () {
+      let result = splitTrim(input, {
+        unique: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', '', 'f']);
+    });
+
+    it('return compact split values without spaces', function () {
+      let result = splitTrim(input, {
+        compact: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'c', 'a  b', 'f']);
+    });
+
+    it('return unique and compact split values without spaces', function () {
+      let result = splitTrim(input, {
+        compact: true,
+        unique: true,
+      });
+      expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', 'f']);
+    });
+  });
+
+  describe('Given no value', function () {
+    it('returns empty array', function () {
+      let result = splitTrim(undefined);
+      expect(result).toEqual([]);
+    });
   });
 });

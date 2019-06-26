@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../plugins/ggrc_utils';
 import loCompact from 'lodash/compact';
 import loIsArray from 'lodash/isArray';
 import loUniq from 'lodash/uniq';
@@ -111,7 +112,7 @@ validatejs.validators.validateMultiChoiceOptions = (value,
     return; // all ok, the value of multi_choice_options not needed
   }
 
-  choices = _.splitTrim(value, ',');
+  choices = splitTrim(value, ',');
 
   if (!choices.length) {
     return 'At least one possible value required.';

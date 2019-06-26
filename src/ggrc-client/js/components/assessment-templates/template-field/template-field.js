@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim, filteredMap} from '../../../plugins/ggrc_utils';
 import loZip from 'lodash/zip';
 import loRange from 'lodash/range';
 import loFind from 'lodash/find';
@@ -51,8 +52,8 @@ export default canComponent.extend({
      * ]
      */
     denormalizeMandatory: function (field) {
-      let options = _.splitTrim(field.attr('multi_choice_options'));
-      let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
+      let options = splitTrim(field.attr('multi_choice_options'));
+      let vals = splitTrim(field.attr('multi_choice_mandatory'));
       let isEqualLength = options.length === vals.length;
       let range;
 
@@ -84,7 +85,7 @@ export default canComponent.extend({
      * is normalized into "2, 3" (10b, 11b).
      */
     normalizeMandatory: function (attrs) {
-      return _.filteredMap(attrs, ddValidationMapToValue).join(',');
+      return filteredMap(attrs, ddValidationMapToValue).join(',');
     },
   }),
   events: {

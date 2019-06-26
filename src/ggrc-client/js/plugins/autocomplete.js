@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../plugins/ggrc_utils';
 import loDefer from 'lodash/defer';
 import loDebounce from 'lodash/debounce';
 import loIsNumber from 'lodash/isNumber';
@@ -59,7 +60,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
           if (objs.length || isNextPage) {
             // Envelope the object to not break model instance due to
             // shallow copy done by jQuery in `response()`
-            objs = _.filteredMap(objs, (obj) => {
+            objs = filteredMap(objs, (obj) => {
               return {
                 item: obj,
               };
@@ -202,7 +203,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
     if (baseSearch) {
       searchtypes = baseSearch.trim().split(',');
 
-      this.options.searchtypes = _.filteredMap(searchtypes,
+      this.options.searchtypes = filteredMap(searchtypes,
         (typeName) => businessModels[typeName].model_singular);
     }
   },
@@ -216,7 +217,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
       model_class: modelClass,
       model: model,
       // Reverse the enveloping we did 25 lines up
-      items: _.filteredMap(items, (item) => item.item),
+      items: filteredMap(items, (item) => item.item),
     };
   },
 
@@ -256,7 +257,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
           try {
             listItems = context.attr('items');
             context.attr('oldLen', listItems.length);
-            listItems.push(..._.filteredMap(items, (item) => item.item));
+            listItems.push(...filteredMap(items, (item) => item.item));
           } catch (error) {
             // Really ugly way to hide canjs exception during scrolling.
             // Please note that it occurs in really rear cases.
@@ -320,7 +321,7 @@ $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
           let ids = responseArr[objName].ids;
           let model = businessModels[objName];
 
-          let res = _.filteredMap(ids, (id) =>
+          let res = filteredMap(ids, (id) =>
             getInstance(model.model_singular, id));
           dfd.resolve(res);
         });

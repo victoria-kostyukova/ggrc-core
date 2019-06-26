@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../../plugins/ggrc_utils';
 import loCompact from 'lodash/compact';
 import loUniq from 'lodash/uniq';
 import Cacheable from '../cacheable';
@@ -54,7 +55,7 @@ export default Cacheable.extend({
         return ''; // all ok, the value of multi_choice_options not needed
       }
 
-      const choices = _.splitTrim(newVal, ',');
+      const choices = splitTrim(newVal, ',');
 
       if (!choices.length) {
         return 'At least one possible value required.';
