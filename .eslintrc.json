@@ -17,7 +17,6 @@
   },
 
   "globals": {
-    "_": false,
     "GGRC": false,
     "moment": false,
     "MutationObserver": false,
