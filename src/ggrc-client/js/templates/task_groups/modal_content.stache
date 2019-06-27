@@ -84,7 +84,7 @@
           </label>
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </div>
-        <input disabled tabindex="8" class="input-block-level" name="slug" placeholder="TASKGROUP-XXX" type="text" value="{{instance.slug}}">
+        <input disabled class="input-block-level" type="text" value="{{instance.slug}}">
       </div>
     </div>
   {{/if}}

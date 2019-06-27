@@ -90,7 +90,7 @@
           Code
         </label>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input disabled tabindex="7" class="input-block-level" name="slug" placeholder="SYSTEM-XXX" type="text" value="{{slug}}">
+        <input disabled class="input-block-level" type="text" value="{{slug}}">
       </div>
     {{/if}}
     <div class="span6 hidable">

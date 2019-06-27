@@ -40,10 +40,7 @@
         Code
       </label>
       <input disabled
-        tabindex="14"
         class="input-block-level"
-        name="slug"
-        placeholder="ASSESSMENT-XXX"
         type="text"
         value:from="slug">
     </div>

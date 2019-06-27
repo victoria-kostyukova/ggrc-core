@@ -89,7 +89,7 @@
         Code
       </label>
       <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <input disabled tabindex="6" class="input-block-level" name="slug" placeholder="PRODUCTGROUP-XXX" type="text" value="{{slug}}">
+      <input disabled class="input-block-level" type="text" value="{{slug}}">
     </div>
   </div>
   {{/if}}

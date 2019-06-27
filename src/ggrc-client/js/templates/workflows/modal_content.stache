@@ -129,9 +129,7 @@
           </label>
           <input
             disabled
-            tabindex="8"
             class="input-block-level"
-            placeholder="WORKFLOW-XXX"
             type="text"
             value:bind="instance.slug">
         </div>
