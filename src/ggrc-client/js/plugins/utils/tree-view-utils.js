@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loMap from 'lodash/map';
+import loSortBy from 'lodash/sortBy';
 import loLast from 'lodash/last';
 import loAssign from 'lodash/assign';
 import makeArray from 'can-util/js/make-array/make-array';
@@ -111,17 +113,14 @@ const NO_DEFAULT_SORTING_LIST = Object.freeze([
 
 allTypes.forEach(function (type) {
   let related = baseWidgets[type].slice(0);
-
-  orderedModelsForSubTier[type] = _.chain(related)
-    .map(function (type) {
-      return {
-        name: type,
-        order: defaultOrderTypes[type],
-      };
-    })
-    .sortBy(['order', 'name'])
-    .map('name')
-    .value();
+  let types = loMap(related, (type) => {
+    return {
+      name: type,
+      order: defaultOrderTypes[type],
+    };
+  });
+  types = loSortBy(types, ['order', 'name']);
+  orderedModelsForSubTier[type] = loMap(types, 'name');
 });
 
 // Define specific rules for Workflow models

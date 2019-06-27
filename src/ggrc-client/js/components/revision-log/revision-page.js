@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loJoin from 'lodash/join';
+import loCompact from 'lodash/compact';
+import loConcat from 'lodash/concat';
+import loMapValues from 'lodash/mapValues';
+import loGroupBy from 'lodash/groupBy';
 import loReverse from 'lodash/reverse';
 import loFlow from 'lodash/flow';
 import loXor from 'lodash/xor';
@@ -76,13 +81,16 @@ export default canComponent.extend({
       this._loadACLPeople(revisions.object);
 
       // combine all the changes and sort them by date descending
-      let changeHistory = _([]).concat(
-        makeArray(this._computeObjectChanges(revisions.object,
+      let changeHistory = loConcat(
+        [],
+        makeArray(this._computeObjectChanges(
+          revisions.object,
           revisions.revisionsForCompare)),
-        makeArray(this._computeMappingChanges(revisions.mappings)))
-        .sortBy('updatedAt')
-        .reverse()
-        .value();
+        makeArray(this._computeMappingChanges(revisions.mappings))
+      );
+      changeHistory = loSortBy(changeHistory, 'updatedAt');
+      changeHistory = loReverse(changeHistory);
+
       this.attr('changeHistory', changeHistory);
     },
     /**
@@ -214,10 +222,16 @@ export default canComponent.extend({
           }
           if (LIST_FIELDS[fieldName]) {
             if (value) {
-              value = _(value).splitTrim(',').sort().compact().join(', ');
+              value = _.splitTrim(value, ',');
+              value = value.sort();
+              value = loCompact(value);
+              value = loJoin(value, ', ');
             }
             if (origVal) {
-              origVal = _(origVal).splitTrim(',').sort().compact().join(', ');
+              origVal = _.splitTrim(origVal, ',');
+              origVal = origVal.sort();
+              origVal = loCompact(origVal);
+              origVal = loJoin(origVal, ', ');
             }
           }
           if (origVal || value) {
@@ -349,24 +363,23 @@ export default canComponent.extend({
       ids = loUniq(loKeys(origValues).concat(loKeys(newValues)));
       defs = loMerge(origDefs, newDefs);
 
-      return _.chain(ids)
-        .filter((id) => !!defs[id])
-        .map((id) => {
-          const def = defs[id];
-          const diff = {
-            fieldName: def.title,
-            origVal:
-              showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
-            newVal:
-              showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE,
-          };
-          if (diff.origVal === diff.newVal) {
-            return undefined;
-          }
-          return diff;
-        })
-        .filter()
-        .value();
+      let resultIds = loFilter(ids, (id) => !!defs[id]);
+      resultIds = loMap(resultIds, (id) => {
+        const def = defs[id];
+        const diff = {
+          fieldName: def.title,
+          origVal:
+            showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
+          newVal:
+            showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE,
+        };
+        if (diff.origVal === diff.newVal) {
+          return undefined;
+        }
+        return diff;
+      });
+      resultIds = loFilter(resultIds);
+      return resultIds;
     },
     /**
      * Compute the instance's object mapping-related changes from the list of
@@ -380,14 +393,13 @@ export default canComponent.extend({
      *   method.
      */
     _computeMappingChanges: function (revisions) {
-      let chains = _.chain(revisions)
-        .groupBy('resource_id')
-        .mapValues(function (chain) {
-          return loSortBy(chain, 'updated_at');
-        }).value();
-      return loMap(revisions, function (revision) {
-        return this._mappingChange(revision, chains[revision.resource_id]);
-      }.bind(this));
+      let chains = loGroupBy(revisions, 'resource_id');
+      chains = loMapValues(chains, (chain) => {
+        return loSortBy(chain, 'updated_at');
+      });
+
+      return loMap(revisions, (revision) =>
+        this._mappingChange(revision, chains[revision.resource_id]));
     },
     /**
      * A helper function for extracting the mapping change information from a

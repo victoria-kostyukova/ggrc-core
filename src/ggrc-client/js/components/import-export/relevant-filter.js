@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSortBy from 'lodash/sortBy';
+import loCompact from 'lodash/compact';
+import loMap from 'lodash/map';
+import loConcat from 'lodash/concat';
 import loForEach from 'lodash/forEach';
 import loFind from 'lodash/find';
 import makeArray from 'can-util/js/make-array/make-array';
@@ -48,12 +52,11 @@ export default canComponent.extend({
         TreeViewConfig.attr('base_widgets_by_type')
       );
 
-      return _(workflowRelatedTypes)
-        .concat(baseWidgetsTypes)
-        .map((mapping) => businessModels[mapping])
-        .compact()
-        .sortBy('model_singular')
-        .value();
+      let relatedTypes = loConcat(workflowRelatedTypes, baseWidgetsTypes);
+      relatedTypes = loMap(relatedTypes, (mapping) => businessModels[mapping]);
+      relatedTypes = loCompact(relatedTypes);
+      relatedTypes = loSortBy(relatedTypes, 'model_singular');
+      return relatedTypes;
     },
     optionHidden: function (option) {
       let type = option.model_singular;

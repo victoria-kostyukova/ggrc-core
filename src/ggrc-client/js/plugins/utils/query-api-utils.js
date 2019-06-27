@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loCompact from 'lodash/compact';
 import loGroupBy from 'lodash/groupBy';
 import loIsNumber from 'lodash/isNumber';
 import loMap from 'lodash/map';
@@ -124,19 +125,16 @@ function buildParam(objName, page, relevant, fields, filters) {
   }
 
   if (page.sort) {
-    params.order_by = _
-      .chain(page.sort)
-      .map((el) => {
-        if (el.key) {
-          return {
-            name: el.key,
-            desc: el.direction === 'desc',
-          };
-        }
-      })
-      .compact()
-      .value();
+    params.order_by = loMap(page.sort, (el) => {
+      if (el.key) {
+        return {
+          name: el.key,
+          desc: el.direction === 'desc',
+        };
+      }
+    });
 
+    params.order_by = loCompact(params.order_by);
     params.order_by = params.order_by.length ? params.order_by : undefined;
   }
 
