@@ -159,7 +159,9 @@ class TestEventLogTabDestructive(base.Test):
       acl_roles_len = len(ACLRolesIDs.object_roles(objctv1.type)) - 4
       exp_event_data = [
           {"actions": sorted(
-              [objctv1_creator.email + " created", u"PersonProfile created"]),
+              [objctv1_creator.email + " created",
+               u"AccessControlList created", u"AccessControlPerson created",
+               u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
               objctv1_creator.updated_at)},
@@ -168,7 +170,9 @@ class TestEventLogTabDestructive(base.Test):
            "time": date_utils.iso8601_to_local_datetime(
               objctv1_creator.updated_at)},
           {"actions": sorted(
-              [objctv2_creator.email + " created", u"PersonProfile created"]),
+              [objctv2_creator.email + " created",
+               u"AccessControlList created", u"AccessControlPerson created",
+               u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
               objctv2_creator.updated_at)},
