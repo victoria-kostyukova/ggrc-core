@@ -5,7 +5,6 @@
 
 import loEach from 'lodash/each';
 import loDifference from 'lodash/difference';
-import loAssign from 'lodash/assign';
 import loMap from 'lodash/map';
 import canMap from 'can-map';
 import * as businessModels from '../models/business-models';
@@ -142,7 +141,7 @@ loEach(baseWidgetsByType, (val, widget) => {
   }
 });
 
-baseWidgetsByType = loAssign(baseWidgetsByType, objectVersionWidgets);
+baseWidgetsByType = Object.assign(baseWidgetsByType, objectVersionWidgets);
 
 export default new canMap({
   base_widgets_by_type: baseWidgetsByType,

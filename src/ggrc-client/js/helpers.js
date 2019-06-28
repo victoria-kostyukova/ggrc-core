@@ -9,7 +9,6 @@ import loIsArray from 'lodash/isArray';
 import loIsString from 'lodash/isString';
 import loIncludes from 'lodash/includes';
 import loTrim from 'lodash/trim';
-import loAssign from 'lodash/assign';
 import loFind from 'lodash/find';
 import moment from 'moment';
 import makeArray from 'can-util/js/make-array/make-array';
@@ -632,7 +631,7 @@ Example:
 */
 canStache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
-    .add(loAssign({}, options.context, options.hash)));
+    .add(Object.assign({}, options.context, options.hash)));
 });
 
 /*

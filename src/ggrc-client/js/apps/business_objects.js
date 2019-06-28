@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loAssign from 'lodash/assign';
 import loForEach from 'lodash/forEach';
 import canMap from 'can-map';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
@@ -47,7 +46,7 @@ let CoreExtension = {};
 
 CoreExtension.name = 'core"';
 widgetModules.push(CoreExtension);
-loAssign(CoreExtension, {
+Object.assign(CoreExtension, {
   init_widgets: function () {
     let baseWidgetsByType = TreeViewConfig.attr('base_widgets_by_type');
     let widgetList = new WidgetList('ggrc_core');

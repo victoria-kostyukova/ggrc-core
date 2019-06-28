@@ -1,11 +1,9 @@
-
 /*
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import loIsNumber from 'lodash/isNumber';
-import loAssign from 'lodash/assign';
 import {ggrcAjax, ggrcGet} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -220,7 +218,7 @@ export default canControl.extend({
       });
   },
   getChartOptions: function (raw) {
-    let options = loAssign({}, this.options.chartOptions);
+    let options = Object.assign({}, this.options.chartOptions);
     let colorMaps = this.options.colorsMap;
     options.colors = raw.statuses.map(function (e) {
       return colorMaps[e.name];

@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loAssign from 'lodash/assign';
 import canMap from 'can-map';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import RefreshQueue from '../../../models/refresh_queue';
@@ -155,7 +154,7 @@ describe('object-mapper component', function () {
     });
 
     it('updates freezed config to the current config', function () {
-      loAssign(viewModel, {
+      Object.assign(viewModel, {
         updateFreezedConfigToLatest:
           jasmine.createSpy('updateFreezedConfigToLatest'),
       });

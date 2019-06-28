@@ -5,7 +5,6 @@
 
 import loIsNull from 'lodash/isNull';
 import loIsUndefined from 'lodash/isUndefined';
-import loAssign from 'lodash/assign';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 import '../../components/assessment-template-clone/assessment-template-clone';
@@ -96,11 +95,11 @@ const ObjectMapper = canControl.extend({
         config: getConfigForCommonObjects(data).general,
       }];
 
-      loAssign(config.general, {useSnapshots: true});
-      loAssign(config.special, special);
+      Object.assign(config.general, {useSnapshots: true});
+      Object.assign(config.special, special);
 
       if (data.is_new) {
-        loAssign(config.general, {
+        Object.assign(config.general, {
           object: data.join_object_type,
           type: data.join_option_type,
           isNew: true,
@@ -134,7 +133,7 @@ const ObjectMapper = canControl.extend({
         return;
       }
 
-      loAssign(config.general, {
+      Object.assign(config.general, {
         object: data.join_object_type,
         'join-object-id': data.join_object_id,
         type: data.join_option_type,
@@ -163,7 +162,7 @@ const ObjectMapper = canControl.extend({
 
       const {relation} = getMegaObjectRelation(data.mega_object_widget);
 
-      loAssign(config.general, {
+      Object.assign(config.general, {
         isMegaObject: data.mega_object,
         megaRelation: relation,
       });
@@ -189,7 +188,7 @@ const ObjectMapper = canControl.extend({
     function getConfigForCommonObjects(data) {
       let base = getBaseConfig();
 
-      loAssign(base.general, {
+      Object.assign(base.general, {
         object: data.join_object_type,
         type: data.join_option_type,
         'join-object-id': data.join_object_id,

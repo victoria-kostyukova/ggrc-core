@@ -6,7 +6,6 @@
 import loMap from 'lodash/map';
 import loSortBy from 'lodash/sortBy';
 import loLast from 'lodash/last';
-import loAssign from 'lodash/assign';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -159,7 +158,7 @@ function getAvailableAttributes(modelType) {
   ).filter(function (attr) {
     return !attr.deny;
   }).map(function (attr) {
-    attr = loAssign({}, attr);
+    attr = Object.assign({}, attr);
     if (!attr.attr_sort_field) {
       attr.attr_sort_field = attr.attr_name;
     }

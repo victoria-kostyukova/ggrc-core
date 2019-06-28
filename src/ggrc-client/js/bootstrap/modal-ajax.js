@@ -5,7 +5,6 @@
 
 import loConstant from 'lodash/constant';
 import loIsEmpty from 'lodash/isEmpty';
-import loAssign from 'lodash/assign';
 import loForEach from 'lodash/forEach';
 import loFind from 'lodash/find';
 import Spinner from 'spin.js';
@@ -62,7 +61,7 @@ let handlers = {
     };
 
     if (hasWarningType(instance)) {
-      modalSettings = loAssign(
+      modalSettings = Object.assign(
         modalSettings,
         warning.settings,
         {

@@ -4,7 +4,6 @@
 */
 
 import loOmit from 'lodash/omit';
-import loAssign from 'lodash/assign';
 import canMap from 'can-map';
 import {
   ObjectMapper as Ctrl,
@@ -87,7 +86,7 @@ describe('ObjectMapper', function () {
       it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
       'if data has is_new`, function () {
         let args;
-        method(loAssign(fakeData, {
+        method(Object.assign(fakeData, {
           is_new: true,
         }), false);
 
@@ -120,7 +119,7 @@ describe('ObjectMapper', function () {
       let fakeDataForCommon;
 
       beforeEach(function () {
-        fakeDataForCommon = loAssign({}, fakeData, {
+        fakeDataForCommon = Object.assign({}, fakeData, {
           toggle: 'unified unified-search',
         });
         spyOn(ObjectSearch, 'launch');
@@ -165,7 +164,7 @@ describe('ObjectMapper', function () {
       let fakeDataForMega;
 
       beforeEach(function () {
-        fakeDataForMega = loAssign({}, fakeData, {
+        fakeDataForMega = Object.assign({}, fakeData, {
           mega_object: 'Program',
           mega_object_widget: 'Program_parent',
           toggle: 'unified unified-search',

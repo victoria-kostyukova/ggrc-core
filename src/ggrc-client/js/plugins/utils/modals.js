@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loAssign from 'lodash/assign';
 import ModalsController from '../../controllers/modals/modals_controller';
 
 /**
@@ -76,7 +75,7 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.stache`;
  * )
  */
 function warning(options, success, fail, extra) {
-  let confirmOptions = loAssign({}, warning.settings, options);
+  let confirmOptions = Object.assign({}, warning.settings, options);
   let confirmResult;
 
   extra = extra || {};

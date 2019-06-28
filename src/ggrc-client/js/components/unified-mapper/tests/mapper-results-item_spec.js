@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loAssign from 'lodash/assign';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-item';
 import Snapshot from '../../../models/service-models/snapshot';
@@ -60,7 +59,7 @@ describe('mapper-results-item', function () {
 
     it('returns item description if no title', function () {
       let result;
-      viewModel.attr('itemData', loAssign(itemData, {
+      viewModel.attr('itemData', Object.assign(itemData, {
         title: undefined,
       }));
       result = viewModel.title();
@@ -69,7 +68,7 @@ describe('mapper-results-item', function () {
 
     it('returns item name if no title and description', function () {
       let result;
-      viewModel.attr('itemData', loAssign(itemData, {
+      viewModel.attr('itemData', Object.assign(itemData, {
         title: undefined,
         description_inline: undefined,
       }));
@@ -80,7 +79,7 @@ describe('mapper-results-item', function () {
     it('returns item email if no title, description, name',
       function () {
         let result;
-        viewModel.attr('itemData', loAssign(itemData, {
+        viewModel.attr('itemData', Object.assign(itemData, {
           title: undefined,
           description_inline: undefined,
           name: undefined,
