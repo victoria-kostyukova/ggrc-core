@@ -27,7 +27,7 @@ from lib.page.widget import controls_tab
 from lib.rest_services import workflow_rest_service
 from lib.rest_facades import (
     control_rest_facade, person_rest_facade, workflow_rest_facade)
-from lib.service import rest_facade
+from lib.service import rest_facade, rest_service
 from lib.service.rest import session_pool
 from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils, \
     assert_utils
@@ -384,7 +384,7 @@ def create_audit_with_control_and_update_control(
   return {"program": program,
           "control": copy.deepcopy(control_mapped_to_program),
           "audit": audit,
-          "updated_control": rest_facade.update_control(
+          "updated_control": rest_facade.update_object(
               control_mapped_to_program)}
 
 
@@ -399,7 +399,7 @@ def create_audit_with_control_and_delete_control(
   return {"program": program,
           "control": copy.deepcopy(control_mapped_to_program),
           "audit": audit,
-          "deleted_control": rest_facade.delete_control(
+          "deleted_control": rest_service.ControlsService().delete_objs(
               control_mapped_to_program)}
 
 
@@ -418,7 +418,7 @@ def create_audit_with_control_with_cas_and_update_control_cav(
   return {"program": program,
           "control": copy.deepcopy(control_mapped_to_program),
           "audit": audit,
-          "updated_control": rest_facade.update_control(
+          "updated_control": rest_facade.update_object(
               control_mapped_to_program, custom_attribute_values=cavs)}
 
 
@@ -431,7 +431,7 @@ def create_audit_with_control_with_cas_and_delete_cas_for_controls(
   fixtures.
   """
   for gca in gcads_for_control:
-    rest_facade.delete_control_cas(gca)
+    rest_service.CustomAttributeDefinitionsService().delete_objs(gca)
   return {"program": program,
           "control": copy.deepcopy(control_mapped_to_program),
           "audit": audit,

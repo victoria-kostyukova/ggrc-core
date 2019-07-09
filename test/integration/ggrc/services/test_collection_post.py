@@ -5,6 +5,7 @@
 
 import datetime
 import json
+import mock
 
 from ggrc import db
 from ggrc import models
@@ -77,6 +78,25 @@ class TestCollectionPost(TestCase):
         1, len(response.json['test_model_collection']['test_model']))
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
+
+  def test_collection_post_status(self):
+    """Test error collection post for success response."""
+    data = json.dumps(
+        [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
+    self.client.get("/login")
+    with mock.patch(
+        "ggrc.services.common.Resource.collection_post_loop",
+        side_effect=lambda args, opts: Exception()
+    ):
+      request_headers = self.get_headers()
+      request_headers.append(('X-GGRC-BackgroundTask', 'true'))
+      response = self.client.post(
+          self.mock_url(),
+          content_type='application/json',
+          data=data,
+          headers=request_headers,
+      )
+    self.assert200(response)
 
   def test_successful_multiple(self):
     """Test collection post successful multiple."""

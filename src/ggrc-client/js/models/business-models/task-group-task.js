@@ -27,7 +27,7 @@ export default Cacheable.extend({
     task_group: Stub,
   },
   tree_view_options: {
-    mapper_attr_list: [
+    attr_list: [
       {attr_title: 'Summary', attr_name: 'title'},
       {attr_title: 'Description', attr_name: 'description'},
     ],

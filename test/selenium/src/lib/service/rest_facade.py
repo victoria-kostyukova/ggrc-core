@@ -201,31 +201,13 @@ def _split_attrs(attrs, second_part_keys=None):
   return dict_1, dict_2
 
 
-def update_control(control, **attrs):
-  """Update control."""
-  # pylint: disable=no-else-return
+def update_object(obj, **attrs):
+  """Update object attrs or update object title if no attrs passed."""
   if not attrs:
-    attrs["title"] = "EDITED_" + control.title
-    return (factory.get_cls_rest_service(
-        objects.get_plural(control.type))().update_obj(
-        obj=control,
-        title=attrs["title"]))
-  else:
-    return (factory.get_cls_rest_service(
-        objects.get_plural(control.type))().update_obj(
-        obj=control, **attrs))
-
-
-def delete_control(control):
-  """Delete control."""
+    attrs.update({"title": element.Common.TITLE_EDITED_PART + obj.title})
   return (factory.get_cls_rest_service(
-      objects.get_plural(control.type))().delete_objs(control))
-
-
-def delete_control_cas(cas):
-  """Delete control cas."""
-  from lib.service.rest_service import CustomAttributeDefinitionsService
-  return CustomAttributeDefinitionsService().delete_objs(cas)
+      objects.get_plural(obj.type))().update_obj(
+      obj=obj, **attrs))
 
 
 def get_last_review_date(obj):

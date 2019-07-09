@@ -13,9 +13,8 @@ import {
   isSnapshot,
   isSnapshotModel,
   isSnapshotRelated,
-  isSnapshotScope,
   toObject,
-  transformQuery,
+  transformQueryToSnapshot,
 } from './snapshot-utils';
 import {
   related,
@@ -30,14 +29,10 @@ import {
   buildCountParams,
 } from './query-api-utils';
 import {
-  parentHasObjectVersions,
-} from './object-versions-utils';
-import {
   getWidgetConfigs,
   getWidgetConfig,
 } from './widgets-utils';
 import {
-  isMegaObjectRelated,
   transformQueryForMega,
 } from './mega-object-utils';
 import {getRolesForType} from './acl-utils';
@@ -67,28 +62,37 @@ let orderedModelsForSubTier = {};
 
 let SUB_TREE_ELEMENTS_LIMIT = 20;
 let SUB_TREE_FIELDS = Object.freeze([
+  'id',
+  'type',
+  'selfLink',
+  'viewLink',
+
+  // title fields
+  'title',
+  'email',
+  'name',
+
+  // snapshot fields
+  'revision',
   'child_id',
   'child_type',
-  'context',
-  'email',
-  'id',
   'is_latest_revision',
-  'name',
-  'revision',
-  'revisions',
-  'selfLink',
-  'slug',
-  'status',
-  'title',
-  'type',
-  'viewLink',
-  'workflow_state',
+
+  // edit rights
   'archived',
-  // label for Audit
-  'program',
-  // labels for assessment templates
+  'readonly',
+
+  // AT fields
   'DEFAULT_PEOPLE_LABELS',
-  'user_roles',
+
+  // Workflow fields
+  'workflow_state',
+
+  // CTGOT fields
+  'next_due_date',
+  'end_date',
+  'isOverdue',
+  'is_verification_needed',
 ]);
 
 let FULL_SUB_LEVEL_LIST = Object.freeze([
@@ -152,7 +156,6 @@ function getAvailableAttributes(modelType) {
     !!Model.tree_view_options.disable_columns_configuration;
 
   let attrs = makeArray(
-    Model.tree_view_options.mapper_attr_list ||
     Model.tree_view_options.attr_list ||
     Cacheable.attr_list
   ).filter(function (attr) {
@@ -398,17 +401,16 @@ function loadFirstTierItems(modelName,
     makeRelevantExpression(modelName, parent.type, parent.id, operation),
     null,
     filter,
-    operation,
   );
-  let requestedType;
+
   let requestData = request.slice() || canList();
 
   if (transformToSnapshot ||
-    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
-    params = transformQuery(params);
+    isSnapshotRelated(parent.type, modelName)) {
+    params = transformQueryToSnapshot(params);
   }
 
-  requestedType = params.object_name;
+  let requestedType = params.object_name;
   requestData.push(params);
   return $.when(...requestData.attr().map((el) => batchRequests(el)))
     .then((...response) => {
@@ -424,14 +426,14 @@ function loadFirstTierItems(modelName,
 
 /**
  *
- * @param {Array} models - Array of models for load in sub tree
+ * @param {Array} widgetIds - Array of models for load in sub tree
  * @param {String} type - Type of parent object.
  * @param {Number} id - ID of parent object.
  * @param {String} filter - Filter.
  * @param {Object} pageInfo - Information about pagination, sorting and filtering
  * @return {Promise} - Items for sub tier.
  */
-function loadItemsForSubTier(models, type, id, filter, pageInfo) {
+function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
   let relevant = {
     type: type,
     id: id,
@@ -440,17 +442,12 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
   let showMore = false;
   let loadedModelObjects = [];
 
-  return _buildSubTreeCountMap(models, relevant, filter)
+  return _buildSubTreeCountMap(widgetIds, relevant, filter)
     .then(function (result) {
-      let countMap = result.countsMap;
-      let dfds;
-      let mappedDfd;
-      let resultDfd;
-
-      loadedModelObjects = getWidgetConfigs(Object.keys(countMap));
+      loadedModelObjects = getWidgetConfigs(Object.keys(result.countsMap));
       showMore = result.showMore;
 
-      dfds = loadedModelObjects.map(function (modelObject) {
+      let dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
 
         let params = buildParam(
@@ -461,26 +458,15 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
           filter
         );
 
-        const isMegaRelated = isMegaObjectRelated(modelObject.countsName);
-
-        if (isMegaRelated) {
-          params.object_name = modelObject.countsName;
-        }
-
-        if (isSnapshotRelated(relevant.type, params.object_name) ||
-          modelObject.isObjectVersion) {
-          params = transformQuery(params);
-        } else if (isMegaRelated) {
-          params = transformQueryForMega(params);
-        }
+        params = _transformQuery(params, relevant, modelObject);
 
         return batchRequests(params);
       });
 
-      resultDfd = $.when(...dfds).promise();
+      let resultDfd = $.when(...dfds).promise();
 
       if (!related.initialized) {
-        mappedDfd = initMappedInstances();
+        let mappedDfd = initMappedInstances();
 
         return $.when(mappedDfd, dfds).then(function () {
           return resultDfd;
@@ -525,6 +511,24 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
         total: total,
       };
     });
+}
+
+/**
+ * Transforms query params for Snapshots and Mega related objects
+ * @param {Object} params query params
+ * @param {Object} relevant parent object
+ * @param {Object} widgetConfig initial config for query
+ * @return {Object} query params
+ */
+function _transformQuery(params, relevant, widgetConfig) {
+  if (isSnapshotRelated(relevant.type, params.object_name) ||
+    widgetConfig.isObjectVersion) {
+    params = transformQueryToSnapshot(params);
+  } else if (widgetConfig.isMegaObject) {
+    params = transformQueryForMega(params, widgetConfig.relation);
+  }
+
+  return params;
 }
 
 /**
@@ -579,95 +583,61 @@ function isDirectlyRelated(instance) {
 
 /**
  *
- * @param {Array} models - Type of model.
- * @param {Object} relevant - Relevant description
- * @param {String} filter - Filter string.
- * @return {Array} - List of queries
- * @private
- */
-function _getQuerryObjectVersion(models, relevant, filter) {
-  let countQuery = [];
-  models.forEach(function (model) {
-    let widgetConfig = getWidgetConfig(model);
-    let name = widgetConfig.name;
-    let query = buildCountParams([name], relevant, filter);
-
-    if (widgetConfig.isObjectVersion) {
-      query = transformQuery(query[0]);
-      countQuery.push(query);
-    } else {
-      countQuery.push(query[0]);
-    }
-  });
-
-  return countQuery;
-}
-
-/**
- *
- * @param {Array} models - Type of model.
+ * @param {Array} widgetIds - selected widget id.
  * @param {Object} relevant - Relevant description
  * @param {String} filter - Filter string.
  * @return {Promise} - Counts for limitation load items for sub tier
  * @private
  */
-function _buildSubTreeCountMap(models, relevant, filter) {
-  let countQuery;
+function _buildSubTreeCountMap(widgetIds, relevant, filter) {
+  let countQuery = [];
   let result;
   let countMap = {};
 
   if (_isFullSubTree(relevant.type)) {
-    models.forEach(function (model) {
-      countMap[model] = false;
+    widgetIds.forEach(function (widgetId) {
+      countMap[widgetId] = false;
     });
-    result = $.Deferred().resolve({
+    return $.Deferred().resolve({
       countsMap: countMap,
       showMore: false,
     });
-  } else {
-    if (parentHasObjectVersions(relevant.type)) {
-      countQuery = _getQuerryObjectVersion(models, relevant, filter);
-    } else {
-      countQuery = buildCountParams(models, relevant, filter)
-        .map(function (param) {
-          if (isSnapshotRelated(
-            relevant.type,
-            param.object_name)) {
-            param = transformQuery(param);
-          } else if (isMegaObjectRelated(param.object_name)) {
-            param = transformQueryForMega(param);
-          }
-          return param;
-        });
-    }
-
-    result = $.when(...countQuery.map((query) => batchRequests(query)))
-      .then((...response) => {
-        let total = 0;
-        let showMore = models.some(function (model, index) {
-          const count = Object.values(response[index])[0].total;
-
-          if (!count) {
-            return false;
-          }
-
-          if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
-            countMap[model] = count;
-          } else {
-            countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
-          }
-
-          total += count;
-
-          return total >= SUB_TREE_ELEMENTS_LIMIT;
-        });
-
-        return {
-          countsMap: countMap,
-          showMore: showMore,
-        };
-      });
   }
+
+  widgetIds.forEach((widgetId) => {
+    let widgetConfig = getWidgetConfig(widgetId);
+    let modelName = widgetConfig.name;
+
+    let query = buildCountParams([modelName], relevant, filter);
+    countQuery.push(_transformQuery(query[0], relevant, widgetConfig));
+  });
+
+  result = $.when(...countQuery.map((query) => batchRequests(query)))
+    .then((...response) => {
+      let total = 0;
+      let showMore = widgetIds.some(function (model, index) {
+        const count = Object.values(response[index])[0].total;
+
+        if (!count) {
+          return false;
+        }
+
+        if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
+          countMap[model] = count;
+        } else {
+          countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
+        }
+
+        total += count;
+
+        return total >= SUB_TREE_ELEMENTS_LIMIT;
+      });
+
+      return {
+        countsMap: countMap,
+        showMore: showMore,
+      };
+    });
 
   return result;
 }
@@ -717,9 +687,8 @@ function startExport(
     filter
   );
 
-  if (transformToSnapshot ||
-    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
-    params = transformQuery(params);
+  if (transformToSnapshot || isSnapshotRelated(parent.type, modelName)) {
+    params = transformQueryToSnapshot(params);
   }
 
   let requestData = request.slice() || canList();

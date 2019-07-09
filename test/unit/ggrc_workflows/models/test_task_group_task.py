@@ -23,8 +23,8 @@ class TestTaskGroupTask(unittest.TestCase):
     tgt = task_group_task.TaskGroupTask()
     self.assertRaises(ValueError,
                       tgt.validate_task_type, "task_type", "helloh")
-    self.assertEqual("menu",
-                     tgt.validate_task_type("task_type", "menu"))
+    self.assertEqual("text",
+                     tgt.validate_task_type("task_type", "text"))
 
   def test_validate_date(self, _):
     """Test validate date."""

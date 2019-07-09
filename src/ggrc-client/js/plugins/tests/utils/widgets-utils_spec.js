@@ -293,7 +293,7 @@ describe('GGRC Utils Widgets', function () {
           return child === 'Control';
         });
 
-      spyOn(SnapshotUtils, 'transformQuery')
+      spyOn(SnapshotUtils, 'transformQueryToSnapshot')
         .and.callFake(function (query) {
           return query;
         });

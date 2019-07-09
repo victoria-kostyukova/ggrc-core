@@ -2,9 +2,15 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for background_task model."""
+
+import mock
+
+from ggrc.app import app
+
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestBackgroundTask(TestCase):
@@ -42,6 +48,30 @@ class TestBackgroundTask(TestCase):
         content.json['background_task']
     self.assertEqual(set(bg_task_content.keys()),
                      {"id", "selfLink", "status", "type"})
+
+  def test_bg_error_task(self):
+    """Test error BackgroundTask for success response."""
+    from ggrc.views import create_missing_revisions
+
+    with mock.patch(
+        "ggrc.views.app.make_response",
+        return_value=app.make_response(
+            ("error", 500, [("Content-Type", "text/html")])
+        )
+    ):
+      with mock.patch("ggrc.utils.revisions.do_missing_revisions"):
+        bg_task = factories.BackgroundTaskFactory(name="test_error_task_queue")
+        response = create_missing_revisions(bg_task)
+        self.assertEqual(response.status_code, 200)
+
+  def test_bg_success_task(self):
+    """Test success BackgroundTask for success response."""
+    from ggrc.views import create_missing_revisions
+
+    with mock.patch("ggrc.utils.revisions.do_missing_revisions"):
+      bg_task = factories.BackgroundTaskFactory(name="test_success_task_queue")
+      response = create_missing_revisions(bg_task)
+      self.assertEqual(response.status_code, 200)
 
 
 class TestPermissions(TestCase):

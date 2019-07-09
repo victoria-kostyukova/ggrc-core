@@ -67,7 +67,12 @@ export default canComponent.extend({
   leakScope: true,
   viewModel,
   events: {
+    // this event is called when object was just created or redefined
     '{viewModel} source': function () {
+      this.viewModel.refreshItems();
+    },
+    // this event is called when object was updated with data
+    '{viewModel} source.id': function () {
       this.viewModel.refreshItems();
     },
   },

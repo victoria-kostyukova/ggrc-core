@@ -11,7 +11,7 @@ import {
 } from './query-api-utils';
 import {
   isSnapshotRelated,
-  transformQuery,
+  transformQueryToSnapshot,
 } from './snapshot-utils';
 import {getMappingList} from '../../models/mappers/mappings';
 import {inferObjectType} from './models-utils';
@@ -60,7 +60,7 @@ function initMappedInstances() {
         operation: 'relevant',
       });
     if (isSnapshotRelated(currentPageInstance.type, model)) {
-      query = transformQuery(query);
+      query = transformQueryToSnapshot(query);
     }
     reqParams.push(batchRequests(query));
   });

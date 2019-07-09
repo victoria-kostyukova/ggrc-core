@@ -66,7 +66,7 @@ class TestSnapshots(base.Test):
         "audit": audit,
         "program": program,
         "control": copy.deepcopy(control_mapped_to_program),
-        "updated_control": rest_facade.update_control(
+        "updated_control": rest_facade.update_object(
             control_mapped_to_program),
         "second_control": rest_facade.create_control_mapped_to_program(program)
     }

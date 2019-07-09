@@ -90,27 +90,20 @@ describe('sub-tree-item component', () => {
       expect(viewModel.attr('title')).toBe('title');
     });
 
-    it('should return "instance.description_inline" attr ' +
-    'if "instance.title" attr is falsy value', () => {
-      viewModel.attr('instance', {description_inline: 'description_inline'});
-      expect(viewModel.attr('title')).toBe('description_inline');
-    });
-
     it('should return "instance.name" attr ' +
-    'if "instance.title" and "instance.description_inline" attr ' +
-    'are falsy values', () => {
+    'if "instance.title" attr is falsy value', () => {
       viewModel.attr('instance', {name: 'name'});
       expect(viewModel.attr('title')).toBe('name');
     });
 
     it('should return "instance.email" attr ' +
-    'if "instance.title", "instance.description_inline" and ' +
+    'if "instance.title" and ' +
     '"instance.name" attr are falsy values', () => {
       viewModel.attr('instance', {email: 'email'});
       expect(viewModel.attr('title')).toBe('email');
     });
 
-    it('should return "" if "instance.title", "instance.description_inline", ' +
+    it('should return "" if "instance.title", ' +
     '"instance.name" and "instance.email" attr are falsy values', () => {
       viewModel.attr('instance', {});
       expect(viewModel.attr('title')).toBe('');

@@ -27,7 +27,7 @@
               {{> /static/templates/base_objects/notes.stache}}
 
               <div class="row-fluid wrap-row">
-                <div data-test-id="title_manager_7a906d2e">
+                <div>
                   <custom-roles
                     instance:from="instance"
                     readOnly:from="instance.issueTrackerEnabled"></custom-roles>

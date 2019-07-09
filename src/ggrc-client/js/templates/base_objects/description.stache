@@ -6,9 +6,9 @@
 {{#instance}}
 
   <div class="row-fluid wrap-row">
-    <div data-test-id="title_description_7a906d2e" class="span12">
+    <div class="span12">
       <h6>Description</h6>
-      <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
+      <div class="rtf-block">
         <read-more
           text:from="description"
           handleMarkdown:from="instance.class.isChangeableExternally">

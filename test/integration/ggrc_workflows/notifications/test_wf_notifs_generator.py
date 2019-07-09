@@ -38,7 +38,8 @@ class TestWfNotifsGenerator(TestCase):
     with freeze_time("2015-05-01 14:29:00"):
       wf_slug = "wf1"
       with factories.single_commit():
-        wf = wf_factories.WorkflowFactory(slug=wf_slug)
+        wf = wf_factories.WorkflowFactory(slug=wf_slug,
+                                          is_verification_needed=True)
         task_group = wf_factories.TaskGroupFactory(workflow=wf)
         wf_factories.TaskGroupTaskFactory(
             task_group=task_group,

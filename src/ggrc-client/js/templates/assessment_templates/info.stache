@@ -10,7 +10,7 @@
 
         <div class="pane-header">
           <div class="pane-header__container">
-            <div class="pane-header__title" data-test-id="title_0ad9fbaf">
+            <div class="pane-header__title">
               {{#if is_info_pin}}
                 <h6>Title</h6>
               {{/if}}

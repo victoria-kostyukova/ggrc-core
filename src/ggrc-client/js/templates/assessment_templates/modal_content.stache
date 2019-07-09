@@ -25,13 +25,14 @@
             name:bind="assessmentType">
           </dropdown-component>
         </assessment-object-type-dropdown>
-
-        <label class="inline-check pull-left">
-          <input type="checkbox" class="js-toggle-controlplans"
+         <div class="ggrc-form-item__checkbox-item assessment-procedure-message">
+          <label class="assessment-procedure-message__label">
+           <input type="checkbox" class="assessment-procedure-message__checkbox"
                  el:checked:bind="instance.test_plan_procedure"/>
-	        Copy Assessment Procedure from mapped object
-        </label>
-
+	         Copy Assessment Procedure from mapped object
+          </label>
+          <i class="fa fa-question-circle assessment-procedure-message__icon" rel="tooltip" title="Assessment procedure will be copied at the moment of mapping object"></i>
+         </div>
       </div>
     </div>
 
@@ -47,7 +48,7 @@
         </label>
 
         <input
-          data-id="title_txtbx" tabindex="1" class="input-block-level"
+          tabindex="1" class="input-block-level"
           placeholder="Enter Title"
           name="title"
           type="text"
@@ -90,7 +91,7 @@
             title="Provide more details on the purpose of this Assessment and
                    provide context for how and when this CA might be used."></i>
         </label>
-        <a data-id="hide_default_test_plan_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div class="rich-text">
           <rich-text
             tabindex="2"
@@ -128,13 +129,13 @@
     </div>
 
     <div class="row-fluid">
-      <div data-id="code_hidden" class="span4 hidable">
+      <div class="span4 hidable">
         <label>
           Code
           <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
-        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx" tabindex="3" class="input-block-level" name="slug" placeholder="AUDIT-XXX" type="text" value="{{instance.slug}}">
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <input {{^if new_object_form}} disabled {{/if}} tabindex="3" class="input-block-level" name="slug" placeholder="AUDIT-XXX" type="text" value="{{instance.slug}}">
       </div>
       <div id="state" class="span4 hidable">
         <label>

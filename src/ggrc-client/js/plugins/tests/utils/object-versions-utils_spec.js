@@ -4,7 +4,6 @@
 */
 
 import * as objectVersionsUtils from '../../utils/object-versions-utils';
-import {businessObjects} from '../../../plugins/models-types-collections';
 
 describe('isObjectVersion method', () => {
   it('should return true if model name contains "_version"', () => {
@@ -25,19 +24,6 @@ describe('isObjectVersion method', () => {
   it('should return false if param type is not "string"', () => {
     const result = objectVersionsUtils.isObjectVersion([]);
     expect(result).toBeFalsy();
-  });
-});
-
-describe('parentHasObjectVersions method', () => {
-  it('should return true if parent model has object versions tabs', () => {
-    businessObjects.forEach((obj) => {
-      const result = objectVersionsUtils.parentHasObjectVersions(obj);
-      if (obj === 'Issue') {
-        expect(result).toBeTruthy();
-      } else {
-        expect(result).toBeFalsy();
-      }
-    });
   });
 });
 

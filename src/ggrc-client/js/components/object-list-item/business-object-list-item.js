@@ -46,7 +46,6 @@ export default canComponent.extend({
       itemTitle: {
         get() {
           return this.attr('itemData.title') ||
-            this.attr('itemData.description_inline') ||
             this.attr('itemData.name') ||
             this.attr('itemData.email') ||
             '<span class="empty-message">None</span>';

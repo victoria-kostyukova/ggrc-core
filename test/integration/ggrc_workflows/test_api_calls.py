@@ -297,7 +297,8 @@ class TestStatusApiPatch(TestCase):
     wf_slug = "WF-SLUG-{}".format(factories.random_str(
         length=6, chars=string.ascii_letters))
     with factories.single_commit():
-      workflow = wf_factories.WorkflowFactory(slug=wf_slug)
+      workflow = wf_factories.WorkflowFactory(slug=wf_slug,
+                                              is_verification_needed=True)
       task_group = wf_factories.TaskGroupFactory(workflow=workflow)
       for ind in xrange(3):
         wf_factories.TaskGroupTaskFactory(

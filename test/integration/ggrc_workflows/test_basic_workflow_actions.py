@@ -523,6 +523,7 @@ class TestBasicWorkflowActions(TestCase):
     self.one_time_workflow_1 = {
         "title": "one time wf test",
         "description": "some test workflow",
+        "is_verification_needed": True,
         "task_groups": [{
             "title": "tg_1",
             "task_group_tasks": [{}, {}, {}]

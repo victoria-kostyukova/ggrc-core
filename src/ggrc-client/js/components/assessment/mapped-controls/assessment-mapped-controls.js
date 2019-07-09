@@ -20,7 +20,7 @@ import {
 } from '../../../plugins/utils/query-api-utils';
 import {
   toObject,
-  transformQuery,
+  transformQueryToSnapshot,
 } from '../../../plugins/utils/snapshot-utils';
 import template from './assessment-mapped-controls.stache';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
@@ -96,7 +96,7 @@ const viewModel = canMap.extend({
           buildParam(query.objName, {}, relevant, query.fields);
         return {
           type: query.type,
-          request: transformQuery(resultingQuery),
+          request: transformQueryToSnapshot(resultingQuery),
         };
       });
     return params;

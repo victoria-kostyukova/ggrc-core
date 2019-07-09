@@ -5,7 +5,7 @@
 
 {{#instance}}
 <div class="row-fluid wrap-row">
-  <div data-test-id="title_manager_7a906d2e">
+  <div>
     <custom-roles instance:from="{.}"
       orderOfRoles:from="instance.constructor.orderOfRoles"></custom-roles>
   </div>

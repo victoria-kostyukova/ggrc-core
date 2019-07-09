@@ -25,7 +25,7 @@ export default Cacheable.extend({
 
   tree_view_options: {
     add_item_view: 'task_groups/tree_add_item',
-    mapper_attr_list: [
+    attr_list: [
       {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Assignee', attr_name: 'assignee',
         attr_sort_field: 'contact'},

@@ -6,7 +6,7 @@
 {{#instance}}
 {{^if readonly}}
   <div class="row-fluid wrap-row">
-    <div data-test-id="title_reference_url_aa7d1a65">
+    <div>
       <related-documents instance:from="instance" kind:from="'REFERENCE_URL'">
         <related-urls
           instance:from="instance"

@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div data-id="reference_url_hidden" class="span12">
+<div class="span12">
   <deferred-mapper
     instance:from="instance">
     <related-documents
@@ -26,7 +26,7 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
           <spinner-component toggle:from="isDisabled"></spinner-component>
         </label>
-        <a data-id="hide_reference_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </related-urls>
     </related-documents>
   </deferred-mapper>

@@ -28,20 +28,19 @@
           </div>
           <select name="task_type" tabindex="2">
             <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
-            <option value="menu" {{#is(instance.task_type, "menu")}}selected="selected"{{/is}}>Dropdown</option>
             <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
           </select>
         </div>
       </div>
       <div class="row-fluid">
-        {{^if_in instance.task_type 'menu,checkbox'}}
+        {{#is(instance.task_type, "text")}}
           <div class="span12 hidable">
             <div class="form-header-container">
               <label class="form-label">
                 Task Description
                 <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
               </label>
-              <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </div>
             <div class="rich-text">
                 <rich-text
@@ -51,19 +50,6 @@
                   content:bind="instance.description">
                 </rich-text>
             </div>
-          </div>
-        {{/if_in}}
-        {{#is(instance.task_type, "menu")}}
-          <div class="span12">
-            <label class="form-label">
-              Dropdown Options (Comma Separated)
-              <i class="fa fa-asterisk"></i>
-              <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
-            </label>
-            <textarea-array array:bind="instance.response_options"
-                            placeholder:from="'Enter Values'" 
-                            className:from="'span12 double'">
-            </textarea-array>
           </div>
         {{/is}}
         {{#is(instance.task_type, "checkbox")}}
@@ -83,15 +69,15 @@
         <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
       </div>
       <div class="row-fluid">
-        <div class="span6 hidable" data-id="code_hidden">
+        <div class="span6 hidable">
           <div class="form-header-container">
             <label class="form-label">
               Code
               <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
             </label>
-            <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </div>
-          <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="TASK-XXX" type="text" value="{{instance.slug}}">
+          <input {{^if new_object_form}} disabled {{/if}} tabindex="8" class="input-block-level" name="slug" placeholder="TASK-XXX" type="text" value="{{instance.slug}}">
         </div>
       </div>
     </div>

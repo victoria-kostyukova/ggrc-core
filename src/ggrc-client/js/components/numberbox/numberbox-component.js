@@ -21,7 +21,6 @@ export default canComponent.extend({
     enableFloat: false,
     enableNegative: false,
     disabled: false,
-    attrDataId: '',
     additionalClass: '',
     placeholder: '',
     ckeckKey(positivePattern, negativePattern, key) {

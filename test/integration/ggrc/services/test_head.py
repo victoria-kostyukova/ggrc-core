@@ -54,3 +54,11 @@ class TestHeadRequest(TestCase):
       response = self.api.head(model, obj_id)
       self.assert200(response)
       self.assertEqual(counter.get, 3)
+
+  def test_head_invalid_url_405(self):
+    """Ensures 405 status code on non valid url via HEAD request"""
+    response = self.api.client.head('/api/controls')
+    self.assert405(response)
+
+    response = self.api.client.head('/controls/1')
+    self.assert405(response)

@@ -43,7 +43,7 @@ class TestWorkflowObjectsImport(TestCase):
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
-    self.assertEqual(4, TaskGroupTask.query.count())
+    self.assertEqual(3, TaskGroupTask.query.count())
     task_group = TaskGroup.query.first()
     mapped_objs = filter(
         lambda rel: rel.destination_type != 'TaskGroupTask',
@@ -53,11 +53,9 @@ class TestWorkflowObjectsImport(TestCase):
 
     task2 = TaskGroupTask.query.filter_by(slug="t-2").first()
     task3 = TaskGroupTask.query.filter_by(slug="t-3").first()
-    task4 = TaskGroupTask.query.filter_by(slug="t-4").first()
     self.assertEqual(task2.start_date, date(2015, 7, 10))
     self.assertEqual(task2.end_date, date(2016, 12, 30))
     self.assertIn("ch2", task3.response_options)
-    self.assertIn("option 1", task4.response_options)
 
   def test_bad_imports(self):
     """Test workflow import with errors and warnings"""
@@ -90,13 +88,13 @@ class TestWorkflowObjectsImport(TestCase):
         "Task Group Task": {
             "row_warnings": {
                 errors.WRONG_REQUIRED_VALUE.format(
-                    line=73, value="aaaa", column_name="Task Type"
+                    line=71, value="aaaa", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=74, default_value="Rich Text", column_name="Task Type"
+                    line=72, default_value="Rich Text", column_name="Task Type"
                 ),
                 errors.MISSING_VALUE_WARNING.format(
-                    line=75, default_value="Rich Text", column_name="Task Type"
+                    line=73, default_value="Rich Text", column_name="Task Type"
                 ),
             }
         },
@@ -112,10 +110,6 @@ class TestWorkflowObjectsImport(TestCase):
             "task-9",
             "task-10",
             "task-11",
-        ],
-        "menu": [
-            "task-5",
-            "task-8",
         ],
         "checkbox": [
             "task-3",
@@ -144,8 +138,6 @@ class TestWorkflowObjectsImport(TestCase):
                     line=5, start_date="Start date", end_date="End date"),
                 errors.INVALID_START_END_DATES.format(
                     line=6, start_date="Start date", end_date="End date"),
-                errors.INVALID_START_END_DATES.format(
-                    line=7, start_date="Start date", end_date="End date"),
             }
         },
     }

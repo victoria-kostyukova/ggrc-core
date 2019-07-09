@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div {{#if hidable}} data-id="code_hidden" class="ggrc-form-item hidable" {{/if}}>
+<div {{#if hidable}} class="ggrc-form-item hidable" {{/if}}>
   <div class="span6 bottom-spacing">
     <label class="form-label">
       {{labelName}}
@@ -12,7 +12,7 @@
       {{/if}}
     </label>
     {{#if hidable}}
-      <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">
+      <a href="javascript://" class="field-hide" tabindex="-1">
         hide
       </a>
     {{/if}}

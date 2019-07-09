@@ -55,7 +55,6 @@ export default canComponent.extend({
       objectTitle: {
         get: function () {
           return this.attr('itemData.title') ||
-            this.attr('itemData.description_inline') ||
             this.attr('itemData.name') ||
             this.attr('itemData.email') || false;
         },

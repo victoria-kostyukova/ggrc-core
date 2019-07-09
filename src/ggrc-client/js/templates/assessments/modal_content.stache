@@ -47,13 +47,14 @@
       </div>
     </div>
     <div class="ggrc-form-item">
-  <div class="ggrc-form-item__checkbox-item">
-    <label class="inline-check pull-left">
-      <input type="checkbox" class="js-toggle-controlplans"
+      <div class="ggrc-form-item__checkbox-item assessment-procedure-message">
+       <label class="assessment-procedure-message__label">
+        <input type="checkbox" class="assessment-procedure-message__checkbox"
            el:checked:bind="instance.test_plan_procedure"/>
-        Copy Assessment Procedure from mapped object
-    </label>
-  </div>
+         Copy Assessment Procedure from mapped object
+       </label>
+       <i class="fa fa-question-circle assessment-procedure-message__icon" rel="tooltip" title="Assessment procedure will be copied at the moment of mapping object"></i>
+      </div>
     </div>
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
@@ -61,7 +62,7 @@
           Title
           <i class="fa fa-asterisk"></i>
         </label>
-        <input data-id="title_txtbx" type="text" tabindex="2"
+        <input type="text" tabindex="2"
                class="input-block-level" placeholder="Enter Title"
                name="title" value:from="title" autofocus>
         {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}

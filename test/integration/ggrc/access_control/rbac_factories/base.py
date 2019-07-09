@@ -52,7 +52,7 @@ class BaseRBACFactory(object):
     # pylint: disable=attribute-defined-outside-init
     acr_id = acr.id
     with factories.single_commit():
-      self.workflow = wf_factories.WorkflowFactory()
+      self.workflow = wf_factories.WorkflowFactory(is_verification_needed=True)
       self.workflow_id = self.workflow.id
       self.assign_person(self.workflow, acr, user_id)
 

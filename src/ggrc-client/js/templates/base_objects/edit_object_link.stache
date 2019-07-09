@@ -5,8 +5,7 @@
 
 {{#is_allowed 'update' instance context='for'}}
   <li>
-    <a data-test-id="dropdown_settings_edit_f4b27aec"
-       href="javascript://"
+    <a href="javascript://"
        data-link-purpose="open-edit-modal"
        data-toggle="modal-ajax-form"
        data-modal-reset="reset"

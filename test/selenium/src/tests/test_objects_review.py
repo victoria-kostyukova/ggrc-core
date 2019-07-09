@@ -154,3 +154,20 @@ class TestObjectsReview(base.Test):
     actual_emails = (emails_digest_service.ReviewDigestService().
                      get_review_request_emails())
     self.general_contain_assert(expected_email, actual_emails)
+
+  @pytest.mark.smoke_tests
+  def test_notification_of_reverted_review(self, second_creator,
+                                           program_with_approved_review,
+                                           selenium):
+    """Confirm user gets email notification when object review reverted to
+    'Unreviewed' state."""
+    users.set_current_user(entities_factory.PeopleFactory.superuser)
+    rest_facade.update_object(program_with_approved_review)
+    expected_email = entity.ReviewEmailUI(
+        recipient_email=second_creator.email,
+        obj_type=program_with_approved_review.type,
+        obj_title=program_with_approved_review.title)
+    actual_emails = (
+        emails_digest_service.ReviewDigestService().
+        get_reverted_review_emails())
+    self.general_contain_assert(expected_email, actual_emails)

@@ -240,20 +240,31 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 {% endif %}
 
                 {% if digest.get('assessment_updated') %}
-                  <h2 {{ style.sub_title() }} >Assessments have been updated</h2>
-                  <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_updated'].iteritems() %}
-                    <li {{ style.list_item() }} >
-                      The below fields were updated for
-                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
-                        {{ assessment_data['title']|e }}</a>
-                      ({{ assessment_data['notif_updated_at'].values()[0] }}):
-                      <ul>
-                        {{ assessment_data['updated_fields']|sort|join(', ') }}
-                      </ul>
-                    </li>
+                    <p {{ style.notification_title() }}>Assessment "{{ assessment_data['title'] }}" has been updated</p>
+                    <table {{ style.proposal_table_full() }}>
+                      <thead>
+                        <tr>
+                            <th {{ style.proposal_th() }}>ATTRIBUTE</th>
+                            <th {{ style.proposal_th() }}>NEW VALUE</th>
+                            <th {{ style.proposal_th() }}>OLD VALUE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for field, value in assessment_data['updated_data'].iteritems() %}
+                      <tr>
+                        <td>{{ field }}</td>
+                        <td>{{ value[0] }}</td>
+                        <td>{{ value[1] }}</td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                    <p {{ style.notification_body() }}>
+                        Go to GGRC to check this assessment
+                    </p>
+                    <a href="{{ assessment_data['url'] }}" {{ style.notification_btn() }}>Open</a>
                   {% endfor %}
-                  </ul>
                 {% endif %}
 
                 {% if digest.get('assessment_completed') %}

@@ -17,7 +17,7 @@
               Program
               <i class="fa fa-asterisk"></i>
             </label>
-            <input data-id="program_dd" type="text" class="input-block-level" name="program.id" tabindex="1" data-permission-type="update" {{autocomplete_select}} data-lookup="Program" autofocus/>
+            <input type="text" class="input-block-level" name="program.id" tabindex="1" data-permission-type="update" {{autocomplete_select}} data-lookup="Program" autofocus/>
           </div>
           {{#instance.computed_errors.program}}
             <label class="help-inline warning">
@@ -46,7 +46,7 @@
         <label>
           State
         </label>
-        <a data-id="hide_status_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div tabindex="4">
             <dropdown-component optionsList:from="model.statuses"
                       name:bind="instance.status"
@@ -65,12 +65,12 @@
     </div>
     <div>
       <div class="row-fluid">
-        <div data-id="description_hidden" class="span6 hidable">
+        <div class="span6 hidable">
           <label>
             Description
             <i class="fa fa-question-circle" rel="tooltip" title="Describe reason and purpose of the Audit."></i>
           </label>
-          <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           <div class="rich-text">
               <rich-text
                 tabindex="10"
@@ -84,13 +84,13 @@
 
         <div class="span6 hide-wrap hidable">
           <div class="row-fluid inner-hide">
-            <div data-id="audit_firm_hidden" class="span12 hidable">
+            <div class="span12 hidable">
               <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
                 <object-loader path:from="instance.audit_firm">
                   <label>
                     Audit Firm
                   </label>
-                  <a data-id="hide_audit_firm_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
                   <input type="text" class="span8 search-icon"
                          name="audit_firm.title"
                          value="{{loadedObject.title}}"
@@ -106,16 +106,16 @@
       </div>
     </div>
     <div class="row-fluid">
-      <div data-id="planned_start_date_hidden" class="span3 hidable">
-        <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <div class="span3 hidable">
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <datepicker-component date:bind="start_date"
                     label:from="'Planned Start Date'"
                     setMaxDate:from="end_date"
                     tabindex="20">
         </datepicker-component>
       </div>
-      <div data-id="planned_end_date_hidden" class="span3 hidable">
-        <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <div class="span3 hidable">
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <datepicker-component date:bind="end_date"
                     setMinDate:from="start_date"
                     label:from="'Planned End Date'"
@@ -127,11 +127,11 @@
     </div>
 
     <div class="row-fluid">
-      <div data-id="planned_report_period_from_hidden" class="span6 hidable">
+      <div class="span6 hidable">
         <label>
           Report Period:
         </label>
-        <a data-id="hide_planned_report_period_from_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div class="row-fluid">
           <div class="span6">
             <datepicker-component date:bind="report_start_date"
@@ -146,7 +146,7 @@
           </div>
         </div>
       </div>
-      <div data-id="folder_hidden" class="span3 hidable">
+      <div class="span3 hidable">
         <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="13"></ggrc-gdrive-folder-picker>
       </div>
       <div class="span3 hidable">
@@ -172,7 +172,7 @@
                 <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
                 <spinner-component toggle:from="isDisabled"></spinner-component>
               </label>
-              <a data-id="hide_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </related-urls>
           </related-documents>
         </deferred-mapper>
@@ -180,13 +180,13 @@
     </div>
 
     <div class="row-fluid">
-      <div data-id="code_hidden" class="span4 hidable">
+      <div class="span4 hidable">
         <label>
           Code
           <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
-        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="AUDIT-XXX" type="text" value="{{instance.slug}}">
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <input {{^if new_object_form}} disabled {{/if}} tabindex="8" class="input-block-level" name="slug" placeholder="AUDIT-XXX" type="text" value="{{instance.slug}}">
       </div>
     </div>
 

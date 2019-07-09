@@ -153,19 +153,20 @@ const viewModel = canMap.extend({
   },
   /**
    *
-   * @param {Array} [models] -
+   * @param {Array} [widgetIds] - ids of selected widgets
+   * e.g. model names, model names with _version, _parent, _child postfixes
    * @return {*}
    */
-  loadItems: function (models) {
+  loadItems: function (widgetIds) {
     let parentType = this.attr('parentModel');
     let parentId = this.attr('parentId');
     let deepLevel = this.attr('deepLevel');
     let filter = this.getDepthFilter(deepLevel);
 
-    models = models || this.attr('childModels') || [];
-    models = makeArray(models);
+    widgetIds = widgetIds || this.attr('childModels') || [];
+    widgetIds = makeArray(widgetIds);
 
-    if (!models.length) {
+    if (!widgetIds.length) {
       this.attr('directlyItems', []);
       this.attr('notDirectlyItems', []);
       return $.Deferred().resolve();
@@ -179,7 +180,7 @@ const viewModel = canMap.extend({
     this.attr('loading', true);
 
     return TreeViewUtils
-      .loadItemsForSubTier(models, parentType, parentId, filter, pageInfo)
+      .loadItemsForSubTier(widgetIds, parentType, parentId, filter, pageInfo)
       .then((result) => {
         stopFn();
         this.attr('loading', false);

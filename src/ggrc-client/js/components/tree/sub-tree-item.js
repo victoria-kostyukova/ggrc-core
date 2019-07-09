@@ -63,7 +63,6 @@ let viewModel = BaseTreeItemVM.extend({
         const instance = this.attr('instance');
         return (
           instance.attr('title') ||
-          instance.attr('description_inline') ||
           instance.attr('name') ||
           instance.attr('email') || ''
         );

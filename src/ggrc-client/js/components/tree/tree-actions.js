@@ -16,8 +16,7 @@ import {
   isAuditor,
 } from '../../plugins/utils/acl-utils';
 import {
-  isSnapshotModel,
-  isSnapshotScope,
+  isSnapshotRelated,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
 import template from './templates/tree-actions.stache';
@@ -53,9 +52,8 @@ export default canComponent.extend({
           let parentInstance = this.attr('parentInstance');
           let model = this.attr('model');
 
-          return (isSnapshotScope(parentInstance) &&
-            isSnapshotModel(model.model_singular)) ||
-            this.attr('options.objectVersion');
+          return (isSnapshotRelated(parentInstance.type, model.model_singular)
+            || this.attr('options.objectVersion'));
         },
       },
       showGenerateAssessments: {

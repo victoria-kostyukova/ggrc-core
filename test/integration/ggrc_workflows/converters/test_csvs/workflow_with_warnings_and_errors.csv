@@ -23,4 +23,3 @@ Task,code*,Summary*,task group,task description,Task Assignees*,task type,start 
 ,t-1,task for wf-1,tg-1,test,user1@ggrc.com,Rich text,7/1/2015,7/15/2015
 ,t-2,task for wf-2,tg-1,test,user1@ggrc.com,Rich text,7/10/2015,12/30/2016
 ,t-3,checkbox task,tg-1,"ch1, ch2 , some checkbox 3",user1@ggrc.com,Checkboxes,7/11/2016,12/29/2017
-,t-4,dropdown task,tg-1,"option 1, another option ,   o3",user1@ggrc.com,Dropdown,7/10/2017,12/31/2018

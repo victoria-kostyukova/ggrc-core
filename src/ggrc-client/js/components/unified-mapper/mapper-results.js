@@ -21,7 +21,7 @@ import template from './templates/mapper-results.stache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
-  transformQuery,
+  transformQueryToSnapshot,
   toObject,
 } from '../../plugins/utils/snapshot-utils';
 import {
@@ -268,7 +268,7 @@ export default canComponent.extend({
         advancedFilters);
       if (this.attr('useSnapshots')) {
         // Transform Base Query to Snapshot
-        query = transformQuery(query);
+        query = transformQueryToSnapshot(query);
       }
       // Add Permission check
       query.permissions = (modelName === 'Person') ||
@@ -294,7 +294,7 @@ export default canComponent.extend({
         if (relatedQuery) {
           if (this.attr('useSnapshots')) {
             // Transform Related Query to Snapshot
-            relatedQuery = transformQuery(relatedQuery);
+            relatedQuery = transformQueryToSnapshot(relatedQuery);
           }
           // we need it to find result in response from backend
           result.relatedQueryIndex = request.push(relatedQuery) - 1;

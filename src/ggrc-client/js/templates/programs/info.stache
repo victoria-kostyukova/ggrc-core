@@ -16,7 +16,7 @@
               {{> /static/templates/base_objects/description.stache}}
               {{> /static/templates/base_objects/notes.stache}}
               <div class="row-fluid wrap-row">
-                <div data-test-id="title_manager_7a906d2e">
+                <div>
                   <custom-roles readOnly:from="instance.readOnlyProgramRoles"
                                 includeRoles:from="instance.class.programRoles"
                                 instance:from="instance">
@@ -33,8 +33,7 @@
                 <div class="row-fluid">
                   <div class="span12">
                     <div class="info-expand">
-                      <a data-test-id="button_advanced_cf47bc01"
-                        class="show-hidden-fields info-show-hide active" href="javascript://">
+                      <a class="show-hidden-fields info-show-hide active" href="javascript://">
                         <span class="out">
                           <i class="fa fa-caret-right"></i>
                           Show
@@ -50,13 +49,13 @@
                 </div><!-- row-fluid end -->
                 <div class="hidden-fields-area">
                   <div class="row-fluid wrap-row">
-                    <div data-test-id="title_code_cf47bc01" class="span4">
+                    <div class="span4">
                       <h6>Code</h6>
                       <p>
                         {{slug}}
                       </p>
                     </div>
-                    <div data-test-id="title_effective_date_cf47bc01" class="span4">
+                    <div class="span4">
                       <h6>Effective Date</h6>
                       {{#if start_date}}
                         <p>
@@ -66,7 +65,7 @@
                         <span class="empty-message">None</span>
                       {{/if}}
                     </div>
-                    <div data-test-id="title_stop_date_cf47bc01" class="span4">
+                    <div class="span4">
                       <h6>Last Deprecated Date</h6>
                       {{#if end_date}}
                         <p>

@@ -76,7 +76,7 @@ def get_updated_cavs(new_attrs, rev_content):
     if old_val != new_val:
       if not old_val and not new_val:
         continue
-      yield attr_name
+      yield attr_name, new_val, old_val
 
 
 def add_notification(obj, notif_type_name):

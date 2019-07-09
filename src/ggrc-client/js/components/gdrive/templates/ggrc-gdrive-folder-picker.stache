@@ -9,7 +9,7 @@
       Attachment
       <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
     </label>
-    <a data-id="hide_folder_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
   {{/unless}}
 </div>
 <div class="mapped-folder">

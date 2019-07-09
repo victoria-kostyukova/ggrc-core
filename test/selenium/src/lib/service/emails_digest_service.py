@@ -43,6 +43,13 @@ class ReviewDigestService(FastEmailsService):
     self.open_emails_digest()
     return fast_emails_digest.FastEmailsDigest().get_review_request_emails()
 
+  def get_reverted_review_emails(self):
+    """Get all notification emails about reviews reverted to 'Unreviewed'
+    state."""
+    self.open_emails_digest()
+    return (fast_emails_digest.FastEmailsDigest().
+            get_reverted_review_emails())
+
 
 class DailyEmailsService(BaseEmailsService):
   """Class for daily emails business layer's services objects."""

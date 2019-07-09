@@ -35,34 +35,6 @@ describe('SnapshotUtils', function () {
     });
   });
 
-  describe('getSnapshotItemQuery() method', function () {
-    it('getSnapshotItemQuery() should return correct expression',
-      function () {
-        let relevantInstance = {
-          type: 'Assessment',
-          viewLink: '/assessments/123',
-        };
-        let childId = 10;
-        let childType = 'Control';
-
-        let query = SnapshotUtils
-          .getSnapshotItemQuery(relevantInstance, childId, childType);
-
-        let queryData = query.data[0];
-        let queryExpression = queryData.filters.expression;
-        let objectName = queryData.object_name;
-        let rightNodes = queryExpression.right;
-
-        expect(objectName).toEqual('Snapshot');
-        expect(queryExpression.left.object_name).toEqual('Assessment');
-        expect(rightNodes.left.left).toEqual('child_type');
-        expect(rightNodes.left.right).toEqual(childType);
-        expect(rightNodes.right.left).toEqual('child_id');
-        expect(rightNodes.right.right).toEqual(childId);
-      }
-    );
-  });
-
   describe('toObject() method', function () {
     let snapshot;
     let toObject;

@@ -6,205 +6,198 @@ Copyright (C) 2019 Google Inc.
 <div class="pane-header">
   <div class="pane-header__container">
     <div class="pane-header__title">
-        {{#if is_info_pin}}
-            <h6>title</h6>
-        {{/if}}
-            <inline-edit-control
-                on:inlineSave="saveInlineForm(scope.event)"
-                propName:from="'title'"
-                type:from="'input'"
-                hideContentInEditMode:from="true"
-                mandatory:from="true"
-                isLoading:from="isLoading"
-                instance:from="instance"
-                value:from="instance.title"
-                isEditIconDenied:from="isEditDenied">
-                    {{#unless editMode}}
-                        <confirm-edit-action
-                            on:setEditMode="setEditModeInline(scope.event)"
-                            on:setInProgress="setInProgressState()"
-                            isEditIconDenied:from="isEditIconDenied"
-                            instance:from="instance"
-                            onStateChangeDfd:from="onStateChangeDfd"
-                            editMode:from="editMode">
-                                <base-inline-control-title
-                                    class="inline__header"
-                                    editMode:from="editMode"
-                                    isEditIconDenied:from="isEditIconDenied"
-                                    on:setEditModeInline="confirmEdit()">
-                                        <h3 class="pane-header__title-name">{{instance.title}}</h3>
-                                        <div class="pane-header__title-item">
-                                          <div class="state-value {{addclass 'state' currentState}} {{#if instance.verified}}verified{{/if}}">
-                                              {{currentState}}
-                                          </div>
-                                        </div>
-                                        {{#if instance.archived}}
-                                          <span class="pane-header__title-item">
-                                            <span class="state-value state-archived">Archived</span>
-                                          </span>
-                                        {{/if}}
-                                        {{#eq instance.status 'Completed'}}
-                                            {{#if instance.verified}}
-                                              <span class="pane-header__title-item">
-                                                <i class="fa fa-check-circle green verified-icon"
-                                                    rel="tooltip"
-                                                    title="Verified on {{localize_date instance.verified_date}}">
-                                                </i>
-                                              </span>
-                                            {{/if}}
-                                        {{/eq}}
-                                </base-inline-control-title>
-                        </confirm-edit-action>
-                    {{/unless}}
-            </inline-edit-control>
-    </div>
-        <div class="pane-header__toolbar">
-          {{#if is_info_pin}}
-            <info-pin-buttons maximized:from="maximized"
-                              onChangeMaximizedState:from="@onChangeMaximizedState"
-                              onClose:from="@onClose">
-            </info-pin-buttons>
-          {{/if}}
-          <div class="info-pane-utility">
-            <three-dots-menu>
-                  {{#is_allowed 'update' instance context='for'}}
-                      {{^if instance.archived}}
-                          {{> /static/templates/base_objects/edit_object_link.stache}}
-                      {{/if}}
-                  {{/is_allowed}}
-                  <li>
-                    <permalink-component instance:from="instance"/>
-                  </li>
-                  {{#if_config_exist 'ASSESSMENT_SHORT_URL_PREFIX'}}
-                    <li>
-                      <shortlink-component instance:from="instance"/>
-                    </li>
-                  {{/if_config_exist}}
-                  {{#if is_info_pin}}
-                  <unmap-dropdown-item
-                      page_instance:from="page_instance"
-                      instance:from="instance"
-                      options:from="options">
-                  </unmap-dropdown-item>
-                  {{#if instance.viewLink}}
-                      <li>
-                          <a href="{{instance.viewLink}}">
-                              <i class="fa fa-long-arrow-right"></i>
-                              Open {{instance.class.title_singular}}
-                          </a>
-                      </li>
-                  {{/if}}
-                  {{/if}}
-
-                  {{#if_in instance.status "Not Started,In Progress"}}
-                  {{#is_allowed 'update' instance context='for'}}
-                      <li>
-                          {{#unless instance.archived}}
-                              {{#if verifiers.length}}
-                                <reminder-component
-                                        instance:from="instance"
-                                        type:from="statusToPerson"
-                                        modal_title:from="'Reminder for Assignees set'"
-                                        modal_description:from="'Tomorrow all Assignees will receive a notification to look at this Assessment if they didn&#39;t move it to &#39;Finished&#39; in between.'">
-                                <a href="javascript://" on:el:click="reminder">
-                                    <i class="fa fa-bell-o"></i>
-                                    Send reminder to assignees
-                                </a>
-                                </reminder-component>
-                              {{else}}
-                                <reminder-component instance:from="instance"
-                                        type:from="statusToPerson"
-                                        modal_title:from="'Reminder for Assignees set'"
-                                        modal_description:from="'Tomorrow all Assignees will receive a notification to look at this Assessment if they didn&#39;t move it to &#39;Final&#39; in between.'">
-                                <a href="javascript://" on:el:click="reminder">
-                                    <i class="fa fa-bell-o"></i>
-                                    Send reminder to assignees
-                                </a>
-                                </reminder-component>
-                              {{/if}}
-                          {{/unless}}
-                      </li>
-                  {{/is_allowed}}
-                  {{/if_in}}
-
-                  {{#is_allowed 'update' instance context='for'}}
-                      {{^if instance.archived}}
-                          <li>
-                              {{^is(instance.status, "Rework Needed")}}
-                                  {{#is(instance.status, "Deprecated")}}
-                                      {{! Set default state }}
-                                      <object-change-state toState:from="initialState"
-                                                           on:onStateChange="onStateChange(scope.event)">
-                                          <a href="javascript:void(0)">
-                                              <i class="fa fa-reply"></i> Restore
-                                          </a>
-                                      </object-change-state>
-                                  {{else}}
-                                      <object-change-state toState:from="deprecatedState"
-                                                           on:onStateChange="onStateChange(scope.event)"
-                                      >
-                                          <a href="javascript:void(0)">
-                                              <i class="fa fa-times-circle"></i> Deprecate
-                                          </a>
-                                      </object-change-state>
-                                  {{/is}}
-                              {{else}}
-                                  <object-change-state toState:from="deprecatedState"
-                                                       on:onStateChange="onStateChange(scope.event)"
-                                  >
-                                      <a href="javascript:void(0)">
-                                          <i class="fa fa-times-circle"></i> Deprecate
-                                      </a>
-                                  </object-change-state>
-                              {{/is}}
-                          </li>
-                      {{/if}}
-                  {{/is_allowed}}
-
-                  {{#is_allowed 'delete' instance}}
-                      {{^if instance.archived}}
-                      <li>
-                          <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}"
-                              data-object-singular="{{model.model_singular}}" data-modal-reset="reset"
-                              data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                              <i class="fa fa-trash"></i>
-                              Delete
-                          </a>
-                      </li>
-                      {{/if}}
-                  {{/is_allowed}}
-            </three-dots-menu>
-
-            {{#if is_info_pin}}
-                {{#unless options.isSubTreeItem}}
-                    <div>
-                        <prev-next-buttons disabled:from="isInfoPaneSaving"
-                                           currentIndex:bind="options.selectedItem"
-                                           totalCount:bind="options.pageInfo.total">
-                        </prev-next-buttons>
+      {{#if is_info_pin}}
+        <h6>title</h6>
+      {{/if}}
+      <inline-edit-control
+        on:inlineSave="saveInlineForm(scope.event)"
+        propName:from="'title'"
+        type:from="'input'"
+        hideContentInEditMode:from="true"
+        mandatory:from="true"
+        isLoading:from="isLoading"
+        instance:from="instance"
+        value:from="instance.title"
+        isEditIconDenied:from="isEditDenied">
+          {{#unless editMode}}
+            <confirm-edit-action
+              on:setEditMode="setEditModeInline(scope.event)"
+              on:setInProgress="setInProgressState()"
+              isEditIconDenied:from="isEditIconDenied"
+              instance:from="instance"
+              onStateChangeDfd:from="onStateChangeDfd"
+              editMode:from="editMode">
+                <base-inline-control-title
+                  class="inline__header"
+                  editMode:from="editMode"
+                  isEditIconDenied:from="isEditIconDenied"
+                  on:setEditModeInline="confirmEdit()">
+                    <h3 class="pane-header__title-name">{{instance.title}}</h3>
+                    <div class="pane-header__title-item">
+                      <div class="state-value {{addclass 'state' currentState}} {{#if instance.verified}}verified{{/if}}">
+                        {{currentState}}
+                      </div>
                     </div>
-                {{/unless}}
-            {{/if}}
-
-            {{#unless isEditDenied}}
-                    <object-state-toolbar verifiers:from="verifiers"
-                                          instance:from="instance"
-                                          disabled:from="isInfoPaneSaving"
-                                          instanceState:from="currentState"
-                                          isUndoButtonVisible:from="isUndoButtonVisible"
-                                          on:onStateChange="onStateChange(scope.event)">
-                    </object-state-toolbar>
-            {{/unless}}
-            <div class="form-status">
-                <info-pane-save-status infoPaneSaving:from="isInfoPaneSaving">
-                    <loading-status class="loading-status"
-                                    isLoading:from="infoPaneSaving"
-                                    loadingText:from="'Saving...'"
-                                    showSpinner:from="true">
-                    </loading-status>
-                </info-pane-save-status>
-            </div>
-          </div>
-        </div>
+                    {{#if instance.archived}}
+                      <span class="pane-header__title-item">
+                        <span class="state-value state-archived">Archived</span>
+                      </span>
+                    {{/if}}
+                    {{#eq instance.status 'Completed'}}
+                      {{#if instance.verified}}
+                        <span class="pane-header__title-item">
+                          <i class="fa fa-check-circle green verified-icon" rel="tooltip" title="Verified on {{localize_date instance.verified_date}}"></i>
+                        </span>
+                      {{/if}}
+                    {{/eq}}
+                </base-inline-control-title>
+            </confirm-edit-action>
+          {{/unless}}
+      </inline-edit-control>
     </div>
+    <div class="pane-header__toolbar">
+      {{#if is_info_pin}}
+        <info-pin-buttons 
+          maximized:from="maximized"
+          onChangeMaximizedState:from="@onChangeMaximizedState"
+          onClose:from="@onClose">
+        </info-pin-buttons>
+      {{/if}}
+      <div class="info-pane-utility">
+        <three-dots-menu>
+          {{#is_allowed 'update' instance context='for'}}
+            {{^if instance.archived}}
+              {{> /static/templates/base_objects/edit_object_link.stache}}
+            {{/if}}
+          {{/is_allowed}}
+          <li>
+            <permalink-component instance:from="instance"/>
+          </li>
+          {{#if_config_exist 'ASSESSMENT_SHORT_URL_PREFIX'}}
+            <li>
+              <shortlink-component instance:from="instance"/>
+            </li>
+          {{/if_config_exist}}
+          {{#if is_info_pin}}
+            <unmap-dropdown-item
+                page_instance:from="page_instance"
+                instance:from="instance"
+                options:from="options">
+            </unmap-dropdown-item>
+            {{#if instance.viewLink}}
+              <li>
+                <a href="{{instance.viewLink}}">
+                  <i class="fa fa-long-arrow-right"></i>
+                  Open {{instance.class.title_singular}}
+                </a>
+              </li>
+            {{/if}}
+          {{/if}}
+
+          {{#if_in instance.status "Not Started,In Progress"}}
+            {{#is_allowed 'update' instance context='for'}}
+              <li>
+                {{#unless instance.archived}}
+                  <reminder-component
+                    instance:from="instance"
+                    type:from="statusToPerson"
+                    modal_title:from="'Reminder for Assignees set'"
+                    modal_description:from="'A reminder to complete the Assessment for Assignees will be sent in the next daily email digest.'">
+                      <a href="javascript://" on:el:click="reminder">
+                        <i class="fa fa-bell-o"></i>
+                        Send reminder to assignees
+                      </a>
+                  </reminder-component>
+                {{/unless}}
+              </li>
+            {{/is_allowed}}
+          {{/if_in}}
+
+          {{#is_allowed 'update' instance context='for'}}
+            {{^if instance.archived}}
+              <li>
+                {{^is(instance.status, "Rework Needed")}}
+                  {{#is(instance.status, "Deprecated")}}
+                    {{! Set default state }}
+                    <object-change-state 
+                      toState:from="initialState"
+                      on:onStateChange="onStateChange(scope.event)">
+                        <a href="javascript:void(0)">
+                          <i class="fa fa-reply"></i>
+                          Restore
+                        </a>
+                    </object-change-state>
+                  {{else}}
+                    <object-change-state 
+                      toState:from="deprecatedState"
+                      on:onStateChange="onStateChange(scope.event)">
+                        <a href="javascript:void(0)">
+                          <i class="fa fa-times-circle"></i>
+                          Deprecate
+                        </a>
+                    </object-change-state>
+                  {{/is}}
+                {{else}}
+                  <object-change-state 
+                    toState:from="deprecatedState"
+                    on:onStateChange="onStateChange(scope.event)">
+                      <a href="javascript:void(0)">
+                        <i class="fa fa-times-circle"></i>
+                        Deprecate
+                      </a>
+                  </object-change-state>
+                {{/is}}
+              </li>
+            {{/if}}
+          {{/is_allowed}}
+
+          {{#is_allowed 'delete' instance}}
+            {{^if instance.archived}}
+              <li>
+                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}"
+                  data-object-singular="{{model.model_singular}}" data-modal-reset="reset"
+                  data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                  <i class="fa fa-trash"></i>
+                  Delete
+                </a>
+              </li>
+            {{/if}}
+          {{/is_allowed}}
+        </three-dots-menu>
+
+        {{#if is_info_pin}}
+          {{#unless options.isSubTreeItem}}
+            <div>
+              <prev-next-buttons 
+                disabled:from="isInfoPaneSaving"
+                currentIndex:bind="options.selectedItem"
+                totalCount:bind="options.pageInfo.total">
+              </prev-next-buttons>
+            </div>
+          {{/unless}}
+        {{/if}}
+
+        {{#unless isEditDenied}}
+          <object-state-toolbar 
+            verifiers:from="verifiers"
+            instance:from="instance"
+            disabled:from="isInfoPaneSaving"
+            instanceState:from="currentState"
+            isUndoButtonVisible:from="isUndoButtonVisible"
+            on:onStateChange="onStateChange(scope.event)">
+          </object-state-toolbar>
+        {{/unless}}
+        <div class="form-status">
+          <info-pane-save-status infoPaneSaving:from="isInfoPaneSaving">
+            <loading-status 
+              class="loading-status"
+              isLoading:from="infoPaneSaving"
+              loadingText:from="'Saving...'"
+              showSpinner:from="true">
+            </loading-status>
+          </info-pane-save-status>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

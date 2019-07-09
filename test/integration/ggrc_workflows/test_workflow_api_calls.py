@@ -646,5 +646,5 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(201, resp.status_code)
     workflow_id = resp.json['workflow']['id']
     self.assertEqual(
-        flag if flag is not None else True,
+        flag if flag is not None else False,
         all_models.Workflow.query.get(workflow_id).is_verification_needed)

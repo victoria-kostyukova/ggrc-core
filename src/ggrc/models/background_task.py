@@ -347,6 +347,7 @@ def queued_task(func):
       return app.make_response((
           'failure', 200, [('Content-Type', 'text/html')]))
     task.finish("Success", result)
+    result.status_code = 200
     return result
   return decorated_view
 

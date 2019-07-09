@@ -35,6 +35,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
         "description": "start this many a time",
         "unit": "week",
         "repeat_every": 1,
+        "is_verification_needed": True,
         "task_groups": [{
             "title": "weekly task group",
             "task_group_tasks": [{
@@ -311,6 +312,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
         "title": "test workflow",
         "unit": "week",
         "repeat_every": 1,
+        "is_verification_needed": True,
         "task_groups": [{
             "title": "test group",
             "task_group_tasks": [{
@@ -434,6 +436,7 @@ class TestWorkflowCycleStatePropagation(TestCase):
         "title": "test workflow",
         "unit": "week",
         "repeat_every": 1,
+        "is_verification_needed": True,
         "task_groups": [{
             "title": "test group1",
             "task_group_tasks": [{

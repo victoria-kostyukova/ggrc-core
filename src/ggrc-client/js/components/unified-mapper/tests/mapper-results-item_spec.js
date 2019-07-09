@@ -44,7 +44,6 @@ describe('mapper-results-item', function () {
     beforeEach(function () {
       itemData = {
         title: 'mockTitle',
-        description_inline: 'mockDescription',
         name: 'mockName',
         email: 'mockEmail',
       };
@@ -57,31 +56,20 @@ describe('mapper-results-item', function () {
       expect(result).toEqual('mockTitle');
     });
 
-    it('returns item description if no title', function () {
+    it('returns item name if no title', function () {
       let result;
       viewModel.attr('itemData', Object.assign(itemData, {
         title: undefined,
-      }));
-      result = viewModel.title();
-      expect(result).toEqual('mockDescription');
-    });
-
-    it('returns item name if no title and description', function () {
-      let result;
-      viewModel.attr('itemData', Object.assign(itemData, {
-        title: undefined,
-        description_inline: undefined,
       }));
       result = viewModel.title();
       expect(result).toEqual('mockName');
     });
 
-    it('returns item email if no title, description, name',
+    it('returns item email if no title, name',
       function () {
         let result;
         viewModel.attr('itemData', Object.assign(itemData, {
           title: undefined,
-          description_inline: undefined,
           name: undefined,
         }));
         result = viewModel.title();

@@ -431,7 +431,7 @@ describe('mapper-results component', function () {
     it('transform query to snapshot if useSnapshots is true', function () {
       let result;
       viewModel.attr('useSnapshots', true);
-      spyOn(SnapshotUtils, 'transformQuery')
+      spyOn(SnapshotUtils, 'transformQueryToSnapshot')
         .and.returnValue({mockData: 'snapshot'});
       result = viewModel.getQuery();
       expect(result.request[0]).toEqual(jasmine.objectContaining({

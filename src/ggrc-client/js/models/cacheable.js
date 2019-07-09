@@ -21,7 +21,6 @@ import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attr
 import {CUSTOM_ATTRIBUTE_TYPE} from '../plugins/utils/custom-attribute/custom-attribute-config';
 import {
   isSnapshot,
-  setAttrs,
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent-notifier';
@@ -480,7 +479,6 @@ export default canModel.extend({
   init: function () {
     let cache = this.constructor.cache;
     let idKey = this.constructor.id;
-    setAttrs(this);
     if ((this[idKey] || this[idKey] === 0) &&
       !isSnapshot(this)) {
       cache[this[idKey]] = this;

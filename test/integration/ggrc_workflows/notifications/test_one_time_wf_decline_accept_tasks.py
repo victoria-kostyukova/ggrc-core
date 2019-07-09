@@ -291,6 +291,7 @@ class TestCycleTaskStatusChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
+        "is_verification_needed": True,
         # admin will be current user with id == 1
         "task_groups": [{
             "title": "single task group",
@@ -310,6 +311,7 @@ class TestCycleTaskStatusChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
+        "is_verification_needed": True,
         # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",

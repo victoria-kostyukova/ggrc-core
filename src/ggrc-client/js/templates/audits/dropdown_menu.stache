@@ -6,7 +6,6 @@
 <three-dots-menu>
   {{^if instance.archived}}
     {{#is_allowed 'update' instance context='for'}}
-      {{#if instance.is_snapshotable}}
         <li>
           <snapshot-scope-update instance:from="instance">
             <a href="javascript://" on:el:click="upsertIt">
@@ -14,7 +13,6 @@
               Update objects to latest version</a>
           </snapshot-scope-update>
         </li>
-      {{/if}}
       {{> /static/templates/base_objects/edit_object_link.stache}}
 
       <li>
@@ -110,8 +108,7 @@
   {{^if instance.archived}}
     {{#is_allowed 'delete' instance}}
         <li>
-          <a data-test-id="dropdown_settings_delete_6a62eaaf"
-             data-toggle="modal-ajax-deleteform"
+          <a data-toggle="modal-ajax-deleteform"
              data-object-plural="{{model.table_plural}}"
              data-object-singular="{{model.model_singular}}"
              data-modal-reset="reset" data-modal-class="modal"

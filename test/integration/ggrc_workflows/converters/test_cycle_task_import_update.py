@@ -216,6 +216,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self.workflow_active = {
         "title": "workflow active title",
         "description": "workflow active description",
+        "is_verification_needed": True,
         "access_control_list": [
             acl_helper.get_acl_json(wf_admin_role_id, self.person_1.id)],
         "notify_on_change": False,
@@ -311,6 +312,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self.workflow_historical = {
         "title": "workflow historical title",
         "description": "workflow historical description",
+        "is_verification_needed": True,
         "access_control_list": [
             acl_helper.get_acl_json(wf_admin_role_id, self.person_1.id)],
         "notify_on_change": False,

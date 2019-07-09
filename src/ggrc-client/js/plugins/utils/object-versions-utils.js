@@ -6,13 +6,6 @@
 import * as businessModels from '../../models/business-models';
 
 /**
-   * Util methods for work with Object versions.
-   */
-let modelsIncludeVersions = [
-  'Issue',
-];
-
-/**
  * Check provided model name.
  * Returns true if model name contains '_version'
  * @param {String} modelName - model to check
@@ -22,16 +15,6 @@ function isObjectVersion(modelName) {
   return modelName && typeof modelName === 'string' ?
     modelName.indexOf('_version') > -1 :
     false;
-}
-
-/**
- * Check provided parent model name.
- * Returns true if parent model has object versions tabs
- * @param {String} parentModelName - parent model to check
- * @return {Boolean} True or False
- */
-function parentHasObjectVersions(parentModelName) {
-  return modelsIncludeVersions.indexOf(parentModelName) > -1;
 }
 
 function getObjectVersionConfig(modelName) {
@@ -54,6 +37,5 @@ function getObjectVersionConfig(modelName) {
 
 export {
   isObjectVersion,
-  parentHasObjectVersions,
   getObjectVersionConfig,
 };

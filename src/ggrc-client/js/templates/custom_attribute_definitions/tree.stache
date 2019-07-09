@@ -70,9 +70,7 @@
                         data-placement="right"
                         data-original-title="Add Attribute"
                         on:el:click="showAddNewItemModal(scope.element)">
-                        <i class="fa fa-plus-circle"
-                          data-test-id="button_add-86eaf948">
-                        </i>
+                        <i class="fa fa-plus-circle"></i>
                       </a>
                     </div>
                   </div>

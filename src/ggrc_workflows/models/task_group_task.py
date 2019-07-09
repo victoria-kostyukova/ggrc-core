@@ -89,9 +89,8 @@ class TaskGroupTask(roleable.Roleable,
     self._task_group = task_group
 
   TEXT = 'text'
-  MENU = 'menu'
   CHECKBOX = 'checkbox'
-  VALID_TASK_TYPES = [TEXT, MENU, CHECKBOX]
+  VALID_TASK_TYPES = [TEXT, CHECKBOX]
 
   @orm.validates('task_type')
   def validate_task_type(self, key, value):
@@ -159,7 +158,7 @@ class TaskGroupTask(roleable.Roleable,
           "display_name": "Task Type",
           "mandatory": True,
           "description": ("Accepted values are:"
-                          "\n'Rich Text'\n'Dropdown'\n'Checkbox'"),
+                          "\n'Rich Text'\n'Checkbox'"),
       }
   }
 

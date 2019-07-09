@@ -41,7 +41,6 @@
       <br>
       <select name="task_type">
         <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
-        <option value="menu" {{#is(instance.task_type, "menu")}}selected="selected"{{/is}}>Dropdown</option>
         <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
       </select>
       <deferred-mapper

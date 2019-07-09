@@ -38,7 +38,7 @@
     <label class="ggrc-form-item__label">
       Code
     </label>
-    <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx"
+    <input {{^if new_object_form}} disabled {{/if}}
       tabindex="14"
       class="input-block-level"
       name="slug"

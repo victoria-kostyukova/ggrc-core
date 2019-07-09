@@ -24,7 +24,6 @@ const viewModel = canMap.extend({
   title() {
     let displayItem = this.displayItem();
     return displayItem.title ||
-      displayItem.description_inline ||
       displayItem.name ||
       displayItem.email;
   },

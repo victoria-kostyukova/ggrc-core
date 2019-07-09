@@ -14,11 +14,11 @@ class FastEmailsDigest(base.WithBrowser):
     self.emails_url = (environment.app_url + url.NOTIFICATIONS +
                        "/show_fast_digest")
     self._review_requests = self._browser.elements(
-        xpath="//title/following-sibling::div/div"
-              "[contains(., 'review was requested')]")
+        xpath="//div/div[contains(., 'review was requested')]")
+    self._reverted_reviews = self._browser.elements(
+        xpath="//div/div[contains(., 'reverted to')]")
     self._proposals = self._browser.elements(
-        xpath="//title/following-sibling::div/div"
-              "[contains(., 'proposed changes')]")
+        xpath="//div/div[contains(., 'proposed changes')]")
 
   def open_digest_page(self):
     """Open page with fast emails digest."""
@@ -28,6 +28,12 @@ class FastEmailsDigest(base.WithBrowser):
     """Get all review request notification emails."""
     return [ReviewNotificationItem(element).get_notification_email() for
             element in self._review_requests]
+
+  def get_reverted_review_emails(self):
+    """Get all notification emails about reviews reverted to 'Unreviewed'
+    state."""
+    return [ReviewNotificationItem(element).get_notification_email() for
+            element in self._reverted_reviews]
 
   def get_proposal_emails(self):
     """Get all proposal notification emails."""

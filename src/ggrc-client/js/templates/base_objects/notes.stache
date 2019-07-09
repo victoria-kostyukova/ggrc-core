@@ -6,9 +6,9 @@
 {{#instance}}
   {{#if_helpers '\n #if' notes '\n or #if' isRevision}}
     <div class="row-fluid wrap-row">
-      <div data-test-id="title_notes_ef5bc3a71e88" class="span12">
+      <div class="span12">
         <h6>Notes</h6>
-        <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
+        <div class="rtf-block">
           <read-more
             text:from="notes"
             handleMarkdown:from="instance.class.isChangeableExternally">

@@ -206,7 +206,6 @@ class LhnMenu(object):
   FILTER_SUBMIT_BUTTON = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch-submit")
   FILTER_CLEAR_BUTTON = (
       By.CSS_SELECTOR, '.lhs-search [data-title="Clear filters"]')
-  LHS_ITEM = (By.CSS_SELECTOR, '[test-data-id="lhs-item_3ad27b8b"]')
   ALL_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="all_objects_e0345ec4"]')
   MY_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="my_objects_6fa95ae1"]')
   PIN = (By.CSS_SELECTOR, ".lhn-pin")
@@ -252,11 +251,6 @@ class ExtendedInfo(object):
  member object."""
   # labels
   TITLE = (By.CSS_SELECTOR, "#extended-info .main-title")
-  # user input elements
-  BUTTON_MAP_TO = (
-      By.CSS_SELECTOR, '[data-test-id="extended_info_button_map"]')
-  ALREADY_MAPPED = (
-      By.CSS_SELECTOR, '[data-test-id="extended_info_object_already_mapped"]')
 
 
 class CommonModalUnifiedMapper(object):
@@ -342,41 +336,10 @@ class ModalCreateNewPerson(BaseModalCreateNew):
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for Create new object modals."""
-  MODAL = Common.MODAL_CREATE
-  # user input elements
-  UI_TITLE = (By.CSS_SELECTOR, MODAL + ' [placeholder="Enter Title"]')
-  CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
-                           MODAL + ' [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR, '{} [data-toggle="modal-submit-addmore"]'.format(MODAL))
 
 
 class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for Create new Program modals."""
-  # user input elements
-  UI_DESCRIPTION = (By.CSS_SELECTOR,
-                    '[data-test-id="new_program_field_description_1fb8bc06"] '
-                    '.ql-editor')
-  UI_NOTES = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_notes_75b8bc05"] '
-              '.ql-editor')
-  UI_STATE = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_dropdown_state_036a1fa6"]')
-  BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
-  BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  REF_URL_CSS = (By.CSS_SELECTOR, '[data-id="reference_url_hidden"]')
-  UI_EFFECTIVE_DATE = (By.CSS_SELECTOR,
-                       '[test-id="new_program_field_effective_date_f2783a28"] '
-                       '[data-id="effective_date_hidden"] .datepicker__input')
-  EFFECTIVE_DATE_DATEPICKER = (
-      By.CSS_SELECTOR,
-      '[test-id="new_program_field_effective_date_f2783a28"] '
-      '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="label_title_2c925d94"]')
-  DESCRIPTION = (
-      By.CSS_SELECTOR, '[data-test-id="label_description_2c925d94"]')
-  PRIVACY = (By.CSS_SELECTOR, '[data-test-id="label_privacy_2c925d94"]')
 
 
 class ModalCreateNewOrgGroup(BaseModalCreateNew):
@@ -385,8 +348,6 @@ class ModalCreateNewOrgGroup(BaseModalCreateNew):
 
 class ModalCreateNewRisk(BaseModalCreateNew):
   """Locators for Create new Risk modals."""
-  UI_DESCRIPTION = (
-      By.CSS_SELECTOR, '[tabindex="2"] .ql-editor')
 
 
 class ModalCreateNewDataAsset(BaseModalCreateNew):
@@ -411,74 +372,6 @@ class ModalCreateNewProduct(BaseModalCreateNew):
 
 class ModalCreateNewControl(BaseModalCreateNew):
   """Locators for Create new Control modals."""
-  class _Locator(object):
-    """Locators for Create new Control modals visible when creating from LHN.
-    """
-    @staticmethod
-    def get_assignee_row(first_id, second_id):
-      return (
-          By.CSS_SELECTOR,
-          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-          'label'.format(first_id, second_id))
-
-    @staticmethod
-    def get_dropdown_item(first_id, second_id):
-      return (
-          By.CSS_SELECTOR,
-          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-          'select'.format(first_id, second_id))
-  DESCRIPTION = (
-      By.CSS_SELECTOR, '[data-test-id="control_description-label_9cc51ca3"]')
-  UI_DESCRIPTION = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_description-text_9cc51ca3"] .ql-editor')
-  TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] label')
-  UI_TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] '
-                       '.ql-editor')
-  NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
-  KIND_OR_NATURE = (
-      By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
-  DROPDOWN_KIND_OR_NATURE = (
-      By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] select')
-  FRAUD_RELATED = (
-      By.CSS_SELECTOR, '[data-test-id="control_fraud_9cc51ca3"] label')
-  DROPDOWN_FRAUD_RELATED = (
-      By.CSS_SELECTOR, '[data-test-id="control_fraud_9cc51ca3"] select')
-  FREQUENCY = (
-      By.CSS_SELECTOR, '[data-test-id="control_frequency_fb20318a"] label')
-  DROPDOWN_FREQUENCY = (
-      By.CSS_SELECTOR, '[data-test-id="control_frequency_fb20318a"] select')
-  ASSERTIONS = (
-      By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
-  ADMIN = (
-      By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
-  REF_URL_CSS = (By.CSS_SELECTOR, '[data-id="reference_url_hidden"]')
-  SIGNIFICANCE = (
-      By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] label')
-  DROPDOWN_SIGNIFICANCE = (
-      By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] select')
-  TYPE_OR_MEANS = (
-      By.CSS_SELECTOR, '[data-test-id="control_type_means_2ffa1b64"] label')
-  DROPDOWN_TYPE_OR_MEANS = (
-      By.CSS_SELECTOR, '[data-test-id="control_type_means_2ffa1b64"] select')
-  CATEGORIES = (
-      By.CSS_SELECTOR, '[data-test-id="control_categories_1eb33246"] label')
-  STATE = (
-      By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] label')
-  DROPDOWN_STATE = (
-      By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
-  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] .ql-editor')
-  UI_EFFECTIVE_DATE = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="effective_date_hidden"] .datepicker__input')
-  EFFECTIVE_DATE_DATEPICKER = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
-  BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
 class ModalCreateNewObjective(BaseModalCreateNew):
@@ -775,30 +668,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  DESCRIPTION = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_description_7a906d2e"] h6'.format(WIDGET))
-  DESCRIPTION_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_description_content_7a906d2e"]'.format(WIDGET))
-  NOTES = (By.CSS_SELECTOR,
-           '{} [data-test-id="title_notes_ef5bc3a71e88"] h6'.format(WIDGET))
-  NOTES_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_notes_content_ef5bc3a71e88"]'.format(WIDGET))
-  REF_URL_CSS = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_reference_url_aa7d1a65"]'.format(WIDGET))
-  CODE = (By.CSS_SELECTOR,
-          '{} [data-test-id="title_code_cf47bc01"] h6'.format(WIDGET))
-  CODE_ENTERED = (By.CSS_SELECTOR,
-                  '{} [data-test-id="title_code_cf47bc01"] p'.format(WIDGET))
-  EFFECTIVE_DATE = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_effective_date_cf47bc01"] h6'.format(WIDGET))
-  EFFECTIVE_DATE_ENTERED = (
-      By.CSS_SELECTOR,
-      '[data-test-id="title_effective_date_cf47bc01"] p'.format(WIDGET))
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
@@ -1151,9 +1020,6 @@ class AdminCustomAttributes(object):
   FILTER_BUTTON_RESET = (By.CSS_SELECTOR,
                          '.tree-filter__button>[type="reset"]')
   # programs dropdown
-  BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
-      By.CSS_SELECTOR,
-      '.tree-item:nth-child(5) [data-test-id="button_add-86eaf948"]')
   PROGRAMS_LABEL_ATTRIBUTE_NAME = _Locator.get_programs_label(1)
   PROGRAMS_LABEL_ATTRIBUTE_TYPE = _Locator.get_programs_label(2)
   PROGRAMS_LABEL_MANDATORY = _Locator.get_programs_label(3)

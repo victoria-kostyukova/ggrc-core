@@ -145,5 +145,7 @@ class TestAsUserTime(unittest.TestCase):
     roles = {r_id: mock.Mock() for r_id in role_ids}
     expected_role = {roles[i] for i in expected_role_ids}
     # pylint: disable=protected-access
-    self.assertEqual(expected_role,
-                     data_handlers._get_updated_roles(new_acl, old_acl, roles))
+    actual_role = set()
+    for act_role in data_handlers._get_updated_roles(new_acl, old_acl, roles):
+      actual_role.add(act_role[0])
+    self.assertEqual(expected_role, actual_role)

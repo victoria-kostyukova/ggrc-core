@@ -10,7 +10,7 @@
   {{#instance}}
     <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
       <div class="pane-header__container">
-        <div class="pane-header__title" data-test-id="title_0ad9fbaf">
+        <div class="pane-header__title">
           {{#if is_info_pin}}
             <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
           {{/if}}
@@ -141,18 +141,6 @@
                     handleMarkdown:from="instance.class.isChangeableExternally">
                   </read-more>
                 </div>
-              {{/is}}
-              {{#is(instance.task_type, "menu")}}
-                <h6>Response Options</h6>
-                {{! here we need to start a quick form or other component}}
-                <ggrc-quick-update instance:from="instance">
-                  <dropdown-component name:bind="instance.selected_response_options.0"
-                            className:from="'noop'" {{! to not use default from component}}
-                            optionsList:from="instance.response_options"
-                            isDisabled:from="isDisabled"
-                            on:el:change="save">
-                  </dropdown-component>
-                </ggrc-quick-update>
               {{/is}}
               {{#is(instance.task_type, "checkbox")}}
                 <h6>Response Options</h6>

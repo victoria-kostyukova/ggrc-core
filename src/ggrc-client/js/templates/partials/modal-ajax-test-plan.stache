@@ -4,12 +4,12 @@
 }}
 
 <div class="row-fluid">
-  <div data-id="test_plan_hidden" class="span6 hidable">
+  <div class="span6 hidable">
     <label>
       Assessment Procedure
       <i class="fa fa-question-circle" rel="tooltip" title="Provide an assessment procedure for this {{model.title_singular}}."></i>
     </label>
-    <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
     <div class="rich-text">
       <rich-text
         tabindex="3"

@@ -7,10 +7,11 @@ from ggrc.rbac import permissions
 from ggrc.services.common import \
     ModelView, as_json, inclusion_filter, filter_resource
 from ggrc.utils import benchmark
-from werkzeug.exceptions import Forbidden
+from werkzeug import exceptions
 
 
 class BaseObjectView(ModelView):
+  # pylint: disable=inconsistent-return-statements
   model_template = '{model_plural}/show.haml'
   base_template = 'base_objects/show.haml'
 
@@ -20,14 +21,8 @@ class BaseObjectView(ModelView):
     if method == 'get':
       if self.pk in kwargs and kwargs[self.pk] is not None:
         return self.get(*args, **kwargs)
-      else:
-        # No `pk` given; fallthrough for now
-        pass
-    else:
-      # Method not supported; fallthrough for now
-      pass
 
-    raise NotImplementedError()
+    raise exceptions.MethodNotAllowed()
 
   def get_context_for_object(self, obj):
     return {
@@ -70,7 +65,7 @@ class BaseObjectView(ModelView):
           'text/html', 406, [('Content-Type', 'text/plain')]))
     if not permissions.is_allowed_read(self.model.__name__, obj.id,
                                        obj.context_id):
-      raise Forbidden()
+      raise exceptions.Forbidden()
 
     with benchmark("Render"):
       rendered_template = self.render_template_for_object(obj)

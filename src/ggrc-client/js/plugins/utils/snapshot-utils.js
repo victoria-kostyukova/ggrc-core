@@ -7,12 +7,8 @@ import loFind from 'lodash/find';
 import canConstruct from 'can-construct';
 import canList from 'can-list';
 import canMap from 'can-map';
-import {
-  buildParam,
-} from './query-api-utils';
 import Permission from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
-import {getPageInstance} from '../utils/current-page-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
@@ -27,36 +23,12 @@ import {ggrcGet} from '../ajax_extensions';
 const auditScopeModels = ['Assessment', 'AssessmentTemplate'];
 
 /**
- * Set extra attrs for snapshoted objects or snapshots
- * @param {Object} instance - Object instance
- */
-function setAttrs(instance) {
-  // Get list of objects that supports 'snapshot scope' from config
-  let className = instance.type;
-  if (isSnapshotParent(className)) {
-    instance.attr('is_snapshotable', true);
-  }
-}
-
-/**
  * Check whether object is snapshot
  * @param {Object} instance - Object instance
  * @return {Boolean} True or False
  */
 function isSnapshot(instance) {
   return instance && (instance.snapshot || instance.isRevision);
-}
-
-/**
- * Check whether object is in spanshot scope
- * @param {Object} parentInstance - Object (parent) instance
- * @return {Boolean} True or False
- */
-function isSnapshotScope(parentInstance) {
-  let instance = parentInstance || getPageInstance();
-  return instance ?
-    instance.is_snapshotable || isAuditScopeModel(instance.type) :
-    false;
 }
 
 /**
@@ -190,7 +162,7 @@ function toObjects(values) {
  * @param {Object} query - original query
  * @return {Object} The transformed query
  */
-function transformQuery(query) {
+function transformQueryToSnapshot(query) {
   let type = query.object_name;
   let expression = query.filters.expression;
   query.object_name = 'Snapshot';
@@ -213,38 +185,6 @@ function transformQuery(query) {
  */
 function isSnapshotType(instance) {
   return instance && instance.type === 'Snapshot';
-}
-
-/**
- * build query for getting a snapshot.
- * @param {String} instance - Relevant instance
- * @param {String} childId - Child id of snapshot
- * @param {String} childType - Child type of snapshot
- * @return {Object} Query object
- */
-function getSnapshotItemQuery(instance, childId, childType) {
-  let relevantFilters = [{
-    type: instance.type,
-    id: instance.id,
-    operation: 'relevant',
-  }];
-  let filters = {
-    expression: {
-      left: {
-        left: 'child_type',
-        op: {name: '='},
-        right: childType,
-      },
-      op: {name: 'AND'},
-      right: {
-        left: 'child_id',
-        op: {name: '='},
-        right: childId,
-      },
-    },
-  };
-  let query = buildParam('Snapshot', {}, relevantFilters, [], filters);
-  return {data: [query]};
 }
 
 /**
@@ -295,7 +235,6 @@ function getSnapshotsCounts(widgets, instance) {
 
 export {
   isSnapshot,
-  isSnapshotScope,
   isSnapshotParent,
   isSnapshotRelated,
   isSnapshotRelatedType,
@@ -303,9 +242,7 @@ export {
   isAuditScopeModel,
   toObject,
   toObjects,
-  transformQuery,
-  setAttrs,
-  getSnapshotItemQuery,
+  transformQueryToSnapshot,
   isSnapshotType,
   getParentUrl,
   getSnapshotsCounts,

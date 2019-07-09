@@ -64,7 +64,7 @@
           </div>
         </div>
         <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.issue_id"}}field-failure{{/isValidAttr}}">
-          <numberbox-component attrDataId:from="'code_txtbx'"
+          <numberbox-component
                      additionalClass:from="'input-block-level'"
                      placeholder:from="'Enter Ticket ID'"
                      value:bind="instance.issue_tracker.issue_id">
@@ -82,7 +82,7 @@
       <label class="ggrc-form-item__label">
         Hotlist ID
       </label>
-      <numberbox-component attrDataId:from="'code_txtbx'"
+      <numberbox-component
                  additionalClass:from="'input-block-level'"
                  placeholder:from="'Enter Hotlist ID'"
                  value:bind="instance.issue_tracker.hotlist_id">
@@ -93,7 +93,7 @@
         Component ID
         <i class="fa fa-asterisk"></i>
       </label>
-      <numberbox-component attrDataId:from="'code_txtbx'"
+      <numberbox-component
                  additionalClass:from="'input-block-level'"
                  placeholder:from="'Enter Component ID'"
                  value:bind="instance.issue_tracker.component_id">
@@ -137,8 +137,7 @@
           Ticket Title
           <i class="fa fa-asterisk"></i>
         </label>
-        <input data-id="code_txtbx"
-               class="input-block-level"
+        <input class="input-block-level"
                placeholder="Enter Ticket Title"
                type="text"
                el:value:bind="instance.issue_tracker.title"

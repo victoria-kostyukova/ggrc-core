@@ -88,7 +88,7 @@ class Workflow(roleable.Roleable,
   is_old_workflow = deferred(
       db.Column(db.Boolean, default=False, nullable=True), 'Workflow')
 
-  IS_VERIFICATION_NEEDED_DEFAULT = True
+  IS_VERIFICATION_NEEDED_DEFAULT = False
   is_verification_needed = db.Column(
       db.Boolean,
       default=IS_VERIFICATION_NEEDED_DEFAULT,
