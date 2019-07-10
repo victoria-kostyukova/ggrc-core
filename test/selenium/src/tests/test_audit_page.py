@@ -107,11 +107,12 @@ class TestAuditPage(base.Test):
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
     actual_asmt_tmpls = asmt_tmpls_ui_service.get_list_objs_from_tree_view(
         src_obj=audit)
-    # 'expected_asmt_tmpls': modified_by (None) *factory
+    # 'expected_asmt_tmpls': modified_by, slug (None) *factory
     # 'actual_asmt_tmpls': assignees, verifiers, template_object_type (None)
     self.general_equal_assert(
         [expected_asmt_tmpl], actual_asmt_tmpls,
-        "modified_by", "assignees", "verifiers", "template_object_type")
+        "modified_by", "slug", "assignees", "verifiers",
+        "template_object_type")
 
   @pytest.mark.smoke_tests
   def test_asmt_creation(self, program, audit, selenium):
@@ -129,7 +130,8 @@ class TestAuditPage(base.Test):
     asmt.update_attrs(
         created_at=rest_asmt.created_at,
         updated_at=rest_asmt.updated_at,
-        modified_by=rest_asmt.modified_by
+        modified_by=rest_asmt.modified_by,
+        slug=rest_asmt.slug
     ).repr_ui()
     self.general_equal_assert(asmt, actual_asmt, "custom_attributes")
 

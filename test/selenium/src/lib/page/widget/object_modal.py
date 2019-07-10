@@ -34,7 +34,6 @@ _FIELD_METHOD_MAPPING = {
     "title": "set_title",
     "description": "set_description",
     "status": "set_state",
-    "slug": "set_code",
     "assertions": "select_assertions",
     "mapped_objects": "map_objects",
     "task_groups": "set_first_task_group_title",  # workflow,
@@ -56,8 +55,7 @@ class BaseObjectModal(base.WithBrowser):
     self.description_field = self._root.div(
         data_placeholder="Enter Description")
     self.state_select = self._root.element(id="state").select()
-    self.code_field = self._root.text_field(name="slug")
-    self._fields = ["title", "description", "status", "slug"]
+    self._fields = ["title", "description", "status"]
     self.close_btn = self._root.element(class_name="modal-dismiss")
 
   def submit_obj(self, obj):
@@ -120,10 +118,6 @@ class BaseObjectModal(base.WithBrowser):
     """Sets value in state dropdown."""
     self.state_select.wait_until(lambda e: e.exists).select(state)
 
-  def set_code(self, code):
-    """Sets code."""
-    self.code_field.set(code)
-
   def click_propose(self):
     """Click propose button."""
     self._root.link(text="Propose").click()
@@ -169,7 +163,7 @@ class ControlModal(BaseObjectModal):
         class_name="modal-header", text="New {}".format(
             objects.get_singular(objects.CONTROLS, title=True))).parent(
                 class_name="modal-wide")
-    self._fields = ["title", "description", "status", "slug", "assertions"]
+    self._fields = ["title", "description", "status", "assertions"]
 
   def select_assertions(self, assertions):
     """Selects assertions."""
@@ -194,7 +188,7 @@ class AssessmentModal(BaseObjectModal):
 
   def __init__(self, _driver=None):
     super(AssessmentModal, self).__init__()
-    self._fields = ["title", "description", "slug", "mapped_objects"]
+    self._fields = ["title", "description", "mapped_objects"]
 
   def map_objects(self, objs):
     """Maps objects using `Map Objects` button."""
@@ -219,7 +213,7 @@ class IssueModal(BaseObjectModal):
 
   def __init__(self):
     super(IssueModal, self).__init__()
-    self._fields = ["title", "description", "status", "slug", "due_date"]
+    self._fields = ["title", "description", "status", "due_date"]
     self._due_date_picker = page_elements.Datepicker(
         self._root.element(id="issue-due-date"))
 

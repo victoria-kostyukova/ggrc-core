@@ -15,9 +15,6 @@ from lib.constants import (
 from lib.constants.element import AdminWidgetCustomAttributes, ReviewStates
 from lib.decorator import lazy_property
 from lib.entities import entity
-from lib.entities.entity import (
-    PersonEntity, CustomAttributeDefinitionEntity, CommentEntity,
-    ControlEntity)
 from lib.utils import date_utils, help_utils, string_utils
 from lib.utils.string_utils import StringMethods
 
@@ -31,9 +28,7 @@ class EntitiesFactory(object):
     self.obj_type = objects.get_obj_type(self.obj_name)
     self.obj_title = self.generate_string(self.obj_type)
     self.obj_entity_cls = factory.get_cls_obj_entity(object_name=self.obj_name)
-    if self.__class__ not in [CustomAttributeDefinitionEntity, PersonEntity,
-                              CommentEntity]:
-      self.obj_slug = self.generate_slug()
+    self.obj_slug = None
     self._acl_roles = []
 
   def obj_inst(self):
@@ -144,7 +139,7 @@ class PeopleFactory(EntitiesFactory):
     """Extract values for person's email attributes."""
     return [
         person.email for person in help_utils.convert_to_list(people)
-        if isinstance(person, PersonEntity)]
+        if isinstance(person, entity.PersonEntity)]
 
   @staticmethod
   def get_acl_members(role_id, people):
@@ -153,11 +148,11 @@ class PeopleFactory(EntitiesFactory):
     """
     def get_acl_member(role_id, person):
       """Return ACL member as dict: {ac_role_id: *, person: {id: *}."""
-      if isinstance(person, PersonEntity):
+      if isinstance(person, entity.PersonEntity):
         return {"ac_role_id": role_id, "person": person.repr_min_dict()}
       else:
         raise ValueError(messages.CommonMessages.err_common.format(
-            PersonEntity, person))
+            entity.PersonEntity, person))
     return [get_acl_member(role_id, person)
             for person in help_utils.convert_to_list(people)]
 
@@ -366,7 +361,7 @@ class ProgramsFactory(EntitiesFactory):
     """Create Program entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     program_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.DRAFT),
         review=ReviewsFactory().default_review()
     )
@@ -413,8 +408,9 @@ class ControlsFactory(EntitiesFactory):
     """
     assertions = attrs.get("assertions", ["security"])
     obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
-        assertions=[ControlEntity.ASSERTIONS[name] for name in assertions],
+        title=self.obj_title,
+        assertions=[entity.ControlEntity.ASSERTIONS[name]
+                    for name in assertions],
         status=unicode(object_states.DRAFT),
         external_slug=self.generate_slug(),
         external_id=self.generate_external_id(),
@@ -439,7 +435,7 @@ class ObjectivesFactory(EntitiesFactory):
     """Create Objective entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     objective_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.DRAFT))
     if is_add_rest_attrs:
       objective_obj.update_attrs(
@@ -462,7 +458,7 @@ class RisksFactory(EntitiesFactory):
     """Creates Risk entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         description=self.generate_string("description"),
         risk_type=self.generate_string("risk_type"),
         status=unicode(object_states.DRAFT))
@@ -487,7 +483,7 @@ class OrgGroupsFactory(EntitiesFactory):
     """Creates OrgGroup entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.DRAFT))
     if is_add_rest_attrs:
       obj.update_attrs(
@@ -523,7 +519,7 @@ class AuditsFactory(EntitiesFactory):
     """Create Audit entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     audit_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.PLANNED))
     return audit_obj
 
@@ -560,7 +556,6 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     """
     attrs = copy.deepcopy(attrs)
     attrs.setdefault("title", self.obj_title)
-    attrs.setdefault("slug", self.obj_slug)
     attrs.setdefault("status", object_states.DRAFT)
     attrs.setdefault("template_object_type", "Control")
     default_people = {"assignees": roles.PRINCIPAL_ASSIGNEES,
@@ -687,7 +682,7 @@ class AssessmentsFactory(EntitiesFactory):
     """Create Assessment entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     asmt_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.NOT_STARTED),
         assessment_type=objects.get_obj_type(objects.CONTROLS), verified=False)
     if is_add_rest_attrs:
@@ -711,7 +706,7 @@ class IssuesFactory(EntitiesFactory):
     """Create Issue entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
     issue_obj = self.obj_inst().update_attrs(
-        title=self.obj_title, slug=self.obj_slug,
+        title=self.obj_title,
         status=unicode(object_states.DRAFT),
         due_date=date_utils.first_working_day_after_today())
     if is_add_rest_attrs:

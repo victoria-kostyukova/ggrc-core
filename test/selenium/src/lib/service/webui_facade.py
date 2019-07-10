@@ -50,6 +50,7 @@ def create_asmt(selenium, audit):
   expected_asmt.created_at = expected_asmt_rest.created_at
   expected_asmt.modified_by = users.current_user().email
   expected_asmt.updated_at = expected_asmt_rest.updated_at
+  expected_asmt.slug = expected_asmt_rest.slug
   return expected_asmt
 
 
