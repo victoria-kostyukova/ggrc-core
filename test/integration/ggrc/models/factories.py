@@ -28,6 +28,14 @@ from ggrc.access_control import roleable
 from integration.ggrc.models.model_factory import ModelFactory
 
 
+def is_external_custom_attributable(_type):
+  """Check whether given _type is ExternalCustomAttributable"""
+  from ggrc.models import get_model
+  from ggrc.models.mixins import external_customattributable
+  return issubclass(get_model(_type),
+                    external_customattributable.ExternalCustomAttributable)
+
+
 def random_str(length=8, prefix="", chars=None):
   chars = chars or string.ascii_uppercase + string.digits + "  _.-"
   return prefix + "".join(random.choice(chars) for _ in range(length))
@@ -115,6 +123,17 @@ class CustomAttributeDefinitionFactory(TitledFactory):
   attribute_type = "Text"
   multi_choice_options = None
 
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Assert definition_type"""
+    assert not is_external_custom_attributable(kwargs["definition_type"]), \
+        "Please use ExternalCustomAttributeDefinitionFactory"
+    return super(CustomAttributeDefinitionFactory, cls)._create(
+        target_class,
+        *args,
+        **kwargs
+    )
+
 
 class CustomAttributeValueFactory(ModelFactory):
 
@@ -138,18 +157,30 @@ class ExternalCustomAttributeDefinitionFactory(TitledFactory):
   multi_choice_options = None
 
   @classmethod
-  def _generate_id(cls):
-    """Return next id"""
-    cls._latest_id = getattr(cls, "_latest_id", 0) + 1
-    return cls._latest_id
+  def _generate_id(cls, _id=None):
+    """Return id next after biggest or provided as _id argument"""
+    if _id:
+      if _id > getattr(cls, "_biggest_id", 0):
+        cls._biggest_id = _id
+      return _id
+    else:
+      cls._biggest_id = getattr(cls, "_biggest_id", 0) + 1
+      return cls._biggest_id
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Assign id attribute since it is not autoincremental"""
-    external_cad_id = cls._generate_id() if not kwargs.get('id') \
-        else kwargs.pop('id')
-    return super(ExternalCustomAttributeDefinitionFactory, cls).\
-        _create(target_class, id=external_cad_id, *args, **kwargs)
+    assert is_external_custom_attributable(kwargs["definition_type"]), \
+        "Please use CustomAttributeDefinitionFactory"
+    ecad_id = cls._generate_id(kwargs.pop('id', None))
+    ecad_external_id = kwargs.pop('external_id', ecad_id + 1)
+    return super(ExternalCustomAttributeDefinitionFactory, cls)._create(
+        target_class,
+        id=ecad_id,
+        external_id=ecad_external_id,
+        *args,
+        **kwargs
+    )
 
 
 class ExternalCustomAttributeValueFactory(ModelFactory):
