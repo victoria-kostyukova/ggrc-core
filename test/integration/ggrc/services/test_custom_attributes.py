@@ -100,32 +100,6 @@ class TestGlobalCustomAttributes(ProductTestCase):
                      "my custom attribute value")
 
   @ddt.data(
-      ("objective", "Objective title")
-  )
-  @ddt.unpack
-  def test_create_from_ggrcq(self, definition_type, title):
-    """Test create definition only for GGRCQ."""
-    api = Api()
-    payload = [
-        {
-            "custom_attribute_definition": {
-                "attribute_type": "Text",
-                "context": {"id": None},
-                "definition_type": definition_type,
-                "helptext": "",
-                "mandatory": False,
-                "modal_title": "Title",
-                "placeholder": "",
-                "title": title
-            }
-        }
-    ]
-
-    with api.as_external():
-      response = api.post(all_models.CustomAttributeDefinition, payload)
-      self.assertEqual(response.status_code, 200)
-
-  @ddt.data(
       ("control", "Control title")
   )
   @ddt.unpack

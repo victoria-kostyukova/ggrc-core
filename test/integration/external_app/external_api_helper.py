@@ -13,6 +13,10 @@ from ggrc.app import app
 class ExternalApiClient(object):
   """Simulates requests from external_app"""
 
+  API_NAMES_REVERSE_MAPPING = {
+      "external_custom_attribute_definition": "custom_attribute_definition",
+  }
+
   DEFAULT_HEADERS = {
       "X-Requested-By": "SYNC_SERVICE",
       "Content-Type": "application/json",
@@ -99,6 +103,7 @@ class ExternalApiClient(object):
       }
       headers.update(precondition_headers)
 
+    obj_type = self.API_NAMES_REVERSE_MAPPING.get(obj_type, obj_type)
     if obj_type not in data:
       resp.json[obj_type].update(data)
       data = resp.json

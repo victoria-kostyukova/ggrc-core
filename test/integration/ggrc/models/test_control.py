@@ -124,6 +124,60 @@ class TestSyncServiceControl(TestCase):
         }
     }
 
+  @staticmethod
+  def prepare_external_cad_body(definition_type, attribute_type):
+    """Create payload for CAD.
+
+    Args:
+      definition_type: custom attribute definition type.
+      attribute_type: object type.
+    Returns:
+      Dictionary with external cad payload.
+    """
+    return {
+        "attribute_type": attribute_type,
+        "context": None,
+        "created_at": "2019-08-05T07:44:23",
+        "definition_id": 444,
+        "definition_type": definition_type,
+        "helptext": "Help Text",
+        "id": 444,
+        "mandatory": False,
+        "modified_by": None,
+        "multi_choice_mandatory": None,
+        "multi_choice_options": "",
+        "placeholder": "Placeholder",
+        "selfLink": "/api/external_custom_attribute_definitions/1",
+        "title": "Attribute title",
+        "type": "ExternalCustomAttributeDefinition",
+        "updated_at": "2019-08-05T07:44:23",
+    }
+
+  @staticmethod
+  def prepare_external_cav_body(obj_id, obj_type):
+    """Create payload for CAV.
+
+    Args:
+      obj_id: Integer value of object id.
+      obj_type: String representation of object type.
+    Returns:
+      Dictionary with external cav payload.
+    """
+    return {
+        "attributable_id": obj_id,
+        "attributable_type": obj_type,
+        "attribute_object": None,
+        "attribute_value": "Attribute value",
+        "context": None,
+        "created_at": "2019-08-05T07:45:19",
+        "custom_attribute_id": 444,
+        "id": 333,
+        "modified_by": None,
+        "preconditions_failed": None,
+        "type": "ExternalCustomAttributeValue",
+        "updated_at": "2019-08-05T07:45:19",
+    }
+
   def normilize_field(self, field):
     """Convert field from date/db.Model/query to string value."""
     # pylint: disable=protected-access
@@ -177,6 +231,34 @@ class TestSyncServiceControl(TestCase):
           expected_value,
           "Fields '{}' are not equal".format(field)
       )
+
+  def assert_cav_fields(self, cav, expected_body):
+    """Asserts that CAV fields are correct.
+
+    Args:
+      cav: CAV object.
+      expected_body: Dictionary with expected CAV body.
+    """
+    self.assertEqual(
+        cav.id,
+        expected_body["id"]
+    )
+    self.assertEqual(
+        cav.custom_attribute_id,
+        expected_body["custom_attribute_id"]
+    )
+    self.assertEqual(
+        cav.attributable_id,
+        expected_body["attributable_id"]
+    )
+    self.assertEqual(
+        cav.attributable_type,
+        expected_body["attributable_type"]
+    )
+    self.assertEqual(
+        cav.attribute_value,
+        expected_body["attribute_value"]
+    )
 
   def test_control_read(self):
     """Test correctness of control field values on read operation."""
@@ -252,6 +334,30 @@ class TestSyncServiceControl(TestCase):
     self.assertIsNotNone(revision)
 
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
+  def test_create_control_with_cads(self):
+    """Test create control with CADs/CAVs."""
+    factories.ExternalCustomAttributeDefinitionFactory(
+        id=444,
+        attribute_type="Text",
+        definition_type="control"
+    )
+    control_body = self.prepare_control_request_body()
+    cad_body = self.prepare_external_cad_body("Text", "Control")
+    cav_body = self.prepare_external_cav_body(123, "Control")
+    control_body.update({
+        "custom_attribute_definitions": [cad_body],
+        "custom_attribute_values": [cav_body],
+    })
+
+    response = self.api.post(all_models.Control, {
+        "control": control_body,
+    })
+
+    self.assertEqual(response.status_code, 201)
+    cav = all_models.ExternalCustomAttributeValue.query.one()
+    self.assert_cav_fields(cav, cav_body)
+
+  @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
   def test_control_update(self):
     """Test control update using sync service."""
     external_user = factories.PersonFactory(email=self.ext_user_email)
@@ -304,6 +410,36 @@ class TestSyncServiceControl(TestCase):
         all_models.Revision.modified_by_id == control.modified_by_id,
     ).one()
     self.assertIsNotNone(revision)
+
+  @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
+  def test_update_control_with_cads(self):
+    """Test update control with CADs/CAVs."""
+    factories.ExternalCustomAttributeDefinitionFactory(
+        id=444,
+        attribute_type="Text",
+        definition_type="control"
+    )
+    external_user = factories.PersonFactory(email=self.ext_user_email)
+    control = factories.ControlFactory(id=123, modified_by=external_user)
+    response = self.api.get(control, control.id)
+    response_json = response.json
+    cad_body = self.prepare_external_cad_body("Text", "Control")
+    cav_body = self.prepare_external_cav_body(123, "Control")
+    api_link = response_json["control"].pop("selfLink")
+    response_json["control"].update({
+        "custom_attribute_definitions": [cad_body],
+        "custom_attribute_values": [cav_body],
+    })
+
+    response = self.api.client.put(
+        api_link,
+        data=json.dumps(response_json),
+        headers=self.api.headers,
+    )
+
+    self.assertEqual(response.status_code, 200)
+    cav = all_models.ExternalCustomAttributeValue.query.one()
+    self.assert_cav_fields(cav, cav_body)
 
   def test_create_with_assertions(self):
     """Check control creation with assertions pass"""

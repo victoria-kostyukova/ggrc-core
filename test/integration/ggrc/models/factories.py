@@ -146,8 +146,10 @@ class ExternalCustomAttributeDefinitionFactory(TitledFactory):
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Assign id attribute since it is not autoincremental"""
+    external_cad_id = cls._generate_id() if not kwargs.get('id') \
+        else kwargs.pop('id')
     return super(ExternalCustomAttributeDefinitionFactory, cls).\
-        _create(target_class, id=cls._generate_id(), *args, **kwargs)
+        _create(target_class, id=external_cad_id, *args, **kwargs)
 
 
 class ExternalCustomAttributeValueFactory(ModelFactory):
