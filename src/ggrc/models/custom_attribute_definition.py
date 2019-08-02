@@ -153,8 +153,10 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
     Returns:
       value if the name passes all uniqueness checks.
     """
-
-    value = value if value is None else re.sub(r"\s+", " ", value).strip()
+    if value:
+      value = re.sub(r"\s+", " ", value).strip()
+    if not value:
+      raise ValueError("Invalid value: {}".format(value))
 
     if key == "title":
       validators.validate_name_correctness(value)
