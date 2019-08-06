@@ -8,6 +8,7 @@ import ddt
 
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.utils import iso_to_us_date
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 from integration.ggrc.utils import helpers
@@ -141,3 +142,42 @@ class TestExportControls(TestCase):
 
     exported_values = helpers.parse_export_data(response.data)
     self.assertEqual(exported_values[alias], expected_values)
+
+  @ddt.data(
+      ("Date", None, "2019-08-01"),
+      ("Multiselect", "yes,no", "no,yes"),
+      ("Rich Text", None, "sample text"),
+      ("Dropdown", "one,two,three,four,five", "four"),
+  )
+  @ddt.unpack
+  def test_control_export_with_ecad(self, attribute_type, multi_choice_options,
+                                    attribute_value):
+    """Test exporting of control with filtering by external cad."""
+    with factories.single_commit():
+      cad = factories.ExternalCustomAttributeDefinitionFactory(
+          definition_type="control",
+          attribute_type=attribute_type,
+          multi_choice_options=multi_choice_options,
+      )
+      control = factories.ControlFactory(slug="Control 1")
+      factories.ExternalCustomAttributeValueFactory(
+          attributable=control,
+          custom_attribute=cad,
+          attribute_value=attribute_value,
+      )
+
+    search_request = [{
+        "object_name": "Control",
+        "filters": {
+            "expression": {
+                "left": cad.title,
+                "op": {"name": "="},
+                "right": attribute_value,
+            },
+        },
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control"][0]
+    self.assertIn(cad.title, parsed_data)
+    if attribute_type == "Date":
+      attribute_value = iso_to_us_date(attribute_value)
+    self.assertEqual(parsed_data[cad.title], attribute_value)

@@ -154,4 +154,6 @@ class TestExportRisk(query_helper.WithQueryApi, TestCase):
 
     response = self.export_csv([export_query])
     self.assertIn("any treat source NEW", response.data)
+    self.assertIn("date_GCA", response.data)
+    self.assertIn("12/13/2019", response.data)
     self.assertIn("any description upd 1", response.data)
