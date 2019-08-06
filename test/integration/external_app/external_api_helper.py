@@ -5,7 +5,10 @@
 
 import json
 from email.utils import parseaddr
+
 from flask import g
+
+from ggrc import models
 from ggrc import settings
 from ggrc.app import app
 
@@ -126,7 +129,8 @@ class ExternalApiClient(object):
   def _build_api_link(obj_type, obj_id=None):
     """Build api link based on obj_type and obj_id"""
     obj_id_part = "" if obj_id is None else "/" + str(obj_id)
-    return "/api/{}s{}".format(obj_type, obj_id_part)
+    obj = models.get_model(obj_type)
+    return "/api/%s%s" % (obj._inflector.table_plural, obj_id_part)
 
   def delete(self, obj, obj_id, url=None):
     """Simulates ext_app DELETE request"""
