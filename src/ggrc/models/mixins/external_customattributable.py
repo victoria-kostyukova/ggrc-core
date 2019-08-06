@@ -121,18 +121,10 @@ class ExternalCustomAttributable(CustomAttributableBase):
       # TODO: decompose to smaller methods
       # TODO: remove complicated nested conditions, better to use
       # instant exception raising
-      if not value.get("attribute_object_id"):
-        # value.get("attribute_object", {}).get("id") won't help because
-        # value["attribute_object"] can be None
-        value["attribute_object_id"] = (value["attribute_object"].get("id") if
-                                        value.get("attribute_object") else
-                                        None)
-
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
         attr.attributable = self
         attr.attribute_value = value.get("attribute_value")
-        attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
         # this is automatically appended to self._custom_attribute_values
         # on attributable=self
@@ -140,33 +132,16 @@ class ExternalCustomAttributable(CustomAttributableBase):
         custom_attribute = referenced_objects.get(
             "ExternalCustomAttributeDefinition", custom_attribute_id
         )
-        attribute_object = value.get("attribute_object")
         _id = value.get("id")
-        if attribute_object is None:   # TODO remove attribute object !!!!
-          ExternalCustomAttributeValue(
-              id=_id,
-              attributable=self,
-              custom_attribute=custom_attribute,
-              custom_attribute_id=custom_attribute_id,
-              attribute_value=value.get("attribute_value"),
-          )
-        elif isinstance(attribute_object, dict):
-          attribute_object_type = attribute_object.get("type")
-          attribute_object_id = attribute_object.get("id")
-
-          attribute_object = referenced_objects.get(
-              attribute_object_type, attribute_object_id
-          )
-
-          cav = ExternalCustomAttributeValue(
-              attributable=self,
-              custom_attribute=custom_attribute,
-              custom_attribute_id=custom_attribute_id,
-              attribute_value=value.get("attribute_value"),
-          )
-          cav.attribute_object = attribute_object
-        else:
-          raise BadRequest("Bad custom attribute value inserted")
+        _external_id = value.get("external_id")
+        ExternalCustomAttributeValue(
+            id=_id,
+            external_id=_external_id,
+            attributable=self,
+            custom_attribute=custom_attribute,
+            custom_attribute_id=custom_attribute_id,
+            attribute_value=value.get("attribute_value"),
+        )
       elif "href" in value:
         # Ignore setting of custom attribute stubs. Getting here means that the
         # front-end is not using the API correctly and needs to be updated.
