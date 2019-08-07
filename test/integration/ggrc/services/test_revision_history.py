@@ -44,6 +44,7 @@ class TestRevisionHistory(TestCase):
 
     with factories.single_commit():
       self.control = factories.ControlFactory()
+      self.objective = factories.ObjectiveFactory()
       self.program = factories.ProgramFactory()
       self.program.context.related_object = self.program
       self.relationship = factories.RelationshipFactory(
@@ -179,20 +180,20 @@ class TestRevisionHistory(TestCase):
      content"""
     person = factories.PersonFactory()
     cad = factories.CustomAttributeDefinitionFactory(
-        definition_type="control",
-        definition_id=self.control.id,
+        definition_type="objective",
+        definition_id=self.objective.id,
         attribute_type="Map:Person",
         title="Local Person CA",
     )
     factories.CustomAttributeValueFactory(
-        attributable=self.control,
+        attributable=self.objective,
         custom_attribute=cad,
         attribute_value=person.type,
         attribute_object_id=str(person.id),
     )
-    self.api.put(self.control, {"title": "new_title"})
-    control = all_models.Control.eager_query().get(self.control.id)
-    self.update_revisions(control)
+    self.api.put(self.objective, {"title": "new_title"})
+    objective = all_models.Objective.eager_query().get(self.objective.id)
+    self.update_revisions(objective)
 
   @ddt.data(True, False)
   def test_get_mandatory_acrs(self, mandatory):

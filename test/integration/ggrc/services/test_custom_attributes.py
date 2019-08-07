@@ -253,14 +253,13 @@ class TestGlobalCustomAttributes(ProductTestCase):
       (" abc ", "abc"),
       ("    abc  abc ", "abc abc"),
       ("abc", "abc"),
-      ("", ""),
   )
   @ddt.unpack
   def test_cad_title_strip(self, title, validated_title):
     """Test CAD title strip on validation."""
     with factories.single_commit():
       cad = factories.CustomAttributeDefinitionFactory(
-          definition_type="control",
+          definition_type="objective",
           attribute_type=all_models.CustomAttributeDefinition.ValidTypes.TEXT,
           title=title,
       )
@@ -328,7 +327,7 @@ class TestGlobalCustomAttributes(ProductTestCase):
     with factories.single_commit():
       cads = {
           f: factories.CustomAttributeDefinitionFactory(
-              mandatory=f, definition_type="control")
+              mandatory=f, definition_type="objective")
           for f in [True, False]
       }
     resp = self.generator.api.get_query(

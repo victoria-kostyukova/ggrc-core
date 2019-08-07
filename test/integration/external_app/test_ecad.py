@@ -134,22 +134,22 @@ class TestExtSnapshotting(query_helper.WithQueryApi, ggrc.TestCase):
     """Test revisions and snapshots content contains
     external custom attributes."""
     with factories.single_commit():
-      cad = factories.ExternalCustomAttributeDefinitionFactory(
+      control = factories.ControlFactory(slug="Control 1")
+      ecad = factories.ExternalCustomAttributeDefinitionFactory(
           definition_type="control",
           attribute_type=attribute_type,
           multi_choice_options=multi_choice_options,
       )
-      control = factories.ControlFactory(slug="Control 1")
       factories.ExternalCustomAttributeValueFactory(
+          custom_attribute=ecad,
           attributable=control,
-          custom_attribute=cad,
           attribute_value=attribute_value,
       )
       audit = factories.AuditFactory()
     snapshots = self._create_snapshots(audit, [control])
     content = snapshots[0].revision.content
     self.assertEqual(content["custom_attribute_definitions"][0]["title"],
-                     cad.title)
+                     ecad.title)
     self.assertEqual(content["custom_attribute_values"][0]["attribute_value"],
                      attribute_value)
 

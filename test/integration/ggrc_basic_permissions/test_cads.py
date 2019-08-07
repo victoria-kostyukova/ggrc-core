@@ -23,7 +23,7 @@ class TestCADPermissions(TestCase):
     super(TestCADPermissions, self).setUp()
     self.api = Api()
     self.client.get("/login")
-    self.definition_type = "control"
+    self.definition_type = "objective"
     self.generator = generator.ObjectGenerator()
     roles = {r.name: r for r in all_models.Role.query.all()}
     with factories.single_commit():
