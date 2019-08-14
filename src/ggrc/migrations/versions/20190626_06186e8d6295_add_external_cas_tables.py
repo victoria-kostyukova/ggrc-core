@@ -26,7 +26,7 @@ def upgrade():
       sa.Column('definition_type', sa.String(length=250), nullable=False),
       sa.Column('attribute_type', sa.String(length=250), nullable=False),
       sa.Column('multi_choice_options', sa.Text(), nullable=True),
-      sa.Column('mandatory', sa.Boolean(), nullable=False),
+      sa.Column('mandatory', sa.Boolean(), nullable=True),
       sa.Column('helptext', sa.String(length=250), nullable=True),
       sa.Column('placeholder', sa.String(length=250), nullable=True),
       sa.Column('context_id', sa.Integer(), nullable=True),
@@ -45,12 +45,6 @@ def upgrade():
       'external_custom_attribute_definitions',
       ['title'],
       unique=False
-  )
-
-  op.alter_column(
-      'custom_attribute_definitions', 'mandatory',
-      existing_type=sa.Boolean(),
-      nullable=False
   )
 
   op.create_table(
