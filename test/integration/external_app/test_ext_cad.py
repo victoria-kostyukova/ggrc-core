@@ -303,5 +303,5 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     self._run_cad_asserts(
         attribute_type,
         external_cad,
-        response_json["custom_attribute_definition"]
+        response_json["external_custom_attribute_definition"]
     )

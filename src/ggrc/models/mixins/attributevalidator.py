@@ -68,7 +68,8 @@ class AttributeValidator(object):
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object"""
     model = ggrc.models.get_model(definition_type)
-    if issubclass(model, ggrc.models.mixins.ExternalCustomAttributable):
+    if model and issubclass(model,
+                            ggrc.models.mixins.ExternalCustomAttributable):
       cad = ggrc.models.all_models.ExternalCustomAttributeDefinition
       query_filter = []
     else:
