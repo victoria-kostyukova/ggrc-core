@@ -822,6 +822,7 @@ class Resource(ModelView):
     return cache_utils.has_memcache()
 
   def apply_paging(self, matches_query):
+    """Apply pagination."""
     page_size = min(
         int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
         self.MAX_PAGE_SIZE)
@@ -847,6 +848,7 @@ class Resource(ModelView):
     return matches, collection_extras
 
   def get_matched_resources(self, matches):
+    """Gets matched resources."""
     cache_objs = {}
     if self.has_cache():
       self.request.cache_manager = cache_utils.get_cache_manager()
@@ -865,6 +867,7 @@ class Resource(ModelView):
     return cache_objs, database_objs
 
   def collection_get(self):
+    """Gets collection."""
     with benchmark("dispatch_request > collection_get > Check headers"):
       accept_header = self.request.headers.get('Accept', '').strip()
       if (
@@ -1217,6 +1220,7 @@ class Resource(ModelView):
 
   @utils.validate_mimetype("application/json")  # noqa
   def collection_post(self):
+    """Posts into collection."""
     with benchmark("collection post"):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
@@ -1525,6 +1529,7 @@ class Resource(ModelView):
     return resources
 
   def build_collection_representation(self, objs, extras=None):
+    """Builds collection representation."""
     table_plural = self.model._inflector.table_plural
     collection_name = '{0}_collection'.format(table_plural)
     resource = {
@@ -1546,6 +1551,7 @@ class Resource(ModelView):
     return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
+    """Builds resource representation."""
     table_singular = self.model._inflector.table_singular
     resource = {
         table_singular: obj,
