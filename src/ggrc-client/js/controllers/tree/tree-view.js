@@ -20,6 +20,7 @@ import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
 import CustomAttributeDefinition from '../../models/custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../../models/custom-roles/access-control-role';
+import ExternalCADefinition from '../../models/custom-attributes/external-custom-attribute-definition';
 
 const TreeViewControl = TreeLoader.extend({
   // static properties
@@ -190,12 +191,20 @@ const TreeViewControl = TreeLoader.extend({
             internal: false,
           });
           break;
-        case 'custom_attribute_definitions':
-          dfd = CustomAttributeDefinition.findAll({
+        case 'custom_attribute_definitions': {
+          let cadModel = CustomAttributeDefinition;
+
+          if (instance.isChangeableExternally) {
+            cadModel = ExternalCADefinition;
+          }
+
+          dfd = cadModel.findAll({
             definition_type: instance.root_object,
             definition_id: null,
           });
+
           break;
+        }
       }
 
       this.find_all_deferred = dfd;
