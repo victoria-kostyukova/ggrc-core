@@ -54,7 +54,8 @@ class Api(object):
     self.client.get("/login")
     self.resource = Resource()
     self.headers = {'Content-Type': 'application/json',
-                    "X-Requested-By": "GGRC"
+                    "X-Requested-By": "GGRC",
+                    'X-usertimezoneoffset': '120'
                     }
     self.user_headers = {}
     self.person_name = None
