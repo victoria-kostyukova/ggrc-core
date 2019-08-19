@@ -7,6 +7,7 @@ Provides basic login and session management using Flask-Login with various
 backends
 """
 
+import datetime
 import json
 import logging
 import re
@@ -184,3 +185,15 @@ def is_external_app_user():
 
   from ggrc.utils.user_generator import is_app_2_app_user_email
   return is_app_2_app_user_email(user.email)
+
+
+def get_user_date():
+  """Get current user timezone and prepare users current date
+
+  Returns:
+      datetime.date()
+  """
+  user_tz_offset = int(request.headers['x-usertimezoneoffset']) / 60
+  user_date = (datetime.datetime.now() + datetime.timedelta(
+      hours=user_tz_offset)).date()
+  return user_date
