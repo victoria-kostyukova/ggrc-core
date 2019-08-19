@@ -252,7 +252,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     attribute_payload = self._get_payload(attribute_type)
     payload = [
         {
-            "custom_attribute_definition": attribute_payload,
+            "external_custom_attribute_definition": attribute_payload,
         }
     ]
 
@@ -275,7 +275,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     attribute_payload = self._get_payload(attribute_type)
     attribute_payload['id'] = external_cad.id
     payload = {
-        "custom_attribute_definition": attribute_payload,
+        "external_custom_attribute_definition": attribute_payload,
     }
 
     response = self.api.put(
@@ -338,7 +338,8 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
         }
     }
     if attribute_type == "Multiselect":
-      body["custom_attribute_definition"]["multi_choice_options"] = "yes,no"
+      body["external_custom_attribute_definition"][
+          "multi_choice_options"] = "yes,no"
     return body
 
   @ddt.data(
@@ -474,8 +475,8 @@ class TestECADResponse(ggrc.TestCase):
             "multi_choice_options": "opt1,opt2",
         }
     }
-    cad_model = models.all_models.ExternalCustomAttributeDefinition
-    response = self.ext_api.post(cad_model, data=cad_body)
+    ecad_model = models.all_models.ExternalCustomAttributeDefinition
+    response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(response)
     check_attrs = cad_body["external_custom_attribute_definition"].keys()
     for attr in check_attrs:
@@ -500,8 +501,8 @@ class TestECADResponse(ggrc.TestCase):
             "multi_choice_options": "opt1,opt2",
         }
     }
-    cad_model = models.all_models.ExternalCustomAttributeDefinition
-    cad_response = self.ext_api.post(cad_model, data=cad_body)
+    ecad_model = models.all_models.ExternalCustomAttributeDefinition
+    cad_response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(cad_response)
     control = factories.ControlFactory(slug="Control 1")
     cav_body = {
