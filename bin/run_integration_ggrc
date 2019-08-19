@@ -14,6 +14,7 @@ db_reset -d "$GGRC_TEST_DB"
 echo -e "\nRunning integration ggrc tests"
 nosetests integration \
   -e "^access_control$" \
+  -e "^external_app$" \
   -e "^ggrc_basic_permissions$" \
   -e "^ggrc_gdrive_integration$" \
   -e "^ggrc_workflows$" \

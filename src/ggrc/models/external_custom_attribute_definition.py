@@ -32,8 +32,6 @@ class ExternalCustomAttributeDefinition(CustomAttributeDefinitionBase):
                                      backref='custom_attribute',
                                      cascade='all, delete-orphan')
 
-  _root_attribute = "custom_attribute_definition"
-
   _extra_table_args = (
       UniqueConstraint('definition_type',
                        'title',

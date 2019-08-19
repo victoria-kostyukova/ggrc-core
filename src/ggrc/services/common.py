@@ -667,10 +667,7 @@ class Resource(ModelView):
     header_error = self.validate_headers_for_put_or_delete(obj)
     if header_error:
       return header_error
-    root_attribute = (
-        getattr(self.model, "_root_attribute", None) or
-        self.model._inflector.table_singular
-    )
+    root_attribute = self.model._inflector.table_singular
     try:
       src = src[root_attribute]
     except KeyError:
@@ -1015,10 +1012,7 @@ class Resource(ModelView):
     Raises:
       BadRequest if any of the required attributes are missing.
     """
-    root_attribute = (
-        getattr(self.model, "_root_attribute", None) or
-        self.model._inflector.table_singular
-    )
+    root_attribute = self.model._inflector.table_singular
     try:
       src = wrapped_src[root_attribute]
     except KeyError:
