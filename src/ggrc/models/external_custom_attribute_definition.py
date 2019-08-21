@@ -3,10 +3,12 @@
 
 """External Custom attribute definition module"""
 
+from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
 from ggrc.models import reflection
+from ggrc.models import exceptions
 from ggrc.models.custom_attribute_definition \
     import CustomAttributeDefinitionBase
 
@@ -61,6 +63,15 @@ class ExternalCustomAttributeDefinition(CustomAttributeDefinitionBase):
                            update=False),
       *_include_links
   )
+
+  @validates("id")
+  def validate_cad_id(self, _, value):
+    """Validates external CAD id."""
+    # pylint: disable=no-self-use
+    if value is None:
+      raise exceptions.ValidationError("id for the CAD is not specified.")
+
+    return value
 
   @property
   def definition_attr(self):

@@ -266,6 +266,26 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     self._run_cad_asserts(attribute_type, ex_cad, attribute_payload)
 
   @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
+  def test_create_cad_wh_id(self, attribute_type):
+    """Test create CAD without id."""
+    attribute_payload = self._get_payload(attribute_type)
+    attribute_payload.pop("id")
+
+    payload = [
+        {
+            "external_custom_attribute_definition": attribute_payload,
+        }
+    ]
+
+    response = self.api.post(
+        all_models.ExternalCustomAttributeDefinition,
+        data=payload
+    )
+
+    self.assertEqual(response.status_code, 400)
+    self.assertIn("id for the CAD is not specified.", response.data)
+
+  @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
   def test_update_custom_attribute(self, attribute_type):
     """Test for update external CAD validation."""
     external_cad = factories.ExternalCustomAttributeDefinitionFactory(
@@ -287,6 +307,29 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     self.assertEqual(response.status_code, 200)
     ex_cad = all_models.ExternalCustomAttributeDefinition.eager_query().first()
     self._run_cad_asserts(attribute_type, ex_cad, attribute_payload)
+
+  @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
+  def test_update_cad_wh_id(self, attribute_type):
+    """Test update CAD without id."""
+    external_cad = factories.ExternalCustomAttributeDefinitionFactory(
+        title="GCA example",
+        definition_type="control",
+    )
+    attribute_payload = self._get_payload(attribute_type)
+    attribute_payload.pop("id")
+
+    payload = {
+        "external_custom_attribute_definition": attribute_payload,
+    }
+
+    response = self.api.put(
+        all_models.ExternalCustomAttributeDefinition,
+        obj_id=external_cad.id,
+        data=payload
+    )
+
+    self.assertEqual(response.status_code, 400)
+    self.assertIn("id for the CAD is not specified.", response.data)
 
   @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
   def test_get_custom_attribute(self, attribute_type):
