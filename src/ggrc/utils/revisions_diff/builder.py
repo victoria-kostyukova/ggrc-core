@@ -147,7 +147,7 @@ def get_validated_value(cad, value, object_id):
     value = value.strip()
     return value, object_id
   if cad.attribute_type == cad.ValidTypes.CHECKBOX:
-    value = int(value)
+    value = int(value) if value is not None else None
   if value is not None:
     value = unicode(value)
   return value, object_id
