@@ -37,13 +37,7 @@ class RestClient(object):
 
   def is_endpoint_external(self):
     """Checks if endpoint is external."""
-    return self.endpoint in objects.SINGULAR_EXTERNAL_OBJS
-
-  def is_cad_external(self, obj_dict):
-    """Checks if cad is external."""
-    return (self.endpoint == objects.get_singular(
-        objects.CUSTOM_ATTRIBUTES) and
-        obj_dict["definition_type"] in objects.SINGULAR_EXTERNAL_OBJS)
+    return self.endpoint in objects.EXTERNAL_END_POINTS
 
   def is_relationship_types_external(self, obj_dict):
     """Check if source or destination objects type is external."""
@@ -62,7 +56,6 @@ class RestClient(object):
         obj_dict, list) else obj_dict[obj_dict.keys()[0]]
 
     return (self.is_endpoint_external() or
-            self.is_cad_external(obj_dict) or
             self.is_relationship_types_external(obj_dict))
 
   def send_get(self, url, **kwargs):

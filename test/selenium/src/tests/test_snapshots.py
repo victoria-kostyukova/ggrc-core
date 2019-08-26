@@ -102,7 +102,7 @@ class TestSnapshots(base.Test):
           ("create_audit_with_control_with_cas_and_update_control_cav",
            "control", True, True),
           ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-           "control", True, True)],
+           "control", True, False)],
       ids=["Audit contains snapshotable Control after updating Control",
            "Audit contains snapshotable Control after deleting Control",
            "Audit contains snapshotable Control "
@@ -111,7 +111,8 @@ class TestSnapshots(base.Test):
            "after deleting CAs for Controls"],
       indirect=["obj"])
   def test_destructive_audit_contains_snapshotable_control(
-      self, obj, expected_control, is_openable, is_updateable, selenium
+      self, login_as_creator, obj, expected_control, is_openable,
+      is_updateable, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Audit contains snapshotable Control after updating Control.

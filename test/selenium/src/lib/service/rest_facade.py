@@ -94,7 +94,9 @@ def create_asmts_from_template(audit, asmt_template, objs_to_map):
 
 def create_gcad(**attrs):
   """Creates global CADs for all types."""
-  return rest_service.CustomAttributeDefinitionsService().create_obj(
+  return rest_service.CustomAttributeDefinitionsService(
+      is_external=True if (objects.get_plural(attrs["definition_type"])
+                           in objects.EXTERNAL_OBJECTS) else False).create_obj(
       factory_params=attrs)
 
 
@@ -102,7 +104,8 @@ def create_gcads_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",
                       attribute_type=ca_type)
-          for ca_type in element.AdminWidgetCustomAttributes.ALL_GCA_TYPES]
+          for ca_type
+          in element.AdminWidgetCustomAttributes.ALL_EXTERNAL_GCA_TYPES]
 
 
 def create_issue(obj=None):

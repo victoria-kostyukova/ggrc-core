@@ -327,6 +327,8 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
     else:
       attrs["multi_choice_options"] = None
     attrs.setdefault("mandatory", False)
+    if attrs["definition_type"] in objects.EXTERNAL_END_POINTS:
+      attrs["id"] = self.generate_external_id()
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:

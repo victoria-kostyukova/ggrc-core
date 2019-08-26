@@ -25,7 +25,8 @@ class BaseRestService(object):
     self.endpoint = endpoint
     self.client = client.RestClient(self.endpoint)
     self.entities_factory_cls = factory.get_cls_entity_factory(
-        object_name=self.endpoint)
+        object_name=objects.CUSTOM_ATTRIBUTES
+        if endpoint == objects.EXTERNAL_CUSTOM_ATTRIBUTES else self.endpoint)
 
   def create_list_objs(self, entity_factory, count, attrs_to_factory=None,
                        **attrs_for_template):
@@ -253,9 +254,10 @@ class RisksService(BaseRestService):
 
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
-  def __init__(self):
+  def __init__(self, is_external=False):
     super(CustomAttributeDefinitionsService, self).__init__(
-        url.CUSTOM_ATTRIBUTES)
+        url.EXTERNAL_CUSTOM_ATTRIBUTES if is_external
+        else url.CUSTOM_ATTRIBUTES)
 
   def create_dashboard_gcas(self, obj_type, count=1):
     """Create 'Dashboard' CAs via rest according to passed obj_type and count.
