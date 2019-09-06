@@ -6,7 +6,7 @@ import json
 import requests
 
 from lib import url as url_module
-
+from lib.utils import date_utils
 
 BASIC_HEADERS = {"X-Requested-By": "GGRC",
                  "Content-Type": "application/json",
@@ -47,6 +47,8 @@ def create_session(user, is_external=False):
     session.headers["X-ggrc-user"] = json.dumps(session.headers["X-ggrc-user"])
   else:
     session.headers = copy.deepcopy(BASIC_HEADERS)
+    session.headers["x-usertimezoneoffset"] = (
+        date_utils.user_timezone_offset_min_str())
     _set_login_cookie(session, user)
   return session
 

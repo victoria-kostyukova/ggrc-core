@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Date utils."""
 import datetime
+import time
 
 from dateutil import tz
 
@@ -87,3 +88,14 @@ def iso8601_to_ui_str_with_zone(iso8601_str):
    (mm/dd/yyyy hh:mm:ss AM/PM) format."""
   return datetime.datetime.strftime(
       iso8601_to_local_datetime(iso8601_str), "%m/%d/%Y %I:%M:%S %p")
+
+
+def user_timezone_offset():
+  """Returns user timezone offset in seconds."""
+  return (time.mktime(datetime.datetime.now().timetuple()) -
+          time.mktime(datetime.datetime.utcnow().timetuple()))
+
+
+def user_timezone_offset_min_str():
+  """Returns user timezone offset in minutes in string."""
+  return str(int(user_timezone_offset() / 60))
