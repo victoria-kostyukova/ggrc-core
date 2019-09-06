@@ -11,14 +11,7 @@ from ggrc import builder
 from ggrc import db
 from ggrc import rbac
 from ggrc import settings
-from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_user_date
-from ggrc.models.context import HasOwnContext
-from ggrc.models.exceptions import ValidationError
-from ggrc.models.deferred import deferred
-from ggrc.models.mixins import base
-from ggrc.models.mixins import Base, CustomAttributable
-from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.fulltext import attributes
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import context
