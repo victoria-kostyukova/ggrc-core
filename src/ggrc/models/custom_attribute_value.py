@@ -64,12 +64,6 @@ class CustomAttributeValueBase(base.ContextRBAC,
         else None
     return setattr(self, self.attributable_attr, value)
 
-  @staticmethod
-  def _extra_table_args(_):
-    return (
-        db.UniqueConstraint('attributable_id', 'custom_attribute_id'),
-    )
-
   @property
   def latest_revision(self):
     """Latest revision of CAV (used for comment precondition check)."""
@@ -170,6 +164,7 @@ class CustomAttributeValue(CustomAttributeValueBase):
   # For example an instance of attribute type Map:Person will have a person id
   # in attribute_object_id and string 'Person' in attribute_value.
   attribute_object_id = db.Column(db.Integer)
+  attribute_object_id_nn = db.Column(db.Integer, nullable=False, default=0)
 
   custom_attribute_id = db.Column(
       db.Integer,
@@ -182,7 +177,7 @@ class CustomAttributeValue(CustomAttributeValueBase):
       'attributable_id',
       'attributable_type',
       'attribute_value',
-      'attribute_object',
+      'attribute_objects',
       reflection.Attribute('preconditions_failed',
                            create=False,
                            update=False),
@@ -199,6 +194,17 @@ class CustomAttributeValue(CustomAttributeValueBase):
       "Checkbox": lambda self: self._validate_checkbox(),
   }
 
+  @staticmethod
+  def _extra_table_args(_):
+    return (
+        db.UniqueConstraint(
+            'attributable_id',
+            'custom_attribute_id',
+            'attribute_object_id_nn',
+            name='uq_custom_attribute_value',
+        ),
+    )
+
   @property
   def attribute_object(self):
     """Fetch the object referred to by attribute_object_id.
@@ -213,6 +219,22 @@ class CustomAttributeValue(CustomAttributeValueBase):
     except:  # pylint: disable=bare-except
       return None
 
+  @property
+  def attribute_objects(self):
+    """Get all objects mapped to attributable object with given cav
+
+    Returns:
+        list of mapped objects to attributable object
+    """
+    cavs = self.attributable.custom_attribute_values
+    return [cav.attribute_object for cav in cavs
+            if cav.attribute_object and
+            cav.custom_attribute_id == self.custom_attribute_id]
+
+  @property
+  def attribute_objects_id(self):
+    return [o.id for o in self.attribute_objects]
+
   @attribute_object.setter
   def attribute_object(self, value):
     """Set attribute_object_id via whole object.
@@ -226,6 +248,7 @@ class CustomAttributeValue(CustomAttributeValueBase):
       # value
       return None
     self.attribute_object_id = value.id
+    self.attribute_object_id_nn = value.id or 0
     return setattr(self, self._attribute_object_attr, value)
 
   @property
@@ -325,6 +348,7 @@ class CustomAttributeValue(CustomAttributeValueBase):
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       self.attribute_object_id = id_
+      self.attribute_object_id_nn = id_ or 0
 
   def _validate_map_type(self):
     """Validate related CAD attribute_type and provided attribute_value
@@ -509,8 +533,9 @@ class CustomAttributeValue(CustomAttributeValueBase):
   def log_json_base(self):
     res = super(CustomAttributeValue, self).log_json_base()
 
-    if self.attribute_object_id is not None and \
-       self._attribute_object_attr is not None:
-      res["attribute_object"] = self.attribute_object
+    if self.attribute_object:
+      res["attribute_objects"] = self.attribute_objects
+    else:
+      res["attribute_objects"] = None
 
     return res
