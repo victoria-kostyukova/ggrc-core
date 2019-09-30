@@ -97,7 +97,7 @@ function toObject(instance) {
   });
   content.updated_at = instance.updated_at;
   content.canGetLatestRevision =
-    !instance.is_latest_revision &&
+    !instance.is_latest_revision && !instance.is_identical_revision &&
     isAllowedFor('update', {
       type: instance.child_type,
       id: instance.child_id}) &&

@@ -436,9 +436,11 @@ class AttributeInfo(object):
               attr.multi_choice_options):
         if description:
           description += "\n\n"
-        description += u"Accepted values are:\n{}".format(
+        description += u"Allowed values are:\n{}".format(
             attr.multi_choice_options.replace(",", "\n")
         )
+      elif attr.attribute_type == attr.ValidTypes.CHECKBOX:
+        description += u"Allowed values are:\nTRUE\nFALSE"
       if attr.definition_id:
         ca_type = cls.Type.OBJECT_CUSTOM
         attr_name = u"{}{}".format(
@@ -541,7 +543,6 @@ class AttributeInfo(object):
       definitions[key] = definition
 
     definitions.update(cls.get_acl_definitions(object_class))
-
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(cls.get_custom_attr_definitions(
           object_class, ca_cache=ca_cache, fields=ca_fields

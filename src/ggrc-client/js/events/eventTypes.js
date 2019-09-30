@@ -231,6 +231,27 @@ const MAP_OBJECTS = {
   type: 'mapObjects',
 };
 
+
+/**
+ * Notifies that object was destroyed and/or unmapped from the instance.
+ * @event OBJECT_DESTROYED
+ * @type {object}
+ * @property {object} object - Destroyed object.
+ */
+const OBJECT_DESTROYED = {
+  type: 'objectDestroyed',
+};
+
+/**
+ * Notifies that object was destroyed and should be unmapped from the instance.
+ * @event UNMAP_DESTROYED_OBJECT
+ * @type {object}
+ * @property {object} object - Destroyed object.
+ */
+const UNMAP_DESTROYED_OBJECT = {
+  type: 'unmapDestroyedObject',
+};
+
 /**
  * Deferred map objects to instance.
  * @event deferredMapObjects
@@ -303,4 +324,6 @@ export {
   REFRESH_MAPPED_COUNTER,
   OBJECTS_MAPPED_VIA_MAPPER,
   DEFERRED_MAPPED_UNMAPPED,
+  OBJECT_DESTROYED,
+  UNMAP_DESTROYED_OBJECT,
 };

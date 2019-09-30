@@ -38,9 +38,10 @@ class _ObjectWidgetBar(_WidgetBar):
  (e.g. each Info Widget is object specific).
  """
 
-  def __init__(self, driver=None):
-    super(_ObjectWidgetBar, self).__init__(driver)
-    self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
+  @property
+  def tab_info(self):
+    """Returns Info widget/tab."""
+    return base.Tab(self._driver, locator.WidgetBar.INFO)
 
   def _get_widget(self, widget_name):
     """Add attribute, click on relevant tab and return relevant widget."""

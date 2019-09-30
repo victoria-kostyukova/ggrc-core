@@ -227,11 +227,23 @@ class Relationship(base.ContextRBAC, Base, db.Model):
 
     return False
 
+  @property
+  def is_orphan(self):
+    """Check if relationship's source or destination is deleted."""
+    deleted_objs = db.session.deleted
+    return self.source in deleted_objs or self.destination in deleted_objs
+
   # pylint:disable=unused-argument
   @classmethod
   def validate_delete(cls, mapper, connection, target):
     """Validates is delete of Relationship is allowed."""
     from ggrc.utils.user_generator import is_ext_app_request
+
+    if target.is_orphan:
+      # If relationship's source or destination is being deleted, relationship
+      # should be deleted as well in spite of source and destination types.
+      return
+
     cls.validate_relation_by_type(target.source_type,
                                   target.destination_type)
     if is_ext_app_request() and not target.is_external:

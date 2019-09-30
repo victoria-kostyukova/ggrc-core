@@ -91,3 +91,13 @@ class TestAssessmentTemplatesExport(TestCase):
 
     self.assertEqual(response.status_code, 200)
     self.assertIn(expected_description, response.data)
+
+  def test_default_assessment_type(self):
+    """Tests if Default Assignment Type has tip message"""
+    response = self.export_csv(self.EXPORT_ALL_FIELDS_DATA)
+    expected_description = "Allowed values are:\n{}".format(
+        '\n'.join(AssessmentTemplate.DEFAULT_ASSESSMENT_TYPE_OPTIONS
+                  ))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(expected_description, response.data)

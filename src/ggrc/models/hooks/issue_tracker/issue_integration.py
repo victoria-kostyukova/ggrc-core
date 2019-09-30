@@ -10,6 +10,7 @@ import logging
 import itertools
 
 from ggrc import db
+from ggrc.integrations import constants
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.models import all_models
@@ -168,12 +169,15 @@ def create_ticket_for_new_issue(obj, issue_tracker_info):
     issue_url = integration_utils.build_issue_tracker_url(res["issueId"])
     issuetracker_issue_params["issue_url"] = issue_url
     issuetracker_issue_params["issue_id"] = res["issueId"]
+  except integrations_errors.HotlistPermissionError:
+    obj.add_warning(constants.WarningsDescription.HOTLIST_PERMISSIONS_ERROR)
+    issuetracker_issue_params["enabled"] = False
   except integrations_errors.Error as error:
     logger.error(
         "Unable to create a ticket while creating object ID=%d: %s",
         obj.id, error
     )
-    obj.add_warning("Unable to create a ticket in issue tracker.")
+    obj.add_warning(constants.WarningsDescription.CREATE_ISSUE)
     issuetracker_issue_params["enabled"] = False
 
   # Create object in GGRC with info about issue tracker integration.

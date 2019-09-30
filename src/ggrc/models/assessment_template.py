@@ -71,7 +71,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
 
   RELATED_TYPE = 'assessment'
 
-  # the type of the object under assessment
+  # the type of the Default Assessment Type
   template_object_type = db.Column(db.String, nullable=True)
 
   # whether to use the control test plan as a procedure
@@ -164,6 +164,29 @@ class AssessmentTemplate(assessment.AuditRelationship,
   _custom_publish = {
       'audit': audit.build_audit_stub,
   }
+  DEFAULT_ASSESSMENT_TYPE_OPTIONS = ("Access Groups",
+                                     "Account Balances",
+                                     "Data Assets",
+                                     "Facilities",
+                                     "Key Reports",
+                                     "Markets",
+                                     "Org Groups",
+                                     "Processes",
+                                     "Product Groups",
+                                     "Products",
+                                     "Systems",
+                                     "Technology Environments",
+                                     "Vendors",
+                                     "Contracts",
+                                     "Controls",
+                                     "Objectives",
+                                     "Policies",
+                                     "Regulations",
+                                     "Requirements",
+                                     "Risks",
+                                     "Standards",
+                                     "Threats",
+                                     )
 
   _aliases = {
       "status": {
@@ -200,8 +223,10 @@ class AssessmentTemplate(assessment.AuditRelationship,
           "mandatory": False,
       },
       "template_object_type": {
-          "display_name": "Object Under Assessment",
+          "display_name": "Default Assessment Type",
           "mandatory": True,
+          "description": "Allowed values are:\n{}".format(
+              '\n'.join(DEFAULT_ASSESSMENT_TYPE_OPTIONS)),
       },
       "archived": {
           "display_name": "Archived",

@@ -5,7 +5,7 @@
 
 from selenium.common import exceptions
 
-from lib import base, decorator
+from lib import base, decorator, url
 from lib.constants import locator
 from lib.element import tab_element
 from lib.page import widget_bar, lhn
@@ -149,9 +149,24 @@ class Header(GenericHeader):
     self._refresh_elements()
 
 
-class Dashboard(widget_bar.Dashboard, Header):
+class Dashboard(widget_bar.Dashboard):
   """Main dashboard page."""
   # pylint: disable=abstract-method
+
+  @property
+  def header(self):
+    """Returns header of dashboard page."""
+    return Header(self._driver)
+
+  @property
+  def dashboard_url(self):
+    """Returns dashboard page url."""
+    return url.dashboard()
+
+  def open_objs_tab_via_url(self, obj_type):
+    """Opens objects dashboard tab via url according to specified object
+    type."""
+    selenium_utils.open_url(self.dashboard_url + "#!" + obj_type.lower())
 
   def start_workflow(self):
     """Clicks "Start new Workflow" button."""

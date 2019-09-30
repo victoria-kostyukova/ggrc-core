@@ -8,6 +8,7 @@ from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
 from integration.ggrc import TestCase, Api
 from integration.ggrc.models import factories
+from integration.ggrc import generator
 
 
 def get_snapshottable_models():
@@ -264,6 +265,7 @@ class TestSnapshot(TestCase):
   def setUp(self):
     super(TestSnapshot, self).setUp()
     self.api = Api()
+    self.generator = generator.ObjectGenerator()
 
   def test_search_by_reference_url(self):
     """Test search audit related snapshots of control type by reference_url"""
@@ -345,3 +347,32 @@ class TestSnapshot(TestCase):
     )
     self.assert200(response)
     self.assertEquals(1, response.json[0]["Snapshot"]["count"])
+
+  # pylint: disable=invalid-name
+  def test_identity_revision_after_adding_comment(self):
+    """Test checks identity of revisions after adding comment"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      standard = factories.StandardFactory()
+
+    snapshot = self._create_snapshots(audit, [standard])[0]
+    snapshot_id = snapshot.id
+    self.generator.generate_comment(standard, "", "some comment")
+
+    response = self.api.get(snapshot.__class__, snapshot_id)
+    self.assertStatus(response, 200)
+    self.assertTrue(response.json['snapshot']['is_identical_revision'])
+
+  def test_is_identical_revision(self):
+    """Test checks correctly work of is_identical_revision flag"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      standard = factories.StandardFactory()
+      standard_id = standard.id
+
+    snapshot = self._create_snapshots(audit, [standard])[0]
+    snapshot_id = snapshot.id
+    standard = all_models.Standard.query.get(standard_id)
+    self.api.put(standard, {"title": "Test standard 1"})
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
+    self.assertFalse(snapshot.is_identical_revision)

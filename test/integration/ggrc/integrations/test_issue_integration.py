@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc import models
 from ggrc import settings
 
+from ggrc.integrations import constants
 from ggrc.integrations import integrations_errors
 from ggrc.integrations.synchronization_jobs.issue_sync_job import \
     ISSUE_STATUS_MAPPING
@@ -769,7 +770,8 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
     mock_update_issue.assert_not_called()
 
   @mock.patch("ggrc.integrations.issues.Client.create_issue",
-              side_effect=[integrations_errors.Error, {"issueId": "issueId"}])
+              side_effect=[integrations_errors.HttpError(data=''),
+                           {"issueId": "issueId"}])
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_issue_recreation(self, _):
     """Test retrying to turn on integration after failed creation."""
@@ -838,3 +840,31 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
           },
       })
     update_issue_mock.assert_not_called()
+
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              side_effect=[integrations_errors.HotlistPermissionError()])
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_no_permissions_hotlist(self, _):
+    """Test warning message if no permissions to Hotlist."""
+    issue_tracker_attrs = {
+        "enabled": True,
+        "component_id": 1234,
+        "hotlist_id": 4321,
+        "issue_type": "Default Issue type",
+        "issue_priority": "P2",
+        "issue_severity": "S1",
+    }
+
+    response = self.api.post(all_models.Issue, {
+        "issue": {
+            "title": "test title",
+            "context": None,
+            "issue_tracker": issue_tracker_attrs,
+            "due_date": "10/10/2019"
+        },
+    })
+
+    self.assertIn(constants.WarningsDescription.HOTLIST_PERMISSIONS_ERROR,
+                  response.json.get(
+                      "issue", {}).get("issue_tracker",
+                                       {}).get("_warnings", []))

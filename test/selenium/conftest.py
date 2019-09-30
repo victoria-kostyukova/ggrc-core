@@ -747,7 +747,7 @@ def obj(request):
 def lhn_menu(selenium):
   """Open LHN menu and return LHN page objects model."""
   selenium_utils.open_url(url.Urls().dashboard)
-  return dashboard.Dashboard(selenium).open_lhn_menu()
+  return dashboard.Dashboard(selenium).header.open_lhn_menu()
 
 
 @pytest.fixture()

@@ -27,6 +27,8 @@ from ggrc.models.mixins import with_last_assessment_date
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.utils import benchmark
 from ggrc.utils import errors
+from ggrc.utils import referenced_objects
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 
 class Snapshot(rest_handable.WithDeleteHandable,
@@ -58,6 +60,8 @@ class Snapshot(rest_handable.WithDeleteHandable,
       reflection.Attribute("is_latest_revision", create=False, update=False),
       reflection.Attribute("original_object_deleted",
                            create=False,
+                           update=False),
+      reflection.Attribute("is_identical_revision", create=False,
                            update=False),
       reflection.Attribute("update_revision", read=False),
   )
@@ -136,6 +140,16 @@ class Snapshot(rest_handable.WithDeleteHandable,
         issubclass(inflector.get_model(self.child_type), Synchronizable)
     )
     return bool(deleted or external_deleted)
+
+  @builder.simple_property
+  def is_identical_revision(self):
+    """Flag if the snapshot has the identical revision."""
+    instance = referenced_objects.get(self.child_type, self.child_id)
+    return self.revisions and revisions_diff.is_identical_revision(
+        instance,
+        self.revision.content,
+        self.revisions[-1].content
+    )
 
   @classmethod
   def eager_query(cls, **kwargs):

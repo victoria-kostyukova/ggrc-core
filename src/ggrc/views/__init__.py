@@ -22,6 +22,7 @@ from ggrc.builder import json as builder_json
 from ggrc.cache import utils as cache_utils
 from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
+from ggrc.integrations.external_app import constants
 from ggrc.models import background_task, reflection, revision
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
@@ -677,8 +678,12 @@ def get_attributes_json():
   """Get a list of all custom attribute definitions"""
   with benchmark("Get attributes JSON"):
     with benchmark("Get attributes JSON: query"):
+      # get only GCA and exclude external CADs
+      # external GCA should be deleted from internal GCA table
       attrs = models.CustomAttributeDefinition.eager_query().filter(
-          models.CustomAttributeDefinition.definition_id.is_(None)
+          models.CustomAttributeDefinition.definition_id.is_(None),
+          ~models.CustomAttributeDefinition.definition_type.in_(
+              constants.GGRCQ_OBJ_TYPES_FOR_SYNC)
       ).all()
       ext_attrs = models.ExternalCustomAttributeDefinition.eager_query().all()
     with benchmark("Get attributes JSON: publish"):
@@ -737,7 +742,11 @@ def get_all_attributes_json(load_custom_attributes=False):
     published = {}
     ca_cache = collections.defaultdict(list)
     if load_custom_attributes:
-      definitions = models.CustomAttributeDefinition.eager_query().group_by(
+      # get only GCA and exclude external CADs
+      # external GCA should be deleted from internal GCA table
+      definitions = models.CustomAttributeDefinition.eager_query().filter(
+          ~models.CustomAttributeDefinition.definition_type.in_(
+              constants.GGRCQ_OBJ_TYPES_FOR_SYNC)).group_by(
           models.CustomAttributeDefinition.title,
           models.CustomAttributeDefinition.definition_type)
       for attr in definitions:

@@ -14,14 +14,13 @@ class ControlsTab(object_page.ObjectPage):
 
   @property
   def _tree_widget(self):
-    """Returns tree widget with active cycles."""
+    """Returns tree widget with controls."""
     return tree_widget.TreeWidget(
         container=self._browser.section(id=self._url_fragment()),
         table_row_cls=controls_tree_rows.ControlsRow)
 
   def rows(self):
-    """Returns workflow cycle rows."""
-    # self._tree_widget._tree_widget.tree_items()
+    """Returns rows with controls."""
     return self._tree_widget.tree_items()
 
   def get_control(self, control):

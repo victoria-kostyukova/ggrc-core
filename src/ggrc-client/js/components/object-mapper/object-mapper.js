@@ -5,6 +5,7 @@
 
 import canStache from 'can-stache';
 import canComponent from 'can-component';
+import loFind from 'lodash/find';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';
@@ -32,6 +33,8 @@ import {
   BEFORE_MAPPING,
   OBJECTS_MAPPED_VIA_MAPPER,
   DEFERRED_MAP_OBJECTS,
+  OBJECT_DESTROYED,
+  UNMAP_DESTROYED_OBJECT,
 } from '../../events/eventTypes';
 import {
   allowedToMap,
@@ -119,9 +122,9 @@ export default canComponent.extend({
       useSnapshots: resolvedConfig.useSnapshots,
       isLoadingOrSaving: function () {
         return this.attr('is_saving') ||
-        //  disable changing of object type while loading
-        //  to prevent errors while speedily selecting different types
-        this.attr('is_loading');
+          //  disable changing of object type while loading
+          //  to prevent errors while speedily selecting different types
+          this.attr('is_loading');
       },
       deferred_to: parentViewModel.attr('deferred_to'),
       deferred_list: [],
@@ -198,6 +201,34 @@ export default canComponent.extend({
           this._super(...arguments);
         }
       },
+
+      onDestroyItem: function (item) {
+        if (!this.attr('deferred_to.list')) {
+          return;
+        }
+        const source = this.attr('deferred_to').instance;
+        const object = loFind(this.attr('deferred_to.list'),
+          (x) => x.id === item.id);
+        const deferredToList = this.attr('deferred_to.list')
+          .filter((x) => x.id !== item.id);
+        this.attr('deferred_to.list').replace(deferredToList);
+        if (source) {
+          if (source.list) {
+            const deferredList = deferredToList
+              .map((x) => {
+                return ({
+                  id: x.id,
+                  type: x.type,
+                });
+              });
+            this.attr('deferred_to.instance.list').replace(deferredList);
+          }
+          source.dispatch({
+            ...UNMAP_DESTROYED_OBJECT,
+            object,
+          });
+        }
+      },
     });
   },
 
@@ -211,6 +242,15 @@ export default canComponent.extend({
         this.map(event.objects, event.options);
       }
     },
+
+    [`{parentInstance} ${OBJECT_DESTROYED.type}`](event, {object}) {
+      // this event is called when item was removed from mapper-result
+      // so deferred list should be updated
+      if (object && object.id) {
+        this.viewModel.onDestroyItem(object);
+      }
+    },
+
     // hide object-mapper modal when create new object button clicked
     'create-and-map click'() {
       this.element.trigger('hideModal');
@@ -308,8 +348,8 @@ export default canComponent.extend({
       confirm({
         modal_title: 'Confirmation',
         modal_description: 'Objects from the child program will' +
-        ' automatically be mapped to parent program. Do you want' +
-        ' to proceed?',
+          ' automatically be mapped to parent program. Do you want' +
+          ' to proceed?',
         modal_confirm: 'Proceed',
         button_view:
           `${GGRC.templates_path}/modals/confirm_cancel_buttons.stache`,

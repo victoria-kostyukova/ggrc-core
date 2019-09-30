@@ -755,9 +755,16 @@ class WithNetworkZone(object):
   _fulltext_attrs = [
       "network_zone",
   ]
+  NZ_OPTIONS = ("Service",
+                "Core",
+                "3rd Party",
+                "Prod",
+                "Corp")
   _aliases = {
       "network_zone": {
           "display_name": "Network Zone",
+          "description": "Allowed values are:\n{}".format(
+              "\n".join(NZ_OPTIONS)),
       },
   }
 

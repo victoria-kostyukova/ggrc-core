@@ -9,12 +9,13 @@ This module contains all function needed for handling notification objects
 needed by ggrc notifications.
 """
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods,broad-except
 
 from collections import namedtuple
 from datetime import date, datetime, time
 from functools import partial
 from itertools import chain, izip
+from logging import getLogger
 from operator import attrgetter
 
 from enum import Enum
@@ -29,6 +30,9 @@ from ggrc.services import signals
 from ggrc import models
 from ggrc.utils import errors
 from ggrc.models.mixins.statusable import Statusable
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Transitions(Enum):
@@ -104,7 +108,9 @@ def _get_unsent_notification(notif_type, obj, for_update=True):
 
   def _get_notif_key(notif):
     """Return key to use during notification comparison."""
-    return notif.object_id, notif.object_type, notif.notification_type.id
+    return (notif.object_id,
+            notif.object_type,
+            notif.notification_type_id or notif.notification_type.id)
 
   obj_key = (obj.id, obj.type, notif_type.id)
   notifs = (o for o in db.session if isinstance(o, models.Notification))
@@ -467,36 +473,87 @@ def register_handlers():  # noqa: C901
 
   @signals.Restful.model_deleted.connect_via(models.Assessment)
   def assignable_deleted_listener(sender, obj=None, src=None, service=None):
-    handle_assignable_deleted(obj)
+    """Listener for deletion of assessments."""
+    try:
+      handle_assignable_deleted(obj)
+    except Exception as ex:
+      logger.warning(
+          "Unable to send notification about deletion of"
+          " Assessment: %s.\n Error: %s", obj.id, ex.message
+      )
 
   @signals.Restful.model_put.connect_via(models.Assessment)
   def assignable_modified_listener(sender, obj=None, src=None, service=None):
-    handle_assignable_modified(obj)
+    """Listener for modification of assessments."""
+    try:
+      handle_assignable_modified(obj)
+    except Exception as ex:
+      logger.warning(
+          "Unable to send notification about modification of"
+          " Assessment: %s.\n Error: %s", obj.id, ex.message
+      )
 
   @signals.Restful.model_put_before_commit.connect_via(models.Assessment)
   def assignable_put_listener(sender, obj=None, event=None, **kwargs):
     """Assessment put before commit listener."""
-    handle_assignable_modified(obj, event)
+    try:
+      handle_assignable_modified(obj, event)
+    except Exception as ex:
+      logger.warning(
+          "Unable to send notification about modification of"
+          " Assessment: %s.\n Error: %s", obj.id, ex.message
+      )
 
   @signals.Restful.collection_posted.connect_via(models.Assessment)
   def assignable_created_listener(sender, objects=None, **kwargs):
-    handle_assignable_created(objects)
+    """Listener for creation of assessments."""
+    try:
+      handle_assignable_created(objects)
+    except Exception as ex:
+      object_ids = (o.id for o in objects)
+      logger.warning(
+          "Unable to send notification about creation of"
+          " Assessments: %s.\n Error: %s", object_ids, ex.message
+      )
 
   @signals.Restful.model_put.connect_via(models.Assessment)
   def assessment_send_reminder(sender, obj=None, src=None, service=None):
     """Assessment put listener."""
     reminder_type = src.get("reminderType", False)
     if reminder_type:
-      handle_reminder(obj, reminder_type)
+      try:
+        handle_reminder(obj, reminder_type)
+      except Exception as ex:
+        logger.warning(
+            "Unable to send notification reminder for"
+            " Assessment: %s.\n Error: %s", obj.id, ex.message
+        )
 
   @signals.Restful.collection_posted.connect_via(models.Comment)
   def comment_created_listener(sender, objects=None, sources=None, **kwargs):
     """Listener for comments posted."""
     for obj, src in izip(objects, sources):
-      handle_comment_created(obj, src)
+      try:
+        handle_comment_created(obj, src)
+      except Exception as ex:
+        logger.warning(
+            "Unable to send notification about"
+            " Comment: %s.\n Error: %s", obj.id, ex.message
+        )
 
   @signals.Restful.model_posted.connect_via(models.Relationship)
   @signals.Restful.model_deleted.connect_via(models.Relationship)
   def relationship_altered_listener(sender, obj=None, src=None, service=None):
-    """Listener for modified relationships."""
-    handle_relationship_altered(obj)
+    """Listener for creation/deletion of relationships."""
+    try:
+      handle_relationship_altered(obj)
+    except Exception as ex:
+      logger.warning(
+          "Unable to send notification about relationship"
+          " Source:%s-%s <-> Destination:%s-%s.\n Error: %s",
+          obj.source_type,
+          obj.source_id,
+          obj.destination_type,
+          obj.destination_id,
+          ex.message
+      )

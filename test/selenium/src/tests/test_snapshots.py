@@ -538,15 +538,12 @@ class TestSnapshots(base.Test):
   @pytest.mark.xfail(raises=IOError)
   @pytest.mark.parametrize(
       "obj",
-      [pytest.param(
-          None, marks=pytest.mark.skip(reason="TBD")),
+      [pytest.param(None),
        pytest.param(
           "assessment_w_mapped_control_w_issue",
           marks=pytest.mark.skip(
               reason="Issue has another mapping flow to control")),
-       pytest.param(
-           "assessment_w_mapped_control_wo_issue",
-           marks=pytest.mark.skip(reason="TBD"))],
+       pytest.param("assessment_w_mapped_control_wo_issue")],
       ids=["Export of snapshoted Control from Audit's Info Page "
            "via mapped Controls' Tree View",
            "Export of snapshoted Control from Issue's Info Page "
@@ -574,12 +571,11 @@ class TestSnapshots(base.Test):
         (obj["issue"] if is_issue_flow else obj["assessment"]) if obj
         else audit_with_one_control["audit"])
     expected_control = audit_with_one_control["control"].repr_ui()
-    controls_ui_service = webui_service.ControlsService(
-        selenium, is_versions_widget=is_issue_flow)
-    path_to_exported_file = controls_ui_service.export_objs_via_tree_view(
-        path_to_export_dir=create_tmp_dir, src_obj=dynamic_objects)
-    actual_controls = controls_ui_service.get_list_objs_from_csv(
-        path_to_exported_file=path_to_exported_file)
+    actual_controls = webui_facade.export_objects(
+        path_to_export_dir=create_tmp_dir,
+        obj_type=audit_with_one_control["control"].type,
+        src_obj=dynamic_objects,
+        is_versions_widget=is_issue_flow)
     # 'actual_controls': created_at, updated_at,
     #                    custom_attributes (GGRC-2344) (None)
     self.general_equal_assert(
@@ -734,7 +730,7 @@ class TestSnapshots(base.Test):
       rest_facade.map_objs(
           create_audit_with_control_and_update_control["audit"], obj)
       expected_objs_names_from_mapper = expected_objs_names_from_mapper + (
-          objects.PROGRAMS, objects.PROJECTS, objects.DOCUMENTS)
+          objects.PROGRAMS, objects.DOCUMENTS)
     expected_objs_names_from_add_widget = expected_objs_names_from_mapper
     expected_objs_types_from_mapper = sorted(
         objects.get_normal_form(obj_name)

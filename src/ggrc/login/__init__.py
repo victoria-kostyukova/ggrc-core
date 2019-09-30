@@ -188,12 +188,14 @@ def is_external_app_user():
 
 
 def get_user_date():
-  """Get current user timezone and prepare users current date
+  """
+    Get current user timezone from HTTP request
+    and prepare users current date
 
   Returns:
       datetime.date()
   """
-  user_tz_offset = int(request.headers['x-usertimezoneoffset']) / 60
+  user_tz_offset = int(request.headers.get('x-usertimezoneoffset', 0)) / 60
   user_date = (datetime.datetime.now() + datetime.timedelta(
       hours=user_tz_offset)).date()
   return user_date

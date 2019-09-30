@@ -126,8 +126,6 @@ class CustomAttributeDefinitionFactory(TitledFactory):
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Assert definition_type"""
-    assert not is_external_custom_attributable(kwargs["definition_type"]), \
-        "Please use ExternalCustomAttributeDefinitionFactory"
     return super(CustomAttributeDefinitionFactory, cls)._create(
         target_class,
         *args,

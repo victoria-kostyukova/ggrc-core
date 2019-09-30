@@ -174,7 +174,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Title", "Object Title"),
         (alias, value),
     ]))
@@ -653,7 +653,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Title", "Object Title"),
         (alias, value),
     ]))
@@ -702,7 +702,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Title", "Object Title"),
         (alias, value),
     ]))
@@ -984,7 +984,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
         ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Title", "Object Title"),
         ("Ticket Tracker Integration", tmpl_value),
     ]))

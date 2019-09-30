@@ -35,6 +35,22 @@ class TestExportEmptyTemplate(TestCase):
         "X-export-view": "blocks",
     }
 
+  @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
+  def test_custom_attr_cb(self, model):
+    """Test if  custom attribute checkbox type has hint for {}."""
+    with factories.single_commit():
+      factories.CustomAttributeDefinitionFactory(
+          definition_type=model.lower(),
+          attribute_type="Checkbox",
+      )
+    data = {
+        "export_to": "csv",
+        "objects": [{"object_name": model, "fields": "all"}]
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nTRUE\nFALSE", response.data)
+
   def test_basic_policy_template(self):
     """Tests for basic policy templates."""
     data = {
@@ -47,6 +63,25 @@ class TestExportEmptyTemplate(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertIn("Title*", response.data)
     self.assertIn("Policy", response.data)
+
+  @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
+  def test_custom_attr_dd(self, model):
+    """Test if custom attribute Dropdown type has hint for {}."""
+    with factories.single_commit():
+      multi_options = "option_1,option_2,option_3"
+      factories.CustomAttributeDefinitionFactory(
+          definition_type=model.lower(),
+          attribute_type="Dropdown",
+          multi_choice_options=multi_options,
+      )
+    data = {
+        "export_to": "csv",
+        "objects": [{"object_name": model, "fields": "all"}]
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\n{}".format(
+        multi_options.replace(',', '\n')), response.data)
 
   def test_multiple_empty_objects(self):
     """Tests for multiple empty objects"""
@@ -124,6 +159,21 @@ class TestExportEmptyTemplate(TestCase):
     for field in self.TICKET_TRACKER_FIELDS:
       self.assertIn(field, response.data)
 
+  @ddt.data("Process", "System")
+  def test_network_zone_tip(self, model):
+    """Tests if Network Zone column has tip message in export file for {}"""
+
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": model, "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\n{}".format('\n'.join(
+        all_models.SystemOrProcess.NZ_OPTIONS)), response.data)
+
   @ddt.data("Assessment", "Issue")
   def test_delete_tip_in_export_csv(self, model):
     """Tests if delete column has tip message in export file for {}"""
@@ -150,12 +200,13 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.VALID_CONCLUSIONS)), response.data)
 
-  def test_archived_tip(self):
-    """Tests if Archived column has tip message for Assessment. """
+  @ddt.data("Assessment", "Audit")
+  def test_archived_tip(self, model):
+    """Tests if Archived column has tip message for {}. """
     data = {
         "export_to": "csv",
         "objects": [
-           {"object_name": "Assessment", "fields": "all"},
+           {"object_name": model, "fields": "all"},
 
         ],
     }
@@ -173,7 +224,7 @@ class TestExportEmptyTemplate(TestCase):
     }
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
-    self.assertIn("Options are:\n{}".format('\n'.join(
+    self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.ASSESSMENT_TYPE_OPTIONS)), response.data)
 
   def test_role_tip(self):
@@ -203,9 +254,35 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Product.TYPE_OPTIONS)), response.data)
 
+  def test_f_realtime_email_updates(self):
+    """Tests if Force real-time email updates column has tip message. """
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Workflow", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nYes\nNo", response.data)
+
+  def test_need_verification_tip(self):
+    """Tests if Need Verification column has tip message in export file. """
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Workflow", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("This field is not changeable\nafter workflow activation."
+                  "\nAllowed values are:\nTRUE\nFALSE", response.data)
+
 
 @ddt.ddt
 class TestExportSingleObject(TestCase):
+  """Test case for export single object."""
 
   def setUp(self):
     super(TestExportSingleObject, self).setUp()

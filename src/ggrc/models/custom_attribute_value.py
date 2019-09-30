@@ -108,7 +108,7 @@ class CustomAttributeValueBase(base.ContextRBAC,
     """Validate dropdown option."""
     valid_options = set(self.custom_attribute.multi_choice_options.split(","))
     if self.attribute_value:
-      self.attribute_value = self.attribute_value.strip()
+      self.attribute_value = str(self.attribute_value).strip()
       if self.attribute_value not in valid_options:
         raise ValueError("Invalid custom attribute dropdown option: {v}, "
                          "expected one of {l}"

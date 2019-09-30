@@ -204,7 +204,7 @@ class TestWorkflowsCycleGeneration(TestCase):
     self.assertEqual(expected_date, active_wf.next_cycle_start_date)
 
   def test_recalculate_date_not_started(self):
-    """Changing start_date on notstarted workflow will
+    """Changing start_date on not started workflow will
        not affect next_cycle_start_date"""
     setup_start_date = dtm.date(2017, 1, 15)
     update_start_date = dtm.date(2017, 1, 1)
@@ -225,13 +225,17 @@ class TestWorkflowsCycleGeneration(TestCase):
     self.assertIsNone(Workflow.query.get(workflow_id).next_cycle_start_date)
 
   @ddt.data(
-      # (setup_date, freeze_date, repeat_every, unit),
-      (dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1, Workflow.MONTH_UNIT),
-      (dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1, Workflow.WEEK_UNIT),
+      # (setup_date, freeze_date, unit, repeat_every, expected cycles),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 4, 28),
+       Workflow.MONTH_UNIT, 1, 3),
+      (dtm.date(2017, 3, 10), dtm.date(2017, 3, 24),
+       Workflow.WEEK_UNIT, 1, 3),
+      (dtm.date(2019, 9, 20), dtm.date(2019, 9, 21),
+       Workflow.DAY_UNIT, 1, 1),
   )
   @ddt.unpack
   def test_recurring_wf_start_date_and_cycles(self, setup_date, freeze_date,
-                                              repeat_every, unit):
+                                              unit, repeat_every, cycles):
     """Test case for correct cycle start date and number of cycles"""
     with freeze_time(freeze_date):
       with factories.single_commit():
@@ -246,8 +250,8 @@ class TestWorkflowsCycleGeneration(TestCase):
 
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
-    # freeze_date is chosen so that we expect 3 cycles to be generated:
-    self.assertEqual(len(active_wf.cycles), 3)
+    # freeze_date is chosen so that we expect {cycles} cycles to be generated:
+    self.assertEqual(len(active_wf.cycles), cycles)
     cycle_task = active_wf.cycles[0].cycle_task_group_object_tasks[0]
     adj_start_date = cycle_task.start_date
     self.assertEqual(setup_date, adj_start_date)

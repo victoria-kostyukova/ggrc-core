@@ -7,6 +7,7 @@
 import json
 import ddt
 
+from ggrc.views import get_attributes_json
 from ggrc.views import get_all_attributes_json
 
 from integration.ggrc.services import TestCase
@@ -38,3 +39,43 @@ class TestGetAttributes(TestCase):
     all_attrs = json.loads(all_attrs_str)
     all_attrs_for_type = all_attrs[object_type]
     self.assertIn(role_name, (x["attr_name"] for x in all_attrs_for_type))
+
+  def test_get_attributes_cads(self):
+    """Test get attributes json with cads."""
+    factories.CustomAttributeDefinitionFactory(
+        title="cad text",
+        definition_type="control",
+        attribute_type="Text",
+    )
+    ext_cad = factories.ExternalCustomAttributeDefinitionFactory(
+        title="ext cad text",
+        definition_type="control",
+        attribute_type="Text",
+    )
+    attrs_str = get_attributes_json()
+    attrs_json = json.loads(attrs_str)
+    self.assertEqual(len(attrs_json), 1)
+    attr = attrs_json[0]
+    self.assertEqual(attr["external_id"], ext_cad.external_id)
+    self.assertEqual(attr["title"], ext_cad.title)
+    self.assertEqual(attr["definition_type"], ext_cad.definition_type)
+    self.assertEqual(attr["attribute_type"], ext_cad.attribute_type)
+
+  def test_get_all_attributes_cads(self):
+    """Test get all attributes json with cads."""
+    cad = factories.CustomAttributeDefinitionFactory(
+        title="cad text",
+        definition_type="control",
+        attribute_type="Text",
+    )
+    ext_cad = factories.ExternalCustomAttributeDefinitionFactory(
+        title="ext cad text",
+        definition_type="control",
+        attribute_type="Text",
+    )
+    attrs_str = get_all_attributes_json(load_custom_attributes=True)
+    attrs_json = json.loads(attrs_str)
+    attrs_by_type = attrs_json["Control"]
+    attrs = (attr["attr_name"] for attr in attrs_by_type)
+    self.assertIn(ext_cad.title, attrs)
+    self.assertNotIn(cad.title, attrs)

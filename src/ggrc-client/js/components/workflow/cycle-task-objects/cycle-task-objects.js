@@ -16,6 +16,7 @@ import {
 import {
   DEFERRED_MAPPED_UNMAPPED,
   OBJECTS_MAPPED_VIA_MAPPER,
+  OBJECT_DESTROYED,
 } from '../../../events/eventTypes';
 import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
@@ -98,6 +99,12 @@ const events = {
   },
   [`{viewModel.instance} ${OBJECTS_MAPPED_VIA_MAPPER.type}`](el, {objects}) {
     this.viewModel.includeLoadedObjects(objects);
+  },
+
+  [`{viewModel.instance} ${OBJECT_DESTROYED.type}`](event, {object}) {
+    if (object) {
+      this.viewModel.excludeObjects([object]);
+    }
   },
 };
 

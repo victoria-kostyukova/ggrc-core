@@ -115,7 +115,7 @@ class TestWithLastCommentAssessment(TestCase, WithQueryApi):
     audit = factories.AuditFactory()
     response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "Asmnt-code"),
+        ("Code*", ""),
         ("Audit", audit.slug),
         ("Assignees", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -123,18 +123,17 @@ class TestWithLastCommentAssessment(TestCase, WithQueryApi):
         ("Last Comment", "some comment"),
     ]))
     self._check_csv_response(response, {})
-    asmnts = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == "Asmnt-code"
-    ).all()
-    self.assertEqual(len(asmnts), 1)
-    self.assertEqual(asmnts[0].last_comment, None)
+    asmnt = all_models.Assessment.query.filter(
+        all_models.Assessment.title == "Test title"
+    ).first()
+    self.assertEqual(asmnt.last_comment, None)
 
   def test_ca_create_on_import(self):
     """Test creating last_comment CA when comments imported"""
     audit = factories.AuditFactory()
     response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "Asmnt-code"),
+        ("Code*", ""),
         ("Audit", audit.slug),
         ("Assignees", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -144,7 +143,7 @@ class TestWithLastCommentAssessment(TestCase, WithQueryApi):
     tasks = self.taskqueue_stub.get_filtered_tasks()
     deferred.run(tasks[0].payload)
     self._check_csv_response(response, {})
-    asmnt = all_models.Assessment.query.filter_by(slug="Asmnt-code").first()
+    asmnt = all_models.Assessment.query.filter_by(title="Test title").first()
     self.assertEqual(asmnt.last_comment, "new comment3")
 
   def test_ca_update_on_import(self):

@@ -128,7 +128,8 @@ class Audit(Snapshotable,
       "notes": None,
       "archived": {
           "display_name": "Archived",
-          "mandatory": False
+          "mandatory": False,
+          "description": "Allowed values are:\nyes\nno"
       },
       "status": {
           "display_name": "State",

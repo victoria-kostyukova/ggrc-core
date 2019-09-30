@@ -8,10 +8,17 @@
   {{#if needReuse}}
     {{#is_allowed 'update' baseInstance context='for'}}
       {{#unless instance.archived}}
-        <button type="button"
-                class="btn btn-small btn-green grid-data__toolbar-item"
-                on:el:click="reuseSelected()"
-                {{#if unableToReuse}}disabled{{/if}}>Reuse</button>
+        <confirm-edit-action class="grid-data__toolbar-item"
+                              on:setEditMode="reuseSelected()"
+                              on:setInProgress="setInProgressState()"
+                              instance:from="instance">
+          <button type="button"
+                  class="btn btn-small btn-green"
+                  on:el:click="confirmEdit()"
+                  {{#if unableToReuse}}disabled{{/if}}>
+            Reuse
+          </button>
+        </confirm-edit-action>
       {{/unless}}
     {{/is_allowed}}
   {{/if}}

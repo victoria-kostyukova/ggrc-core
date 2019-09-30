@@ -191,10 +191,10 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_all_objects(self, my_work_dashboard):
     """Tests number of objects in LHN and in All Objects."""
-    lhn_objects = (my_work_dashboard.open_lhn_menu().select_all_objects().
-                   get_all_lhn_objects_as_set)
+    lhn_objects = (my_work_dashboard.header.open_lhn_menu().
+                   select_all_objects().get_all_lhn_objects_as_set)
     hnb_objects = set(
-        [tab.name for tab in my_work_dashboard.
+        [tab.name for tab in my_work_dashboard.header.
          select_all_objects().get_visible_tabs])
     if hnb_objects.issubset(lhn_objects) is False:
       pytest.xfail(

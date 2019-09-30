@@ -6,6 +6,7 @@
 import loDebounce from 'lodash/debounce';
 import loGet from 'lodash/get';
 import loFindIndex from 'lodash/findIndex';
+import loSortBy from 'lodash/sortBy';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -284,10 +285,24 @@ let viewModel = canMap.extend({
       this.attr('options.widgetId')
     );
 
+    this.addServiceColumns(columns);
+
     this.attr('columns.available', columns.available);
     this.attr('columns.selected', columns.selected);
     this.attr('columns.mandatory', columns.mandatory);
     this.attr('columns.disableConfiguration', columns.disableConfiguration);
+  },
+  addServiceColumns(columns) {
+    if (this.attr('modelName') === 'Person') {
+      const serviceCols =
+        this.attr('model').tree_view_options.service_attr_list;
+
+      columns.available = columns.available.concat(serviceCols);
+      columns.selected = columns.selected.concat(serviceCols);
+
+      columns.available = loSortBy(columns.available, 'order');
+      columns.selected = loSortBy(columns.selected, 'order');
+    }
   },
   setSortingConfiguration: function () {
     let sortingInfo = TreeViewUtils
@@ -303,6 +318,8 @@ let viewModel = canMap.extend({
       selectedColumns,
       this.attr('options.widgetId')
     );
+
+    this.addServiceColumns(columns);
 
     this.attr('columns.selected', columns.selected);
   },
@@ -878,11 +895,11 @@ const processNotExistedSearch = (viewModel) => {
   viewModel.removeAdvancedFilters();
 };
 
-const loadSavedSearch = (viewModel) => {
+export const loadSavedSearch = (viewModel) => {
   const searchId = viewModel.attr('router.saved_search');
   viewModel.attr('loading', true);
 
-  SavedSearch.findOne({id: searchId}).then((response) => {
+  return SavedSearch.findOne({id: searchId}).then((response) => {
     viewModel.attr('loading', false);
     const savedSearch = response.SavedSearch;
 
@@ -915,8 +932,8 @@ const loadSavedSearch = (viewModel) => {
  * @param {Array} parentItems - parentItems attribute of Advanced search
  * @return {Array} - filtered parentItems
  */
-const filterParentItems = (parentInstance, parentItems) => {
-  return parentItems = parentItems.filter((item) =>
+export const filterParentItems = (parentInstance, parentItems) => {
+  return parentItems.filter((item) =>
     item.value.id !== parentInstance.value.id ||
     item.value.type !== parentInstance.value.type);
 };

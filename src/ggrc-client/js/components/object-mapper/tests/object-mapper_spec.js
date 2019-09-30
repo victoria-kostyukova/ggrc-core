@@ -10,7 +10,7 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Component from '../object-mapper';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
-import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
+import {DEFERRED_MAP_OBJECTS, UNMAP_DESTROYED_OBJECT} from '../../../events/eventTypes';
 import * as Mappings from '../../../models/mappers/mappings';
 
 describe('object-mapper component', function () {
@@ -94,7 +94,7 @@ describe('object-mapper component', function () {
         expect(viewModel.isLoadingOrSaving()).toEqual(true);
       });
       it('returns false if page is not loading, it is not saving,' +
-      ' type change is not blocked and it is not loading', function () {
+        ' type change is not blocked and it is not loading', function () {
         viewModel.attr('is_saving', false);
         viewModel.attr('is_loading', false);
         expect(viewModel.isLoadingOrSaving()).toEqual(false);
@@ -143,6 +143,86 @@ describe('object-mapper component', function () {
           );
         });
     });
+
+    describe('onDestroyItem() method', function () {
+      let vm;
+
+      beforeEach(function () {
+        vm = new Component.prototype.viewModel({}, parentViewModel)();
+      });
+
+      it('should remove item from deferred_to.list',
+        function () {
+          const item = {id: 1};
+          vm.attr({
+            deferred_to: {
+              instance: {},
+              list: [{id: 1}, {id: 2}],
+            },
+          });
+          vm.onDestroyItem(item);
+          expect(vm.attr('deferred_to.list').length).toBe(1);
+          expect(vm.attr('deferred_to.list')).not.toContain(
+            jasmine.objectContaining(item)
+          );
+        });
+
+      it('should remove item from deferred_to.instance.list',
+        function () {
+          const item = {id: 1, type: 'a'};
+          vm.attr({
+            deferred_to: {
+              instance: {
+                list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+              },
+              list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+            },
+          });
+          vm.onDestroyItem(item);
+          expect(vm.attr('deferred_to.instance.list').length).toBe(1);
+          expect(vm.attr('deferred_to.instance.list')).not.toContain(
+            jasmine.objectContaining(item)
+          );
+        });
+
+      it('should not remove non-existent item',
+        function () {
+          const item = {id: 3, type: 'c'};
+          vm.attr({
+            deferred_to: {
+              instance: {
+                list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+              },
+              list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+            },
+          });
+          vm.onDestroyItem(item);
+          expect(vm.attr('deferred_to.instance.list').length).toBe(2);
+          expect(vm.attr('deferred_to.list').length).toBe(2);
+        });
+
+      it('dispatches UNMAP_DESTROYED_OBJECT',
+        function () {
+          const item = {id: 1, type: 'a'};
+          vm.attr({
+            deferred_to: {
+              instance: {
+                list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+              },
+              list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
+            },
+          });
+          const object = vm.attr('deferred_to.list')[0];
+          spyOn(vm.attr('deferred_to.instance'), 'dispatch');
+          vm.onDestroyItem(item);
+
+          expect(vm.attr('deferred_to.instance').dispatch)
+            .toHaveBeenCalledWith({
+              ...UNMAP_DESTROYED_OBJECT,
+              object,
+            });
+        });
+    });
   });
 
   describe('map() method', function () {
@@ -171,7 +251,7 @@ describe('object-mapper component', function () {
     });
 
     it('calls performMegaMap to map results for mega-objects ' +
-    'if "options" and "options.megaMapping" are truthy values', function () {
+      'if "options" and "options.megaMapping" are truthy values', function () {
       const objects = jasmine.any(Object);
       const options = {
         megaMapping: true,
@@ -519,7 +599,7 @@ describe('object-mapper component', function () {
     });
 
     it('returns true if source object is a Snapshot parent and mapped type ' +
-    'is snapshotable', function () {
+      'is snapshotable', function () {
       let result;
       spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
       viewModel.attr('object', 'Audit');

@@ -5,6 +5,8 @@
 
 import sqlalchemy as sa
 
+from ggrc.migrations import utils
+
 
 CADS_BY_OBJECT_TYPE_SQL = u'''
   SELECT
@@ -100,6 +102,22 @@ def _propagate_external_cads(connection, cads):
     )
 
 
+def _add_revisions(connection, cads):
+  """Adds CADs to objects without revisions.
+
+  Args:
+    connection: sqlalchemy.engine.Connection object.
+    cads: List of CADs objects.
+  """
+  cad_ids = [cad.id for cad in cads]
+  utils.add_to_objects_without_revisions_bulk(
+      connection,
+      cad_ids,
+      "ExternalCustomAttributeDefinition",
+      "created"
+  )
+
+
 def migrate_to_external_cads(connection, obj_type):
   """Migrates CADs to external CADs for object type.
 
@@ -109,3 +127,4 @@ def migrate_to_external_cads(connection, obj_type):
   """
   cads = _get_cads(connection, obj_type)
   _propagate_external_cads(connection, cads)
+  _add_revisions(connection, cads)

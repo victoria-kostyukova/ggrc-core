@@ -421,7 +421,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     names = {
         "Title",
         "Audit",
-        "Object Under Assessment",
+        "Default Assessment Type",
         "Use Control Assessment Procedure",
         "Default Assessment Procedure",
         "Default Assignees",
@@ -444,7 +444,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     expected_fields = {
         "mandatory": {
             "Title",
-            "Object Under Assessment",
+            "Default Assessment Type",
             "Audit",
             "Code",
             "Default Assignees",

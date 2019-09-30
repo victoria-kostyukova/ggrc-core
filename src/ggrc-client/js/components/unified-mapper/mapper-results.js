@@ -5,6 +5,7 @@
 
 import loReduce from 'lodash/reduce';
 import loFindIndex from 'lodash/findIndex';
+import loFind from 'lodash/find';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -36,6 +37,7 @@ import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isMegaMapping as isMegaMappingUtil} from '../../plugins/utils/mega-object-utils';
+import {OBJECT_DESTROYED} from '../../events/eventTypes';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -529,7 +531,8 @@ export default canComponent.extend({
       const selectedItems = this.attr('selected');
       const selectedIndex = loFindIndex(selectedItems,
         (item) => item.attr('id') === itemId);
-
+      const selectedObject = loFind(this.attr('items'),
+        (item) => item.attr('id') === itemId);
       // remove selection of destroyed item
       // if it was selected before deletion
       if (selectedIndex !== -1) {
@@ -548,6 +551,15 @@ export default canComponent.extend({
       }
 
       this.setItems();
+      if (this.attr('baseInstance')) {
+        this.attr('baseInstance').dispatch({
+          ...OBJECT_DESTROYED,
+          object: {
+            id: itemId,
+            type: selectedObject && selectedObject.type,
+          },
+        });
+      }
     },
   }),
   events: {

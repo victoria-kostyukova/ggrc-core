@@ -1,8 +1,10 @@
-[//]: <> (updated 07/31/2019)
+[//]: <> (updated 10/01/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Create a single Assessment with custom attributes from an Assessment Template (v2.10.0, 07/31/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.o94fdb9ksier)
+[Administration of Global Custom Attributes for Controls and Risks is moved to the new frontend (v2.17.0, 10/1/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4djbh0pcizjf)
+
+[Create a single Assessment with custom attributes from an Assessment Template (v2.10.0, 07/31/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.s2dqe41tlzl1)
 
 [Ability to save searches (v2.9.0, 07/23/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.1cnxwn1wbuun)
 
@@ -111,6 +113,10 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Administration of Global Custom Attributes for Controls and Risks is moved to the new frontend (v2.17.0, 10/1/2019)
+
+From now, you can create/edit Global Custom Attributes for Controls and Risks only in the new frontend. But newly created Global Custom Attributes for Controls and Risks and their values are still displayed in the old frontend.
 
 ### Create a single Assessment with custom attributes from an Assessment Template (v2.10.0, 07/31/2019)
 

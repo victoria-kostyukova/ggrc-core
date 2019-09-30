@@ -5,7 +5,7 @@
 
 """Test import of commentable fields."""
 
-from collections import OrderedDict
+import collections
 import ddt
 
 from ggrc.models import all_models
@@ -31,13 +31,13 @@ class TestImportCommentable(TestCase):
     model_name = model.__name__
     import_data = [
         ("object_type", model_name),
-        ("Code", "{}-2".format(model_name)),
+        ("Code", ""),
         ("Title", "{}-Title".format(model_name)),
         ("Admin", "user@example.com"),
         ("Recipients", ','.join(recipients)),
         ("Send by default", True),
     ]
-    response = self.import_data(OrderedDict(import_data))
+    response = self.import_data(collections.OrderedDict(import_data))
     self._check_csv_response(response, {})
     obj = model.query.first()
     self.assertEqual(obj.send_by_default, True)
@@ -49,13 +49,13 @@ class TestImportCommentable(TestCase):
     model_name = "Program"
     import_data = [
         ("object_type", model_name),
-        ("Code", "{}-2".format(model_name)),
+        ("Code", ""),
         ("Title", "{}-Title".format(model_name)),
         ("Program Managers", "user@example.com"),
         ("Recipients", ','.join(recipients)),
         ("Send by default", True),
     ]
-    response = self.import_data(OrderedDict(import_data))
+    response = self.import_data(collections.OrderedDict(import_data))
     self._check_csv_response(response, {})
     obj = all_models.Program.query.first()
     self.assertEqual(obj.send_by_default, True)
@@ -68,7 +68,7 @@ class TestImportCommentable(TestCase):
     model_name = model.__name__
     import_data = [
         ("object_type", model_name),
-        ("Code", "{}-1".format(model_name)),
+        ("Code", ""),
         ("Title", "{}-Title".format(model_name)),
         ("Admin", "user@example.com"),
         ("Recipients", ','.join(recipients)),
@@ -76,7 +76,7 @@ class TestImportCommentable(TestCase):
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
     ]
-    response = self.import_data(OrderedDict(import_data))
+    response = self.import_data(collections.OrderedDict(import_data))
     self._check_csv_response(response, {})
     obj = model.query.first()
     self.assertEqual(sorted(obj.recipients.split(",")), sorted(recipients))

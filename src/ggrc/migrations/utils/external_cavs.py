@@ -5,6 +5,8 @@
 
 import sqlalchemy as sa
 
+from ggrc.migrations import utils
+
 CAVS_BY_OBJECT_TYPE_SQL = u'''
   SELECT
     custom_attribute_id,
@@ -43,6 +45,12 @@ PROPAGATE_EXTERNAL_CAVS_BY_CAVS_SQL = u'''
   )
 '''
 
+EXTERNAL_CAV_IDS_BY_TYPE = u'''
+  SELECT id
+  FROM external_custom_attribute_values
+  WHERE attributable_type = :object_type
+'''
+
 
 def _get_cavs(connection, object_type):
   """Returns CAVs by object type.
@@ -59,6 +67,23 @@ def _get_cavs(connection, object_type):
   return cavs
 
 
+def _get_external_cav_ids(connection, object_type):
+  """Returns CAVs ids by object type.
+
+  Args:
+    connection: sqlalchemy.engine.Connection object.
+    object_type: String representation of object type.
+  Returns:
+    List of CAVs ids
+  """
+  cavs = connection.execute(
+      sa.text(EXTERNAL_CAV_IDS_BY_TYPE),
+      object_type=object_type
+  ).fetchall()
+
+  return [cav.id for cav in cavs]
+
+
 def _propagate_external_cavs(connection, cavs):
   """Propagates external CAVs by CAVs.
   Args:
@@ -72,6 +97,39 @@ def _propagate_external_cavs(connection, cavs):
     )
 
 
+def _add_revisions(connection, obj_type):
+  """Adds CAVs to objects without revisions.
+
+  Args:
+    connection: sqlalchemy.engine.Connection object.
+    obj_type: String representation of object type.
+  """
+  cav_ids = _get_external_cav_ids(connection, obj_type)
+  utils.add_to_objects_without_revisions_bulk(
+      connection,
+      cav_ids,
+      "ExternalCustomAttributeValue",
+      "created"
+  )
+
+
+def _add_object_revisions(connection, cavs, obj_type):
+  """Adds CAVs related objects to objects without revisions.
+
+  Args:
+    connection: sqlalchemy.engine.Connection object.
+    obj_type: String representation of object type.
+    cavs: List of CAVs objects.
+  """
+  obj_ids = set(cav.attributable_id for cav in cavs)
+  utils.add_to_objects_without_revisions_bulk(
+      connection,
+      obj_ids,
+      obj_type.title(),
+      "modified"
+  )
+
+
 def migrate_to_external_cavs(connection, obj_type):
   """Migrates CAVs to external CAVs.
 
@@ -81,3 +139,5 @@ def migrate_to_external_cavs(connection, obj_type):
   """
   cavs = _get_cavs(connection, obj_type)
   _propagate_external_cavs(connection, cavs)
+  _add_revisions(connection, obj_type)
+  _add_object_revisions(connection, cavs, obj_type)

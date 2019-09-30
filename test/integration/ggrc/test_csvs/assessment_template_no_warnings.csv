@@ -16,7 +16,7 @@ Audit,Code*,Program*,Title*,Audit Captains*,State,,,,,,,,,,
 ,Audit,Program,Audit,user@example.com,Planned,,,,,,,,,,
 ,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,
-Object type,,,,,Only works if object under assessment is Control.,,,,"List of custom attributes for the assessment template
+Object type,,,,,Only works if default assessment type is Control.,,,,"List of custom attributes for the assessment template
 One attribute per line. fields are separated by commas,
 
 <attribute type>, <attribute name>, [<attribute value1>, <attribute value2>, ...]
@@ -26,7 +26,7 @@ attribute name: any single line string without commas. Leading and trailing spac
 list of attribute values: comma separetd list, only used if attribute type is ""Dropdown"".
 
 Limitations: Dropdown values can not start with either ""(a)"" or ""(c)"" and attribute names can not contain commas "","".",,,,,,
-Assessment Template,Code,Audit,Title,Object under assessment,Use control assessment procedure,Default Assessment Procedure,Default Assignees,Default Verifiers,Custom Attributes,,,,,,
+Assessment Template,Code,Audit,Title,Default assessment type,Use control assessment procedure,Default Assessment Procedure,Default Assignees,Default Verifiers,Custom Attributes,,,,,,
 ,T-1,Audit,Template 1,Control,yes,this will be ignored,Object admins,Auditors,"Text, my text name
 mandatory Text, Some Other text name
 Rich text, custom description

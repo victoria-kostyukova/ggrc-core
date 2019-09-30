@@ -28,6 +28,7 @@ from ggrc.models import exceptions
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
+from ggrc.utils import helpers as helper_utils
 
 
 logger = logging.getLogger(__name__)
@@ -608,6 +609,21 @@ class AssessmentTrackerHandler(object):
         issue_db_info
     )
 
+  def handle_asmt_test_plan_update(self, assessment):
+    """Handle assessment's test plan update.
+
+    Args:
+        assessment (models.Assessment): Assessment instance.
+    """
+    if (
+        self._is_tracker_enabled(assessment.audit) and
+        helper_utils.has_attr_changes(assessment, "test_plan")
+    ):
+      issue_obj = assessment.issuetracker_issue
+      issue_id = issue_obj.issue_id if issue_obj else None
+      if issue_id and integration_utils.is_already_linked(issue_id):
+        self._add_update_test_plan_comment(assessment)
+
   @staticmethod
   def handle_template_delete(assessment_template):
     """Handle assessment template delete.
@@ -887,6 +903,17 @@ class AssessmentTrackerHandler(object):
               assessment,
               issue_db_info
           )
+
+  def _add_update_test_plan_comment(self, assessment):
+    """Send test plan update comment to issue.
+
+    Args:
+        assessment (models.Assessment): Assessment instance.
+    """
+    issue_id = assessment.issuetracker_issue.issue_id
+    issue_payload = self._collect_payload_test_plan_upd(assessment.test_plan)
+    sync_result = self._send_issue_update(issue_id, issue_payload)
+    self._ticket_warnings_for_update(sync_result, assessment)
 
   @staticmethod
   def _get_issue_from_assmt_template(template_info):
@@ -1342,6 +1369,19 @@ class AssessmentTrackerHandler(object):
     )
 
     return template.format(issue_id=issue_id)
+
+  @staticmethod
+  def _generate_test_plan_upd_comment(test_plan):
+    """Generate test plan update comment.
+
+    Args:
+      test_plan (str): New test plan to include into comment.
+
+    Returns:
+      String representing comment for test plan update.
+    """
+    test_plan = html2text.HTML2Text().handle(test_plan).strip("\n")
+    return constants.ASMT_TEST_PLAN_UPD_TMPL.format(test_plan)
 
   @classmethod
   def _update_with_assmt_data_for_ticket_create(cls, assessment, assmt_src):
@@ -1799,6 +1839,13 @@ class AssessmentTrackerHandler(object):
     }
 
     return issue_payload
+
+  @classmethod
+  def _collect_payload_test_plan_upd(cls, test_plan):
+    """Collect assessment's test plan update payload."""
+    return {
+        "comment": cls._generate_test_plan_upd_comment(test_plan)
+    }
 
   def _merge_issue_information(self, issue_info_db, issue_tracker_info):
     """Merge issue information with Issue Tracker.
@@ -2550,12 +2597,14 @@ class AssessmentTrackerHandler(object):
         assessment: object from Assessment model
     """
     if sync_result.status == SyncResult.SyncResultStatus.ERROR:
-      assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
+      if isinstance(sync_result.error,
+                    integrations_errors.HotlistPermissionError):
+        assessment.add_warning(constants.WarningsDescription.
+                               HOTLIST_PERMISSIONS_ERROR)
+      else:
+        assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
       logger.error(
-          constants.ErrorsDescription.CREATE_ASSESSMENT % (
-              assessment.id,
-              sync_result.error
-          ),
+          constants.ErrorsDescription.CREATE_ASSESSMENT,
           assessment.id,
           sync_result.error
       )
@@ -2822,6 +2871,18 @@ def _hook_assmt_delete(sender, obj=None, service=None):
   tracker_handler.handle_assessment_delete(obj)
 
 
+def _hook_asmt_test_plan_update(session, flush_context, instances):
+  """Handle snapshot to assessment mapping."""
+  # pylint: disable=unused-argument
+  assessments = [o for o in session if isinstance(o, all_models.Assessment)]
+  if not assessments:
+    return
+
+  tracker_handler = AssessmentTrackerHandler()
+  for asmt in assessments:
+    tracker_handler.handle_asmt_test_plan_update(asmt)
+
+
 def init_hook():
   """Initializes hooks."""
 
@@ -2860,4 +2921,10 @@ def init_hook():
   signals.Restful.model_deleted.connect(
       _hook_assmt_delete,
       sender=all_models.Assessment
+  )
+
+  sa.event.listen(
+      sa.orm.session.Session,
+      "before_flush",
+      _hook_asmt_test_plan_update,
   )

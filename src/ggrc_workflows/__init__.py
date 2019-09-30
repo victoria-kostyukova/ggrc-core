@@ -13,7 +13,7 @@ from flask import Blueprint
 from sqlalchemy import inspect, orm
 
 from ggrc import db
-from ggrc.login import get_current_user
+from ggrc.login import get_current_user, get_user_date
 from ggrc.models import all_models
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
@@ -202,13 +202,14 @@ def build_cycles(workflow, cycle=None, user=None):
   user: User isntance (optional). User who will be the creator of the cycles.
   """
   user = user or get_current_user()
+  request_user_date = get_user_date()
   if not workflow.next_cycle_start_date:
     workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
         workflow.min_task_start_date)
   if cycle:
     build_cycle(workflow, cycle, user)
   if workflow.unit and workflow.repeat_every:
-    while workflow.next_cycle_start_date <= user.user_date:
+    while workflow.next_cycle_start_date <= request_user_date:
       build_cycle(workflow, current_user=user)
 
 

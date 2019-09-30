@@ -149,7 +149,7 @@ class TestImportIssues(TestCase):
 
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -176,7 +176,7 @@ class TestImportIssues(TestCase):
 
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -213,7 +213,7 @@ class TestImportIssues(TestCase):
 
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),

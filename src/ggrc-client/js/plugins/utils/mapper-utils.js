@@ -86,7 +86,7 @@ function getMegaInstance(instance, destination, context, relationsObj) {
 function unmapObjects(instance, objects) {
   const pendingUnmap = loMap(objects, (object) =>
     Relationship.findRelationship(instance, object)
-      .then((relationship) => relationship.destroy())
+      .then((relationship) => relationship && relationship.destroy())
   );
 
   return Promise.all(pendingUnmap);

@@ -7,6 +7,7 @@ import json
 
 import ddt
 
+from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.exceptions import ValidationError
 
@@ -387,6 +388,26 @@ class TestExternalRelationship(TestCase):
     relationship = all_models.Relationship.query.get(rel.id)
     response = self.api.delete(relationship)
     self.assert400(response)
+
+  @ddt.data(*READONLY_MAPPING_PAIRS)
+  @ddt.unpack
+  def test_local_delete_relationship_if_orphan(self, model1, model2):
+    """Test deletion of orphan relationship {0.__name__} - {1.__name__}."""
+    with self.object_generator.api.as_external():
+      _, obj1 = self.object_generator.generate_object(model1)
+      _, obj2 = self.object_generator.generate_object(model2)
+      _, rel = self.object_generator.generate_relationship(
+          obj1, obj2, is_external=True)
+
+    relationship_id = rel.id
+
+    self.api.set_user(all_models.Person.query.get(self.person_id))
+    obj_to_delete = model2.query.get(obj2.id)
+    response = self.api.delete(obj_to_delete)
+    self.assert200(response)
+
+    rel_q = all_models.Relationship.query.filter_by(id=relationship_id)
+    self.assertFalse(db.session.query(rel_q.exists()).scalar())
 
   @ddt.data(*READONLY_MAPPING_PAIRS)
   @ddt.unpack

@@ -6,7 +6,10 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {
+  makeFakeInstance,
+  makeFakeModel,
+} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
@@ -14,11 +17,16 @@ import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 import * as MegaObjectUtils from '../../../plugins/utils/mega-object-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../tree-widget-container';
+import Component, {loadSavedSearch, filterParentItems} from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
 import exportMessage from '../templates/export-message.stache';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
+import SavedSearch from '../../../models/service-models/saved-search';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import router from '../../../router';
+import Cacheable from '../../../models/cacheable';
+import Program from '../../../models/business-models/program';
+import Assessment from '../../../models/business-models/assessment';
 
 describe('tree-widget-container component', function () {
   let vm;
@@ -223,6 +231,76 @@ describe('tree-widget-container component', function () {
       vm.openAdvancedFilter();
 
       expect(vm.attr('advancedSearch.open')).toBe(true);
+    });
+
+    it('should add "parentInstance" when isObjectContextPage is TRUE' +
+    'and "parentInstance" is empty', () => {
+      const parentInstance = {id: 1, type: 'Audit'};
+      spyOn(CurrentPageUtils, 'isObjectContextPage').and.returnValue(true);
+      spyOn(AdvancedSearch.create, 'parentInstance')
+        .and.returnValue({type: 'parentInstance', value: parentInstance});
+
+      vm.attr('advancedSearch.parentInstance', null);
+
+      vm.openAdvancedFilter();
+
+      expect(AdvancedSearch.create.parentInstance).toHaveBeenCalled();
+      expect(vm.attr('advancedSearch.parentInstance.value').serialize())
+        .toEqual(parentInstance);
+    });
+
+    it('should NOT add "parentInstance" because it already set', () => {
+      spyOn(CurrentPageUtils, 'isObjectContextPage').and.returnValue(true);
+      spyOn(AdvancedSearch.create, 'parentInstance');
+
+      vm.attr('advancedSearch.parentInstance', {id: 1});
+
+      vm.openAdvancedFilter();
+
+      expect(AdvancedSearch.create.parentInstance).not.toHaveBeenCalled();
+      expect(vm.attr('advancedSearch.parentInstance')).not.toBeNull();
+    });
+
+    it('should NOT add "parentInstance" because isObjectContextPage is FALSE',
+      () => {
+        spyOn(CurrentPageUtils, 'isObjectContextPage').and.returnValue(false);
+        spyOn(AdvancedSearch.create, 'parentInstance');
+
+        vm.attr('advancedSearch.parentInstance', null);
+
+        vm.openAdvancedFilter();
+
+        expect(AdvancedSearch.create.parentInstance).not.toHaveBeenCalled();
+        expect(vm.attr('advancedSearch.parentInstance')).toBeNull();
+      }
+    );
+
+    it('should filter parentItems and exclude parentInstance', () => {
+      const parentInstance = {id: 1, type: 'Audit'};
+      spyOn(CurrentPageUtils, 'isObjectContextPage').and.returnValue(true);
+      spyOn(AdvancedSearch.create, 'parentInstance')
+        .and.returnValue({type: 'parentInstance', value: parentInstance});
+
+      vm.attr('advancedSearch.parentInstance', null);
+
+      vm.attr('advancedSearch.appliedParentItems', [
+        {value: {id: 1, type: 'Audit'}},
+        {value: {id: 2, type: 'Audit'}},
+        {value: {id: 1, type: 'Program'}},
+      ]);
+
+      vm.openAdvancedFilter();
+
+      expect(vm.attr('advancedSearch.parentItems').serialize()).toEqual([
+        {value: {id: 2, type: 'Audit'}},
+        {value: {id: 1, type: 'Program'}},
+      ]);
+
+      expect(vm.attr('advancedSearch.parentInstance.value').serialize())
+        .toEqual({
+          id: 1,
+          type: 'Audit',
+        });
     });
   });
 
@@ -684,5 +762,351 @@ describe('tree-widget-container component', function () {
         exportMessage,
         {data: true});
     });
+  });
+
+  describe('applySavedSearch() method', () => {
+    let method;
+
+    beforeEach(() => {
+      spyOn(vm, 'clearAppliedSavedSearch');
+      vm.attr('filterIsDirty', false);
+      vm.attr('savedSearchPermalink', '');
+
+      method = vm.applySavedSearch.bind(vm);
+    });
+
+    it('should call "clearAppliedSavedSearch" when selectedSavedSearch is null',
+      () => {
+        method(null);
+        expect(vm.clearAppliedSavedSearch).toHaveBeenCalled();
+      }
+    );
+
+    it('should call "clearAppliedSavedSearch" when filter is dirty', () => {
+      vm.attr('filterIsDirty', true);
+
+      method({});
+      expect(vm.clearAppliedSavedSearch).toHaveBeenCalled();
+    });
+
+    it('should set permalink when selectedSavedSearch is not empty ' +
+    'and filter is NOT dirty', () => {
+      spyOn(AdvancedSearch, 'buildSearchPermalink').and.returnValue('link');
+
+      method(new canMap({id: 5}));
+      expect(AdvancedSearch.buildSearchPermalink).toHaveBeenCalled();
+      expect(vm.attr('savedSearchPermalink')).toEqual('link');
+    });
+
+    it('should set appliedSavedSearch when selectedSavedSearch is not empty ' +
+    'and filter is NOT dirty', () => {
+      const selectedSavedSearch = {id: 123};
+      spyOn(AdvancedSearch, 'buildSearchPermalink').and.returnValue('link');
+
+      method(new canMap(selectedSavedSearch));
+      expect(vm.attr('appliedSavedSearch').serialize())
+        .toEqual(selectedSavedSearch);
+    });
+  });
+
+  describe('setColumnsConfiguration() method', () => {
+    it('should call addServiceColumns() method', () => {
+      vm.attr('model', {
+        model_singular: 'test model',
+      });
+      spyOn(TreeViewUtils, 'getColumnsForModel')
+        .and.returnValue([]);
+      spyOn(vm, 'addServiceColumns');
+
+      vm.setColumnsConfiguration();
+
+      expect(vm.addServiceColumns).toHaveBeenCalled();
+    });
+  });
+
+  describe('onUpdateColumns() method', () => {
+    it('should call addServiceColumns() method', () => {
+      vm.attr('model', {
+        model_singular: 'test model',
+      });
+      spyOn(TreeViewUtils, 'setColumnsForModel')
+        .and.returnValue([]);
+      spyOn(vm, 'addServiceColumns');
+
+      vm.onUpdateColumns({});
+
+      expect(vm.addServiceColumns).toHaveBeenCalled();
+    });
+  });
+
+  describe('addServiceColumns() method', () => {
+    const columns = {};
+
+    beforeEach(() => {
+      columns.available = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+      }];
+      columns.selected = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+      }];
+
+      const fakeModel = makeFakeModel({
+        model: Cacheable,
+        staticProps: {
+          model_singular: 'Person',
+          tree_view_options: {
+            service_attr_list: [{
+              name: 'serviceCol1',
+            }],
+          },
+        },
+      });
+
+      vm.attr('model', fakeModel);
+    });
+
+    it('should work for Persons', () => {
+      vm.addServiceColumns(columns);
+
+      const expectedOutput = {
+        available: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }, {
+          name: 'serviceCol1',
+        }],
+        selected: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }, {
+          name: 'serviceCol1',
+        }],
+      };
+
+      expect(columns).toEqual(expectedOutput);
+    });
+
+    it('should not work for models except Person', () => {
+      const expectedOutput = {
+        available: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }],
+        selected: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }],
+      };
+
+      vm.attr('model', Assessment);
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
+
+      vm.attr('model', Program);
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
+    });
+
+    it('should sort columns by order', () => {
+      columns.available = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+        order: 2,
+      }];
+      columns.selected = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+        order: 2,
+      }];
+
+      vm.attr('model').tree_view_options.service_attr_list = [{
+        name: 'serviceCol1',
+        order: 1,
+      }];
+
+      const expectedOutput = {
+        available: [{
+          name: 'serviceCol1',
+          order: 1,
+        }, {
+          name: 'col2',
+          order: 2,
+        }, {
+          name: 'col1',
+        }],
+        selected: [{
+          name: 'serviceCol1',
+          order: 1,
+        }, {
+          name: 'col2',
+          order: 2,
+        }, {
+          name: 'col1',
+        }],
+      };
+
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
+    });
+  });
+});
+
+describe('loadSavedSearch() function', () => {
+  const viewModel = new canMap({
+    router: {
+      saved_search: 1,
+    },
+    loading: false,
+    modelName: 'Control',
+    advancedSearch: {},
+    removeAdvancedFilters: () => {},
+    applyAdvancedFilters: () => {},
+  });
+
+  let treeFunction;
+
+  beforeAll(() => {
+    treeFunction = loadSavedSearch;
+  });
+
+  it('should set "loading" flag to true while loading', (done) => {
+    let dfd = $.Deferred();
+
+    spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+
+    let loadDfd = treeFunction(viewModel);
+    expect(viewModel.attr('loading')).toBeTruthy();
+
+    loadDfd.then(() => {
+      expect(viewModel.attr('loading')).toBeFalsy();
+      done();
+    });
+
+    dfd.resolve({});
+  });
+
+  it('should call "removeAdvancedFilters" when search response is null',
+    (done) => {
+      let dfd = $.Deferred();
+
+      spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+      spyOn(viewModel, 'removeAdvancedFilters');
+
+      treeFunction(viewModel).then(() => {
+        expect(viewModel.removeAdvancedFilters).toHaveBeenCalled();
+        done();
+      });
+
+      dfd.resolve({SavedSearch: null});
+    }
+  );
+
+  it('should call "removeAdvancedFilters" when search is NOT AdvancedSearch',
+    (done) => {
+      let dfd = $.Deferred();
+
+      spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+      spyOn(viewModel, 'removeAdvancedFilters');
+
+      treeFunction(viewModel).then(() => {
+        expect(viewModel.removeAdvancedFilters).toHaveBeenCalled();
+        done();
+      });
+
+      dfd.resolve({SavedSearch: {
+        search_type: 'GlobalSearch',
+        object_type: 'Control',
+      }});
+    }
+  );
+
+  it('should call "removeAdvancedFilters" when search.object_type' +
+  ' is NOT equal to viewModel.modelName',
+  (done) => {
+    let dfd = $.Deferred();
+
+    spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+    spyOn(viewModel, 'removeAdvancedFilters');
+
+    treeFunction(viewModel).then(() => {
+      expect(viewModel.removeAdvancedFilters).toHaveBeenCalled();
+      done();
+    });
+
+    dfd.resolve({SavedSearch: {
+      search_type: 'AdvancedSearch',
+      object_type: 'Regulation',
+    }});
+  });
+
+  it('should call "removeAdvancedFilters" when search loading was failed',
+    (done) => {
+      let dfd = $.Deferred();
+
+      spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+      spyOn(viewModel, 'removeAdvancedFilters');
+
+      treeFunction(viewModel).fail(() => {
+        expect(viewModel.removeAdvancedFilters).toHaveBeenCalled();
+        done();
+      });
+
+      dfd.reject();
+    }
+  );
+
+  it('should call "applyAdvancedFilters" when search appropriate to viewModel',
+    (done) => {
+      let dfd = $.Deferred();
+
+      spyOn(SavedSearch, 'findOne').and.returnValue(dfd);
+      spyOn(viewModel, 'applyAdvancedFilters');
+      spyOn(AdvancedSearch, 'parseFilterJson');
+
+      treeFunction(viewModel).then(() => {
+        expect(viewModel.applyAdvancedFilters).toHaveBeenCalled();
+        done();
+      });
+
+      dfd.resolve({SavedSearch: {
+        search_type: 'AdvancedSearch',
+        object_type: 'Control',
+      }});
+    }
+  );
+});
+
+describe('filterParentItems() method', () => {
+  it('should exclude parentInstance from parentItem', () => {
+    const parentInstance = {
+      value: {
+        id: 5,
+        type: 'Control',
+      },
+    };
+
+    const parentItems = [
+      {value: {id: 7, type: 'Regulation'}},
+      {value: {id: 5, type: 'Regulation'}},
+      {value: {id: 5, type: 'Control'}},
+      {value: {id: 6, type: 'Control'}},
+    ];
+
+    const result = filterParentItems(parentInstance, parentItems);
+    expect(result).toEqual([
+      {value: {id: 7, type: 'Regulation'}},
+      {value: {id: 5, type: 'Regulation'}},
+      {value: {id: 6, type: 'Control'}},
+    ]);
   });
 });

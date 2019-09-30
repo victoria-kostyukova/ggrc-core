@@ -136,7 +136,7 @@ def assert_cannot_delete_control(selenium, cntrl):
 def _get_ui_service(selenium, obj):
   """Get webui_service for object"""
   obj_type = objects.get_plural(obj.type)
-  return webui_service.BaseWebUiService(selenium, obj_type)
+  return webui_service.BaseWebUiService(obj_type, selenium)
 
 
 def _assert_title_editable(obj, selenium, info_page):
@@ -398,3 +398,16 @@ def soft_assert_no_modals_present(modal_obj, soft_assert):
     soft_assert.expect(not modal_obj.is_present,
                        "There should be no modal windows in browser "
                        "tab number {}.".format(tab_num))
+
+
+def export_objects(path_to_export_dir, obj_type, src_obj=None,
+                   is_versions_widget=False):
+  """Opens generic widget of objects or mapped objects
+    and exports objects to test's temporary directory as CSV file.
+    Returns: list of objects from CSV file in test's temporary directory
+    'path_to_export_dir'."""
+  ui_service = factory.get_cls_webui_service(
+      objects.get_plural(singular=obj_type, title=True))(is_versions_widget)
+  widget = (ui_service.open_widget_of_mapped_objs(src_obj) if src_obj
+            else ui_service.open_obj_dashboard_tab())
+  return ui_service.exported_objs_via_tree_view(path_to_export_dir, widget)

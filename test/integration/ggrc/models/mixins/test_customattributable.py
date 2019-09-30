@@ -436,7 +436,7 @@ class TestCreateRevisionAfterDeleteCAD(TestCase):
 
     snapshot = models.Snapshot.query.filter().first()
 
-    self.assertEqual(snapshot.is_latest_revision, False)
+    self.assertFalse(snapshot.is_latest_revision)
 
 
 class TestCADUpdate(TestCase):

@@ -4,7 +4,7 @@
 """Test import and export of objects with custom attributes."""
 
 import itertools
-from collections import OrderedDict
+import collections
 
 import ddt
 
@@ -31,9 +31,9 @@ class TestACLImportExport(TestCase):
     role = factories.AccessControlRoleFactory(object_type="Market")
     role_id = role.id
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -60,9 +60,9 @@ class TestACLImportExport(TestCase):
       role = factories.AccessControlRoleFactory(object_type="Market")
       emails = {factories.PersonFactory().email for _ in range(3)}
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -84,9 +84,9 @@ class TestACLImportExport(TestCase):
 
     update_emails = set(list(emails)[:2]) | {"user@example.com"}
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -94,9 +94,11 @@ class TestACLImportExport(TestCase):
         (role_name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
-    response = self.import_data(OrderedDict([
+
+    market = all_models.Market.query.filter_by(title="Title").first()
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", market.slug),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         (role_name, "\n".join(update_emails)),
@@ -114,9 +116,9 @@ class TestACLImportExport(TestCase):
       role_name = factories.AccessControlRoleFactory(object_type="Market").name
       emails = {factories.PersonFactory().email for _ in range(3)}
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -124,9 +126,11 @@ class TestACLImportExport(TestCase):
         (role_name, "\n".join(emails)),
     ]))
     self._check_csv_response(response, {})
-    response = self.import_data(OrderedDict([
+
+    market = all_models.Market.query.filter_by(title="Title").first()
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", market.slug),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         (role_name, ""),
@@ -147,9 +151,9 @@ class TestACLImportExport(TestCase):
       ).name
       emails = {factories.PersonFactory().email for _ in range(3)}
 
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -184,13 +188,17 @@ class TestACLImportExport(TestCase):
     scoping_models_names = [m.__name__ for m in all_models.all_models
                             if issubclass(m, ScopeObject)]
 
-    import_dict = OrderedDict([
+    market = models.Market.query.first()
+
+    import_dict = collections.OrderedDict([
         ("object_type", object_type),
-        ("code", "{}-1".format(object_type.lower())),
+        ("code", ""),
         ("title", "Title"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
     ])
+    if market:
+      import_dict["code"] = market.slug
     if object_type == "Control":
       import_dict["Assertions*"] = "Privacy"
     if object_type in scoping_models_names:
@@ -340,9 +348,9 @@ class TestACLImportExport(TestCase):
       role_name = factories.AccessControlRoleFactory(object_type="Market").name
       emails = {factories.PersonFactory().email for _ in range(3)}
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Market"),
-        ("code", "market-1"),
+        ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
@@ -378,7 +386,7 @@ class TestACLImportExport(TestCase):
         )
 
     for role in {"Program Editors", "Program Readers"}:
-      response = self.import_data(OrderedDict([
+      response = self.import_data(collections.OrderedDict([
           ("object_type", program.type),
           ("code", program.slug),
           (role, "--"),
@@ -394,9 +402,9 @@ class TestACLImportExport(TestCase):
       factories.PersonFactory(email="user0@example.com")
       factories.PersonFactory(email="user1@example.com")
     roles = "user0@example.com\nuser1@example.com"
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "OrgGroup"),
-        ("Code*", "OrgGroup-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("title", "Test OrgGroup"),
         ("Assignee", roles),

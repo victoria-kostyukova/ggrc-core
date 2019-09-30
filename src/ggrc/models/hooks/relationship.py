@@ -297,8 +297,8 @@ def copy_snapshot_test_plan(objects):
       # Test plan of snapshotted object should be copied to
       # Assessment test plan in case of proper snapshot type
       # and if test_plan_procedure was set to True
-      if asmnt.assessment_type == snapshot.child_type and \
-         asmnt.test_plan_procedure:
+      types_match = asmnt.assessment_type == snapshot.child_type
+      if types_match and asmnt.test_plan_procedure:
         asmt_hooks.set_test_plan(
             assessment=asmnt,
             template=None,

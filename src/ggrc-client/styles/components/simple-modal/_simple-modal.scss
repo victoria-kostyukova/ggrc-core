@@ -38,7 +38,7 @@ simple-modal {
   border: 0;
   background: $white;
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-  flex: 0 1;
+  flex: 0 1 auto;
 
   &__toolbar {
     display: flex;
@@ -167,7 +167,6 @@ simple-modal {
   }
 
   &.related-assessments {
-    flex: 1;
 
     .simple-modal__body {
       overflow: hidden;

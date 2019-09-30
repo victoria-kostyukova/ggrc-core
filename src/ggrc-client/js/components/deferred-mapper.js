@@ -18,6 +18,7 @@ import {
   REFRESH_SUB_TREE,
   DEFERRED_MAP_OBJECTS,
   DEFERRED_MAPPED_UNMAPPED,
+  UNMAP_DESTROYED_OBJECT,
 } from '../events/eventTypes';
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import {reify, isReifiable} from '../plugins/utils/reify-utils';
@@ -186,7 +187,9 @@ export default canComponent.extend({
 
       const indexInList = loFindIndex(this.attr('list'),
         ({id, type}) => id === obj.id && type === obj.type);
-      this.attr('list').splice(indexInList, 1);
+      if (indexInList !== -1) {
+        this.attr('list').splice(indexInList, 1);
+      }
     },
     addListItem(item) {
       if (isSnapshotType(item) && item.snapshotObject) {
@@ -207,6 +210,11 @@ export default canComponent.extend({
   events: {
     '{instance} updated'() {
       this.viewModel.deferredUpdate();
+    },
+    [`{instance} ${UNMAP_DESTROYED_OBJECT.type}`](event, {object}) {
+      if (object) {
+        this.viewModel.removeMappings(object);
+      }
     },
     '{instance} created'() {
       this.viewModel.deferredUpdate();
