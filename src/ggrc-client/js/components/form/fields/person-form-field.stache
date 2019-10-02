@@ -4,26 +4,26 @@
 }}
 
 <div class="input-wrapper">
-  {{#if inputValue}}
-    <div class="person-info-wrapper">
-      <a class="person-info-wrapper__remove-value" href="javascript:void(0)" on:el:click="unsetPerson">
-        <i class="fa fa-times" aria-hidden="true"></i>
-      </a>
-      <person-data personId:from="inputValue"></person-data>
-    </div>
-  {{else}}
-    {{^if_config_exist 'external_services.Person'}}
-    <autocomplete-component searchItemsType:from="'Person'"
-                  on:itemSelected="setPerson(scope.event)"
-                  placeholder:from="'Select person'"
-                  class="{{#if disabled}}disabled-block{{/if}}">
+  {{^if_config_exist 'external_services.Person'}}
+    <autocomplete-component
+      searchItemsType:from="'Person'"
+      on:itemSelected="addPerson(scope.event)"
+      placeholder:from="'Select person'"
+      class="{{#if disabled}}disabled-block{{/if}}"
+    >
     </autocomplete-component>
-    {{else}}
-    <external-data-autocomplete type:from="'Person'"
-                                placeholder:from="'Select person'"
-                                minLength:from="2"
-                                on:itemSelected="setPerson(scope.event)">
+  {{else}}
+    <external-data-autocomplete
+      type:from="'Person'"
+      placeholder:from="'Select person'"
+      minLength:from="2"
+      on:itemSelected="addPerson(scope.event)"
+    >
     </external-data-autocomplete>
-    {{/if_config_exist}}
-  {{/if}}
+  {{/if_config_exist}}
+  <deletable-people-group
+    showEmptyMessage:from="false"
+    on:unmap="removePerson(scope.event)"
+    people:from="value">
+  </deletable-people-group>
 </div>

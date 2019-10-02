@@ -8,6 +8,8 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../../person/person-data';
 import template from './person-form-field.stache';
+import loEvery from 'lodash/every';
+import loFilter from 'lodash/filter';
 
 export default canComponent.extend({
   tag: 'person-form-field',
@@ -15,39 +17,32 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: canMap.extend({
     define: {
-      inputValue: {
-        set(newValue) {
-          let oldValue = this.attr('_value');
-          if (oldValue === newValue) {
-            return;
-          }
-
-          this.attr('_value', newValue);
-          this.valueChanged(newValue);
-        },
-        get() {
-          return this.attr('_value');
-        },
-      },
       value: {
         set(newValue) {
-          this.attr('_value', newValue);
-        },
-        get() {
-          return this.attr('_value');
+          return newValue || [];
         },
       },
       fieldId: {
         type: 'number',
       },
     },
-    _value: null,
-    setPerson: function (ev) {
-      this.attr('inputValue', ev.selectedItem.serialize().id);
+    addPerson({selectedItem: {href, id, type}}) {
+      const value = this.attr('value');
+      const isNewPerson = loEvery(value, (el) => el.id !== id);
+
+      if (!isNewPerson) {
+        return;
+      }
+
+      const newPerson = new canMap({context_id: null, href, id, type});
+      value.push(newPerson);
+      this.valueChanged(value);
     },
-    unsetPerson: function (scope, el, ev) {
-      ev.preventDefault();
-      this.attr('inputValue', null);
+    removePerson({person}) {
+      const value = this.attr('value');
+      const filtredValue = loFilter(value, ({id}) => id !== person.id);
+      this.attr('value', filtredValue);
+      this.valueChanged(filtredValue);
     },
     valueChanged: function (newValue) {
       this.dispatch({

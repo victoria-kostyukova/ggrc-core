@@ -195,6 +195,30 @@ describe('assessment-local-ca component', () => {
         hasMissingInfo: false,
       });
     });
+
+    it(`should be valid for mandatory person field
+      if value is not empty`, () => {
+      const field = new canMap({
+        type: 'person',
+        value: [{}],
+        validation: {mandatory: true},
+      });
+      performValidation(field);
+
+      expect(field.validation.valid).toBe(true);
+    });
+
+    it(`should be invalid for mandatory person field
+      if value is empty`, () => {
+      const field = new canMap({
+        type: 'person',
+        value: [],
+        validation: {mandatory: true},
+      });
+      performValidation(field);
+
+      expect(field.validation.valid).toBe(false);
+    });
   });
 
   describe('check performDropdownValidation', () => {
