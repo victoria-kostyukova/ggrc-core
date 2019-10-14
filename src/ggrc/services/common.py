@@ -664,6 +664,7 @@ class Resource(ModelView):
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
     """PUT operation handler."""
+    # pylint: disable=too-many-statements
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:

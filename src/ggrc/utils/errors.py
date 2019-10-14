@@ -68,3 +68,7 @@ MAPPED_ASSESSMENT = (u"The following Audit cannot be deleted due to existing "
 SNAPSHOT_INVALID_OBJECT_SLUG = (u"Snapshot for object %s with ID=%s contains "
                                 u"invalid object slug. The value will be "
                                 u"ignored.")
+
+MISSING_ASSESSMENT_VERIFIERS = (u"No verifier is assigned to the assessment. "
+                                u"The request can be further processed if "
+                                u"only a verifier is assigned.")

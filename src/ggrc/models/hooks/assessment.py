@@ -28,29 +28,12 @@ from ggrc.models import custom_attribute_definition as ggrc_cad
 from ggrc.models.hooks import common
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.models.hooks.issue_tracker import integration_utils
-from ggrc.models.exceptions import StatusValidationError
+from ggrc.models import exceptions
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
 
 logger = logging.getLogger(__name__)
-
-
-def _validate_assessment_state(old_value, obj):
-  """Checks if it's allowed to set done state from not done."""
-  new_value = obj.status
-  if old_value in obj.NOT_DONE_STATES and \
-     new_value in obj.DONE_STATES:
-    if hasattr(obj, "preconditions_failed") and obj.preconditions_failed:
-      raise StatusValidationError("CA-introduced completion "
-                                  "preconditions are not satisfied. "
-                                  "Check preconditions_failed "
-                                  "of items of self.custom_attribute_values")
-  if (obj.status == obj.FINAL_STATE and
-     not obj.verified and
-     not getattr(obj, 'sox_302_enabled', False) and
-     getattr(obj, 'verifiers', [])):
-    obj.status = obj.DONE_STATE
 
 
 def _get_audit_id(asmt_src):
@@ -157,12 +140,18 @@ def _handle_assessment(assessment,  # type: models.Assessment
   set_assessment_type(assessment, tmpl)
 
 
-def init_hook():
+def init_hook():  # noqa: ignore=C901
   """Initializes hooks."""
 
   # pylint: disable=unused-variable
   @signals.Restful.collection_posted.connect_via(all_models.Assessment)
-  def handle_assessment_post(sender, objects=None, sources=None, service=None):
+  def handle_assessment_post(
+      sender,
+      objects=None,
+      sources=None,
+      service=None,
+      check_acl=True
+  ):
     """Applies custom attribute definitions and maps people roles.
 
     Applicable when generating Assessment with template.
@@ -178,6 +167,12 @@ def init_hook():
 
     audit, template = None, None
     for assessment, src in itertools.izip(objects, sources):
+      if check_acl:
+        try:
+          assessment.validate_change_state(assessment.START_STATE)
+        except exceptions.StatusValidationError as error:
+          db.session.rollback()
+          raise error
       audit = _get_object_from_src(
           src, _get_audit_id, all_models.Audit, current=audit)
 
@@ -231,8 +226,8 @@ def init_hook():
     initial_state = kwargs['initial_state']
     old_value = initial_state.status
     try:
-      _validate_assessment_state(old_value, obj)
-    except StatusValidationError as error:
+      obj.validate_change_state(old_value)
+    except exceptions.StatusValidationError as error:
       db.session.rollback()
       raise error
 
