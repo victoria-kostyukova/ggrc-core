@@ -74,6 +74,8 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
   mandatory = db.Column(db.Boolean, nullable=True, default=False)
   helptext = db.Column(db.String)
   placeholder = db.Column(db.String)
+  previous_id = db.Column(db.Integer, nullable=True)
+  external_name = db.Column(db.String, nullable=Trueq)
 
   _sanitize_html = [
       "multi_choice_options",
@@ -403,6 +405,7 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
         "mandatory": self.mandatory,
         "helptext": self.helptext,
         "placeholder": self.placeholder,
+        "previous_id": self.previous_id,
     }
     ca_definition = CustomAttributeDefinition(**data)
     db.session.add(ca_definition)
