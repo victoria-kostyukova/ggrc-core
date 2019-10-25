@@ -121,7 +121,7 @@ class TestExportEmptyTemplate(TestCase):
             ("Workflow", 3),
             ("Person", 3))
   @ddt.unpack
-  def test_non_editable_tips(self, model, counts):
+  def  test_non_editable_tips(self, model, counts):
     """Tests if {} has non-editable fields hint correctly"""
     data = {
         "export_to": "csv",
