@@ -116,6 +116,7 @@ class WithACLandCAFactory(ModelFactory):
             attributable=instance,
             attribute_value=cav.get("attribute_value"),
             attribute_object_id=cav.get("attribute_object_id"),
+            attribute_object_id_nn=cav.get("attribute_object_id_nn"),
             custom_attribute_id=cav.get("custom_attribute_id"),
         ))
 
