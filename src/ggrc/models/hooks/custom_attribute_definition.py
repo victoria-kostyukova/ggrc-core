@@ -5,7 +5,9 @@
 
 from ggrc import models, views
 from ggrc.services import signals
+from ggrc.models import get_model
 from ggrc.models import custom_attribute_definition as cad
+from ggrc.models.mixins import synchronizable
 
 
 def init_hook():
@@ -54,3 +56,20 @@ def init_hook():
     views.start_update_cad_related_objs(
         event.id, model_name, need_revisions=True
     )
+
+  # pylint: disable=unused-argument
+  @signals.Restful.model_posted_after_commit.connect_via(
+      models.all_models.CustomAttributeDefinition)
+  def handle_creating_cad_for_ext(sender, obj=None, src=None,
+                                  service=None, event=None):
+    """Handel creating mapper obj for CAD if parent is External
+
+    Args:
+      sender: A class of Resource handling the POST request.
+      obj: A list of model instances created from the POSTed JSON.
+      service: The instance of Resource handling the PUT request.
+      event: Instance of an Event (if change took place) or None otherwise
+    """
+    model = get_model(obj.definition_type)
+    if issubclass(model, synchronizable.Synchronizable):
+      views.create_external_mapping(obj, src)

@@ -68,7 +68,8 @@ def validate_definition_type_cad(mapper, content, target):
   )
 
   if should_prevent:
-    raise exceptions.MethodNotAllowed()
+    # raise exceptions.MethodNotAllowed()
+    pass
 
 
 def validate_definition_type_ecad(mapper, content, target):

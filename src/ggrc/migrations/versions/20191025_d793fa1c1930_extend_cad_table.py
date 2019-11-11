@@ -28,7 +28,7 @@ def upgrade():
   op.add_column(table_name, sa.Column('previous_id', sa.Integer,
                                       autoincrement=False, nullable=True))
   op.add_column(table_name, sa.Column('external_name', sa.String(255),
-                                      autoincrement=False, nullable=True))
+                                      nullable=True))
 
 
 def downgrade():

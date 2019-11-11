@@ -535,8 +535,8 @@ class TestECADResponse(ggrc.TestCase):
   def test_cad_response(self):
     """Test response after creation of eCAD"""
     cad_body = {
-        "external_custom_attribute_definition": {
-            "id": 1,
+        "custom_attribute_definition": {
+            # "id": 1,
             "external_id": 2,
             "external_name": "risk_dropdown_123123",
             "title": "ECAD TiTle",
@@ -546,24 +546,25 @@ class TestECADResponse(ggrc.TestCase):
             "helptext": "Help Text",
             "placeholder": "Some Placeholder",
             "multi_choice_options": "opt1,opt2",
+            "entity_name": "custom_attribute_definition",
         }
     }
-    ecad_model = models.all_models.ExternalCustomAttributeDefinition
+    ecad_model = models.all_models.CustomAttributeDefinition
     response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(response)
-    check_attrs = cad_body["external_custom_attribute_definition"].keys()
+    check_attrs = cad_body["custom_attribute_definition"].keys()
     for attr in check_attrs:
       self.assertIn(attr,
-                    response.json["external_custom_attribute_definition"])
+                    response.json["custom_attribute_definition"])
       self.assertEqual(
-          response.json["external_custom_attribute_definition"][attr],
-          cad_body["external_custom_attribute_definition"][attr])
+          response.json["custom_attribute_definition"][attr],
+          cad_body["custom_attribute_definition"][attr])
 
   def test_cav_response(self):
     """Test response after creation of eCAD"""
     cad_body = {
-        "external_custom_attribute_definition": {
-            "id": 1,
+        "custom_attribute_definition": {
+            # "id": 1,
             "external_id": 2,
             "external_name": "control_dropdown_123123",
             "title": "ECAD TiTle",

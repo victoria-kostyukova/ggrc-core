@@ -44,6 +44,7 @@ from ggrc.models.external_custom_attribute_definition \
     import ExternalCustomAttributeDefinition
 from ggrc.models.external_custom_attribute_value \
     import ExternalCustomAttributeValue
+from ggrc.models.external_mapper import ExternalMapping
 from ggrc.models.facility import Facility
 from ggrc.models.import_export import ImportExport
 from ggrc.models.issue import Issue
@@ -123,6 +124,7 @@ all_models = [  # pylint: disable=invalid-name
     ExternalCustomAttributeDefinition,
     ExternalCustomAttributeValue,
     ExternalComment,
+    ExternalMapping,
     Facility,
     ImportExport,
     Issue,

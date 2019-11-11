@@ -21,6 +21,7 @@ from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import attributevalidator
 from ggrc.models.mixins import base
+from ggrc.models.mixins.with_external_mapping import WithExternalMapping
 from ggrc.utils import errors
 from ggrc.utils import validators
 
@@ -75,7 +76,7 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
   helptext = db.Column(db.String)
   placeholder = db.Column(db.String)
   previous_id = db.Column(db.Integer, nullable=True)
-  external_name = db.Column(db.String, nullable=Trueq)
+  external_name = db.Column(db.String, nullable=True)
 
   _sanitize_html = [
       "multi_choice_options",
@@ -205,7 +206,8 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
       )
 
 
-class CustomAttributeDefinition(CustomAttributeDefinitionBase):
+class CustomAttributeDefinition(WithExternalMapping,
+                                CustomAttributeDefinitionBase):
   """Custom attribute definition model."""
 
   __tablename__ = 'custom_attribute_definitions'
@@ -231,6 +233,7 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
 
   definition_id = db.Column(db.Integer)
   multi_choice_mandatory = db.Column(db.String)
+  previous_id = db.Column(db.Integer, nullable=True)
 
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute',

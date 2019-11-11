@@ -24,7 +24,7 @@ from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
 from ggrc.integrations.synchronization_jobs import one_time_back_sync
 from ggrc.integrations.external_app import constants
-from ggrc.models import background_task, reflection, revision
+from ggrc.models import background_task, reflection, revision, ExternalMapping
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
@@ -301,6 +301,24 @@ def _merge_errors(create_errors, update_errors):
     errors = create_errors.extend(update_errors) \
         if update_errors else create_errors
   return errors
+
+
+def create_external_mapping(obj, src):
+  """
+  Creating external mapping object
+  Args:
+    obj: A list of model instances created from the POSTed JSON.
+    src: A list of original POSTed JSON dictionaries.
+  """
+  mapping_data = dict()
+  mapping_data["external_type"] = src.get("entity_name")
+  mapping_data["external_id"] = src.get("external_id")
+  mapping_data["object_type"] = obj.type
+  mapping_data["object_id"] = obj.id
+
+  mapping = ExternalMapping(**mapping_data)
+  db.session.add(mapping)
+  db.session.commit()
 
 
 @app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
