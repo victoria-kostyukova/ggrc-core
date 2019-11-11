@@ -24,7 +24,7 @@ class TestPeopleSearch(TestCase):
     super(TestPeopleSearch, self).setUp()
     self.api = api_helper.Api()
     self.client.get("/login")
-    self.client.post("/admin/full_reindex")
+    self.client.post("/admin/reindex")
 
   @ddt.data("", "Creator", "Editor", "Reader", "Administrator")
   def test_search_people_by_auth(self, search_role):

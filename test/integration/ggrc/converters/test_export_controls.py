@@ -55,7 +55,7 @@ class TestExportControls(TestCase):
     new_owner_name = new_owner.email
     control_slug = self.control.slug
 
-    self.client.post("/admin/full_reindex")
+    self.client.post("/admin/reindex")
 
     self.assert_slugs("Admin",
                       new_owner_email,

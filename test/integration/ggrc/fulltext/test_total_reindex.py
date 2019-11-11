@@ -3,6 +3,8 @@
 
 """Test for total reindex procedure"""
 
+import unittest
+
 import ddt
 from sqlalchemy import orm
 
@@ -94,6 +96,8 @@ class TestTotalReindex(TestCase):
 
   OBJECT_TEST_COUNT = 10
 
+  @unittest.skip("Deprecated during GGRC-8069 until full_reindex and "
+                 "reindex_snapshot haven't work properly")
   def test_simple_reindex(self):
     """Test for check simple reindex procedure."""
     self.client.get("/login")

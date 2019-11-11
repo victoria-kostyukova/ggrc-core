@@ -19,6 +19,7 @@ import sys
 import sqlalchemy
 from sqlalchemy.orm import class_mapper
 
+from werkzeug import exceptions as wzg_exceptions
 import flask
 from ggrc.settings import CUSTOM_URL_ROOT
 from ggrc.utils import benchmarks
@@ -431,6 +432,20 @@ def validate_mimetype(accepted_mimetype):
       return function(*args, **kwargs)
     return inner
   return mimetype_decorator
+
+
+def deprecated_endpoint(description):
+  """Mark endpoint as a deprecated one."""
+  def deprecated_decorator(function):
+    """Decorated passed function with deprecated response."""
+    @functools.wraps(function)
+    def generate_response(*args, **kwargs):  # pylint: disable=unused-argument
+      """Return response telling that endpoint is deprecated."""
+      raise wzg_exceptions.MethodNotAllowed(
+          description=description or "Endpoint is deprecated."
+      )
+    return generate_response
+  return deprecated_decorator
 
 
 def make_simple_response(error=None):
