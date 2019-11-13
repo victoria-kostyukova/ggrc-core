@@ -3,7 +3,6 @@
 """Disabled objects tests."""
 
 # pylint: disable=redefined-outer-name
-import copy
 import pytest
 
 from lib import base, browsers, factory, url
@@ -131,20 +130,15 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  def test_user_cannot_update_predefined_field(self, control, selenium):
+  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_user_cannot_update_predefined_field(self, obj, selenium,
+                                               soft_assert):
     """Tests that user cannot update predefined field."""
-    expected_conditions = {"predefined_field_updatable": False,
-                           "same_url_for_new_tab": True}
-    actual_conditions = copy.deepcopy(expected_conditions)
-
-    info_widget = webui_service.ControlsService(
-        selenium).open_info_page_of_obj(control)
-    info_widget.assertions.open_inline_edit()
-    actual_conditions[
-        "predefined_field_updatable"] = info_widget.assertions.input.exists
-    old_tab, new_tab = browsers.get_browser().windows()
-    actual_conditions["same_url_for_new_tab"] = (old_tab.url == new_tab.url)
-    assert expected_conditions == actual_conditions
+    webui_facade.soft_assert_cannot_update_predefined_field(soft_assert, obj)
+    soft_assert.expect(webui_facade.are_tabs_urls_equal(),
+                       "Urls should be equal.")
+    soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,

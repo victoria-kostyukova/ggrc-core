@@ -840,6 +840,11 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
     """Click Control Review Details button."""
     self._root.element(text="Control Review Details").click()
 
+  @property
+  def predefined_field(self):
+    """Returns assertions element as a predefined field for controls."""
+    return self.assertions
+
 
 class Objectives(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Objective object Info pages and Info panels."""
@@ -1008,6 +1013,12 @@ class Risks(page_mixins.WithDisabledProposals,
   def risk_owners(self):
     """Returns Risk Owners page element."""
     return self._related_people_list(roles.RISK_OWNERS, self._root)
+
+  @property
+  def predefined_field(self):
+    """Returns description element as a predefined field for risk."""
+    return page_elements.SimpleField(
+        self._root, element.Common.DESCRIPTION, with_inline_edit=True)
 
 
 class Threat(InfoWidget):
