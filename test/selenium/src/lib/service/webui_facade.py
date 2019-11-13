@@ -236,31 +236,28 @@ def get_object(selenium, obj):
   return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
 
 
-def map_object_via_unified_mapper(
-    selenium, obj_name, dest_objs_type=None, obj_to_map=None,
-    return_tree_items=False, open_in_new_frontend=False,
-    proceed_in_new_tab=False
+def perform_disabled_mapping(
+    dest_obj, return_tree_items=False, create_new_obj=False
 ):
-  """Maps selected obj to dest_obj_type via Unified Mapper.
+  """Maps selected obj to dest_obj via Unified Mapper.
+  If return_tree_items then expects search results presence in tree view.
+  If create_new_obj then tries to create a new object based on passed
+  dest_obj entity.
   Returns:
     MapObjectsModal instance.
   """
-  assert dest_objs_type or obj_to_map, ("At least one of params "
-                                        "should be provided.")
-  if not dest_objs_type:
-    dest_objs_type = obj_to_map._obj_name()
-  map_modal = unified_mapper.MapObjectsModal(driver=selenium,
-                                             obj_name=obj_name)
-  map_modal.search_dest_objs(dest_objs_type=dest_objs_type,
+  map_modal = unified_mapper.MapObjectsModal(
+      driver=browsers.get_browser(),
+      obj_name=objects.get_plural(dest_obj.type))
+  map_modal.search_dest_objs(dest_objs_type=dest_obj.type,
                              return_tree_items=return_tree_items)
-  if open_in_new_frontend:
-    map_modal.open_in_new_frontend_btn.click()
+  if create_new_obj:
+    dest_obj_modal = map_modal.click_create_and_map_obj()
+    if objects.get_plural(dest_obj.type) not in objects.DISABLED_OBJECTS:
+      dest_obj_modal.submit_obj(dest_obj)
+    object_modal.CommonConfirmModal().confirm()
   else:
-    if obj_to_map:
-      dest_obj_modal = map_modal.click_create_and_map_obj()
-      dest_obj_modal.submit_obj(obj_to_map)
-    if proceed_in_new_tab:
-      object_modal.CommonConfirmModal().confirm()
+    map_modal.open_in_new_frontend_btn.click()
   return map_modal
 
 

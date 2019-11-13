@@ -9,8 +9,8 @@ from lib import factory, url, base, cache, constants
 from lib.constants import objects, messages, element, regex, locator
 from lib.element import tab_containers
 from lib.entities import entity
-from lib.page import dashboard, widget_bar, export_page
-from lib.page.modal import unified_mapper, request_review
+from lib.page import dashboard, export_page
+from lib.page.modal import request_review
 from lib.page.widget import generic_widget, object_modal
 from lib.utils import (
     selenium_utils, file_utils, test_utils, ui_utils, string_utils)
@@ -820,17 +820,6 @@ class ProgramsService(BaseWebUiService):
     # todo fix freezing when navigate through tabs by URLs and using driver.get
     selenium_utils.open_url(generic_widget_url, is_via_js=True)
     return generic_widget.Programs(self._driver, self._actual_obj_name)
-
-  def add_and_map_obj_widget(self, obj):
-    """Adds widget of selected type and
-    click `Create and map new object` link and
-    returns modal object for selected object type."""
-    widget_bar.Programs().add_widget()
-    dashboard.CreateObjectDropdown().click_item_by_text(
-        text=objects.get_normal_form(obj))
-    obj_modal = unified_mapper.CommonUnifiedMapperModal(
-        self._driver, obj).click_create_and_map_obj()
-    return obj_modal
 
 
 class ProductsService(BaseWebUiService):

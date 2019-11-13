@@ -482,6 +482,16 @@ class RegulationModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS, ADMIN)
 
 
+class ProductModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Products.
+  """
+  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+
+
 class AuditModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Audits.

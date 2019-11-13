@@ -6,7 +6,6 @@
 * Proposal for object
 """
 from lib import base
-from lib.constants import objects
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
@@ -20,7 +19,6 @@ def get_modal_obj(obj_type, _selenium=None):
   mapping = {
       "assessment": AssessmentModal,
       "issue": IssueModal,
-      "control": ControlModal,
       "threat": ThreatModal,
       "workflow": WorkflowModal,
       "task_group_task": TaskGroupTaskModal,
@@ -174,27 +172,6 @@ class DiscardChangesModal(base.Modal):
     """Clicks Discard button and wait for modal is closed."""
     self.wait_until_present()
     self._root.link(text="Discard").click()
-
-
-class ControlModal(BaseObjectModal):
-  """Represents control object modal."""
-
-  def __init__(self, _driver=None):
-    super(ControlModal, self).__init__()
-    self._root = self._browser.element(
-        class_name="modal-header", text="New {}".format(
-            objects.get_singular(objects.CONTROLS, title=True))).parent(
-                class_name="modal-wide")
-    self._fields = ["title", "description", "status", "assertions"]
-
-  def select_assertions(self, assertions):
-    """Selects assertions."""
-    multi_select_root = self._root.element(data_id="assertions_dd")
-    # Chromedriver's `click` isn't able to work with these elements
-    multi_select_root.element(
-        class_name="multiselect-dropdown__input").js_click()
-    for assertion in assertions:
-      multi_select_root.checkbox(id=str(assertion["id"])).js_click()
 
 
 class ThreatModal(BaseObjectModal):

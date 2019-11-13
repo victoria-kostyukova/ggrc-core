@@ -8,18 +8,12 @@
 
 import pytest
 
-from lib import base, browsers, url
-from lib.app_entity_factory import regulation_entity_factory
+from lib import base, browsers, url, factory
 from lib.constants import objects
+from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.page.modal import unified_mapper
 from lib.service import webui_service, webui_facade
-
-
-@pytest.fixture()
-def regulation(selenium):
-  """Creates regulation object."""
-  return regulation_entity_factory.RegulationFactory().create()
 
 
 class TestProgramPage(base.Test):
@@ -50,15 +44,21 @@ class TestProgramPage(base.Test):
         sorted(expected_controls), sorted(actual_controls),
         *Representation.tree_view_attrs_to_exclude)
 
-  def test_no_modal_for_program_control(self, login_as_creator, program,
-                                        selenium):
-    """Tests that 'New Control' modal is not opened
-    when creator adds control to a program."""
-    programs_service = webui_service.ProgramsService(selenium)
-    programs_service.open_info_page_of_obj(program)
-    obj_modal = programs_service.add_and_map_obj_widget(objects.CONTROLS)
-    assert not obj_modal.is_present, ("'New Control' modal "
-                                      "should not be present.")
+  @pytest.mark.parametrize("obj", objects.DISABLED_OBJECTS)
+  def test_cannot_create_disabled_obj_from_mapper(self, obj, program,
+                                                  soft_assert, selenium):
+    """Check that 'New object' modal is not opened when creator adds
+    disabled object to a program."""
+    info_widget = webui_service.ProgramsService().open_info_page_of_obj(
+        program)
+    info_widget.click_add_tab_btn().click_item_by_text(
+        text=objects.get_normal_form(obj))
+    webui_facade.soft_assert_no_modals_present(
+        webui_facade.perform_disabled_mapping(
+            factory.get_cls_entity_factory(obj)().create(),
+            return_tree_items=True, create_new_obj=True),
+        soft_assert)
+    soft_assert.assert_expectations()
 
   def test_user_cannot_map_control_to_scope_ojbects_via_add_tab(
           self, control, soft_assert, selenium):
@@ -90,27 +90,20 @@ class TestControlsPage(base.Test):
     """Tests that user cannot map Control to Scope Objects/Directives
     via Unified Mapper (existent new scope/directive object)"""
     dashboard_controls_tab.get_control(control).select_map_to_this_object()
-    map_modal = webui_facade.map_object_via_unified_mapper(
-        selenium=selenium, obj_name=objects.CONTROLS,
-        dest_objs_type=objects.get_singular(plural=objects.PRODUCTS,
-                                            title=True),
-        return_tree_items=False,
-        open_in_new_frontend=True)
+    map_modal = webui_facade.perform_disabled_mapping(
+        entities_factory.ProductsFactory().create())
     browsers.get_browser().windows()[1].use()
     assert not map_modal.is_present, (
         "There should be no modal windows in new browser tab.")
 
-  def test_cannot_map_control_via_um_create_new_obj(self, control, regulation,
+  def test_cannot_map_control_via_um_create_new_obj(self, control,
                                                     dashboard_controls_tab,
                                                     soft_assert, selenium):
     """Tests that user cannot map control to scope objects/directives
     via unified mapper (create a new scope/directive object)."""
     dashboard_controls_tab.get_control(control).select_map_to_this_object()
-    map_modal = webui_facade.map_object_via_unified_mapper(
-        selenium=selenium, obj_name=objects.CONTROLS,
-        dest_objs_type=objects.get_singular(plural=objects.REGULATIONS,
-                                            title=True),
-        obj_to_map=regulation, proceed_in_new_tab=True)
+    map_modal = webui_facade.perform_disabled_mapping(
+        entities_factory.RegulationsFactory().create(), create_new_obj=True)
     new_tab = browsers.get_browser().windows()[1]
     soft_assert.expect(new_tab.url == url.Urls().dashboard_info_tab,
                        "Dashboard info page should be opened in new tab.")
