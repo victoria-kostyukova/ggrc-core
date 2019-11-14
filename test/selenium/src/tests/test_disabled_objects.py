@@ -26,15 +26,20 @@ class TestDisabledObjects(base.Test):
   # pylint: disable=unused-argument
 
   @pytest.mark.smoke_tests
-  def test_user_cannot_edit_or_del_control_from_info_page(self, control,
-                                                          controls_service):
-    """Confirm that user cannot edit or delete Control from info page."""
-    three_bbs = controls_service.open_info_page_of_obj(control).three_bbs
-    expected_options = {"can_edit": False,
-                        "can_delete": False}
-    actual_options = {"can_edit": three_bbs.edit_option.exists,
-                      "can_delete": three_bbs.delete_option.exists}
-    assert actual_options == expected_options
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_cannot_edit_or_del_disabled_obj_from_info_page(
+      self, obj, selenium, soft_assert
+  ):
+    """Confirm that user cannot edit or delete disabled object from
+    info page."""
+    three_bbs = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))().open_info_page_of_obj(obj).three_bbs
+    soft_assert.expect(not three_bbs.edit_option.exists,
+                       "'Edit' option should not be available.")
+    soft_assert.expect(not three_bbs.delete_option.exists,
+                       "'Delete' option should not be available.")
+    soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
