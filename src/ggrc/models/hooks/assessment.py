@@ -277,7 +277,7 @@ def _get_people_ids_by_role(role_name, defaul_role_name, template_settings,
     return template_role
 
   default_people = role_name_people_id_map.get(defaul_role_name)
-  return role_name_people_id_map.get(template_role, default_people) or []
+  return role_name_people_id_map.get(template_role) or default_people
 
 
 def _generate_role_people_map(audit, snapshot, snapshot_rev_content):
@@ -313,13 +313,6 @@ def _generate_role_people_map(audit, snapshot, snapshot_rev_content):
       person.id for person, acl in audit.access_control_list
       if acl.ac_role_id == auditor_role_id
   ])
-
-  if not role_name_person_id_map["Auditors"]:
-    # If assessment is being generated with a snapshot and there is no auditors
-    # on it's audit, audit captains should be taken as auditors.
-    role_name_person_id_map["Auditors"].extend(
-        role_name_person_id_map["Audit Lead"],
-    )
 
   return role_name_person_id_map
 
