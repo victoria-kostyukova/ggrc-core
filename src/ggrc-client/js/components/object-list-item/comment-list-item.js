@@ -23,6 +23,12 @@ export default canComponent.extend({
     instance: {},
     baseInstance: {},
     define: {
+      handleMarkdown: {
+        get() {
+          return this.attr('baseInstance').constructor.isChangeableExternally
+          || this.attr('instance').constructor.isChangeableExternally;
+        },
+      },
       showIcon: {
         type: Boolean,
         value: false,
