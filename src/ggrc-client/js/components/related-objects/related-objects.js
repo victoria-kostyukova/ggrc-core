@@ -14,7 +14,7 @@ import {
   RELATED_ADDED,
 } from '../../events/event-types';
 import {
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import Pagination from '../base-objects/pagination';
 
@@ -97,32 +97,27 @@ export default canComponent.extend({
       };
       return params;
     },
-    loadRelatedItems: function () {
-      let dfd = $.Deferred();
-      let params = this.getParams();
-      this.attr('isLoading', true);
+    async loadRelatedItems() {
+      try {
+        const params = this.getParams();
+        this.attr('isLoading', true);
 
-      batchRequests(params)
-        .done(function (data) {
-          let relatedType = this.attr('relatedItemsType');
-          let ModelConstructor = this.attr('modelConstructor');
-          let values = data[relatedType].values;
-          let result = values.map(function (item) {
-            return {
-              instance: ModelConstructor.model(item),
-            };
-          });
-          // Update paging object
-          this.attr('paging.total', data[relatedType].total);
-          dfd.resolve(result);
-        }.bind(this))
-        .fail(function () {
-          dfd.resolve([]);
-        })
-        .always(function () {
-          this.attr('isLoading', false);
-        }.bind(this));
-      return dfd;
+        const data = await batchRequests(params);
+
+        const relatedType = this.attr('relatedItemsType');
+        const ModelConstructor = this.attr('modelConstructor');
+        const {values} = data[relatedType];
+        const result = values.map((item) => ({
+          instance: ModelConstructor.model(item),
+        }));
+        // Update paging object
+        this.attr('paging.total', data[relatedType].total);
+        return result;
+      } catch {
+        return [];
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     getSortingInfo: function () {
       let orderBy = this.attr('orderBy');
