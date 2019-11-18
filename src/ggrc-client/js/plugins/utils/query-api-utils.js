@@ -36,7 +36,9 @@ import {
 
 const BATCH_TIMEOUT = 100;
 let batchQueue = [];
+let batchPromiseQueue = [];
 let batchTimeout = null;
+let batchPromiseTimeout = null;
 
 /**
  * Collect requests to Query API.
@@ -58,6 +60,21 @@ function batchRequests(params) {
     _resolveBatch(batchQueue.splice(0, batchQueue.length));
   }, BATCH_TIMEOUT);
   return dfd;
+}
+
+function batchRequestsWithPromise(params) {
+  return new Promise((resolve, reject) => {
+    batchPromiseQueue.push({resolve: resolve, reject: reject, params: params});
+
+    if (loIsNumber(batchPromiseTimeout)) {
+      clearTimeout(batchPromiseTimeout);
+    }
+
+    batchPromiseTimeout = setTimeout(function () {
+      _resolveBatchWithPromise(
+        batchPromiseQueue.splice(0, batchPromiseQueue.length));
+    }, BATCH_TIMEOUT);
+  });
 }
 
 /**
@@ -261,6 +278,25 @@ function _resolveBatch(queue) {
   });
 }
 
+function _resolveBatchWithPromise(queue) {
+  makeRequest({
+    data: queue.map((el) => el.params),
+  }).then(function (result) {
+    result.forEach(function (info, i) {
+      let req = queue[i];
+
+      req.resolve(info);
+    });
+  }).catch((jqxhr, textStatus, exception) => {
+    if (isConnectionLost()) {
+      connectionLostNotifier();
+    } else {
+      handleAjaxError(jqxhr, exception);
+    }
+    queue.forEach((req) => req.reject());
+  });
+}
+
 /**
  * Loads objects based on passed stubs.
  * @async
@@ -364,6 +400,7 @@ export {
   buildParam,
   buildRelevantIdsQuery,
   batchRequests,
+  batchRequestsWithPromise,
   buildCountParams,
   loadObjectsByStubs,
   loadObjectsByTypes,
