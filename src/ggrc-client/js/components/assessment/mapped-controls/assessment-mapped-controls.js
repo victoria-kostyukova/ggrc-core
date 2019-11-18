@@ -16,7 +16,7 @@ import {
 } from '../../../plugins/utils/ca-utils';
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../../plugins/utils/query-api-utils';
 import {
   toObject,
@@ -101,18 +101,22 @@ const viewModel = canMap.extend({
       });
     return params;
   },
-  loadItems(id) {
-    let params = this.getParams(id);
-
-    this.attr('isLoading', true);
-    return $.when(...params.map((param) => {
-      return batchRequests(param.request).then((response) => {
-        let objects = response.Snapshot.values.map((item) => toObject(item));
-        this.attr(param.type, objects);
+  async loadItems(id) {
+    try {
+      const params = this.getParams(id);
+      this.attr('isLoading', true);
+      const responses = await Promise.all(
+        params.map((param) => batchRequests(param.request))
+      );
+      responses.map((response, index) => {
+        const objects = response.Snapshot.values.map((item) => toObject(item));
+        this.attr(params[index].type, objects);
       });
-    })).then(null, () => {
+    } catch {
       notifier('error', 'Failed to fetch related objects.');
-    }).always(() => this.attr('isLoading', false));
+    } finally {
+      this.attr('isLoading', false);
+    }
   },
   attributesToFormFields(snapshot) {
     const attributes = prepareCustomAttributes(
