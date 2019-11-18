@@ -28,7 +28,7 @@ import {
 import {
   buildRelevantIdsQuery,
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
@@ -115,7 +115,7 @@ export default canComponent.extend({
           this.attr('isBeforeLoad', false);
           stopFn();
         })
-        .always(() => {
+        .finally(() => {
           this.attr('isLoading', false);
         });
     },
@@ -392,49 +392,47 @@ export default canComponent.extend({
       }
       return Model.model(value);
     },
-    load: function () {
-      const self = this;
-      const modelKey = this.getModelKey();
-      const isMegaMapping = this.attr('isMegaMapping');
-      const dfd = $.Deferred();
-      const query = this.getQuery('values', true, isMegaMapping);
+    async load() {
+      try {
+        const modelKey = this.getModelKey();
+        const isMegaMapping = this.attr('isMegaMapping');
+        const query = this.getQuery('values', true, isMegaMapping);
+        const responseArr = await Promise.all(
+          query.request.map((request) => batchRequests(request))
+        );
+        const data = responseArr[query.queryIndex];
 
-      $.when(...query.request.map((request) => batchRequests(request)))
-        .done((...responseArr) => {
-          const data = responseArr[query.queryIndex];
+        const relatedData = this.getRelatedData(
+          isMegaMapping,
+          responseArr,
+          query,
+          modelKey,
+        );
 
-          const relatedData = this.getRelatedData(
-            isMegaMapping,
-            responseArr,
-            query,
-            modelKey,
-          );
+        let result =
+          data[modelKey].values.map((value) => {
+            return {
+              id: value.id,
+              type: value.type,
+              data: this.transformValue(value),
+            };
+          });
+        this.setSelectedItems(result);
+        this.setDisabledItems(isMegaMapping, result, relatedData, modelKey);
 
-          let result =
-            data[modelKey].values.map((value) => {
-              return {
-                id: value.id,
-                type: value.type,
-                data: self.transformValue(value),
-              };
-            });
-          this.setSelectedItems(result);
-          this.setDisabledItems(isMegaMapping, result, relatedData, modelKey);
+        if (isMegaMapping) {
+          this.setMegaRelations(result, relatedData, modelKey);
+        }
+        this.disableItself(isMegaMapping, result);
 
-          if (isMegaMapping) {
-            this.setMegaRelations(result, relatedData, modelKey);
-          }
-          this.disableItself(isMegaMapping, result);
-
-          // Update paging object
-          this.paging.attr('total', data[modelKey].total);
-          dfd.resolve(result);
-        })
-        .fail(() => dfd.resolve([]))
-        .always(() => {
-          this.dispatch('loaded');
-        });
-      return dfd;
+        // Update paging object
+        this.paging.attr('total', data[modelKey].total);
+        return result;
+      } catch {
+        return [];
+      } finally {
+        this.dispatch('loaded');
+      }
     },
     getRelatedData: function (isMegaMapping, responseArr, query, modelKey) {
       return isMegaMapping ?
@@ -485,39 +483,40 @@ export default canComponent.extend({
 
       return relatedData;
     },
-    loadAllItemsIds: function () {
-      let modelKey = this.getModelKey();
-      let dfd = $.Deferred();
-      let queryType = 'ids';
-      let query = this.getQuery(queryType, false);
+    loadAllItemsIds: async function () {
+      try {
+        const modelKey = this.getModelKey();
+        const queryType = 'ids';
+        const query = this.getQuery(queryType, false);
+        const responseArr = await Promise.all(
+          query.request.map((request) => batchRequests(request))
+        );
+        const data = responseArr[query.queryIndex];
+        const relatedData = responseArr[query.relatedQueryIndex];
+        const values = data[modelKey][queryType];
+        let result = values.map((item) => {
+          const object = {
+            id: item,
+            type: modelKey,
+          };
 
-      $.when(...query.request.map((request) => batchRequests(request)))
-        .done((...responseArr) => {
-          let data = responseArr[query.queryIndex];
-          let relatedData = responseArr[query.relatedQueryIndex];
-          let values = data[modelKey][queryType];
-          let result = values.map((item) => {
-            let object = {
-              id: item,
-              type: modelKey,
-            };
-
-            if (this.attr('useSnapshots')) {
-              object.child_type = this.attr('type');
-            }
-
-            return object;
-          });
-          // Do not perform extra mapping validation in case object generation
-          if (!this.attr('objectGenerator') && relatedData) {
-            result = result.filter((item) => {
-              return relatedData[modelKey].ids.indexOf(item.id) < 0;
-            });
+          if (this.attr('useSnapshots')) {
+            object.child_type = this.attr('type');
           }
-          dfd.resolve(result);
-        })
-        .fail(() => dfd.resolve([]));
-      return dfd;
+
+          return object;
+        });
+
+        // Do not perform extra mapping validation in case object generation
+        if (!this.attr('objectGenerator') && relatedData) {
+          result = result.filter((item) => {
+            return relatedData[modelKey].ids.indexOf(item.id) < 0;
+          });
+        }
+        return result;
+      } catch (e) {
+        return [];
+      }
     },
     setItemsDebounced: function () {
       clearTimeout(this.attr('_setItemsTimeout'));
