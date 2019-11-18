@@ -9,7 +9,7 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import '../object-list/object-list';
 import template from './related-comments.stache';
@@ -79,26 +79,21 @@ export default canComponent.extend({
 
       return buildParam('Comment', {}, relevantFilters, [], []);
     },
-    requestQuery: function (query) {
-      let dfd = $.Deferred();
-      this.attr('isLoading', true);
+    async requestQuery(query) {
+      try {
+        this.attr('isLoading', true);
 
-      batchRequests(query)
-        .done(function (response) {
-          let type = Object.keys(response)[0];
-          let values = response[type].values;
-          let result = values.map(function (item) {
-            return {instance: item, isSelected: false};
-          });
-          dfd.resolve(result);
-        })
-        .fail(function () {
-          dfd.resolve([]);
-        })
-        .always(function () {
-          this.attr('isLoading', false);
-        }.bind(this));
-      return dfd;
+        const response = await batchRequests(query);
+        const {values} = Object.values(response)[0];
+        return values.map((item) => ({
+          instance: item,
+          isSelected: false,
+        }));
+      } catch {
+        return [];
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     loadObjects: function () {
       let query = this.getObjectQuery();
