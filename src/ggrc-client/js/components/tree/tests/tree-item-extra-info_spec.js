@@ -194,17 +194,17 @@ describe('tree-item-extra-info component', function () {
     });
   });
 
-  describe('addDeferredContent() method', () => {
+  describe('addPromiseContent() method', () => {
     it('pushes passed callback from event to pendingContent', () => {
       const event = {
-        deferredCallback: () => Promise.resolve(),
+        callback: () => Promise.resolve(),
       };
       viewModel.attr('pendingContent', []);
 
-      viewModel.addDeferredContent(event);
+      viewModel.addPromiseContent(event);
 
       expect(viewModel.attr('pendingContent').serialize()).toEqual([
-        event.deferredCallback,
+        event.callback,
       ]);
     });
   });

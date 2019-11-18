@@ -159,8 +159,8 @@ let viewModel = canMap.extend({
 
     this.addContent(...Array.from(resolvedContent));
   },
-  addDeferredContent({deferredCallback}) {
-    this.attr('pendingContent').push(deferredCallback);
+  addPromiseContent({callback}) {
+    this.attr('pendingContent').push(callback);
   },
   addContent(...dataPromises) {
     let dfds = this.attr('contentPromises');

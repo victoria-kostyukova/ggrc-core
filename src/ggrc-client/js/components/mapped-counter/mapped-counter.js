@@ -8,7 +8,7 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   buildCountParams,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import {getMappingList} from '../../models/mappers/mappings';
 import {REFRESH_MAPPED_COUNTER} from '../../events/event-types';
@@ -52,12 +52,12 @@ let viewModel = canMap.extend({
   type: '',
   count: 0,
   /**
-   * Just to avoid multiple dispatching of deferredUpdateCounter event,
+   * Just to avoid multiple dispatching of updateCounter event,
    * we lock it. It helps us to avoid extra queries, which might be produced
    * by load method.
    */
-  lockUntilDeferredUpdate: false,
-  load: function () {
+  lockUntilUpdate: false,
+  load() {
     let instance = this.attr('instance');
     let type = this.attr('type');
     let relevant = {
@@ -66,36 +66,35 @@ let viewModel = canMap.extend({
     };
     let types = type ? [type] : getMappingList(instance.type);
     let countQuery = buildCountParams(types, relevant);
-    let dfds = countQuery.map(batchRequests);
 
-    return $.when(...dfds).then(function () {
-      let counts = Array.prototype.slice.call(arguments);
-
-      let total = types.reduce(function (count, type, ind) {
+    return Promise.all(
+      countQuery.map(batchRequests)
+    ).then((counts) => {
+      let total = types.reduce((count, type, ind) => {
         return count + counts[ind][type].total;
       }, 0);
 
       this.attr('isSpinnerVisible', false);
       this.attr('count', total);
-    }.bind(this));
+    });
   },
-  deferredUpdateCounter() {
-    const isLocked = this.attr('lockUntilDeferredUpdate');
+  updateCounter() {
+    const isLocked = this.attr('lockUntilUpdate');
 
     if (isLocked) {
       return;
     }
 
-    this.attr('lockUntilDeferredUpdate', true);
+    this.attr('lockUntilUpdate', true);
 
-    const deferredCallback = () => this.load()
-      .always(() => {
-        this.attr('lockUntilDeferredUpdate', false);
+    const callback = () => this.load()
+      .finally(() => {
+        this.attr('lockUntilUpdate', false);
       });
 
     this.dispatch({
-      type: 'deferredUpdateCounter',
-      deferredCallback,
+      type: 'updateCounter',
+      callback,
     });
   },
 });
@@ -120,7 +119,7 @@ export default canComponent.extend({
       const viewModel = this.viewModel;
 
       if (viewModel.attr('type') === modelType) {
-        viewModel.deferredUpdateCounter();
+        viewModel.updateCounter();
       }
     },
   },

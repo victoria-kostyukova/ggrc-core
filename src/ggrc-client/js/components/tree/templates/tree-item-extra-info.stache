@@ -52,7 +52,7 @@
             <mapped-counter instance:from="instance"
                             type:from="'Comment'"
                             addContent:from="@addContent"
-                            on:deferredUpdateCounter="addDeferredContent(scope.event)"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
             <div class="date">
               <i class="fa fa-clock-o {{#if instance.isOverdue}}red{{else}}color{{/if}}"></i> Due On:
