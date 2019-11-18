@@ -48,7 +48,7 @@ import './confirm-edit-action';
 import '../../multi-select-label/multi-select-label';
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../../plugins/utils/query-api-utils';
 import {loadComments} from '../../../plugins/utils/comments-utils';
 import {
@@ -316,28 +316,21 @@ export default canComponent.extend({
         this.getEvidenceAdditionFilter(kind));
       return query;
     },
-    requestQuery: function (query, type) {
-      let dfd = $.Deferred();
-      type = type || '';
-      this.attr('isUpdating' + loCapitalize(type), true);
-
-      batchRequests(query)
-        .done(function (response) {
-          let type = Object.keys(response)[0];
-          let values = response[type].values;
-          dfd.resolve(values);
-        })
-        .fail(function () {
-          dfd.resolve([]);
-        })
-        .always(function () {
-          this.attr('isUpdating' + loCapitalize(type), false);
-
-          tracker.stop(this.attr('instance.type'),
-            tracker.USER_JOURNEY_KEYS.INFO_PANE,
-            tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
-        }.bind(this));
-      return dfd;
+    async requestQuery(query, queryType = '') {
+      try {
+        this.attr('isUpdating' + loCapitalize(queryType), true);
+        const response = await batchRequests(query);
+        const type = Object.keys(response)[0];
+        const {values} = response[type];
+        return values;
+      } catch {
+        return [];
+      } finally {
+        this.attr('isUpdating' + loCapitalize(queryType), false);
+        tracker.stop(this.attr('instance.type'),
+          tracker.USER_JOURNEY_KEYS.INFO_PANE,
+          tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
+      }
     },
     loadSnapshots: function () {
       let query = this.getSnapshotQuery();
