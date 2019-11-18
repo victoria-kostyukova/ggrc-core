@@ -25,7 +25,7 @@ import {
 } from './current-page-utils';
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
   buildCountParams,
 } from './query-api-utils';
 import {
@@ -413,11 +413,11 @@ function loadFirstTierItems(modelName,
 
   let requestedType = params.object_name;
   requestData.push(params);
-  return $.when(...requestData.attr().map((el) => batchRequests(el)))
-    .then((...response) => {
+  return Promise.all(requestData.attr().map((el) => batchRequests(el)))
+    .then((response) => {
       response = loLast(response)[requestedType];
 
-      response.values = response.values.map(function (source) {
+      response.values = response.values.map((source) => {
         return _createInstance(source, modelName);
       });
 
@@ -434,84 +434,77 @@ function loadFirstTierItems(modelName,
  * @param {Object} pageInfo - Information about pagination, sorting and filtering
  * @return {Promise} - Items for sub tier.
  */
-function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
-  let relevant = {
-    type: type,
-    id: id,
-    operation: 'relevant',
-  };
-  let showMore = false;
-  let loadedModelObjects = [];
+async function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
+  try {
+    const relevant = {
+      type: type,
+      id: id,
+      operation: 'relevant',
+    };
 
-  return _buildSubTreeCountMap(widgetIds, relevant, filter)
-    .then(function (result) {
-      loadedModelObjects = getWidgetConfigs(Object.keys(result.countsMap));
-      showMore = result.showMore;
+    const {showMore, countsMap} =
+      await _buildSubTreeCountMap(widgetIds, relevant, filter);
 
-      let dfds = loadedModelObjects.map(function (modelObject) {
-        let subTreeFields = getSubTreeFields(type, modelObject.name);
+    const loadedModelObjects = getWidgetConfigs(Object.keys(countsMap));
 
-        let params = buildParam(
-          modelObject.name,
-          pageInfo,
-          relevant,
-          subTreeFields,
-          filter
-        );
+    const requests = loadedModelObjects.map((modelObject) => {
+      const subTreeFields = getSubTreeFields(type, modelObject.name);
 
-        params = _transformQuery(params, relevant, modelObject);
+      let params = buildParam(
+        modelObject.name,
+        pageInfo,
+        relevant,
+        subTreeFields,
+        filter
+      );
 
-        return batchRequests(params);
-      });
+      params = _transformQuery(params, relevant, modelObject);
 
-      let resultDfd = $.when(...dfds).promise();
+      return batchRequests(params);
+    });
 
-      if (!related.initialized) {
-        let mappedDfd = initMappedInstances();
+    const result = await Promise.all(requests);
 
-        return $.when(mappedDfd, dfds).then(function () {
-          return resultDfd;
-        });
+    if (!related.initialized) {
+      await initMappedInstances();
+    }
+
+    const directlyRelated = [];
+    const notRelated = [];
+    let total;
+
+    loadedModelObjects.forEach((modelObject, index) => {
+      let values;
+
+      if (isSnapshotModel(modelObject.name) &&
+        result[index].Snapshot) {
+        values = result[index].Snapshot.values;
+        total = result[index].Snapshot.total;
+      } else {
+        values = result[index][modelObject.name].values;
+        total = result[index][modelObject.name].total;
       }
 
-      return resultDfd;
-    })
-    .then(function () {
-      let directlyRelated = [];
-      let notRelated = [];
-      let response = makeArray(arguments);
-      let total;
+      values.forEach((source) => {
+        let instance = _createInstance(source, modelObject.name);
 
-      loadedModelObjects.forEach(function (modelObject, index) {
-        let values;
-
-        if (isSnapshotModel(modelObject.name) &&
-          response[index].Snapshot) {
-          values = response[index].Snapshot.values;
-          total = response[index].Snapshot.total;
+        if (isDirectlyRelated(instance)) {
+          directlyRelated.push(instance);
         } else {
-          values = response[index][modelObject.name].values;
-          total = response[index][modelObject.name].total;
+          notRelated.push(instance);
         }
-
-        values.forEach(function (source) {
-          let instance = _createInstance(source, modelObject.name);
-
-          if (isDirectlyRelated(instance)) {
-            directlyRelated.push(instance);
-          } else {
-            notRelated.push(instance);
-          }
-        });
       });
-
-      return {
-        directlyItems: directlyRelated,
-        notDirectlyItems: notRelated,
-        showMore: showMore,
-        total: total,
-      };
     });
+
+    return {
+      directlyItems: directlyRelated,
+      notDirectlyItems: notRelated,
+      showMore: showMore,
+      total: total,
+    };
+  } catch {
+    return Promise.reject();
+  }
 }
 
 /**
@@ -592,14 +585,13 @@ function isDirectlyRelated(instance) {
  */
 function _buildSubTreeCountMap(widgetIds, relevant, filter) {
   let countQuery = [];
-  let result;
   let countMap = {};
 
   if (_isFullSubTree(relevant.type)) {
-    widgetIds.forEach(function (widgetId) {
+    widgetIds.forEach((widgetId) => {
       countMap[widgetId] = false;
     });
-    return $.Deferred().resolve({
+    return Promise.resolve({
       countsMap: countMap,
       showMore: false,
     });
@@ -613,10 +605,10 @@ function _buildSubTreeCountMap(widgetIds, relevant, filter) {
     countQuery.push(_transformQuery(query[0], relevant, widgetConfig));
   });
 
-  result = $.when(...countQuery.map((query) => batchRequests(query)))
-    .then((...response) => {
+  return Promise.all(countQuery.map((query) => batchRequests(query)))
+    .then((response) => {
       let total = 0;
-      let showMore = widgetIds.some(function (model, index) {
+      let showMore = widgetIds.some((model, index) => {
         const count = Object.values(response[index])[0].total;
 
         if (!count) {
@@ -639,8 +631,6 @@ function _buildSubTreeCountMap(widgetIds, relevant, filter) {
         showMore: showMore,
       };
     });
-
-  return result;
 }
 
 function _isFullSubTree(type) {
