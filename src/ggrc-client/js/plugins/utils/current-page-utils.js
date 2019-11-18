@@ -7,7 +7,7 @@ import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
 import {
   buildRelevantIdsQuery,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from './query-api-utils';
 import {
   isSnapshotRelated,
@@ -43,9 +43,9 @@ function getPageInstance() {
 }
 
 function initMappedInstances() {
-  let currentPageInstance = getPageInstance();
+  const currentPageInstance = getPageInstance();
+  const reqParams = [];
   let models = getMappingList(currentPageInstance.type);
-  let reqParams = [];
 
   relatedToCurrentInstance.attr('initialized', true);
   models = makeArray(models);
@@ -65,15 +65,13 @@ function initMappedInstances() {
     reqParams.push(batchRequests(query));
   });
 
-  return $.when(...reqParams)
-    .then(function () {
-      let response = makeArray(arguments);
-
-      models.forEach(function (model, idx) {
-        let ids = response[idx][model] ?
+  return Promise.all(reqParams)
+    .then((response) => {
+      models.forEach((model, idx) => {
+        const ids = response[idx][model] ?
           response[idx][model].ids :
           response[idx].Snapshot.ids;
-        let map = ids.reduce(function (mapped, id) {
+        const map = ids.reduce((mapped, id) => {
           mapped[id] = true;
           return mapped;
         }, {});
