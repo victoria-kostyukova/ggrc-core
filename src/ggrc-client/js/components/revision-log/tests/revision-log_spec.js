@@ -12,6 +12,7 @@ import RefreshQueue from '../../../models/refresh-queue';
 import Revision from '../../../models/service-models/revision';
 import Person from '../../../models/business-models/person';
 import Stub from '../../../models/stub';
+import tracker from '../../../tracker';
 import * as ReifyUtils from '../../../plugins/utils/reify-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
 
@@ -56,108 +57,147 @@ describe('revision-log component', function () {
     });
   });
 
-  describe('fetchItems() method', function () {
-    let fetchDfd;
-
-    beforeEach(function () {
-      fetchDfd = new $.Deferred();
-      spyOn(viewModel, 'fetchRevisions')
-        .and.returnValue(fetchDfd);
-      spyOn(NotifierUtils, 'notifier');
-      spyOn(viewModel, 'fetchAdditionalInfoForRevisions')
-        .and.callFake(() => 'additionalFetched');
-      spyOn(viewModel, 'composeRevisionsData')
-        .and.callFake(() => 'composedRevisions');
+  describe('fetchItems() method', () => {
+    beforeEach(() => {
+      spyOn(tracker, 'start')
+        .and.returnValue(jasmine.createSpy());
     });
 
-    it('assigns true to isLoading', () => {
+    it('assigns true to "isLoading" attribute', () => {
+      spyOn(viewModel, 'fetchRevisions');
+      viewModel.attr('isLoading', false);
+
       viewModel.fetchItems();
 
       expect(viewModel.attr('isLoading')).toBe(true);
     });
 
-    it('assigns null to revisions', () => {
+    it('assigns null to "revisions" attribute', () => {
       viewModel.fetchItems();
 
       expect(viewModel.attr('revisions')).toBeNull();
     });
 
-    it('calls fetchAdditionalInfoForRevisions with fetched revisions',
-      (done) => {
-        viewModel.fetchItems();
+    it('calls fetchRevisions() method', () => {
+      spyOn(viewModel, 'fetchRevisions');
 
-        fetchDfd.resolve('revisions').then(() => {
-          expect(viewModel.fetchAdditionalInfoForRevisions)
-            .toHaveBeenCalledWith('revisions');
-          done();
-        });
+      viewModel.fetchItems();
+
+      expect(viewModel.fetchRevisions).toHaveBeenCalled();
+    });
+
+    describe('if all operations was finished success', () => {
+      beforeEach(() => {
+        spyOn(viewModel, 'fetchRevisions')
+          .and.returnValue(Promise.resolve('revisions'));
+        spyOn(viewModel, 'fetchAdditionalInfoForRevisions')
+          .withArgs('revisions')
+          .and.returnValue(Promise.resolve('additionalFetched'));
+        spyOn(viewModel, 'composeRevisionsData')
+          .withArgs('additionalFetched')
+          .and.returnValue(Promise.resolve('composedRevisions'));
       });
 
-    it('calls composeRevisionsData with fetched revisions ' +
-    'after additional info fetched', (done) => {
-      fetchDfd.resolve('revisions');
+      it('calls fetchAdditionalInfoForRevisions() method', async () => {
+        await viewModel.fetchItems();
 
-      viewModel.fetchItems().then(() => {
+        expect(viewModel.fetchAdditionalInfoForRevisions)
+          .toHaveBeenCalledWith('revisions');
+      });
+
+      it('calls composeRevisionsData() method', async () => {
+        await viewModel.fetchItems();
+
         expect(viewModel.composeRevisionsData)
           .toHaveBeenCalledWith('additionalFetched');
-        done();
       });
-    });
 
-    it('displays specified error if fetching the data fails', function (done) {
-      fetchDfd.reject('Server error');
+      it('assigns result of composeRevisionsData to "revisions" attribute',
+        async () => {
+          viewModel.attr('revisions', null);
 
-      viewModel.fetchItems().fail(() => {
-        expect(NotifierUtils.notifier).toHaveBeenCalledWith(
-          'error',
-          'Failed to fetch revision history data.'
-        );
-        done();
-      });
-    });
+          await viewModel.fetchItems();
 
-    it('assigns result of composeRevisionsData to revisions attr', (done) => {
-      fetchDfd.resolve('revisions');
+          expect(viewModel.attr('revisions')).toBe('composedRevisions');
+        });
 
-      viewModel.fetchItems().then(() => {
-        expect(viewModel.attr('revisions')).toEqual('composedRevisions');
-        done();
-      });
-    });
+      it('sets false to "isLoading" attribute', async () => {
+        viewModel.attr('isLoading', true);
 
-    it('assigns false to "isLoading" after data fetching ' +
-    'in case of success', (done) => {
-      fetchDfd.resolve();
+        await viewModel.fetchItems();
 
-      viewModel.fetchItems().done(() => {
         expect(viewModel.attr('isLoading')).toBe(false);
-        done();
       });
     });
 
-    it('assigns false to "isLoading" after data fetching ' +
-    'in case of fail', (done) => {
-      fetchDfd.reject();
+    describe('sets false to "isLoading" attr and displays specified error',
+      () => {
+        let message;
 
-      viewModel.fetchItems().fail(() => {
-        expect(viewModel.attr('isLoading')).toBe(false);
-        done();
+        beforeEach(() => {
+          spyOn(NotifierUtils, 'notifier');
+          message = 'Failed to fetch revision history data.';
+          viewModel.attr('isLoading', true);
+        });
+
+        it('after fetchRevisions() method was failed', async () => {
+          spyOn(viewModel, 'fetchRevisions')
+            .and.returnValue(Promise.reject());
+
+          await viewModel.fetchItems();
+
+          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+            'error',
+            message
+          );
+        });
+
+        it('after fetchAdditionalInfoForRevisions() method was failed',
+          async () => {
+            spyOn(viewModel, 'fetchRevisions')
+              .and.returnValue(Promise.resolve());
+            spyOn(viewModel, 'fetchAdditionalInfoForRevisions')
+              .and.returnValue(Promise.reject());
+
+            await viewModel.fetchItems();
+
+            expect(viewModel.attr('isLoading')).toBe(false);
+            expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+              'error',
+              message
+            );
+          });
+
+        it('after composeRevisionsData() method was failed', async () => {
+          spyOn(viewModel, 'fetchRevisions')
+            .and.returnValue(Promise.resolve());
+          spyOn(viewModel, 'fetchAdditionalInfoForRevisions')
+            .and.returnValue(Promise.resolve());
+          spyOn(viewModel, 'composeRevisionsData')
+            .and.returnValue(Promise.reject());
+
+          await viewModel.fetchItems();
+
+          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+            'error',
+            message
+          );
+        });
       });
-    });
   });
 
   describe('fetchRevisions() method', () => {
-    let requestDfd;
-
     beforeEach(() => {
-      requestDfd = $.Deferred();
       spyOn(viewModel, 'getQueryFilter').and.returnValue('filter');
       spyOn(QueryApiUtils, 'buildParam').and.returnValue('buildedParams');
-      spyOn(QueryApiUtils, 'batchRequests').and.returnValue(requestDfd);
       spyOn(viewModel, 'makeRevisionModels').and.returnValue('revisionsModels');
     });
 
     it('builds params according to passed params', () => {
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve());
       const pageInfo = {
         current: 123,
         pageSize: 321,
@@ -185,14 +225,20 @@ describe('revision-log component', function () {
     });
 
     it('batches request with builded params', () => {
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve());
+
       viewModel.fetchRevisions();
 
-      expect(QueryApiUtils.batchRequests).toHaveBeenCalledWith('buildedParams');
+      expect(QueryApiUtils.batchRequestsWithPromise)
+        .toHaveBeenCalledWith('buildedParams');
     });
 
     it('assigns total of received data to pageInfo of viewModel', (done) => {
       const revisionsData = {total: 696};
-      requestDfd.resolve({Revision: revisionsData});
+
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve({Revision: revisionsData}));
 
       viewModel.fetchRevisions().then(() => {
         expect(viewModel.attr('pageInfo.total')).toBe(revisionsData.total);
@@ -202,7 +248,8 @@ describe('revision-log component', function () {
 
     it('makes revision models from received data', (done) => {
       const revisionsData = {};
-      requestDfd.resolve({Revision: revisionsData});
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve({Revision: revisionsData}));
 
       viewModel.fetchRevisions().then(() => {
         expect(viewModel.makeRevisionModels)
@@ -213,7 +260,8 @@ describe('revision-log component', function () {
 
     it('returns revisions models', (done) => {
       const revisionsData = {};
-      requestDfd.resolve({Revision: revisionsData});
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve({Revision: revisionsData}));
 
       viewModel.fetchRevisions().then((revisions) => {
         expect(revisions).toBe('revisionsModels');
