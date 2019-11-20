@@ -13,6 +13,8 @@ import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../mapper-results';
+import traker from '../../../tracker';
+import * as isMegaMappingUtils from '../../../plugins/utils/mega-object-utils';
 import Program from '../../../models/business-models/program';
 import QueryParser from '../../../generated/ggrc-filter-query-parser';
 
@@ -62,41 +64,68 @@ describe('mapper-results component', function () {
       items = [
         {data: 'mockData'},
       ];
+      spyOn(traker, 'start').and.returnValue(jasmine.createSpy());
       spyOn(viewModel, 'load')
-        .and.returnValue($.Deferred().resolve(items));
+        .and.returnValue(Promise.resolve(items));
       spyOn(viewModel, 'setColumnsConfiguration');
       spyOn(viewModel, 'setRelatedAssessments');
       viewModel.attr({});
     });
 
-    it('sets loaded items to viewModel.items', function (done) {
+    it('calls load() method', async () => {
+      await viewModel.setItems();
+
+      expect(viewModel.load).toHaveBeenCalled();
+    });
+
+    it('sets loaded items to viewModel.items', async () => {
       viewModel.attr('items', []);
-      viewModel.setItems().then(() => {
-        expect(viewModel.attr('items').length).toEqual(1);
-        expect(viewModel.attr('items')[0])
-          .toEqual(jasmine.objectContaining({
-            data: 'mockData',
-          }));
-        done();
-      });
+
+      await viewModel.setItems();
+
+      expect(viewModel.attr('items').length).toEqual(1);
+      expect(viewModel.attr('items')[0])
+        .toEqual(jasmine.objectContaining({
+          data: 'mockData',
+        }));
     });
 
-    it('calls setColumnsConfiguration and setRelatedAssessments',
-      function (done) {
-        viewModel.setItems().then(() => {
-          expect(viewModel.setColumnsConfiguration).toHaveBeenCalled();
-          expect(viewModel.setRelatedAssessments).toHaveBeenCalled();
-          done();
-        });
-      });
+    it('sets true to "isLoading" attribute', () => {
+      viewModel.attr('isLoading', false);
 
-    it('sets viewModel.isBeforeLoad to false', function (done) {
+      viewModel.setItems();
+
+      expect(viewModel.attr('isLoading')).toBe(true);
+    });
+
+    it('calls setColumnsConfiguration() method', async () => {
+      await viewModel.setItems();
+
+      expect(viewModel.setColumnsConfiguration).toHaveBeenCalled();
+    });
+
+    it('calls setRelatedAssessments() method', async () => {
+      await viewModel.setItems();
+
+      expect(viewModel.setRelatedAssessments).toHaveBeenCalled();
+    });
+
+    it('sets viewModel.isBeforeLoad to false', async () => {
       viewModel.attr('isBeforeLoad', true);
-      viewModel.setItems().then(() => {
-        expect(viewModel.attr('isBeforeLoad')).toEqual(false);
-        done();
-      });
+
+      await viewModel.setItems();
+
+      expect(viewModel.attr('isBeforeLoad')).toEqual(false);
     });
+
+    it('sets false to "isLoading" attribute after load() success',
+      async () => {
+        viewModel.attr('isLoading', true);
+
+        await viewModel.setItems();
+
+        expect(viewModel.attr('isLoading')).toBe(false);
+      });
   });
 
   describe('setColumnsConfiguration() method', function () {
@@ -779,129 +808,214 @@ describe('mapper-results component', function () {
       });
   });
 
-  describe('load() method', function () {
-    let data = {
-      program: {
-        values: [{
-          id: 123,
-          type: 'mockType',
-        }],
-        total: 4,
-      },
-    };
-    let expectedResult = [{
-      id: 123,
-      type: 'mockType',
-      data: 'transformedValue',
-    }];
-    let relatedData;
-    let dfdRequest;
-    let resultDfd;
-
-    beforeEach(function () {
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Control');
+  describe('load() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'dispatch');
+      spyOn(isMegaMappingUtils, 'isMegaMapping')
+        .and.returnValue(true);
       spyOn(viewModel, 'getModelKey')
-        .and.returnValue('program');
+        .and.returnValue('modelKey');
       spyOn(viewModel, 'getQuery')
+        .withArgs('values', true, true)
         .and.returnValue({
           queryIndex: 0,
           relatedQueryIndex: 1,
-          request: [],
+          request: [{
+            header: 'header1',
+            data: {},
+          }],
         });
-      spyOn(viewModel, 'transformValue')
-        .and.returnValue('transformedValue');
-      spyOn(viewModel, 'setSelectedItems');
-      spyOn(viewModel, 'setDisabledItems');
-      spyOn(viewModel, 'setMegaRelations');
-      spyOn(viewModel, 'disableItself');
-      dfdRequest = $.Deferred();
-      spyOn(QueryAPI, 'batchRequests');
-      spyOn($, 'when')
-        .and.returnValue(dfdRequest.promise());
     });
 
-    it('calls viewModel.setSelectedItems()', function () {
-      dfdRequest.resolve(data, relatedData);
+    it('calls getModelkey() method', () => {
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+
       viewModel.load();
-      expect(viewModel.setSelectedItems)
-        .toHaveBeenCalledWith(expectedResult);
+
+      expect(viewModel.getModelKey).toHaveBeenCalled();
     });
 
-    it('calls viewModel.setDisabledItems() if relatedData is defined',
-      function () {
-        relatedData = {
-          program: {
-            ids: 'ids',
+    it('calls getQuery() method', () => {
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+
+      viewModel.load();
+
+      expect(viewModel.getQuery)
+        .toHaveBeenCalledWith('values', true, true);
+    });
+
+    it('calls batchRequest() util', () => {
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+
+      viewModel.load();
+
+      expect(QueryAPI.batchRequestsWithPromise)
+        .toHaveBeenCalled();
+    });
+
+    describe('after batchRequest() success', () => {
+      let response;
+      let query;
+
+      beforeEach(() => {
+        response = {
+          modelKey: {
+            values: [{
+              id: 1,
+              type: 'testType',
+            }],
+            total: 10,
           },
         };
-        let megaMapping = false;
-        let type = 'program';
-        dfdRequest.resolve(data, relatedData);
-        viewModel.load();
+
+        query = {
+          queryIndex: 0,
+          relatedQueryIndex: 1,
+          request: [{
+            header: 'header1',
+            data: {},
+          }],
+        };
+
+        spyOn(viewModel, 'transformValue')
+          .withArgs({
+            id: 1,
+            type: 'testType',
+          })
+          .and.returnValue('transformedValue');
+        spyOn(viewModel, 'setSelectedItems');
+        spyOn(viewModel, 'setDisabledItems');
+        spyOn(viewModel, 'getRelatedData')
+          .withArgs(
+            true,
+            [response],
+            query,
+            'modelKey'
+          )
+          .and.returnValue('relatedData');
+        spyOn(viewModel, 'setMegaRelations');
+        spyOn(viewModel, 'disableItself');
+        spyOn(QueryAPI, 'batchRequestsWithPromise')
+          .withArgs({
+            header: 'header1',
+            data: {},
+          })
+          .and.returnValue(Promise.resolve(response));
+      });
+
+      it('calls getRelatedData() method', async () => {
+        await viewModel.load();
+
+        expect(viewModel.getRelatedData)
+          .toHaveBeenCalled();
+      });
+
+      it('calls transformValue() method', async () => {
+        await viewModel.load();
+
+        expect(viewModel.transformValue)
+          .toHaveBeenCalled();
+      });
+
+      it('calls setSelectedItems() method', async () => {
+        await viewModel.load();
+
+        expect(viewModel.setSelectedItems)
+          .toHaveBeenCalledWith([{
+            id: 1,
+            type: 'testType',
+            data: 'transformedValue',
+          }]);
+      });
+
+      it('calls setDisabledItems() method', async () => {
+        await viewModel.load();
+
         expect(viewModel.setDisabledItems)
-          .toHaveBeenCalledWith(megaMapping, expectedResult, relatedData, type);
+          .toHaveBeenCalledWith(
+            true,
+            [{
+              id: 1,
+              type: 'testType',
+              data: 'transformedValue',
+            }],
+            'relatedData',
+            'modelKey'
+          );
       });
 
-    it('calls viewModel.setMegaRelations() if "isMegaMapping" is true',
-      function () {
-        relatedData = {
-          parent: {
-            program: {
-              ids: [],
-            },
-          },
-          child: {
-            program: {
-              ids: [123],
-            },
-          },
-        };
-        viewModel.attr('type', 'Program');
-        spyOn(viewModel, 'getRelatedData').and.returnValue(relatedData);
-        dfdRequest.resolve(data, relatedData);
-        viewModel.load();
+      it('calls setMegaRelations() method' +
+        'if "isMegaMapping" attribute equal true', async () => {
+        await viewModel.load();
+
         expect(viewModel.setMegaRelations)
-          .toHaveBeenCalledWith(expectedResult, relatedData, 'program');
+          .toHaveBeenCalledWith(
+            [{
+              id: 1,
+              type: 'testType',
+              data: 'transformedValue',
+            }],
+            'relatedData',
+            'modelKey'
+          );
       });
 
-    it('calls viewModel.disableItself()', function () {
-      let isMegaMapping = false;
-      dfdRequest.resolve(data, relatedData);
-      viewModel.load();
-      expect(viewModel.disableItself)
-        .toHaveBeenCalledWith(isMegaMapping, expectedResult);
-    });
+      it('calls disableItself() method', async () => {
+        await viewModel.load();
 
-    it('updates paging', function () {
-      dfdRequest.resolve(data, relatedData);
-      viewModel.load();
-      expect(viewModel.attr('paging.total')).toEqual(4);
-    });
+        expect(viewModel.disableItself)
+          .toHaveBeenCalledWith(
+            true,
+            [{
+              id: 1,
+              type: 'testType',
+              data: 'transformedValue',
+            }]
+          );
+      });
 
-    it('sets isLoading to false', function () {
-      dfdRequest.resolve(data, relatedData);
-      viewModel.load();
-      expect(viewModel.attr('isLoading')).toEqual(false);
-    });
+      it('updates paging object', async () => {
+        viewModel.paging.attr('total', null);
 
-    it('returns promise with array of items', function (done) {
-      dfdRequest.resolve(data, relatedData);
-      resultDfd = viewModel.load();
-      expect(resultDfd.state()).toEqual('resolved');
-      resultDfd.then(function (result) {
-        expect(result).toEqual(expectedResult);
-        done();
+        await viewModel.load();
+
+        expect(viewModel.paging.total)
+          .toEqual(10);
+      });
+
+      it('returns array of loaded objects', async () => {
+        const result = await viewModel.load();
+
+        expect(result).toEqual([{
+          id: 1,
+          type: 'testType',
+          data: 'transformedValue',
+        }]);
+      });
+
+      it('dispatchs loaded event', async () => {
+        await viewModel.load();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith('loaded');
       });
     });
 
-    it('returns promise with empty array if fail', function (done) {
-      dfdRequest.reject();
-      resultDfd = viewModel.load();
-      expect(resultDfd.state()).toEqual('resolved');
-      resultDfd.then(function (result) {
+    describe('if batchRequsts was failed', () => {
+      beforeAll(() => {
+        spyOn(QueryAPI, 'batchRequestsWithPromise')
+          .and.returnValue(Promise.reject());
+      });
+
+      it('returns empty array', async () => {
+        const result = await viewModel.load();
+
         expect(result).toEqual([]);
-        done();
+      });
+
+      it('dispatchs loaded event', async () => {
+        await viewModel.load();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith('loaded');
       });
     });
   });
@@ -1064,113 +1178,116 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('loadAllItemsIds() method', function () {
-    let data = {
-      program: {
-        ids: [123],
-      },
-    };
-
-    let expectedResult = [{
-      id: 123,
-      type: 'program',
-    }];
-
-    let filters = {
-      program: {
-        ids: [123],
-      },
-    };
-
-    let dfdRequest;
-
-    beforeEach(function () {
+  describe('loadAllItemsIds() method', () => {
+    beforeEach(() => {
       viewModel.attr({});
-      dfdRequest = $.Deferred();
-      spyOn(QueryAPI, 'batchRequests');
-      spyOn($, 'when')
-        .and.returnValue(dfdRequest.promise());
-
       spyOn(viewModel, 'getQuery')
+        .withArgs('ids', false)
         .and.returnValue({
           queryIndex: 0,
           relatedQueryIndex: 1,
-          request: [],
+          request: [{
+            header: 'header1',
+            data: {},
+          },
+          {
+            header: 'header2',
+            data: {},
+          }],
         });
-      spyOn(viewModel, 'transformValue')
-        .and.returnValue('transformedValue');
-    });
-
-    it('rerturns promise with items', function (done) {
       spyOn(viewModel, 'getModelKey')
-        .and.returnValue('program');
-      dfdRequest.resolve(data, filters);
-      viewModel.attr('objectGenerator', true);
-      let resultDfd = viewModel.loadAllItemsIds();
-      expect(resultDfd.state()).toEqual('resolved');
-      resultDfd.then(function (result) {
-        expect(result).toEqual(expectedResult);
-        done();
-      });
+        .and.returnValue('modelKey');
     });
 
-    it('returns promise with snapshot items', (done) => {
-      let data = {
-        snapshot: {
-          ids: [123],
-        },
-      };
-
-      let filters = {
-        snapshot: {
-          ids: [],
-        },
-      };
-
-      let expectedResult = [{
-        id: 123,
-        type: 'snapshot',
-        child_type: 'program',
-      }];
-
-      spyOn(viewModel, 'getModelKey')
-        .and.returnValue('snapshot');
-      viewModel.attr('type', 'program');
-      viewModel.attr('useSnapshots', true);
-      dfdRequest.resolve(data, filters);
-      let resultDfd = viewModel.loadAllItemsIds();
-      expect(resultDfd.state()).toEqual('resolved');
-      resultDfd.then((result) => {
-        expect(result).toEqual(expectedResult);
-        done();
+    describe('before call batchRequests()', () => {
+      beforeEach(() => {
+        spyOn(QueryAPI, 'batchRequestsWithPromise');
       });
-    });
 
-    it('performs extra mapping validation in case Assessment generation',
-      function (done) {
-        spyOn(viewModel, 'getModelKey')
-          .and.returnValue('program');
-        dfdRequest.resolve(data, filters);
-        viewModel.attr('objectGenerator', false);
-        let resultDfd = viewModel.loadAllItemsIds();
-        expect(resultDfd.state()).toEqual('resolved');
-        resultDfd.then(function (result) {
-          expect(result).toEqual([]);
-          done();
+      it('calls getModelKey() method', () => {
+        viewModel.loadAllItemsIds();
+
+        expect(viewModel.getModelKey).toHaveBeenCalled();
+      });
+
+      it('calls getQuery() method', () => {
+        viewModel.loadAllItemsIds();
+
+        expect(viewModel.getModelKey).toHaveBeenCalled();
+      });
+
+      it('calls batchRequests() util', () => {
+        viewModel.loadAllItemsIds();
+
+        expect(QueryAPI.batchRequestsWithPromise).toHaveBeenCalledWith({
+          header: 'header1',
+          data: {},
+        });
+
+        expect(QueryAPI.batchRequestsWithPromise).toHaveBeenCalledWith({
+          header: 'header2',
+          data: {},
         });
       });
+    });
 
-    it('rerturns promise with empty array if fail',
-      function (done) {
-        dfdRequest.reject();
+    describe('after batchRequest() success', () => {
+      beforeEach(() => {
+        spyOn(QueryAPI, 'batchRequestsWithPromise')
+          .withArgs({
+            header: 'header1',
+            data: {},
+          })
+          .and.returnValue(Promise.resolve({
+            modelKey: {
+              ids: [1, 2],
+            },
+          }))
+          .withArgs({
+            header: 'header2',
+            data: {},
+          })
+          .and.returnValue(Promise.resolve({
+            modelKey: {
+              ids: [1, 3],
+            },
+          }));
+      });
+
+      it('adds "type" attribute value to all objects' +
+        'if "useSnapshots" attribute is true', async () => {
+        viewModel.attr('type', 'testType');
         viewModel.attr('objectGenerator', true);
-        let resultDfd = viewModel.loadAllItemsIds();
-        expect(resultDfd.state()).toEqual('resolved');
-        resultDfd.then(function (result) {
-          expect(result).toEqual([]);
-          done();
+        viewModel.attr('useSnapshots', true);
+
+        const result = await viewModel.loadAllItemsIds();
+
+        result.forEach((obj) => {
+          expect(obj.type).toBe('modelKey');
         });
       });
+
+      it('performs extra mapping validation in case Assessment generation',
+        async () => {
+          viewModel.attr('objectGenerator', false);
+
+          const result = await viewModel.loadAllItemsIds();
+
+          expect(result[0].id).toBe(2);
+          expect(result.length).toBe(1);
+        });
+    });
+
+    describe('if batchRequest() was failed', () => {
+      it('returns empty array', async () => {
+        spyOn(QueryAPI, 'batchRequestsWithPromise')
+          .and.returnValue(Promise.reject());
+
+        const result = await viewModel.loadAllItemsIds();
+
+        expect(result).toEqual([]);
+      });
+    });
   });
 
   describe('setItemsDebounced() method', function () {
