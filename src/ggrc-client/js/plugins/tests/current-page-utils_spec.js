@@ -4,6 +4,9 @@
  */
 
 import * as CurrentPageUtils from '../utils/current-page-utils';
+import * as QueryAPI from '../utils/query-api-utils';
+import * as Mappings from '../../models/mappers/mappings';
+import * as SnapshotUtils from '../utils/snapshot-utils';
 
 describe('GGRC Utils CurrentPage', function () {
   let pageType;
@@ -125,6 +128,66 @@ describe('GGRC Utils CurrentPage', function () {
     it('returns False if pageType defined', function () {
       GGRC.pageType = 'ADMIN';
       expect(method()).toBeFalsy();
+    });
+  });
+
+  describe('initMappedInstances() method', () => {
+    beforeEach(() => {
+      spyOn(Mappings, 'getMappingList');
+      spyOn(SnapshotUtils, 'isSnapshotRelated');
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+
+      spyOn(QueryAPI, 'buildRelevantIdsQuery').and.returnValue({
+        operation: 'relevant',
+      });
+
+      spyOn(SnapshotUtils, 'transformQueryToSnapshot').withArgs({
+        operation: 'relevant',
+      }).and.returnValue({
+        id: 1,
+      });
+    });
+
+    it('inits mappings for snapshotable objects', async () => {
+      Mappings.getMappingList
+        .and.returnValue(['testSnapshotable']);
+
+      SnapshotUtils.isSnapshotRelated.and.returnValue(true);
+
+      QueryAPI.batchRequestsWithPromise
+        .and.returnValue(Promise.resolve({
+          Snapshot: {
+            ids: ['snap_1', 'snap_2', 'snap_3'],
+          },
+        }));
+
+      const result = await CurrentPageUtils.initMappedInstances();
+
+      expect(result['testSnapshotable'].attr()).toEqual({
+        snap_1: true,
+        snap_2: true,
+        snap_3: true,
+      });
+    });
+
+    it('should init mappings for non-snapshotable objects', async () => {
+      Mappings.getMappingList
+        .and.returnValue(['testNonSnapshotable']);
+
+      QueryAPI.batchRequestsWithPromise
+        .and.returnValue(Promise.resolve({
+          testNonSnapshotable: {
+            ids: ['non_snap_1', 'non_snap_2', 'non_snap_3'],
+          },
+        }));
+
+      const result = await CurrentPageUtils.initMappedInstances();
+
+      expect(result['testNonSnapshotable'].attr()).toEqual({
+        non_snap_1: true,
+        non_snap_2: true,
+        non_snap_3: true,
+      });
     });
   });
 });
