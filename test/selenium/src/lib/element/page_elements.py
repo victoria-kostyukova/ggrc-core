@@ -534,9 +534,7 @@ class PersonCAActionsStrategy(CAActionsStrategy):
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    if self._input.exists:  # editable
-      return self._input.text
-    elif self._chosen_person_el.exists:  # readonly
+    if self._chosen_person_el.exists:
       return self._chosen_person_el.text
     return None
 
