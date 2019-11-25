@@ -191,7 +191,7 @@ const bindXHRToButton = (xhr, el, newtext) => {
   }
   $el.addClass('disabled');
   $el.attr('disabled', true);
-  xhr.always(() => {
+  xhr.finally(() => {
     // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
     if ($el.length) {
       $el.removeAttr('disabled')
@@ -210,7 +210,8 @@ const bindXHRToDisableElement = (xhr, el) => {
   }
 
   $el.addClass('disabled');
-  xhr.always(() => {
+
+  xhr.finally(() => {
     $el.removeClass('disabled');
   });
 };
