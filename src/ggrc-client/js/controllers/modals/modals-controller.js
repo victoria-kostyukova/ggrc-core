@@ -86,7 +86,7 @@ export default canControl.extend({
     preload_view: '/dashboard/modal-preload.stache',
     header_view: '/modals/modal-header.stache',
     custom_attributes_view:
-    '/custom_attributes/modal-content.stache',
+      '/custom_attributes/modal-content.stache',
     button_view: BUTTON_VIEW_DONE,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
@@ -358,7 +358,7 @@ export default canControl.extend({
       //          (typeof el.attr('value') !== 'undefined' && el.val().length)) {
       if (el.prop('value').length === 0 ||
         (typeof el.attr('value') !== 'undefined' &&
-        !el.attr('value').length)) {
+          !el.attr('value').length)) {
         this.set_value_from_element(el);
       }
     },
@@ -512,7 +512,7 @@ export default canControl.extend({
     }
   },
 
-  '{contentEl} a.field-hide click': function (el, ev) { // field hide
+  '{contentEl} a.field-hide click': function (el) {// field hide
     let $el = $(el);
     let totalInner = $el.closest('.hide-wrap.hidable')
       .find('.inner-hide').length;
@@ -695,7 +695,7 @@ export default canControl.extend({
     }
   },
 
-  triggerSave(el, ev) {
+  triggerSave(el) {
     if (this.wasDestroyed()) {
       return;
     }
@@ -705,7 +705,7 @@ export default canControl.extend({
 
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      const ajd = this.save_instance(el, ev);
+      const ajd = this.save_instance();
 
       if (!ajd) {
         return;
@@ -727,21 +727,26 @@ export default canControl.extend({
         this.options.attr('isSaving', false);
         initAuditTitle(this.options.instance, this.options.new_object_form);
       });
+
+      const promise = new Promise((resolve) => {
+        ajd.always(() => resolve());
+      });
+
       if (this.options.add_more) {
-        bindXHRToButton(ajd, saveCloseBtn);
-        bindXHRToButton(ajd, saveAddmoreBtn, 'Saving, please wait...');
+        bindXHRToButton(promise, saveCloseBtn);
+        bindXHRToButton(promise, saveAddmoreBtn, 'Saving, please wait...');
       } else {
-        bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
-        bindXHRToButton(ajd, saveAddmoreBtn);
+        bindXHRToButton(promise, saveCloseBtn, 'Saving, please wait...');
+        bindXHRToButton(promise, saveAddmoreBtn);
       }
 
-      bindXHRToDisableElement(ajd, deleteBtn);
-      bindXHRToDisableElement(ajd, modalBackdrop);
-      bindXHRToDisableElement(ajd, modalCloseBtn);
+      bindXHRToDisableElement(promise, deleteBtn);
+      bindXHRToDisableElement(promise, modalBackdrop);
+      bindXHRToDisableElement(promise, modalCloseBtn);
     }
   },
 
-  new_instance: function (data) {
+  new_instance: function () {
     let newInstance = this.prepareInstance();
     this.reset_form(newInstance, () => {
       if (this.wasDestroyed()) {
@@ -775,7 +780,7 @@ export default canControl.extend({
     return instance;
   },
 
-  save_instance: function (el, ev) {
+  save_instance: function () {
     let that = this;
     let instance = this.options.instance;
     let ajd;
@@ -801,22 +806,21 @@ export default canControl.extend({
     this.disable_hide = true;
 
     ajd = instance.save();
-    ajd.catch(this.save_error.bind(this))
-      .then(function (obj) {
-        // enable ui after clicking on save & other
-        that.disableEnableContentUI(false);
-        delete that.disable_hide;
-        if (that.options.add_more) {
-          if (that.options.$trigger && that.options.$trigger.length) {
-            that.options.$trigger.trigger('modal:added', [obj]);
-          }
-          that.new_instance();
-        } else {
-          that.element.trigger('modal:success', [obj])
-            .modal_form('hide');
-          that.update_hash_fragment();
+    ajd.then(function (obj) {
+      // enable ui after clicking on save & other
+      that.disableEnableContentUI(false);
+      delete that.disable_hide;
+      if (that.options.add_more) {
+        if (that.options.$trigger && that.options.$trigger.length) {
+          that.options.$trigger.trigger('modal:added', [obj]);
         }
-      });
+        that.new_instance();
+      } else {
+        that.element.trigger('modal:success', [obj])
+          .modal_form('hide');
+        that.update_hash_fragment();
+      }
+    }).catch(this.save_error.bind(this));
     this.save_ui_status();
     return ajd;
   },
