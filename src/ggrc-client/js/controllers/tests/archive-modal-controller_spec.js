@@ -15,7 +15,7 @@ describe('ToggleArchive modal', function () {
     let $element;
     let event;
 
-    beforeAll(() => {
+    beforeEach(() => {
       $element = $('<div data-modal_form="">' +
         '<a data-dismiss="modal"></a>' +
         '</div>');
@@ -26,7 +26,7 @@ describe('ToggleArchive modal', function () {
         options: {
           instance: new canMap({
             refresh: jasmine.createSpy('save')
-              .and.returnValue($.Deferred().promise()),
+              .and.returnValue(new Promise(() => {})),
           }),
         },
       };
@@ -46,24 +46,15 @@ describe('ToggleArchive modal', function () {
   describe('notifyArchivingResult() method', () => {
     let notifyArchivingResult;
     let ctrlInst;
-    let dfd;
-    let dfdSave;
-    let dfdRefresh;
     let instance;
 
     beforeEach(() => {
-      dfdRefresh = $.Deferred();
-      dfdSave = $.Deferred();
-
       instance = new canMap({ });
 
       ctrlInst = {
         options: {
           instance: instance,
         },
-        archive: jasmine.createSpy('archive'),
-        displaySuccessNotify: jasmine.createSpy('displaySuccessNotify'),
-        displayErrorNotify: jasmine.createSpy(),
       };
 
       notifyArchivingResult =
@@ -71,55 +62,54 @@ describe('ToggleArchive modal', function () {
     });
 
     it('calls archive() after instance.refresh() has resolved',
-      (done) => {
-        dfdRefresh.resolve();
+      async () => {
+        ctrlInst.archive = jasmine.createSpy()
+          .and.returnValue(Promise.resolve());
+        ctrlInst.displaySuccessNotify = jasmine.createSpy()
+          .and.returnValue(Promise.resolve());
 
-        dfd = notifyArchivingResult(dfdRefresh);
-        dfd.then(() => {
-          expect(ctrlInst.archive).toHaveBeenCalled();
-          done();
-        });
+        await notifyArchivingResult(Promise.resolve());
+
+        expect(ctrlInst.archive).toHaveBeenCalled();
       });
 
     it('calls displaySuccessNotify() method' +
-      'if instance.save() hasn\'t rejected', (done) => {
-      dfdRefresh.resolve();
-      dfdSave.resolve();
+      'if instance.save() hasn\'t rejected', async () => {
+      ctrlInst.archive = jasmine.createSpy()
+        .and.returnValue(Promise.resolve());
+      ctrlInst.displaySuccessNotify = jasmine.createSpy()
+        .and.returnValue(Promise.resolve());
 
-      dfd = notifyArchivingResult(dfdRefresh);
-      dfd.then(() => {
-        expect(ctrlInst.displaySuccessNotify).toHaveBeenCalled();
-        done();
-      });
+      await notifyArchivingResult(Promise.resolve());
+
+      expect(ctrlInst.displaySuccessNotify).toHaveBeenCalled();
     });
 
     it('calls displayErrorNotify() method if instance.refresh() has rejected',
-      (done) => {
-        dfdSave.resolve();
-        dfdRefresh.reject();
+      async () => {
+        ctrlInst.archive = jasmine.createSpy();
+        ctrlInst.displaySuccessNotify = jasmine.createSpy();
+        ctrlInst.displayErrorNotify = jasmine.createSpy();
 
-        dfd = notifyArchivingResult(dfdRefresh);
-        dfd.fail(() => {
-          expect(ctrlInst.archive).not.toHaveBeenCalled();
-          expect(ctrlInst.displaySuccessNotify).not.toHaveBeenCalled();
-          expect(ctrlInst.displayErrorNotify).toHaveBeenCalled();
-          done();
-        });
+        await notifyArchivingResult(Promise.reject());
+
+        expect(ctrlInst.archive).not.toHaveBeenCalled();
+        expect(ctrlInst.displaySuccessNotify).not.toHaveBeenCalled();
+        expect(ctrlInst.displayErrorNotify).toHaveBeenCalled();
       });
 
     it('calls displayErrorNotify() method if instance.save() has rejected',
-      (done) => {
-        ctrlInst.archive = jasmine.createSpy('archive')
-          .and.returnValue(dfdSave.reject());
+      async () => {
+        ctrlInst.archive = jasmine.createSpy()
+          .and.returnValue(Promise.reject());
+        ctrlInst.displaySuccessNotify = jasmine.createSpy();
+        ctrlInst.displayErrorNotify = jasmine.createSpy();
 
-        dfd = notifyArchivingResult(dfdRefresh);
-        dfdRefresh.resolve();
-        dfd.fail(() => {
-          expect(ctrlInst.archive).toHaveBeenCalled();
-          expect(ctrlInst.displaySuccessNotify).not.toHaveBeenCalled();
-          expect(ctrlInst.displayErrorNotify).toHaveBeenCalled();
-          done();
-        });
+        await notifyArchivingResult(Promise.resolve());
+
+        expect(ctrlInst.archive).toHaveBeenCalled();
+        expect(ctrlInst.displaySuccessNotify).not.toHaveBeenCalled();
+        expect(ctrlInst.displayErrorNotify).toHaveBeenCalled();
       });
   });
 
