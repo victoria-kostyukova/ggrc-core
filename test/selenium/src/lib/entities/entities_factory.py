@@ -659,11 +659,7 @@ class AssessmentsFactory(EntitiesFactory):
     about 'mapped_objects' and 'asmt_tmpl' use generation logic accordingly.
     """
     mapped_objects = help_utils.convert_to_list(mapped_objects)
-    asmts_creators = PeopleFactory.extract_people_emails(self.admins)
-    asmts_assignees = audit.audit_captains
-    asmts_verifiers = (
-        audit.auditors if audit.auditors else audit.audit_captains)
-    asmts_cas_def = None
+    asmts_cas_def = getattr(asmt_tmpl, "custom_attribute_definitions", None)
     asmts_type = (
         mapped_objects[0].type
         if all(getattr(mapped_obj, "type") for mapped_obj in mapped_objects)
@@ -674,31 +670,36 @@ class AssessmentsFactory(EntitiesFactory):
             "Mapped objects' type: {} have to be the same with Assessment "
             "Template's type: {}".format(
                 asmts_type, asmt_tmpl.template_object_type))
-      # if assignees or verifiers are ids (int not str related attrs)
-      # todo add logic to converts ids (int) repr to users' names
-      if any(all(isinstance(user, int) for user in asmts_users)
-             for asmts_users in
-             [asmts_users for asmts_users in asmts_assignees, asmts_verifiers
-              if isinstance(asmts_users, list)]):
-        raise NotImplementedError
-      if asmt_tmpl.assignees == unicode(roles.AUDITORS):
-        asmts_assignees = audit.auditors
-      if asmt_tmpl.verifiers != unicode(roles.AUDITORS):
-        asmts_verifiers = audit.audit_captains
-
-      if getattr(asmt_tmpl, "custom_attribute_definitions"):
-        asmts_cas_def = asmt_tmpl.custom_attribute_definitions
-    asmts_objs = [
-        empty_asmt.update_attrs(
-            title=mapped_object.title + " assessment for " + audit.title,
-            audit=audit.title, mapped_objects=[mapped_object],
-            creators=asmts_creators, assignees=asmts_assignees,
-            verifiers=asmts_verifiers, assessment_type=asmts_type,
-            custom_attribute_definitions=asmts_cas_def
-        ) for empty_asmt, mapped_object
-        in zip([self.obj_inst() for _ in xrange(len(mapped_objects))],
-               mapped_objects)]
+    asmts_objs = []
+    for mapped_object in mapped_objects:
+      asmt = self.obj_inst().update_attrs(
+          title=mapped_object.title + " assessment for " + audit.title,
+          audit=audit.title, mapped_objects=[mapped_object],
+          assessment_type=asmts_type,
+          custom_attribute_definitions=asmts_cas_def,
+          **self.acl_roles_from_template(audit, asmt_tmpl, mapped_object))
+      asmts_objs.append(asmt)
     return asmts_objs
+
+  def acl_roles_from_template(self, audit, template, snapshot):
+    """Returns dict with roles as keys and assigned users as values according
+    to template settings."""
+    acl = {"creators": PeopleFactory.extract_people_emails(self.admins),
+           "verifiers": None, "assignees": None}
+    asmt_template_roles_mapping = {
+        element.CommonAudit.AUDIT_CAPTAIN: audit.audit_captains,
+        roles.AUDITORS: audit.auditors,
+        roles.PRINCIPAL_ASSIGNEES: snapshot.principal_assignees}
+    # handle other roles if needed
+    if template:
+      for role in ("assignees", "verifiers"):
+        people = getattr(template, role)
+        if people in asmt_template_roles_mapping.keys():
+          people = asmt_template_roles_mapping[people]
+        acl[role] = people
+    if not acl["assignees"]:
+      acl["assignees"] = audit.audit_captains
+    return acl
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Assessment entity with randomly and predictably filled fields, if

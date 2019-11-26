@@ -9,10 +9,10 @@ import json
 import requests
 
 from lib import environment, factory, url, constants
-from lib.constants import objects, messages, roles
+from lib.constants import objects, messages
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
-    PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory,
+    PeopleFactory, CustomAttributeDefinitionsFactory,
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
@@ -339,30 +339,22 @@ class AssessmentsFromTemplateService(HelpRestService):
   """Service for creating assessments from templates."""
   def __init__(self):
     super(AssessmentsFromTemplateService, self).__init__(url.ASSESSMENTS)
+    self.entities_factory_cls = entities_factory.AssessmentsFactory()
 
   def create_assessments(self, audit, template, snapshots):
     """Create assessments from template."""
     assessments = []
     for snapshot in snapshots:
-      assessment = entities_factory.AssessmentsFactory().create()
+      assessment = self.entities_factory_cls.create()
       assessment.update_attrs(audit=audit, template=template, object=snapshot)
       response = self.client.create_object(**assessment.__dict__)
       attrs = BaseRestService.get_items_from_resp(response)
-      assessment = AssessmentsFactory().create()
+      assessment = self.entities_factory_cls.create()
       assessment.__dict__.update({k: v for k, v in attrs.iteritems()
                                   if v and k not in ["type", ]})
-      for acr_name in ("assignees", "verifiers"):
-        people = getattr(template, acr_name)
-        if people == roles.PRINCIPAL_ASSIGNEES:
-          people = snapshot.principal_assignees
-        elif people == roles.AUDITORS:
-          people = audit.auditors
-        elif people == "Audit Captain":
-          people = audit.audit_captains
-        # handle other roles if needed
-        if not people:
-          people = audit.audit_captains
-        setattr(assessment, acr_name, people)
+      assessment.__dict__.update(
+          self.entities_factory_cls.acl_roles_from_template(audit, template,
+                                                            snapshot))
       assessments.append(assessment)
     return assessments
 
