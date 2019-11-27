@@ -26,8 +26,8 @@ export default canComponent.extend({
     isProposal: false,
     includeRoles: [],
     excludeRoles: [],
+    disabledRoles: [],
+    rolesTooltips: [],
     readOnly: false,
-    showGroupTooltip: false,
-    groupTooltip: null,
   }),
 });

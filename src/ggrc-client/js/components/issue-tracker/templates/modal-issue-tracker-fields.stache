@@ -41,8 +41,7 @@
       <div class="ggrc-form-item__row issue-tracker__toolbar">
         <button type="button"
           class="btn btn-small btn-darkBlue"
-          on:el:click="generateNewTicket"
-          {{#if isTicketIdMandatory}} disabled {{/if}}>
+          on:el:click="generateNewTicket">
           Generate new ticket
         </button>
         <button type="button"

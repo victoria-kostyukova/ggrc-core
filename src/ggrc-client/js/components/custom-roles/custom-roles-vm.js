@@ -35,6 +35,7 @@ export default canMap.extend({
   excludeRoles: [],
   conflictRoles: [],
   orderOfRoles: [],
+  disabledRoles: [],
   readOnly: false,
   // When we delete some role this action can delete another acl role on the backend.
   // In this case we get in response less objects then was in request.

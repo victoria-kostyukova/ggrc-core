@@ -72,6 +72,11 @@ export default class IssueTracker extends Mixin {
     return GGRC.ISSUE_TRACKER_ENABLED
       && issueTrackerUtils.isIssueTrackerEnabled(this);
   }
+
+  issueLinked() {
+    return GGRC.ISSUE_TRACKER_ENABLED
+      && issueTrackerUtils.isIssueLinked(this);
+  }
 }
 
 Object.assign(

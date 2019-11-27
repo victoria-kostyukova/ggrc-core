@@ -29,7 +29,8 @@
             instance:from="instance"
             readOnly:from="readOnly"
             updatableGroupId:from="updatableGroupId"
-            singleUserRole:from="singleUserRole">
+            singleUserRole:from="singleUserRole"
+            disabledRoles:from="disabledRoles">
               <div>
                   <editable-people-group
                     required:from="required"

@@ -46,6 +46,11 @@ export default canComponent.extend({
 
       this.attr('instance').setDefaultHotlistAndComponent();
       this.attr('instance.issue_tracker.issue_id', null);
+
+      this.dispatch({
+        type: 'issueTrackerStateChanged',
+        state: 'generateNew',
+      });
     },
     linkToExistingTicket() {
       if (this.attr('currentState') === state.LINK_TO_EXISTING) {
@@ -59,6 +64,11 @@ export default canComponent.extend({
         issue_id: null,
         hotlist_id: null,
         component_id: null,
+      });
+
+      this.dispatch({
+        type: 'issueTrackerStateChanged',
+        state: 'linkToExisting',
       });
     },
     setTicketIdMandatory() {
@@ -76,14 +86,6 @@ export default canComponent.extend({
         _initialized: initialized,
       });
     },
-    statusChanged() {
-      this.setTicketIdMandatory();
-
-      if (this.attr('currentState') === state.GENERATE_NEW &&
-        this.attr('isTicketIdMandatory')) {
-        this.linkToExistingTicket();
-      }
-    },
   }),
   events: {
     inserted() {
@@ -99,7 +101,7 @@ export default canComponent.extend({
       vm.setValidationFlags({initialized: false, linking: false});
     },
     '{viewModel.instance} status'() {
-      this.viewModel.statusChanged();
+      this.viewModel.setTicketIdMandatory();
     },
     removed() {
       let instance = this.viewModel.attr('instance');

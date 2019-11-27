@@ -29,14 +29,15 @@
             isProposal:from="isProposal"
             updatableGroupId:from="updatableGroupId"
             readOnly:from="readOnly"
-            data-original-title="{{groupTooltip}}"
+            disabledRoles:from="disabledRoles"
+            rolesTooltips:from="rolesTooltips"
             singleUserRole:from="singleUserRole"
-            {{#showGroupTooltip}}
-              rel="tooltip"
-              data-placement="bottom"
-            {{/showGroupTooltip}}
             >
-              <div {{^required}}class="hidable"{{/required}}>
+              <div
+                {{^required}}class="hidable"{{/required}}
+                data-original-title="{{tooltip}}"
+                rel="tooltip"
+                data-placement="bottom">
                 <deletable-people-group
                   showEmptyMessage:from="false"
                   required:from="required"

@@ -4,7 +4,7 @@
 }}
 
 {{#instance}}
-  <info-pane instance:from="instance">
+  <issue-main-content-wrapper instance:from="instance" isIssueLinked:from="instance.issueLinked">
     <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
       <inline-form-control instance:from="instance">
         <div class="tier-content">
@@ -79,9 +79,13 @@
 
                     <div class="row-fluid wrap-row">
                       <div>
-                        <custom-roles
-                          instance:from="instance"
-                          readOnly:from="instance.issueTrackerEnabled"></custom-roles>
+                        <issue-roles-wrapper
+                          disable:from="disableIssueTrackerDependentFields">
+                          <custom-roles
+                            instance:from="instance"
+                            disabledRoles:from="disabledRoles">
+                          </custom-roles>
+                        </issue-roles-wrapper>
                       </div>
                     </div>
 
@@ -210,5 +214,5 @@
     {{#if is_info_widget}}
       <info-pane-footer createdAt:from="instance.created_at" modifiedAt:from="instance.updated_at" modifiedBy:from="instance.modified_by"></info-pane-footer>
     {{/if}}
-  </info-pane>
+  </issue-main-content-wrapper>
 {{/instance}}

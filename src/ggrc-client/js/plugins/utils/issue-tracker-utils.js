@@ -28,6 +28,12 @@ const isIssueTrackerEnabled = (instance) => {
     && instance.attr('issue_tracker.enabled');
 };
 
+const isIssueLinked = (instance) => {
+  const issueTracker = instance.attr('issue_tracker');
+  return issueTracker.attr('enabled')
+    && (isIssueCreated(instance) || issueTracker.attr('is_linking'));
+};
+
 /**
  * Removes unnecessary fields from issue_tracker attr before save
  * @param {can.Map} instance - instance of model
@@ -96,8 +102,9 @@ function checkWarnings(instance) {
 export {
   issueTrackerStaticFields,
   isIssueTrackerInitialized,
-  isIssueTrackerEnabled,
   isIssueCreated,
+  isIssueTrackerEnabled,
+  isIssueLinked,
   initIssueTrackerObject,
   checkWarnings,
   cleanUpWarnings,

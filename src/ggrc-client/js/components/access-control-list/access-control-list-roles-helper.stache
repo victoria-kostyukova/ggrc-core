@@ -12,8 +12,8 @@
   isNewInstance:from="isNewInstance"
   includeRoles:from="includeRoles"
   excludeRoles:from="excludeRoles"
+  disabledRoles:from="disabledRoles"
+  rolesTooltips:from="rolesTooltips"
   readOnly:from="readOnly"
-  orderOfRoles:from="orderOfRoles"
-  showGroupTooltip:from="showGroupTooltip"
-  groupTooltip:from="groupTooltip">
+  orderOfRoles:from="orderOfRoles">
 </custom-roles-modal>

@@ -28,7 +28,8 @@ export default canComponent.extend({
             !this.attr('updatableGroupId') &&
             (this.attr('isNewInstance') ||
               this.attr('isProposal') ||
-              isAllowedFor('update', instance));
+              isAllowedFor('update', instance)) &&
+            !this.attr('isDisabledRole');
 
           return canEdit;
         },
@@ -45,7 +46,21 @@ export default canComponent.extend({
             'Change person' : 'Add person';
         },
       },
+      isDisabledRole: {
+        get() {
+          return this.attr('disabledRoles').attr().includes(this.attr('title'));
+        },
+      },
+      tooltip: {
+        get() {
+          const roleTooltip = this.attr('rolesTooltips').attr()
+            .find((roleTooltip) => roleTooltip.role === this.attr('title'));
+          return roleTooltip ? roleTooltip.tooltip : '';
+        },
+      },
     },
+    disabledRoles: [],
+    rolesTooltips: [],
     instance: {},
     isNewInstance: false,
     groupId: '',
@@ -59,7 +74,6 @@ export default canComponent.extend({
     updatableGroupId: null,
     readOnly: false,
     isProposal: false,
-
     changeEditableGroup: function (args) {
       if (args.editableMode) {
         this.attr('backUpPeople', this.attr('people').attr());
