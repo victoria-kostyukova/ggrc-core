@@ -23,11 +23,6 @@ const isIssueCreated = (instance) => {
   return !!(instance.attr('issue_tracker.issue_url'));
 };
 
-const isIssueTrackerEnabled = (instance) => {
-  return isIssueCreated(instance)
-    && instance.attr('issue_tracker.enabled');
-};
-
 const isIssueLinked = (instance) => {
   const issueTracker = instance.attr('issue_tracker');
   return issueTracker.attr('enabled')
@@ -103,7 +98,6 @@ export {
   issueTrackerStaticFields,
   isIssueTrackerInitialized,
   isIssueCreated,
-  isIssueTrackerEnabled,
   isIssueLinked,
   initIssueTrackerObject,
   checkWarnings,

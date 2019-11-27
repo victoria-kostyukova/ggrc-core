@@ -115,11 +115,6 @@ export default class AssessmentIssueTracker extends Mixin {
     return this.attr('can_use_issue_tracker')
       && issueTrackerUtils.isIssueCreated(this);
   }
-
-  issueTrackerEnabled() {
-    return this.attr('can_use_issue_tracker')
-      && issueTrackerUtils.isIssueTrackerEnabled(this);
-  }
 }
 
 Object.assign(
