@@ -6,20 +6,20 @@
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
-import '../object-list-item/business-object-list-item';
+import '../../object-list-item/business-object-list-item';
 import template from './issue-unmap-item.stache';
-import Pagination from '../base-objects/pagination';
+import Pagination from '../../base-objects/pagination';
 import {
   buildParam,
   batchRequests,
-} from '../../plugins/utils/query-api-utils';
+} from '../../../plugins/utils/query-api-utils';
 import {
   getPageInstance,
   navigate,
-} from '../../plugins/utils/current-page-utils';
-import {notifier} from '../../plugins/utils/notifiers-utils';
-import Relationship from '../../models/service-models/relationship';
-import * as businessModels from '../../models/business-models';
+} from '../../../plugins/utils/current-page-utils';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
+import Relationship from '../../../models/service-models/relationship';
+import * as businessModels from '../../../models/business-models';
 
 export default canComponent.extend({
   tag: 'issue-unmap-item',

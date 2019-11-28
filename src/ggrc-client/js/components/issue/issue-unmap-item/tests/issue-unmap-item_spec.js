@@ -4,14 +4,14 @@
 */
 
 import canMap from 'can-map';
-import {getComponentVM, makeFakeInstance} from '../../../../js_specs/spec-helpers';
+import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec-helpers';
 import Component from '../issue-unmap-item';
-import * as QueryAPI from '../../../plugins/utils/query-api-utils';
-import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
-import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
-import Relationship from '../../../models/service-models/relationship';
-import * as businessModels from '../../../models/business-models';
-import Issue from '../../../models/business-models/issue';
+import * as QueryAPI from '../../../../plugins/utils/query-api-utils';
+import * as CurrentPageUtils from '../../../../plugins/utils/current-page-utils';
+import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
+import Relationship from '../../../../models/service-models/relationship';
+import * as businessModels from '../../../../models/business-models';
+import Issue from '../../../../models/business-models/issue';
 
 describe('issue-unmap-item component', () => {
   let viewModel;
