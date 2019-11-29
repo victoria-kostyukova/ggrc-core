@@ -597,9 +597,8 @@ export default canComponent.extend({
     '{viewModel.pageInfo} pageSize': function () {
       this.viewModel.loadItems();
     },
-    ' selectTreeItem': function (el, ev, selectedEl, instance) {
+    ' selectTreeItem'(el, ev, selectedEl, instance) {
       let parent = this.viewModel.attr('parent_instance');
-      let setInstanceDfd;
       let infoPaneOptions = new canMap({
         instance: instance,
         parent_instance: parent,
@@ -623,12 +622,12 @@ export default canComponent.extend({
       el.find('.item-active').removeClass('item-active');
       selectedEl.addClass('item-active');
 
-      setInstanceDfd = $('.pin-content').control()
+      const setInstancePromise = $('.pin-content').control()
         .setInstance(infoPaneOptions, selectedEl, true);
 
-      setInstanceDfd.then(function () {
+      setInstancePromise.then(() => {
         this.viewModel.attr('canOpenInfoPin', true);
-      }.bind(this));
+      });
     },
     ' refreshTree'(el, ev) {
       ev.stopPropagation();
