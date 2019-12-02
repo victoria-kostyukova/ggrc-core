@@ -52,30 +52,32 @@ class TestMegaProgram(base.Test):
     return is_error_exist
 
   @pytest.mark.smoke_tests
-  def test_mapping_child_program_and_automapping(
-      self, programs, selenium, soft_assert
+  @pytest.mark.parametrize('map_program_as_parent', [False, True])
+  def test_mapping_program_and_automapping(
+      self, programs, selenium, soft_assert, map_program_as_parent
   ):
-    """Checks that user can map program 2 to program 1 as child and that
-    automapping to program 1 of regulation which is mapped to program 2 works.
+    """Checks that user can map program 2 to program 1 as child or parent
+    and that automapping to parent program of regulation which is mapped to
+    child program works.
 
     Preconditions:
-    - Two programs created via REST API."""
+      - Two programs created via REST API."""
     first_program, second_program = programs
-    regulation = rest_facade.create_regulation(second_program)
+    regulation = (rest_facade.create_regulation(first_program)
+                  if map_program_as_parent else
+                  rest_facade.create_regulation(second_program))
     mega_program_ui_facade.map_programs_via_add_tab_button(
-        selenium, src_program=first_program, mapped_programs=[second_program])
-    soft_assert.expect(
-        self.is_ggrc_8062(first_program, selenium),
-        "GGRC-8062 Mega program icon doesn't appear without reloading page",
-        is_expected_error=True)
-    info_page = webui_service.ProgramsService().open_info_page_of_obj(
-        first_program)
-    webui_facade.soft_assert_tab_with_number_exists(
-        info_page, soft_assert, info_page.CHILD_PROGRAMS_TAB_NAME,
-        len([second_program]))
-    mega_program_ui_facade.soft_assert_mapping_child_program_and_automapping(
-        selenium, first_program, second_program, regulation,
-        users.current_user(), soft_assert)
+        selenium, src_program=first_program,
+        mapped_programs=[second_program], map_as_parent=map_program_as_parent)
+    if not map_program_as_parent:
+      soft_assert.expect(
+          self.is_ggrc_8062(first_program, selenium),
+          "GGRC-8062 Mega program icon doesn't appear without reloading page",
+          is_expected_error=True)
+    mega_program_ui_facade.soft_assert_mapping_program_and_automapping(
+        selenium, soft_assert, src_program=first_program,
+        mapped_program=second_program, mapped_obj=regulation,
+        user=users.current_user(), is_mapped_as_parent=map_program_as_parent)
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests

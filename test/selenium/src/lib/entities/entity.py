@@ -772,7 +772,13 @@ class ProgramEntity(Entity, mixin.Reviewable):
     self.delete_attrs("admins")
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
-        "secondary_contacts", "review", **attrs)
+        "secondary_contacts", "review", "parents", "children", **attrs)
+
+  def tree_item_representation(self):
+    """Make program's copy and convert it to the view of tree item."""
+    obj = super(ProgramEntity, self).tree_item_representation()
+    obj.children, obj.parents = [], []
+    return obj
 
 
 class ProductEntity(Entity):
