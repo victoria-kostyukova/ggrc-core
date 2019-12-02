@@ -75,6 +75,30 @@ export default Cacheable.extend({
         attr_name: 'external_review_status',
         attr_sort_field: 'review_status_display_name',
         order: 80,
+      }, {
+        attr_title: 'Created By',
+        attr_name: 'created_by',
+        attr_sort_field: 'created_by',
+      }, {
+        attr_title: 'Due Date',
+        attr_name: 'due_date',
+        attr_sort_field: 'due_date',
+      }, {
+        attr_title: 'Last Owner Reviewed Date',
+        attr_name: 'last_submitted_at',
+        attr_sort_field: 'last_submitted_at',
+      }, {
+        attr_title: 'Last Owner Reviewed By',
+        attr_name: 'last_submitted_by',
+        attr_sort_field: 'last_submitted_by',
+      }, {
+        attr_title: 'Last Compliance Reviewed Date',
+        attr_name: 'last_verified_at',
+        attr_sort_field: 'last_verified_at',
+      }, {
+        attr_title: 'Last Compliance Reviewed By',
+        attr_name: 'last_verified_by',
+        attr_sort_field: 'last_verified_by',
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',
       'updated_at'],

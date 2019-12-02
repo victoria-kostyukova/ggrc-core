@@ -104,6 +104,138 @@
                     <div class="span4">
                       <external-attribute
                         instance:from="instance"
+                        title:from="'Effective Date'"
+                        attrName:from="'start_date'"
+                      >
+                        {{#if start_date}}
+                          <p>
+                            {{localize_date start_date}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </external-attribute>
+                    </div>
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Deprecated Date
+                          </h6>
+                        </div>
+                        {{#if end_date}}
+                          <p>
+                            {{localize_date end_date}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <external-attribute
+                        instance:from="instance"
+                        title:from="'Due Date'"
+                        attrName:from="'due_date'"
+                      >
+                        {{#if due_date}}
+                          <p>
+                            {{localize_date due_date}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </external-attribute>
+                    </div>
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Created By
+                          </h6>
+                        </div>
+                        {{#if created_by}}
+                          <p>
+                            {{created_by.email}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Owner Reviewed Date
+                          </h6>
+                        </div>
+                        {{#if last_submitted_at}}
+                          <p>
+                            {{localize_date last_submitted_at}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Owner Reviewed By
+                          </h6>
+                        </div>
+                        {{#if last_submitted_by}}
+                          <p>
+                            {{last_submitted_by.email}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Compliance Reviewed Date
+                          </h6>
+                        </div>
+                        {{#if last_verified_at}}
+                          <p>
+                            {{localize_date last_verified_at}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                    <div class="span4">
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Compliance Reviewed By
+                          </h6>
+                        </div>
+                        {{#if last_verified_by}}
+                          <p>
+                            {{last_verified_by.email}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <external-attribute
+                        instance:from="instance"
                         title:from="'Kind/Nature'"
                         attrName:from="'kind'"
                       >
@@ -135,9 +267,7 @@
                         </p>
                       </external-attribute>
                     </div>
-                  </div>
-                  <div class="row-fluid wrap-row">
-                    <div class="span8">
+                    <div class="span4">
                       <external-attribute
                         instance:from="instance"
                         title:from="'Significance'"
@@ -156,91 +286,8 @@
                         </p>
                       </external-attribute>
                     </div>
-                    <div class="span4">
-                      <external-attribute
-                        instance:from="instance"
-                        title:from="'Type/Means'"
-                        attrName:from="'means'"
-                      >
-                        {{#if means}}
-                          <p>
-                            {{means}}
-                          </p>
-                        {{else}}
-                          <span class="empty-message">None</span>
-                        {{/if}}
-                      </external-attribute>
-                    </div>
                   </div>
                   <div class="row-fluid wrap-row">
-                    <div class="span4">
-                      <external-attribute
-                        instance:from="instance"
-                        title:from="'Effective Date'"
-                        attrName:from="'start_date'"
-                      >
-                        {{#if start_date}}
-                          <p>
-                            {{localize_date start_date}}
-                          </p>
-                        {{else}}
-                          <span class="empty-message">None</span>
-                        {{/if}}
-                      </external-attribute>
-                    </div>
-                    <div class="span4">
-                      <div class="action-toolbar-container">
-                        <div class="action-toolbar">
-                          <h6 class="action-toolbar__header">
-                            Last Deprecated Date
-                          </h6>
-                        </div>
-                        {{#if end_date}}
-                          <p>
-                            {{localize_date end_date}}
-                          </p>
-                        {{else}}
-                          <span class="empty-message">None</span>
-                        {{/if}}
-                      </div>
-                    </div>
-                    <div class="span4">
-                      <external-attribute
-                        instance:from="instance"
-                        title:from="'Frequency'"
-                        attrName:from="'verify_frequency'"
-                      >
-                        {{#if verify_frequency}}
-                          <p>
-                            {{verify_frequency}}
-                          </p>
-                        {{else}}
-                          <span class="empty-message">None</span>
-                        {{/if}}
-                      </external-attribute>
-                    </div>
-                  </div>
-                  <div class="row-fluid wrap-row">
-                    <div class="span8">
-                      <external-attribute
-                        instance:from="instance"
-                        title:from="'Assertions'"
-                        attrName:from="'control_assertions'"
-                        mandatory:from="true"
-                      >
-                        {{#if assertions.length}}
-                          <ul>
-                            <sort-component items:from="assertions">
-                              {{#sortedItems}}
-                                <li>{{.}}</li>
-                              {{/sortedItems}}
-                            </sort-component>
-                          </ul>
-                        {{else}}
-                          <span class="empty-message">None</span>
-                        {{/if}}
-                      </external-attribute>
-                    </div>
                     <div class="span4">
                       <external-attribute
                         instance:from="instance"
@@ -260,8 +307,60 @@
                         {{/if}}
                       </external-attribute>
                     </div>
+                    <div class="span4">
+                      <external-attribute
+                        instance:from="instance"
+                        title:from="'Frequency'"
+                        attrName:from="'verify_frequency'"
+                      >
+                        {{#if verify_frequency}}
+                          <p>
+                            {{verify_frequency}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </external-attribute>
+                    </div>
+                    <div class="span4">
+                      <external-attribute
+                        instance:from="instance"
+                        title:from="'Assertions'"
+                        attrName:from="'control_assertions'"
+                        mandatory:from="true"
+                      >
+                        {{#if assertions.length}}
+                          <ul>
+                            <sort-component items:from="assertions">
+                              {{#sortedItems}}
+                                <li>{{.}}</li>
+                              {{/sortedItems}}
+                            </sort-component>
+                          </ul>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </external-attribute>
+                    </div>
                   </div>
-                </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <external-attribute
+                        instance:from="instance"
+                        title:from="'Type/Means'"
+                        attrName:from="'means'"
+                      >
+                        {{#if means}}
+                          <p>
+                            {{means}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </external-attribute>
+                    </div>
+                  </div>
+                </div><!-- hidden-fields-area end -->
               </div><!-- custom-attr-wrap end -->
               {{> custom_attributes/info.stache}}
             </div>

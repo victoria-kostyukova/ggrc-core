@@ -183,18 +183,12 @@
                             Last Deprecated Date
                           </h6>
                         </div>
-                        {{#if last_deprecated_date}}
+                        {{#if end_date}}
                           <p>
-                            {{localize_date last_deprecated_date}}
+                            {{localize_date end_date}}
                           </p>
                         {{else}}
-                          {{#if end_date}}
-                            <p>
-                              {{localize_date end_date}}
-                            </p>
-                          {{else}}
-                            <span class="empty-message">None</span>
-                          {{/if}}
+                          <span class="empty-message">None</span>
                         {{/if}}
                       </div>
                     </div>
