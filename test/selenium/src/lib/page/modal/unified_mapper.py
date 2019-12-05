@@ -37,8 +37,6 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
     self.tree_view = base.UnifiedMapperTreeView(
         self._driver, obj_name=obj_name)
     self._add_attr_btn = None
-    self.search_result_toggle = base.Toggle(
-        self.modal_elem, self._locators.RESULT_TOGGLE_CSS)
     self.open_in_new_frontend_btn = self._browser.link(
         class_name=["btn", "btn-small", "btn-white"],
         text="Open in new frontend")
