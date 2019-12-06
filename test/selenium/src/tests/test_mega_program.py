@@ -8,6 +8,7 @@ import pytest
 from lib import base, users
 from lib.service import rest_facade, webui_facade, webui_service
 from lib.ui import mega_program_ui_facade
+from lib.constants import objects, messages
 
 
 class TestMegaProgram(base.Test):
@@ -77,6 +78,7 @@ class TestMegaProgram(base.Test):
         users.current_user(), soft_assert)
     soft_assert.assert_expectations()
 
+  @pytest.mark.smoke_tests
   def test_mega_program_icon_in_unified_mapper(
       self, mapped_programs, selenium
   ):
@@ -87,3 +89,21 @@ class TestMegaProgram(base.Test):
     parent_program, child_program = mapped_programs
     webui_facade.check_mega_program_icon_in_unified_mapper(
         selenium, child_program=child_program, parent_program=parent_program)
+
+  @pytest.mark.smoke_tests
+  def test_disabled_mapping_to_itself_in_unified_mapper(
+      self, selenium, program
+  ):
+    """Checks that mapping the program to itself functionality is disabled
+    in Unified Mapper.
+
+    Preconditions:
+     - Program created via REST API.
+    """
+    program_mapper = webui_service.ProgramsService(
+        obj_name=objects.PROGRAM_CHILDS, driver=selenium).get_unified_mapper(
+            src_obj=program)
+    program_item = program_mapper.tree_view.get_item_by_obj_name(program.title)
+    assert program_item.is_checkbox_disabled, (
+        messages.AssertionMessages.ITEM_CHECKBOX_SHOULD_BE_DISABLED.format(
+            obj_name=program.title))

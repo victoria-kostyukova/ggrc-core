@@ -922,12 +922,6 @@ class TreeView(object):
       By.CSS_SELECTOR, Common.WDG_NOT_HIDDEN + ITEM_EXPAND_BTN)
 
 
-class TreeViewItem(object):
-  """Locators for Tree View Item element"""
-  CELL = (By.CSS_SELECTOR,
-          "div[class*='attr']:not(.attr-content):not(.selectable-attrs)")
-
-
 class AdminTreeView(object):
   """Locators for Tree View components in Admin dashboard."""
   # common

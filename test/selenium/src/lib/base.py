@@ -684,6 +684,11 @@ class TreeView(Component):
         list_scopes.append(scope)
     return list_scopes
 
+  def get_item_by_obj_name(self, obj_name):
+    """Returns item by object name."""
+    return next(
+        item for item in self.tree_view_items() if obj_name in item.text)
+
 
 class UnifiedMapperTreeView(TreeView):
   """Tree-View class for Unified Mapper"""
@@ -765,8 +770,6 @@ class MapperSetVisibleFieldsModal(SetVisibleFieldsModal):
 
 class TreeViewItem(Element):
   """Class for describing single item on Tree View."""
-  _locators = constants.locator.TreeViewItem
-
   def __init__(self, driver, locator_or_element, item_btn_locator=None):
     super(TreeViewItem, self).__init__(driver, locator_or_element)
     self.item_btn = (
@@ -810,14 +813,22 @@ class TreeViewItem(Element):
   @property
   def cell_values(self):
     """Return list of text from each cell"""
-    return [cell.text for
-            cell in selenium_utils.get_when_all_visible(
-                self.element, self._locators.CELL)]
+    return [cell.text for cell in selenium_utils.get_when_all_visible(
+            self.element, (By.CSS_SELECTOR, "div[class*='attr']"
+                                            ":not(.attr-content)"
+                                            ":not(.selectable-attrs)"))]
 
   @property
-  def mega_program_icon(self):
-    """Return mega program icon"""
-    return self._browser.element(css=".mega-object-tree-view-icon")
+  def has_mega_program_icon(self):
+    """Returns True if item has mega program icon, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element, (By.CSS_SELECTOR, ".mega-object-tree-view-icon"))
+
+  @property
+  def is_checkbox_disabled(self):
+    """Returns True if checkbox is disabled, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element, (By.CSS_SELECTOR, 'input[type="checkbox"]:disabled'))
 
 
 class CommentInput(object):
