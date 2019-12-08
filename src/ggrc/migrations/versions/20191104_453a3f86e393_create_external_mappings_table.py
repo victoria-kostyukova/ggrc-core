@@ -23,9 +23,9 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   op.create_table(
       "external_mappings",
-      sa.Column("object_type", sa.String(length=250), nullable=False),
+      sa.Column("object_type", sa.String(length=255), nullable=False),
       sa.Column("object_id", sa.Integer, nullable=False),
-      sa.Column("external_type", sa.String(length=250), nullable=False),
+      sa.Column("external_type", sa.String(length=255), nullable=False),
       sa.Column("external_id", sa.Integer, nullable=False),
       sa.Column("created_at", sa.DateTime, nullable=False),
       sa.UniqueConstraint("external_type", "external_id",

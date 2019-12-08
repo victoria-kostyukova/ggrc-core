@@ -15,8 +15,6 @@ import sqlalchemy as sa
 
 from alembic import op
 
-from ggrc.migrations import utils
-
 
 # revision identifiers, used by Alembic.
 
@@ -47,13 +45,11 @@ def _get_count_of_ids_for_mapping(conn):
               JOIN custom_attribute_definitions as cav
               WHERE (cav.id = ecav.id OR cav.previous_id = ecav.id)
               AND ecav.external_id IS NOT NULL
-          ) AS count_1
-          
+          ) AS count_1          
       """
   )
   count = conn.execute(query).fetchone()
   return count[0]
-
 
 
 def _add_mappings_records(conn):

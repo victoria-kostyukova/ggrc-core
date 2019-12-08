@@ -30,6 +30,7 @@ snapshots_table = Snapshot.__table__  # pylint: disable=invalid-name
 Stub = namedtuple("Stub", ["type", "id"])
 
 _USE_DEFAULT_MIGRATOR = object()
+MIGRATION_FAILED_ERROR = "Migration {} was failed"
 
 
 def get_relationships(connection, type_, id_, filter_types=None):
