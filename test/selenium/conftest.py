@@ -635,6 +635,14 @@ def programs_with_audit_and_techenv(mapped_programs, technology_environment):
 
 
 @pytest.fixture()
+def programs_with_regulation(mapped_programs):
+  """Creates regulation mapped to child program."""
+  regulation = rest_facade.create_regulation(mapped_programs[1])
+  return {'programs': mapped_programs,
+          'regulation': regulation}
+
+
+@pytest.fixture()
 def issue():
   """Create an issue mapped to the program"""
   return rest_facade.create_issue(obj=None)

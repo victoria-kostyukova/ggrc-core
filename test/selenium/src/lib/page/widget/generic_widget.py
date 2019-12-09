@@ -18,12 +18,14 @@ from lib.utils import selenium_utils
 class Widget(base.Widget):
   """All widgets with Tree View and Filters."""
   # pylint: disable=too-many-instance-attributes
-  def __init__(self, driver, obj_name, is_versions_widget=False):
+  def __init__(self, driver, obj_name, is_versions_widget=False,
+               actual_name=None):
+    self.actual_name = obj_name if not actual_name else actual_name
     self.obj_name = obj_name
     self._locators_filter = locator.BaseWidgetGeneric
     self.is_versions_widget = is_versions_widget
     self.info_widget_cls = factory.get_cls_widget(
-        object_name=obj_name, is_info=True)
+        object_name=self.actual_name, is_info=True)
     # Filter
     self.button_help = base.Button(driver, self._locators_filter.HELP_BTN_CSS)
     self.filter = base.FilterCommon(
@@ -201,7 +203,7 @@ class TreeView(base.TreeView):
     Return: lib.page.widget.info_widget."obj_name"
     """
     item_num = self._get_item_num_by_title(title)
-    return (Widget(self._driver, self.obj_name).
+    return (factory.get_cls_widget(self.obj_name)(self._driver, self.obj_name).
             select_member_by_num(item_num))
 
   def _get_item_num_by_title(self, title):
@@ -295,17 +297,20 @@ class Issues(Widget):
 
 class Programs(Widget):
   """Model for Programs generic widgets"""
-  def __init__(self, driver=None, obj_name=objects.PROGRAMS):
-    self._actual_name = obj_name
-    if obj_name in (objects.PROGRAM_PARENTS, objects.PROGRAM_CHILDS):
-      self.obj_name = objects.PROGRAMS
-    else:
-      self.obj_name = obj_name
-    super(Programs, self).__init__(driver, self.obj_name)
 
-  @property
-  def _locators_widget(self):
-    return factory.get_locator_widget(self._actual_name.upper())
+
+class ProgramChilds(Widget):
+  """Model for ProgramChilds generic widgets"""
+  def __init__(self, driver, obj_name):
+    super(ProgramChilds, self).__init__(
+        driver, obj_name, actual_name=objects.PROGRAMS)
+
+
+class ProgramParents(Widget):
+  """Model for ProgramChilds generic widgets"""
+  def __init__(self, driver, obj_name):
+    super(ProgramParents, self).__init__(
+        driver, obj_name, actual_name=objects.PROGRAMS)
 
 
 class TechnologyEnvironments(Widget):

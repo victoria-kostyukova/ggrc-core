@@ -468,6 +468,13 @@ class ProgramChildModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
 
 
+class ProgramParentModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+   fields for Parent Programs.
+   """
+  DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
+
+
 class RegulationModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
   fields for Regulations.
