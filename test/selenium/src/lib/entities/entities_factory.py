@@ -496,11 +496,6 @@ class RisksFactory(EntitiesFactory):
         external_id=self.generate_external_id(),
         review_status=ReviewStates.UNREVIEWED,
         review_status_display_name=ReviewStates.UNREVIEWED)
-    if is_add_rest_attrs:
-      obj.update_attrs(
-          recipients=",".join((
-              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))))
     return obj
 
 
