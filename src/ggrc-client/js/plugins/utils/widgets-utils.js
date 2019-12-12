@@ -80,9 +80,9 @@ function getWidgetList(modelName, path) {
   // the assessments_view only needs the Assessments widget
   if (isAssessmentsView) {
     widgetList = {
-      assessment: widgetList.Assessment,
+      Assessment: widgetList.Assessment,
     };
-    widgetList.assessment.treeViewDepth = 0;
+    widgetList.Assessment.treeViewDepth = 0;
   }
 
   return widgetList;

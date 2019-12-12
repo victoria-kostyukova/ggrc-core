@@ -38,7 +38,7 @@ describe('GGRC Utils Widgets', function () {
       let keys = Object.keys(result);
 
       expect(keys.length).toEqual(1);
-      expect(keys).toContain('assessment');
+      expect(keys).toContain('Assessment');
     });
 
     it('returns widgets for non-assessment view', function () {
@@ -129,7 +129,7 @@ describe('GGRC Utils Widgets', function () {
     it('returns assessment model name only for assessment view', function () {
       let result = method('assessment', '/assessments_view');
 
-      expect(result).toContain('assessment');
+      expect(result).toContain('Assessment');
     });
 
     it('returns appropriate models for non-assessment view',
