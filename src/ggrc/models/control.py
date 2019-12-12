@@ -127,6 +127,34 @@ class Control(with_external_created_by.WithExternalCreatedBy,
       'verify_frequency',
       'version',
       'review_status_display_name',
+
+      attributes.DateFullTextAttr(
+          "due_date",
+          "due_date",
+      ),
+      attributes.FullTextAttr(
+          "created_by",
+          "created_by",
+          ["email", "name"],
+      ),
+      attributes.DatetimeFullTextAttr(
+          "last_submitted_at",
+          "last_submitted_at",
+      ),
+      attributes.FullTextAttr(
+          "last_submitted_by",
+          "last_submitted_by",
+          ["email", "name"],
+      ),
+      attributes.DatetimeFullTextAttr(
+          "last_verified_at",
+          "last_verified_at",
+      ),
+      attributes.FullTextAttr(
+          "last_verified_by",
+          "last_verified_by",
+          ["email", "name"],
+      )
   ]
 
   _sanitize_html = [
@@ -166,6 +194,27 @@ class Control(with_external_created_by.WithExternalCreatedBy,
       "review_status_display_name": {
           "display_name": "Review Status",
           "mandatory": False
+      },
+
+      "due_date": {
+          "display_name": "Due Date",
+          "mandatory": False,
+      },
+      "last_submitted_at": {
+          "display_name": "Last Owner Reviewed Date",
+          "mandatory": False,
+      },
+      "last_submitted_by": {
+          "display_name": "Last Owner Reviewed By",
+          "mandatory": False,
+      },
+      "last_verified_at": {
+          "display_name": "Last Compliance Reviewed Date",
+          "mandatory": False,
+      },
+      "last_verified_by": {
+          "display_name": "Last Compliance Reviewed By",
+          "mandatory": False,
       },
   }
 
