@@ -2,54 +2,53 @@
     Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
+
 <div class="folder-attachments-list">
     <related-documents instance:from="instance" kind:from="'FILE'" isLoading:to="isListLoading">
         <div class="folder-attachments-list__heading">
             <spinner-component class="folder-attachments-list__spinner" toggle:from="showSpinner"></spinner-component>
             <h6>{{title}}</h6>
         </div>
-            <ggrc-gdrive-folder-picker hideLabel:from="true"
-                                       readonly:from="readonly"
-                                       instance:from="instance"
-                                       current_folder:to="scope.vars.currentFolder"
-                                       folder_error:bind="folderError"
-            ></ggrc-gdrive-folder-picker>
+        <ggrc-gdrive-folder-picker hideLabel:from="true"
+                                    readonly:from="readonly"
+                                    instance:from="instance"
+                                    current_folder:to="scope.vars.currentFolder"
+                                    folder_error:bind="folderError"
+        ></ggrc-gdrive-folder-picker>
         <object-list items:from="documents" emptyMessage:from="noItemsText" showMore:from="showMore">
             <editable-document-object-list-item document:from="{.}">
-            {{#unless readonly}}
-                <unmap-button
-                    destination:from="instance"
-                    source:from="document"
-                    isUnmapping:to="../../../../isUnmapping">
-                    <action-toolbar-control>
-                      <i class="fa fa-trash"></i>
-                    </action-toolbar-control>
-                </unmap-button>
-            {{/unless}}
+                {{#unless readonly}}
+                    <div class="action-toolbar__controls">
+                        <a href="javascript://" on:el:click="removeRelatedDocument(%context.document)">
+                            <action-toolbar-control>
+                                <i class="fa fa-trash"></i>
+                            </action-toolbar-control>
+                        </a>
+                    </div>
+                {{/unless}}
             </editable-document-object-list-item>
         </object-list>
-
-    {{#unless readonly}}
-    {{#is_allowed 'update' instance context='for'}}
-    {{#if scope.vars.currentFolder}}
-    {{^if folderError}}
-    <span class="attachments-list-action">
-        <button
-            type="button"
-            rel="tooltip"
-            data-placement="bottom"
-            data-original-title="{{tooltip}}"
-            class="btn btn-small btn-white"
-            data-toggle="unified-mapper"
-            data-join-object-id="{{instance.id}}"
-            data-join-object-type="{{instance.constructor.model_singular}}"
-            data-join-option-type="Document">
-            Attach
-        </button>
-    </span>
-    {{/if}}
-    {{/if}}
-    {{/is_allowed}}
-    {{/unless}}
+        {{#unless readonly}}
+            {{#is_allowed 'update' instance context='for'}}
+                {{#if scope.vars.currentFolder}}
+                    {{^if folderError}}
+                        <span class="attachments-list-action">
+                            <button
+                                type="button"
+                                rel="tooltip"
+                                data-placement="bottom"
+                                data-original-title="{{tooltip}}"
+                                class="btn btn-small btn-white"
+                                data-toggle="unified-mapper"
+                                data-join-object-id="{{instance.id}}"
+                                data-join-object-type="{{instance.constructor.model_singular}}"
+                                data-join-option-type="Document">
+                                Attach
+                            </button>
+                        </span>
+                    {{/if}}
+                {{/if}}
+            {{/is_allowed}}
+        {{/unless}}
     </related-documents>
 </div>

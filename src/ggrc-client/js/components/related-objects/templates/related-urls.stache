@@ -8,28 +8,11 @@
   <div class="related-urls__list">
     <object-list items:bind="urls" emptyMessage:from="emptyMessage" showMore:from="showMore">
       {{#is(modelType, "Evidence")}}
-        <item-edit-control document:bind="{.}"
-                         propName:from="'notes'"
-                         value:bind="notes"
-                         date:bind="updated_at"
-                         instance:from="instance"
-                         placeholder="Add optional description"
-                         isEditIconDenied:from="isEditDenied"
-                         on:removeItem="removeUrl({.})">
-          <a class="item-edit-control__content__link"
-             href="{{normalizeLink link}}"
-             target="_blank"
-             rel="tooltip"
-             data-original-title="{{title}}">
-            {{title}}
-          </a>
-          {{#unless editMode}}
-            <div class="object-list__item__description">
-              {{notes}}
-            </div>
-          {{/unless}}
-          <span class="date">{{localize_date date}}</span>
-        </item-edit-control>
+        <evidence-item
+            evidence:from="{.}"
+            isEditIconDenied:from="isEditDenied"
+            on:removeItem="removeUrl({.})"
+        />
       {{else}}
       <div class="action-toolbar">
         <document-object-list-item
@@ -53,9 +36,9 @@
   {{#if canAddUrl}}
     {{#if isFormVisible}}
       <form class="related-urls__create create-form">
-        <div class="item-edit-control">
+        <div class="editable-evidence-item">
           <fieldset {{#if isDisabled}}disabled{{/if}}>
-            <div class="item-edit-control__content">
+            <div class="editable-evidence-item__content">
                <input el:value:bind="value"
                class="create-form__input"
                type="text"

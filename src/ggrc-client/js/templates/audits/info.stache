@@ -73,6 +73,7 @@
                   on:removeUrl="removeRelatedDocument(scope.event.payload)"
                   modelType:from="modelType">
                   <div class="related-urls__heading">
+                    <spinner-component class="related-urls__spinner" toggle:from="isLoading"/>
                     <h6 class="related-urls__title">Evidence URL</h6>
                   </div>
                 </related-urls>

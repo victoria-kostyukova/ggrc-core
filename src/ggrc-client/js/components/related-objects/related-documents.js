@@ -79,7 +79,11 @@ export default canComponent.extend({
       let modelType = this.attr('modelType');
       return batchRequests(query).then((response) => {
         const documents = response[modelType].values;
-        this.attr('documents').replace(documents);
+
+        this.attr('documents').replace(
+          documents.map((document) => this.getDocumentModel(document))
+        );
+
         this.attr('isLoading', false);
       });
     },
@@ -154,8 +158,13 @@ export default canComponent.extend({
         });
     },
     removeRelatedDocument: async function (document) {
-      let self = this;
-      let documents;
+      this.attr('isLoading', true);
+
+      let documents = this.attr('documents').filter((item) =>
+        item.id !== document.id
+      );
+      this.attr('documents', documents);
+
       let relationship = await Relationship.findRelationship(
         document, this.instance);
       if (!relationship.id) {
@@ -165,22 +174,13 @@ export default canComponent.extend({
         });
       }
 
-      documents = this.attr('documents').filter(function (item) {
-        return item.id !== document.id;
-      });
-
-      this.attr('isLoading', true);
-      this.attr('documents', documents);
-
       return relationship.destroy()
-        .then(function () {
-          self.refreshRelatedDocuments();
-        })
-        .fail(function (err) {
+        .fail((err) => {
           console.error(`Unable to remove related document: ${err}`);
+          this.refreshRelatedDocuments();
         })
-        .done(function () {
-          self.attr('isLoading', false);
+        .done(() => {
+          this.attr('isLoading', false);
         });
     },
     markDocumentForDeletion: function (document) {
@@ -222,6 +222,10 @@ export default canComponent.extend({
         pageInstance.type,
         pageInstance.id
       );
+    },
+    getDocumentModel(document) {
+      const Model = businessModels[this.attr('modelType')];
+      return Model.findInCacheById(document.id) || new Model(document);
     },
   }),
   init: function () {

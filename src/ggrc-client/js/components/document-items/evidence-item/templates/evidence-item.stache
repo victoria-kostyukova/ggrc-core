@@ -1,0 +1,68 @@
+{{!
+    Copyright (C) 2020 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if editMode}}
+  <div class="editable-evidence-item">
+    <div class="document-object-item editable-evidence-item__content">
+      <div class="document-object-item__body">
+        <a class="editable-evidence-item__content__link"
+          href="{{normalizeLink evidence.link}}"
+          target="_blank"
+          rel="tooltip"
+          data-original-title="{{evidence.title}}"
+        >
+          {{evidence.title}}
+        </a>
+        <span class="date">{{localize_date evidence.updated_at}}</span>
+        <text-form-field
+          value:from="context.notes"
+          placeholder:from="'Add optional description'"
+          on:valueChanged="notesChanged(scope.event)"/>
+      </div>
+    </div>
+    <div class="create-form__controls">
+      <button href="javascript://" type="button" class="create-form__confirm" on:el:click="save()">
+        <i class="fa fa-check"></i>
+      </button>
+      <button type="button" class="create-form__cancel" on:el:click="cancel()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+  </div>
+{{else}}
+  <div class="action-toolbar action-toolbar-align">
+    <div class="action-toolbar__item-control-content flex-box">
+      <div class="related-documents__spinner">
+        <spinner-component toggle:from="isLoading"/>
+      </div>
+      <div class="document-object-item">
+        <div class="document-object-item__body">
+          <a class="editable-evidence-item__content__link"
+            href="{{normalizeLink evidence.link}}"
+            target="_blank"
+            rel="tooltip"
+            data-original-title="{{evidence.title}}"
+          >
+            {{evidence.title}}
+          </a>
+          <div class="editable-evidence-item__note">
+            {{evidence.notes}}
+          </div>
+          <span class="date">{{localize_date evidence.updated_at}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-toolbar__controls">
+      {{#if canEdit}}
+        <action-toolbar-control on:el:click="setEditMode(scope.event)">
+          <i class="fa fa-pencil-square-o"></i>
+        </action-toolbar-control>
+        <action-toolbar-control on:el:click="remove(evidence)">
+          <i class="fa fa-trash"></i>
+        </action-toolbar-control>
+      {{/if}}
+    </div>
+  </div>
+{{/if}}

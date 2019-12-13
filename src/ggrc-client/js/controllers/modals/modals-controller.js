@@ -54,6 +54,7 @@ import '../../components/modal-autocomplete/modal-autocomplete';
 import '../../components/people-autocomplete-dropdown/people-autocomplete-dropdown';
 import '../../components/person-autocomplete-field/person-autocomplete-field';
 import '../../components/assessment-templates/assessment-template-save-button/assessment-template-save-button';
+import '../../components/document-items/evidence-item/evidence-item';
 import '../../components/inline/inline-form-control';
 import '../../components/inline/inline-edit-control';
 import {
