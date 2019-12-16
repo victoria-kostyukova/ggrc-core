@@ -321,22 +321,6 @@ export default canControl.extend({
       customAttributes = canStache(customAttributes)(context);
       $(this.options.contentEl).append(customAttributes);
     }
-
-    // Update UI status array
-    let $form = $(this.element).find('form');
-    let tabList = $form.find('[tabindex]');
-    let hidableTabs = 0;
-    for (let i = 0; i < tabList.length; i++) {
-      if ($(tabList[i]).attr('tabindex') > 0) {
-        hidableTabs++;
-      }
-    }
-    // ui_array index is used as the tab_order, Add extra space for skipped numbers
-    let storableUI = hidableTabs + 20;
-    for (let i = 0; i < storableUI; i++) {
-      // When we start, all the ui elements are visible
-      this.options.ui_array.push(0);
-    }
   },
 
   'input:not([data-lookup]), textarea, select change':
