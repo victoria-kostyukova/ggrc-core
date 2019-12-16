@@ -6,6 +6,8 @@
 import * as AjaxExtensions from '../../plugins/ajax-extensions';
 import canMap from 'can-map';
 import * as QueryAPI from '../utils/query-api-utils';
+import * as ErrorUtils from '../utils/errors-utils';
+import * as NotifiresUtils from '../utils/notifiers-utils';
 
 describe('QueryAPI utils', function () {
   describe('batchRequests() method', function () {
@@ -48,6 +50,101 @@ describe('QueryAPI utils', function () {
           done();
         });
       }, 150);
+    });
+  });
+
+  describe('batchRequestsWithPromise() method', () => {
+    let batchRequests = QueryAPI.batchRequestsWithPromise;
+    let ggrcAjax;
+
+    beforeEach(() => {
+      spyOn(AjaxExtensions, 'ggrcAjax');
+      ggrcAjax = AjaxExtensions.ggrcAjax;
+    });
+
+    afterEach(() => {
+      ggrcAjax.calls.reset();
+    });
+
+    it('does only one ajax call for a group of consecutive calls',
+      async () => {
+        AjaxExtensions.ggrcAjax.and.returnValues(
+          Promise.resolve([1, 2, 3, 4]), Promise.resolve([1]));
+
+        await Promise.all([
+          batchRequests(1),
+          batchRequests(2),
+          batchRequests(3),
+          batchRequests(4),
+        ]).then(() => {
+          expect(ggrcAjax.calls.count()).toEqual(1);
+        });
+      });
+
+    it('does several ajax calls for delays calls', (done) => {
+      AjaxExtensions.ggrcAjax.and.returnValues(
+        Promise.resolve([1, 2, 3, 4]), Promise.resolve([1]));
+
+      batchRequests(1);
+      batchRequests(2);
+      batchRequests(3);
+      batchRequests(4);
+
+      // Make a request with a delay
+      setTimeout(() => {
+        batchRequests(4).then(() => {
+          expect(ggrcAjax.calls.count()).toEqual(2);
+          done();
+        });
+      }, 150);
+    });
+
+    describe('when ggrcAjax() was failed', () => {
+      beforeEach(() => {
+        AjaxExtensions.ggrcAjax.and.returnValue(
+          $.Deferred().reject('jqxhr', 'textStatus', 'exception'));
+        spyOn(ErrorUtils, 'isConnectionLost');
+      });
+
+      it('calls connectionLostNotifier() if internet connection lost',
+        async () => {
+          ErrorUtils.isConnectionLost.and.returnValue(true);
+          spyOn(NotifiresUtils, 'connectionLostNotifier');
+
+          try {
+            await batchRequests(1);
+          } catch {
+            expect(NotifiresUtils.connectionLostNotifier).toHaveBeenCalled();
+          }
+        });
+
+      it('calls handleAjaxError() if internet connection doesn\'t lost',
+        async () => {
+          ErrorUtils.isConnectionLost.and.returnValue(false);
+          spyOn(ErrorUtils, 'handleAjaxError');
+
+          try {
+            await batchRequests(1);
+          } catch {
+            expect(ErrorUtils.handleAjaxError)
+              .toHaveBeenCalledWith('jqxhr', 'exception');
+          }
+        });
+
+      it('rejects every request', async () => {
+        ErrorUtils.isConnectionLost.and.returnValue(false);
+        spyOn(ErrorUtils, 'handleAjaxError');
+
+        const results = await Promise.allSettled([
+          batchRequests(1),
+          batchRequests(2),
+          batchRequests(3),
+        ]);
+
+        results.forEach(({status}) => {
+          expect(status).toBe('rejected');
+        });
+      });
     });
   });
 
