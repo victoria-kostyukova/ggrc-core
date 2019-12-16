@@ -77,7 +77,7 @@ class Representation(object):
     """
     from lib.constants import element, files
     els = element.TransformationElements
-    csv = files.TransformationCSVFields
+    csv = files.CSVFields
     # common for UI and CSV
     result_remap_items = {
         els.TITLE: "title", els.ADMIN: "admins",

@@ -58,8 +58,8 @@ EVIDENCE = 'evidence'
 REVIEWS = "reviews"
 CHANGE_LOG_ITEMS = "change_log_items"
 
-EDITABLE_GGRC_OBJ = (CONTRACTS, OBJECTIVES, POLICIES, REGULATIONS,
-                     REQUIREMENTS, STANDARDS, THREATS,)
+EDITABLE_GGRC_OBJS = (CONTRACTS, OBJECTIVES, POLICIES, REGULATIONS,
+                      REQUIREMENTS, STANDARDS, THREATS,)
 
 # disabled
 SCOPE_OBJECTS = (ACCESS_GROUPS, ACCOUNT_BALANCES, DATA_ASSETS, FACILITIES,
@@ -71,17 +71,17 @@ DISABLED_OBJECTS = (CONTROLS, RISKS)
 
 ALL_DISABLED_OBJECTS = (CONTROLS, RISKS,) + SCOPE_OBJECTS
 
-ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJ + ALL_DISABLED_OBJECTS
+ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJS + ALL_DISABLED_OBJECTS
 
-EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJ + (
+EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJS + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
 
-OBJS_SUPPORTING_MANDATORY_CA = EDITABLE_GGRC_OBJ + (
+OBJS_SUPPORTING_MANDATORY_CA = EDITABLE_GGRC_OBJS + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, PEOPLE)
 
 ALL_CA_OBJS = EDITABLE_CA_OBJS + ALL_DISABLED_OBJECTS
 
-EDITABLE_OBJS_W_CUSTOM_ROLES = EDITABLE_GGRC_OBJ + (
+EDITABLE_OBJS_W_CUSTOM_ROLES = EDITABLE_GGRC_OBJS + (
     ASSESSMENTS, DOCUMENTS, EVIDENCE, ISSUES, AUDITS, PROGRAMS)
 
 ALL_OBJS_W_CUSTOM_ROLES = EDITABLE_OBJS_W_CUSTOM_ROLES + ALL_DISABLED_OBJECTS
@@ -158,11 +158,14 @@ def get_plural(singular, title=False):
   return _plural
 
 
-def get_normal_form(obj_name):
-  """Transforms object name to title form
+def get_normal_form(obj_name, title=True):
+  """Replaces underscores with spaces.
+
+  Transforms to title form if title is True.
   (product_groups -> Product Groups).
   """
-  return obj_name.replace("_", " ").title()
+  obj_name_wo_spaces = obj_name.replace("_", " ")
+  return obj_name_wo_spaces.title() if title else obj_name_wo_spaces
 
 
 ALL_PLURAL = [k for k in globals().keys() if

@@ -3,7 +3,9 @@
 """File's labels and properties."""
 
 
-class TransformationCSVFields(object):
-  """To transformation fields of CSV files."""
+class CSVFields(object):
+  """Fields of export/import CSV files."""
   # pylint: disable=too-few-public-methods
   REVISION_DATE = "Revision Date"
+  MAP = "map:"
+  UNMAP = "unmap:"

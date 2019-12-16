@@ -58,4 +58,5 @@ class ExportPage(base.Component):
         if not filename.endswith("crdownload"):  # file is not fully downloaded
           return os.path.join(path_to_export_dir, filename)
       return None
+
     return test_utils.wait_for(path_to_downloaded_file)
