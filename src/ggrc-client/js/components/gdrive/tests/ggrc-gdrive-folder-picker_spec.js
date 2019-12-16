@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../ggrc-gdrive-folder-picker';
+import * as ajaxExtensions from '../../../plugins/ajax-extensions';
 
 describe('ggrc-gdrive-folder-picker component', function () {
   'use strict';
@@ -45,6 +46,98 @@ describe('ggrc-gdrive-folder-picker component', function () {
         expect(viewModel.setCurrent).not.toHaveBeenCalled();
       });
     });
+
+    describe('unlinkFolder() method', () => {
+      const defaultFolder = {id: 12345};
+      const defaultFolderError = 404;
+      let ggrcAjaxSpy;
+      let method;
+
+      beforeEach(() => {
+        const instance = {
+          refresh: jasmine.createSpy(),
+        };
+        ggrcAjaxSpy = spyOn(ajaxExtensions, 'ggrcAjax');
+
+        viewModel.attr('_folder_change_pending', false);
+        viewModel.attr('current_folder', defaultFolder);
+        viewModel.attr('folder_error', defaultFolderError);
+        viewModel.attr('instance', instance);
+
+        method = viewModel.unlinkFolder.bind(viewModel);
+      });
+
+      it('should set "_folder_change_pending" to true', () => {
+        ggrcAjaxSpy.and.returnValue($.Deferred().resolve());
+
+        method();
+        expect(viewModel.attr('_folder_change_pending')).toBe(true);
+      });
+
+      it('should set "current_folder" to NULL', () => {
+        ggrcAjaxSpy.and.returnValue($.Deferred().resolve());
+
+        method();
+        expect(viewModel.attr('current_folder')).toBeNull();
+      });
+
+      it('should set "folder_error" to null when request was successful',
+        (done) => {
+          const dfd = $.Deferred();
+          ggrcAjaxSpy.and.returnValue(dfd);
+
+          method().then(() => {
+            expect(viewModel.attr('folder_error')).toBeNull();
+            done();
+          });
+
+          dfd.resolve();
+        }
+      );
+
+      it('should NOT set "folder_error" to null when request was failed',
+        (done) => {
+          const dfd = $.Deferred();
+          ggrcAjaxSpy.and.returnValue(dfd);
+
+          method().fail(() => {
+            expect(viewModel.attr('folder_error')).toEqual(defaultFolderError);
+            done();
+          });
+
+          dfd.reject();
+        }
+      );
+
+      it('should call "instance.refresh" when request was successful',
+        (done) => {
+          const dfd = $.Deferred();
+          ggrcAjaxSpy.and.returnValue(dfd);
+
+          method().then(() => {
+            expect(viewModel.attr('instance').refresh).toHaveBeenCalled();
+            done();
+          });
+
+          dfd.resolve();
+        }
+      );
+
+      it('should set "current_folder" from backup when request was failed',
+        (done) => {
+          const dfd = $.Deferred();
+          ggrcAjaxSpy.and.returnValue(dfd);
+
+          method().fail(() => {
+            expect(viewModel.attr('current_folder').serialize())
+              .toEqual(defaultFolder);
+            done();
+          });
+
+          dfd.reject();
+        }
+      );
+    });
   });
 
   describe('events', function () {
@@ -72,11 +165,11 @@ describe('ggrc-gdrive-folder-picker component', function () {
       });
     });
 
-    describe('"a[data-toggle=gdrive-remover] click" handler', function () {
+    describe('"a[data-toggle=gdrive-remover] click" handler', () => {
       let method;
       let that;
 
-      beforeEach(function () {
+      beforeEach(() => {
         viewModel.attr('instance', {
           folder: folderId,
         });
@@ -88,28 +181,32 @@ describe('ggrc-gdrive-folder-picker component', function () {
         method = events['a[data-toggle=gdrive-remover] click'].bind(that);
       });
 
-      it('unsets folder id for deferred instance', function (done) {
+      it('unsets current_folder', (done) => {
         viewModel.attr('deferred', true);
 
-        spyOn(viewModel, 'unsetCurrent');
-
         method().then(() => {
-          expect(viewModel.instance.attr('folder')).toEqual(null);
-          expect(viewModel.unsetCurrent).toHaveBeenCalled();
+          expect(viewModel.attr('current_folder')).toBeNull();
           done();
         });
       });
 
-      it('calls unlinkFolder() for existing instance', function (done) {
+      it('unsets folder id for deferred instance', (done) => {
+        viewModel.attr('deferred', true);
+
+        method().then(() => {
+          expect(viewModel.instance.attr('folder')).toBeNull();
+          done();
+        });
+      });
+
+      it('calls unlinkFolder() for existing instance', (done) => {
         viewModel.attr('deferred', false);
 
-        spyOn(viewModel, 'unsetCurrent');
         spyOn(viewModel, 'unlinkFolder')
           .and.returnValue($.Deferred().resolve());
 
         method().then(() => {
           expect(viewModel.unlinkFolder).toHaveBeenCalled();
-          expect(viewModel.unsetCurrent).toHaveBeenCalled();
           done();
         });
       });

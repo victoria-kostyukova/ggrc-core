@@ -27,7 +27,7 @@
           </a>
         </div>
         <div class="action-toolbar__controls">
-          {{^if readonly}}
+          {{#if canEdit}}
             <a class="icon-link entry-attachment mapped-folder__action-button"
               href="javascript://"
               rel="tooltip"
@@ -57,39 +57,39 @@
         </div>
       </div>
     </div>
-    {{else}}
-      {{#if folder_error}}
-        <div class="action-toolbar">
-          <small>
-            <strong>Error:</strong>
-            The folder is deleted from gDrive or you do not have access to it. <br>
-            Please assign a new folder or
-            {{#if folderId}}
-              <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">request access.</a>
-            {{else}}
-              request access.
-            {{/if}}
-          </small>
-          <div class="action-toolbar__controls">
-            {{^if readonly}}
-              <a class="icon-link entry-attachment" href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true">
+  {{else}}
+    {{#if folder_error}}
+      <div class="action-toolbar">
+        <small>
+          <strong>Error:</strong>
+          The folder is deleted from gDrive or you do not have access to it. <br>
+          Please assign a new folder or
+          {{#if folderId}}
+            <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">request access.</a>
+          {{else}}
+            request access.
+          {{/if}}
+        </small>
+        <div class="action-toolbar__controls">
+          {{^if canEdit}}
+            <a class="icon-link entry-attachment" href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true">
+              <action-toolbar-control>
+                <i class="fa fa-pencil"></i>
+              </action-toolbar-control>
+            </a>
+            {{^if no_detach}}
+              <a class="icon-link" href="javascript://" rel="tooltip" data-original-title="Detach folder from {{instance.constructor.title_singular}}" data-toggle="gdrive-remover"
+                data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}">
                 <action-toolbar-control>
-                  <i class="fa fa-pencil"></i>
+                  <i class="fa fa-trash"></i>
                 </action-toolbar-control>
               </a>
-              {{^if no_detach}}
-                <a class="icon-link" href="javascript://" rel="tooltip" data-original-title="Detach folder from {{instance.constructor.title_singular}}" data-toggle="gdrive-remover"
-                  data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}">
-                  <action-toolbar-control>
-                    <i class="fa fa-trash"></i>
-                  </action-toolbar-control>
-                </a>
-              {{/if}}
             {{/if}}
-          </div>
+          {{/if}}
         </div>
-      {{else}}
-        {{#if showAssignFolder}}
+      </div>
+    {{else}}
+      {{#if canEdit}}
         <a href="javascript://"
           tabindex="{{firstnonempty tabindex '0'}}"
           class="btn btn-white entry-attachment  tree-item-add mapped-folder__add-button"
@@ -99,7 +99,7 @@
           data-id="{{instance.id}}">
             Assign folder
         </a>
-        {{/if}}
       {{/if}}
+    {{/if}}
   {{/if}}
 </div>

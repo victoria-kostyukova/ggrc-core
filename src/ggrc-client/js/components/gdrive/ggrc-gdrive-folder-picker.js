@@ -29,7 +29,7 @@ export default canComponent.extend({
         type: 'boolean',
         value: false,
       },
-      showAssignFolder: {
+      canEdit: {
         type: 'boolean',
         get() {
           return !this.attr('readonly') &&
@@ -57,7 +57,11 @@ export default canComponent.extend({
      *   folder has been successfully unlinked from it
      */
     unlinkFolder: function () {
-      let instance = this.attr('instance');
+      const instance = this.attr('instance');
+      const backUpFolder = this.attr('current_folder').serialize();
+
+      this.attr('_folder_change_pending', true);
+      this.attr('current_folder', null);
 
       return ggrcAjax({
         url: '/api/remove_folder',
@@ -68,7 +72,12 @@ export default canComponent.extend({
           folder: instance.attr('folder'),
         },
       }).then(() => {
+        this.attr('folder_error', null);
         return instance.refresh();
+      }).fail(() => {
+        this.attr('current_folder', backUpFolder);
+      }).always(() => {
+        this.attr('_folder_change_pending', false);
       });
     },
     /**
@@ -108,11 +117,6 @@ export default canComponent.extend({
           this.attr('folder_error', error);
         }.bind(this));
     },
-    unsetCurrent: function () {
-      this.attr('_folder_change_pending', false);
-      this.attr('folder_error', null);
-      this.attr('current_folder', null);
-    },
     setRevisionFolder: function () {
       let folderId = this.instance.attr('folder');
       if (folderId) {
@@ -144,23 +148,18 @@ export default canComponent.extend({
      * Handle a click on the button for detaching an upload folder from
      * a model instance (e.g. an Audit).
      *
-     * @param {Object} el - The jQuery-wrapped DOM element on which the event
-     *   has been triggered.
-     * @param {Object} ev - The event object.
      * @return {Object} - Deferred chain.
      */
-    'a[data-toggle=gdrive-remover] click': function () {
-      let viewModel = this.viewModel;
-      let dfd;
-
+    'a[data-toggle=gdrive-remover] click'() {
+      const viewModel = this.viewModel;
       if (viewModel.deferred) {
         viewModel.instance.attr('folder', null);
-        dfd = $.when();
-      } else {
-        dfd = viewModel.unlinkFolder();
+        viewModel.attr('current_folder', null);
+
+        return $.when();
       }
 
-      return dfd.then(viewModel.unsetCurrent.bind(viewModel));
+      return viewModel.unlinkFolder();
     },
     'a[data-toggle=gdrive-picker] click': function (el) {
       uploadFiles({
