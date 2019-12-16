@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {exists, filteredMap, getView, getFragment} from '../../plugins/ggrc-utils';
+import {exists, filteredMap, getView} from '../../plugins/ggrc-utils';
 import loIsFunction from 'lodash/isFunction';
 import loForEach from 'lodash/forEach';
 import loFilter from 'lodash/filter';
@@ -81,10 +81,10 @@ import {
 } from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {refreshAll} from '../../models/refresh-queue';
+import preloadView from '../modals/templates/modal-preload-view.stache';
 
 export default canControl.extend({
   defaults: {
-    preload_view: '/dashboard/modal-preload.stache',
     header_view: '/modals/modal-header.stache',
     custom_attributes_view:
       '/custom_attributes/modal-content.stache',
@@ -108,8 +108,9 @@ export default canControl.extend({
     }
 
     if (!this.element.find('.modal-body').length) {
-      let frag = getFragment(this.options.preload_view);
+      let frag = canStache(preloadView)();
       this.after_preload(frag);
+
       return;
     }
 
@@ -575,7 +576,7 @@ export default canControl.extend({
     for (i = 0; i < hiddenElements.length; i++) {
       $hiddenElement = $(hiddenElements[i]);
       tabValue = $hiddenElement.attr('tabindex');
-      // The UI array index start from 0, and tab-index/io-index is from 1
+      // The UI array index start from 0, and tab-index is from 1
       if (tabValue > 0) {
         this.options.ui_array[tabValue - 1] = 1;
         $hiddenElement.attr({
