@@ -86,6 +86,7 @@ class TestSnapshotBlockConverter(TestCase):
         ('test_plan', 'Assessment Procedure'),
         ('start_date', 'Effective Date'),
         ('end_date', 'Last Deprecated Date'),
+        ('due_date', 'Due Date'),
         ('archived', 'Archived'),
         ('status', 'State'),
         ('review_status_display_name', 'Review Status'),
@@ -103,7 +104,10 @@ class TestSnapshotBlockConverter(TestCase):
         ('created_at', 'Created Date'),
         ('folder', "GDrive Folder ID"),
         ('created_by', 'Created By'),
-
+        ('last_submitted_at', 'Last Owner Reviewed Date'),
+        ('last_submitted_by', 'Last Owner Reviewed By'),
+        ('last_verified_at', 'Last Compliance Reviewed Date'),
+        ('last_verified_by', 'Last Compliance Reviewed By'),
     ]
     ac_roles = db.session.query(all_models.AccessControlRole.name).filter(
         all_models.AccessControlRole.object_type == "Control",
