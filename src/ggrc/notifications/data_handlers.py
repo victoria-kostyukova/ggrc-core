@@ -266,6 +266,15 @@ def _get_assignable_dict(people, notif, ca_cache=None):
   for person in people:
     # We should default to today() if no start date is found on the object.
     start_date = getattr(obj, "start_date", datetime.date.today())
+    if notif.notification_type.name == "assessment_updated":
+      updated_data = _get_updated_fields(obj,
+                                         notif.created_at,
+                                         definitions,
+                                         roles)
+      if not updated_data:
+        continue
+    else:
+      updated_data = None
     data[person.email] = {
         "user": get_person_dict(person),
         notif.notification_type.name: {
@@ -278,10 +287,7 @@ def _get_assignable_dict(people, notif, ca_cache=None):
                     notif.id: as_user_time(notif.created_at)},
                 "notif_updated_at": {
                     notif.id: as_user_time(notif.updated_at)},
-                "updated_data": _get_updated_fields(obj,
-                                                    notif.created_at,
-                                                    definitions,
-                                                    roles)
+                "updated_data": updated_data
                 if notif.notification_type.name == "assessment_updated"
                 else None,
             }
