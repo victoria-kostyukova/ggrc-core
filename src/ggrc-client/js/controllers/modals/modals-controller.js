@@ -57,6 +57,7 @@ import '../../components/assessment-templates/assessment-template-save-button/as
 import '../../components/evidence-item/evidence-item';
 import '../../components/inline/inline-form-control';
 import '../../components/inline/inline-edit-control';
+import '../../components/modal-container/modal-container';
 import {
   bindXHRToButton,
   bindXHRToDisableElement,
@@ -69,10 +70,6 @@ import {
 import {
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
-import {
-  getModalState,
-  setModalState,
-} from '../../plugins/utils/display-prefs-utils';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import {
@@ -93,8 +90,6 @@ export default canControl.extend({
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
     add_more: false,
-    ui_array: [],
-    reset_visible: false,
     // used for revision-comparer
     extraCssClass: '',
     afterFetch: function () {},
@@ -167,7 +162,6 @@ export default canControl.extend({
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
-          this.restore_ui_status_from_storage();
           initAuditTitle(this.options.instance, this.options.new_object_form);
         }
       })
@@ -227,6 +221,7 @@ export default canControl.extend({
         }.bind(this));
       }
     } else {
+      // case when modal is opened via confirm() util
       this.options.attr('instance', {});
       that.on();
       dfd = new $.Deferred().resolve(instance);
@@ -457,7 +452,6 @@ export default canControl.extend({
         return;
       }
       this.options.attr('add_more', true);
-      this.save_ui_status();
       this.triggerSave(el, ev);
     },
 
@@ -495,189 +489,6 @@ export default canControl.extend({
       }, saveInstance);
     } else {
       saveInstance();
-    }
-  },
-
-  '{contentEl} a.field-hide click': function (el) {// field hide
-    let $el = $(el);
-    let totalInner = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hide').length;
-    let totalHidden;
-    let uiUnit;
-    let i;
-    let tabValue;
-    let $hidable = [
-      'span',
-      'ggrc-form-item',
-    ].map((className) => $el.closest(`[class*="${className}"].hidable`))
-      .find((item) => item.length > 0);
-
-    $el.closest('.inner-hide').addClass('inner-hidable');
-    totalHidden = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hidable').length;
-
-    $hidable.addClass('hidden');
-    this.options.attr('reset_visible', true);
-    // update ui array
-    uiUnit = $hidable.find('[tabindex]');
-    for (i = 0; i < uiUnit.length; i++) {
-      tabValue = $(uiUnit[i]).attr('tabindex');
-      if (tabValue > 0) {
-        this.options.ui_array[tabValue - 1] = 1;
-        $(uiUnit[i]).attr('tabindex', '-1');
-        $(uiUnit[i]).attr('uiindex', tabValue);
-      }
-    }
-
-    if (totalInner === totalHidden) {
-      $el.closest('.inner-hide').parent('.hidable').addClass('hidden');
-    }
-
-    return false;
-  },
-
-  '{contentEl} #formHide click': function () {
-    if (this.wasDestroyed()) {
-      return false;
-    }
-
-    let i;
-    let uiArrLength = this.options.ui_array.length;
-    let $hidables = this.element.find('.hidable');
-    let hiddenElements = $hidables.find('[tabindex]');
-    let $hiddenElement;
-    let tabValue;
-    for (i = 0; i < uiArrLength; i++) {
-      this.options.ui_array[i] = 0;
-    }
-
-    this.options.attr('reset_visible', true);
-
-    $hidables.addClass('hidden');
-    this.element.find('.inner-hide').addClass('inner-hidable');
-
-    // Set up the hidden elements index to 1
-    for (i = 0; i < hiddenElements.length; i++) {
-      $hiddenElement = $(hiddenElements[i]);
-      tabValue = $hiddenElement.attr('tabindex');
-      // The UI array index start from 0, and tab-index is from 1
-      if (tabValue > 0) {
-        this.options.ui_array[tabValue - 1] = 1;
-        $hiddenElement.attr({
-          tabindex: '-1',
-          uiindex: tabValue,
-        });
-      }
-    }
-
-    return false;
-  },
-
-  '{contentEl} #formRestore click': function () {
-    if (this.wasDestroyed()) {
-      return false;
-    }
-
-    // Update UI status array to initial state
-    let i;
-    let uiArrLength = this.options.ui_array.length;
-    let $form = this.element.find('form');
-    let $body = $form.closest('.modal-body');
-    let uiElements = $body.find('[uiindex]');
-    let $el;
-    let tabVal;
-
-    for (i = 0; i < uiArrLength; i++) {
-      this.options.ui_array[i] = 0;
-    }
-
-    // Set up the correct tab index for tabbing
-    // Get all the ui elements with 'uiindex' set to original tabindex
-    // Restore the original tab index
-
-    for (i = 0; i < uiElements.length; i++) {
-      $el = $(uiElements[i]);
-      tabVal = $el.attr('uiindex');
-      $el.attr('tabindex', tabVal);
-    }
-
-    this.options.attr('reset_visible', false);
-    this.element.find('.hidden').removeClass('hidden');
-    this.element.find('.inner-hide').removeClass('inner-hidable');
-    return false;
-  },
-
-  save_ui_status: function () {
-    if (!this.options.model) {
-      return;
-    }
-    let modelName = this.options.model.model_singular;
-    let resetVisible = this.options.reset_visible ?
-      this.options.reset_visible : false;
-    let uiArray = this.options.ui_array ? this.options.ui_array : [];
-    let displayState = {
-      reset_visible: resetVisible,
-      ui_array: uiArray,
-    };
-
-    setModalState(modelName, displayState);
-  },
-
-  restore_ui_status_from_storage: function () {
-    if (!this.options.model) {
-      return;
-    }
-    let modelName = this.options.model.model_singular;
-    let displayState = getModalState(modelName);
-
-    // set up reset_visible and ui_array
-    if (displayState !== null) {
-      if (displayState.reset_visible) {
-        this.options.attr('reset_visible', displayState.reset_visible);
-      }
-      if (displayState.ui_array) {
-        this.options.ui_array = displayState.ui_array.slice();
-      }
-    }
-    this.restore_ui_status();
-  },
-
-  restore_ui_status: function () {
-    if (this.wasDestroyed()) {
-      return;
-    }
-
-    let $selected;
-    let str;
-    let tabindex;
-    let i;
-    let $form;
-    let $body;
-
-    // walk through the ui_array, for the one values,
-    // select the element with tab index and hide it
-
-    if (this.options.attr('reset_visible')) {// some elements are hidden
-      $form = this.element.find('form');
-      $body = $form.closest('.modal-body');
-
-      for (i = 0; i < this.options.ui_array.length; i++) {
-        if (this.options.ui_array[i] === 1) {
-          tabindex = i + 1;
-          str = '[tabindex=' + tabindex + ']';
-          $selected = $body.find(str);
-
-          if ($selected) {
-            $selected.closest('.hidable').addClass('hidden');
-            $selected.attr({
-              uiindex: tabindex,
-              tabindex: '-1',
-            });
-          }
-        }
-      }
-
-      return false;
     }
   },
 
@@ -748,8 +559,6 @@ export default canControl.extend({
       this.serialize_form();
       this.options.attr('instance').backup();
     });
-
-    this.restore_ui_status();
   },
 
   prepareInstance: function () {
@@ -807,7 +616,7 @@ export default canControl.extend({
         that.update_hash_fragment();
       }
     }).catch(this.save_error.bind(this));
-    this.save_ui_status();
+
     return ajd;
   },
 

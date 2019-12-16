@@ -3,6 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<modal-container
+  instance:from="instance"
+  model:from="model"
+  isModalSaving:from="isSaving">
 <div class="hideable-holder">
   <wrapper-assessment-template instance:from="instance">
   <form action="javascript://">
@@ -223,3 +227,4 @@
  </form>
  </wrapper-assessment-template>
 </div>
+</modal-container>

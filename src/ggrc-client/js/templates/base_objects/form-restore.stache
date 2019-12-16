@@ -8,7 +8,7 @@
     <div class="pull-right reset-form">
       <p>
         <small><em>Fields are only temporarily hidden</em></small>
-        {{#if reset_visible}}
+        {{#if resetVisible}}
           <a id="formRestore" tabindex="36" class="btn btn-small btn-white" href="javascript://">Show all optional fields</a>
         {{else}}
           <a id="formHide" tabindex="36" class="btn btn-small btn-white" href="javascript://">Hide all optional fields</a>

@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<modal-container
+  instance:from="instance"
+  model:from="model"
+  isModalSaving:from="isSaving">
 <div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
@@ -129,3 +133,4 @@
 </form>
 {{/instance}}
 </div>
+</modal-container>

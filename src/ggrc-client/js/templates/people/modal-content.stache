@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<modal-container
+  instance:from="instance"
+  model:from="model"
+  isModalSaving:from="isSaving">
 <div class="hideable-holder">
 {{#instance}}
 <person-modal instance:from="instance" isNewInstance:from="new_object_form">
@@ -83,3 +87,4 @@
 </person-modal>
 {{/instance}}
 </div>
+</modal-container>

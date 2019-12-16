@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<modal-container
+  instance:from="instance"
+  model:from="model"
+  isModalSaving:from="isSaving">
 <form action="javascript://" class="form">
   {{> base_objects/form-restore.stache}}
 
@@ -128,3 +132,4 @@
     </div>
   </div>
 </form>
+</modal-container>

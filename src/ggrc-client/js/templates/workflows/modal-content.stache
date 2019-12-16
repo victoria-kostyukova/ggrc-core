@@ -140,3 +140,6 @@
     {{/if}}
   </form>
 </div>
+<div class="ggrc-form">
+  <gca-controls instance:from="instance" />
+</div>
