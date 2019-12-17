@@ -83,6 +83,8 @@ from ggrc.models.threat import Threat
 from ggrc.models.vendor import Vendor
 from ggrc.models.review import Review
 from ggrc.models.mixins import ScopeObject as _ScopeObject
+from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import CustomAttributable
 
 
 all_models = [  # pylint: disable=invalid-name
@@ -219,3 +221,16 @@ def get_scope_model_names():
   # type: () -> List[str]
   """Return list of names of usable scope models"""
   return list(model.__name__ for model in get_scope_models())
+
+
+def get_external_models():
+  """Return list of useble external models"""
+  return [m for m in all_models
+          if issubclass(m, synchronizable.Synchronizable)]
+
+
+def get_internal_grc_models():
+  """Return list of usable internal GRC models"""
+  return [m for m in all_models
+          if (not issubclass(m, synchronizable.Synchronizable) and
+              issubclass(m, CustomAttributable))]

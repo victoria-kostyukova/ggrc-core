@@ -12,13 +12,6 @@ from sqlalchemy.ext.declarative import declared_attr
 class WithExternalMapping(object):
   """Mixin for attributes those contains external info"""
 
-  from ggrc.models import reflection
-
-  _api_attrs = reflection.ApiAttributes(
-      "external_id",
-      "entity_type",
-  )
-
   @declared_attr
   def _external_info(cls):  # pylint: disable=no-self-argument
     """

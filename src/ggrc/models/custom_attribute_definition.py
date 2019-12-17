@@ -253,6 +253,7 @@ class CustomAttributeDefinition(WithExternalMapping,
       'mandatory',
       'helptext',
       'placeholder',
+      'external_name',
   ]
 
   _api_attrs = reflection.ApiAttributes(
