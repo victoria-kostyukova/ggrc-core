@@ -4,6 +4,7 @@
 """Integration tests for log_json method."""
 
 from types import NoneType
+from datetime import datetime
 import ddt
 
 from ggrc.models import all_models
@@ -36,6 +37,10 @@ class TestLogJson(TestCase):
   ATTRS_TO_EXCLUDE = "modified_by"
   ERROR_MESSAGE = "Model {} has problem with field {}, " \
                   "after calling log_json, it == {}"
+
+  def setUp(self):
+    super(TestLogJson, self).setUp()
+    self.client.get("/login")
 
   @staticmethod
   def _prepare_create_param(person, list_attr):
@@ -75,3 +80,50 @@ class TestLogJson(TestCase):
     self._check_json_representation(
         person_type_attrs, json_representation, model
     )
+
+  @ddt.data(
+      (
+          'Export',
+          True,
+          True,
+          ['status', 'created_at', 'results', 'id', 'title']
+      ),
+      (
+          'Export',
+          False,
+          True,
+          ['status', 'start_at', 'description', 'title', 'created_at',
+           'job_type', 'results', 'end_at', 'created_by_id', 'id']
+      ),
+      (
+          'Import',
+          True,
+          False,
+          ['status', 'created_at', 'results', 'id', 'title']
+      ),
+      (
+          'Import',
+          False,
+          False,
+          ['status', 'start_at', 'description', 'title', 'created_at',
+           'job_type', 'results', 'end_at', 'created_by_id', 'id']
+      )
+  )
+  @ddt.unpack
+  def test_import_export_log_json(self, job_type, is_default, is_export,
+                                  result):
+    """Test log_json for import and export"""
+    user = all_models.Person.query.first()
+
+    with factories.single_commit():
+      ie_job = factories.ImportExportFactory(
+          job_type=job_type,
+          status='Finished',
+          created_at=datetime.now(),
+          created_by=user,
+          title="test.csv",
+      )
+
+    logged_ie = ie_job.log_json(is_default=is_default, is_export=is_export)
+
+    self.assertItemsEqual(logged_ie.keys(), result)

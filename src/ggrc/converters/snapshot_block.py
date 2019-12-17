@@ -9,6 +9,7 @@ from collections import defaultdict
 from collections import OrderedDict
 
 from cached_property import cached_property
+from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
@@ -126,16 +127,30 @@ class SnapshotBlockConverter(object):
 
     The content of the given snapshots also contains the mapped audit field.
     """
-    with benchmark("Gather selected snapshots"):
-      if not self.ids:
-        return []
-      snapshots = models.Snapshot.eager_query().filter(
-          models.Snapshot.id.in_(self.ids)
-      ).all()
+    def _prepare_chunk(self):
+      """Separate list of ids on chunks"""
+      for chunk in utils.list_chunks(self.ids, 100):
+        yield chunk
 
-      for snapshot in snapshots:  # add special snapshot attribute
+    def _prepare_snapshots(self):
+      """Get snapshots models by ids chunks"""
+      with benchmark("Gather selected snapshots"):
+        for chunk in _prepare_chunk(self):
+          if not chunk:
+            yield []
+          _app_ctx_stack.top.sqlalchemy_queries = []
+          snapshots = models.Snapshot.eager_query().filter(
+              models.Snapshot.id.in_(chunk)
+          ).all()
+          yield snapshots
+
+    result_snapshots = []
+    # add special snapshot attribute
+    for snapshots in _prepare_snapshots(self):
+      for snapshot in snapshots:
         snapshot.content = self._extend_revision_content(snapshot)
-      return snapshots
+        result_snapshots.append(snapshot)
+    return result_snapshots
 
   @cached_property
   def child_type(self):
