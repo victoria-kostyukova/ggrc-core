@@ -42,8 +42,10 @@ class TestAuditResource(TestCase):
       )
       audit_2 = factories.AuditFactory()
 
-    self._create_snapshots(audit_1, [control])
-    self._create_snapshots(audit_2, [regulation])
+    snapshot1 = self._create_snapshots(audit_1, [control])
+    factories.RelationshipFactory(source=audit_1, destination=snapshot1[0])
+    snapshot2 = self._create_snapshots(audit_2, [regulation])
+    factories.RelationshipFactory(source=audit_2, destination=snapshot2[0])
 
     audits = [audit_1, audit_2]
     expected_snapshot_counts = {
@@ -57,8 +59,7 @@ class TestAuditResource(TestCase):
 
   # pylint:disable=invalid-name
   def test_snapshot_counts_query_no_perm(self):
-    """Test snapshot_counts endpoint counts only Snapshots that user has
-    access to"""
+    """Test snapshot_counts calculate Snapshots based on permissions"""
 
     with factories.single_commit():
       audit = factories.AuditFactory()
@@ -83,24 +84,18 @@ class TestAuditResource(TestCase):
       control_1 = factories.ControlFactory()
       control_2 = factories.ControlFactory()
       regulation = factories.RegulationFactory()
-      factories.RelationshipFactory(
-          source=audit,
-          destination=control_1
-      )
 
-    snapshots = self._create_snapshots(audit, [control_1,
-                                               control_2,
-                                               regulation])
-    factories.RelationshipFactory(
-        source=assmnt,
-        destination=snapshots[0]
+    snapshots = self._create_snapshots(
+        audit,
+        [control_1, control_2, regulation]
     )
+    for snap in snapshots:
+      factories.RelationshipFactory(source=audit, destination=snap)
+    factories.RelationshipFactory(source=assmnt, destination=snapshots[0])
 
     self.api.set_user(user)
 
-    expected_snapshot_counts = {
-        audit_id: {"Control": 1},
-    }
+    expected_snapshot_counts = {"Control": 1}
 
     snapshot_counts = self._get_snapshots_count(audit_id)
-    self.assertEqual(expected_snapshot_counts[audit_id], snapshot_counts)
+    self.assertEqual(expected_snapshot_counts, snapshot_counts)

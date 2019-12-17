@@ -142,6 +142,7 @@ class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
       if not permissions.is_allowed_read_for(obj):
         raise exceptions.Forbidden()
 
-    result = collections.Counter([snap.child_type for snap in obj.snapshots
-                                  if permissions.is_allowed_read_for(snap)])
+    with benchmark("Get snapshots count based on read permissions"):
+      result = collections.Counter([snap.child_type for snap in obj.snapshots
+                                    if permissions.is_allowed_read_for(snap)])
     return self.json_success_response(result)
