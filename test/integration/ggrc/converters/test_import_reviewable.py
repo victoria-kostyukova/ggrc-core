@@ -42,7 +42,7 @@ class TestImportReviewable(TestCase):
     expected_response = {
         "Program": {
             "row_warnings": {
-                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                errors.READONLY_WILL_BE_IGNORED.format(
                     column_name="Review State", line=3),
             },
         }
@@ -275,9 +275,9 @@ class TestImportReviewable(TestCase):
     expected_response = {
         object_type: {
             "row_warnings": {
-                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                errors.READONLY_WILL_BE_IGNORED.format(
                     column_name="Review State", line=3),
-                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                errors.READONLY_WILL_BE_IGNORED.format(
                     column_name="Reviewers", line=3),
             },
         }

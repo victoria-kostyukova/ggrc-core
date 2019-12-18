@@ -1082,7 +1082,7 @@ class ReviewableColumnHandler(ExportOnlyColumnHandler):
     """Adds 'ignored message' warnings if new value unequal initial"""
     if self.raw_value and self.raw_value != self.get_value():
       self.add_warning(
-          errors.REVIEWABLE_WILL_BE_IGNORED,
+          errors.READONLY_WILL_BE_IGNORED,
           column_name=self.display_name
       )
 

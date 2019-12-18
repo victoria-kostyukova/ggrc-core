@@ -1,6 +1,7 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Handlers for boolean attributes."""
+# pylint: disable=inconsistent-return-statements
 
 from logging import getLogger
 
@@ -31,7 +32,7 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     return self.raw_value.lower()
 
   def parse_item(self):
-    """ mandatory checkboxes will get evelauted to false on empty value """
+    """Mandatory checkboxes will get evaluated to false on empty value."""
     raw_value = self.raw_column_value
     if raw_value in self.TRUE_VALUES:
       return True
@@ -130,7 +131,7 @@ class StrictBooleanColumnHandler(CheckboxColumnHandler):
 
   You can sent only true, false, and empty string values.
   If you send true in model will send boolean True.
-  If you send false in model will send boolean Flase.
+  If you send false in model will send boolean False.
   If you send empty string, and model already exists column will be skipped.
   If you send empty string and not existing instance and column is mandatory,
   Will be raised exception.
@@ -141,3 +142,20 @@ class StrictBooleanColumnHandler(CheckboxColumnHandler):
   @property
   def raw_column_value(self):
     return self.raw_value.lower().strip()
+
+
+class ReadOnlyCheckboxColumnHandler(CheckboxColumnHandler):
+  """Handler for read-only columns"""
+
+  def _validate_item(self):
+    """Adds 'readonly will be ignored' warnings if new value unequal initial"""
+
+    if self.raw_value and self.raw_value != self.get_value():
+      self.add_warning(
+          errors.READONLY_WILL_BE_IGNORED,
+          column_name=self.display_name
+      )
+
+  def set_value(self):
+    """Set value for current column after validating."""
+    self._validate_item()

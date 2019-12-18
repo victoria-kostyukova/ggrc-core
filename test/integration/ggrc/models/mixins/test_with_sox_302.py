@@ -9,6 +9,7 @@ import collections
 
 import ddt
 
+from ggrc.converters import errors
 from ggrc.models import all_models
 from ggrc.models.mixins import statusable
 from ggrc.models.mixins import with_sox_302
@@ -16,6 +17,18 @@ from integration import ggrc as integration_tests_ggrc
 from integration.ggrc import api_helper
 from integration.ggrc import query_helper
 from integration.ggrc.models import factories as ggrc_factories
+
+
+READ_ONLY_WARNING = {
+    "Assessment": {
+        "row_warnings": {
+            errors.READONLY_WILL_BE_IGNORED.format(
+                line=3,
+                value='',
+                column_name='SOX 302 assessment workflow')
+        }
+    }
+}
 
 
 class BaseTestWithSOX302(integration_tests_ggrc.TestCase):
@@ -186,17 +199,34 @@ class TestImportWithSOX302(BaseTestWithSOX302):
     self._assert_sox_302_enabled_flag(tmpl, exp_value)
 
   @ddt.data(
-      {"imported_value": "yes", "exp_value": False},
-      {"imported_value": "no", "exp_value": False},
-      {"imported_value": "", "exp_value": False},
+      {
+          "imported_value": "yes",
+          "exp_value": False,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "imported_value": "no",
+          "exp_value": False,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "imported_value": "",
+          "exp_value": False,
+          "expected_warnings": {}
+      },
   )
   @ddt.unpack
-  def test_sox_302_immut_asmt_create(self, imported_value, exp_value):
+  def test_sox_302_immut_asmt_create(self, imported_value, exp_value,
+                                     expected_warnings):
+    # pylint: disable=invalid-name
     """Test SOX 302 enabled is immutable when create asmt via import.
 
     Test `sox_302_enabled` on Assessment could not be set via import if there
     isn't any AssessmentTemplate provided in import data. SOX 302 enabled flag
     is read only on Assessment and could be set only from template.
+
+    Warning that 'SOX 302 assessment workflow' will be ignored
+    via import is shown.
     """
     audit = ggrc_factories.AuditFactory()
     audit_id = audit.id
@@ -215,27 +245,60 @@ class TestImportWithSOX302(BaseTestWithSOX302):
     self._login()
     response = self.import_data(asmt_data)
 
-    self._check_csv_response(response, {})
+    self._check_csv_response(response, expected_warnings)
     asmt = self._get_query_by_audit_for(all_models.Assessment, audit_id).one()
     self._assert_sox_302_enabled_flag(asmt, exp_value)
 
   @ddt.data(
-      {"tmpl_value": True, "imported_value": "yes", "exp_value": True},
-      {"tmpl_value": True, "imported_value": "no", "exp_value": True},
-      {"tmpl_value": True, "imported_value": "", "exp_value": True},
-      {"tmpl_value": False, "imported_value": "yes", "exp_value": False},
-      {"tmpl_value": False, "imported_value": "no", "exp_value": False},
-      {"tmpl_value": False, "imported_value": "", "exp_value": False},
+      {
+          "tmpl_value": True,
+          "imported_value": "yes",
+          "exp_value": True,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "tmpl_value": True,
+          "imported_value": "no",
+          "exp_value": True,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "tmpl_value": True,
+          "imported_value": "",
+          "exp_value": True,
+          "expected_warnings": {}
+      },
+      {
+          "tmpl_value": False,
+          "imported_value": "yes",
+          "exp_value": False,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "tmpl_value": False,
+          "imported_value": "no",
+          "exp_value": False,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "tmpl_value": False,
+          "imported_value": "",
+          "exp_value": False,
+          "expected_warnings": {}
+      },
   )
   @ddt.unpack
   def test_sox_302_asmt_with_tmpl_create(self, tmpl_value, imported_value,
-                                         exp_value):
+                                         exp_value, expected_warnings):
     # pylint: disable=invalid-name
     """Test SOX 302 enabled is mutable when create asmt with tmpl via import.
 
     Test `sox_302_enabled` on Assessment could be set via import if there is an
     AssessmentTemplate provided in import data. SOX 302 enabled flag is read
     only on Assessment and could be set only from template.
+
+    Warning that 'SOX 302 assessment workflow' will be ignored
+    via import is shown.
     """
     with ggrc_factories.single_commit():
       audit = ggrc_factories.AuditFactory()
@@ -259,26 +322,61 @@ class TestImportWithSOX302(BaseTestWithSOX302):
     self._login()
     response = self.import_data(asmt_data)
 
-    self._check_csv_response(response, {})
+    self._check_csv_response(response, expected_warnings)
     asmt = self._get_query_by_audit_for(all_models.Assessment, audit_id).one()
     self._assert_sox_302_enabled_flag(asmt, exp_value)
 
   @ddt.data(
-      {"init_value": True, "imported_value": "yes", "exp_value": True},
-      {"init_value": True, "imported_value": "no", "exp_value": True},
-      {"init_value": True, "imported_value": "", "exp_value": True},
-      {"init_value": False, "imported_value": "yes", "exp_value": False},
-      {"init_value": False, "imported_value": "no", "exp_value": False},
-      {"init_value": False, "imported_value": "", "exp_value": False},
+      {
+          "init_value": True,
+          "imported_value": "yes",
+          "exp_value": True,
+          "expected_warnings": {}
+      },
+      {
+          "init_value": True,
+          "imported_value": "no",
+          "exp_value": True,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "init_value": True,
+          "imported_value": "",
+          "exp_value": True,
+          "expected_warnings": {}
+      },
+      {
+          "init_value": False,
+          "imported_value": "yes",
+          "exp_value": False,
+          "expected_warnings": READ_ONLY_WARNING
+      },
+      {
+          "init_value": False,
+          "imported_value": "no",
+          "exp_value": False,
+          "expected_warnings": {}
+      },
+      {
+          "init_value": False,
+          "imported_value": "",
+          "exp_value": False,
+          "expected_warnings": {}
+      },
   )
   @ddt.unpack
-  def test_sox_302_immut_asmt_upd(self, init_value, imported_value, exp_value):
+  def test_sox_302_immut_asmt_upd(self, init_value, imported_value,
+                                  exp_value, expected_warnings):
+    # pylint: disable=invalid-name
     """Test SOX 302 enabled is immutable when update asmt via import.
 
     Test `sox_302_enabled` on Assessment could not be set via import during
     Assessment update if there isn't any AssessmentTemplate provided in import
     data. SOX 302 enabled flag is read only on Assessment and could not be
-    updated in noway.
+    updated in any way.
+
+    Warning that 'SOX 302 assessment workflow' will be ignored
+    via import is shown.
     """
     asmt = ggrc_factories.AssessmentFactory(sox_302_enabled=init_value)
     asmt_id = asmt.id
@@ -292,7 +390,7 @@ class TestImportWithSOX302(BaseTestWithSOX302):
     self._login()
     response = self.import_data(asmt_data)
 
-    self._check_csv_response(response, {})
+    self._check_csv_response(response, expected_warnings)
     asmt = self._refresh_object(asmt.__class__, asmt_id)
     self._assert_sox_302_enabled_flag(asmt, exp_value)
 
