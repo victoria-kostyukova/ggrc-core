@@ -15,20 +15,30 @@ class SetValueForAsmtDropdown(base.Modal):
     self.modal_header_lbl = self.modal_elem.div(
         class_name="simple-modal__header-text")
 
-  def click_close_button(self):
+  @property
+  def comment_input(self):
+    """Comment panel."""
+    return base.CommentInput(self.modal_elem)
+
+  @property
+  def _save_button(self):
+    """Save button."""
+    return self.modal_elem.button(text="Save")
+
+  @property
+  def _close_button(self):
+    """Close button."""
+    return self.modal_elem.button(text="Close")
+
+  def close_modal(self):
     """Click close button."""
-    self.modal_elem.button(text="Close").click()
+    self._close_button.click()
+    self._close_button.wait_until_not_present()
 
-  def click_save_button(self):
+  def save(self):
     """Click save button."""
-    self.modal_elem.button(text="Save").click()
-
-  def set_dropdown_comment(self, comment):
-    """Set comment via dropdown."""
-    input_field = self.modal_elem.div(text="Comment").parent(
-        tag_name="div").div(class_name="ql-editor")
-    input_field.click()
-    input_field.send_keys(comment)
+    self._save_button.click()
+    self._save_button.wait_until_not_present()
 
   def set_dropdown_url(self, url):
     """Set evidence url via dropdown."""
@@ -43,7 +53,7 @@ class SetValueForAsmtDropdown(base.Modal):
     if "url" in kwargs:
       self.set_dropdown_url(kwargs["url"])
     if "comment" in kwargs:
-      self.set_dropdown_comment(kwargs["comment"])
-      self.click_save_button()
+      self.comment_input.fill(kwargs["comment"])
+      self.save()
     else:
-      self.click_close_button()
+      self.close_modal()
