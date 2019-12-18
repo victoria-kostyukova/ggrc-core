@@ -425,6 +425,17 @@ class ImportRowConverter(RowConverter):
 
     self.obj.issue_tracker_to_import['issue_tracker'] = self.issue_tracker
 
+  @staticmethod
+  def _is_cav_updating(obj, handler):
+    """Check if {handler} going to update CAV for {obj}"""
+    for cav in obj.custom_attribute_values:
+      if cav.display_name == handler.display_name:
+        if json_comparator.fields_equal(handler.raw_value, cav.value):
+          return False
+        else:
+          return True
+    return True
+
   def _check_updating_readonly_fields(self):
     """Check if trying to update fields with SOX restrictions"""
     if self.is_new:
@@ -441,6 +452,20 @@ class ImportRowConverter(RowConverter):
                   handler.value):
             handler.ignore = True
             ignored_names.append(attr_name)
+
+        for obj_name, handler in self.objects.items():
+          is_local_restricted = (
+              obj_name.startswith("__object_custom__") and
+              "custom_attributes_values" in self.obj.import_restrictions
+          )
+          is_global_restricted = (
+              obj_name.startswith("__custom__") and
+              "global_custom_attributes_values"
+              in self.obj.import_restrictions)
+
+          if ((is_local_restricted or is_global_restricted) and
+             self._is_cav_updating(self.obj, handler)):
+            ignored_names.append(handler.display_name)
 
         if not ignored_names:
           return

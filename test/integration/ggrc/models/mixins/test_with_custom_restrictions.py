@@ -398,7 +398,7 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
         'Assessment': {
             'row_warnings': {"Line 3: The system is in a read-only mode and "
                              "is dedicated for SOX needs. The following "
-                             "columns will be ignored: {}.".format(
+                             "columns will be ignored: '{}'.".format(
                                  global_cad_name),
                              },
         }
@@ -426,6 +426,7 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assmnt_slug),
+        ("state", "Completed"),
         (global_cad_name, "Some value 1"),
         (local_cad_name, "Some value 2"),
     ]), person=all_models.Person.query.get(person_id))
