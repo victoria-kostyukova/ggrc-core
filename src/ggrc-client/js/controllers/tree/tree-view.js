@@ -24,6 +24,7 @@ import ExternalCADefinition from '../../models/custom-attributes/external-custom
 const TreeViewControl = TreeLoader.extend({
   // static properties
   defaults: {
+    listItemIsLoaded: false,
     model: null,
     show_view: null,
     show_header: false,
@@ -38,6 +39,11 @@ const TreeViewControl = TreeLoader.extend({
     // example child option:
     // { property: "controls", model: Control, }
     // { parent_find_param: "system_id" ... }
+    loadListItem() {
+      if (!this.attr('listItemIsLoaded')) {
+        this.attr('listItemIsLoaded', true);
+      }
+    },
   },
   do_not_propagate: [
     'header_view',
@@ -163,6 +169,7 @@ const TreeViewControl = TreeLoader.extend({
       //  Skip, because already done, e.g., display() already called
       return this.find_all_deferred;
     }
+
     if (isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr(
         'id', this.options.parent_instance ?

@@ -6,7 +6,9 @@
 <li class="tree-item" data-model="true">
   <div class="item-main" {{canData 'model'}}>
     <div class="item-wrap">
-      {{> base_objects/open-close.stache}}
+      <div on:el:click="loadListItem()">
+        {{> base_objects/open-close.stache}}
+      </div>
       <div class="select disabled">
         <div class="item-data">
           <div class="row-fluid">
@@ -27,58 +29,60 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <div class="table-wrap {{#if instance.isChangeableExternally}}table-wrap_type_readonly{{/if}}">
-        <model-loader path:from="'custom-roles/access-control-role'">
-        <tree-structure
-          parentModel:from="instance"
-          model:from="loadedModel"
-          modalTitle:from="'Add Custom Role to type {{instance.title_singular}}'"
-          contentViewPath:from="'/access_control_roles/modal-content.stache'">
-          <table class="table">
-            <colgroup>
-              <col style="width: 40%"/>
-              <col style="width: 15%"/>
-              <col style="width: 15%"/>
-              <col style="width: 15%"/>
-              <col style="width: 15%"/>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Role name</th>
-                <th>Read</th>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th></th>
-              </tr>
-            </thead>
-            {{#child_options.0}}
-            <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
-            </tbody>
-            {{/child_options.0}}
-            <!-- Custom attribute definitions here -->
-            {{^if instance.isChangeableExternally}}
-            <tfoot class="add-item">
-              <tr>
-                <td colspan="5" class="tree-item tree-item-add">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a
-                        href="javascript://"
-                        class="btn btn-small btn-draft"
-                        rel="tooltip"
-                        data-placement="right"
-                        data-original-title="Add Custom Role"
-                        on:el:click="showAddNewItemModal(scope.element)">
-                        <i class="fa fa-plus-circle"></i>
-                      </a>
+        {{#if listItemIsLoaded}}
+          <model-loader path:from="'custom-roles/access-control-role'">
+          <tree-structure
+            parentModel:from="instance"
+            model:from="loadedModel"
+            modalTitle:from="'Add Custom Role to type {{instance.title_singular}}'"
+            contentViewPath:from="'/access_control_roles/modal-content.stache'">
+            <table class="table">
+              <colgroup>
+                <col style="width: 40%"/>
+                <col style="width: 15%"/>
+                <col style="width: 15%"/>
+                <col style="width: 15%"/>
+                <col style="width: 15%"/>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Role name</th>
+                  <th>Read</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                  <th></th>
+                </tr>
+              </thead>
+              {{#child_options.0}}
+              <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
+              </tbody>
+              {{/child_options.0}}
+              <!-- Custom attribute definitions here -->
+              {{^if instance.isChangeableExternally}}
+              <tfoot class="add-item">
+                <tr>
+                  <td colspan="5" class="tree-item tree-item-add">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <a
+                          href="javascript://"
+                          class="btn btn-small btn-draft"
+                          rel="tooltip"
+                          data-placement="right"
+                          data-original-title="Add Custom Role"
+                          on:el:click="showAddNewItemModal(scope.element)">
+                          <i class="fa fa-plus-circle"></i>
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-            {{/if}}
-          </table>
-        </tree-structure>
-        </model-loader>
+                  </td>
+                </tr>
+              </tfoot>
+              {{/if}}
+            </table>
+          </tree-structure>
+          </model-loader>
+        {{/if}}
       </div>
     </div>
   </div>
