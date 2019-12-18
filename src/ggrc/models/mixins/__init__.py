@@ -36,6 +36,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins.base import Base
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
+from ggrc.models.mixins.with_workflow_state import WithWorkflowState
 from ggrc.models.mixins.with_external_created_by import WithExternalCreatedBy
 from ggrc.models.utils import validate_option
 from ggrc.fulltext import attributes
@@ -893,4 +894,5 @@ __all__ = [
     "VerifiedDate",
     "WithContact",
     "Folderable",
+    "WithWorkflowState",
 ]

@@ -25,6 +25,7 @@ class Facility(Roleable,
                mixins.base.ContextRBAC,
                mixins.ScopeObject,
                mixins.Folderable,
+               mixins.WithWorkflowState,
                Indexed,
                db.Model):
   """Facility model"""

@@ -25,6 +25,7 @@ class Market(Roleable,
              mixins.base.ContextRBAC,
              mixins.ScopeObject,
              mixins.Folderable,
+             mixins.WithWorkflowState,
              Indexed,
              db.Model):
   """Market model"""

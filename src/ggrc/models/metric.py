@@ -26,6 +26,7 @@ class Metric(Personable,
              mixins.ScopeObject,
              mixins.base.ContextRBAC,
              mixins.Folderable,
+             mixins.WithWorkflowState,
              Indexed,
              db.Model):
   """Representation for Metric model."""

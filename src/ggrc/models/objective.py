@@ -28,6 +28,7 @@ class Objective(mixins.with_last_assessment_date.WithLastAssessmentDate,
                 mixins.base.ContextRBAC,
                 mixins.BusinessObject,
                 mixins.Folderable,
+                mixins.WithWorkflowState,
                 Indexed,
                 db.Model):
   """Class representing Objective."""

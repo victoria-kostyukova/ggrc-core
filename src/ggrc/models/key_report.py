@@ -28,6 +28,7 @@ class KeyReport(synchronizable.Synchronizable,
                 mixins.base.ContextRBAC,
                 mixins.ScopeObject,
                 mixins.Folderable,
+                mixins.WithWorkflowState,
                 fulltext_mixin.Indexed,
                 db.Model,
                 ):

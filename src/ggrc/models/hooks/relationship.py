@@ -18,6 +18,7 @@ from ggrc.models import exceptions
 from ggrc.models.comment import Commentable, ExternalCommentable
 from ggrc.models.hooks import assessment as asmt_hooks
 from ggrc.models.mixins.base import ChangeTracked
+from ggrc_workflows import models as wf_models
 from ggrc.services import signals
 
 
@@ -434,3 +435,23 @@ def init_hook():  # noqa
 
       elif not is_external_app_user() and obj.is_external:
         raise BadRequest(error_message.format("external"))
+
+  @signals.Restful.model_posted.connect_via(
+      all_models.Relationship)
+  @signals.Restful.model_deleted.connect_via(
+      all_models.Relationship)
+  def handle_map_unmap_obj_to_ctgot(sender, obj=None, **kwargs):
+    """
+        Calculate workflow_state of objects mapped to CycleTaskGroupObjectTask.
+    """
+    if (obj.source_type == 'CycleTaskGroupObjectTask' and
+            obj.destination_type in wf_models.WORKFLOW_OBJECT_TYPES):
+      remote = obj.destination
+      remote.workflow_state = wf_models.Workflow.get_object_state(
+          remote.cycle_task_group_object_tasks)
+
+    if (obj.source_type in wf_models.WORKFLOW_OBJECT_TYPES and
+            obj.destination_type == 'CycleTaskGroupObjectTask'):
+      remote = obj.source
+      remote.workflow_state = wf_models.Workflow.get_object_state(
+          remote.cycle_task_group_object_tasks)

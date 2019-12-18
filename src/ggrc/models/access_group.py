@@ -27,6 +27,7 @@ class AccessGroup(Roleable,
                   base.ContextRBAC,
                   mixins.ScopeObject,
                   mixins.Folderable,
+                  mixins.WithWorkflowState,
                   Indexed,
                   db.Model):
   """Class representing AccessGroup."""

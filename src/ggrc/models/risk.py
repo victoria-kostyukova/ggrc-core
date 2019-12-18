@@ -34,6 +34,7 @@ class Risk(with_external_created_by.WithExternalCreatedBy,
            mixins.base.ContextRBAC,
            mixins.BusinessObject,
            mixins.Folderable,
+           mixins.WithWorkflowState,
            Indexed,
            db.Model):
   """Basic Risk model."""
