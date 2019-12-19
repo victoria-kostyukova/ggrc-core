@@ -429,11 +429,20 @@ class ImportRowConverter(RowConverter):
   def _is_cav_updating(obj, handler):
     """Check if {handler} going to update CAV for {obj}"""
     for cav in obj.custom_attribute_values:
-      if cav.display_name == handler.display_name:
-        if json_comparator.fields_equal(handler.raw_value, cav.value):
-          return False
-        else:
-          return True
+      if cav.custom_attribute.display_name == handler.display_name:
+        cav_attribute = cav.attribute_value
+        handler_value = handler.parse_item()
+
+        if cav.custom_attribute.attribute_type == u'Checkbox':
+          cav_attribute = cav_attribute == u'1'
+
+        if cav.custom_attribute.attribute_type == u'Map:Person':
+          cav_attribute = cav.attribute_object.email
+          handler_value = handler.get_value()
+
+        if handler_value is None:
+          handler_value = ''
+        return not json_comparator.fields_equal(cav_attribute, handler_value)
     return True
 
   def _check_updating_readonly_fields(self):
@@ -463,9 +472,10 @@ class ImportRowConverter(RowConverter):
               "global_custom_attributes_values"
               in self.obj.import_restrictions)
 
-          if ((is_local_restricted or is_global_restricted) and
-             self._is_cav_updating(self.obj, handler)):
-            ignored_names.append(handler.display_name)
+          if is_local_restricted or is_global_restricted:
+            handler.ignore = True
+            if self._is_cav_updating(self.obj, handler):
+              ignored_names.append(handler.display_name)
 
         if not ignored_names:
           return

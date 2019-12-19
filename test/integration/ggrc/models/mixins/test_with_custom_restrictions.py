@@ -19,7 +19,7 @@ from integration.ggrc.models import factories
 from integration.ggrc.query_helper import WithQueryApi
 
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-public-methods
 @ddt.ddt
 class TestWithCustomRestrictions(TestCase, WithQueryApi):
   """Test cases for With Custom Restrictions mixin"""
@@ -54,6 +54,25 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
         all_models.Role.name == "Reader").first()
     rbac_factories.UserRoleFactory(role=reader_role, person=person)
     return person
+
+  @staticmethod
+  def create_local_cad(obj, title, type_):
+    """Generate Local Custom Attribute Definition for object"""
+    return factories.CustomAttributeDefinitionFactory(
+        title=title,
+        definition_type=obj.type,
+        definition_id=obj.id,
+        attribute_type=type_
+    )
+
+  @staticmethod
+  def create_global_cad(obj, title, type_):
+    """Generate Global Custom Attribute Definition for object type"""
+    return factories.CustomAttributeDefinitionFactory(
+        title=title,
+        definition_type=obj.type,
+        attribute_type=type_
+    )
 
   def set_current_person(self, user):
     """Set user as current for Flask app"""
@@ -410,17 +429,9 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
                                           status="In Progress")
       self.assign_person(asmnt, "Assignees", user.id)
       assmnt_slug = asmnt.slug
-      factories.CustomAttributeDefinitionFactory(
-          title=local_cad_name,
-          definition_type="assessment",
-          definition_id=asmnt.id,
-          attribute_type="Text",
-      )
-      factories.CustomAttributeDefinitionFactory(
-          title=global_cad_name,
-          definition_type="assessment",
-          attribute_type="Text",
-      )
+      assmnt_id = asmnt.id,
+      self.create_local_cad(asmnt, local_cad_name, "Checkbox")
+      self.create_global_cad(asmnt, global_cad_name, "Text")
 
     self.set_current_person(user)
     response = self.import_data(collections.OrderedDict([
@@ -428,24 +439,27 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
         ("Code*", assmnt_slug),
         ("state", "Completed"),
         (global_cad_name, "Some value 1"),
-        (local_cad_name, "Some value 2"),
+        (local_cad_name, "yes"),
     ]), person=all_models.Person.query.get(person_id))
     self._check_csv_response(response, exp_errors)
 
+    assessment = self.refresh_object(asmnt, assmnt_id)
+    self.assertEqual("Completed", assessment.status)
+
   def test_asmnt_cads_update_completed(self):
     """Test update of completed assessment with local and global cads."""
-    global_cad_name = "Global CAD fox sox"
-    local_cad_name = "Local CAD for sox"
+    global_cad_name = "Global CAD"
+    local_cad_name = "Local CAD"
+    person_local_cad = "Person Local CAD"
+    date_local_cad = "Date Local CAD"
     exp_errors = {
         'Assessment': {
             'row_warnings': {"Line 3: The system is in a read-only mode and "
                              "is dedicated for SOX needs. The following "
-                             "columns will be ignored: {}.".format(
-                                 global_cad_name),
-                             "Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: {}.".format(
-                                 local_cad_name),
+                             "columns will be ignored: "
+                             "'{}', '{}', '{}', '{}'.".format(
+                                 date_local_cad, global_cad_name,
+                                 local_cad_name, person_local_cad),
                              },
         }
     }
@@ -454,28 +468,28 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
       person_id = user.id
       asmnt = factories.AssessmentFactory(sox_302_enabled=True,
                                           status="Completed")
+      assmnt_id = asmnt.id
       self.assign_person(asmnt, "Assignees", user.id)
       assmnt_slug = asmnt.slug
-      factories.CustomAttributeDefinitionFactory(
-          title=local_cad_name,
-          definition_type="assessment",
-          definition_id=asmnt.id,
-          attribute_type="Text",
-      )
-      factories.CustomAttributeDefinitionFactory(
-          title=global_cad_name,
-          definition_type="assessment",
-          attribute_type="Text",
-      )
+
+      self.create_local_cad(asmnt, local_cad_name, "Text")
+      self.create_local_cad(asmnt, person_local_cad, "Map:Person")
+      self.create_local_cad(asmnt, date_local_cad, "Date")
+      self.create_global_cad(asmnt, global_cad_name, "Checkbox")
 
     self.set_current_person(user)
     response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assmnt_slug),
-        (global_cad_name, "Some value 1"),
+        (global_cad_name, "yes"),
         (local_cad_name, "Some value 2"),
+        (person_local_cad, factories.PersonFactory().email),
+        (date_local_cad, "12/26/2019")
     ]), person=all_models.Person.query.get(person_id))
     self._check_csv_response(response, exp_errors)
+
+    assessment = self.refresh_object(asmnt, assmnt_id)
+    self.assertEqual("Completed", assessment.status)
 
   def test_import_sox302_assmt_status(self):
     """Test user sox302 update read only Status via import"""
@@ -492,6 +506,7 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
                                                status="Completed")
       person_id = user.id
       assmnt_slug = assessment.slug
+      assmnt_id = assessment.id
       self.assign_person(assessment, "Assignees", person_id)
 
     self.set_current_person(user)
@@ -502,3 +517,6 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     ]), person=all_models.Person.query.get(person_id))
 
     self._check_csv_response(response, exp_errors)
+
+    assessment = self.refresh_object(assessment, assmnt_id)
+    self.assertEqual("Completed", assessment.status)
