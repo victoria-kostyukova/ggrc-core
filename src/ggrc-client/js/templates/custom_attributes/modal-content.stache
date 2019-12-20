@@ -8,7 +8,9 @@
   {{^if_instance_of instance 'Assessment'}}
     <div class="ggrc-form">
       <gca-controls instance:from="instance"
+        {{^if_instance_of instance 'Workflow'}}
                     allowHide:from="true"
+        {{/if_instance_of}}
       ></gca-controls>
     </div>
   {{/if_instance_of}}
