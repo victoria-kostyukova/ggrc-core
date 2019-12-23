@@ -3,7 +3,7 @@
 
 """Tests import of comments."""
 
-from collections import OrderedDict
+import collections
 
 import ddt
 
@@ -17,17 +17,9 @@ from ggrc.models import Assessment, Comment
 class TestCommentsImport(TestCase):
   """Test comments import"""
 
-  @classmethod
-  def setUpClass(cls):
-    TestCase.clear_data()
-    cls.response1 = TestCase._import_file("import_comments.csv")
-    cls.response2 = TestCase._import_file(
-        "import_comments_without_assignee_roles.csv")
-
   def setUp(self):
     """Log in before performing queries."""
-    self._check_csv_response(self.response1, {})
-    self._check_csv_response(self.response2, {})
+    super(TestCommentsImport, self).setUp()
     self.client.get("/login")
 
   @ddt.data(("Assessment 1", ["comment", "new_comment1", "new_comment2"]),
@@ -37,12 +29,59 @@ class TestCommentsImport(TestCase):
             ("Assessment 5", ["one;two", "three;", "four", "hello"]),
             ("Assessment 6", ["a normal comment with {} characters"]))
   @ddt.unpack
-  def test_assessment_comments(self, slug, expected_comments):
+  def test_assessment_comments(self, title, expected_comments):
     """Test assessment comments import"""
-    asst = Assessment.query.filter_by(slug=slug).first()
-    comments = [comment.description for comment in asst.comments]
+    audit = factories.AuditFactory()
+    audit_slug = audit.slug
+    self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Title", title),
+        ("Audit", audit_slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("comments", ";;".join(expected_comments))
+    ]))
+
+    assmt = Assessment.query.filter_by(title=title).first()
+    comments = [comment.description for comment in assmt.comments]
     self.assertEqual(comments, expected_comments)
-    for comment in asst.comments:
+    for comment in assmt.comments:
+      assignee_roles = comment.assignee_type
+      self.assertIn("Assignees", assignee_roles)
+      self.assertIn("Creators", assignee_roles)
+
+  # pylint: disable=invalid-name
+  def test_assessment_comments_without_assignee_roles(self):
+    """Test import of assessment comments, without assignee roles"""
+    audit = factories.AuditFactory()
+    audit_slug = audit.slug
+    title = "Assessment 1"
+    self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Title", title),
+        ("Audit", audit_slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("comments", "comment1")
+    ]))
+
+    assmt = Assessment.query.filter_by(title=title).first()
+    assmt_slug = assmt.slug
+    new_comments = ["new_comment1", "new_comment2"]
+
+    self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assmt_slug),
+        ("comments", ";;".join(new_comments))
+    ]))
+
+    expected_comments = ["comment1", "new_comment1", "new_comment2"]
+    assmt = Assessment.query.filter_by(title=title).first()
+    comments = [comment.description for comment in assmt.comments]
+    self.assertEqual(comments, expected_comments)
+    for comment in assmt.comments:
       assignee_roles = comment.assignee_type
       self.assertIn("Assignees", assignee_roles)
       self.assertIn("Creators", assignee_roles)
@@ -84,7 +123,7 @@ class TestLCACommentsImport(TestCase):
           attribute_value="comment_required",
       )
     self.assertEqual(self.asmt.status, "In Progress")
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "LCA Comment"),
         ("description", "test description"),
         ("custom_attribute_definition", cad.id),
