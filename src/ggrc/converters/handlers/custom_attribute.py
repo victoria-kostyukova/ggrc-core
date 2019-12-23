@@ -55,7 +55,13 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
 
     cav = self._get_or_create_ca()
 
-    cav.attribute_value = self.value
+    value = self.parse_item()
+    if (isinstance(value, bool) and
+       ((value and cav.attribute_value == '1') or
+       (not value and cav.attribute_value == '0'))):
+      pass  # do not update checkbox if value do not changing
+    else:
+      cav.attribute_value = value
     if isinstance(cav.attribute_value, models.mixins.base.Identifiable):
       obj = cav.attribute_value
       cav.attribute_value = obj.__class__.__name__
