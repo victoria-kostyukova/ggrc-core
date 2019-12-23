@@ -61,6 +61,7 @@ import router from '../../router';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
+import Comment from '../../models/service-models/comment';
 import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.stache';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
@@ -325,7 +326,8 @@ let viewModel = canMap.extend({
     function onCreated(ev, instance) {
       if (activeTabModel === instance.type) {
         _refresh(true);
-      } else if (!(instance instanceof Relationship)) {
+      } else if (!(instance instanceof Relationship)
+      && !(instance instanceof Comment)) {
         _refreshCounts();
       }
     }
