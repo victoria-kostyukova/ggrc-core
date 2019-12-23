@@ -10,6 +10,7 @@ import Component from '../revisions-comparer';
 import Revision from '../../../models/service-models/revision';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Control from '../../../models/business-models/control';
+import * as RevisionUtils from '../../../plugins/utils/revision-utils';
 
 describe('revisions-comparer component', function () {
   let viewModel;
@@ -35,6 +36,7 @@ describe('revisions-comparer component', function () {
           resource_type: 'Control',
         },
       ];
+      spyOn(RevisionUtils, 'setActualGCAs').and.callFake((data) => data);
     });
 
     it('returns instances of necessary type and with isRevision', function () {

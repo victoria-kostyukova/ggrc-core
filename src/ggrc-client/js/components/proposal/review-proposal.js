@@ -12,6 +12,7 @@ import {
   buildModifiedAttValues,
 } from '../../plugins/utils/object-history-utils';
 import Revision from '../../models/service-models/revision';
+import {setActualGCAs} from '../../plugins/utils/revision-utils';
 
 import template from './templates/review-proposal.stache';
 
@@ -66,6 +67,8 @@ export default canComponent.extend({
       Revision.findAll(query).then((data) => {
         const originalRevision = data[0];
         this.attr('leftRevisionId', originalRevision.id);
+        originalRevision.content =
+          setActualGCAs(originalRevision.content, instance);
         this.buildModifiedRevision(originalRevision);
       });
     },
