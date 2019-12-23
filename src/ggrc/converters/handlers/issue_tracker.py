@@ -15,6 +15,7 @@ from ggrc.models.hooks.issue_tracker import \
 _ATTR_NAME_TO_ISSUE_TRACKER_KEY = {
     "issue_title": "title",
 }
+TYPES_TO_SYNC = {'Assessment', 'Issue'}
 
 
 class IssueTrackerColumnHandler(handlers.ColumnHandler):
@@ -42,7 +43,6 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
   def set_obj_attr(self):
     if self.dry_run or self.value is None:
       return
-
     self._set_issue_tracker_value(self.value)
 
 
@@ -178,6 +178,12 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
     value = self.raw_value.strip().lower()
     if not value:
       return None
+    obj = self.row_converter.obj
+    if obj.type in TYPES_TO_SYNC:
+      if obj.issue_tracker.get('enabled') and value == self._false:
+        self.row_converter.issuetracker_status_info[obj.type][obj.id] = False
+      elif not obj.issue_tracker.get('enabled') and value == self._true:
+        self.row_converter.issuetracker_status_info[obj.type][obj.id] = True
     if value in self.TRUE_VALUES:
       if self._needs_status_check() and self._wrong_status():
         self.add_warning(self._get_err_message(),
