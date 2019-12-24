@@ -18,8 +18,20 @@ function failAll(done) {
 }
 
 function getComponentVM(Component) {
-  const viewModelConfig = Component.prototype.viewModel;
-  return new viewModelConfig();
+  // viewModel is CanMap
+  if (Component.prototype.viewModel) {
+    return new Component.prototype.viewModel();
+  }
+
+  // ViewModel is DefineMap
+  const VM = Component.prototype.ViewModel;
+
+  /*
+    turn OFF "seal" flag to add possibility use "spyOn" jasmine function.
+    Needs to override default behavior of ViewModel's method.
+  */
+  VM.seal = false;
+  return new VM();
 }
 
 function makeFakeModel({model, staticProps = {}, instanceProps = {}} = {}) {

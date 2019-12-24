@@ -78,7 +78,14 @@ export default canComponent.extend({
       if (isSelected) {
         this.attr('selectedItem.el', el);
         this.attr('selectedItem.data', ctx.instance);
-        ctx.attr('isSelected', true);
+
+        if (ctx.attr) {
+          // ctx is CanMap
+          ctx.attr('isSelected', true);
+        } else {
+          // ctx is DefineMap
+          ctx.isSelected = true;
+        }
       }
     },
     /**
@@ -86,7 +93,13 @@ export default canComponent.extend({
      */
     clearSelection: function () {
       this.attr('items').forEach(function (item) {
-        item.removeAttr('isSelected', false);
+        if (item.removeAttr) {
+          // item is CanMap
+          item.removeAttr('isSelected', false);
+        } else {
+          // item is DefineMap
+          delete item.isSelected;
+        }
       });
       this.attr('selectedItem.el', null);
       this.attr('selectedItem.data', null);

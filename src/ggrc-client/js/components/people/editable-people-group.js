@@ -16,85 +16,91 @@ import template from './editable-people-group.stache';
 
 const SHOW_MODAL_LIMIT = 4;
 
-let viewModel = peopleGroupVM.extend({
-  title: '',
-  canEdit: {},
-  showPeopleGroupModal: false,
-  updatableGroupId: null,
-  define: {
-    editableMode: {
-      set: function (newValue, setValue) {
-        // the order of "showPeopleGroupModal" change is important
-        // to avoid render of {{^showPeopleGroupModal}} block
-        if (newValue) {
-          this.attr('showPeopleGroupModal', this.attr('isModalLimitExceeded'));
-          setValue(newValue);
-          return;
-        }
+const ViewModel = peopleGroupVM.extend({
+  title: {
+    value: '',
+  },
+  canEdit: {
+    value: true,
+  },
+  showPeopleGroupModal: {
+    value: false,
+  },
+  updatableGroupId: {
+    value: null,
+  },
+  editableMode: {
+    set(newValue, setValue) {
+      // the order of "showPeopleGroupModal" change is important
+      // to avoid render of {{^showPeopleGroupModal}} block
+      if (newValue) {
+        this.showPeopleGroupModal = this.isModalLimitExceeded;
+        setValue(newValue);
+        return;
+      }
 
-        setValue(false);
-        this.attr('showPeopleGroupModal', false);
-      },
-    },
-    isModalLimitExceeded: {
-      get() {
-        return this.attr('people.length') > SHOW_MODAL_LIMIT;
-      },
-    },
-    showSeeMoreLink: {
-      get: function () {
-        return !this.attr('editableMode') &&
-          !this.attr('isLoading') &&
-          !this.attr('isReadonly') &&
-          this.attr('isModalLimitExceeded');
-      },
-    },
-    /**
-     * Contains people list which is displayed when editableMode is off
-     * @type {canList}
-     */
-    showPeople: {
-      get: function () {
-        if (this.attr('isModalLimitExceeded') && !this.attr('isReadonly')) {
-          return this.attr('people').attr().slice(0, SHOW_MODAL_LIMIT);
-        }
-
-        return this.attr('people').attr();
-      },
-    },
-    /**
-     * Indicates whether people group is readonly
-     * canEdit becomes false while people group is saving
-     * (updatableGroupId is not null in this case)
-     * @type {boolean}
-     */
-    isReadonly: {
-      type: 'boolean',
-      get() {
-        return !(this.attr('canEdit') || this.attr('updatableGroupId'));
-      },
+      setValue(false);
+      this.showPeopleGroupModal = false;
     },
   },
-  personSelected: function (person) {
+  isModalLimitExceeded: {
+    get() {
+      return this.people.length > SHOW_MODAL_LIMIT;
+    },
+  },
+  showSeeMoreLink: {
+    get() {
+      return !this.editableMode &&
+        !this.isLoading &&
+        !this.isReadonly &&
+        this.isModalLimitExceeded;
+    },
+  },
+  /**
+   * Contains people list which is displayed when editableMode is off
+   * @type {Array}
+   */
+  showPeople: {
+    get() {
+      if (this.isModalLimitExceeded && !this.isReadonly) {
+        return this.people.serialize().slice(0, SHOW_MODAL_LIMIT);
+      }
+
+      return this.people.serialize();
+    },
+  },
+  /**
+   * Indicates whether people group is readonly
+   * canEdit becomes false while people group is saving
+   * (updatableGroupId is not null in this case)
+   * @type {Boolean}
+   */
+  isReadonly: {
+    type: 'boolean',
+    get() {
+      return !(this.canEdit || this.updatableGroupId);
+    },
+  },
+  personSelected(person) {
     this.dispatch({
       type: 'personSelected',
       person: person,
-      groupId: this.attr('groupId'),
+      groupId: this.groupId,
     });
   },
-  save: function () {
+  save() {
     this.dispatch('saveChanges');
-    this.attr('editableMode', false);
+    this.editableMode = false;
   },
-  cancel: function () {
+  cancel() {
     this.changeEditableMode(false);
   },
-  changeEditableMode: function (editableMode) {
-    this.attr('editableMode', editableMode);
+  changeEditableMode(editableMode) {
+    this.editableMode = editableMode;
     this.dispatch({
       type: 'changeEditableMode',
       editableMode: editableMode,
-      groupId: this.attr('groupId'),
+      groupId: this.groupId,
     });
   },
 });
@@ -103,13 +109,13 @@ export default canComponent.extend({
   tag: 'editable-people-group',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     '{window} mousedown': function (el, ev) {
       let viewModel = this.viewModel;
       let isInside = isInnerClick(this.element, ev.target);
-      let editableMode = viewModel.attr('editableMode');
-      let showPeopleGroupModal = viewModel.attr('showPeopleGroupModal');
+      let editableMode = viewModel.editableMode;
+      let showPeopleGroupModal = viewModel.showPeopleGroupModal;
 
       if (!showPeopleGroupModal && !isInside && editableMode) {
         viewModel.save();
