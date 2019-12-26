@@ -500,9 +500,9 @@ def prefix_subject(subject):
   if not settings.NOTIFICATION_PREFIX:
     return subject
 
-  return "[{prefix}] {subject}".format(
+  return u"[{prefix}] {subject}".format(
       prefix=settings.NOTIFICATION_PREFIX,
-      subject=subject,
+      subject=subject.decode("utf-8") if isinstance(subject, str) else subject,
   )
 
 
