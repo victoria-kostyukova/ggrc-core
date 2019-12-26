@@ -293,9 +293,8 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     """Test user sox302 update read only fields via import"""
     exp_errors = {
         'Assessment': {
-            'row_warnings': {"Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: 'title'."},
+            'row_errors': {"Line 3: You don't have permission to update/delete"
+                           " this record."},
         }
     }
     with factories.single_commit():
@@ -385,11 +384,9 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     """Test user sox302 update read only access control roles via import"""
     exp_errors = {
         'Assessment': {
-            'row_warnings': {"Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: {}.".format(role_name)
-                             },
-        }
+            'row_errors': {"Line 3: You don't have permission to update/delete"
+                           " this record."},
+        },
     }
     with factories.single_commit():
       user = self.generate_person()
@@ -415,11 +412,8 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     local_cad_name = "Local CAD for sox"
     exp_errors = {
         'Assessment': {
-            'row_warnings': {"Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: '{}'.".format(
-                                 global_cad_name),
-                             },
+            'row_errors': {"Line 3: You don't have permission to update/delete"
+                           " this record."},
         }
     }
     with factories.single_commit():
@@ -429,7 +423,6 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
                                           status="In Progress")
       self.assign_person(asmnt, "Assignees", user.id)
       assmnt_slug = asmnt.slug
-      assmnt_id = asmnt.id,
       self.create_local_cad(asmnt, local_cad_name, "Checkbox")
       self.create_global_cad(asmnt, global_cad_name, "Text")
 
@@ -443,9 +436,6 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     ]), person=all_models.Person.query.get(person_id))
     self._check_csv_response(response, exp_errors)
 
-    assessment = self.refresh_object(asmnt, assmnt_id)
-    self.assertEqual("Completed", assessment.status)
-
   def test_asmnt_cads_update_completed(self):
     """Test update of completed assessment with local and global cads."""
     global_cad_name = "Global CAD"
@@ -454,13 +444,8 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     date_local_cad = "Date Local CAD"
     exp_errors = {
         'Assessment': {
-            'row_warnings': {"Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: "
-                             "'{}', '{}', '{}', '{}'.".format(
-                                 date_local_cad, global_cad_name,
-                                 local_cad_name, person_local_cad),
-                             },
+            'row_errors': {"Line 3: You don't have permission to update/delete"
+                           " this record."},
         }
     }
     with factories.single_commit():
@@ -495,9 +480,8 @@ class TestWithCustomRestrictions(TestCase, WithQueryApi):
     """Test user sox302 update read only Status via import"""
     exp_errors = {
         'Assessment': {
-            'row_warnings': {"Line 3: The system is in a read-only mode and "
-                             "is dedicated for SOX needs. The following "
-                             "columns will be ignored: 'status'."},
+            'row_errors': {"Line 3: You don't have permission to update/delete"
+                           " this record."},
         }
     }
     with factories.single_commit():
