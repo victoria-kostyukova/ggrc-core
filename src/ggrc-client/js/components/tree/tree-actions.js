@@ -5,7 +5,7 @@
 
 import '../clipboard-link/clipboard-link';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 import '../change-request-link/change-request-link';
@@ -30,155 +30,160 @@ import {
 import template from './templates/tree-actions.stache';
 import pubSub from '../../pub-sub';
 
+const ViewModel = canDefineMap.extend({
+  parentInstance: {
+    value: null,
+  },
+  options: {
+    value: null,
+  },
+  model: {
+    value: null,
+  },
+  showedItems: {
+    value: () => [],
+  },
+  searchPermalinkEnabled: {
+    value: false,
+  },
+  pubSub: {
+    value: () => pubSub,
+  },
+  addItem: {
+    get() {
+      return (this.options.objectVersion
+        || this.parentInstance.attr('_is_sox_restricted')
+        || this.isUpdateDenied())
+        ? false
+        : this.options.add_item_view ||
+        this.model.tree_view_options.add_item_view ||
+        'base_objects/tree-add-item';
+    },
+  },
+  show3bbs: {
+    get() {
+      let modelName = this.model.model_singular;
+      return !isMyAssessments()
+        && modelName !== 'Document'
+        && modelName !== 'Evidence';
+    },
+  },
+  isSnapshots: {
+    get() {
+      let parentInstance = this.parentInstance;
+      let model = this.model;
+
+      return (isSnapshotRelated(parentInstance.type, model.model_singular)
+        || this.options.objectVersion);
+    },
+  },
+  isAssessmentOnAudit: {
+    get() {
+      let parentInstance = this.parentInstance;
+      let model = this.model;
+
+      return parentInstance.attr('type') === 'Audit' &&
+        model.model_singular === 'Assessment';
+    },
+  },
+  showBulkUpdate: {
+    get() {
+      return this.options.showBulkUpdate;
+    },
+  },
+  showChangeRequest: {
+    get() {
+      const isCycleTask = (
+        this.model.model_singular === 'CycleTaskGroupObjectTask'
+      );
+
+      return (
+        isCycleTask &&
+        isMyWork() &&
+        !!GGRC.config.CHANGE_REQUEST_URL
+      );
+    },
+  },
+  showCreateTaskGroup: {
+    get() {
+      const isActiveTab =
+        this.options.countsName === 'cycles:active';
+      const isActiveWorkflow =
+        this.parentInstance.status === 'Active';
+      const isOneTimeWorkflow =
+        this.parentInstance.repeat === 'off';
+      return isActiveWorkflow
+        && isOneTimeWorkflow
+        && isActiveTab
+        && !this.isUpdateDenied();
+    },
+  },
+  showImport: {
+    get() {
+      let instance = this.parentInstance;
+      let model = this.model;
+      return !this.isSnapshots &&
+        !model.isChangeableExternally &&
+        (isAllowed(
+          'update', model.model_singular, instance.context)
+          || isAuditor(instance, GGRC.current_user));
+    },
+  },
+  showExport: {
+    get() {
+      return this.showedItems.length;
+    },
+  },
+  showBulkComplete: {
+    value: false,
+  },
+  showBulkVerify: {
+    value: false,
+  },
+  applySavedSearchPermalink() {
+    pubSub.dispatch({
+      type: 'applySavedSearchPermalink',
+      widgetId: this.options.widgetId,
+    });
+  },
+  setShowBulkVerify() {
+    if (!this.isAssessmentOnAudit) {
+      this.showBulkVerify = false;
+      return;
+    }
+
+    const parentInstance = this.parentInstance;
+    const relevant = {
+      type: parentInstance.type,
+      id: parentInstance.id,
+      operation: 'relevant',
+    };
+
+    getAsmtCountForVerify(relevant).then((count) => {
+      this.showBulkVerify = count > 0;
+    });
+  },
+  isUpdateDenied() {
+    const instance = this.parentInstance;
+    return (instance.type === 'Workflow')
+      && !isAllowedFor('update', instance);
+  },
+});
+
 export default canComponent.extend({
   tag: 'tree-actions',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      addItem: {
-        type: String,
-        get() {
-          return (this.attr('options.objectVersion')
-            || this.attr('parentInstance._is_sox_restricted')
-            || this.isUpdateDenied())
-            ? false
-            : this.attr('options').add_item_view ||
-            this.attr('model').tree_view_options.add_item_view ||
-            'base_objects/tree-add-item';
-        },
-      },
-      show3bbs: {
-        type: Boolean,
-        get: function () {
-          let modelName = this.attr('model').model_singular;
-          return !isMyAssessments()
-            && modelName !== 'Document'
-            && modelName !== 'Evidence';
-        },
-      },
-      isSnapshots: {
-        type: Boolean,
-        get: function () {
-          let parentInstance = this.attr('parentInstance');
-          let model = this.attr('model');
-
-          return (isSnapshotRelated(parentInstance.type, model.model_singular)
-            || this.attr('options.objectVersion'));
-        },
-      },
-      isAssessmentOnAudit: {
-        get() {
-          let parentInstance = this.attr('parentInstance');
-          let model = this.attr('model');
-
-          return parentInstance.type === 'Audit' &&
-            model.model_singular === 'Assessment';
-        },
-      },
-      showBulkUpdate: {
-        type: 'boolean',
-        get: function () {
-          return this.attr('options.showBulkUpdate');
-        },
-      },
-      showChangeRequest: {
-        get() {
-          const isCycleTask = (
-            this.attr('model').model_singular === 'CycleTaskGroupObjectTask'
-          );
-
-          return (
-            isCycleTask &&
-            isMyWork() &&
-            !!GGRC.config.CHANGE_REQUEST_URL
-          );
-        },
-      },
-      showCreateTaskGroup: {
-        type: 'boolean',
-        get() {
-          const isActiveTab =
-            this.attr('options.countsName') === 'cycles:active';
-          const isActiveWorkflow =
-            this.attr('parentInstance.status') === 'Active';
-          const isOneTimeWorkfow =
-            this.attr('parentInstance.repeat') === 'off';
-          return isActiveWorkflow
-            && isOneTimeWorkfow
-            && isActiveTab
-            && !this.isUpdateDenied();
-        },
-      },
-      showImport: {
-        type: 'boolean',
-        get() {
-          let instance = this.attr('parentInstance');
-          let model = this.attr('model');
-          return !this.attr('isSnapshots') &&
-            !model.isChangeableExternally &&
-            (isAllowed(
-              'update', model.model_singular, instance.context)
-              || isAuditor(instance, GGRC.current_user));
-        },
-      },
-      showExport: {
-        type: 'boolean',
-        get() {
-          return this.attr('showedItems').length;
-        },
-      },
-      showBulkComplete: {
-        value: false,
-      },
-      showBulkVerify: {
-        value: false,
-        get(lastSetValue, setAttrValue) {
-          setAttrValue(lastSetValue); // set default value before request
-
-          if (this.attr('isAssessmentOnAudit')) {
-            const parentInstance = this.attr('parentInstance');
-            const relevant = {
-              type: parentInstance.type,
-              id: parentInstance.id,
-              operation: 'relevant',
-            };
-
-            getAsmtCountForVerify(relevant)
-              .then((count) => {
-                setAttrValue(count > 0);
-              });
-          }
-        },
-      },
-    },
-    parentInstance: null,
-    options: null,
-    model: null,
-    showedItems: [],
-    searchPermalinkEnabled: false,
-    pubSub,
-    applySavedSearchPermalink() {
-      pubSub.dispatch({
-        type: 'applySavedSearchPermalink',
-        widgetId: this.attr('options.widgetId'),
-      });
-    },
-    isUpdateDenied() {
-      const instance = this.attr('parentInstance');
-      return (instance.type === 'Workflow')
-        && !isAllowedFor('update', instance);
-    },
-  }),
+  ViewModel,
   events: {
+    inserted() {
+      this.viewModel.setShowBulkVerify();
+    },
     '{pubSub} triggerSearchPermalink'(scope, ev) {
       const widgetId = ev.widgetId;
 
-      if (widgetId === this.viewModel.attr('options.widgetId')) {
-        this.viewModel.attr(
-          'searchPermalinkEnabled',
-          ev.searchPermalinkEnabled
-        );
+      if (widgetId === this.viewModel.options.widgetId) {
+        this.viewModel.searchPermalinkEnabled = ev.searchPermalinkEnabled;
       }
     },
   },

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/sub-tree-models.stache';
 import childModelsMap from '../tree/child-models-map';
@@ -15,64 +15,68 @@ import {
   getWidgetConfig,
 } from '../../plugins/utils/widgets-utils';
 
-let viewModel = canMap.extend({
-  define: {
-    isActive: {
-      type: Boolean,
-      value: false,
-    },
-    displayModelsList: {
-      get: function () {
-        return this.attr('modelsList').map((model) => {
-          const displayName = model.attr('widgetName')
-            .replace(' ', '')
-            .split(/(?=[A-Z])/)
-            .join(' ');
-          model.attr('displayName', displayName);
-          return model;
-        }).sort((a, b) => {
-          return a.displayName > b.displayName ? 1 : -1;
-        });
-      },
-    },
-    selectedModels: {
-      set: function (newModels) {
-        let modelsList = this.attr('modelsList') || [];
-
-        modelsList.forEach(function (item) {
-          item.attr('display', newModels.indexOf(item.name) !== -1);
-        });
-        return newModels;
-      },
+const ViewModel = canDefineMap.extend({
+  type: {
+    value: null,
+  },
+  modelsList: {
+    value: null,
+  },
+  title: {
+    value: null,
+  },
+  isActive: {
+    type: 'boolean',
+    value: false,
+  },
+  displayModelsList: {
+    get() {
+      return this.modelsList.map((model) => {
+        const displayName = model.widgetName
+          .replace(' ', '')
+          .split(/(?=[A-Z])/)
+          .join(' ');
+        model.displayName = displayName;
+        return model;
+      }).sort((a, b) => {
+        return a.displayName > b.displayName ? 1 : -1;
+      });
     },
   },
-  init: function () {
-    let modelName = this.attr('type');
+  selectedModels: {
+    set(newModels) {
+      let modelsList = this.modelsList || [];
+
+      modelsList.forEach((item) => {
+        item.display = newModels.indexOf(item.name) !== -1;
+      });
+      return newModels;
+    },
+  },
+  init() {
+    let modelName = this.type;
     let defaultModels = getModelsForSubTier(modelName).selected;
-    this.attr('modelsList', this.getDisplayModels(modelName));
+    this.modelsList = this.getDisplayModels(modelName);
 
     // list of models can be changed in others tree-items
-    childModelsMap.attr('container').bind(modelName, function (ev) {
-      this.attr('selectedModels',
-        childModelsMap.getModels(modelName) || defaultModels);
-    }.bind(this));
+    childModelsMap.attr('container').bind(modelName, () => {
+      this.selectedModels =
+        childModelsMap.getModels(modelName) || defaultModels;
+    });
   },
-  type: null,
-  modelsList: null,
-  title: null,
-  activate: function () {
-    this.attr('isActive', true);
+  activate() {
+    this.isActive = true;
   },
   // is called when "Set Visibility" button is clicked
-  setVisibility: function (ev) {
+  setVisibility(ev) {
     let selectedModels = this.getSelectedModels();
 
-    childModelsMap.setModels(this.attr('type'), selectedModels);
+    childModelsMap.setModels(this.type, selectedModels);
 
-    this.attr('isActive', false);
+    this.isActive = false;
     ev.stopPropagation();
   },
-  getDisplayModels: function (parentType) {
+  getDisplayModels(parentType) {
     let savedModels = childModelsMap.getModels(parentType);
     let defaultModels = getModelsForSubTier(parentType);
     let selectedModels = savedModels || defaultModels.selected;
@@ -89,27 +93,28 @@ let viewModel = canMap.extend({
     });
     return displayList;
   },
-  getSelectedModels: function () {
-    return this.attr('modelsList').filter((model) => model.display)
+  getSelectedModels() {
+    return this.modelsList
+      .filter((model) => model.display)
       .map((model) => model.name);
   },
-  selectAll: function (ev) {
+  selectAll(ev) {
     ev.stopPropagation();
-    this.attr('modelsList').forEach(function (item) {
-      item.attr('display', true);
+    this.modelsList.forEach((item) => {
+      item.display = true;
     });
   },
-  selectNone: function (ev) {
+  selectNone(ev) {
     ev.stopPropagation();
-    this.attr('modelsList').forEach(function (item) {
-      item.attr('display', false);
+    this.modelsList.forEach((item) => {
+      item.display = false;
     });
   },
 });
 
 let events = {
-  '.sub-tree-models mouseleave': function () {
-    this.viewModel.attr('isActive', false);
+  '.sub-tree-models mouseleave'() {
+    this.viewModel.isActive = false;
   },
 };
 
@@ -117,11 +122,11 @@ export default canComponent.extend({
   tag: 'sub-tree-models',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
-  events: events,
+  ViewModel,
+  events,
 });
 
 export {
-  viewModel,
+  ViewModel,
   events,
 };

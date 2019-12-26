@@ -28,9 +28,9 @@ describe('bulk-update-button component', function () {
     it('should open ObjectBulkUpdate modal', function () {
       let type = 'some model';
       let element = {};
-      viewModel.attr('model', {
+      viewModel.model = {
         model_singular: type,
-      });
+      };
 
       event(element);
 
@@ -59,10 +59,10 @@ describe('bulk-update-button component', function () {
         options: {},
       };
 
-      viewModel.attr('model', {
+      viewModel.model = {
         name_singular: 'Some Model',
         name_plural: 'Some Models',
-      });
+      };
       resMessage = 'items updated';
       updateDfd = $.Deferred();
 
@@ -91,7 +91,7 @@ describe('bulk-update-button component', function () {
       updateDfd.resolve([{status: 'updated'}]).then(() => {
         expect(viewModel.getResultNotification)
           .toHaveBeenCalledWith(
-            jasmine.objectContaining(viewModel.attr('model').serialize()), 1
+            jasmine.objectContaining(viewModel.model.serialize()), 1
           );
         expect(NotifiersUtils.notifier)
           .toHaveBeenCalledWith('info', resMessage);

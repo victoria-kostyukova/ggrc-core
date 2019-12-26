@@ -4,34 +4,49 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../sort-component/sort-component';
 import template from './templates/tree-view.stache';
 
-let viewModel = canMap.extend({
-  define: {
-    notResult: {
-      type: Boolean,
-      get: function () {
-        return !this.attr('loading') && !this.attr('items').length;
-      },
+const ViewModel = canDefineMap.extend({
+  notResult: {
+    get() {
+      return !this.loading && !this.items.length;
     },
   },
-  items: [],
-  parentInstance: null,
-  model: null,
-  selectedColumns: [],
-  mandatory: [],
-  disableConfiguration: null,
-  loading: false,
-  limitDepthTree: 0,
-  depthFilter: '',
+  items: {
+    value: () => [],
+  },
+  parentInstance: {
+    value: null,
+  },
+  model: {
+    value: null,
+  },
+  selectedColumns: {
+    value: () => [],
+  },
+  mandatory: {
+    value: () => [],
+  },
+  disableConfiguration: {
+    value: null,
+  },
+  loading: {
+    value: false,
+  },
+  limitDepthTree: {
+    value: 0,
+  },
+  depthFilter: {
+    value: '',
+  },
 });
 
 export default canComponent.extend({
   tag: 'tree-view',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

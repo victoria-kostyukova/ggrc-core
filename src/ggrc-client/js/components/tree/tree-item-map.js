@@ -4,40 +4,43 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/tree-item-map.stache';
 import {trigger} from 'can-event';
 
-let viewModel = canMap.extend({
-  define: {
-    title: {
-      type: String,
-      value: 'Map to this Object',
-    },
-    model: {
-      type: '*',
-      get: function () {
-        return this.attr('instance.model');
-      },
+const ViewModel = canDefineMap.extend({
+  instance: {
+    value: null,
+  },
+  cssClasses: {
+    value: null,
+  },
+  disableLink: {
+    value: false,
+  },
+  title: {
+    type: 'string',
+    value: 'Map to this Object',
+  },
+  model: {
+    get() {
+      return this.instance.attr('model');
     },
   },
-  instance: null,
-  cssClasses: null,
-  disableLink: false,
 });
 
 export default canComponent.extend({
   tag: 'tree-item-map',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
-    'a click': function (el, ev) {
+    'a click'(el, ev) {
       let viewModel = this.viewModel;
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
-      if (!viewModel.attr('disableLink')) {
+      if (!viewModel.disableLink) {
         if (instance.attr('type') === 'Assessment') {
           el.data('type', instance.attr('assessment_type'));
         }
@@ -49,11 +52,11 @@ export default canComponent.extend({
         });
       }
 
-      viewModel.attr('disableLink', true);
+      viewModel.disableLink = true;
 
       // prevent open of two mappers
-      setTimeout(function () {
-        viewModel.attr('disableLink', false);
+      setTimeout(() => {
+        viewModel.disableLink = false;
       }, 300);
 
       ev.preventDefault();

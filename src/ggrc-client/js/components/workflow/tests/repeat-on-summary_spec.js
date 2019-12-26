@@ -7,18 +7,18 @@ import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../repeat-on-summary';
 import * as WorkflowConfig from '../../../apps/workflow-config';
 
-describe('repeat-on-summary component', function () {
+describe('repeat-on-summary component', () => {
   'use strict';
 
-  let viewModel;
+  let ViewModel;
 
-  beforeEach(function () {
-    viewModel = getComponentVM(Component);
+  beforeEach(() => {
+    ViewModel = getComponentVM(Component);
   });
 
-  describe('unitText getter', function () {
+  describe('unitText getter', () => {
     let unitOptions;
-    beforeAll(function () {
+    beforeAll(() => {
       unitOptions = WorkflowConfig.unitOptions;
       WorkflowConfig.unitOptions = [
         {
@@ -38,42 +38,42 @@ describe('repeat-on-summary component', function () {
           singular: 'month'}];
     });
 
-    afterAll(function () {
+    afterAll(() => {
       WorkflowConfig.unitOptions = unitOptions;
     });
 
-    it('returns empty text when unit is not specified', function () {
+    it('returns empty text when unit is not specified', () => {
       let result;
 
-      result = viewModel.attr('unitText');
+      result = ViewModel.unitText;
 
       expect(result).toBe('');
     });
 
-    it('returns empty text when incorrect unit specified', function () {
+    it('returns empty text when incorrect unit specified', () => {
       let result;
-      viewModel.attr('unit', 'Hour');
+      ViewModel.unit = 'Hour';
 
-      result = viewModel.attr('unitText');
+      result = ViewModel.unitText;
 
       expect(result).toBe('');
     });
 
-    it('returns appropriate when correct unit specified', function () {
+    it('returns appropriate when correct unit specified', () => {
       let result;
-      viewModel.attr('unit', 'Week');
+      ViewModel.unit = 'Week';
 
-      result = viewModel.attr('unitText');
+      result = ViewModel.unitText;
 
       expect(result).toBe('week');
     });
 
-    it('returns appropriate when correct unit specified', function () {
+    it('returns appropriate when correct unit specified', () => {
       let result;
-      viewModel.attr('unit', 'Week');
-      viewModel.attr('repeatEvery', 4);
+      ViewModel.unit = 'Week';
+      ViewModel.repeatEvery = 4;
 
-      result = viewModel.attr('unitText');
+      result = ViewModel.unitText;
 
       expect(result).toBe('4 weeks');
     });

@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   peopleWithRoleName,
@@ -15,24 +15,28 @@ const template = '<tree-field-wrapper source:from="peopleList"' +
 ' type:from="type" field:from="\'email\'">' +
 '<tree-field source:from="items"/></tree-field-wrapper>';
 
-const viewModel = canMap.extend({
-  define: {
-    peopleList: {
-      get() {
-        const instance = this.attr('instance');
-        const roleName = this.attr('role');
-        return peopleWithRoleName(instance, roleName);
-      },
+const ViewModel = canDefineMap.extend({
+  instance: {
+    value: () => ({}),
+  },
+  role: {
+    value: '',
+  },
+  type: {
+    get() {
+      return Person;
     },
   },
-  instance: {},
-  role: '',
-  type: Person,
+  peopleList: {
+    get() {
+      return peopleWithRoleName(this.instance, this.role);
+    },
+  },
 });
 
 export default canComponent.extend('treePeopleWithRoleListField', {
   tag: 'tree-people-with-role-list-field',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

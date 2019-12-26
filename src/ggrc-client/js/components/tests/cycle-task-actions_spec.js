@@ -3,33 +3,32 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import tracker from '../../tracker';
 import * as WorkflowHelpers from '../../plugins/utils/workflow-utils';
 import Component from '../cycle-task-actions/cycle-task-actions';
 import {getComponentVM} from '../../../js_specs/spec-helpers';
 
-describe('cycle-task-actions component', function () {
-  'use strict';
-
+describe('cycle-task-actions component', () => {
   let vm;
   let fakeEvent;
 
-  beforeEach(function () {
+  beforeEach(() => {
     vm = getComponentVM(Component);
     fakeEvent = {
       stopPropagation: jasmine.createSpy(),
     };
   });
 
-  describe('changeStatus() method', function () {
+  describe('changeStatus() method', () => {
     let changeStatus;
     let fakeElement;
 
-    beforeEach(function () {
+    beforeEach(() => {
       spyOn(tracker, 'start').and.returnValue(() => {});
 
-      vm.attr('oldValues', []);
-      vm.attr('instance', {
+      vm.oldValues = [];
+      vm.instance = new canMap({
         status: 'In Progress',
       });
 
@@ -39,50 +38,53 @@ describe('cycle-task-actions component', function () {
       fakeElement.dataset.value = 'Verified';
     });
 
-    it('puts status and adds previous one for undo', async function (done) {
-      spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(true));
+    it('puts status and adds previous one for undo', async (done) => {
+      spyOn(vm, 'setStatus')
+        .and.returnValue(Promise.resolve(true));
 
       await changeStatus(null, fakeElement, fakeEvent);
-      expect(vm.attr('oldValues').length).toEqual(1);
-      expect(vm.attr('oldValues')[0].status).toEqual('In Progress');
+      expect(vm.oldValues.length).toEqual(1);
+      expect(vm.oldValues[0].status).toEqual('In Progress');
       expect(vm.setStatus).toHaveBeenCalledWith('Verified');
       done();
     });
 
     it('puts status, adds previous one for undo and fires "expand" event',
-      async function (done) {
-        spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(true));
+      async (done) => {
+        spyOn(vm, 'setStatus')
+          .and.returnValue(Promise.resolve(true));
 
         await changeStatus(null, fakeElement, fakeEvent);
-        expect(vm.attr('oldValues').length).toEqual(1);
-        expect(vm.attr('oldValues')[0].status).toEqual('In Progress');
+        expect(vm.oldValues.length).toEqual(1);
+        expect(vm.oldValues[0].status).toEqual('In Progress');
         expect(vm.setStatus).toHaveBeenCalledWith('Verified');
         done();
       }
     );
 
     it('doesn\'t change previous status if setStatus returned false',
-      async function (done) {
-        spyOn(vm, 'setStatus').and.returnValue(Promise.resolve(false));
+      async (done) => {
+        spyOn(vm, 'setStatus')
+          .and.returnValue(Promise.resolve(false));
 
         await changeStatus(null, fakeElement, fakeEvent);
-        expect(vm.attr('oldValues').length).toEqual(0);
+        expect(vm.oldValues.length).toEqual(0);
         expect(vm.setStatus).toHaveBeenCalledWith('Verified');
         done();
       });
   });
 
-  describe('undo() method', function () {
+  describe('undo() method', () => {
     let undo;
 
-    beforeEach(function () {
+    beforeEach(() => {
       spyOn(vm, 'setStatus');
 
       undo = vm.undo.bind(vm);
     });
 
-    it('sets previous status', function () {
-      vm.attr('oldValues', [{status: 'test'}]);
+    it('sets previous status', () => {
+      vm.oldValues = [{status: 'test'}];
 
       undo(null, null, fakeEvent);
 
@@ -91,27 +93,27 @@ describe('cycle-task-actions component', function () {
   });
 
   describe('setStatus() method', () => {
-    beforeEach(function () {
-      vm.attr('instance', {});
+    beforeEach(() => {
+      vm.instance = new canMap({});
       spyOn(WorkflowHelpers, 'updateStatus');
     });
 
-    it('disables component before status updating', function () {
+    it('disables component before status updating', () => {
       vm.setStatus(status);
-      expect(vm.attr('disabled')).toBe(true);
+      expect(vm.disabled).toBe(true);
     });
 
-    it('enables component after status updating', async function (done) {
+    it('enables component after status updating', async (done) => {
       await vm.setStatus(status);
-      expect(vm.attr('disabled')).toBe(false);
+      expect(vm.disabled).toBe(false);
       done();
     });
 
-    it('updates status for cycle task', async function (done) {
+    it('updates status for cycle task', async (done) => {
       const status = 'New State';
       await vm.setStatus(status);
       expect(WorkflowHelpers.updateStatus).toHaveBeenCalledWith(
-        vm.attr('instance'),
+        vm.instance,
         status
       );
       done();

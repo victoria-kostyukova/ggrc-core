@@ -8,8 +8,10 @@ import canStache from 'can-stache';
 import template from './assessments-bulk-verify-button.stache';
 import BulkUpdatableButton from '../view-models/bulk-updatable-button-vm';
 
-const viewModel = BulkUpdatableButton.extend({
-  isButtonView: false,
+const ViewModel = BulkUpdatableButton.extend({
+  isButtonView: {
+    value: false,
+  },
   async openBulkVerifyModal(el) {
     const {AssessmentsBulkVerify} = await import(
       /* webpackChunkName: "mapper" */
@@ -23,5 +25,5 @@ const viewModel = BulkUpdatableButton.extend({
 export default canComponent.extend({
   tag: 'assessments-bulk-verify-button',
   view: canStache(template),
-  viewModel,
+  ViewModel,
 });

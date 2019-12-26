@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   hasQuestions,
@@ -12,36 +12,36 @@ import {
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questions-link.stache';
 
+const ViewModel = canDefineMap.extend({
+  instance: {
+    value: null,
+  },
+  hasQuestions: {
+    get() {
+      let instance = this.instance;
+
+      if (instance.attr('status') === 'Deprecated') {
+        return false;
+      }
+
+      return hasQuestions(instance);
+    },
+  },
+  questionsUrl: {
+    get() {
+      let instance = this.attr('instance');
+      return getQuestionsUrl(instance);
+    },
+  },
+});
+
 export default canComponent.extend({
   tag: 'questions-link',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      hasQuestions: {
-        type: Boolean,
-        get: function () {
-          let instance = this.attr('instance');
-
-          if (instance.attr('status') === 'Deprecated') {
-            return false;
-          }
-
-          return hasQuestions(instance);
-        },
-      },
-      questionsUrl: {
-        type: String,
-        get: function () {
-          let instance = this.attr('instance');
-          return getQuestionsUrl(instance);
-        },
-      },
-    },
-    instance: null,
-  }),
+  ViewModel,
   events: {
-    '.question-link click': function (el, ev) {
+    '.question-link click'(el, ev) {
       ev.stopPropagation();
     },
   },

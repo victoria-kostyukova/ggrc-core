@@ -9,66 +9,39 @@ import * as BulkUpdateService from '../../../../plugins/utils/bulk-update-servic
 
 describe('assessment-tree-actions component', () => {
   let viewModel;
+  let getAsmtCountForVerifySpy;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
+    getAsmtCountForVerifySpy =
+      spyOn(BulkUpdateService, 'getAsmtCountForVerify');
   });
 
-  describe('showBulkVerify get() method', () => {
-    let method;
-    let setAttrValue;
-    let dfd;
+  describe('setShowBulkVerify() method', () => {
+    it('should set "showBulkVerify" to false when "getAsmtCountForVerify" ' +
+    'returns count === 0', (done) => {
+      const dfd = $.Deferred();
 
-    beforeEach(() => {
-      method = viewModel.define.showBulkVerify.get.bind(viewModel);
-      setAttrValue = jasmine.createSpy('setAttrValue');
-      dfd = $.Deferred();
-      spyOn(BulkUpdateService, 'getAsmtCountForVerify')
-        .and.returnValue(dfd);
-    });
+      getAsmtCountForVerifySpy.and.returnValue(dfd);
+      viewModel.setShowBulkVerify();
 
-    it('calls setAttrValue() with "false" before requestAssessmentsCount call',
-      () => {
-        method(false, setAttrValue);
-
-        expect(setAttrValue).toHaveBeenCalledWith(false);
-      });
-
-    it('calls getAsmtCountForVerify()', () => {
-      method(false, setAttrValue);
-
-      expect(BulkUpdateService.getAsmtCountForVerify)
-        .toHaveBeenCalled();
-    });
-
-    it('calls setAttrValue() two times with specified params', (done) => {
-      method(false, setAttrValue);
-
-      dfd.resolve(3)
-        .then(() => {
-          expect(setAttrValue).toHaveBeenCalledTimes(2);
-          expect(setAttrValue.calls.first().args[0]).toBe(false);
-          expect(setAttrValue.calls.mostRecent().args[0]).toBe(true);
-          done();
-        });
-    });
-
-    it('calls setAttrValue() with "true" ' +
-      'if received assessments count > 0', (done) => {
-      method(false, setAttrValue);
-
-      dfd.resolve(3).then(() => {
-        expect(setAttrValue).toHaveBeenCalledWith(true);
+      dfd.resolve(0);
+      dfd.then(() => {
+        expect(viewModel.showBulkVerify).toBeFalsy();
         done();
       });
     });
 
-    it('calls setAttrValue() with "false" ' +
-      'if received assessments count <= 0', (done) => {
-      method(false, setAttrValue);
+    it('should set "showBulkVerify" to true when "getAsmtCountForVerify" ' +
+    'returns count > 0', (done) => {
+      const dfd = $.Deferred();
 
-      dfd.resolve(0).then(() => {
-        expect(setAttrValue).toHaveBeenCalledWith(false);
+      getAsmtCountForVerifySpy.and.returnValue(dfd);
+      viewModel.setShowBulkVerify();
+
+      dfd.resolve(5);
+      dfd.then(() => {
+        expect(viewModel.showBulkVerify).toBeTruthy();
         done();
       });
     });

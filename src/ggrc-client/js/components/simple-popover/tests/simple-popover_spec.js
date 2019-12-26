@@ -6,18 +6,18 @@
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../simple-popover';
 
-describe('simple-popover component', function () {
+describe('simple-popover component', () => {
   let viewModel;
   let init;
 
-  beforeAll(function () {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
     init = Component.prototype.init.bind({
       viewModel,
     });
   });
 
-  describe('init() method ', function () {
+  describe('init() method ', () => {
     it('saves element in viewModel', () => {
       let element = {};
       init(element);
@@ -26,15 +26,15 @@ describe('simple-popover component', function () {
     });
   });
 
-  describe('show() method ', function () {
-    beforeEach(function () {
+  describe('show() method ', () => {
+    beforeEach(() => {
       viewModel.hide();
     });
 
     it('opens popover', () => {
       viewModel.show();
 
-      expect(viewModel.attr('open')).toBeTruthy();
+      expect(viewModel.open).toBeTruthy();
     });
 
     it('creates event listener', () => {
@@ -45,15 +45,15 @@ describe('simple-popover component', function () {
     });
   });
 
-  describe('hide() method ', function () {
-    beforeEach(function () {
+  describe('hide() method ', () => {
+    beforeEach(() => {
       viewModel.show();
     });
 
     it('closes popover', () => {
       viewModel.hide();
 
-      expect(viewModel.attr('open')).toBeFalsy();
+      expect(viewModel.open).toBeFalsy();
     });
 
     it('removes event listener', () => {
@@ -64,9 +64,9 @@ describe('simple-popover component', function () {
     });
   });
 
-  describe('toggle() method ', function () {
+  describe('toggle() method ', () => {
     it('delegates to hide', () => {
-      viewModel.attr('open', true);
+      viewModel.open = true;
       spyOn(viewModel, 'hide');
       viewModel.toggle();
 
@@ -74,7 +74,7 @@ describe('simple-popover component', function () {
     });
 
     it('delegates to show', () => {
-      viewModel.attr('open', false);
+      viewModel.open = false;
       spyOn(viewModel, 'show');
       viewModel.toggle();
 

@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh-queue';
@@ -14,65 +14,71 @@ import {formatDate} from '../../plugins/utils/date-utils';
 import Comment from '../../models/service-models/comment';
 import {getOnlyAnchorTags} from '../../plugins/ggrc-utils';
 
+const ViewModel = canDefineMap.extend({
+  comment: {
+    value: null,
+  },
+  author: {
+    value: null,
+  },
+  instance: {
+    set(instance) {
+      const comment = new Comment({
+        id: instance.last_comment_id,
+        description: instance.last_comment,
+      });
+
+      this.comment = comment;
+      return instance;
+    },
+  },
+  commentText: {
+    get() {
+      const html = this.comment && this.comment.attr('description') || '';
+
+      let lines = getOnlyAnchorTags(html);
+      return lines;
+    },
+  },
+  getAuthor() {
+    const person = peopleWithRoleName(this.comment, 'Admin')[0];
+    this.author = person;
+  },
+  tooltip() {
+    const date = formatDate(
+      this.comment && this.comment.attr('created_at'),
+      true
+    );
+    const authorEmail = this.author && this.author.email;
+
+    if (date && authorEmail) {
+      return `${date}, ${authorEmail}`;
+    }
+    return '';
+  },
+});
+
 export default canComponent.extend({
   tag: 'last-comment',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      instance: {
-        set(instance) {
-          const comment = new Comment({
-            id: instance.last_comment_id,
-            description: instance.last_comment,
-          });
-
-          this.attr('comment', comment);
-          return instance;
-        },
-      },
-      commentText: {
-        get() {
-          const html = this.attr('comment.description') || '';
-
-          let lines = getOnlyAnchorTags(html);
-          return lines;
-        },
-      },
-    },
-    comment: null,
-    author: null,
-    getAuthor() {
-      const person = peopleWithRoleName(this.attr('comment'), 'Admin')[0];
-
-      this.attr('author', person);
-    },
-    tooltip() {
-      const date = formatDate(this.attr('comment.created_at'), true);
-      const authorEmail = this.attr('author.email');
-
-      if (date && authorEmail) {
-        return `${date}, ${authorEmail}`;
-      }
-      return '';
-    },
-  }),
+  ViewModel,
   events: {
     ['{this} mouseover']() {
       const vm = this.viewModel;
 
       new RefreshQueue()
-        .enqueue(vm.attr('comment'))
+        .enqueue(vm.comment)
         .trigger()
         .done((response) => {
-          vm.attr('comment', response[0]);
-          if (!vm.attr('author')) {
+          vm.comment = response[0];
+          if (!vm.author) {
             vm.getAuthor();
           }
         });
     },
     [`{instance} ${COMMENT_CREATED.type}`]([instance], {comment}) {
-      this.viewModel.attr('comment', comment);
+      this.viewModel.comment = comment;
       this.viewModel.getAuthor();
     },
   },

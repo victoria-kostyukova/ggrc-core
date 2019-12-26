@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   DESTINATION_UNMAPPED,
@@ -21,135 +21,145 @@ import childModelsMap from './child-models-map';
 import tracker from '../../tracker';
 import Pagination from '../base-objects/pagination';
 
-const viewModel = canMap.extend({
-  define: {
-    parentModel: {
-      type: String,
-      get: function () {
-        return this.attr('parent').type;
-      },
-    },
-    parentId: {
-      type: Number,
-      get: function () {
-        return this.attr('parent').id;
-      },
-    },
-    showAllRelatedLink: {
-      type: String,
-      get: function () {
-        return this.attr('parent') ? this.attr('parent').viewLink : '';
-      },
-    },
-    loading: {
-      type: Boolean,
-      value: false,
-    },
-    notDirectlyExpanded: {
-      type: Boolean,
-      value: false,
-    },
-    needToSplit: {
-      type: Boolean,
-      get: function () {
-        return isObjectContextPage() &&
-          getPageType() !== 'Workflow' &&
-          this.attr('notDirectlyItems').length;
-      },
-    },
-    notResult: {
-      type: Boolean,
-      value: false,
-    },
-    drawRelated: {
-      type: Boolean,
-      value: false,
-    },
-    showMore: {
-      type: Boolean,
-      value: false,
-    },
-    isOpen: {
-      type: Boolean,
-      set: function (newValue, setValue) {
-        let isReady = this.attr('dataIsReady');
-
-        if (!isReady && newValue) {
-          if (!this.attr('childModels')) {
-            this.initializeChildModels();
-          }
-          this.loadItems().then(function () {
-            setValue(newValue);
-          });
-        } else {
-          setValue(newValue);
-        }
-      },
-    },
-    paging: {
-      value() {
-        return new Pagination({
-          pageSize: 25, pageSizeSelect: [25, 50, 100],
-        });
-      },
-    },
-    showPagination: {
-      type: Boolean,
-      get() {
-        return this.attr('parentModel') === 'CycleTaskGroup';
-      },
-    },
-    childModels: {
-      type: '*',
-      set: function (models, setResult) {
-        if (!this.attr('dataIsReady')) {
-          setResult(models);
-        } else if (this.attr('dataIsReady') && !this.attr('isOpen')) {
-          this.attr('dataIsReady', false);
-          setResult(models);
-        } else {
-          this.loadItems(models).then(function () {
-            setResult(models);
-          });
-        }
-      },
-    },
-    cssClasses: {
-      type: String,
-      get: function () {
-        let classes = [];
-
-        if (this.attr('loading')) {
-          classes.push('loading');
-        }
-
-        return classes.join(' ');
-      },
+const ViewModel = canDefineMap.extend({
+  dataIsReady: {
+    value: false,
+  },
+  limitDepthTree: {
+    value: 0,
+  },
+  depthFilter: {
+    value: '',
+  },
+  parent: {
+    value: null,
+  },
+  directlyItems: {
+    value: () => [],
+  },
+  notDirectlyItems: {
+    value: () => [],
+  },
+  deepLevel: {
+    value: 0,
+  },
+  _collapseAfterUnmapCallBack: {
+    value: null,
+  },
+  parentModel: {
+    get() {
+      return this.parent.type;
     },
   },
-  dataIsReady: false,
-  limitDepthTree: 0,
-  depthFilter: '',
-  parent: null,
-  directlyItems: [],
-  notDirectlyItems: [],
-  deepLevel: 0,
-  _collapseAfterUnmapCallBack: null,
-  initializeChildModels: function () {
-    let parentModel = this.attr('parentModel');
+  parentId: {
+    get() {
+      return this.parent.id;
+    },
+  },
+  showAllRelatedLink: {
+    get() {
+      return this.parent ? this.parent.viewLink : '';
+    },
+  },
+  loading: {
+    type: 'boolean',
+    value: false,
+  },
+  notDirectlyExpanded: {
+    type: 'boolean',
+    value: false,
+  },
+  getDepthFilter: {
+    value: null,
+  },
+  needToSplit: {
+    get() {
+      return isObjectContextPage() &&
+        getPageType() !== 'Workflow' &&
+        this.notDirectlyItems.length;
+    },
+  },
+  notResult: {
+    type: 'boolean',
+    value: false,
+  },
+  drawRelated: {
+    type: 'boolean',
+    value: false,
+  },
+  showMore: {
+    type: 'boolean',
+    value: false,
+  },
+  isOpen: {
+    type: 'boolean',
+    set(newValue, setValue) {
+      let isReady = this.dataIsReady;
+
+      if (!isReady && newValue) {
+        if (!this.childModels) {
+          this.initializeChildModels();
+        }
+        this.loadItems().then(function () {
+          setValue(newValue);
+        });
+      } else {
+        setValue(newValue);
+      }
+    },
+  },
+  paging: {
+    value() {
+      return new Pagination({
+        pageSize: 25, pageSizeSelect: [25, 50, 100],
+      });
+    },
+  },
+  showPagination: {
+    get() {
+      return this.parentModel === 'CycleTaskGroup';
+    },
+  },
+  childModels: {
+    set(models, setResult) {
+      if (!this.dataIsReady) {
+        setResult(models);
+      } else if (this.dataIsReady && !this.isOpen) {
+        this.dataIsReady = false;
+        setResult(models);
+      } else {
+        this.loadItems(models).then(function () {
+          setResult(models);
+        });
+      }
+    },
+  },
+  cssClasses: {
+    get() {
+      let classes = [];
+
+      if (this.loading) {
+        classes.push('loading');
+      }
+
+      return classes.join(' ');
+    },
+  },
+  initializeChildModels() {
+    let parentModel = this.parentModel;
     let savedModels = childModelsMap.getModels(parentModel);
     let defaultModels = TreeViewUtils.getModelsForSubTier(parentModel);
 
-    this.attr('childModels', savedModels || defaultModels.selected);
+    this.childModels = savedModels || defaultModels.selected;
 
-    childModelsMap.attr('container').bind(parentModel, function (ev) {
-      this.attr('childModels',
-        childModelsMap.getModels(parentModel) || defaultModels.selected);
-    }.bind(this));
+    childModelsMap.container.bind(parentModel, (ev) => {
+      this.childModels =
+        childModelsMap.getModels(parentModel) || defaultModels.selected;
+    });
   },
-  expandNotDirectlyRelated: function () {
-    let isExpanded = this.attr('notDirectlyExpanded');
-    this.attr('notDirectlyExpanded', !isExpanded);
+  expandNotDirectlyRelated() {
+    let isExpanded = this.notDirectlyExpanded;
+    this.notDirectlyExpanded = !isExpanded;
   },
   /**
    *
@@ -157,84 +167,83 @@ const viewModel = canMap.extend({
    * e.g. model names, model names with _version, _parent, _child postfixes
    * @return {*}
    */
-  loadItems: function (widgetIds) {
-    let parentType = this.attr('parentModel');
-    let parentId = this.attr('parentId');
-    let deepLevel = this.attr('deepLevel');
+  loadItems(widgetIds) {
+    let parentType = this.parentModel;
+    let parentId = this.parentId;
+    let deepLevel = this.deepLevel;
     let filter = this.getDepthFilter(deepLevel);
 
-    widgetIds = widgetIds || this.attr('childModels') || [];
+    widgetIds = widgetIds || this.childModels || [];
     widgetIds = makeArray(widgetIds);
 
     if (!widgetIds.length) {
-      this.attr('directlyItems', []);
-      this.attr('notDirectlyItems', []);
+      this.directlyItems = [];
+      this.notDirectlyItems = [];
       return $.Deferred().resolve();
     }
 
-    const pageInfo = this.attr('showPagination') ? this.attr('paging') : {};
+    const pageInfo = this.showPagination ? this.paging : {};
     const stopFn = tracker.start(parentType,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.SUB_TREE_LOADING);
 
-    this.attr('loading', true);
+    this.loading = true;
 
     return TreeViewUtils
       .loadItemsForSubTier(widgetIds, parentType, parentId, filter, pageInfo)
       .then((result) => {
         stopFn();
-        this.attr('loading', false);
-        this.attr('directlyItems', result.directlyItems);
-        this.attr('notDirectlyItems', result.notDirectlyItems);
-        this.attr('dataIsReady', true);
-        this.attr('showMore', result.showMore);
-        this.attr('paging.total', result.total);
+        this.loading = false;
+        this.directlyItems = result.directlyItems;
+        this.notDirectlyItems = result.notDirectlyItems;
+        this.dataIsReady = true;
+        this.showMore = result.showMore;
+        this.paging.total = result.total;
 
         if (!result.directlyItems.length && !result.notDirectlyItems.length) {
-          this.attr('notResult', true);
+          this.notResult = true;
         }
 
         // bind 'destinationUnmapped' event
-        this.attr('directlyItems').forEach((item) => {
+        this.directlyItems.forEach((item) => {
           if (item) {
             item.bind(DESTINATION_UNMAPPED.type,
-              this.attr('_collapseAfterUnmapCallBack'));
+              this._collapseAfterUnmapCallBack);
           }
         });
       }, stopFn.bind(null, true));
   },
   refreshItems() {
-    if (this.attr('isOpen')) {
+    if (this.isOpen) {
       this.loadItems();
     } else {
       // mark the sub tree items should be refreshed,
       // when sub tree will be open
-      this.attr('dataIsReady', false);
+      this.dataIsReady = false;
     }
   },
-  collapseAfterUnmap: function () {
+  collapseAfterUnmap() {
     // unbind 'destinationUnmapped' event
-    this.attr('directlyItems').forEach((item) => {
+    this.directlyItems.forEach((item) => {
       if (item) {
         item.unbind(DESTINATION_UNMAPPED.type,
-          this.attr('_collapseAfterUnmapCallBack'));
+          this._collapseAfterUnmapCallBack);
       }
     });
 
-    this.attr('dataIsReady', false);
-    this.attr('isOpen', false);
+    this.dataIsReady = false;
+    this.isOpen = false;
     this.dispatch('collapseSubtree');
   },
-  init: function () {
-    this.attr('_collapseAfterUnmapCallBack',
-      this.collapseAfterUnmap.bind(this));
+  init() {
+    this._collapseAfterUnmapCallBack = this.collapseAfterUnmap.bind(this);
   },
 });
 
 const events = {
   inserted() {
     let parents = this.element.parents('sub-tree-wrapper');
-    this.viewModel.attr('deepLevel', parents.length);
+    this.viewModel.deepLevel = parents.length;
   },
   [`{viewModel.parent} ${REFRESH_SUB_TREE.type}`]() {
     this.viewModel.refreshItems();
@@ -251,6 +260,6 @@ export default canComponent.extend({
   tag: 'sub-tree-wrapper',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events,
 });

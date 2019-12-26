@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import BulkUpdatableButtonVM from '../bulk-updatable-button-vm';
 import * as CurrentPageUtils from '../../../../plugins/utils/current-page-utils';
 
@@ -16,7 +17,7 @@ describe('bulk-updatable-button-vm component', () => {
   describe('getModalConfig() method', () => {
     it('returns object with filled "mappedToItems" property' +
     'if "parentInstance" attr is truthy value', () => {
-      viewModel.attr('parentInstance', {
+      viewModel.parentInstance = new canMap({
         id: 123,
         type: 'fakeType',
         title: 'fakeTitle',
@@ -35,7 +36,7 @@ describe('bulk-updatable-button-vm component', () => {
 
     it('returns object with empty "mappedToItems" property ' +
     'if "parentInstance" attr is falsy value', () => {
-      viewModel.attr('parentInstance', null);
+      viewModel.parentInstance = null;
       spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(true);
 
       expect(viewModel.getModalConfig()).toEqual({

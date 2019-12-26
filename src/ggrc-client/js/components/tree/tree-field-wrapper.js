@@ -5,27 +5,35 @@
 
 import loForEach from 'lodash/forEach';
 import makeArray from 'can-util/js/make-array/make-array';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import RefreshQueue from '../../models/refresh-queue';
 
-const viewModel = canMap.extend({
-  field: 'title',
-  source: null,
-  type: null,
-  items: [],
-  init: function () {
+const ViewModel = canDefineMap.extend({
+  field: {
+    value: 'title',
+  },
+  source: {
+    value: null,
+  },
+  type: {
+    value: null,
+  },
+  items: {
+    value: () => [],
+  },
+  init() {
     this.refreshItems();
   },
-  refreshItems: function () {
+  refreshItems() {
     this.getItems()
       .then((data) => {
-        let items = data.map((item) => item[this.attr('field')]);
-        this.attr('items', items);
+        let items = data.map((item) => item[this.field]);
+        this.items = items;
       });
   },
   getItems: function () {
-    let source = this.attr('source');
+    let source = this.source;
     let sourceList = Array.isArray(source) ? source : makeArray(source);
     let deferred = $.Deferred();
     let readyItemsList;
@@ -34,27 +42,27 @@ const viewModel = canMap.extend({
       return deferred.resolve([]);
     }
 
-    readyItemsList = sourceList.filter((item) => item[this.attr('field')]);
+    readyItemsList = sourceList.filter((item) => item[this.field]);
 
     if (readyItemsList.length === sourceList.length) {
       deferred.resolve(sourceList);
     } else {
       this.loadItems(sourceList)
-        .then(function (data) {
+        .then((data) => {
           deferred.resolve(data);
         })
-        .fail(function () {
+        .fail(() => {
           deferred.resolve([]);
         });
     }
 
     return deferred;
   },
-  loadItems: function (items) {
+  loadItems(items) {
     const rq = new RefreshQueue();
-    const Type = this.attr('type');
+    const Type = this.type;
 
-    loForEach(items, function (item) {
+    loForEach(items, (item) => {
       rq.enqueue(Type.model(item));
     });
 
@@ -65,14 +73,14 @@ const viewModel = canMap.extend({
 export default canComponent.extend({
   tag: 'tree-field-wrapper',
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     // this event is called when object was just created or redefined
-    '{viewModel} source': function () {
+    '{viewModel} source'() {
       this.viewModel.refreshItems();
     },
     // this event is called when object was updated with data
-    '{viewModel} source.id': function () {
+    '{viewModel} source.id'() {
       this.viewModel.refreshItems();
     },
   },

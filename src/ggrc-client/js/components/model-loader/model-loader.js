@@ -4,23 +4,24 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './model-loader.stache';
+
+const ViewModel = canDefineMap.extend({
+  loadedModel: {
+    get(last, set) {
+      import(`../../models/${this.path}`).then((model) => set(model.default));
+    },
+  },
+  path: {
+    value: '',
+  },
+});
 
 export default canComponent.extend({
   tag: 'model-loader',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      loadedModel: {
-        get(last, set) {
-          let path = this.attr('path');
-          import(`../../models/${path}`).then((model) => set(model.default));
-        },
-      },
-    },
-    path: '',
-  }),
+  ViewModel,
 });

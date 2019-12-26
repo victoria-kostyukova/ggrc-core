@@ -4,20 +4,22 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
-let viewModel = canMap.extend({
-  define: {
-    trigger: {
-      type: 'boolean',
-      set: function (value) {
-        if (!this.attr('activated') && value) {
-          this.attr('activated', true);
-        }
-      },
+
+const ViewModel = canDefineMap.extend({
+  activated: {
+    type: 'boolean',
+    value: false,
+  },
+  activate: {
+    set(value) {
+      if (!this.activated && value) {
+        this.activated = true;
+      }
+      return value;
     },
   },
-  activated: false,
 });
 
 /**
@@ -27,5 +29,5 @@ export default canComponent.extend({
   tag: 'lazy-render',
   view: canStache('{{#if activated}}<content/>{{/if}}'),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

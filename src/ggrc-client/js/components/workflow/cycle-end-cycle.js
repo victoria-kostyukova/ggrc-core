@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   getPageInstance,
@@ -29,22 +29,26 @@ import {trigger} from 'can-event';
 
 export default canComponent.extend({
   tag: 'cycle-end-cycle',
-  viewModel: canMap.extend({
-    cycle: null,
+  leakScope: true,
+  ViewModel: canDefineMap.extend({
+    cycle: {
+      value: null,
+    },
   }),
   events: {
-    click: function (el, ev) {
+    click(el, ev) {
       ev.stopPropagation();
 
-      this.viewModel.attr('cycle')
+      this.viewModel.cycle
         .refresh()
-        .then(function (cycle) {
-          return cycle.attr('is_current', false).save();
+        .then((cycle) => {
+          cycle.attr('is_current', false);
+          return cycle.save();
         })
-        .then(function () {
+        .then(() => {
           return getPageInstance().refresh();
         })
-        .then(function () {
+        .then(() => {
           let pageInstance = getPageInstance();
           trigger.call(el[0], 'refreshTree');
 
@@ -54,5 +58,4 @@ export default canComponent.extend({
         });
     },
   },
-  leakScope: true,
 });

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import './tree-visible-column-checkbox';
@@ -12,109 +12,120 @@ import template from './templates/tree-header.stache';
 import {getVisibleColumnsConfig, getSortingForModel}
   from '../../plugins/utils/tree-view-utils';
 
+const ViewModel = canDefineMap.extend({
+  model: {
+    value: null,
+  },
+  columns: {
+    value: () => ({}),
+  },
+  selectedColumns: {
+    value: () => [],
+  },
+  availableColumns: {
+    value: () => [],
+  },
+  disableConfiguration: {
+    value: null,
+  },
+  mandatory: {
+    value: () => [],
+  },
+  orderBy: {
+    value: () => ({}),
+  },
+  cssClasses: {
+    get() {
+      let classes = [];
+
+      if (this.isActiveActionArea()) {
+        classes.push('active-action-area');
+      }
+
+      return classes.join(' ');
+    },
+  },
+  selectableSize: {
+    get() {
+      let attrCount = this.selectedColumns.length;
+      let result = 3;
+
+      if (attrCount < 4) {
+        result = 1;
+      } else if (attrCount < 7) {
+        result = 2;
+      }
+      return result;
+    },
+  },
+  /**
+   * Dispatches the event with names of selected columns.
+   *
+   * @fires updateColumns
+   */
+  setColumns: function () {
+    const selectedNames = this.columns
+      .serialize()
+      .filter((item) => item.selected)
+      .map((item) => item.name);
+
+    this.dispatch({
+      type: 'updateColumns',
+      columns: selectedNames,
+    });
+  },
+  onOrderChange() {
+    const field = this.orderBy.field;
+    const sortDirection = this.orderBy.direction;
+
+    this.dispatch({
+      type: 'sort',
+      field,
+      sortDirection,
+    });
+  },
+  initializeColumns() {
+    let selectedColumns = this.selectedColumns;
+    let availableColumns = this.availableColumns;
+    let columns;
+
+    if (selectedColumns.length && availableColumns.length) {
+      columns = getVisibleColumnsConfig(availableColumns, selectedColumns);
+
+      this.columns = columns;
+    }
+  },
+  isActiveActionArea() {
+    let modelName = this.model.model_singular;
+    return modelName === 'CycleTaskGroupObjectTask' || modelName === 'Cycle';
+  },
+  initializeOrder() {
+    if (!this.model) {
+      return;
+    }
+
+    const sortingInfo = getSortingForModel(this.model.model_singular);
+    this.orderBy = {
+      field: sortingInfo.key,
+      direction: sortingInfo.direction,
+    };
+  },
+  init() {
+    this.initializeOrder();
+    this.initializeColumns();
+  },
+});
+
 export default canComponent.extend({
   tag: 'tree-header',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      cssClasses: {
-        type: String,
-        get: function () {
-          let classes = [];
-
-          if (this.isActiveActionArea()) {
-            classes.push('active-action-area');
-          }
-
-          return classes.join(' ');
-        },
-      },
-      selectableSize: {
-        type: Number,
-        get: function () {
-          let attrCount = this.attr('selectedColumns').length;
-          let result = 3;
-
-          if (attrCount < 4) {
-            result = 1;
-          } else if (attrCount < 7) {
-            result = 2;
-          }
-          return result;
-        },
-      },
-    },
-    model: null,
-    columns: {},
-    selectedColumns: [],
-    availableColumns: [],
-    disableConfiguration: null,
-    mandatory: [],
-    orderBy: {},
-    sortingInfo: null,
-    /**
-     * Dispatches the event with names of selected columns.
-     *
-     * @fires updateColumns
-     */
-    setColumns: function () {
-      const selectedNames = this.attr('columns')
-        .attr()
-        .filter((item) => item.selected)
-        .map((item) => item.name);
-
-      this.dispatch({
-        type: 'updateColumns',
-        columns: selectedNames,
-      });
-    },
-    onOrderChange() {
-      const field = this.attr('orderBy.field');
-      const sortDirection = this.attr('orderBy.direction');
-
-      this.dispatch({
-        type: 'sort',
-        field,
-        sortDirection,
-      });
-    },
-    initializeColumns: function () {
-      let selectedColumns = this.attr('selectedColumns');
-      let availableColumns = this.attr('availableColumns');
-      let columns;
-
-      if (selectedColumns.length && availableColumns.length) {
-        columns = getVisibleColumnsConfig(availableColumns, selectedColumns);
-
-        this.attr('columns', columns);
-      }
-    },
-    isActiveActionArea: function () {
-      let modelName = this.attr('model').model_singular;
-
-      return modelName === 'CycleTaskGroupObjectTask' || modelName === 'Cycle';
-    },
-    initializeOrder() {
-      let sortingInfo;
-      if (!this.attr('model')) {
-        return;
-      }
-
-      sortingInfo = getSortingForModel(this.attr('model').model_singular);
-      this.attr('orderBy.field', sortingInfo.key);
-      this.attr('orderBy.direction', sortingInfo.direction);
-    },
-    init: function () {
-      this.initializeOrder();
-      this.initializeColumns();
-    },
-  }),
+  ViewModel,
   events: {
-    '{viewModel} availableColumns': function () {
+    '{viewModel} availableColumns'() {
       this.viewModel.initializeColumns();
     },
-    '{viewModel} selectedColumns': function () {
+    '{viewModel} selectedColumns'() {
       this.viewModel.initializeColumns();
     },
     '{viewModel.orderBy} changed'() {

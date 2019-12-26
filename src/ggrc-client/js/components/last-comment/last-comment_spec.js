@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import Component from './last-comment';
 import {getComponentVM} from '../../../js_specs/spec-helpers';
 import * as Utils from '../../plugins/utils/acl-utils.js';
@@ -21,7 +22,7 @@ describe('last-comment component', () => {
 
   describe('"commentText" get', () => {
     beforeEach(() => {
-      vm.attr('comment', {});
+      vm.comment = new canMap({});
     });
 
     it('uses getOnlyAnchorTags util to get comment\'s text', () => {
@@ -29,18 +30,18 @@ describe('last-comment component', () => {
         '<p>my <a href="https://www.example.com">example</a></p>';
       const expectedText = 'my <a href="https://www.example.com">example</a>';
 
-      vm.attr('comment.description', commentText);
+      vm.comment.attr('description', commentText);
 
       spyOn(GgrcUtils, 'getOnlyAnchorTags')
         .withArgs(commentText).and.returnValue(expectedText);
-      expect(vm.attr('commentText'))
+      expect(vm.commentText)
         .toBe(expectedText);
     });
 
     it('returns empty string if no description in comment', () => {
-      vm.attr('comment.description', null);
+      vm.comment.description = null;
 
-      expect(vm.attr('commentText')).toBe('');
+      expect(vm.commentText).toBe('');
     });
   });
 
@@ -53,38 +54,38 @@ describe('last-comment component', () => {
     });
 
     it('sets person which is comment admin to author attribute', () => {
-      vm.attr('author', null);
-      vm.attr('comment', 'mockComment');
+      vm.author = null;
+      vm.comment = 'mockComment';
 
       vm.getAuthor();
 
       expect(Utils.peopleWithRoleName)
-        .toHaveBeenCalledWith(vm.attr('comment'), 'Admin');
-      expect(vm.attr('author')).toEqual(person);
+        .toHaveBeenCalledWith(vm.comment, 'Admin');
+      expect(vm.author).toEqual(person);
     });
   });
 
   describe('tooltip() method', () => {
     describe('returns empty string', () => {
       it('if there is no comment', () => {
-        vm.attr('comment', null);
+        vm.comment = null;
         expect(vm.tooltip()).toBe('');
       });
 
       it('if there is no create date of comment', () => {
-        vm.attr('comment', {});
+        vm.comment = new canMap({});
         expect(vm.tooltip()).toBe('');
       });
 
       it('if there is no author', () => {
-        vm.attr('comment', {created_at: Date.now()});
-        vm.attr('author', null);
+        vm.comment = new canMap({created_at: Date.now()});
+        vm.author = null;
         expect(vm.tooltip()).toBe('');
       });
 
       it('if there is no email of author', () => {
-        vm.attr('comment', {created_at: Date.now()});
-        vm.attr('author', {});
+        vm.comment = new canMap({created_at: Date.now()});
+        vm.author = {};
         expect(vm.tooltip()).toBe('');
       });
     });
@@ -93,8 +94,8 @@ describe('last-comment component', () => {
       let date = Date.now();
       let authorEmail = 'mockEmail';
 
-      vm.attr('comment', {created_at: date});
-      vm.attr('author', {email: authorEmail});
+      vm.comment = new canMap({created_at: date});
+      vm.author = {email: authorEmail};
       date = formatDate(date, true);
 
 
@@ -116,10 +117,10 @@ describe('last-comment component', () => {
       });
 
       it('triggers RefreshQueue with comment attribute', () => {
-        vm.attr('comment', {id: 123});
+        vm.comment = new canMap({id: 123});
         handler();
         expect(RefreshQueue.prototype.enqueue)
-          .toHaveBeenCalledWith(vm.attr('comment'));
+          .toHaveBeenCalledWith(vm.comment);
       });
 
       describe('after getting response', () => {
@@ -134,21 +135,21 @@ describe('last-comment component', () => {
 
         it('sets new comment to viewModel.comment attribute', () => {
           handler();
-          expect(vm.attr('comment')).toEqual(jasmine.objectContaining({
+          expect(vm.comment).toEqual(jasmine.objectContaining({
             id: response[0].id,
           }));
         });
 
         it('calls viewModel.getAuthor() method ' +
         'if there is no author attribute', () => {
-          vm.attr('author', null);
+          vm.author = null;
           handler();
           expect(vm.getAuthor).toHaveBeenCalled();
         });
 
         it('does not call viewModel.getAuthor() method ' +
         'if there is author attribute', () => {
-          vm.attr('author', {});
+          vm.author = {};
           handler();
           expect(vm.getAuthor).not.toHaveBeenCalled();
         });
@@ -164,11 +165,11 @@ describe('last-comment component', () => {
 
       it('sets new comment to comment of viewModel', () => {
         const comment = 'mockComment';
-        vm.attr('comment', null);
+        vm.comment = null;
 
         handler([{}], {comment});
 
-        expect(vm.attr('comment')).toEqual(comment);
+        expect(vm.comment).toEqual(comment);
       });
 
       it('calls getAuthor() method of viewModel', () => {

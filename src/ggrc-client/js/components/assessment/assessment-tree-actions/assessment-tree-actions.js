@@ -4,39 +4,47 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {isMyAssessments} from '../../../plugins/utils/current-page-utils';
 import {getAsmtCountForVerify} from '../../../plugins/utils/bulk-update-service';
 import template from './assessment-tree-actions.stache';
 
+const ViewModel = canDefineMap.extend({
+  instance: {
+    value: null,
+  },
+  parentInstance: {
+    value: null,
+  },
+  model: {
+    value: null,
+  },
+  showBulkComplete: {
+    value: false,
+  },
+  showBulkVerify: {
+    value: false,
+  },
+  showBulkSection: {
+    get() {
+      return isMyAssessments();
+    },
+  },
+  setShowBulkVerify() {
+    getAsmtCountForVerify().then((count) => {
+      this.showBulkVerify = count > 0;
+    });
+  },
+});
+
 export default canComponent.extend({
   tag: 'assessment-tree-actions',
   view: canStache(template),
-  viewModel: canMap.extend({
-    define: {
-      showBulkSection: {
-        get() {
-          return isMyAssessments();
-        },
-      },
-      showBulkComplete: {
-        value: false,
-      },
-      showBulkVerify: {
-        value: false,
-        get(lastSetValue, setAttrValue) {
-          setAttrValue(lastSetValue); // set default value before request
-
-          getAsmtCountForVerify()
-            .then((count) => {
-              setAttrValue(count > 0);
-            });
-        },
-      },
+  ViewModel,
+  events: {
+    inserted() {
+      this.viewModel.setShowBulkVerify();
     },
-    instance: null,
-    parentInstance: null,
-    model: null,
-  }),
+  },
 });

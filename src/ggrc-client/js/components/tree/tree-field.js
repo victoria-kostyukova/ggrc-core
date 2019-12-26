@@ -4,24 +4,27 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/tree-field.stache';
 import {getTruncatedList} from '../../plugins/ggrc-utils';
 
+const ViewModel = canDefineMap.extend({
+  tooltipContent: {
+    get() {
+      return getTruncatedList(this.source);
+    },
+  },
+  showTooltip: {
+    value: true,
+  },
+  source: {
+    value: () => [],
+  },
+});
+
 export default canComponent.extend({
   tag: 'tree-field',
   view: canStache(template),
-  viewModel: canMap.extend({
-    define: {
-      tooltipContent: {
-        get() {
-          let source = this.attr('source');
-          return getTruncatedList(source);
-        },
-      },
-    },
-    showTooltip: true,
-    source: [],
-  }),
+  ViewModel,
 });

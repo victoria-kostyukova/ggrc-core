@@ -18,13 +18,13 @@ describe('tree-field-wrapper component', () => {
       spyOn(vm, 'getItems').and.returnValue($.Deferred().resolve([]));
       vm.refreshItems();
 
-      expect(vm.attr('items').length).toBe(0);
+      expect(vm.items.length).toBe(0);
     });
   });
 
   describe('getItems() method', () => {
     it('doesn\'t trigger \'loadItems\' for empty source', (done) => {
-      vm.attr('source', []);
+      vm.source = [];
       spyOn(vm, 'loadItems');
       vm.getItems().then((result) => {
         expect(result.length).toBe(0);
@@ -34,7 +34,7 @@ describe('tree-field-wrapper component', () => {
     });
 
     it('doesn\'t trigger \'loadItems\' for not defined source', (done) => {
-      vm.attr('source', null);
+      vm.source = null;
       spyOn(vm, 'loadItems');
       vm.getItems().then((result) => {
         expect(result.length).toBe(0);
@@ -45,8 +45,9 @@ describe('tree-field-wrapper component', () => {
 
     it('triggers \'loadItems\' for items without required data', (done) => {
       let source = [{}, {}, {}];
-      vm.attr('source', source);
-      spyOn(vm, 'loadItems').and.returnValue($.Deferred().resolve(source));
+      vm.source = source;
+      spyOn(vm, 'loadItems')
+        .and.returnValue($.Deferred().resolve(source));
       vm.getItems().then((result) => {
         expect(result.length).toBe(3);
         expect(vm.loadItems).toHaveBeenCalled();
@@ -57,9 +58,10 @@ describe('tree-field-wrapper component', () => {
     it('doesn\'t trigger \'loadItems\' for items with required data',
       (done) => {
         let source = [{email: 'foo'}, {email: 'bar'}, {email: 'baz'}];
-        vm.attr('field', 'email');
-        vm.attr('source', source);
-        spyOn(vm, 'loadItems').and.returnValue($.Deferred().resolve(source));
+        vm.field = 'email';
+        vm.source = source;
+        spyOn(vm, 'loadItems')
+          .and.returnValue($.Deferred().resolve(source));
         vm.getItems().then((result) => {
           expect(result.length).toBe(source.length);
           expect(vm.loadItems).not.toHaveBeenCalled();

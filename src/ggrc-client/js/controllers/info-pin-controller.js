@@ -102,14 +102,11 @@ export default canControl.extend({
   },
   prepareView: function (opts, el, maximizedState) {
     let instance = opts.attr('instance');
-    let options = this.findOptions(el);
     let populatedOpts = opts.attr('options');
+    // `this.findOptions(el)` is DefineMap (tree-item's ViewModel)
+    let options = populatedOpts || this.findOptions(el);
     let confirmEdit = instance.constructor.confirmEditModal || {};
     let view = getInstanceView(instance);
-
-    if (populatedOpts && !options.attr('result')) {
-      options = populatedOpts;
-    }
 
     if (!loIsEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;

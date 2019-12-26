@@ -3,20 +3,25 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
+
+const ViewModel = canDefineMap.extend({
+  sortedItems: {
+    value: () => [],
+  },
+  items: {
+    value: () => [],
+  },
+  sort() {
+    this.sortedItems = this.items.sort();
+  },
+});
+
 export default canComponent.extend({
   tag: 'sort-component',
   leakScope: true,
-  viewModel: canMap.extend({
-    sortedItems: [],
-    items: [],
-    sort() {
-      const items = this.attr('items');
-      const sortedItems = items.sort();
-      this.attr('sortedItems', sortedItems);
-    },
-  }),
+  ViewModel,
   events: {
     '{viewModel.items} change'() {
       this.viewModel.sort();

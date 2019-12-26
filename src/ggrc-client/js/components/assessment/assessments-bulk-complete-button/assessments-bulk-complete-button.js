@@ -8,7 +8,7 @@ import canStache from 'can-stache';
 import template from './assessments-bulk-complete-button.stache';
 import BulkUpdatableButton from '../view-models/bulk-updatable-button-vm';
 
-const viewModel = BulkUpdatableButton.extend({
+const ViewModel = BulkUpdatableButton.extend({
   async openBulkCompleteModal(el) {
     const {AssessmentsBulkComplete} = await import(
       /* webpackChunkName: "mapper" */
@@ -22,5 +22,5 @@ const viewModel = BulkUpdatableButton.extend({
 export default canComponent.extend({
   tag: 'assessments-bulk-complete-button',
   view: canStache(template),
-  viewModel,
+  ViewModel,
 });

@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   getPageType,
@@ -12,24 +12,27 @@ import {
 export default canComponent.extend({
   tag: 'sub-tree-expander',
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      contextName: {
-        type: String,
-        get: function () {
-          return getPageType();
-        },
+  ViewModel: canDefineMap.extend({
+    expanded: {
+      value: null,
+    },
+    disabled: {
+      value: false,
+    },
+    onChangeState: {
+      value: null,
+    },
+    contextName: {
+      get() {
+        return getPageType();
       },
     },
-    expandNotDirectly: function () {
+    expandNotDirectly() {
       this.dispatch('expandNotDirectly');
     },
-    expanded: null,
-    disabled: false,
-    onChangeState: null,
     onExpand: function () {
-      this.attr('expanded', !this.attr('expanded'));
-      this.onChangeState(this.attr('expanded'));
+      this.expanded = !this.expanded;
+      this.onChangeState(this.expanded);
     },
   }),
 });
