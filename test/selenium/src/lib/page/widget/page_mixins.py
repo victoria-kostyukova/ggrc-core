@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Mixins for info page objects"""
 # pylint: disable=too-few-public-methods
+import re
 
 from lib import base
 from lib.element import page_elements
@@ -59,11 +60,11 @@ class WithAssignFolder(base.WithBrowser):
         class_name="mapped-folder__add-button")
 
 
-class WithDisabledObjectReview(base.WithBrowser):
-  """A mixin for disabled objects reviews."""
+class _BaseWithObjectReview(base.WithBrowser):
+  """Base mixin class for objects reviews."""
 
   def __init__(self, driver=None):
-    super(WithDisabledObjectReview, self).__init__(driver)
+    super(_BaseWithObjectReview, self).__init__(driver)
 
   @property
   def _review_root(self):
@@ -126,7 +127,15 @@ class WithDisabledObjectReview(base.WithBrowser):
         class_name="state-value-dot review-status").text.title()
 
 
-class WithObjectReview(WithDisabledObjectReview):
+class WithDisabledObjectReview(_BaseWithObjectReview):
+  """A mixin for disabled objects reviews."""
+
+  def click_review_details_btn(self):
+    """Click 'Review Details' button."""
+    self._root.link(text=re.compile("Review Details")).click()
+
+
+class WithObjectReview(_BaseWithObjectReview):
   """A mixin for active objects reviews."""
 
   def open_submit_for_review_popup(self):

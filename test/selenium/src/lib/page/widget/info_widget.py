@@ -848,10 +848,6 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
     """Returns Control Owners page element."""
     return self._related_people_list(roles.CONTROL_OWNERS, self._root)
 
-  def click_ctrl_review_details_btn(self):
-    """Click Control Review Details button."""
-    self._root.element(text="Control Review Details").click()
-
   @property
   def predefined_field(self):
     """Returns assertions element as a predefined field for controls."""

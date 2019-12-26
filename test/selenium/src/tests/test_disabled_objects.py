@@ -13,12 +13,6 @@ from lib.service import (rest_facade, webui_service, webui_facade,
 from lib.utils import test_utils
 
 
-@pytest.fixture()
-def controls_service(selenium):
-  """Controls service fixture."""
-  return webui_service.ControlsService(selenium)
-
-
 class TestDisabledObjects(base.Test):
   """Tests for disabled objects functionality."""
   # pylint: disable=no-self-use
@@ -164,13 +158,14 @@ class TestDisabledObjects(base.Test):
     assert new_tab.url == expected_url
 
   @pytest.mark.smoke_tests
-  def test_review_details_for_disabled_obj(self, control, controls_service):
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_review_details_for_disabled_obj(self, obj, selenium):
     """Check that new browser tab is displayed after clicking Review
     Details button for objects disabled in GGRC."""
-    controls_service.open_info_page_of_obj(
-        control).click_ctrl_review_details_btn()
-    old_tab, new_tab = browsers.get_browser().windows()
-    assert old_tab.url == new_tab.url
+    factory.get_cls_webui_service(objects.get_plural(
+        obj.type))().open_info_page_of_obj(obj).click_review_details_btn()
+    assert webui_facade.are_tabs_urls_equal(), "Tabs urls should be equal."
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
