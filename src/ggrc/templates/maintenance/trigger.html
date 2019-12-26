@@ -6,20 +6,27 @@
     <h1>Admin maintenance dashboard</h1>
     <hr>
   </div>
-  <div>
-    <div style="float:right;">
+  <div style="display: flex; align-items: flex-end; flex-direction: column;">
+    <div>
       <input type='button' value="Refresh page" onclick="window.location='/maintenance/index';">
     </div>
     <br>
     <br>
-    <div style="float:right;">
-      <form action='/maintenance/turnoff_maintenance_mode' method='POST'>
+    <div >
+      <form action='/maintenance/turnon_maintenance_mode' method='POST'>
           <p>
-              <input type="submit" value="Turn off maintenance mode">
+            <input type="submit" value="Turn on maintenance mode">
           </p>
       </form>
     </div>
-    <br>
+    <div>
+        <form action='/maintenance/turnoff_maintenance_mode' method='POST'>
+            <p>
+                <input type="submit" value="Turn off maintenance mode">
+            </p>
+        </form>
+      </div>
+    </div>
     <br>
     <br>
     <hr>

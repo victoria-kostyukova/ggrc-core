@@ -123,24 +123,49 @@ def _turn_off_maintenance_mode():
   return "Maintenance mode has was not turned on."
 
 
-@maintenance_app.route('/maintenance/turnoff_maintenance_mode',
-                       methods=['POST'])
-def turn_off_maintenance_mode():
-  """Allow authenticated user to turn off maintenance mode."""
+def _turn_on_maintenance_mode():
+  """Turn on maintenance mode."""
+  db_row = db.session.query(Maintenance).get(1)
+  if db_row:
+    db_row.under_maintenance = True
+    db.session.add(db_row)
+    db.session.commit()
+  else:
+    db.session.add(Maintenance(id=1, under_maintenance=True))
+    db.session.commit()
+  return "Maintenance mode turned on successfully"
+
+
+def _turn_action_if_authorized(turn_function):
+  """Process maintenance function if user authenticated"""
   if "access_token" not in request.form:
     gae_user = users.get_current_user()
     if not (gae_user and
             gae_user.email() in settings.BOOTSTRAP_ADMIN_USERS):
       return "Unauthorized", 403
 
-    return _turn_off_maintenance_mode() or ""
+    return turn_function(), 202
 
   if not (hasattr(settings, 'ACCESS_TOKEN') and
           request.form.get("access_token") == settings.ACCESS_TOKEN):
     logger.error("Invalid access token: %s", request.form.get("access_token"))
     return "Unauthorized", 403
 
-  return _turn_off_maintenance_mode(), 202
+  return turn_function(), 202
+
+
+@maintenance_app.route('/maintenance/turnon_maintenance_mode',
+                       methods=['POST'])
+def turn_on_maintenance_mode():
+  """Allow authenticated user to turn on maintenance mode."""
+  return _turn_action_if_authorized(_turn_on_maintenance_mode)
+
+
+@maintenance_app.route('/maintenance/turnoff_maintenance_mode',
+                       methods=['POST'])
+def turn_off_maintenance_mode():
+  """Allow authenticated user to turn off maintenance mode."""
+  return _turn_action_if_authorized(_turn_off_maintenance_mode)
 
 
 @maintenance_app.route('/maintenance/check_migration_status/<row_id>',
