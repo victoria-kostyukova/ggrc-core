@@ -7,7 +7,15 @@
      {{#if open}} simple-popover_active{{/if}}
      simple-popover_placement_{{placement}}">
     <div class="simple-popover__button">
-        <button type="button" class="btn btn-link" on:el:click="toggle">{{buttonText}}</button>
+        <button type="button" class="btn btn-link" on:el:click="toggle">
+            {{buttonText}}
+            {{#eq (extraCssClass, "simple-popover_pagination_items")}}
+                <span class="pagination-arrows">
+                    <i class="fa fa-angle-up" aria-hidden="true"></i>
+                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                </span>
+            {{/eq}}
+        </button>
     </div>
     {{#if open}}
     <div class="simple-popover__content" on:el:click="hide">

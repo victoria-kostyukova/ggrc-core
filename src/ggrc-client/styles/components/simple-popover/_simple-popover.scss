@@ -39,7 +39,6 @@
 
   .simple-popover__button {
     button {
-      -webkit-appearance: menulist; // emulate native select
       cursor: pointer;
       height: 100%;
       border: 1px solid $widgetBorder;
@@ -53,6 +52,14 @@
       &:hover {
         color: $textGray;
         text-decoration: none;
+      }
+    }
+    .pagination-arrows {
+      position: absolute;
+      top: 2px; 
+      i {
+        font-size: 12px;
+        display: block;
       }
     }
   }
