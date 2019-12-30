@@ -43,14 +43,14 @@ class TestBulkCompleteNotification(TestCase):
     send_mock.assert_called_once()
     _, mail_title, body = send_mock.call_args[0]
     self.assertEqual(mail_title, "Bulk update of Assessments is finished")
-    self.assertIn("Bulk Assesments update is finished successfully", body)
-    self.assertNotIn("Bulk Assesments update is finished partitially", body)
-    self.assertNotIn("Bulk Assesments update has failed", body)
+    self.assertIn("Bulk Assessments update is finished successfully", body)
+    self.assertNotIn("Bulk Assessments update is finished partially", body)
+    self.assertNotIn("Bulk Assessments update has failed", body)
     for asmt_title in assessments_titles:
       self.assertIn(asmt_title, body)
 
   def test_not_completed(self):
-    """Test assessment complete fail notification"""
+    """Test assessment complete finished partially notification"""
     assessments = []
     with factories.single_commit():
       for _ in range(3):
@@ -74,9 +74,9 @@ class TestBulkCompleteNotification(TestCase):
     send_mock.assert_called_once()
     _, mail_title, body = send_mock.call_args[0]
     self.assertEqual(mail_title, "Bulk update of Assessments is finished")
-    self.assertNotIn("Bulk Assesments update is finished successfully", body)
-    self.assertNotIn("Bulk Assesments update has failed", body)
-    self.assertIn("Bulk Assesments update is finished partitially", body)
+    self.assertNotIn("Bulk Assessments update is finished successfully", body)
+    self.assertNotIn("Bulk Assessments update has failed", body)
+    self.assertIn("Bulk Assessments update is finished partially", body)
     for asmt_title in assessments_titles:
       self.assertIn(asmt_title, body)
 
@@ -117,9 +117,9 @@ class TestBulkCompleteNotification(TestCase):
     send_mock.assert_called_once()
     _, mail_title, body = send_mock.call_args[0]
     self.assertEqual(mail_title, "Bulk update of Assessments is finished")
-    self.assertNotIn("Bulk Assesments update is finished successfully", body)
-    self.assertNotIn("Bulk Assesments update is finished partitially", body)
-    self.assertIn("Bulk Assesments update has failed", body)
+    self.assertNotIn("Bulk Assessments update is finished successfully", body)
+    self.assertNotIn("Bulk Assessments update is finished partially", body)
+    self.assertIn("Bulk Assessments update has failed", body)
     for asmt_title in assessments_titles:
       self.assertIn(asmt_title, body)
 
@@ -148,9 +148,9 @@ class TestBulkCompleteNotification(TestCase):
     send_mock.assert_called_once()
     _, mail_title, body = send_mock.call_args[0]
     self.assertEqual(mail_title, "Bulk update of Assessments is finished")
-    self.assertIn("Bulk Assesments update is finished successfully", body)
-    self.assertNotIn("Bulk Assesments update is finished partitially", body)
-    self.assertNotIn("Bulk Assesments update has failed", body)
+    self.assertIn("Bulk Assessments update is finished successfully", body)
+    self.assertNotIn("Bulk Assessments update is finished partially", body)
+    self.assertNotIn("Bulk Assessments update has failed", body)
     for asmt_title in assessments_titles:
       self.assertIn(asmt_title, body)
 
@@ -180,8 +180,40 @@ class TestBulkCompleteNotification(TestCase):
     send_mock.assert_called_once()
     _, mail_title, body = send_mock.call_args[0]
     self.assertEqual(mail_title, "Bulk update of Assessments is finished")
-    self.assertNotIn("Bulk Assesments update is finished successfully", body)
-    self.assertIn("Bulk Assesments update has failed", body)
-    self.assertNotIn("Bulk Assesments update is finished partitially", body)
+    self.assertNotIn("Bulk Assessments update is finished successfully", body)
+    self.assertIn("Bulk Assessments update has failed", body)
+    self.assertNotIn("Bulk Assessments update is finished partially", body)
     for asmt_title in assessments_titles:
       self.assertIn(asmt_title, body)
+
+  def test_send_notification_for_del_object(self):
+    """Test that bulk verify had finished with asmnt del during the operation.
+    Testcase here emulates the situation when user open bulk verify in one
+    browser tab and delete asmnt in another tab, without refreshing asmnts
+    list in the first tab. In that case bulk verify would finish and the right
+    notification for deleted asmnt should be send.
+    """
+    # pylint: disable=invalid-name
+
+    data = {
+        "assessments_ids": [123],
+        "attributes": [],
+    }
+
+    with mock.patch("ggrc.notifications.common.send_email") as send_mock:
+      response = self.api.client.post(
+          "/api/bulk_operations/verify",
+          data=json.dumps(data),
+          headers=self.headers
+      )
+
+    self.assert200(response)
+    send_mock.assert_called_once()
+    _, mail_title, body = send_mock.call_args[0]
+    self.assertEqual(mail_title, "Bulk update of Assessments is finished")
+    self.assertNotIn("Bulk Assessments update is finished successfully", body)
+    self.assertNotIn("Bulk Assessments update is finished partially", body)
+    self.assertNotIn("Bulk Assessments update has failed", body)
+    self.assertIn(
+        "Assessments with following ids were deleted "
+        "before or during Bulk Update", body)

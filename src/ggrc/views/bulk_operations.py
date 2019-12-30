@@ -218,7 +218,7 @@ def bulk_complete(task):
 @app.route("/_background_tasks/bulk_verify", methods=["POST"])
 @background_task.queued_task
 def bulk_verify(task):
-  """Process bulk complete"""
+  """Process bulk verify"""
 
   with benchmark("Create CsvBuilder"):
     builder = csvbuilder.CsvBuilder(task.parameters.get("data", {}))
