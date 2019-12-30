@@ -11,7 +11,10 @@
       <div class="evidence-objects__wrapper-item">
         <div class="evidence__title">Evidence file</div>
           {{#evidenceFiles}}
-            <document-object-list-item instance:from="{.}" />
+            <evidence-item
+              evidence:from="{.}"
+              isEditIconDenied:from="true"
+            />
           {{else}}
             <span class="empty-message">None</span>
           {{/evidenceFiles}}
@@ -19,7 +22,10 @@
       <div class="evidence-objects__wrapper-item">
         <div class="evidence__title">Evidence URL</div>
           {{#evidenceUrls}}
-            <document-object-list-item instance:from="{.}" />
+            <evidence-item
+              evidence:from="{.}"
+              isEditIconDenied:from="true"
+            />
           {{else}}
             <span class="empty-message">None</span>
           {{/evidenceUrls}}

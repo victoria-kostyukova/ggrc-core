@@ -11,6 +11,7 @@ import {
   batchRequests,
 } from '../../../plugins/utils/query-api-utils';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
+import Evidence from '../../../models/business-models/evidence';
 import template from './assessment-evidence-objects.stache';
 
 export default canComponent.extend({
@@ -68,9 +69,9 @@ export default canComponent.extend({
 
         evidences.forEach((item) => {
           if (item.kind === 'URL') {
-            urls.push(item);
+            urls.push(new Evidence(item));
           } else {
-            files.push(item);
+            files.push(new Evidence(item));
           }
         });
         this.attr('evidenceUrls', urls);

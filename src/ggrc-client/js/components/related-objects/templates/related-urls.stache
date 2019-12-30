@@ -9,9 +9,9 @@
     <object-list items:bind="urls" emptyMessage:from="emptyMessage" showMore:from="showMore">
       {{#is(modelType, "Evidence")}}
         <evidence-item
-            evidence:from="{.}"
-            isEditIconDenied:from="isEditDenied"
-            on:removeItem="removeUrl({.})"
+          evidence:from="{.}"
+          isEditIconDenied:from="isEditDenied"
+          on:removeItem="removeUrl({.})"
         />
       {{else}}
       <div class="action-toolbar">
