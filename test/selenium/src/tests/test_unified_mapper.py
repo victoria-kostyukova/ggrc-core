@@ -81,15 +81,18 @@ class TestProgramPage(base.Test):
     soft_assert.assert_expectations()
 
 
-class TestControlsPage(base.Test):
-  """Tests of unified mapper for Controls."""
+class TestDisabledObjectsPage(base.Test):
+  """Tests of unified mapper for disabled objects."""
 
-  def test_user_cannot_map_control_via_unified_mapper(self, control,
-                                                      dashboard_controls_tab,
-                                                      selenium):
-    """Tests that user cannot map Control to Scope Objects/Directives
+  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_cannot_map_disabled_obj_via_unified_mapper(self, obj, selenium):
+    """Tests that user cannot map disabled object to Scope Objects/Directives
     via Unified Mapper (existent new scope/directive object)"""
-    dashboard_controls_tab.get_control(control).select_map_to_this_object()
+    obj_name = objects.get_plural(obj.type)
+    service = factory.get_cls_webui_service(obj_name)()
+    (service.open_obj_dashboard_tab().tree_view
+     .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
         entities_factory.ProductsFactory().create())
     browsers.get_browser().windows()[1].use()
