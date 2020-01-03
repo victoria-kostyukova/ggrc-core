@@ -43,22 +43,8 @@ export default canComponent.extend({
       unitOptions: {
         Value: canList,
       },
-      canSave: {
-        type: 'boolean',
-        value: true,
-      },
-      isSaving: {
-        type: 'boolean',
-        value: false,
-      },
-      onSaveRepeat: {
-        value: function () {
-          return function () {
-            return $.Deferred().resolve();
-          };
-        },
-      },
     },
+    instance: {},
     unit: null,
     repeatEvery: null,
     state: {
@@ -119,19 +105,15 @@ export default canComponent.extend({
     save: function () {
       let unit = null;
       let repeatEvery = null;
-      let onSave = this.attr('onSaveRepeat');
 
       if (this.attr('repeatEnabled')) {
         unit = this.attr('state.result.unit');
         repeatEvery = this.attr('state.result.repeatEvery');
       }
 
-      this.attr('isSaving', true);
-      return onSave(unit, repeatEvery)
-        .then(function () {
-          this.attr('isSaving', false);
-          this.attr('state.open', false);
-        }.bind(this));
+      this.attr('instance.unit', unit);
+      this.attr('instance.repeat_every', repeatEvery);
+      this.attr('state.open', false);
     },
   }),
   events: {
