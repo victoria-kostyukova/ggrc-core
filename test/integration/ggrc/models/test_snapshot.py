@@ -3,6 +3,8 @@
 
 """Tests for snapshot model."""
 
+import ddt
+
 from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
@@ -19,6 +21,7 @@ def get_external_models():
   return {getattr(all_models, stype) for stype in Types.external}
 
 
+@ddt.ddt
 class TestSnapshotQueryApi(TestCase):
   """Basic tests for /query api."""
 
@@ -150,7 +153,7 @@ class TestSnapshotQueryApi(TestCase):
     for type_ in external_ca_model_names:
       with app.app_context():
         for args in external_ca_args:
-          factories.ExternalCustomAttributeDefinitionFactory(
+          factories.CustomAttributeDefinitionFactory(
               definition_type=type_,
               **args
           )
@@ -185,7 +188,7 @@ class TestSnapshotQueryApi(TestCase):
 
       for title, value in ca_values.items():
         for obj in objects:
-          factories.ExternalCustomAttributeValueFactory(
+          factories.CustomAttributeValueFactory(
               custom_attribute=ca_definitions[title],
               attributable=obj,
               attribute_value=value
@@ -243,8 +246,9 @@ class TestSnapshotQueryApi(TestCase):
 
     return clean
 
-  def test_snapshot_content(self):
-    """Test the content of stored revisions
+  @ddt.data(*get_snapshottable_models() - get_external_models())
+  def test_snapshot_content(self, model):
+    """Test the content of stored revisions for {0.__name__}
 
     The content in the revision (that is set by log_json) must match closely to
     what the api returns for a get request. This ensures that when a model is
@@ -252,12 +256,10 @@ class TestSnapshotQueryApi(TestCase):
     fields.
     """
     self.client.get("/login")
-    test_models = get_snapshottable_models() - get_external_models()
-    for model in test_models:
-      obj = model.eager_query().first()
-      generated_json = self._clean_json(obj.log_json())
-      expected_json = self._clean_json(self._get_object(obj))
-      self.assertEqual(expected_json, generated_json)
+    obj = model.eager_query().first()
+    generated_json = self._clean_json(obj.log_json())
+    expected_json = self._clean_json(self._get_object(obj))
+    self.assertEqual(expected_json, generated_json)
 
 
 class TestSnapshot(TestCase):

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -69,7 +69,7 @@ def _add_mappings_records(conn):
               created_at)
           SELECT DISTINCT
               "CustomAttributeDefinition" AS object_type,
-              "CustomAttribute" AS external_type,
+              "CustomAttributeDefinition" AS external_type,
               ecav.id,
               ecav.external_id,
               :date_time

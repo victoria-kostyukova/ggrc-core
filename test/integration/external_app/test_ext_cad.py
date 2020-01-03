@@ -32,7 +32,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
       Dictionary with attribute configuration.
     """
     return {
-        "id": 1,
         "title": "GCA Text",
         "attribute_type": "Text",
         "definition_type": "control",
@@ -42,6 +41,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_string_123123",
+        "entity_name": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -52,7 +52,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
       Dictionary with attribute configuration.
     """
     return {
-        "id": 1,
         "title": "GCA Rich Text",
         "attribute_type": "Rich Text",
         "definition_type": "control",
@@ -62,6 +61,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_html_123123",
+        "entity_name": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -72,7 +72,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
       Dictionary with attribute configuration.
     """
     return {
-        "id": 1,
         "title": "GCA Date",
         "attribute_type": "Date",
         "definition_type": "control",
@@ -81,6 +80,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_date_123123",
+        "entity_name": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -91,7 +91,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
       Dictionary with attribute configuration.
     """
     return {
-        "id": 1,
         "title": "GCA Dropdown",
         "attribute_type": "Dropdown",
         "definition_type": "control",
@@ -101,6 +100,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "external_id": 1,
         "external_name": "control_dropdown_123123",
         "multi_choice_options": "1,3,2",
+        "entity_name": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -111,7 +111,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
       Dictionary with attribute configuration.
     """
     return {
-        "id": 1,
         "title": "GCA Multiselect",
         "attribute_type": "Multiselect",
         "definition_type": "control",
@@ -121,6 +120,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "external_id": 1,
         "external_name": "control_multistring_123123",
         "multi_choice_options": "1,3,2",
+        "entity_name": "CustomAttributeDefinition",
     }
 
   @classmethod
@@ -174,10 +174,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         attribute_payload["placeholder"]
     )
     self.assertEqual(
-        external_cad.external_id,
-        attribute_payload["external_id"]
-    )
-    self.assertEqual(
         external_cad.external_name,
         attribute_payload["external_name"]
     )
@@ -208,10 +204,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     self.assertEqual(
         external_cad.helptext,
         attribute_payload["helptext"]
-    )
-    self.assertEqual(
-        external_cad.external_id,
-        attribute_payload["external_id"]
     )
     self.assertEqual(
         external_cad.external_name,
@@ -250,10 +242,6 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         attribute_payload["multi_choice_options"]
     )
     self.assertEqual(
-        external_cad.external_id,
-        attribute_payload["external_id"]
-    )
-    self.assertEqual(
         external_cad.external_name,
         attribute_payload["external_name"]
     )
@@ -281,104 +269,62 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
     attribute_payload = self._get_payload(attribute_type)
     payload = [
         {
-            "external_custom_attribute_definition": attribute_payload,
+            "custom_attribute_definition": attribute_payload,
         }
     ]
 
     response = self.api.post(
-        all_models.ExternalCustomAttributeDefinition,
+        all_models.CustomAttributeDefinition,
         data=payload
     )
 
     self.assertEqual(response.status_code, 200)
-    ex_cad = all_models.ExternalCustomAttributeDefinition.eager_query().first()
+    ex_cad = all_models.CustomAttributeDefinition.eager_query().first()
     self._run_cad_asserts(attribute_type, ex_cad, attribute_payload)
-
-  @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
-  def test_create_cad_wh_id(self, attribute_type):
-    """Test create CAD without id."""
-    attribute_payload = self._get_payload(attribute_type)
-    attribute_payload.pop("id")
-
-    payload = [
-        {
-            "external_custom_attribute_definition": attribute_payload,
-        }
-    ]
-
-    response = self.api.post(
-        all_models.ExternalCustomAttributeDefinition,
-        data=payload
-    )
-
-    self.assertEqual(response.status_code, 400)
-    self.assertIn("id for the CAD is not specified.", response.data)
 
   @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
   def test_update_custom_attribute(self, attribute_type):
     """Test for update external CAD validation."""
-    external_cad = factories.ExternalCustomAttributeDefinitionFactory(
+    external_cad = factories.CustomAttributeDefinitionFactory(
         title="GCA example",
         definition_type="control",
+        attribute_type=attribute_type,
+        external_id=1,
+        entity_name="CustomAttributeDefinition",
+        multi_choice_options="1,3,2",
     )
     attribute_payload = self._get_payload(attribute_type)
-    attribute_payload['id'] = external_cad.id
     payload = {
-        "external_custom_attribute_definition": attribute_payload,
+        "custom_attribute_definition": attribute_payload,
     }
-
     response = self.api.put(
-        all_models.ExternalCustomAttributeDefinition,
+        obj=all_models.CustomAttributeDefinition,
         obj_id=external_cad.id,
         data=payload
     )
-
+    external_cad = all_models.CustomAttributeDefinition.query.one()
     self.assertEqual(response.status_code, 200)
-    ex_cad = all_models.ExternalCustomAttributeDefinition.eager_query().first()
-    self._run_cad_asserts(attribute_type, ex_cad, attribute_payload)
-
-  @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
-  def test_update_cad_wh_id(self, attribute_type):
-    """Test update CAD without id."""
-    external_cad = factories.ExternalCustomAttributeDefinitionFactory(
-        title="GCA example",
-        definition_type="control",
-    )
-    attribute_payload = self._get_payload(attribute_type)
-    attribute_payload.pop("id")
-
-    payload = {
-        "external_custom_attribute_definition": attribute_payload,
-    }
-
-    response = self.api.put(
-        all_models.ExternalCustomAttributeDefinition,
-        obj_id=external_cad.id,
-        data=payload
-    )
-
-    self.assertEqual(response.status_code, 400)
-    self.assertIn("id for the CAD is not specified.", response.data)
+    self._run_cad_asserts(attribute_type, external_cad, attribute_payload)
 
   @ddt.data("Text", "Rich Text", "Date", "Dropdown", "Multiselect")
   def test_get_custom_attribute(self, attribute_type):
     """Test for get external CAD validation."""
     attribute_payload = self._get_payload(attribute_type)
-    external_cad = factories.ExternalCustomAttributeDefinitionFactory(
+    external_cad = factories.CustomAttributeDefinitionFactory(
         **attribute_payload
     )
-
     response = self.api.get(
-        all_models.ExternalCustomAttributeDefinition,
+        all_models.CustomAttributeDefinition,
         external_cad.id
     )
 
     self.assertEqual(response.status_code, 200)
     response_json = json.loads(response.data)
+    external_cad = all_models.CustomAttributeDefinition.query.one()
     self._run_cad_asserts(
         attribute_type,
         external_cad,
-        response_json["external_custom_attribute_definition"]
+        response_json["custom_attribute_definition"]
     )
 
 
@@ -394,11 +340,11 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
   def _create_cad_body(title, attribute_type, definition_type, model_name):
     """Create body for eCAD POST request"""
     body = {
-        "external_custom_attribute_definition": {
-            "id": 1,
+        "custom_attribute_definition": {
             "external_id": 2,
             "external_name": "%s_%s_123123" %
                              (definition_type, attribute_type.lower()),
+            "entity_name": "CustoAttributeDefinition",
             "title": title,
             "attribute_type": attribute_type,
             "definition_type": definition_type,
@@ -410,7 +356,7 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
         }
     }
     if attribute_type == "Multiselect":
-      body["external_custom_attribute_definition"][
+      body["custom_attribute_definition"][
           "multi_choice_options"] = "yes,no"
     return body
 
@@ -419,7 +365,6 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
       ("control", "Dropdown", ""),
       ("risk", "Rich Text", ""),
       ("risk", "Text", ""),
-      ("risk", "Date", ""),
   )
   @ddt.unpack
   def test_reindex_cad_create(self, definition_type, attribute_type, value):
@@ -428,7 +373,7 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
     model_id = factories.get_model_factory(model_name)().id
     expected = [model_id]
     title = "test_title %s %s" % (definition_type, attribute_type)
-    cad_model = models.all_models.ExternalCustomAttributeDefinition
+    cad_model = models.all_models.CustomAttributeDefinition
     response = self.ext_api.post(
         cad_model,
         data=[
@@ -458,7 +403,7 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
                            attribute_value):
     """Test reindex of control after edit of eCAV"""
     with factories.single_commit():
-      ecad = factories.ExternalCustomAttributeDefinitionFactory(
+      ecad = factories.CustomAttributeDefinitionFactory(
           definition_type="control",
           attribute_type=attribute_type,
           multi_choice_options=multi_choice_options,
@@ -505,12 +450,12 @@ class TestExtSnapshotting(query_helper.WithQueryApi, ggrc.TestCase):
     external custom attributes."""
     with factories.single_commit():
       control = factories.ControlFactory(slug="Control 1")
-      ecad = factories.ExternalCustomAttributeDefinitionFactory(
+      ecad = factories.CustomAttributeDefinitionFactory(
           definition_type="control",
           attribute_type=attribute_type,
           multi_choice_options=multi_choice_options,
       )
-      factories.ExternalCustomAttributeValueFactory(
+      factories.CustomAttributeValueFactory(
           custom_attribute=ecad,
           attributable=control,
           attribute_value=attribute_value,
@@ -536,7 +481,6 @@ class TestECADResponse(ggrc.TestCase):
     """Test response after creation of eCAD"""
     cad_body = {
         "custom_attribute_definition": {
-            # "id": 1,
             "external_id": 2,
             "external_name": "risk_dropdown_123123",
             "title": "ECAD TiTle",
@@ -546,12 +490,14 @@ class TestECADResponse(ggrc.TestCase):
             "helptext": "Help Text",
             "placeholder": "Some Placeholder",
             "multi_choice_options": "opt1,opt2",
-            "entity_name": "custom_attribute_definition",
+            "entity_name": "CustomAttributeDefinition",
         }
     }
     ecad_model = models.all_models.CustomAttributeDefinition
     response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(response)
+    cad_body["custom_attribute_definition"].pop("entity_name")
+    cad_body["custom_attribute_definition"].pop("external_id")
     check_attrs = cad_body["custom_attribute_definition"].keys()
     for attr in check_attrs:
       self.assertIn(attr,
@@ -564,7 +510,6 @@ class TestECADResponse(ggrc.TestCase):
     """Test response after creation of eCAD"""
     cad_body = {
         "custom_attribute_definition": {
-            # "id": 1,
             "external_id": 2,
             "external_name": "control_dropdown_123123",
             "title": "ECAD TiTle",
@@ -576,17 +521,16 @@ class TestECADResponse(ggrc.TestCase):
             "multi_choice_options": "opt1,opt2",
         }
     }
-    ecad_model = models.all_models.ExternalCustomAttributeDefinition
+    ecad_model = models.all_models.CustomAttributeDefinition
     cad_response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(cad_response)
+    ext_cad = all_models.CustomAttributeDefinition.query.one()
     control = factories.ControlFactory(slug="Control 1")
     cav_body = {
         "custom_attribute_values": [{
-            "id": 1,
-            "external_id": 2,
             "attributable_id": control.id,
             "attributable_type": "Control",
-            "custom_attribute_id": 1,
+            "custom_attribute_id": ext_cad.id,
             "attribute_value": "opt2",
         }]
     }

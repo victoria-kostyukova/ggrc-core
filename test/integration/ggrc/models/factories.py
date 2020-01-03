@@ -21,8 +21,9 @@ from contextlib import contextmanager
 import factory
 
 from ggrc import db
+from ggrc.models.mixins import synchronizable
 from ggrc.models import saved_search
-from ggrc.models import all_models
+from ggrc.models import all_models, get_model
 
 from ggrc.access_control import roleable
 
@@ -142,6 +143,11 @@ class WithACLandCAFactory(ModelFactory):
     return instance
 
 
+class ExternalMappingFactory(ModelFactory):
+  class Meta:
+    model = all_models.ExternalMapping
+
+
 class CustomAttributeDefinitionFactory(TitledFactory):
 
   class Meta:
@@ -155,11 +161,32 @@ class CustomAttributeDefinitionFactory(TitledFactory):
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Assert definition_type"""
-    return super(CustomAttributeDefinitionFactory, cls)._create(
+    model = get_model(kwargs.get('definition_type'))
+    if issubclass(model, synchronizable.Synchronizable):
+      if "external_id" in kwargs:
+        external_id = kwargs.pop("external_id")
+      else:
+        external_id = SynchronizableExternalId.next()
+
+      if "entity_name" in kwargs:
+        entity_name = kwargs.pop("entity_name")
+      else:
+        entity_name = "{}_{}_123".format(target_class.type, external_id)
+
+    cad = super(CustomAttributeDefinitionFactory, cls)._create(
         target_class,
         *args,
         **kwargs
     )
+    if issubclass(model, synchronizable.Synchronizable):
+      cad._external_info = ExternalMappingFactory(
+          external_id=external_id,
+          object_type=target_class.type,
+          external_type=entity_name,
+          object_id=cad.id
+      )
+
+    return cad
 
 
 class CustomAttributeValueFactory(ModelFactory):

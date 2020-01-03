@@ -96,7 +96,6 @@ class TestSyncServiceControl(TestCase):
         "definition_id": 444,
         "definition_type": definition_type,
         "helptext": "Help Text",
-        "id": 444,
         "mandatory": False,
         "modified_by": None,
         "multi_choice_mandatory": None,
@@ -104,7 +103,7 @@ class TestSyncServiceControl(TestCase):
         "placeholder": "Placeholder",
         "selfLink": "/api/external_custom_attribute_definitions/1",
         "title": "Attribute title",
-        "type": "ExternalCustomAttributeDefinition",
+        "type": "CustomAttributeDefinition",
         "updated_at": "2019-08-05T07:44:23",
     }
 
@@ -126,7 +125,6 @@ class TestSyncServiceControl(TestCase):
         "context": None,
         "created_at": "2019-08-05T07:45:19",
         "custom_attribute_id": 444,
-        "id": 333,
         "modified_by": None,
         "preconditions_failed": None,
         "type": "ExternalCustomAttributeValue",
@@ -170,10 +168,6 @@ class TestSyncServiceControl(TestCase):
       cav: CAV object.
       expected_body: Dictionary with expected CAV body.
     """
-    self.assertEqual(
-        cav.id,
-        expected_body["id"]
-    )
     self.assertEqual(
         cav.custom_attribute_id,
         expected_body["custom_attribute_id"]
@@ -243,7 +237,7 @@ class TestSyncServiceControl(TestCase):
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
   def test_create_control_with_cads(self):
     """Test create control with CADs/CAVs."""
-    factories.ExternalCustomAttributeDefinitionFactory(
+    factories.CustomAttributeDefinitionFactory(
         id=444,
         attribute_type="Text",
         definition_type="control"
@@ -261,7 +255,7 @@ class TestSyncServiceControl(TestCase):
     })
 
     self.assertEqual(response.status_code, 201)
-    cav = all_models.ExternalCustomAttributeValue.query.one()
+    cav = all_models.CustomAttributeValue.query.one()
     self.assert_cav_fields(cav, cav_body)
 
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
@@ -321,7 +315,7 @@ class TestSyncServiceControl(TestCase):
   def test_update_control_with_cads(self):
     """Test update control with CADs/CAVs."""
     ext_user_email = "external@example.com"
-    factories.ExternalCustomAttributeDefinitionFactory(
+    factories.CustomAttributeDefinitionFactory(
         id=444,
         attribute_type="Text",
         definition_type="control"
@@ -344,7 +338,7 @@ class TestSyncServiceControl(TestCase):
     )
 
     self.assertEqual(response.status_code, 200)
-    cav = all_models.ExternalCustomAttributeValue.query.one()
+    cav = all_models.CustomAttributeValue.query.one()
     self.assert_cav_fields(cav, cav_body)
 
   def test_create_with_asserts(self):

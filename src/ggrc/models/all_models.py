@@ -224,13 +224,22 @@ def get_scope_model_names():
 
 
 def get_external_models():
-  """Return list of useble external models"""
-  return [m for m in all_models
-          if issubclass(m, synchronizable.Synchronizable)]
+  """
+      Collect external models which are custom attributable
+  Returns:
+      list() of usable external models
+
+  """
+  return [model for model in all_models
+          if issubclass(model, synchronizable.Synchronizable)]
 
 
 def get_internal_grc_models():
-  """Return list of usable internal GRC models"""
+  """
+      Collect internal models which are custom attributable
+  Returns:
+      list() of usable internal GRC models
+  """
   return [m for m in all_models
           if (not issubclass(m, synchronizable.Synchronizable) and
               issubclass(m, CustomAttributable))]

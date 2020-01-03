@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -15,6 +15,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from ggrc.migrations.utils import MIGRATION_FAILED_ERROR
+from ggrc.migrations.utils import add_to_objects_without_revisions_bulk
 
 
 # revision identifiers, used by Alembic.
@@ -68,6 +69,28 @@ def _get_cad_ids_for_ggrcq_ggrc(conn):
   )
   old_ids = [ecad_id for ecad_id, in conn.execute(query)]
   return old_ids
+
+
+def _get_ext_name_for_ggrcq_ggrc(conn):
+  """Get external_name, id pairs of for old ecad
+
+  Args:
+    conn: base mysql connection
+
+  Returns:
+      ext_name : list() of tuples with selected (names, ids)
+
+  """
+  query = sa.text(
+      """
+          SELECT ecad.external_name, ecad.id FROM
+          external_custom_attribute_definitions as ecad
+          JOIN custom_attribute_definitions as cad ON
+          (cad.id = ecad.id AND cad.definition_type IN ("control", "risk"));
+      """
+  )
+  ext_name = [(ename, ecad_id) for ename, ecad_id in conn.execute(query)]
+  return ext_name
 
 
 def _migrate_ecads_from_ggrcq_to_cads(conn, ids):
@@ -134,6 +157,26 @@ def _update_cads_with_ids_initial_state(conn, ids):
   conn.execute(query, ids=ids)
 
 
+def _update_ext_names_for_ggrcq_ggrc_cads(conn, names_ids):
+  """
+    Update external names for ggrcq ggrc CADs
+  Args:
+    conn: base mysql connection
+    names_ids: list() of tuples external_names, ids
+
+  """
+  query = sa.text(
+      """
+          UPDATE custom_attribute_definitions as cad
+          SET cad.external_name = :name
+          WHERE cad.id = :id_
+      """
+  )
+
+  for name, id_ in names_ids:
+    conn.execute(query, id_=id_, name=name)
+
+
 # pylint: disable=logging-not-lazy
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
@@ -142,13 +185,21 @@ def upgrade():
 
   cad_ids = _get_cad_ids_for_ggrcq(conn)
   initial_state_ids = _get_cad_ids_for_ggrcq_ggrc(conn)
+  ext_names_ids = _get_ext_name_for_ggrcq_ggrc(conn)
 
   try:
     if cad_ids:  # Migrate eCADs
       _migrate_ecads_from_ggrcq_to_cads(conn, cad_ids)
+      add_to_objects_without_revisions_bulk(conn,
+                                            cad_ids,
+                                            "CustomAttributeDefinition")
 
     if initial_state_ids:  # Update old CADs
       _update_cads_with_ids_initial_state(conn, initial_state_ids)
+      _update_ext_names_for_ggrcq_ggrc_cads(conn, ext_names_ids)
+      add_to_objects_without_revisions_bulk(conn, initial_state_ids,
+                                            "CustomAttributeDefinition",
+                                            action="modified")
   except:
     trans.rollback()
     raise UserWarning(MIGRATION_FAILED_ERROR.format(revision))

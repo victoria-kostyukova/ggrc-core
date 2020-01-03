@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for ExternalMapper model"""
@@ -17,7 +17,14 @@ class ExternalMapping(CreationTimeTracked, db.Model):
 
   _inflector = ModelInflectorDescriptor()
 
-  object_type = db.Column(db.String(250))
+  object_type = db.Column(db.String(255))
   object_id = db.Column(db.Integer)
   external_id = db.Column(db.Integer)
-  external_type = db.Column(db.String(250))
+  external_type = db.Column(db.String(255))
+
+  _api_attrs = [
+      "object_type",
+      "object_id",
+      'external_id',
+      "external_type",
+  ]

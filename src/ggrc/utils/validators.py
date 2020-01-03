@@ -6,7 +6,6 @@
 from werkzeug import exceptions
 
 from ggrc import db
-from ggrc.models import mixins
 
 
 def modified_only(func):
@@ -49,8 +48,8 @@ def validate_object_type_ggrcq(mapper, content, target):
     raise exceptions.MethodNotAllowed()
 
 
-def validate_definition_type_cad(mapper, content, target):
-  """Validate actions for CAD object with definition_type."""
+def validate_definition_type_ecad(mapper, content, target):
+  """Validate actions for eCAD object with definition_type."""
   from ggrc import login as login_module
   from ggrc.models import get_model
   from ggrc.models.mixins import synchronizable
@@ -62,32 +61,10 @@ def validate_definition_type_cad(mapper, content, target):
   if not user or user.is_anonymous():
     return
 
-  should_prevent = (
-      issubclass(model, mixins.ExternalCustomAttributable) or
-      issubclass(model, synchronizable.Synchronizable)
-  )
-
-  if should_prevent:
-    # raise exceptions.MethodNotAllowed()
-    pass
-
-
-def validate_definition_type_ecad(mapper, content, target):
-  """Validate actions for eCAD object with definition_type."""
-  from ggrc import login as login_module
-  from ggrc.models import get_model
-  del mapper, content
-
-  model = get_model(target.definition_type)
-  user = login_module.get_current_user(False)
-
-  if not user or user.is_anonymous():
-    return
-
-  should_prevent = (
-      not login_module.is_external_app_user() or
-      issubclass(model, mixins.CustomAttributable)
-  )
+  should_prevent = all([
+      issubclass(model, synchronizable.Synchronizable),
+      not login_module.is_external_app_user()
+  ])
 
   if should_prevent:
     raise exceptions.MethodNotAllowed()

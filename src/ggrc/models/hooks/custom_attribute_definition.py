@@ -62,7 +62,7 @@ def init_hook():
       models.all_models.CustomAttributeDefinition)
   def handle_creating_cad_for_ext(sender, obj=None, src=None,
                                   service=None, event=None):
-    """Handel creating mapper obj for CAD if parent is External
+    """Handle creating mapper for GGRCQ CADs
 
     Args:
       sender: A class of Resource handling the POST request.

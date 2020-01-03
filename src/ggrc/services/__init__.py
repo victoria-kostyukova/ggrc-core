@@ -5,6 +5,7 @@
 
 from ggrc.services import common
 from ggrc.services.registry import service
+from ggrc.services.resources import external_internal
 
 
 def contributed_services():
@@ -36,7 +37,8 @@ def contributed_services():
       service('comments', models.Comment),
       service('external_comments', models.ExternalComment),
       service('custom_attribute_definitions',
-              models.CustomAttributeDefinition),
+              models.CustomAttributeDefinition,
+              external_internal.ExternalInternalResource),
       service('external_custom_attribute_definitions',
               models.ExternalCustomAttributeDefinition,
               external.ExternalCADResource),

@@ -310,11 +310,12 @@ def create_external_mapping(obj, src):
     obj: A list of model instances created from the POSTed JSON.
     src: A list of original POSTed JSON dictionaries.
   """
-  mapping_data = dict()
-  mapping_data["external_type"] = src.get("entity_name")
-  mapping_data["external_id"] = src.get("external_id")
-  mapping_data["object_type"] = obj.type
-  mapping_data["object_id"] = obj.id
+  mapping_data = {
+      "external_type": src["entity_name"],
+      "external_id": src["external_id"],
+      "object_type": obj.type,
+      "object_id": obj.id,
+  }
 
   mapping = ExternalMapping(**mapping_data)
   db.session.add(mapping)
@@ -633,7 +634,7 @@ def get_attributes_json():
           ~models.CustomAttributeDefinition.definition_type.in_(
               constants.GGRCQ_OBJ_TYPES_FOR_SYNC)
       ).all()
-      ext_attrs = models.ExternalCustomAttributeDefinition.eager_query().all()
+      ext_attrs = models.CustomAttributeDefinition.eager_query().all()
     with benchmark("Get attributes JSON: publish"):
       published = []
       for attr in attrs:
@@ -697,12 +698,6 @@ def get_all_attributes_json(load_custom_attributes=False):
               constants.GGRCQ_OBJ_TYPES_FOR_SYNC)).group_by(
           models.CustomAttributeDefinition.title,
           models.CustomAttributeDefinition.definition_type)
-      for attr in definitions:
-        ca_cache[attr.definition_type].append(attr)
-      ecad = models.ExternalCustomAttributeDefinition
-      definitions = ecad.eager_query().group_by(
-          models.ExternalCustomAttributeDefinition.title,
-          models.ExternalCustomAttributeDefinition.definition_type)
       for attr in definitions:
         ca_cache[attr.definition_type].append(attr)
     for model in models.all_models.all_models:

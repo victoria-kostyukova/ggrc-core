@@ -4,14 +4,12 @@
 """Test for indexing of snapshotted objects"""
 
 import ddt
-from sqlalchemy import exc as sa_exc
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc.snapshotter import datastructures as snapshotter_datastructures
 from ggrc.snapshotter import indexer as snapshotter_indexer
 from ggrc.snapshotter import rules as snapshotter_rules
 
@@ -544,71 +542,3 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     self.assert_indexed_fields(snapshot, "kind", {
         "": option_title
     })
-
-  @staticmethod
-  def _create_int_and_ext_cads(custom_attributable):
-    """Create internal and external CAD differing in title case.
-
-    Args:
-      custom_attributable (db.Model): Instance of custom attributable model
-        for which internal and external CADs should be created.
-    """
-    factories.CustomAttributeDefinitionFactory(
-        definition_type=custom_attributable._inflector.table_singular,
-        title="custom attribute",
-    )
-    factories.ExternalCustomAttributeDefinitionFactory(
-        definition_type=custom_attributable._inflector.table_singular,
-        title="custom attribute".title(),
-    )
-
-  @staticmethod
-  def _create_snapshot_from_last_rev(parent, child):
-    """Create snapshot from last revision of child and map it to parent.
-
-    Get last revision of passed `child` object and create a Snapshot from it
-    mapped to passed `parent` object.
-
-    Args:
-      parent (db.Model): Instacne to be used as a parent for Snapshot.
-      child (db.Model): Instance to be used as a child for Snapshot.
-    """
-    last_rev = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == child.type,
-        all_models.Revision.resource_id == child.id,
-    ).one()
-
-    with factories.single_commit():
-      factories.SnapshotFactory(
-          parent=parent,
-          child_type=child.type,
-          child_id=child.id,
-          revision=last_rev,
-      )
-
-  @ddt.data(
-      factories.ControlFactory,
-      factories.RiskFactory,
-  )
-  def test_reindex_pairs(self, external_model_factory):
-    """Test reindex_pairs for same CADs in internal and external.
-
-    Test that `reindex_pairs` functionality works correctly for snapshots when
-    they have same CADs both in internal and external CAD tables but this CADs
-    have titles in lower and upper case.
-    """
-    with factories.single_commit():
-      audit = factories.AuditFactory()
-      external_object = external_model_factory()
-      self._create_int_and_ext_cads(external_object)
-    self._create_snapshot_from_last_rev(
-        parent=audit,
-        child=external_object,
-    )
-
-    try:
-      snapshotter_indexer.reindex_pairs([
-          snapshotter_datastructures.Pair(audit, external_object),
-      ])
-    except sa_exc.IntegrityError:
-      self.fail("`reindex_pairs` failed due to IntegrityError")

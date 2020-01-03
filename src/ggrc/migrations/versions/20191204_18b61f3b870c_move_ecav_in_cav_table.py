@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -15,6 +15,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from ggrc.migrations.utils import MIGRATION_FAILED_ERROR
+from ggrc.migrations.utils import add_to_objects_without_revisions_bulk
 
 
 logger = logging.getLogger(__name__)
@@ -25,8 +26,8 @@ revision = '18b61f3b870c'
 down_revision = '794ec2bb70b2'
 
 
-def _get_new_ids_for_migrated_ecads(conn):
-  """Get newly created ids and previous_ids after ecads migration
+def _get_ids_for_ggrcq_cads(conn):
+  """Get ids and previouse_ids for ggrcq cads
 
   Args:
     conn: base mysql connection
@@ -45,15 +46,13 @@ def _get_new_ids_for_migrated_ecads(conn):
       """
   )
   ids = conn.execute(query)
-  res = []
-  if ids:
-    res = zip(*ids)
+  res = zip(*ids) if ids else []
 
   return res
 
 
-def _get_old_ecavs_ids(conn):
-  """Get IDs of for old ecav
+def _get_cad_ids_from_ggrc(conn):
+  """Get cad ids from ggrc
 
   Args:
     conn: base mysql connection
@@ -95,7 +94,7 @@ def _get_new_ecavs_ids(conn, ids):
 
 
 def _update_old_cavs(conn, ids):
-  """Update old cavs with previous id
+  """Update cavs for ggrc cads
 
   Args:
     conn: base mysql connection
@@ -112,8 +111,8 @@ def _update_old_cavs(conn, ids):
   conn.execute(query, ids=ids)
 
 
-def _migrate_new_ecav(conn, ids):
-  """Update then migrate new ecavs data to CAV table
+def _add_cavs_for_ggrcq_cads(conn, ids):
+  """Update then migrate cavs data to CAV table for GGRCQ cads
 
   Args:
     conn: base mysql connection
@@ -155,8 +154,8 @@ def upgrade():
   conn = op.get_bind()
   trans = conn.begin()
 
-  old_ecavs_ids = _get_old_ecavs_ids(conn)
-  ids = _get_new_ids_for_migrated_ecads(conn)
+  old_ecavs_ids = _get_cad_ids_from_ggrc(conn)
+  ids = _get_ids_for_ggrcq_cads(conn)
   new_ecav_ids = []
 
   if ids:
@@ -167,10 +166,15 @@ def upgrade():
     # Update old CAVs
     if old_ecavs_ids:
       _update_old_cavs(conn, old_ecavs_ids)
+      add_to_objects_without_revisions_bulk(conn, old_ecavs_ids,
+                                            "CustomAttributeValue",
+                                            action="modified")
 
     # Update and Migrate eCAVs
     if ids:
-      _migrate_new_ecav(conn, zip(new_cads_ids, previous_ids))
+      _add_cavs_for_ggrcq_cads(conn, zip(new_cads_ids, previous_ids))
+      add_to_objects_without_revisions_bulk(conn, new_ecav_ids,
+                                            "CustomAttributeValue")
 
   except:
     trans.rollback()

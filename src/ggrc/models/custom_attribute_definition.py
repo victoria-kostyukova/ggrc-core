@@ -75,7 +75,6 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
   mandatory = db.Column(db.Boolean, nullable=True, default=False)
   helptext = db.Column(db.String)
   placeholder = db.Column(db.String)
-  previous_id = db.Column(db.Integer, nullable=True)
   external_name = db.Column(db.String, nullable=True)
 
   _sanitize_html = [
@@ -261,9 +260,9 @@ class CustomAttributeDefinition(WithExternalMapping,
                            read=True,
                            create=False,
                            update=False),
-      reflection.Attribute("title", update=False),
+      reflection.Attribute("title", update=True),
       reflection.Attribute("attribute_type", update=False),
-      reflection.Attribute("multi_choice_options", update=False),
+      reflection.Attribute("multi_choice_options", update=True),
       *_include_links)
 
   @property
@@ -409,7 +408,6 @@ class CustomAttributeDefinition(WithExternalMapping,
         "mandatory": self.mandatory,
         "helptext": self.helptext,
         "placeholder": self.placeholder,
-        "previous_id": self.previous_id,
     }
     ca_definition = CustomAttributeDefinition(**data)
     db.session.add(ca_definition)
@@ -467,25 +465,15 @@ class CustomAttributeDefinition(WithExternalMapping,
 
 def init_cad_listeners():
   """Register event listeners for CAD and eCAD models"""
-  from ggrc.models.external_custom_attribute_definition \
-      import ExternalCustomAttributeDefinition
 
   for action in ("before_insert", "before_update", "before_delete"):
     sa.event.listen(CustomAttributeDefinition,
-                    action,
-                    validators.validate_definition_type_cad)
-  for action in ("before_insert", "before_update"):
-    sa.event.listen(ExternalCustomAttributeDefinition,
                     action,
                     validators.validate_definition_type_ecad)
   for action in ("after_insert", "after_update", "after_delete"):
     sa.event.listen(CustomAttributeDefinition,
                     action,
                     attributevalidator.invalidate_gca_cache)
-
-  sa.event.listen(ExternalCustomAttributeDefinition,
-                  "before_delete",
-                  raise_method_is_not_allowed)
 
 
 def raise_method_is_not_allowed(*args, **kwargs):
