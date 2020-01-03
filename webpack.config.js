@@ -146,6 +146,9 @@ module.exports = function (env) {
           copy: [{
             source: './src/ggrc/static/manifest.json',
             destination: './src/ggrc/manifest.json',
+          }, {
+            source: './src/ggrc-client/images/maintenance.png',
+            destination: './src/ggrc/static/images/maintenance.png',
           }],
         },
       }),
