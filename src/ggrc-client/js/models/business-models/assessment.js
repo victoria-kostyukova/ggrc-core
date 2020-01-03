@@ -13,7 +13,6 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
 import CaUpdate from '../mixins/ca-update';
-import AutoStatusChangeable from '../mixins/auto-status-changeable';
 import AccessControlList from '../mixins/access-control-list';
 import RefetchHash from '../mixins/refetch-hash';
 import AssessmentIssueTracker from '../mixins/assessment-issue-tracker';
@@ -30,8 +29,7 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/assessments/{id}',
   create: 'POST /api/assessments',
   mixins: [
-    CaUpdate, AutoStatusChangeable,
-    AccessControlList, RefetchHash,
+    CaUpdate, AccessControlList, RefetchHash,
     AssessmentIssueTracker, RelatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
