@@ -12,7 +12,6 @@ import '../spinner-component/spinner-component';
 export default canComponent.extend({
   tag: 'comments-paging',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       showButton: {

@@ -16,7 +16,6 @@ import template from './mapped-comments.stache';
 export default canComponent.extend({
   tag: 'mapped-comments',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       noItemsText: {

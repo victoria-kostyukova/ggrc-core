@@ -10,7 +10,6 @@ import template from './inner-nav-item.stache';
 
 export default canComponent.extend({
   tag: 'inner-nav-item',
-  leakScope: false,
   view: canStache(template),
   viewModel: canMap.extend({
     define: {

@@ -10,7 +10,6 @@ import template from './inner-nav-collapse.stache';
 
 export default canComponent.extend({
   tag: 'inner-nav-collapse',
-  leakScope: false,
   view: canStache(template),
   viewModel: canMap.extend({
     title: null,

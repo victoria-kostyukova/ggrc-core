@@ -185,6 +185,5 @@ let viewModel = canMap.extend({
 export default canComponent.extend({
   tag: 'advanced-search-mapping-criteria',
   view: canStache(template),
-  leakScope: false,
   viewModel: viewModel,
 });

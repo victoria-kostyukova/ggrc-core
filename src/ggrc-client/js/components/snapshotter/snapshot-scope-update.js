@@ -16,7 +16,6 @@ import {trigger} from 'can-event';
 
 export default canComponent.extend({
   tag: 'snapshot-scope-update',
-  leakScope: false,
   viewModel: canMap.extend({
     instance: null,
     upsertIt(scope) {

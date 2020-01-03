@@ -16,7 +16,6 @@ import {getFilters} from './../../../plugins/utils/advanced-search-utils';
 export default canComponent.extend({
   tag: 'create-saved-search',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     filterItems: null,
     mappingItems: null,

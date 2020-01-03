@@ -21,7 +21,6 @@ import {
 export default canComponent.extend({
   tag: 'unmap-dropdown-item',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       issueUnmap: {

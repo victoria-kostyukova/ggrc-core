@@ -38,7 +38,6 @@ const EXPECTED_FILTERS_COUNT = 2;
 export default canComponent.extend({
   tag: 'tree-view-filter',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       modelName: {

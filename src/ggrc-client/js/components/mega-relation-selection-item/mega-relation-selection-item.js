@@ -12,7 +12,6 @@ import pubSub from '../../pub-sub';
 export default canComponent.extend({
   tag: 'mega-relation-selection-item',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     mapAsChild: null,
     isDisabled: false,
