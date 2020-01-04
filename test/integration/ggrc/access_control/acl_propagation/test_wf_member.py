@@ -183,7 +183,7 @@ class TestWfMemberPropagation(base.TestACLPropagation):
               "map_created_control": True,
               "read_mapped_control": True,
               "upmap_control": True,
-              "start": (True, "unimplemented"),
+              "start": True,
               "end": True,
               "verify": True,
               "decline": True,

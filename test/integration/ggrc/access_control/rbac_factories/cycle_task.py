@@ -178,7 +178,7 @@ class CycleTaskRBACFactory(base.BaseRBACFactory):
   def start(self):
     """Start Cycle Task."""
     cycle_task = all_models.CycleTaskGroupObjectTask.query.first()
-    return self.api.put(cycle_task, {"status": "InProgress"})
+    return self.api.put(cycle_task, {"status": "In Progress"})
 
   def end(self):
     """End Cycle Task."""
