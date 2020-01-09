@@ -6,9 +6,6 @@
 import loForEach from 'lodash/forEach';
 import canModel from 'can-model';
 import canMap from 'can-map';
-// TODO: this import is used to correctly build assets. It should be removed and cyclic dependencies should be resolved.
-import '../../plugins/utils/models-utils';
-
 import * as businessModels from '../business-models';
 import {isAllowedFor} from '../../permission';
 import config from './mappings-ggrc';

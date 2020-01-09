@@ -12,6 +12,7 @@ import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
 import canControl from 'can-control';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/modal-issue-tracker-config-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
@@ -74,7 +75,6 @@ import {
   initAuditTitle,
 } from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {refreshAll} from '../../models/refresh-queue';
 
 export default canControl.extend({
