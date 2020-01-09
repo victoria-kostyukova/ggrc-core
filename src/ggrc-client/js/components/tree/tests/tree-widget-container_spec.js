@@ -184,16 +184,6 @@ describe('tree-widget-container component', () => {
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
     });
-
-    it('should load items if count has changed', () => {
-      vm.refetch = false;
-      router.attr('refetch', false);
-      vm.options.forceRefetch = false;
-      vm.pageInfo.attr('total', 100); // less than current count
-
-      _widgetShown();
-      expect(vm.loadItems).toHaveBeenCalled();
-    });
   });
 
   describe('getAbsoluteItemNumber() method', () => {

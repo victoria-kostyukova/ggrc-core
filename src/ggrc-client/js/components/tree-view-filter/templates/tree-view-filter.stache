@@ -10,6 +10,7 @@
   on:vm:openAdvanced="openAdvancedFilter()"
   on:vm:removeAdvanced="removeAdvancedFilters()"
   showAdvanced:from="statusFilterVisible"
+  filter:from="inputFilter"
   isFiltered:from="advancedSearch.filter"
   showEmailImport:from="showEmailImport"
 />
@@ -21,6 +22,7 @@
     on:vm:searchQueryChanged="searchQueryChanged(scope.event)"
     on:vm:treeFilterReady="treeFilterReady(scope.event)"
     on:vm:submitFilter="onFilter()"
+    inputFilter:from="inputFilter"
     disabled:from="advancedSearch.filter">
       <multiselect-dropdown options:from="filterStates"
         placeholder:from="'Filter by State'"

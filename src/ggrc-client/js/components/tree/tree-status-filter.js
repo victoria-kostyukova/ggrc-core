@@ -26,6 +26,9 @@ const ViewModel = canDefineMap.extend({
   widgetId: {
     value: null,
   },
+  inputFilter: {
+    value: '',
+  },
   modelName: {
     value: null,
   },
@@ -87,7 +90,7 @@ const ViewModel = canDefineMap.extend({
       router.removeAttr('state');
     }
   },
-  buildSearchQuery(states) {
+  buildSearchQuery(states, triggerFilterOnChange = false) {
     let allStates = this.allStates;
     let modelName = this.modelName;
     let query = (states.length && loDifference(allStates, states).length) ?
@@ -98,11 +101,11 @@ const ViewModel = canDefineMap.extend({
       type: 'searchQueryChanged',
       name: 'status',
       query,
+      triggerFilterOnChange,
     });
   },
   selectItems(event) {
     let selectedStates = event.selected.map((state) => state.value);
-
     this.buildSearchQuery(selectedStates);
     this.saveTreeStates(selectedStates);
     this.setStatesRoute(selectedStates);
@@ -159,17 +162,16 @@ export default canComponent.extend({
       }
 
       let isCurrent = this.viewModel.widgetId === router.attr('widget');
-      let isEnabled = !this.viewModel.disabled;
 
       let currentStates = this.viewModel.currentStates;
       let isChanged =
         loDifference(currentStates, newStatuses).length ||
-        loDifference(newStatuses, currentStates).length;
+        loDifference(newStatuses, currentStates).length ||
+        this.viewModel.inputFilter;
 
-      if (isCurrent && isEnabled && isChanged) {
-        this.viewModel.buildSearchQuery(newStatuses);
+      if (isCurrent && isChanged) {
+        this.viewModel.buildSearchQuery(newStatuses, true);
         this.viewModel.setStatesDropdown(newStatuses);
-        this.viewModel.filter();
       }
     },
     '{viewModel.router} widget'([router]) {

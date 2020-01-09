@@ -93,6 +93,9 @@ const ViewModel = canDefineMap.extend({
   emailImportSearchId: {
     value: null,
   },
+  inputFilter: {
+    value: '',
+  },
   filtersReady: {
     value: () => {
       return new Set();
@@ -163,16 +166,31 @@ const ViewModel = canDefineMap.extend({
       searchPermalinkEnabled: isDisplay,
     });
   },
-  searchQueryChanged({name, query}) {
-    const filter = makeArray(this.filters)
-      .find((item) => item.name === name);
-    if (filter) {
-      filter.query = query;
-    } else {
-      this.filters.push(new canMap({name, query}));
-    }
+  searchQueryChanged({name, query, newValue, triggerFilterOnChange}) {
+    if (router.attr('redirect')) {
+      this.inputFilter = '';
+      router.removeAttr('redirect');
 
-    this.updateCurrentFilter();
+      this.advancedSearch.attr('filter', null);
+      this.advancedSearch.attr('open', false);
+      this.advancedSearch.attr('selectedSavedSearch', null);
+      this.savedSearchPermalink = null;
+      this.triggerSearchPermalink(false);
+
+      this.filters = [new canMap({name, query})];
+    } else {
+      if (name === 'custom') {
+        this.inputFilter = newValue;
+      }
+      const filter = makeArray(this.filters)
+        .find((item) => item.name === name);
+      if (filter) {
+        filter.query = query;
+      } else {
+        this.filters.push(new canMap({name, query}));
+      }
+    }
+    this.updateCurrentFilter(triggerFilterOnChange);
   },
   treeFilterReady({filterName}) {
     if (!this.shouldWaitForFilters) {
@@ -370,7 +388,7 @@ const ViewModel = canDefineMap.extend({
   searchModalClosed() {
     this.advancedSearch.attr('selectedSavedSearch', null);
   },
-  updateCurrentFilter() {
+  updateCurrentFilter(triggerFilterOnChange) {
     const filters = makeArray(this.filters);
     let additionalFilter = this.additionalFilter;
     let advancedSearchFilter = this.advancedSearch.attr('filter');
@@ -396,6 +414,9 @@ const ViewModel = canDefineMap.extend({
       filter,
       request: advancedSearchRequest,
     };
+    if (triggerFilterOnChange) {
+      this.onFilter();
+    }
   },
   cleanUpRoute() {
     router.removeAttr('saved_search');
