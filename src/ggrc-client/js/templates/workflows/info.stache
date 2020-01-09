@@ -42,28 +42,26 @@
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance context='for'}}
                 <three-dots-menu>
-                    {{^if is_info_pin}}
-                        <li>
-                          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-                            <i class="fa fa-pencil-square-o"></i>
-                            Edit Workflow Info
-                          </a>
-                        </li>
-                    {{/if}}
+                  <li>
+                    <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+                      <i class="fa fa-pencil-square-o"></i>
+                      Edit Workflow Info
+                    </a>
+                  </li>
 
+                  <li>
+                    <permalink-component instance:from="instance"/>
+                  </li>
+
+                  {{^if is_info_pin}}
                     <li>
-                      <permalink-component instance:from="instance"/>
+                       <workflow-clone workflow:from="instance">
+                        <a href="javascript://">
+                          <i class="fa fa-clone"></i>
+                          Clone Workflow
+                        </a>
+                      </workflow-clone>
                     </li>
-
-                    {{^if is_info_pin}}
-                      <li>
-                        <workflow-clone workflow:from="instance">
-                          <a href="javascript://">
-                            <i class="fa fa-clone"></i>
-                            Clone Workflow
-                          </a>
-                        </workflow-clone>
-                      </li>
                       {{#if instance.recurrences}}
                         <li>
                           <workflow-start-cycle workflow:from="instance">
@@ -84,14 +82,6 @@
                           </workflow-deactivate>
                         </li>
                       {{/if}}
-                      {{#is_allowed 'delete' instance}}
-                          <li>
-                            <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                              <i class="fa fa-trash"></i>
-                              Delete
-                            </a>
-                          </li>
-                        {{/is_allowed}}
                     {{/if}}
 
                     {{#if is_info_pin}}
@@ -104,6 +94,15 @@
                         </li>
                       {{/if}}
                     {{/if}}
+
+                    {{#is_allowed 'delete' instance}}
+                      <li>
+                        <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                          <i class="fa fa-trash"></i>
+                          Delete
+                        </a>
+                      </li>
+                    {{/is_allowed}}
                 </three-dots-menu>
               {{/is_allowed}}
             </div>
