@@ -425,10 +425,9 @@ class ImportRowConverter(RowConverter):
 
     self.obj.issue_tracker_to_import['issue_tracker'] = self.issue_tracker
 
-  @staticmethod
-  def _is_cav_updating(obj, handler):
+  def _is_cav_updating(self, handler):
     """Check if {handler} going to update CAV for {obj}"""
-    for cav in obj.custom_attribute_values:
+    for cav in self.obj.custom_attribute_values:
       if cav.custom_attribute.display_name == handler.display_name:
         cav_attribute = cav.attribute_value
         handler_value = handler.parse_item()
@@ -445,16 +444,22 @@ class ImportRowConverter(RowConverter):
         return not json_comparator.fields_equal(cav_attribute, handler_value)
     return True
 
-  @staticmethod
-  def _is_acl_updating(obj, handler):
+  def _is_acl_updating(self, handler):
     """Check if {handler} going to update ACL for {obj}"""
-    for acr_name, acl_obj in obj.acr_name_acl_map.items():
+    for acr_name, acl_obj in self.obj.acr_name_acl_map.items():
       if acr_name == handler.display_name:
         return not json_comparator.fields_equal(
             [people.email for people in acl_obj.current_people],
             [people.email for people in handler.parse_item()]
         )
     return True
+
+  def _is_field_updating(self, handler):
+    """Check if handler going to update attribute for obj"""
+    return (handler.key in self.obj.import_restrictions and handler.value and
+            not json_comparator.fields_equal(getattr(self.obj,
+                                                     handler.key, None),
+                                             handler.value))
 
   def _check_updating_readonly_fields(self):
     """Check if trying to update fields with SOX restrictions"""
@@ -464,12 +469,8 @@ class ImportRowConverter(RowConverter):
     if isinstance(self.obj, WithCustomRestrictions) and \
        self.obj.is_sox_restricted:
 
-      for attr_name, handler in self.attrs.items():
-        if attr_name in self.obj.import_restrictions and \
-            handler.value and \
-            not json_comparator.fields_equal(
-                getattr(self.obj, attr_name, None),
-                handler.value):
+      for handler in self.attrs.values():
+        if self._is_field_updating(handler):
           self.add_error(errors.PERMISSION_ERROR)
           return
 
@@ -485,12 +486,12 @@ class ImportRowConverter(RowConverter):
 
         if (obj_name.startswith("__acl__") and
            "access_control_list" in self.obj.import_restrictions):
-          if self._is_acl_updating(self.obj, handler):
+          if self._is_acl_updating(handler):
             self.add_error(errors.PERMISSION_ERROR)
             return
 
         if is_local_restricted or is_global_restricted:
-          if self._is_cav_updating(self.obj, handler):
+          if self._is_cav_updating(handler):
             self.add_error(errors.PERMISSION_ERROR)
             return
 
