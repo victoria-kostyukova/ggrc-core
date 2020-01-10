@@ -251,7 +251,7 @@ export default {
   },
   Assessment: {
     map: [...snapshotableObjects, 'Issue'],
-    unmap: [...snapshotableObjects, 'Issue'],
+    unmap: [...snapshotableObjects, 'Issue', 'Evidence'],
     indirectMappings: ['Audit', 'Evidence', 'Person'],
   },
   Evidence: {

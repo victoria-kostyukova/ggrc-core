@@ -64,6 +64,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_RELATED,
   REFRESHED,
+  DESTINATION_UNMAPPED,
 } from '../../../events/event-types';
 import {isAllowedFor} from '../../../permission';
 import {
@@ -815,6 +816,12 @@ export default canComponent.extend({
     },
     '{pubSub} relatedItemBeforeSave'(pubSub, event) {
       this.viewModel.addItems(event, event.itemType);
+    },
+    [`{viewModel.instance} ${DESTINATION_UNMAPPED.type}`](scope, {item}) {
+      const {type} = item;
+      if (type === 'Evidence' || type === 'Snapshot') {
+        this.viewModel.updateRelatedItems();
+      }
     },
   },
 });

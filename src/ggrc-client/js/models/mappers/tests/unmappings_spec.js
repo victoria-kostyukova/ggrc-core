@@ -107,7 +107,7 @@ describe('Mappings', function () {
     AccountBalance: loDifference(filtered, modules.core.scope.notMappable,
       modules.core.scope.models),
     Assessment: loDifference(filtered, ['Audit', 'Person', 'Program', 'Project',
-      'Workflow', 'Assessment', 'Document']),
+      'Workflow', 'Assessment', 'Document']).concat(['Evidence']),
     AssessmentTemplate: [],
     Audit: ['Issue'],
     Contract: loDifference(filtered, ['Audit', 'Contract']),
