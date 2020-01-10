@@ -3,6 +3,8 @@
 
 """Test for not_empty operator."""
 
+import ddt
+
 from ggrc.models import all_models
 
 from integration import ggrc as test_ggrc
@@ -12,6 +14,7 @@ from integration.ggrc import query_helper
 from integration.ggrc import review
 
 
+@ddt.ddt
 class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
   """Test for correctness of `not_empty_revisions` operator."""
 
@@ -39,7 +42,7 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
     listeners.reindex_on_commit = lambda: True
     self.del_taskueue()
 
-  def _query_not_empty_revisions(self, instance):
+  def _query_not_empty_revisions(self, instance, ignore_relationships=False):
     """Helper function to qeury not empty revisions with query API."""
     return self._get_first_result_set(
         {
@@ -50,6 +53,7 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
                     "op": {"name": "not_empty_revisions"},
                     "resource_type": instance.type,
                     "resource_id": instance.id,
+                    "ignore_relationships": ignore_relationships,
                 },
             },
         },
@@ -122,4 +126,25 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
     not_empty_revisions = self._query_not_empty_revisions(instance)
 
     self.assertEqual(revisions_count, 2)
-    self.assertEqual(len(not_empty_revisions), 2)
+    self.assertEqual(len(not_empty_revisions), 3)
+
+  @ddt.data(
+      (True, 1),
+      (False, 3)
+  )
+  @ddt.unpack
+  def test_ignore_relationships(self, ignore_relationships, revs_count):
+    """Test 'not_empty_revisions' ignore_relationships flag
+    works as expected"""
+    with factories.single_commit():
+      objective = factories.ObjectiveFactory()
+      data_asset = factories.DataAssetFactory()
+      metric = factories.MetricFactory()
+      factories.RelationshipFactory(source=objective, destination=data_asset)
+      factories.RelationshipFactory(source=metric, destination=objective)
+
+    not_empty_revisions = self._query_not_empty_revisions(
+        objective, ignore_relationships
+    )
+
+    self.assertEqual(len(not_empty_revisions), revs_count)

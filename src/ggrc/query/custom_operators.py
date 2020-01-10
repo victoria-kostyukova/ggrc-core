@@ -38,8 +38,12 @@ def validate(*required_fields):
   """Validate decorator.
 
   Checks if all of required fields are in exp dict.
-  If there are some of required fields are not found then raise the
-  BadQueryException.
+
+  Args:
+      required_fields: list of required_fields names in string format
+
+  Raises:
+      BadQueryException: An error occurred if there is no some required field
   """
   required_fields_set = set(required_fields)
   required_tmpl = "`{field}` required for operation `{operation}`"
@@ -500,6 +504,22 @@ def not_empty_revisions(exp, object_class, target_class, query):
   This operator is useful if revisions with object state changes are needed.
   Revisions without object state changes are created when object editing
   without any actual changes is performed.
+
+  Args:
+      exp: dict contains:
+        resource_type: resource type of queried revisions
+        resource_id: resource_id of queried revisions
+        ignore_relationships(optional):
+          ignore relationship revisions if True (False for default)
+      object_class: model object of queried object type
+      target_class: model object of queried target object type
+      query: full query filter from request
+
+  Returns:
+      Sqlalchemy.Query containing filters to get not empty revisions
+
+  Raises:
+      BadQueryException: An error occurred if there is no such resource class
   """
   if object_class is not revision.Revision:
     raise BadQueryException("'not_empty_revisions' operator works with "
@@ -507,19 +527,40 @@ def not_empty_revisions(exp, object_class, target_class, query):
 
   resource_type = exp["resource_type"]
   resource_id = exp["resource_id"]
+  ignore_relationships = exp.get('ignore_relationships', False)
 
   resource_cls = getattr(all_models, resource_type, None)
   if resource_cls is None:
     raise BadQueryException("'{}' resource type does not exist"
                             .format(resource_type))
 
+  if ignore_relationships:
+    query_filter = sqlalchemy.and_(
+        revision.Revision.resource_type == resource_type,
+        revision.Revision.resource_id == resource_id,
+        sqlalchemy.not_(revision.Revision.is_empty),
+    )
+  else:
+    query_filter = sqlalchemy.or_(
+        sqlalchemy.and_(
+            revision.Revision.resource_type == resource_type,
+            revision.Revision.resource_id == resource_id,
+            sqlalchemy.not_(revision.Revision.is_empty),
+        ),
+        sqlalchemy.and_(
+            revision.Revision.source_type == resource_type,
+            revision.Revision.source_id == resource_id,
+            sqlalchemy.not_(revision.Revision.is_empty),
+        ),
+        sqlalchemy.and_(
+            revision.Revision.destination_type == resource_type,
+            revision.Revision.destination_id == resource_id,
+            sqlalchemy.not_(revision.Revision.is_empty),
+        ),
+    )
   rev_q = db.session.query(
       revision.Revision.id,
-  ).filter(
-      revision.Revision.resource_type == resource_type,
-      revision.Revision.resource_id == resource_id,
-      sqlalchemy.not_(revision.Revision.is_empty),
-  ).order_by(
+  ).filter(query_filter).order_by(
       revision.Revision.created_at,
   )
 
