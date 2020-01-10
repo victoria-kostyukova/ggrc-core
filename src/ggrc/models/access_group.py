@@ -24,10 +24,10 @@ class AccessGroup(Roleable,
                   Relatable,
                   mixins.TestPlanned,
                   mixins.LastDeprecatedTimeboxed,
+                  mixins.CycleTaskable,
                   base.ContextRBAC,
                   mixins.ScopeObject,
                   mixins.Folderable,
-                  mixins.WithWorkflowState,
                   Indexed,
                   db.Model):
   """Class representing AccessGroup."""

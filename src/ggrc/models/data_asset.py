@@ -22,10 +22,10 @@ class DataAsset(Roleable,
                 ScopedCommentable,
                 mixins.TestPlanned,
                 mixins.LastDeprecatedTimeboxed,
+                mixins.CycleTaskable,
                 mixins.base.ContextRBAC,
                 mixins.Folderable,
                 mixins.ScopeObject,
-                mixins.WithWorkflowState,
                 Indexed,
                 db.Model):
   """Class representing DataAsset."""

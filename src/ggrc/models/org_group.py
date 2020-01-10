@@ -21,10 +21,10 @@ class OrgGroup(synchronizable.Synchronizable,
                ScopedCommentable,
                mixins.TestPlanned,
                PublicDocumentable,
+               mixins.CycleTaskable,
                mixins.base.ContextRBAC,
                mixins.ScopeObject,
                mixins.Folderable,
-               mixins.WithWorkflowState,
                Indexed,
                db.Model):
   """Class representing OrgGroup."""
