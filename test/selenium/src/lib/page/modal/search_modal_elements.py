@@ -143,16 +143,50 @@ class SavedSearchesArea(object):
   @property
   def saved_searches(self):
     """Returns:
-          list of saved searches as elements."""
-    return self._root.elements(
-        class_name='.saved-search-item__title')
+          list of saved searches as _SavedSearchRows."""
+    return [_SavedSearchRow(row) for row in self._root.elements(
+        class_name="saved-search-item")]
 
   def get_search_by_title(self, search_title):
     """Returns:
           a saved search with an expected title."""
-    return self._root.element(title=search_title)
+    return _SavedSearchRow(self._root.element(title=search_title).parent(
+        class_name="saved-search-item"))
 
-  def is_search_present(self, search_title):
+
+class _SavedSearchRow(object):
+  """Represents row with saved search."""
+
+  def __init__(self, container):
+    self._root = container
+    self._remove_btn = self._root.element(class_name="fa-trash-o")
+
+  @property
+  def title(self):
+    """Returns:
+          title of saved search."""
+    return self._root.element(
+        class_name="saved-search-item__title").text
+
+  @property
+  def permalink(self):
+    """Hovers to make permalink visible.
+    Returns:
+       permalink."""
+    self._root.hover()
+    return self._root.element(class_name="fa-link")
+
+  def click_remove(self):
+    """Hovers to make the remove button visible.
+    Clicks Remove."""
+    self._root.hover()
+    self._remove_btn.click()
+
+  def wait_until_present(self):
+    """Waits until search is present in saved searches area."""
+    self._root.wait_until(lambda search: search.present)
+
+  def is_present(self):
     """Returns:
           True if saved search is present."""
-    return self.get_search_by_title(search_title).present
+    return self._root.present

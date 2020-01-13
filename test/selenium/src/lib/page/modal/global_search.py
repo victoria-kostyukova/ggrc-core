@@ -3,6 +3,7 @@
 """Global search modal."""
 from lib import base
 from lib.page.modal import search_modal_elements
+from lib.utils import selenium_utils
 
 
 class GlobalSearch(base.WithBrowser):
@@ -15,15 +16,23 @@ class GlobalSearch(base.WithBrowser):
 
   @property
   def search_results_area(self):
+    """Returns a search results area."""
     return search_modal_elements.SearchResultsArea(self._root)
 
   @property
   def search_filter_area(self):
+    """Returns a search filter area."""
     return search_modal_elements.SearchFilterArea(self._root)
 
   @property
   def saved_searches_area(self):
+    """Returns a saved searches area."""
     return search_modal_elements.SavedSearchesArea(self._root)
+
+  @property
+  def saved_searches_titles(self):
+    """Returns list of titles of saved searches."""
+    return [search.title for search in self.saved_searches_area.saved_searches]
 
   def search_obj(self, obj):
     """Search object via Global Search.
@@ -31,12 +40,23 @@ class GlobalSearch(base.WithBrowser):
     self.search_filter_area.search_obj(obj)
     return self.search_results_area.get_result_by(title=obj.title)
 
+  def create_and_save_searches(self, objs):
+    """Creates searches for each obj.
+    Returns list of searches titles """
+    return [self.create_and_save_search(obj) for obj in objs]
+
   def create_and_save_search(self, obj):
-    """Creates and saves a search via Global Search.
-    Waits until a new search is present in Saved Searches."""
+    """Creates and saves a search. Waits until a new search is
+    present in Saved Searches."""
     search_title = "search_for_{}".format(obj.title)
     self.search_filter_area.set_search_attributes(obj)
     self.search_filter_area.save_search(search_title)
     self.saved_searches_area.get_search_by_title(
-        search_title).wait_until(lambda search: search.present)
+        search_title).wait_until_present()
     return search_title
+
+  def remove_saved_search(self, search_title):
+    """Removes saved search by its title. Waits for java script."""
+    self.saved_searches_area.get_search_by_title(
+        search_title).click_remove()
+    selenium_utils.wait_for_js_to_load(self._driver)
