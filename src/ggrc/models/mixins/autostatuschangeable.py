@@ -5,10 +5,12 @@
 
 import collections
 import datetime
+import re
 
 from sqlalchemy import event
 from sqlalchemy import inspect
 from sqlalchemy.orm import session
+from sqlalchemy.orm.attributes import get_history
 
 from ggrc.access_control import roleable
 from ggrc.models import evidence
@@ -46,15 +48,17 @@ class AutoStatusChangeable(object):
       },
       'TRACKED_ATTRIBUTES': {
           'title',
-          'test_plan',
-          'notes',
-          'description',
           'slug',
           'start_date',
           'end_date',
           'design',
           'operationally',
           'assessment_type'
+      },
+      'RICH_TEXT_ATTRS': {
+          'test_plan',
+          'notes',
+          'description'
       }
   }
 
@@ -163,6 +167,33 @@ class AutoStatusChangeable(object):
     if self.status != self._reset_to_status:
       self.status = self._reset_to_status
 
+  @classmethod
+  def _check_need_status_change_for_richtext(cls, obj):
+    """
+    Compares text w/out tags and \n in rich-text fields.
+
+    For such fields (notes, description and test_plan) method compares
+    text without <p>, <br> and \n chars in order to have right line breaks
+    and consistent auto-status-changeable behavior.
+    """
+    # pylint: disable=invalid-name
+    # pylint: disable=protected-access
+
+    mapping = obj.FIRST_CLASS_EDIT_MAPPING
+    for attr in mapping['RICH_TEXT_ATTRS']:
+      val = get_history(obj, attr)
+      old_val = val.deleted
+      new_val = val.added
+
+      old_val = re.sub('<p>|</p>|<br>|\n', '', old_val[0]) \
+          if old_val else old_val
+      new_val = re.sub('<p>|</p>|<br>|\n', '', new_val[0]) \
+          if new_val else new_val
+      obj._need_status_reset = old_val != new_val
+      obj._reset_to_status = obj.PROGRESS_STATE
+      if obj._need_status_reset:
+        return
+
   @staticmethod
   def _date_has_changes(attr):
     """Detect if date attribute changed.
@@ -237,12 +268,19 @@ class AutoStatusChangeable(object):
       obj: (db.Model instance) Object on which to perform operations.
     """
     # pylint: disable=protected-access
+
     mapping = obj.FIRST_CLASS_EDIT_MAPPING
     has_attr_changes = any(cls._has_changes(obj, attr)
                            for attr in mapping['TRACKED_ATTRIBUTES'])
+    has_rich_attr_changes = any(cls._has_changes(obj, attr)
+                                for attr in mapping['RICH_TEXT_ATTRS'])
+
     if obj.status in mapping['MONITOR_STATES'] and has_attr_changes:
       obj._need_status_reset = True
       obj._reset_to_status = obj.PROGRESS_STATE
+
+    if obj.status in mapping['MONITOR_STATES'] and has_rich_attr_changes:
+      cls._check_need_status_change_for_richtext(obj)
 
   @classmethod
   def handle_custom_attribute_edit(cls, obj):

@@ -58,6 +58,8 @@ class ColumnHandler(object):
   value.
   """
 
+  # pylint: disable=too-many-instance-attributes
+
   # special marker to set the field empty
   EXPLICIT_EMPTY_VALUE = {"-", "--", "---"}
 
@@ -506,10 +508,10 @@ class EmailColumnHandler(ColumnHandler):
 
 
 class TextColumnHandler(ColumnHandler):
-  """ Single line text field handler """
+  """Single line text field handler."""
 
   def parse_item(self):
-    """ Remove multiple spaces and new lines from text """
+    """Remove multiple spaces and new lines from text."""
     value = self.raw_value or ""
     value = self.clean_whitespaces(value)
 
@@ -521,6 +523,35 @@ class TextColumnHandler(ColumnHandler):
   @staticmethod
   def clean_whitespaces(value):
     return re.sub(r'\s+', " ", value)
+
+
+class RichTextColumnHandler(TextColumnHandler):
+  """Multiline text handler for rich text fields."""
+
+  def parse_item(self):
+    """
+    Replace newline chars with <p></p> tags.
+
+    Remove multiple spaces and new lines from text.
+    """
+    value = self.raw_value or ""
+    lines = value.splitlines()
+    value = "".join(["<p>{}</p>".format(l) for l in lines])
+    value = self.clean_whitespaces(value)
+
+    if self.mandatory and not value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+
+    return value
+
+  def get_value(self):
+    """Replace <br> and <p></p> tags with newline char."""
+    value = getattr(self.row_converter.obj, self.key, self.value)
+    lines = re.sub("<p>|<br>", "", value).split("</p>")
+    value = "".join("{}\n".format(l) for l in lines)
+    value = value.replace("\n\n", "\n").rstrip("\n")
+
+    return value
 
 
 class MappingColumnHandler(ColumnHandler):

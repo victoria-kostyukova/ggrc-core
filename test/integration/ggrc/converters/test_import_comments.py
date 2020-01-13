@@ -134,5 +134,5 @@ class TestLCACommentsImport(TestCase):
     })
     self.assertEqual(response.status_code, 200)
     new_comment = Comment.query.first()
-    self.assertEqual(new_comment.description, "test description")
+    self.assertEqual(new_comment.description, u'<p>test description</p>')
     self.assertEqual(new_comment.custom_attribute_definition_id, cad.id)

@@ -15,6 +15,7 @@ import freezegun
 from mock import mock
 
 from ggrc import db
+from ggrc import models
 from ggrc import utils
 from ggrc.models import all_models
 from ggrc.access_control.role import get_custom_roles_for
@@ -1547,6 +1548,137 @@ class TestAssessmentImport(TestCase):
 
     self._check_csv_response(response, exp_errors)
 
+  @ddt.data(
+      (
+          "notes",
+          "Notes",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE
+      ),
+      (
+          "notes",
+          "Notes",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3\n",
+          models.Assessment.FINAL_STATE
+      ),
+      (
+          "description",
+          "Description",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE
+      ),
+      (
+          "description",
+          "Description",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3\n",
+          models.Assessment.FINAL_STATE
+      ),
+      (
+          "test_plan",
+          "Assessment Procedure",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE
+      ),
+      (
+          "test_plan",
+          "Assessment Procedure",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3\n",
+          models.Assessment.FINAL_STATE
+      ),
+  )
+  @ddt.unpack
+  def test_import_asmnt_with_richtext(self, attr_name, field_name, old_value,
+                                      new_value, from_status):
+    # pylint: disable=too-many-arguments
+    """
+    Test rich text fields preserve tags after import data without tags.
+
+    Test creates assessment with rich-text fields, that are stored with tags,
+    then imports this Assessment (changing tags to newlines).
+    Updated assessment should contain text with tags and the same
+    status as before, because text is unchanged in these fields.
+    """
+
+    kwargs = {attr_name: old_value}
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit,
+                                               status=from_status,
+                                               **kwargs)
+      assessment.add_person_with_role_name(user, "Verifiers")
+
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Audit", audit.slug),
+        (field_name, new_value),
+        ("State", from_status)
+    ]))
+    self._check_csv_response(resp, {})
+
+    assessment = all_models.Assessment.query.get(assessment.id)
+
+    self.assertEqual(old_value, getattr(assessment, attr_name))
+
+  @ddt.data(
+      (
+          "notes",
+          "Notes",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE
+      ),
+      (
+          "notes",
+          "Notes",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3\n",
+          models.Assessment.FINAL_STATE
+      ),
+  )
+  @ddt.unpack
+  def test_status_after_import_asmnt_with_richtext(self, attr_name, field_name,
+                                                   old_value, new_value,
+                                                   from_status):
+    # pylint: disable=too-many-arguments
+    """
+    Asmnt shouldn't change status after import data w. same text w/out tags.
+
+    Test creates assessment with rich-text fields, that are stored with tags,
+    then imports this Assessment (changing tags to newlines).
+    Updated assessment should contain text with tags and the same
+    status as before, because text is unchanged in these fields.
+    """
+
+    kwargs = {attr_name: old_value}
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit,
+                                               status=from_status,
+                                               **kwargs)
+      assessment.add_person_with_role_name(user, "Verifiers")
+
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Audit", audit.slug),
+        (field_name, new_value),
+        ("State", from_status)
+    ]))
+    self._check_csv_response(resp, {})
+
+    assessment = all_models.Assessment.query.get(assessment.id)
+
+    self.assertEqual(assessment.status, from_status)
+
   @ddt.data((True, "yes", "Completed", "Completed"),
             (False, "no", "Completed", "Completed"),
             (True, "no", "Completed", "In Progress"),
@@ -2058,3 +2190,65 @@ class TestAssessmentExport(TestCase):
     ]), dry_run=True)
 
     self._check_csv_response(response, {})
+
+  @ddt.data(
+      (
+          "notes",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE),
+      (
+          "notes",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3",
+          models.Assessment.FINAL_STATE),
+      (
+          "description",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE),
+      (
+          "description",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3",
+          models.Assessment.FINAL_STATE),
+      (
+          "test_plan",
+          u"<p>test plan</p>",
+          u"test plan",
+          models.Assessment.DONE_STATE),
+      (
+          "test_plan",
+          u"<p>1</p><p>2</p><p>3</p>",
+          u"1\n2\n3",
+          models.Assessment.FINAL_STATE),
+  )
+  @ddt.unpack
+  def test_export_assmnt_with_richtext(self, field_name, old_value,
+                                       new_value, from_status):
+    """Test rich text fields convert tags after export data with tags.
+
+    Test creates assessment with rich-text fields, that are stored with tags,
+    then exports this Assessment (changing tags to newlines).
+    Exported assessment should contain text with newlines and without
+    <p>, </p>, <br>"""
+
+    kwargs = {field_name: old_value}
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.AssessmentFactory(audit=audit,
+                                  status=from_status,
+                                  **kwargs)
+
+    data = [{
+        "object_name": "Assessment",
+        "filters": {
+            "expression": {},
+        },
+        "fields": [field_name],
+    }]
+
+    response = self.export_csv(data)
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(new_value, response.data)
+    self.assertNotIn(old_value, response.data)

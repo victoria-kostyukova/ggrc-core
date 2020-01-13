@@ -1031,12 +1031,12 @@ class TestExportMultipleObjects(TestCase):
     objects = model_cls.query.order_by(model_cls.test_plan).all()
     self.assertEqual(len(objects), 3)
     for num, obj in enumerate(objects):
-      self.assertEqual(obj.test_plan, "Procedure-{}".format(num))
+      self.assertEqual(obj.test_plan, u"<p>Procedure-{}</p>".format(num))
 
     obj_dicts = [
         {
             "Code*": obj.slug,
-            "Assessment Procedure": "Procedure-{}".format(i)
+            "Assessment Procedure": u"Procedure-{}".format(i)
         } for i, obj in enumerate(objects)
     ]
     search_request = [{
