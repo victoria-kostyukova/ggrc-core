@@ -174,12 +174,14 @@ describe('create-document-button component', () => {
     });
 
     describe('useExistingDocuments() method', () => {
-      it('should show confirm modal', () => {
-        spyOn(viewModel, 'showConfirm');
+      it('should show confirm modal', (done) => {
+        spyOn(viewModel, 'makeAdmin');
+        spyOn(viewModel, 'showConfirm').and.returnValue(Promise.resolve());
 
-        viewModel.useExistingDocuments([{}]);
-
-        expect(viewModel.showConfirm).toHaveBeenCalled();
+        viewModel.useExistingDocuments([{}]).then(() => {
+          expect(viewModel.showConfirm).toHaveBeenCalled();
+          done();
+        });
       });
 
       it('should add current user to document admins', (done) => {
@@ -213,12 +215,13 @@ describe('create-document-button component', () => {
       spyOn(viewModel, 'dispatch');
     });
 
-    it('should call uploadFiles method', () => {
-      spyOn(pickerUtils, 'uploadFiles').and.returnValue(Promise.resolve());
+    it('should call uploadFiles method', (done) => {
+      spyOn(pickerUtils, 'uploadFiles').and.returnValue(Promise.resolve([]));
 
-      viewModel.openPicker();
-
-      expect(pickerUtils.uploadFiles).toHaveBeenCalled();
+      viewModel.openPicker().then(() => {
+        expect(pickerUtils.uploadFiles).toHaveBeenCalled();
+        done();
+      });
     });
 
     it('should call mapDocuments method if file is picked', (done) => {

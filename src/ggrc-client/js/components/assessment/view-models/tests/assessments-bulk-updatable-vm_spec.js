@@ -143,6 +143,7 @@ describe('assessments-bulk-updatable-vm component', () => {
   describe('trackBackgroundTask() method', () => {
     it('calls notifier with specified params', () => {
       spyOn(NotifierUtils, 'notifier');
+      spyOn(BackgroundTaskUtils, 'trackStatus');
       viewModel.trackBackgroundTask();
 
       expect(NotifierUtils.notifier).toHaveBeenCalledWith(
