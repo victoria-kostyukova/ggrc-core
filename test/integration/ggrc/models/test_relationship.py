@@ -174,6 +174,28 @@ class TestRelationship(TestCase):
     self.assert200(resp)
     self.assertIsNone(r2)
 
+  def test_delete_related_relationship(self):
+    """Test internal user delete related relationship on request"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      objective = factories.ObjectiveFactory()
+      relationship1 = factories.RelationshipFactory(
+          source=program, destination=objective, is_external=False
+      )
+      relationship1_id = relationship1.id
+      relationship2 = factories.RelationshipFactory(
+          source=objective, destination=program, is_external=False
+      )
+      relationship2_id = relationship2.id
+
+    resp = self.api.delete(relationship1)
+    self.assert200(resp)
+
+    rel1 = all_models.Relationship.query.get(relationship1_id)
+    rel2 = all_models.Relationship.query.get(relationship2_id)
+    self.assertIsNone(rel1)
+    self.assertIsNone(rel2)
+
 
 @ddt.ddt
 class TestExternalRelationship(TestCase):
