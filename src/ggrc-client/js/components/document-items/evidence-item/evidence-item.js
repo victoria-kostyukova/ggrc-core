@@ -17,7 +17,10 @@ export default canComponent.extend({
     define: {
       canEdit: {
         get() {
-          return !this.attr('isEditIconDenied') && !this.attr('isLoading');
+          const isNew = this.attr('evidence').isNew();
+          return !this.attr('isEditIconDenied')
+            && !this.attr('isLoading')
+            && !isNew;
         },
       },
     },
