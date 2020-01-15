@@ -354,6 +354,23 @@ def init_hook():  # noqa
     # pylint: disable=unused-argument
     copy_snapshot_test_plan(objects)
 
+  @signals.Restful.model_deleted.connect_via(all_models.Relationship)
+  def handle_related_relationships(sender, obj, service):
+    """Handle deleting related relationships too"""
+    # pylint: disable=unused-argument
+    relationships = all_models.Relationship.query.filter(sa.and_(
+        all_models.Relationship.source_id == obj.destination_id,
+        all_models.Relationship.source_type == obj.destination_type,
+        all_models.Relationship.destination_type == obj.source_type,
+        all_models.Relationship.destination_id == obj.source_id,
+    )).all()
+
+    for rel in relationships:
+      db.session.delete(rel)
+      LOGGER.info(
+          "Deleted mirrored relationship with id=%d", rel.id
+      )
+
   @signals.Restful.collection_posted.connect_via(all_models.Relationship)
   def handle_comment_mapping(sender, objects=None, **kwargs):
     """Update Commentable.updated_at when Comment mapped."""
