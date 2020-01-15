@@ -318,7 +318,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.SystemOrProcess.NZ_OPTIONS)), response.data)
 
-  @ddt.data("Assessment", "Issue")
+  @ddt.data("Policy", "Regulation")
   def test_delete_tip_in_export_csv(self, model):
     """Tests if delete column has tip message in export file for {}"""
     data = {
