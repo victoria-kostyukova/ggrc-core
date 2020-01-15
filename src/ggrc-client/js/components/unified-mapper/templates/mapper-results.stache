@@ -20,6 +20,7 @@
         </mapper-results-columns-configuration>
       {{/disableColumnsConfiguration}}
       <mapper-results-items-header class="{{#useSnapshots}}is-snapshot{{/useSnapshots}}
+                                          {{#isWorkflowPart}}is-task-group{{/isWorkflowPart}}
                                           {{#searchOnly}}search-only{{/searchOnly}}
                                           {{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
                                    modelType:from="type"

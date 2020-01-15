@@ -13,6 +13,7 @@ import '../unarchive-link';
 import '../assessment/assessment-mapped-objects/assessment-mapped-objects';
 import '../assessment/assessment-evidence-objects/assessment-evidence-objects';
 import '../assessment/assessment-mapped-comments/assessment-mapped-comments';
+import './mapper-results-item-description';
 import template from './templates/mapper-results-item-details.stache';
 import * as businessModels from '../../models/business-models';
 
@@ -34,6 +35,18 @@ export default canComponent.extend({
         get() {
           const instance = this.attr('instance');
           return businessModels[instance.assessment_type].title_plural;
+        },
+      },
+      workflowLink: {
+        get() {
+          const instance = this.attr('instance');
+          let path;
+          if (instance.type === 'TaskGroup') {
+            path = `/workflows/${instance.workflow.id}#!task_group`;
+          } else if (instance.type === 'CycleTaskGroupObjectTask') {
+            path = `/workflows/${instance.workflow.id}#!current`;
+          }
+          return path;
         },
       },
     },

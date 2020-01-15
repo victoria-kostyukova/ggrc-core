@@ -32,15 +32,17 @@
         {{/is}}
       {{/if}}
     </div>
-    <div class="flex-box">
       {{#is(instance.type, "Person")}}
-        {{> people/mapper-item-description.stache}}
+        <div class="flex-box">
+          {{> people/mapper-item-description.stache}}
+        </div>
       {{else}}
-        {{> base_objects/mapper-item-description.stache}}
+        <mapper-results-item-description 
+          instance:from="instance" 
+          class="flex-box" />
       {{/is}}
-    </div>
     <div class="open-link-container">
-      <a href="{{firstnonempty instance.originalLink item.viewLink}}" target="_blank">
+      <a href="{{firstnonempty instance.originalLink item.viewLink workflowLink}}" target="_blank">
         Open in a new tab <i class="fa fa-angle-double-right"></i>
       </a>
     </div>

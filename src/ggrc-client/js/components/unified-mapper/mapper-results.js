@@ -62,6 +62,13 @@ export default canComponent.extend({
           return this.attr('columns.service').length;
         },
       },
+      isWorkflowPart: {
+        get() {
+          const workflowParts
+            = ['CycleTaskGroupObjectTask', 'TaskGroup', 'TaskGroupTask'];
+          return workflowParts.includes(this.attr('type'));
+        },
+      },
     },
     columns: {
       selected: [],

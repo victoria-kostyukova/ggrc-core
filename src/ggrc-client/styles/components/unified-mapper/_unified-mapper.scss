@@ -449,6 +449,10 @@ mapper-results-items-header {
     margin-left: 2 * $icon-width;
   }
 
+  &.is-task-group {
+    margin-right: 0;
+  }
+
   &.has-related-assessments {
     margin-right: $object-selection-item-with-related-assessments-width +
                   $related-assessment-button-width;
