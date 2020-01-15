@@ -4,7 +4,7 @@
 # pylint: disable=no-self-use, invalid-name, unused-argument
 from lib import base, users
 from lib.entities import entities_factory
-from lib.service import webui_facade
+from lib.service import webui_facade, webui_service
 
 
 class TestGlobalSearch(base.Test):
@@ -33,4 +33,23 @@ class TestGlobalSearch(base.Test):
     soft_assert.expect(not (search_modal.saved_searches_area.saved_searches[0].
                             permalink.exists),
                        "Copy link should not be displayed.")
+    soft_assert.assert_expectations()
+
+
+class TestAdvancedSearch(base.Test):
+  """Tests of Advanced Search."""
+
+  def test_saving_of_advanced_search(self, selenium, soft_assert, program,
+                                     controls_mapped_to_program,
+                                     control_mapped_to_program):
+    """Check saved searches are sorted by descending, saved search can be
+    removed, permalink appears near the search and works."""
+    search_modal = webui_service.ControlsService(
+        selenium).open_widget_of_mapped_objs(program).open_advanced_search()
+    controls_mapped_to_program.append(control_mapped_to_program)
+    webui_facade.check_order_and_removing_of_searches(
+        soft_assert, controls_mapped_to_program, search_modal)
+    webui_facade.check_permalink_of_advanced_search_works(
+        soft_assert, selenium, search_modal, [controls_mapped_to_program[1]],
+        program)
     soft_assert.assert_expectations()

@@ -8,7 +8,7 @@ import time
 
 from selenium.common import exceptions
 from selenium.common.exceptions import UnexpectedAlertPresentException
-from selenium.webdriver.common import action_chains
+from selenium.webdriver.common import action_chains, keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -385,3 +385,16 @@ def filter_by_text(elements, text):
   for element in elements:
     if element.text.lower() == text.lower():
       return element
+
+
+def paste_from_clipboard(element):
+  """Pastes from clipboard."""
+  element.clear()
+  element.send_keys(keys.Keys.LEFT_SHIFT, keys.Keys.INSERT)
+
+
+def open_url_in_new_tab(url):
+  """Opens url in a new tab. Switches webdriver to the new tab."""
+  browsers.get_driver().execute_script("window.open('{}', '_blank')".format(
+      url))
+  browsers.get_browser().windows()[1].use()

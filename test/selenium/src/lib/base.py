@@ -438,6 +438,11 @@ class FilterCommon(Component):
     self.text_box = TextInputField(driver, text_box_locator)
     self.button_submit = Button(driver, bt_submit_locator)
 
+  @property
+  def advanced_filter_btn(self):
+    """Returns Advanced filter button."""
+    return self._browser.element(class_name="advanced-filter")
+
   def enter_query(self, query):
     """Enter query to field."""
     self.text_box.enter_text(query)

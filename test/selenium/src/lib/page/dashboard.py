@@ -9,7 +9,7 @@ from lib import base, decorator, environment, url
 from lib.constants import locator
 from lib.element import tab_element, page_elements
 from lib.page import widget_bar, lhn
-from lib.page.modal import global_search
+from lib.page.modal import search_modal
 from lib.page.widget import object_modal, page_mixins
 from lib.utils import selenium_utils
 
@@ -138,7 +138,7 @@ class GenericHeader(base.Component):
   def open_global_search(self):
     """Clicks 'Global Search' button."""
     self.button_search.click()
-    return global_search.GlobalSearch()
+    return search_modal.GlobalSearch()
 
 
 class Header(GenericHeader):

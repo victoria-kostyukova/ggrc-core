@@ -15,8 +15,8 @@ class SearchFilterArea(object):
     self._root = container
     self._search_btn = self._root.button(text="Search")
     self.type_select_option = self._root.select(name="type-select")
-    self.filter_row = self._root.element(
-        class_name="filter-container__attribute")
+    self.filter_value = self._root.element(
+        class_name="filter-container__attribute").text_field(name="right")
     self.filter_name = self._root.element(
         class_name="autocomplete-dropdown__input-container")
     self.filter_operator = self._root.element(
@@ -42,7 +42,7 @@ class SearchFilterArea(object):
       filter_value = obj.title
     self._select_obj_type(obj)
     self._select_search_criteria(search_attr, filter_operator)
-    self._set_filter_value(filter_value)
+    self.set_filter_value(filter_value)
 
   def _select_obj_type(self, obj):
     """Selects object type."""
@@ -56,9 +56,9 @@ class SearchFilterArea(object):
     self.filter_name.parent().element(text=search_attr).click()
     self.filter_operator.option(value=filter_operator).click()
 
-  def _set_filter_value(self, value):
+  def set_filter_value(self, value):
     """Types value in to search criteria text box."""
-    self.filter_row.text_field(name="right").set(value)
+    self.filter_value.set(value)
 
   def _click_search(self):
     """Clicks `Search` button."""
@@ -73,6 +73,24 @@ class SearchFilterArea(object):
     self._save_search_row.text_field(
         css="[placeholder*='Save Search']").set(search_title)
     self._save_search_row.button(text="Save Search").click()
+
+
+class AdvancedSearchFilterArea(SearchFilterArea):
+  """Represents an upper filter area of Advanced search modal."""
+
+  def __init__(self, container):
+    super(AdvancedSearchFilterArea, self).__init__(container)
+    self._add_attribute_btn = self._root.button(text="Add Attribute")
+
+  def set_search_attributes(self, obj=None, filter_value=None,
+                            search_attr=element.Common.TITLE,
+                            filter_operator=value_aliases.EQUAL_OP):
+    """Selects attributes for search."""
+    if not filter_value:
+      filter_value = obj.title
+    self._add_attribute_btn.click()
+    self._select_search_criteria(search_attr, filter_operator)
+    self.set_filter_value(filter_value)
 
 
 class SearchResultsArea(object):
