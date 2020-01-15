@@ -354,3 +354,7 @@ class CADashboard(widget_bar.Dashboard):
 
 class Regulations(Widget):
   """Model for Regulations generic widgets."""
+
+
+class KeyReports(Widget):
+  """Model for Key Reports generic widgets."""
