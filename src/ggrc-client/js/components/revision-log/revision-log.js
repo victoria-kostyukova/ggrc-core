@@ -122,23 +122,13 @@ export default canComponent.extend({
 
       if (!this.attr('options.showLastReviewUpdates')) {
         return QueryParser.parse(
-          `${instance.type} not_empty_revisions_for ${instance.id} OR
-          source_type = ${instance.type} AND
-          source_id = ${instance.id} OR
-          destination_type = ${instance.type} AND
-          destination_id = ${instance.id}`);
+          `${instance.type} not_empty_revisions_for ${instance.id}`);
       } else {
         const reviewDate = moment(this.attr('review.last_reviewed_at'))
           .format('YYYY-MM-DD HH:mm:ss');
 
         return QueryParser.parse(
           `${instance.type} not_empty_revisions_for ${instance.id} AND
-          created_at >= "${reviewDate}" OR
-          source_type = ${instance.type} AND
-          source_id = ${instance.id} AND
-          created_at >= "${reviewDate}" OR
-          destination_type = ${instance.type} AND
-          destination_id = ${instance.id} AND
           created_at >= "${reviewDate}"`);
       }
     },
