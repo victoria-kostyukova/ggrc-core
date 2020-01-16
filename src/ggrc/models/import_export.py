@@ -86,6 +86,11 @@ class ImportExport(Identifiable, db.Model):
 
     return res
 
+  @property
+  def is_export(self):
+    """Checking ie_job is export or not"""
+    return self.job_type == self.EXPORT_JOB_TYPE
+
 
 def create_import_export_entry(**kwargs):
   """Create ImportExport entry"""
@@ -113,11 +118,8 @@ def get_jobs(job_type, ids=None):
                 ImportExport.job_type == job_type]
   if ids:
     conditions.append(ImportExport.id.in_(ids))
-  if job_type == 'Export':
-    return [ie.log_json(is_default=True, is_export=True)
-            for ie in ImportExport.query.filter(*conditions)]
 
-  return [ie.log_json(is_default=True)
+  return [ie.log_json(is_default=True, is_export=ie.is_export)
           for ie in ImportExport.query.filter(*conditions)]
 
 

@@ -22,9 +22,9 @@ from integration.ggrc.models import factories
 
 @base.with_memcache
 class TestExportSQLError(TestCase):
-  """Test for failed exoprt due SQL error"""
+  """Test for failed export due to SQL error."""
 
-  def setUp(self):
+  def setUp(self):  # pylint: disable=missing-docstring
     super(TestExportSQLError, self).setUp()
     self.client.get("/login")
     self.headers = {
@@ -40,13 +40,10 @@ class TestExportSQLError(TestCase):
     flask.g.__setattr__('_current_user', user)
     op_type = all_models.BackgroundOperationType.query.filter_by(
         name='export'
-    ).first()
+    ).one()
 
     with factories.single_commit():
-      factories.ProgramFactory()
-
-    program = all_models.Program.query.first()
-    with factories.single_commit():
+      program = factories.ProgramFactory()
       ie_job = factories.ImportExportFactory(
           job_type='Export',
           status='In Progress',
@@ -55,12 +52,10 @@ class TestExportSQLError(TestCase):
           title="test.csv",
       )
 
-    ie_job_id = ie_job.id
-    with factories.single_commit():
       bg_task = factories.BackgroundTaskFactory(
           name='test export',
           parameters={
-              "ie_id": ie_job_id,
+              "ie_id": ie_job.id,
               "objects": [{
                   'object_name': program.type,
                   'filters': {'expression': {}},
@@ -69,7 +64,7 @@ class TestExportSQLError(TestCase):
               "exportable_objects": [],
               "parent": {
                   "type": "ImportExport",
-                  "id": ie_job_id,
+                  "id": ie_job.id,
               }
           }
       )
@@ -89,9 +84,7 @@ class TestExportSQLError(TestCase):
       )
       run_export(bg_task)
 
-    ie_result = db.session.query(all_models.ImportExport).filter(
-        all_models.ImportExport.id == ie_job_id
-    ).first()
+    ie_result = db.session.query(all_models.ImportExport).get(ie_job.id)
 
     expected_response = ie_result.log_json(is_default=True, is_export=True)
     response = self.client.get(

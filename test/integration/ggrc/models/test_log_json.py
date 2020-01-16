@@ -5,6 +5,7 @@
 
 from types import NoneType
 from datetime import datetime
+
 import ddt
 
 from ggrc.models import all_models
@@ -38,7 +39,7 @@ class TestLogJson(TestCase):
   ERROR_MESSAGE = "Model {} has problem with field {}, " \
                   "after calling log_json, it == {}"
 
-  def setUp(self):
+  def setUp(self):  # pylint: disable=missing-docstring
     super(TestLogJson, self).setUp()
     self.client.get("/login")
 

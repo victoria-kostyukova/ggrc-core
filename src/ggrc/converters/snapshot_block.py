@@ -127,15 +127,10 @@ class SnapshotBlockConverter(object):
 
     The content of the given snapshots also contains the mapped audit field.
     """
-    def _prepare_chunk(self):
-      """Separate list of ids on chunks"""
-      for chunk in utils.list_chunks(self.ids, 100):
-        yield chunk
-
     def _prepare_snapshots(self):
       """Get snapshots models by ids chunks"""
       with benchmark("Gather selected snapshots"):
-        for chunk in _prepare_chunk(self):
+        for chunk in utils.list_chunks(self.ids, 100):
           if not chunk:
             yield []
           _app_ctx_stack.top.sqlalchemy_queries = []

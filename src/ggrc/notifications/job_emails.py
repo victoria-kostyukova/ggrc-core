@@ -53,6 +53,14 @@ EXPORT_CRASHED = {
     "url": u"export"
 }
 
+EXPORT_CRASHED_TOO_MANY_ITEMS = {
+    "title": (u"[WARNING] Your GGRC export request did not finish due "
+              u"to errors"),
+    "body": u"Too many items. The export cannot be processed. "
+            u"Please contact our support team.",
+    "url": u"export"
+}
+
 
 def send_email(template, send_to, filename="", ie_id=None):
   """ Send email """
