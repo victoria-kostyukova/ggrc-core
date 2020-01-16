@@ -43,7 +43,6 @@ MARKETS = "markets"
 RISKS = "risks"
 THREATS = "threats"
 CUSTOM_ATTRIBUTES = "custom_attribute_definitions"
-EXTERNAL_CUSTOM_ATTRIBUTES = "external_" + CUSTOM_ATTRIBUTES
 COMMENTS = "comments"
 SNAPSHOTS = "snapshots"
 TASK_GROUPS = "task_groups"
@@ -180,8 +179,7 @@ def get_obj_type(obj_name):
   return get_singular(obj_name, title=obj_name != CUSTOM_ATTRIBUTES)
 
 
-EXTERNAL_END_POINTS = [get_singular(x) for x
-                       in ALL_DISABLED_OBJECTS + (EXTERNAL_CUSTOM_ATTRIBUTES,)]
+EXTERNAL_END_POINTS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]
 
 SINGULAR_DISABLED_OBJS = [get_singular(x) for x in DISABLED_OBJECTS]
 ALL_SINGULAR_DISABLED_OBJS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]

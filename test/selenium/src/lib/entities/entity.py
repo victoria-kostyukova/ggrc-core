@@ -748,7 +748,7 @@ class CustomAttributeDefinitionEntity(Representation):
         "title", "id", "href", "type", "definition_type", "attribute_type",
         "helptext", "placeholder", "mandatory", "multi_choice_options",
         "created_at", "updated_at", "modified_by", "multi_choice_mandatory",
-        **attrs)
+        "external_name", "entity_name", **attrs)
 
   def __lt__(self, other):
     return self.title < other.title

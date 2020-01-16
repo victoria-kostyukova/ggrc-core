@@ -333,8 +333,14 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
       attrs["multi_choice_options"] = None
     if attrs["definition_type"] != objects.ASSESSMENTS.title():
       attrs.setdefault("mandatory", False)
-    if attrs["definition_type"] in objects.EXTERNAL_END_POINTS:
-      attrs["id"] = self.generate_external_id()
+    if attrs["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS:
+      attrs["id"] = attrs["external_id"] = self.generate_external_id()
+      attrs["external_name"] = "{}_{}_123123".format(
+          attrs["definition_type"].capitalize(),
+          attrs["attribute_type"]
+      )
+      attrs["entity_name"] = objects.get_normal_form(
+          objects.get_singular(objects.CUSTOM_ATTRIBUTES)).replace(" ", "")
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:
