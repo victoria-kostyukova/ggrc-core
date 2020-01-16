@@ -6,263 +6,258 @@
 <div class="ggrc-form">
   <assessment-modal instance:from="instance" isNewInstance:from="new_object_form">
     {{#instance}}
-  <form action="javascript://">
-
-    {{^if new_object_form}}
-      {{#if_in instance.status 'Completed,Verified,In Review'}}
-        {{#if_helpers '\n #if' instance.isDirty '\n or #if' instance._pendingJoins.length}}
-        <div class="ggrc-form-item">
-          <div class="alert width-100">
-            <i class="fa fa-exclamation-triangle"></i>
-            You are about to move assessment from "{{instance.status}}" to "In Progress".
-          </div>
-        </div>
-        {{/if_helpers}}
-      {{/if_in}}
-    {{/if}}
-
-    <div class="ggrc-form-item ggrc-form-item_m-b-0">
-      <div class="ggrc-form-item__multiple-row">
-        <label class="form-label ggrc-form-item__label">
-          Assessment Type
-        </label>
-        <assessment-object-type-dropdown class="input-medium"
-                                         instance:from="instance"
-                                          assessmentType:bind="instance.assessment_type">
-          <dropdown-component
-            optionsGroups:from="objectTypes"
-            isGroupedDropdown:from="true"
-            name:bind="assessmentType">
-          </dropdown-component>
-        </assessment-object-type-dropdown>
-      </div>
-      <div class="ggrc-form-item__multiple-row multi-select-label-container">
-        <label class="form-label ggrc-form-item__label">
-          Label
-        </label>
-        <multi-select-label onlyEditMode:from="true"
-                            instance:from="instance"
-                            labels:from="instance.labels">
-        </multi-select-label>
-      </div>
-    </div>
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__checkbox-item assessment-procedure-message">
-       <label class="assessment-procedure-message__label">
-        <input type="checkbox" class="assessment-procedure-message__checkbox"
-           el:checked:bind="instance.test_plan_procedure"/>
-         Copy Assessment Procedure from mapped object
-       </label>
-       <i class="fa fa-question-circle assessment-procedure-message__icon" rel="tooltip" title="Assessment procedure will be copied at the moment of mapping object"></i>
-      </div>
-    </div>
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-        <label class="form-label ggrc-form-item__label form-label__extended">
-          Title
-          <i class="fa fa-asterisk"></i>
-        </label>
-        <input type="text" tabindex="2"
-               class="input-block-level" placeholder="Enter Title"
-               name="title" value:from="title" autofocus>
-        {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
-      </div>
-    </div>
-
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__row">
-        <label class="ggrc-form-item__label">
-          Assessment Procedure
-        </label>
-        <rich-text tabindex="3"
-            hiddenToolbar:from="true"
-            placeholder:from="'Enter Assessment Procedure'"
-            content:bind="test_plan">
-        </rich-text>
-      </div>
-    </div>
-
-    <div class="ggrc-form-item width-100">
-      <div class="ggrc-form-item__row">
-      <assessment-people instance:from="instance"
-                          infoPaneMode:from="false"
-                          isNewInstance:from="new_object_form">
-      </assessment-people>
-      </div>
-    </div>
-
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__row ggrc-from-item__checkbox-list">
-        <assessment-notifications
-          sendByDefault:from="send_by_default"
-          instance:from="instance"
-          class="flex-box"
-        />
-
-      </div>
-    </div>
-
-    {{#if new_object_form}}
-      <div class="ggrc-form-item">
-        <div class="ggrc-form-item__row">
-          <label class="ggrc-form-item__label assessment-template-dropdown">
-            Select Assessment Template
-            <i class="fa fa-question-circle"
-              rel="tooltip"
-              title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
-            </i>
-          </label>
-          <div class="template-select">
-            <assessment-templates-dropdown
-              instance:from="instance.audit"
-              extraClassName:from="'template-select__dropdown'"
-              on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
-            <spinner-component
-              class="template-select__spinner"
-              toggle:from="isInitialTemplateLoading" />
-          </div>
-        </div>
-      </div>
-      {{#if assessmentTemplate}}
-        {{#if assessmentTemplate.sox_302_enabled}}
+      <form action="javascript://">
+        {{#if showStatusChangeMessage}}
           <div class="ggrc-form-item">
-            <div class="ggrc-form-item__row alert alert-nomargin">
-              This assessment template enables “302 assessment workflow”:
-              <p>
-                - Assignees will have read only permissions upon assessment completion.
-              </p>
-              <p>
-                - Verification step will be skipped if only positive answers are given for the assessment.
-              </p>
+            <div class="alert width-100">
+              <i class="fa fa-exclamation-triangle"></i>
+              You are about to move assessment from "{{instance.status}}" to "In Progress".
             </div>
           </div>
         {{/if}}
+
+        <div class="ggrc-form-item ggrc-form-item_m-b-0">
+          <div class="ggrc-form-item__multiple-row">
+            <label class="form-label ggrc-form-item__label">
+              Assessment Type
+            </label>
+            <assessment-object-type-dropdown class="input-medium"
+                                            instance:from="instance"
+                                              assessmentType:bind="instance.assessment_type">
+              <dropdown-component
+                optionsGroups:from="objectTypes"
+                isGroupedDropdown:from="true"
+                name:bind="assessmentType">
+              </dropdown-component>
+            </assessment-object-type-dropdown>
+          </div>
+          <div class="ggrc-form-item__multiple-row multi-select-label-container">
+            <label class="form-label ggrc-form-item__label">
+              Label
+            </label>
+            <multi-select-label onlyEditMode:from="true"
+                                instance:from="instance"
+                                labels:from="instance.labels">
+            </multi-select-label>
+          </div>
+        </div>
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__checkbox-item assessment-procedure-message">
+          <label class="assessment-procedure-message__label">
+            <input type="checkbox" class="assessment-procedure-message__checkbox"
+              el:checked:bind="instance.test_plan_procedure"/>
+            Copy Assessment Procedure from mapped object
+          </label>
+          <i class="fa fa-question-circle assessment-procedure-message__icon" rel="tooltip" title="Assessment procedure will be copied at the moment of mapping object"></i>
+          </div>
+        </div>
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+            <label class="form-label ggrc-form-item__label form-label__extended">
+              Title
+              <i class="fa fa-asterisk"></i>
+            </label>
+            <input type="text" tabindex="2"
+                  class="input-block-level" placeholder="Enter Title"
+                  name="title" value:from="title" autofocus>
+            {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
+          </div>
+        </div>
+
         <div class="ggrc-form-item">
           <div class="ggrc-form-item__row">
-              <label class="ggrc-form-item__label">
-                Custom Attributes
-              </label>
-              <assessment-template-attributes
-                instance:from="assessmentTemplate"
-                fields:from="assessmentTemplate.custom_attribute_definitions"
-                isLoading:from="isAttributesLoading"
-                editMode:from="false" />
+            <label class="ggrc-form-item__label">
+              Assessment Procedure
+            </label>
+            <rich-text tabindex="3"
+                hiddenToolbar:from="true"
+                placeholder:from="'Enter Assessment Procedure'"
+                content:bind="test_plan">
+            </rich-text>
           </div>
         </div>
-      {{/if}}
-    {{/if}}
 
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__row">
-        <deferred-mapper class="width-100"
-                        instance:from="instance"
-                        useSnapshots:from="true"
-                        on:vm:addMappings="addMappingObjects(scope.event)"
-                        on:vm:removeMappings="removeMappingObject(scope.event)">
-          <label class="ggrc-form-item__label">
-            Mapped Objects
-          </label>
-          <div class="modal-mapped-objects">
-            {{#each mappingsList}}
-              <div class="modal-mapped-objects-item">
-                <div class="modal-mapped-objects-item__details">
-                  <business-object-list-item instance:from="{.}">
-                    <div class="description">
-                      <read-more
-                        text:from="itemData.description"
-                        maxLinesNumber:from="1"
-                        handleMarkdown:from="instance.constructor.isChangeableExternally">
-                      </read-more>
-                    </div>
-                  </business-object-list-item>
-                </div>
-                <div class="modal-mapped-objects-item__unmap">
-                  {{#if new_object_form}}
-                    <a href="javascript://" on:el:click="removeMappings(.)">
-                      <i class="fa fa-trash"></i>
-                    </a>
-                  {{/if}}
+        <div class="ggrc-form-item width-100">
+          <div class="ggrc-form-item__row">
+          <assessment-people instance:from="instance"
+                              infoPaneMode:from="false"
+                              isNewInstance:from="new_object_form">
+          </assessment-people>
+          </div>
+        </div>
+
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row ggrc-from-item__checkbox-list">
+            <assessment-notifications
+              sendByDefault:from="send_by_default"
+              instance:from="instance"
+              class="flex-box"
+            />
+
+          </div>
+        </div>
+
+        {{#if new_object_form}}
+          <div class="ggrc-form-item">
+            <div class="ggrc-form-item__row">
+              <label class="ggrc-form-item__label assessment-template-dropdown">
+                Select Assessment Template
+                <i class="fa fa-question-circle"
+                  rel="tooltip"
+                  title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
+                </i>
+              </label>
+              <div class="template-select">
+                <assessment-templates-dropdown
+                  instance:from="instance.audit"
+                  extraClassName:from="'template-select__dropdown'"
+                  on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+                <spinner-component
+                  class="template-select__spinner"
+                  toggle:from="isInitialTemplateLoading" />
+              </div>
+            </div>
+          </div>
+          {{#if assessmentTemplate}}
+            {{#if assessmentTemplate.sox_302_enabled}}
+              <div class="ggrc-form-item">
+                <div class="ggrc-form-item__row alert alert-nomargin">
+                  This assessment template enables “302 assessment workflow”:
+                  <p>
+                    - Assignees will have read only permissions upon assessment completion.
+                  </p>
+                  <p>
+                    - Verification step will be skipped if only positive answers are given for the assessment.
+                  </p>
                 </div>
               </div>
-            {{/each}}
-          </div>
-          {{#is_allowed "read" instance.audit context="for"}}
-            <div class="objective-selector">
-              <map-button-using-assessment-type
-                instance:from="instance">
-                  <a class="btn btn-small btn-white"
-                    href="javascript://"
-                    {{initDeferredData instance mappingsList}}
-                    on:el:click="onMapObjectsClick(scope.element, scope.event)"
-                    data-placement="left"
-                    data-deferred="true"
-                    data-is-new="{{new_object_form}}"
-                    data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.constructor.model_singular}}"
-                    tabindex="8"
-                    data-snapshot-scope-id="{{instance.audit.id}}"
-                    data-snapshot-scope-type="{{instance.audit.type}}"
-                  >
-                    Map Objects
-                  </a>
-              </map-button-using-assessment-type>
+            {{/if}}
+            <div class="ggrc-form-item">
+              <div class="ggrc-form-item__row">
+                  <label class="ggrc-form-item__label">
+                    Custom Attributes
+                  </label>
+                  <assessment-template-attributes
+                    instance:from="assessmentTemplate"
+                    fields:from="assessmentTemplate.custom_attribute_definitions"
+                    isLoading:from="isAttributesLoading"
+                    editMode:from="false" />
+              </div>
             </div>
-          {{/is_allowed}}
-        </deferred-mapper>
-      </div>
-    </div>
+          {{/if}}
+        {{/if}}
 
-    <div class="additional-fields">
-      <div class="expand-link">
-        <a tabindex="9" class="show-hidden-fields info-show-hide active" href="javascript://">
-          <span class="out">
-            <i class="fa fa-caret-right"></i>
-            SHOW
-          </span>
-          <span class="in">
-            <i class="fa fa-caret-down"></i>
-            HIDE
-          </span>
-          ADDITIONAL FIELDS
-        </a>
-      </div>
-      <div class="hidden-fields-area">
-        {{> assessments/modal-content-additional-fields.stache}}
-      </div>
-    </div>
-
-    {{#if instance.can_use_issue_tracker}}
-      <div class="additional-fields">
-        <div class="expand-issue-tracker-link">
-          <a class="show-hidden-fields info-show-hide active" href="javascript://">
-            <span class="out">
-              <i class="fa fa-caret-right"></i>
-              SHOW
-            </span>
-            <span class="in">
-              <i class="fa fa-caret-down"></i>
-              HIDE
-            </span>
-            TICKET TRACKER INFO
-          </a>
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row">
+            <deferred-mapper class="width-100"
+                            instance:from="instance"
+                            useSnapshots:from="true"
+                            on:vm:addMappings="addMappingObjects(scope.event)"
+                            on:vm:removeMappings="removeMappingObject(scope.event)">
+              <label class="ggrc-form-item__label">
+                Mapped Objects
+              </label>
+              <div class="modal-mapped-objects">
+                {{#each mappingsList}}
+                  <div class="modal-mapped-objects-item">
+                    <div class="modal-mapped-objects-item__details">
+                      <business-object-list-item instance:from="{.}">
+                        <div class="description">
+                          <read-more
+                            text:from="itemData.description"
+                            maxLinesNumber:from="1"
+                            handleMarkdown:from="instance.constructor.isChangeableExternally">
+                          </read-more>
+                        </div>
+                      </business-object-list-item>
+                    </div>
+                    <div class="modal-mapped-objects-item__unmap">
+                      {{#if new_object_form}}
+                        <a href="javascript://" on:el:click="removeMappings(.)">
+                          <i class="fa fa-trash"></i>
+                        </a>
+                      {{/if}}
+                    </div>
+                  </div>
+                {{/each}}
+              </div>
+              {{#is_allowed "read" instance.audit context="for"}}
+                <div class="objective-selector">
+                  <map-button-using-assessment-type
+                    instance:from="instance">
+                      <a class="btn btn-small btn-white"
+                        href="javascript://"
+                        {{initDeferredData instance mappingsList}}
+                        on:el:click="onMapObjectsClick(scope.element, scope.event)"
+                        data-placement="left"
+                        data-deferred="true"
+                        data-is-new="{{new_object_form}}"
+                        data-join-object-id="{{instance.id}}"
+                        data-join-object-type="{{instance.constructor.model_singular}}"
+                        tabindex="8"
+                        data-snapshot-scope-id="{{instance.audit.id}}"
+                        data-snapshot-scope-type="{{instance.audit.type}}"
+                      >
+                        Map Objects
+                      </a>
+                  </map-button-using-assessment-type>
+                </div>
+              {{/is_allowed}}
+            </deferred-mapper>
+          </div>
         </div>
-        <div class="hidden-issue-tracker-fields-area">
-          <issue-tracker-switcher
-            setIssueTitle:from="true"
-            defaultTitle:from="instance.title"
-            instance:from="instance"
-            isIntegrationEnabled:bind="instance.issue_tracker.enabled">
-              <modal-issue-tracker-fields
+
+        <div class="additional-fields">
+          <div class="expand-link">
+            <a tabindex="9" class="show-hidden-fields info-show-hide active" href="javascript://">
+              <span class="out">
+                <i class="fa fa-caret-right"></i>
+                SHOW
+              </span>
+              <span class="in">
+                <i class="fa fa-caret-down"></i>
+                HIDE
+              </span>
+              ADDITIONAL FIELDS
+            </a>
+          </div>
+          <div class="hidden-fields-area">
+            {{> assessments/modal-content-additional-fields.stache}}
+          </div>
+        </div>
+
+        {{#if instance.can_use_issue_tracker}}
+          <div class="additional-fields">
+            <div class="expand-issue-tracker-link">
+              <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                <span class="out">
+                  <i class="fa fa-caret-right"></i>
+                  SHOW
+                </span>
+                <span class="in">
+                  <i class="fa fa-caret-down"></i>
+                  HIDE
+                </span>
+                TICKET TRACKER INFO
+              </a>
+            </div>
+            <div class="hidden-issue-tracker-fields-area">
+              <issue-tracker-switcher
+                setIssueTitle:from="true"
+                defaultTitle:from="instance.title"
                 instance:from="instance"
-                mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.'"
-                note:from="'Turns on Ticket Tracker integration.'">
-              </modal-issue-tracker-fields>
-          </issue-tracker-switcher>
-        </div>
-      </div>
-    {{/if}}
+                isIntegrationEnabled:bind="instance.issue_tracker.enabled">
+                  <modal-issue-tracker-fields
+                    instance:from="instance"
+                    mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.'"
+                    note:from="'Turns on Ticket Tracker integration.'">
+                  </modal-issue-tracker-fields>
+              </issue-tracker-switcher>
+            </div>
+          </div>
+        {{/if}}
 
-  </form>
-  {{/instance}}
+      </form>
+    {{/instance}}
   </assessment-modal>
 </div>
