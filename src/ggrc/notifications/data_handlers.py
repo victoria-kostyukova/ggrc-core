@@ -253,15 +253,13 @@ def _get_assignable_dict(people, notif, ca_cache=None):
       list.
   """
   obj = get_notification_object(notif)
-  roles = _get_assignable_roles(obj)
   data = {}
 
-  # we do not use updated_data data if notification name not assessment update
   if notif.notification_type.name == "assessment_updated":
     definitions = AttributeInfo.get_object_attr_definitions(obj.__class__,
                                                             ca_cache=ca_cache)
     updated_data = _get_updated_fields(obj, notif.created_at, definitions,
-                                       roles)
+                                       _get_assignable_roles(obj))
     if not updated_data:
       return data
   else:
