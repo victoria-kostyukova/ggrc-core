@@ -41,7 +41,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_string_123123",
-        "entity_name": "CustomAttributeDefinition",
+        "external_type": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -61,7 +61,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_html_123123",
-        "entity_name": "CustomAttributeDefinition",
+        "external_type": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -80,7 +80,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "context": None,
         "external_id": 1,
         "external_name": "control_date_123123",
-        "entity_name": "CustomAttributeDefinition",
+        "external_type": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -100,7 +100,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "external_id": 1,
         "external_name": "control_dropdown_123123",
         "multi_choice_options": "1,3,2",
-        "entity_name": "CustomAttributeDefinition",
+        "external_type": "CustomAttributeDefinition",
     }
 
   @staticmethod
@@ -120,7 +120,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         "external_id": 1,
         "external_name": "control_multistring_123123",
         "multi_choice_options": "1,3,2",
-        "entity_name": "CustomAttributeDefinition",
+        "external_type": "CustomAttributeDefinition",
     }
 
   @classmethod
@@ -290,7 +290,7 @@ class TestExternalGlobalCustomAttributes(ProductTestCase):
         definition_type="control",
         attribute_type=attribute_type,
         external_id=1,
-        entity_name="CustomAttributeDefinition",
+        external_type="CustomAttributeDefinition",
         multi_choice_options="1,3,2",
     )
     attribute_payload = self._get_payload(attribute_type)
@@ -344,7 +344,7 @@ class TestECADReindex(query_helper.WithQueryApi, ggrc.TestCase):
             "external_id": 2,
             "external_name": "%s_%s_123123" %
                              (definition_type, attribute_type.lower()),
-            "entity_name": "CustoAttributeDefinition",
+            "external_type": "CustomAttributeDefinition",
             "title": title,
             "attribute_type": attribute_type,
             "definition_type": definition_type,
@@ -490,13 +490,13 @@ class TestECADResponse(ggrc.TestCase):
             "helptext": "Help Text",
             "placeholder": "Some Placeholder",
             "multi_choice_options": "opt1,opt2",
-            "entity_name": "CustomAttributeDefinition",
+            "external_type": "CustomAttributeDefinition",
         }
     }
     ecad_model = models.all_models.CustomAttributeDefinition
     response = self.ext_api.post(ecad_model, data=cad_body)
     self.assert201(response)
-    cad_body["custom_attribute_definition"].pop("entity_name")
+    cad_body["custom_attribute_definition"].pop("external_type")
     cad_body["custom_attribute_definition"].pop("external_id")
     check_attrs = cad_body["custom_attribute_definition"].keys()
     for attr in check_attrs:

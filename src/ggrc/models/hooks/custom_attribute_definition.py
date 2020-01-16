@@ -5,8 +5,9 @@
 
 from ggrc import models, views
 from ggrc.services import signals
-from ggrc.models import get_model
 from ggrc.models import custom_attribute_definition as cad
+from ggrc.models import external_mapper
+from ggrc.models import get_model
 from ggrc.models.mixins import synchronizable
 
 
@@ -72,4 +73,4 @@ def init_hook():
     """
     model = get_model(obj.definition_type)
     if issubclass(model, synchronizable.Synchronizable):
-      views.create_external_mapping(obj, src)
+      external_mapper.create_external_mapping(obj, src)
