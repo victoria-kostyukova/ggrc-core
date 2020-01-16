@@ -38,7 +38,7 @@ def contributed_services():
       service('external_comments', models.ExternalComment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition,
-              external_internal.ExternalInternalResource),
+              external_internal.ExternalInternalCADResource),
       service('external_custom_attribute_definitions',
               models.ExternalCustomAttributeDefinition,
               external.ExternalCADResource),

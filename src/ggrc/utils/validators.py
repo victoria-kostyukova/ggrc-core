@@ -90,3 +90,21 @@ def validate_name_correctness(name):
     if name_to_validate == invalid:
       raise ValueError(u"'{}' is reserved word and should not be used as "
                        u"an name".format(invalid))
+
+
+def validate_cad_attrs_update(init_state, src, attr):
+  """
+      Validate and restrict update CADs attributes by internal users.
+  Args:
+    init_state: namedtuple() with initial states of obj attributes
+    src: dict() data from request
+    attr: str() key of attribute
+  """
+  from ggrc import login as login_module
+
+  should_prevent = all([src[attr] != getattr(init_state, attr),
+                        not login_module.is_external_app_user()])
+
+  # TODO: GGRC-8430, find better solution
+  if should_prevent:
+    src[attr] = getattr(init_state, attr)

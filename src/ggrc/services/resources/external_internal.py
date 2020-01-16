@@ -5,6 +5,7 @@
 
 from ggrc import login
 from ggrc.services import common
+from ggrc.utils import validators
 
 
 class ExternalInternalResource(common.Resource):
@@ -18,3 +19,27 @@ class ExternalInternalResource(common.Resource):
     return super(
         ExternalInternalResource, self
     ).validate_headers_for_put_or_delete(obj)
+
+
+class ExternalInternalCADResource(ExternalInternalResource):
+  """Resource handler for CustomAttributeDefinition model."""
+
+  def put(self, id):
+    """
+        This is to extend the put request for additional data.
+    Args:
+      id: int() requested object id.
+    Returns:
+        View function
+    """
+    from ggrc.models import CustomAttributeDefinition as cad
+
+    obj = cad.query.get(id)
+    src = common.request.json["custom_attribute_definition"]
+    read_only_attrs = {"title", }
+    if src.get("multi_choice_options"):
+      read_only_attrs.add("multi_choice_options")
+    for attr in read_only_attrs:
+      validators.validate_cad_attrs_update(obj, src, attr)
+
+    return super(ExternalInternalCADResource, self).put(id)
