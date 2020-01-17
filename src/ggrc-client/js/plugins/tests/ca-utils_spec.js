@@ -4,6 +4,7 @@
 */
 
 import canMap from 'can-map';
+import loEvery from 'lodash/every';
 import {
   ddValidationMapToValue,
   isCommentRequired,
@@ -11,6 +12,7 @@ import {
   isUrlRequired,
   setCustomAttributeValue,
 } from '../utils/ca-utils';
+import Stub from '../../models/stub';
 
 describe('ca-utils', function () {
   describe('methods to validate requirements', function () {
@@ -161,15 +163,24 @@ describe('ca-utils', function () {
         expect(ca.attr('attribute_value')).toBe('Person');
       });
 
-      it('assigns object with specified id to "attribute_object" attr',
+      it('assigns stub instaces to "attribute_objects" attr',
         function () {
-          let value = 'mockValue';
+          const value = [{id: 1}, {id: 2}, {id: 3}];
           setCustomAttributeValue(ca, value);
+          const attributeObjects = ca.attr('attribute_objects');
+          const isStubInstances =
+            loEvery(attributeObjects, (obj) => obj instanceof Stub);
 
-          expect(ca.attr('attribute_object').serialize()).toEqual({
-            type: 'Person',
-            id: value,
-          });
+          expect(isStubInstances).toBe(true);
+        });
+
+      it('assigns stub for every object to "attribute_objects" attr',
+        function () {
+          const value = [{id: 1}, {id: 2}, {id: 3}];
+          setCustomAttributeValue(ca, value);
+          const attributeObjects = ca.attr('attribute_objects').serialize();
+
+          expect(attributeObjects.length).toEqual(value.length);
         });
     });
   });

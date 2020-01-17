@@ -6,6 +6,9 @@
 import canCompute from 'can-compute';
 import canList from 'can-list';
 import canMap from 'can-map';
+import loMap from 'lodash/map';
+import Stub from '../../models/stub';
+
 let customAttributesType = {
   Text: 'input',
   'Rich Text': 'text',
@@ -100,10 +103,10 @@ function getCustomAttributeType(type) {
  * Converts custom attribute value for UI controls.
  * @param {String} type - Custom attribute type
  * @param {Object} value - Custom attribute value
- * @param {Object} valueObj - Custom attribute object
+ * @param {Array<Object>} valueObjects - original list of Custom Attribute Objects
  * @return {Object} Converted value
  */
-function convertFromCaValue(type, value, valueObj) {
+function convertFromCaValue(type, value, valueObjects) {
   if (type === 'checkbox') {
     return value === '1';
   }
@@ -116,8 +119,8 @@ function convertFromCaValue(type, value, valueObj) {
   }
 
   if (type === 'person') {
-    if (valueObj) {
-      return valueObj.id;
+    if (valueObjects) {
+      return valueObjects;
     }
     return null;
   }
@@ -149,7 +152,7 @@ function prepareCustomAttributes(definitions, values) {
       id: null,
       custom_attribute_id: id,
       attribute_value: def.default_value,
-      attribute_object: null,
+      attribute_objects: null,
       validation: {
         empty: true,
         mandatory: def.mandatory,
@@ -272,7 +275,7 @@ function convertToFormViewField(attr) {
     value: convertFromCaValue(
       attr.attributeType,
       attr.attribute_value,
-      attr.attribute_object
+      attr.attribute_objects
     ),
     title: attr.def.title,
     placeholder: attr.def.placeholder,
@@ -296,7 +299,7 @@ function convertToEditableField(attr) {
     value: convertFromCaValue(
       attr.attributeType,
       attr.attribute_value,
-      attr.attribute_object
+      attr.attribute_objects
     ),
     title: attr.def.title,
     placeholder: attr.def.placeholder,
@@ -353,10 +356,12 @@ function getCustomAttributes(instance, type) {
  */
 function setCustomAttributeValue(ca, value) {
   if (ca.attr('attributeType') === 'person') {
-    let attributeObject = value ? {id: value, type: 'Person'} : null;
-
+    const personStubs =
+      loMap(value, (personData) => new Stub(personData));
+    const attributeObjects =
+      personStubs.length ? personStubs : null;
     ca.attr('attribute_value', 'Person');
-    ca.attr('attribute_object', attributeObject);
+    ca.attr('attribute_objects', attributeObjects);
   } else {
     let convertedValue = convertToCaValue(
       ca.attr('attributeType'),

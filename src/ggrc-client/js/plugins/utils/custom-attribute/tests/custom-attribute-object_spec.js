@@ -9,6 +9,8 @@ import {caDefTypeName} from '../custom-attribute-config';
 import {CONTROL_TYPE} from '../../control-utils.js';
 import {CUSTOM_ATTRIBUTE_TYPE} from './../custom-attribute-config';
 import StateValidator from '../../state-validator-utils';
+import Stub from '../../../../models/stub';
+import loEvery from 'lodash/every';
 
 describe('CustomAttributeObject module', () => {
   let caObject;
@@ -104,19 +106,17 @@ describe('CustomAttributeObject module', () => {
     });
 
     describe('when caObject has Person type', function () {
-      it('returns person id if custom attribute object has "id"', function () {
+      it('returns "null" if attribute_objects equals to "null"', function () {
         caDef.attr('attribute_type', caDefTypeName.MapPerson);
-        const id = 345;
-        caValue.attr('attribute_object', {id});
-        expect(caObject.value).toBe(id);
+        caValue.attr('attribute_objects', null);
+        expect(caObject.value).toBeNull();
       });
 
-      it('returns "null" if custom attribute object doesn\'t have "id"',
-        function () {
-          caDef.attr('attribute_type', caDefTypeName.MapPerson);
-          caValue.attr('attribute_object', {email: 345});
-          expect(caObject.value).toBeNull();
-        });
+      it('returns "null" if attribute_objects empty', function () {
+        caDef.attr('attribute_type', caDefTypeName.MapPerson);
+        caValue.attr('attribute_objects', []);
+        expect(caObject.value).toBeNull();
+      });
     });
 
     it('returns custom attribute value', function () {
@@ -127,16 +127,16 @@ describe('CustomAttributeObject module', () => {
   });
 
   describe('value setter', () => {
-    it('sets custom attribute value to prepared value from param ' +
-    'method', function () {
-      const value = 'Value before preparing';
-      const preparedValue = 'Value after preparing';
-      const prepare = spyOn(caObject, '_prepareAttributeValue')
-        .and.returnValue(preparedValue);
-      caObject.value = value;
-      expect(prepare).toHaveBeenCalledWith(value);
-      expect(caValue.attr('attribute_value')).toBe(preparedValue);
-    });
+    it('sets custom attribute value to prepared value from param method',
+      function () {
+        const value = 'Value before preparing';
+        const preparedValue = 'Value after preparing';
+        const prepare = spyOn(caObject, '_prepareAttributeValue')
+          .and.returnValue(preparedValue);
+        caObject.value = value;
+        expect(prepare).toHaveBeenCalledWith(value);
+        expect(caValue.attr('attribute_value')).toBe(preparedValue);
+      });
   });
 
   describe('customValueId getter', () => {
@@ -196,10 +196,10 @@ describe('CustomAttributeObject module', () => {
   });
 
   describe('attributeObject getter', () => {
-    it('returns custom attribute object', function () {
-      const attributeObject = new canMap();
-      caValue.attr('attribute_object', attributeObject);
-      expect(caObject.attributeObject).toBe(attributeObject);
+    it('returns custom attribute objects', function () {
+      const attributeObjects = [{id: 1}, {id: 2}];
+      caValue.attr('attribute_objects', attributeObjects);
+      expect(caObject.attributeObjects.attr()).toEqual(attributeObjects);
     });
   });
 
@@ -299,9 +299,9 @@ describe('CustomAttributeObject module', () => {
         caValue = new canMap();
       });
 
-      it('attribute_object field then set it to null', function () {
+      it('attribute_objects field then set it to null', function () {
         caObject._setupCaValue(caValue);
-        expect(caValue.attr('attribute_object')).toBeNull();
+        expect(caValue.attr('attribute_objects')).toBeNull();
       });
 
       it('attribute_value field then set it to result ' +
@@ -419,15 +419,29 @@ describe('CustomAttributeObject module', () => {
   });
 
   describe('_prepareAttributeObject() method', () => {
-    it('returns a stub for the person if custom attribute has ' +
-    'caDefTypeName.MapPerson type', function () {
-      const stub = {
-        id: 12345,
-        type: 'Person',
-      };
+    it('returns a list of stub instances for the person ' +
+    'if custom attribute has caDefTypeName.MapPerson type', function () {
+      const stubs = [
+        {id: 1, type: 'Person'},
+        {id: 2, type: 'Person'},
+      ];
       caDef.attr('attribute_type', caDefTypeName.MapPerson);
-      const result = caObject._prepareAttributeObject(stub.id);
-      expect(result).toEqual(stub);
+      const result = caObject._prepareAttributeObjects(stubs);
+      const isStubInstances = loEvery(result, (obj) => obj instanceof Stub);
+
+      expect(isStubInstances).toBe(true);
+    });
+
+    it('returns stub for every object ' +
+    'if custom attribute has caDefTypeName.MapPerson type', function () {
+      const stubs = [
+        {id: 1, type: 'Person'},
+        {id: 2, type: 'Person'},
+      ];
+      caDef.attr('attribute_type', caDefTypeName.MapPerson);
+      const result = caObject._prepareAttributeObjects(stubs);
+
+      expect(result.length).toBe(stubs.length);
     });
 
     it('returns default value if custom attribute has ' +
@@ -435,13 +449,13 @@ describe('CustomAttributeObject module', () => {
       const defValue = 'default value';
       caDef.attr('attribute_type', caDefTypeName.MapPerson);
       caDef.attr('default_value', defValue);
-      const result = caObject._prepareAttributeObject();
+      const result = caObject._prepareAttributeObjects();
       expect(result).toEqual(defValue);
     });
 
     it('returns null by default if custom attribute type is ' +
     'not recognizable', function () {
-      const result = caObject._prepareAttributeObject();
+      const result = caObject._prepareAttributeObjects();
       expect(result).toBeNull();
     });
 
@@ -454,7 +468,7 @@ describe('CustomAttributeObject module', () => {
       ];
       attrTypes.forEach((attrType) => {
         caDef.attr('attribute_type', attrType);
-        const result = caObject._prepareAttributeObject();
+        const result = caObject._prepareAttributeObjects();
         expect(result).toBeNull();
       });
     });
