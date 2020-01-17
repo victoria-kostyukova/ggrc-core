@@ -189,5 +189,7 @@ def get_obj_type(obj_name):
 
 EXTERNAL_END_POINTS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]
 
-SINGULAR_DISABLED_OBJS = [get_singular(x) for x in DISABLED_CONTROLS_RISKS]
+SINGULAR_DISABLED_CONTROL_AND_RISK = [
+    get_singular(x) for x in DISABLED_CONTROLS_RISKS]
+SINGULAR_DISABLED_OBJS = [get_singular(x) for x in ALL_TESTABLE_DISABLED_OBJS]
 ALL_SINGULAR_DISABLED_OBJS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]

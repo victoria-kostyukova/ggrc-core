@@ -22,8 +22,7 @@ class ChangeLogService(base.WithBrowser):
     info_page.tabs.ensure_tab(element.TabContainer.CHANGE_LOG_TAB)
     ui_utils.wait_for_spinner_to_disappear()
     return (change_log.ChangeLog()
-            if objects.get_plural(obj.type) not in
-            objects.DISABLED_CONTROLS_RISKS
+            if objects.get_plural(obj.type) not in objects.ALL_DISABLED_OBJECTS
             else change_log.ReadonlyChangeLog())
 
   def get_obj_changelog(self, obj):

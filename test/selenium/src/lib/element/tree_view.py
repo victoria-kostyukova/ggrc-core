@@ -106,3 +106,11 @@ class Risks(CommonDropdownSettings):
 
 class Regulations(CommonDropdownSettings):
   """Regulations 3BBS button/dropdown settings on Tree View."""
+
+
+class Standards(CommonDropdownSettings):
+  """Standards 3BBS button/dropdown settings on Tree View."""
+
+
+class KeyReports(CommonDropdownSettings):
+  """Key Reports 3BBS button/dropdown settings on Tree View."""

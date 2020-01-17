@@ -42,7 +42,7 @@ class RestClient(object):
   def is_relationship_types_external(self, obj_dict):
     """Check if source or destination objects type is external."""
     return (self.endpoint == objects.get_singular(objects.RELATIONSHIPS) and
-            (any(x for x in objects.SINGULAR_DISABLED_OBJS
+            (any(x for x in objects.ALL_SINGULAR_DISABLED_OBJS
                  if x.title() in (obj_dict["source"]["type"],
                                   obj_dict["destination"]["type"]))))
 

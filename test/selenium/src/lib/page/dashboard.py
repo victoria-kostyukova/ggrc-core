@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """List dashboard."""
 # pylint: disable=too-many-instance-attributes
-
+import inflection
 from selenium.common import exceptions
 
 from lib import base, decorator, environment, url
@@ -166,7 +166,8 @@ class Dashboard(widget_bar.Dashboard):
   def open_objs_tab_via_url(self, obj_type):
     """Opens objects dashboard tab via url according to specified object
     type."""
-    selenium_utils.open_url(self.dashboard_url + "#!" + obj_type.lower())
+    selenium_utils.open_url(
+        self.dashboard_url + "#!" + inflection.underscore(obj_type))
 
   def start_workflow(self):
     """Clicks "Start new Workflow" button."""

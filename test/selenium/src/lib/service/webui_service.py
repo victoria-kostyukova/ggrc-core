@@ -818,6 +818,12 @@ class RegulationsService(BaseWebUiService):
     super(RegulationsService, self).__init__(objects.REGULATIONS, driver)
 
 
+class StandardsService(BaseWebUiService):
+  """Class for Standards business layer's services objects."""
+  def __init__(self, driver=None):
+    super(StandardsService, self).__init__(objects.STANDARDS, driver)
+
+
 class TechnologyEnvironmentsService(BaseWebUiService):
   """Class for Technology Environments business layer's services objects."""
   def __init__(self, driver=None):

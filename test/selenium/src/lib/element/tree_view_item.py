@@ -101,3 +101,11 @@ class Risks(SnapshotsDropdownTreeViewItem):
 
 class Regulations(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Regulations TreeViewItem"""
+
+
+class Standards(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Standards TreeViewItem"""
+
+
+class KeyReports(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Key Reports TreeViewItem"""

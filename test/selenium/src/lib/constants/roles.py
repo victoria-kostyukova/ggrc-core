@@ -229,6 +229,11 @@ class ACLRolesIDsMetaClass(type):
         object_type=objects.get_obj_type(objects.PROJECTS),
         name=objects.get_singular(VERIFIERS, title=True))
 
+  @property
+  def KEY_REPORT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.KEY_REPORTS), name=ADMIN)
+
 
 class ACLRolesIDs(object):
   """Access Control List Roles IDs."""

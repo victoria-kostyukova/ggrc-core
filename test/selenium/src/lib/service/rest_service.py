@@ -274,6 +274,12 @@ class ProjectsService(BaseRestService):
     super(ProjectsService, self).__init__(url.PROJECTS)
 
 
+class KeyReportsService(BaseRestService):
+  """Service for working with Key Reports entities."""
+  def __init__(self):
+    super(KeyReportsService, self).__init__(url.KEY_REPORTS)
+
+
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
   def __init__(self):
