@@ -275,7 +275,7 @@ export default canComponent.extend({
             fieldName: role.name,
             origVal: [],
             newVal: [],
-            isRole: true,
+            isCollectionField: true,
           });
 
           roleDiff.attr('origVal', this._buildPeopleEmails(rev1people));
@@ -287,25 +287,17 @@ export default canComponent.extend({
 
       return diff;
     },
-    _objectCADiff: function (origValues, origDefs, newValues, newDefs) {
-      let ids;
-      let defs;
-      let showValue = function (value, def) {
-        let obj;
+    _objectCADiff(origValues, origDefs, newValues, newDefs) {
+      const showValue = (value, def) => {
         switch (def.attribute_type) {
           case 'Checkbox':
             return loFlow(Number, Boolean)(value.attribute_value)
               ? '✓'
               : undefined;
           case 'Map:Person':
-            if (!value.attribute_object) {
-              return;
-            }
-            obj = Person.findInCacheById(value.attribute_object.id);
-            if (obj === undefined) {
-              return value.attribute_value;
-            }
-            return obj.name || obj.email || value.attribute_value;
+            return value.attribute_objects ?
+              this._buildPeopleEmails(value.attribute_objects).serialize() :
+              null;
           case 'Date':
             if (!value.attribute_value) {
               return value.attribute_value;
@@ -321,20 +313,24 @@ export default canComponent.extend({
       newValues = loKeyBy(newValues, 'custom_attribute_id');
       newDefs = loKeyBy(newDefs, 'id');
 
-      ids = loUniq(Object.keys(origValues).concat(Object.keys(newValues)));
-      defs = loMerge(origDefs, newDefs);
+      const ids = loUniq(Object.keys(origValues)
+        .concat(Object.keys(newValues)));
+      const defs = loMerge(origDefs, newDefs);
 
       let resultIds = loFilter(ids, (id) => !!defs[id]);
       resultIds = loMap(resultIds, (id) => {
         const def = defs[id];
+        const origVal =
+          showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE;
+        const newVal =
+          showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE;
         const diff = {
           fieldName: def.title,
-          origVal:
-            showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
-          newVal:
-            showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE,
+          origVal,
+          newVal,
+          isCollectionField: Array.isArray(origVal) || Array.isArray(newVal),
         };
-        if (diff.origVal === diff.newVal) {
+        if (loIsEqual(diff.origVal, diff.newVal)) {
           return undefined;
         }
         return diff;

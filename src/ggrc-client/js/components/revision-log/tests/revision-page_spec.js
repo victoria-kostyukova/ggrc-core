@@ -348,6 +348,7 @@ describe('revision-page component', function () {
         fieldName: 'CA',
         origVal: '—',
         newVal: 'custom value',
+        isCollectionField: false,
       }]);
     });
 
@@ -369,6 +370,7 @@ describe('revision-page component', function () {
         fieldName: 'CA',
         origVal: 'custom value',
         newVal: '—',
+        isCollectionField: false,
       }]);
     });
 
@@ -415,10 +417,12 @@ describe('revision-page component', function () {
         fieldName: 'CA1',
         origVal: 'v1',
         newVal: 'v3',
+        isCollectionField: false,
       }, {
         fieldName: 'CA2',
         origVal: 'v2',
         newVal: 'v4',
+        isCollectionField: false,
       }]);
     });
 
@@ -437,6 +441,22 @@ describe('revision-page component', function () {
       const result = viewModel
         ._objectCADiff(oldValues, defs, newValues, defs);
       expect(result.length).toBe(0);
+    });
+
+    it(`should call "_buildPeopleEmails" with "attribute_objects"
+      if type is "Map:Person"`, () => {
+      spyOn(viewModel, '_buildPeopleEmails').and.returnValue({serialize() {}});
+      const values = [
+        {
+          custom_attribute_id: 1,
+          attribute_objects: [],
+        },
+      ];
+      const defs = [{id: 1, attribute_type: 'Map:Person'}];
+      viewModel._objectCADiff(values, defs);
+
+      expect(viewModel._buildPeopleEmails)
+        .toHaveBeenCalledWith(values[0].attribute_objects);
     });
   });
 
