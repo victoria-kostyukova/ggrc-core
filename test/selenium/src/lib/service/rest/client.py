@@ -5,6 +5,7 @@
 import json
 import urlparse
 
+import inflection
 import requests
 
 from lib import environment, url as url_module, users
@@ -43,8 +44,9 @@ class RestClient(object):
     """Check if source or destination objects type is external."""
     return (self.endpoint == objects.get_singular(objects.RELATIONSHIPS) and
             (any(x for x in objects.ALL_SINGULAR_DISABLED_OBJS
-                 if x.title() in (obj_dict["source"]["type"],
-                                  obj_dict["destination"]["type"]))))
+                 if inflection.camelize(x)
+                 in (obj_dict["source"]["type"],
+                     obj_dict["destination"]["type"]))))
 
   def is_ca_external(self, obj_dict):
     """Check if custom attribute is external."""

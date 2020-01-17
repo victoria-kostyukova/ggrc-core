@@ -145,12 +145,14 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
                            indirect=True)
-  @pytest.mark.parametrize('mapped_obj', ["product", "standard"],
+  @pytest.mark.parametrize('mapped_obj',
+                           [objects.get_singular(objects.STANDARDS),
+                            objects.get_singular(objects.REGULATIONS)],
                            indirect=True)
   def test_cannot_unmap_disabled_obj(self, obj, mapped_obj, selenium):
-    """Check that user cannot unmap Risk/Control from Scope Objects/Directives
+    """Check that user cannot unmap disabled object from Standard/Regulation
     and new tab opens."""
     webui_service.BaseWebUiService(
         objects.get_plural(obj.type)).open_info_panel_of_mapped_obj(
