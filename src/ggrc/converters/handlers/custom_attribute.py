@@ -296,3 +296,92 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
 
     template = templates[0]
     return template
+
+  def get_date_value(self):
+    """Get date value from input string date."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    value = None
+    try:
+      value = parse(self.raw_value).strftime(
+          utils.DATE_FORMAT_ISO,
+      )
+    except (TypeError, ValueError):
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return value
+
+  def get_checkbox_value(self):
+    """Get boolean value for checkbox fields."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    self.raw_value = re.sub(r'\s+', "", self.raw_value)
+    value = self.raw_value.lower() in ("yes", "true")
+    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      value = None
+    return value
+
+  def get_multiselect_values(self):
+    """Get valid value for multiselect fields."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
+
+    definition = self.get_ca_definition()
+    choices_list = definition.multi_choice_options.split(",")
+    choice_map = {choice.lower(): choice for choice in choices_list}
+    is_valid_values = True
+    valid_values = ""
+
+    for raw_value in self.raw_value.lower().split(","):
+      valid_value = choice_map.get(raw_value)
+      if not valid_value:
+        is_valid_values = False
+        continue
+      valid_values += "{},".format(valid_value)
+
+    valid_values = valid_values.rstrip(",")
+
+    if not is_valid_values:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return valid_values
+
+  def get_dropdown_value(self):
+    """Get valid value of the dropdown field."""
+    definition = self.get_ca_definition()
+    choices_list = definition.multi_choice_options.split(",")
+    valid_choices = [val.strip() for val in choices_list]
+    choice_map = {choice.lower(): choice for choice in valid_choices}
+    value = choice_map.get(self.raw_value.lower())
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    if value is None and self.raw_value != "":
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return value
+
+  def get_text_value(self):
+    """Get cleaned text value."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    value = self.clean_whitespaces(self.raw_value)
+    return value
+
+  def get_rich_text_value(self):
+    """Get parsed rich text value."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    value = url_parser.parse(self.raw_value)
+    return value
+
+  def get_person_value(self):
+    """Fetch a person based on the email text in column.
+
+    Returns:
+        Person model instance
+    """
+    if self.raw_value == "":
+      return None  # ignore empty fields
+    value = models.Person.query.filter_by(email=self.raw_value).first()
+    if not value:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      value = None
+    return value
