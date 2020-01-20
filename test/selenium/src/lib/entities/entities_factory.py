@@ -331,9 +331,16 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
                        StringMethods.random_list_strings())
     else:
       attrs["multi_choice_options"] = None
-    attrs.setdefault("mandatory", False)
-    if attrs["definition_type"] in objects.EXTERNAL_END_POINTS:
-      attrs["id"] = self.generate_external_id()
+    if attrs["definition_type"] != objects.ASSESSMENTS.title():
+      attrs.setdefault("mandatory", False)
+    if attrs["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS:
+      attrs["id"] = attrs["external_id"] = self.generate_external_id()
+      attrs["external_name"] = "{}_{}_123123".format(
+          attrs["definition_type"].capitalize(),
+          attrs["attribute_type"]
+      )
+      attrs["entity_name"] = objects.get_normal_form(
+          objects.get_singular(objects.CUSTOM_ATTRIBUTES)).replace(" ", "")
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:
@@ -394,10 +401,11 @@ class ProductsFactory(EntitiesFactory):
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Product entity."""
-    product_object = self.obj_inst().update_attrs(
-        title=self.obj_title
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_id=self.generate_external_id(),
+        external_slug=self.generate_slug()
     )
-    return product_object
 
 
 class TechnologyEnvironmentsFactory(EntitiesFactory):
@@ -413,7 +421,11 @@ class TechnologyEnvironmentsFactory(EntitiesFactory):
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create TechnologyEnvironment entity."""
-    return self.obj_inst().update_attrs(title=self.obj_title)
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_id=self.generate_external_id(),
+        external_slug=self.generate_slug()
+    )
 
 
 class ControlsFactory(EntitiesFactory):
@@ -490,6 +502,27 @@ class RisksFactory(EntitiesFactory):
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return obj
+
+
+class ProjectsFactory(EntitiesFactory):
+  """Factory class for Projects entities."""
+  def __init__(self):
+    super(ProjectsFactory, self).__init__(objects.PROJECTS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.PROJECT_ADMINS, [users.current_user()]),
+        ("assignees", roles.ACLRolesIDs.PROJECT_ASSIGNEES,
+         [users.current_user()]),
+        ("verifiers", roles.ACLRolesIDs.PROJECT_VERIFIERS,
+         [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Project entity with randomly and predictably filled fields, if
+    'is_add_rest_attrs' then add attributes for REST."""
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id())
 
 
 class OrgGroupsFactory(EntitiesFactory):

@@ -6,7 +6,6 @@
 from werkzeug import exceptions
 
 from ggrc import db
-from ggrc.models import mixins
 
 
 def modified_only(func):
@@ -49,8 +48,8 @@ def validate_object_type_ggrcq(mapper, content, target):
     raise exceptions.MethodNotAllowed()
 
 
-def validate_definition_type_cad(mapper, content, target):
-  """Validate actions for CAD object with definition_type."""
+def validate_definition_type_ecad(mapper, content, target):
+  """Validate actions for eCAD object with definition_type."""
   from ggrc import login as login_module
   from ggrc.models import get_model
   from ggrc.models.mixins import synchronizable
@@ -62,31 +61,10 @@ def validate_definition_type_cad(mapper, content, target):
   if not user or user.is_anonymous():
     return
 
-  should_prevent = (
-      issubclass(model, mixins.ExternalCustomAttributable) or
-      issubclass(model, synchronizable.Synchronizable)
-  )
-
-  if should_prevent:
-    raise exceptions.MethodNotAllowed()
-
-
-def validate_definition_type_ecad(mapper, content, target):
-  """Validate actions for eCAD object with definition_type."""
-  from ggrc import login as login_module
-  from ggrc.models import get_model
-  del mapper, content
-
-  model = get_model(target.definition_type)
-  user = login_module.get_current_user(False)
-
-  if not user or user.is_anonymous():
-    return
-
-  should_prevent = (
-      not login_module.is_external_app_user() or
-      issubclass(model, mixins.CustomAttributable)
-  )
+  should_prevent = all([
+      issubclass(model, synchronizable.Synchronizable),
+      not login_module.is_external_app_user()
+  ])
 
   if should_prevent:
     raise exceptions.MethodNotAllowed()
@@ -112,3 +90,21 @@ def validate_name_correctness(name):
     if name_to_validate == invalid:
       raise ValueError(u"'{}' is reserved word and should not be used as "
                        u"an name".format(invalid))
+
+
+def validate_cad_attrs_update(init_state, src, attr):
+  """
+      Validate and restrict update CADs attributes by internal users.
+  Args:
+    init_state: namedtuple() with initial states of obj attributes
+    src: dict() data from request
+    attr: str() key of attribute
+  """
+  from ggrc import login as login_module
+
+  should_prevent = all([src[attr] != getattr(init_state, attr),
+                        not login_module.is_external_app_user()])
+
+  # TODO: GGRC-8430, find better solution
+  if should_prevent:
+    src[attr] = getattr(init_state, attr)

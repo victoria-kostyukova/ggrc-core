@@ -44,6 +44,7 @@ from ggrc.models.external_custom_attribute_definition \
     import ExternalCustomAttributeDefinition
 from ggrc.models.external_custom_attribute_value \
     import ExternalCustomAttributeValue
+from ggrc.models.external_mapper import ExternalMapping
 from ggrc.models.facility import Facility
 from ggrc.models.import_export import ImportExport
 from ggrc.models.issue import Issue
@@ -82,6 +83,8 @@ from ggrc.models.threat import Threat
 from ggrc.models.vendor import Vendor
 from ggrc.models.review import Review
 from ggrc.models.mixins import ScopeObject as _ScopeObject
+from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import CustomAttributable
 
 
 all_models = [  # pylint: disable=invalid-name
@@ -123,6 +126,7 @@ all_models = [  # pylint: disable=invalid-name
     ExternalCustomAttributeDefinition,
     ExternalCustomAttributeValue,
     ExternalComment,
+    ExternalMapping,
     Facility,
     ImportExport,
     Issue,
@@ -217,3 +221,25 @@ def get_scope_model_names():
   # type: () -> List[str]
   """Return list of names of usable scope models"""
   return list(model.__name__ for model in get_scope_models())
+
+
+def get_external_models():
+  """
+      Collect external models which are custom attributable
+  Returns:
+      list() of usable external models
+
+  """
+  return [model for model in all_models
+          if issubclass(model, synchronizable.Synchronizable)]
+
+
+def get_internal_grc_models():
+  """
+      Collect internal models which are custom attributable
+  Returns:
+      list() of usable internal GRC models
+  """
+  return [m for m in all_models
+          if (not issubclass(m, synchronizable.Synchronizable) and
+              issubclass(m, CustomAttributable))]

@@ -138,54 +138,50 @@ class TestImportIssues(TestCase):
     # without any errors and warnings
     with factories.single_commit():
       mandatory_role = factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=True
       ).name
       factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=False
       )
       email = factories.PersonFactory().email
 
     response_json = self.import_data(OrderedDict([
-        ("object_type", "Market"),
+        ("object_type", "Regulation"),
         ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
-        ("Assignee", "user@example.com"),
-        ("Verifier", "user@example.com"),
         (mandatory_role, email),
     ]))
     self._check_csv_response(response_json, {})
     self.assertEqual(1, response_json[0]["created"])
-    self.assertEqual(1, len(models.Market.query.all()))
+    self.assertEqual(1, models.Regulation.query.count())
 
   def test_import_without_mandatory(self):
     """Test import of data without mandatory role"""
     # Data can't be imported if mandatory role is not provided
     with factories.single_commit():
       mandatory_role = factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=True
       ).name
       not_mandatory_role = factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=False
       ).name
       email = factories.PersonFactory().email
 
     response_json = self.import_data(OrderedDict([
-        ("object_type", "Market"),
+        ("object_type", "Regulation"),
         ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
-        ("Assignee", "user@example.com"),
-        ("Verifier", "user@example.com"),
         (not_mandatory_role, email),
     ]))
 
     expected_errors = {
-        "Market": {
+        "Regulation": {
             "row_errors": {
                 errors.MISSING_COLUMN.format(
                     line=3, column_names=mandatory_role, s=""
@@ -193,37 +189,34 @@ class TestImportIssues(TestCase):
             }
         }
     }
-    self._check_csv_response(response_json, expected_errors)
 
-    markets_count = models.Market.query.count()
-    self.assertEqual(markets_count, 0)
+    self._check_csv_response(response_json, expected_errors)
+    self.assertEqual(0, models.Regulation.query.count())
 
   def test_import_empty_mandatory(self):
     """Test import of data with empty mandatory role"""
     with factories.single_commit():
       mandatory_role = factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=True
       ).name
       not_mandatory_role = factories.AccessControlRoleFactory(
-          object_type="Market",
+          object_type="Regulation",
           mandatory=False
       ).name
       email = factories.PersonFactory().email
 
     response_json = self.import_data(OrderedDict([
-        ("object_type", "Market"),
+        ("object_type", "Regulation"),
         ("code", ""),
         ("title", "Title"),
         ("Admin", "user@example.com"),
-        ("Assignee", "user@example.com"),
-        ("Verifier", "user@example.com"),
         (not_mandatory_role, email),
         (mandatory_role, ""),
     ]))
 
     expected_errors = {
-        "Market": {
+        "Regulation": {
             "row_warnings": {
                 errors.OWNER_MISSING.format(
                     line=3, column_name=mandatory_role
@@ -233,9 +226,7 @@ class TestImportIssues(TestCase):
     }
 
     self._check_csv_response(response_json, expected_errors)
-
-    market_counts = models.Market.query.count()
-    self.assertEqual(market_counts, 1)
+    self.assertEqual(1, models.Regulation.query.count())
 
   def test_import_issue_with_snapshot(self):
     """Test checks impossibility to map snapshot to issue via import"""

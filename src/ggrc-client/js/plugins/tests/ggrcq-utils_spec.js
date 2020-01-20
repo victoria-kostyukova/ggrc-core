@@ -9,6 +9,7 @@ import {
   getMappingUrl,
   getUnmappingUrl,
   isMappableExternally,
+  getCreateObjectUrl,
 } from '../utils/ggrcq-utils';
 import {
   businessObjects,
@@ -20,6 +21,7 @@ import Cacheable from '../../models/cacheable';
 import Control from '../../models/business-models/control';
 import Risk from '../../models/business-models/risk';
 import Standard from '../../models/business-models/standard';
+import AccessGroup from '../../models/business-models/access-group';
 import TechnologyEnvironment
   from '../../models/business-models/technology-environment';
 
@@ -154,7 +156,7 @@ describe('GGRCQ utils', () => {
       let result = getMappingUrl(instance, model);
       let expected = GGRC.GGRC_Q_INTEGRATION_URL +
         'controls/control=control-1/directives' +
-        '?mappingStatus=in_progress,not_in_scope,reviewed&types=standard';
+        '?mappingStatus=in_progress,not_in_scope,reviewed&type=standard';
       expect(result).toBe(expected);
     });
 
@@ -209,7 +211,7 @@ describe('GGRCQ utils', () => {
       let expected = GGRC.GGRC_Q_INTEGRATION_URL +
         'questionnaires/technology_environment=technologyenvironment-1' +
         '/map-objects?mappingStatus=in_progress,not_in_scope,reviewed' +
-        '&types=standard';
+        '&type=standard';
       expect(getMappingUrl(instance, Standard)).toBe(expected);
     });
 
@@ -250,6 +252,22 @@ describe('GGRCQ utils', () => {
           '?mappingStatus=in_progress,not_in_scope,reviewed';
         expect(result).toBe(expected);
       });
+
+    it('should return url to map scope object 1 to scope object 2', () => {
+      const scopeObject1 = makeFakeInstance({model: AccessGroup,
+        instanceProps: {
+          type: 'AccessGroup',
+          slug: 'ACCESSGROUP-1',
+        }})();
+      const scopeObject2 = TechnologyEnvironment;
+
+      const result = getMappingUrl(scopeObject1, scopeObject2);
+      const expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'questionnaires/access_group=accessgroup-1/scope' +
+        '?mappingStatus=in_progress,not_in_scope,reviewed' +
+        '&types=technology_environment';
+      expect(result).toBe(expected);
+    });
   });
 
   describe('getUnmappingUrl util', () => {
@@ -272,7 +290,7 @@ describe('GGRCQ utils', () => {
       let result = getUnmappingUrl(instance, model);
       let expected = GGRC.GGRC_Q_INTEGRATION_URL +
         'controls/control=control-1/directives' +
-        '?mappingStatus=in_progress,reviewed&types=standard';
+        '?mappingStatus=in_progress,reviewed&type=standard';
       expect(result).toBe(expected);
     });
 
@@ -325,7 +343,7 @@ describe('GGRCQ utils', () => {
 
       let expected = GGRC.GGRC_Q_INTEGRATION_URL +
         'questionnaires/technology_environment=technologyenvironment-1' +
-        '/map-objects?mappingStatus=in_progress,reviewed&types=standard';
+        '/map-objects?mappingStatus=in_progress,reviewed&type=standard';
       expect(getUnmappingUrl(instance, Standard)).toBe(expected);
     });
 
@@ -339,6 +357,30 @@ describe('GGRCQ utils', () => {
         'directives/standard=standard-1/applicable-scope' +
         '?mappingStatus=in_progress,reviewed&types=technology_environment';
       expect(getUnmappingUrl(instance, TechnologyEnvironment)).toBe(expected);
+    });
+
+    it('should return url to unmap scope from scope object', () => {
+      const instance = makeFakeInstance({model: AccessGroup})({
+        type: 'AccessGroup',
+        slug: 'ACCESSGROUP-1',
+      });
+
+      const expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'questionnaires/access_group=accessgroup-1/scope' +
+        '?mappingStatus=in_progress,reviewed&types=technology_environment';
+      expect(getUnmappingUrl(instance, TechnologyEnvironment)).toBe(expected);
+    });
+  });
+
+  describe('getCreateObjectUrl util', () => {
+    it('should return proper url for scope object', () => {
+      const url = `${GGRC.GGRC_Q_INTEGRATION_URL}scope?create=access_group`;
+      expect(getCreateObjectUrl(AccessGroup)).toBe(url);
+    });
+
+    it('should return proper url for non-scope object', () => {
+      const url = `${GGRC.GGRC_Q_INTEGRATION_URL}controls?action=create`;
+      expect(getCreateObjectUrl(Control)).toBe(url);
     });
   });
 });

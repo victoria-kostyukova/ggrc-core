@@ -154,13 +154,13 @@ class TestExportControls(TestCase):
                                     attribute_value):
     """Test exporting of control with filtering by external cad."""
     with factories.single_commit():
-      cad = factories.ExternalCustomAttributeDefinitionFactory(
+      cad = factories.CustomAttributeDefinitionFactory(
           definition_type="control",
           attribute_type=attribute_type,
           multi_choice_options=multi_choice_options,
       )
       control = factories.ControlFactory(slug="Control 1")
-      factories.ExternalCustomAttributeValueFactory(
+      factories.CustomAttributeValueFactory(
           attributable=control,
           custom_attribute=cad,
           attribute_value=attribute_value,

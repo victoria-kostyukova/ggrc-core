@@ -1,0 +1,30 @@
+{{!
+    Copyright (C) 2020 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+ <div class="action-toolbar-container">
+  <div class="action-toolbar">
+    <h6 class="action-toolbar__header">
+      {{title}}{{#if mandatory}}<i class="fa fa-asterisk"></i>{{/if}}
+    </h6>
+    {{#if showToolbarControls}}
+    <div class="action-toolbar__controls">
+      <div class="action-toolbar__controls-item">
+        {{#if instance.constructor.isProposable}}
+          <proposable-control
+            instance:from="instance"
+            attrName:from="attrName"
+          ></proposable-control>
+        {{else}}
+          <external-control
+            instance:from="instance"
+            attrName:from="attrName"
+          ></external-control>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+  </div>
+  <content />
+</div>

@@ -199,27 +199,60 @@ function getChangeLogUrl(instance) {
  * @return {string} Redirection url
  */
 function getMapUrl(instance, destinationModel, statuses) {
-  if (isChangeableExternally(instance)) {
-    return getMapObjectToExternalObjectUrl(
-      instance,
-      destinationModel,
-      statuses,
-    );
-  } else if (destinationModel.isChangeableExternally) {
-    return getMapExternalObjectToObjectUrl(
-      instance,
-      destinationModel.table_plural,
-      statuses
-    );
-  } else if (isMappableExternally(instance.constructor, destinationModel)) {
-    return getMapObjectsExternallyUrl(
-      instance,
-      destinationModel,
-      statuses
-    );
+  const source = instance.constructor.model_singular;
+  const destination = destinationModel.constructor.model_singular;
+
+  const scopingSource = scopingObjects.includes(source);
+  const scopingDest = scopingObjects.includes(destination);
+
+  const extDirectiveSource = externalDirectiveObjects.includes(source);
+  const extDirectiveDest = externalDirectiveObjects.includes(destination);
+
+  const extBusinessSource = externalBusinessObjects.includes(source);
+  const extBusinessDest = externalBusinessObjects.includes(destination);
+
+
+  let view = scopingDest ? 'scope'
+    : destinationModel.table_plural;
+  let path = instance.constructor.table_plural;
+
+  if (scopingSource) {
+    path = 'questionnaires';
+
+    if (extDirectiveDest) {
+      view = 'map-objects';
+    }
+  } else if (extBusinessSource) {
+    if (extDirectiveDest) {
+      view = 'directives';
+    }
+  } else if (extDirectiveSource) {
+    path = 'directives';
+
+    if (scopingDest) {
+      view = 'applicable-scope';
+    }
+  } else {
+    return '';
   }
 
-  return '';
+  let addType = true;
+  if (extBusinessDest) {
+    addType = false;
+  }
+
+  const typeParamName = scopingDest ? 'types'
+    : (extDirectiveDest ? 'type' : '');
+  const params = `mappingStatus=${statuses}`
+    + (addType ? `&${typeParamName}=${destinationModel.table_singular}` : '');
+
+  return getUrl({
+    path,
+    model: instance.constructor.table_singular,
+    slug: instance.slug,
+    view,
+    params,
+  });
 }
 
 /**
@@ -247,100 +280,27 @@ function getUnmappingUrl(instance, destinationModel) {
 }
 
 /**
- * Get url to mapping view for external objects
- * @param {Object} instance - The model instance
- * @param {Object} destinationModel - The destination model
- * @param {String} statuses - Required statuses list (comma separated)
- * @return {String} Url
- */
-function getMapObjectToExternalObjectUrl(instance, destinationModel, statuses) { // eslint-disable-line
-  let view = '';
-  let useUrlTypes = true;
-
-  if (externalDirectiveObjects.includes(destinationModel.model_singular)) {
-    view = 'directives';
-  } else if (scopingObjects.includes(destinationModel.model_singular)) {
-    view = 'scope';
-  } else if (
-    externalBusinessObjects.includes(destinationModel.model_singular)
-  ) {
-    view = destinationModel.table_plural;
-    useUrlTypes = false;
-  }
-
-  const destinationType = destinationModel.table_singular;
-  const params = `mappingStatus=${statuses}` + (useUrlTypes
-    ? `&types=${destinationType}`
-    : ''
-  );
-
-  return getUrl({
-    path: instance.constructor.table_plural,
-    model: instance.constructor.table_singular,
-    slug: instance.slug,
-    view,
-    params,
-  });
-}
-
-/**
- * Get url to external object mapping view for selected object
- * @param {object} instance - The model instance
- * @param {string} view - View parameter for url
- * @param {string} statuses - Required statuses list (comma separated)
- * @param {string} types - Required types list (comma separated)
- * @return {string} Url
- */
-function getMapExternalObjectToObjectUrl(instance, view, statuses, types) { // eslint-disable-line id-length
-  let path = '';
-  const sourceType = instance.constructor.model_singular;
-  if (externalDirectiveObjects.includes(sourceType)) {
-    path = 'directives';
-  } else if (scopingObjects.includes(sourceType)) {
-    path = 'questionnaires';
-  }
-
-  const params = `mappingStatus=${statuses}` + (types ? `&types=${types}`: '');
-
-  return getUrl({
-    path,
-    model: instance.constructor.table_singular,
-    slug: instance.slug,
-    view,
-    params,
-  });
-}
-
-/**
- * Get url to external object mapping view for selected object
- * @param {object} instance - The source instance
- * @param {Object} destinationModel - The destination model
- * @param {string} statuses - Required statuses list (comma separated)
- * @return {string} Url
- */
-function getMapObjectsExternallyUrl(instance, destinationModel, statuses) { // eslint-disable-line
-  let view = '';
-  if (scopingObjects.includes(destinationModel.model_singular)) {
-    view = 'applicable-scope';
-  } else if (
-    externalDirectiveObjects.includes(destinationModel.model_singular)) {
-    view = 'map-objects';
-  }
-
-  return getMapExternalObjectToObjectUrl(
-    instance, view, statuses, destinationModel.table_singular);
-}
-
-/**
  * Get url to create new object
  * @param {Object} model - The object model
  * @return {String} Url to create new object
  */
 function getCreateObjectUrl(model) {
-  return getUrl({
-    path: model.table_plural,
-    params: 'action=create',
-  });
+  let options;
+
+  const isScope = scopingObjects.includes(model.model_singular);
+  if (isScope) {
+    options = {
+      path: 'scope',
+      params: `create=${model.root_object}`,
+    };
+  } else {
+    options = {
+      path: model.table_plural,
+      params: 'action=create',
+    };
+  }
+
+  return getUrl(options);
 }
 
 /**

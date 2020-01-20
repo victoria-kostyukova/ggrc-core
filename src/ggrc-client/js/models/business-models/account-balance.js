@@ -4,12 +4,10 @@
  */
 
 import Cacheable from '../cacheable';
-import UniqueTitle from '../mixins/unique-title';
-import CaUpdate from '../mixins/ca-update';
-import AccessControlList from '../mixins/access-control-list';
-import ScopeObjectNotifications from '../mixins/notifications/scope-object-notifications';
 import Questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
+import ChangeableExternally from '../mixins/changeable-externally';
+import DisableAddComments from '../mixins/disable-add-comments';
 
 export default Cacheable.extend({
   root_object: 'account_balance',
@@ -21,11 +19,9 @@ export default Cacheable.extend({
   update: 'PUT /api/account_balances/{id}',
   destroy: 'DELETE /api/account_balances/{id}',
   mixins: [
-    UniqueTitle,
-    CaUpdate,
-    AccessControlList,
-    ScopeObjectNotifications,
     Questionnaire,
+    ChangeableExternally,
+    DisableAddComments,
   ],
   is_custom_attributable: true,
   isRoleable: true,
@@ -54,28 +50,13 @@ export default Cacheable.extend({
         attr_title: 'Notes',
         attr_name: 'notes',
       }, {
-        attr_title: 'Assessment Procedure',
-        attr_name: 'test_plan',
+        attr_title: 'Created By',
+        attr_name: 'created_by',
+        attr_sort_field: 'created_by',
       }]),
   },
   sub_tree_view_options: {
     default_filter: ['Control'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-}, {
-  define: {
-    title: {
-      value: '',
-      validate: {
-        required: true,
-        validateUniqueTitle: true,
-      },
-    },
-    _transient_title: {
-      value: '',
-      validate: {
-        validateUniqueTitle: true,
-      },
-    },
-  },
-});
+}, {});

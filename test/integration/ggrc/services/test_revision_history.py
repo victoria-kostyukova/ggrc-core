@@ -219,7 +219,7 @@ class TestRevisionHistory(TestCase):
   def test_get_mandatory_cads(self, mandatory):
     """CAD and mandatory meta info if mandatory flag is {0}."""
     control_id = self.control.id
-    cad = factories.ExternalCustomAttributeDefinitionFactory(
+    cad = factories.CustomAttributeDefinitionFactory(
         title="test_name",
         definition_type="control",
         mandatory=mandatory)

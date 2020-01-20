@@ -3,4 +3,6 @@
 
 """Module provides constants for external app."""
 
-GGRCQ_OBJ_TYPES_FOR_SYNC = {'control', 'risk'}
+from ggrc.models.all_models import get_external_models
+
+GGRCQ_OBJ_TYPES_FOR_SYNC = {model.__name__ for model in get_external_models()}

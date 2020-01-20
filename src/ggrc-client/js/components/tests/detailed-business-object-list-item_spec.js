@@ -10,9 +10,7 @@ describe('detailed-business-object-list-item component', function () {
   'use strict';
 
   const snapshotParentTitle = 'Control title #1';
-  const snapshotParentUrl = '/controls/55';
-  const vendorObjectTitle = 'Vendor title 123';
-  const vendorObjectLink = '/vendors/33';
+  const objectiveObjectTitle = 'Objective title 123';
   const controlVisibleRoles = [
     'Admin', 'Control Operators', 'Control Owners', 'Other Contacts',
   ];
@@ -33,11 +31,11 @@ describe('detailed-business-object-list-item component', function () {
     },
   };
 
-  let vendorObject = {
-    selfLink: '/api/vendors/33',
-    viewLink: vendorObjectLink,
-    type: 'Vendor',
-    title: vendorObjectTitle,
+  let objectiveObject = {
+    selfLink: '/api/objectives/33',
+    viewLink: '/objectives/33',
+    type: 'Objective',
+    title: objectiveObjectTitle,
     id: 33,
   };
 
@@ -49,24 +47,6 @@ describe('detailed-business-object-list-item component', function () {
     id: 12,
   };
 
-  describe('objectLink property', function () {
-    let viewModel;
-
-    beforeEach(function () {
-      viewModel = getComponentVM(Component);
-    });
-
-    it('check objectLink of Vendor object', function () {
-      viewModel.attr('instance', vendorObject);
-      expect(viewModel.attr('objectLink')).toEqual(vendorObjectLink);
-    });
-
-    it('check objectLink of Snapshot object', function () {
-      viewModel.attr('instance', snapshotObject);
-      expect(viewModel.attr('objectLink')).toEqual(snapshotParentUrl);
-    });
-  });
-
   describe('objectTitle property', function () {
     let viewModel;
 
@@ -74,9 +54,9 @@ describe('detailed-business-object-list-item component', function () {
       viewModel = getComponentVM(Component);
     });
 
-    it('check objectTitle of Vendor object', function () {
-      viewModel.attr('instance', vendorObject);
-      expect(viewModel.attr('objectTitle')).toEqual(vendorObjectTitle);
+    it('check objectTitle of Objective object', function () {
+      viewModel.attr('instance', objectiveObject);
+      expect(viewModel.attr('objectTitle')).toEqual(objectiveObjectTitle);
     });
 
     it('check objectTitle of Snapshot object', function () {
@@ -99,7 +79,7 @@ describe('detailed-business-object-list-item component', function () {
     });
 
     it('returns default roles for not Control object', function () {
-      viewModel.attr('instance', vendorObject);
+      viewModel.attr('instance', objectiveObject);
       expect(viewModel.attr('visibleRoles')).toEqual(defaultVisibleRoles);
     });
   });

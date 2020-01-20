@@ -46,6 +46,12 @@ class RestClient(object):
                  if x.title() in (obj_dict["source"]["type"],
                                   obj_dict["destination"]["type"]))))
 
+  def is_ca_external(self, obj_dict):
+    """Check if custom attribute is external."""
+    return (self.endpoint == objects.get_singular(
+            objects.CUSTOM_ATTRIBUTES) and
+            obj_dict["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS)
+
   def is_external_user_needed(self, obj_dict):
     """Return True if request related to controls or GCAs for controls."""
     # pylint: disable=invalid-name
@@ -56,6 +62,7 @@ class RestClient(object):
         obj_dict, list) else obj_dict[obj_dict.keys()[0]]
 
     return (self.is_endpoint_external() or
+            self.is_ca_external(obj_dict) or
             self.is_relationship_types_external(obj_dict))
 
   def send_get(self, url, **kwargs):

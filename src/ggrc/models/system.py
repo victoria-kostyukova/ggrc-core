@@ -28,6 +28,7 @@ from ggrc.models import reflection
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
 class SystemOrProcess(ScopedCommentable,
+                      synchronizable.Synchronizable,
                       mixins.TestPlanned,
                       mixins.LastDeprecatedTimeboxed,
                       mixins.base.ContextRBAC,

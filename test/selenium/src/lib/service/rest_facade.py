@@ -116,9 +116,7 @@ def create_asmts_from_template(audit, asmt_template, objs_to_map):
 
 def create_gcad(**attrs):
   """Creates global CADs for all types."""
-  return rest_service.CustomAttributeDefinitionsService(
-      is_external=True if (objects.get_plural(attrs["definition_type"])
-                           in objects.DISABLED_OBJECTS) else False).create_obj(
+  return rest_service.CustomAttributeDefinitionsService().create_obj(
       factory_params=attrs)
 
 
@@ -141,6 +139,11 @@ def create_issue(obj=None):
 def create_risk(**attrs):
   """Create an risk."""
   return _create_obj_in_program_scope("Risks", None, **attrs)
+
+
+def create_project(**attrs):
+  """Create an project."""
+  return _create_obj_in_program_scope("Projects", None, **attrs)
 
 
 @decorator.check_that_obj_is_created

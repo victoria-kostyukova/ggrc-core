@@ -748,7 +748,7 @@ class CustomAttributeDefinitionEntity(Representation):
         "title", "id", "href", "type", "definition_type", "attribute_type",
         "helptext", "placeholder", "mandatory", "multi_choice_options",
         "created_at", "updated_at", "modified_by", "multi_choice_mandatory",
-        **attrs)
+        "external_name", "entity_name", **attrs)
 
   def __lt__(self, other):
     return self.title < other.title
@@ -816,6 +816,15 @@ class RiskEntity(Entity):
     super(RiskEntity, self).__init__()
     self.set_attrs(
         "risk_type", "threat_source", "threat_event", "vulnerability", **attrs)
+
+
+class ProjectEntity(Entity):
+  """Class that represent model for Project entity."""
+
+  def __init__(self, **attrs):
+    super(ProjectEntity, self).__init__()
+    self.set_attrs(
+        "assignees", "verifiers", **attrs)
 
 
 class OrgGroupEntity(Entity):

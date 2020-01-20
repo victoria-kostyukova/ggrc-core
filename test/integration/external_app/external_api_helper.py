@@ -105,7 +105,6 @@ class ExternalApiClient(object):
     if obj_type not in data:
       resp.json[obj_type].update(data)
       data = resp.json
-
     return self.client.put(url, data=json.dumps(data), headers=headers)
 
   def _get_precondition_headers(self, obj_type, obj_id):

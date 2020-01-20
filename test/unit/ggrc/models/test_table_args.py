@@ -19,6 +19,7 @@ class TestTableArgs(unittest.TestCase):
       "ObjectTypes",
       "AttributeTemplates",
       "ObjectTemplates",
+      "ExternalMapping",
   }
 
   def test_extra_args_included(self):
