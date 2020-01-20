@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -10,7 +10,7 @@
       <div class="new-relevant-block">
         <export-panel type:from="type"
                       item:from="{.}"
-                      panel_index:from="@index"
+                      panel_index:from="scope.index"
                       removable:from="isRemovable">
        </export-panel>
      </div>

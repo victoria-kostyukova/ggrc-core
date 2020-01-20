@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -36,7 +36,7 @@ describe('related-urls component', () => {
       expect(result).toBe(false);
     });
 
-    it(`returns false if user can update instance 
+    it(`returns false if user can update instance
         but edit is disabled in the component`, () => {
       Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);
@@ -82,7 +82,7 @@ describe('related-urls component', () => {
       expect(result).toBe(false);
     });
 
-    it(`returns false if user can update instance 
+    it(`returns false if user can update instance
         but edit is disabled in the component`, () => {
       Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);

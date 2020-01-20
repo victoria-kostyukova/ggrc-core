@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -75,7 +75,7 @@ describe('Mappings', () => {
   const filtered = loDifference(allTypes, notMappableModels);
 
   const mappingRules = Object.freeze({
-    AccessGroup: loDifference(filtered, ['AccessGroup']),
+    AccessGroup: filtered,
     AccountBalance: filtered,
     Assessment: loDifference(filtered, ['Audit', 'Person', 'Program', 'Project',
       'Workflow', 'Assessment', 'Document']),

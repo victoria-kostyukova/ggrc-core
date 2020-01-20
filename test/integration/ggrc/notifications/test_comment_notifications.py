@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for notifications for models with assignable mixin."""
@@ -145,26 +145,14 @@ class TestCommentNotification(TestNotifications):
         self.assertTrue(comment["description"].endswith(expected_suffix))
 
   @ddt.data(
-      all_models.AccessGroup,
-      all_models.DataAsset,
-      all_models.Market,
-      all_models.Facility,
       all_models.Objective,
-      all_models.OrgGroup,
-      all_models.System,
-      all_models.Process,
-      all_models.Product,
       all_models.Requirement,
-      all_models.Vendor,
       all_models.Issue,
       all_models.Policy,
       all_models.Regulation,
       all_models.Standard,
       all_models.Contract,
       all_models.Threat,
-      all_models.Metric,
-      all_models.TechnologyEnvironment,
-      all_models.ProductGroup,
   )
   @patch("ggrc.notifications.common.send_email")
   def test_models_comments(self, model, _):

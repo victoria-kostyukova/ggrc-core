@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -148,7 +148,7 @@
       {{/is}}
     </div>
   {{/case}}
-  
+
   {{#case 'workflow'}}
     <div class="tree-title-area">
       <span class="tiny-data" rel="tooltip" title="Workflow title">
@@ -158,7 +158,7 @@
   {{/case}}
 
   {{#case 'repeat'}}
-    <repeat-on-summary class="repeat-cell" unit:from="instance.unit" 
+    <repeat-on-summary class="repeat-cell" unit:from="instance.unit"
                        repeatEvery:from="instance.repeat_every"
                        hideRepeatOff:from="false" >
     </repeat-on-summary>
@@ -217,7 +217,7 @@
     {{#is(instance.key_control, false)}}Non-Key{{/is}}
     {{#is(instance.key_control, true)}}Key{{/is}}
   {{/case}}
-  
+
   {{#case 'is_verification_needed'}}
     <span>
       {{#if instance.is_verification_needed}}

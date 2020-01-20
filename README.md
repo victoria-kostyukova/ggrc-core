@@ -421,6 +421,6 @@ and then run `build_assets` or `watch_assets` to rebuild files
 
 # Copyright Notice
 
-Copyright (C) 2013-2019 Google Inc.
+Copyright (C) 2013-2020 Google Inc.
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -1328,6 +1328,10 @@ class Resource(ModelView):
         try:
           self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
+          import traceback
+          import sys
+          ex_type, ex, tb = sys.exc_info()
+          traceback.print_tb(tb)
           res.append(self._make_error_from_exception(error))
           db.session.rollback()
         except ServiceUnavailable as error:
@@ -1344,6 +1348,7 @@ class Resource(ModelView):
           ))
           db.session.rollback()
         except Exception as error:
+
           res.append((getattr(error, "code", 500), error.message))
           logger.warning("Collection POST commit failed", exc_info=True)
           db.session.rollback()

@@ -1,10 +1,11 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import Directive from './directive';
 import AccessControlList from '../mixins/access-control-list';
+import Reviewable from '../mixins/reviewable';
 
 export default Directive.extend({
   root_object: 'policy',
@@ -24,7 +25,10 @@ export default Directive.extend({
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
-  mixins: [AccessControlList],
+  mixins: [
+    AccessControlList,
+    Reviewable,
+  ],
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
   },

@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -17,13 +17,28 @@
 
 <div class="row-fluid">
   <div class="span12">
-    <h6>Description</h6>
-    <div class="rtf">
-      <read-more
-        text:from="instance.description"
-        handleMarkdown:from="instance.constructor.isChangeableExternally">
-      </read-more>
-    </div>
+    {{#if instance.constructor.isChangeableExternally}}
+      <external-attribute
+        instance:from="instance"
+        title:from="'Description'"
+        attrName:from="'description'"
+      >
+        <div class="rtf-block">
+          <read-more
+            text:from="description"
+            handleMarkdown:from="instance.constructor.isChangeableExternally">
+          </read-more>
+        </div>
+      </external-attribute>
+    {{else}}
+      <h6>Description</h6>
+      <div class="rtf">
+        <read-more
+          text:from="instance.description"
+          handleMarkdown:from="instance.constructor.isChangeableExternally">
+        </read-more>
+      </div>
+    {{/if}}
   </div>
 </div>
 

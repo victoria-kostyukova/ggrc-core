@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixtures."""
 # pylint: disable=invalid-name
@@ -605,6 +605,12 @@ def product():
 def risk():
   """Creates a risk."""
   return rest_facade.create_risk()
+
+
+@pytest.fixture()
+def project():
+  """Creates a project."""
+  return rest_facade.create_project()
 
 
 @pytest.fixture()

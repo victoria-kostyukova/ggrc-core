@@ -1,9 +1,9 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as pickerUtils from '../../../plugins/utils/gdrive-picker-utils';
+import * as PickerUtils from '../../../plugins/utils/gdrive-picker-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
@@ -88,65 +88,93 @@ describe('ggrc-gdrive-picker-launcher', function () {
     });
   });
 
-  describe('trigger_upload() method', function () {
-    let uploadFilesDfd;
-    let createModelDfd;
+  describe('trigger_upload() method', () => {
     let el;
+    let files;
 
-    beforeEach(function () {
+    beforeEach(() => {
       el = jasmine.createSpyObj(['data', 'trigger']);
-      uploadFilesDfd = $.Deferred();
-      spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
+      files = ['file', 'file'];
     });
 
-    it('sets "isUploading" flag to true', function () {
+    it('sets "isUploading" flag to true', () => {
+      spyOn(PickerUtils, 'uploadFiles').and.returnValue(Promise.resolve([]));
+
       viewModel.attr('isUploading', false);
 
       viewModel.trigger_upload(viewModel, el);
-
       expect(viewModel.attr('isUploading')).toBe(true);
     });
 
-    describe('sets "isUploading" flag to false', function () {
-      beforeEach(function () {
-        createModelDfd = $.Deferred();
+    it('calls createDocumentModel() method after uploadFiles() success',
+      async () => {
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve(files));
+        spyOn(viewModel, 'createDocumentModel');
+
+        await viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.createDocumentModel).toHaveBeenCalledWith(files);
+      });
+
+    it('triggers rejected if error type equal GDRIVE_PICKER_ERR_CANCEL',
+      async () => {
+        const error = {
+          type: PickerUtils.GDRIVE_PICKER_ERR_CANCEL,
+        };
+
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.reject(error));
+        spyOn(viewModel, 'createDocumentModel');
+        spyOn($.fn, 'trigger').and.callThrough();
+
+        await viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.createDocumentModel).not.toHaveBeenCalled();
+        expect($.fn.trigger).toHaveBeenCalledWith('rejected');
+      });
+
+    describe('sets "isUploading" flag to false', () => {
+      beforeEach(() => {
         viewModel.attr('isUploading', true);
-        spyOn(viewModel, 'createDocumentModel').and.returnValue(createModelDfd);
       });
 
-      it('when uploadFiles() was failed', function (done) {
-        uploadFilesDfd.reject();
+      it('when uploadFiles() was failed', async () => {
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.reject());
+        spyOn(viewModel, 'createDocumentModel');
 
-        viewModel.trigger_upload(viewModel, el).fail(() => {
-          expect(viewModel.attr('isUploading')).toBe(false);
-          done();
-        });
+        await viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.createDocumentModel).not.toHaveBeenCalled();
       });
 
-      it('after createDocumentModel() success', function (done) {
-        uploadFilesDfd.resolve();
-        createModelDfd.resolve([]);
+      it('after createDocumentModel() success', async () => {
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve([]));
+        spyOn(viewModel, 'createDocumentModel')
+          .and.returnValue(Promise.resolve());
 
-        viewModel.trigger_upload(viewModel, el).then(() => {
-          expect(viewModel.attr('isUploading')).toBe(false);
-          done();
-        });
+        await viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
       });
 
-      it('when createDocumentModel() was failed', function (done) {
-        uploadFilesDfd.resolve();
-        createModelDfd.reject();
+      it('when createDocumentModel() was failed', async () => {
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve([]));
+        spyOn(viewModel, 'createDocumentModel')
+          .and.returnValue(Promise.reject());
 
-        viewModel.trigger_upload(viewModel, el).fail(() => {
-          expect(viewModel.attr('isUploading')).toBe(false);
-          done();
-        });
+        await viewModel.trigger_upload(viewModel, el);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
       });
     });
   });
 
   describe('trigger_upload_parent() method', () => {
-    let uploadDfd;
     let parentFolderDfd;
     let parentFolderStub;
     let errorMessage;
@@ -154,10 +182,9 @@ describe('ggrc-gdrive-picker-launcher', function () {
     beforeEach(() => {
       parentFolderStub = {id: 'id'};
       parentFolderDfd = $.Deferred();
-      uploadDfd = $.Deferred();
 
-      spyOn(pickerUtils, 'findGDriveItemById').and.returnValue(parentFolderDfd);
-      spyOn(viewModel, 'uploadParentHelper').and.returnValue(uploadDfd);
+      spyOn(PickerUtils, 'findGDriveItemById').and.returnValue(parentFolderDfd);
+      spyOn(viewModel, 'uploadParentHelper').and.returnValue(Promise.resolve());
       spyOn($.fn, 'trigger').and.callThrough();
     });
 
@@ -165,7 +192,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
       viewModel.instance.attr('_transient.folder', 'folder');
 
       viewModel.trigger_upload_parent(viewModel);
-      expect(pickerUtils.findGDriveItemById).not.toHaveBeenCalled();
+      expect(PickerUtils.findGDriveItemById).not.toHaveBeenCalled();
     });
 
     it('calls findGDriveItemById() if transient folder doesn\'t exist', () => {
@@ -174,7 +201,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
       viewModel.instance.attr('folder', folderId);
 
       viewModel.trigger_upload_parent(viewModel);
-      expect(pickerUtils.findGDriveItemById).toHaveBeenCalledWith(folderId);
+      expect(PickerUtils.findGDriveItemById).toHaveBeenCalledWith(folderId);
     });
 
 
@@ -202,17 +229,18 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
   describe('uploadParentHelper() method', () => {
     let uploadParentHelper;
-    let uploadFilesDfd;
-    let parentFolderDfd;
     let files;
     let parentFolderStub;
     let scope;
     let error;
 
     beforeEach(() => {
-      parentFolderStub = {id: 'id'};
-      parentFolderDfd = $.Deferred();
-      uploadFilesDfd = $.Deferred();
+      parentFolderStub = {
+        id: 'id',
+        userPermission: {
+          role: 'owner',
+        },
+      };
       files = ['file', 'file'];
 
       scope = {
@@ -221,91 +249,102 @@ describe('ggrc-gdrive-picker-launcher', function () {
         },
       };
 
-      spyOn(viewModel, 'createDocumentModel')
-        .and.returnValue(uploadFilesDfd.resolve());
-
-      spyOn(pickerUtils, 'uploadFiles')
-        .and.returnValue(parentFolderDfd);
-
       spyOn(NotifiersUtils, 'notifier');
 
       uploadParentHelper = viewModel.uploadParentHelper.bind(viewModel);
     });
 
+    it('calls notifier() if user have no access to write in audit folder',
+      () => {
+        parentFolderStub.userPermission.role = 'reader';
+
+        uploadParentHelper(parentFolderStub, scope);
+
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', NotifiersUtils.messages[403]);
+      });
+
     it('sets "isUploading" flag to true', () => {
       viewModel.attr('isUploading', false);
+      spyOn(PickerUtils, 'uploadFiles')
+        .and.returnValue(Promise.resolve(files));
+      spyOn(viewModel, 'createDocumentModel')
+        .and.returnValue(Promise.resolve());
 
-      uploadParentHelper(parentFolderStub);
+      uploadParentHelper(parentFolderStub, scope);
+
       expect(viewModel.attr('isUploading')).toBe(true);
     });
 
-    it('sets "isUploading" flag to false after uploadFiles() success',
-      (done) => {
-        parentFolderDfd.resolve(files);
 
+    it('calls createDocumentModel() method after uploadFiles() success',
+      async () => {
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve(files));
+        spyOn(viewModel, 'createDocumentModel')
+          .and.returnValue(Promise.resolve());
+
+        await uploadParentHelper(parentFolderStub, scope);
+
+        expect(viewModel.createDocumentModel).toHaveBeenCalledWith(files);
+      });
+
+    it('sets "isUploading" flag to false after uploadFiles() success',
+      async () => {
         viewModel.attr('isUploading', true);
 
-        uploadParentHelper(parentFolderStub, scope).then(() => {
-          expect(viewModel.attr('isUploading')).toBe(false);
-          done();
-        });
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve(files));
+        spyOn(viewModel, 'createDocumentModel')
+          .and.returnValue(Promise.resolve());
+
+        await uploadParentHelper(parentFolderStub, scope);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
       });
 
     it('sets "isUploading" flag to false when uploadFiles() was failed',
-      (done) => {
-        parentFolderDfd.reject();
-
+      async () => {
         viewModel.attr('isUploading', true);
 
-        uploadParentHelper(parentFolderStub, scope).fail(() => {
-          expect(viewModel.attr('isUploading')).toBe(false);
-          done();
-        });
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.reject());
+        spyOn(viewModel, 'createDocumentModel');
+
+        await uploadParentHelper(parentFolderStub, scope);
+
+        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.createDocumentModel).not.toHaveBeenCalled();
       });
 
-    it('calls createDocumentModel() method after uploadFiles() success',
-      (done) => {
-        parentFolderDfd.resolve(files);
-
+    it('sets "isUploading" flag to false when createDocumentModel() was failed',
+      async () => {
         viewModel.attr('isUploading', true);
 
-        uploadParentHelper(parentFolderStub, scope).then(() => {
-          expect(viewModel.createDocumentModel).toHaveBeenCalledWith(files);
-          done();
-        });
-      });
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.resolve(files));
+        spyOn(viewModel, 'createDocumentModel')
+          .and.returnValue(Promise.reject());
 
-    it('calls notifier() if error code equal 403',
-      (done) => {
-        error = {
-          code: 403,
-          type: 'GDRIVE_PICKER_ERR_CANCEL',
-        };
+        await uploadParentHelper(parentFolderStub, scope);
 
-        parentFolderDfd.reject(error);
-
-        uploadParentHelper(parentFolderStub, scope).fail(() => {
-          expect(NotifiersUtils.notifier)
-            .toHaveBeenCalledWith('error', NotifiersUtils.messages[403]);
-          done();
-        });
+        expect(viewModel.attr('isUploading')).toBe(false);
       });
 
     it('calls notifier() if error type not equal GDRIVE_PICKER_ERR_CANCEL',
-      (done) => {
+      async () => {
         error = {
-          code: 404,
           type: 'SOME_ANOTHER_ERROR',
           message: 'not found',
         };
 
-        parentFolderDfd.reject(error);
+        spyOn(PickerUtils, 'uploadFiles')
+          .and.returnValue(Promise.reject(error));
 
-        uploadParentHelper(parentFolderStub, scope).fail(() => {
-          expect(NotifiersUtils.notifier)
-            .toHaveBeenCalledWith('error', error.message);
-          done();
-        });
+        await uploadParentHelper(parentFolderStub, scope);
+
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', error.message);
       });
   });
 });

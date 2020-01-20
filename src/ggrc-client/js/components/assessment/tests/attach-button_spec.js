@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -31,51 +31,69 @@ describe('attach-button component', function () {
     });
   });
 
-  describe('checkFolder() method', function () {
+  describe('checkFolder() method', () => {
     it('should set isFolderAttached to true when folder is attached',
-      function (done) {
+      async () => {
         viewModel.attr('isFolderAttached', false);
         viewModel.attr('instance.folder', 'gdrive_folder_id');
 
         spyOn(viewModel, 'findFolder').and
-          .returnValue($.Deferred().resolve({}));
+          .returnValue(Promise.resolve({}));
 
-        viewModel.checkFolder().then(() => {
-          expect(viewModel.attr('isFolderAttached')).toBe(true);
-          done();
-        });
+        await viewModel.checkFolder();
+
+        expect(viewModel.attr('isFolderAttached')).toBe(true);
       });
 
     it('should set isFolderAttached to false when folder is not attached',
-      function (done) {
+      async () => {
         viewModel.attr('isFolderAttached', true);
         viewModel.attr('instance.folder', null);
 
         spyOn(viewModel, 'findFolder').and
-          .returnValue($.Deferred().resolve());
+          .returnValue(Promise.resolve());
 
-        viewModel.checkFolder().then(() => {
-          expect(viewModel.attr('isFolderAttached')).toBe(false);
-          done();
-        });
+        await viewModel.checkFolder();
+
+        expect(viewModel.attr('isFolderAttached')).toBe(false);
       });
 
-    it('set correct isFolderAttached if instance refreshes during ' +
-      'request to GDrive', function () {
-      let dfd = $.Deferred();
-      spyOn(gDriveUtils, 'findGDriveItemById').and.returnValue(dfd);
+    it('sets correct isFolderAttached if instance refreshes during ' +
+      'request to GDrive', async () => {
+      spyOn(gDriveUtils, 'findGDriveItemById').and.callFake(() => {
+        viewModel.attr('instance.folder', null);
+        return Promise.resolve({folderId: 'gdrive_folder_id'});
+      });
 
       viewModel.attr('instance.folder', 'gdrive_folder_id');
-      viewModel.checkFolder(); // makes request to GDrive
 
-      // instance is refreshed and folder becomes null
-      viewModel.attr('instance.folder', null);
-      viewModel.checkFolder();
-
-      // resolve request to GDrive after instance refreshing
-      dfd.resolve({folderId: 'gdrive_folder_id'});
+      await viewModel.checkFolder();
 
       expect(viewModel.attr('isFolderAttached')).toBe(false);
     });
+
+    it('should set error data to error attribute if findFolder() was failed',
+      async () => {
+        spyOn(viewModel, 'findFolder').and
+          .returnValue(Promise.reject('Declined by user'));
+
+        viewModel.attr('error', null);
+
+        await viewModel.checkFolder();
+
+        expect(viewModel.attr('error')).toBe('Declined by user');
+      });
+
+    it('should set "false" to canAttach attribute if findFolder() was failed',
+      async () => {
+        spyOn(viewModel, 'findFolder').and
+          .returnValue(Promise.reject('Declined by user'));
+
+        viewModel.attr('canAttach', true);
+
+        await viewModel.checkFolder();
+
+        expect(viewModel.attr('canAttach')).toBe(false);
+      });
   });
 });

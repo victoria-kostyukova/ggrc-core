@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -17,15 +17,15 @@
           </label>
           <div class="popover-component__container">
             <popover-component
-              header:from="popovers.relObjectsHeader(@index)"
-              content:from="popovers.relObjectsContent(@index)"
+              header:from="popovers.relObjectsHeader(scope.index)"
+              content:from="popovers.relObjectsContent(scope.index)"
             >
               <i class="fa fa-question-circle" data-popover-trigger></i>
             </popover-component>
             {{#if relatedAnswers.length}}
               <popover-component
-                header:from="popovers.relAnswersHeader(@index)"
-                content:from="popovers.relAnswersContent(@index)"
+                header:from="popovers.relAnswersHeader(scope.index)"
+                content:from="popovers.relAnswersContent(scope.index)"
               >
                 <i class="fa fa-exclamation-circle" data-popover-trigger></i>
               </popover-component>
@@ -41,13 +41,13 @@
         fieldId:from="id"
         placeholder:from="placeholder"
         options:from="multiChoiceOptions.values"
-        on:vm:valueChanged="fieldValueChanged(scope.event.value, @index)"
+        on:vm:valueChanged="fieldValueChanged(scope.event.value, scope.index)"
         class="form-field__content {{getFieldClass(type)}}" />
       {{#if attachments}}
         <div class="form-field__validation-hint-placeholder">
           <button type="button"
             class="btn btn-small btn-link btn-link-nopadding"
-            on:el:click="updateRequiredInfo(@index)">
+            on:el:click="updateRequiredInfo(scope.index)">
             {{#if validation.hasMissingInfo}}
               Add required info
             {{else}}

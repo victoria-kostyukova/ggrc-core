@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -241,7 +241,7 @@ describe('assessment-local-ca component', () => {
         },
         errorsMap: {
           comment: false,
-          evidence: false,
+          attachment: false,
           url: false,
         },
       });
@@ -262,7 +262,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -281,7 +281,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -303,7 +303,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -324,7 +324,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -334,7 +334,7 @@ describe('assessment-local-ca component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'evidence required');
 
-      dropdownField.attr('errorsMap.evidence', true);
+      dropdownField.attr('errorsMap.attachment', true);
       performDropdownValidation(dropdownField);
 
       expect(viewModel.attr('evidenceAmount')).toBe(0);
@@ -347,7 +347,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: true,
+        attachment: true,
         url: false,
       });
     });
@@ -369,7 +369,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -380,7 +380,7 @@ describe('assessment-local-ca component', () => {
       dropdownField.attr('value', 'com+ev required');
 
       dropdownField.attr('errorsMap.comment', true);
-      dropdownField.attr('errorsMap.evidence', true);
+      dropdownField.attr('errorsMap.attachment', true);
 
       performDropdownValidation(dropdownField);
 
@@ -393,7 +393,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: true,
+        attachment: true,
         url: false,
       });
     });
@@ -403,7 +403,7 @@ describe('assessment-local-ca component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'com+ev required');
 
-      dropdownField.attr('errorsMap.evidence', true);
+      dropdownField.attr('errorsMap.attachment', true);
       performDropdownValidation(dropdownField);
 
       expect(dropdownField.attr().validation).toEqual({
@@ -415,7 +415,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: true,
+        attachment: true,
         url: false,
       });
     });
@@ -439,7 +439,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -461,7 +461,7 @@ describe('assessment-local-ca component', () => {
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       });
     });
@@ -488,14 +488,14 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: false,
         });
       });
 
       it('if evidence is missing', () => {
         viewModel.attr('urlsAmount', 1);
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
 
         performDropdownValidation(dropdownField);
 
@@ -508,7 +508,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: true,
+          attachment: true,
           url: false,
         });
       });
@@ -528,14 +528,14 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: true,
         });
       });
 
       it('if both of them missing', () => {
         dropdownField.attr('errorsMap.url', true);
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
 
         performDropdownValidation(dropdownField);
 
@@ -548,7 +548,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: true,
+          attachment: true,
           url: true,
         });
       });
@@ -575,7 +575,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: false,
         });
       });
@@ -595,7 +595,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: true,
-          evidence: false,
+          attachment: false,
           url: false,
         });
       });
@@ -614,7 +614,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: true,
         });
       });
@@ -634,7 +634,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: true,
-          evidence: false,
+          attachment: false,
           url: true,
         });
       });
@@ -662,14 +662,14 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: false,
         });
       });
 
       it('if evidence is missing', () => {
         viewModel.attr('urlsAmount', 1);
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
 
         performDropdownValidation(dropdownField);
 
@@ -682,7 +682,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: true,
+          attachment: true,
           url: false,
         });
       });
@@ -702,13 +702,13 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: false,
+          attachment: false,
           url: true,
         });
       });
 
       it('if evidence and url is missing', () => {
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
         dropdownField.attr('errorsMap.url', true);
 
         performDropdownValidation(dropdownField);
@@ -722,7 +722,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: false,
-          evidence: true,
+          attachment: true,
           url: true,
         });
       });
@@ -743,7 +743,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: true,
-          evidence: false,
+          attachment: false,
           url: true,
         });
       });
@@ -751,7 +751,7 @@ describe('assessment-local-ca component', () => {
       it('if comment and evidence is missing', () => {
         viewModel.attr('urlsAmount', 1);
         dropdownField.attr('errorsMap.comment', true);
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
 
         performDropdownValidation(dropdownField);
 
@@ -764,14 +764,14 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: true,
-          evidence: true,
+          attachment: true,
           url: false,
         });
       });
 
       it('if all of them missing', () => {
         dropdownField.attr('errorsMap.url', true);
-        dropdownField.attr('errorsMap.evidence', true);
+        dropdownField.attr('errorsMap.attachment', true);
         dropdownField.attr('errorsMap.comment', true);
 
         performDropdownValidation(dropdownField);
@@ -785,7 +785,7 @@ describe('assessment-local-ca component', () => {
         });
         expect(dropdownField.attr().errorsMap).toEqual({
           comment: true,
-          evidence: true,
+          attachment: true,
           url: true,
         });
       });
@@ -838,7 +838,7 @@ describe('assessment-local-ca component', () => {
         },
         errorsMap: {
           comment: false,
-          evidence: false,
+          attachment: false,
           url: false,
         },
       });

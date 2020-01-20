@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -170,12 +170,11 @@ export default canComponent.extend({
         el.trigger('picked', {
           files,
         });
-      })
-        .fail((err) => {
-          if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
-            el.trigger('rejected');
-          }
-        });
+      }).catch((err) => {
+        if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
+          el.trigger('rejected');
+        }
+      });
     },
     'a[data-toggle=gdrive-picker] keyup'(element, event) {
       const ESCAPE_KEY_CODE = 27;

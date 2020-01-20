@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for snapshot export."""
@@ -78,7 +78,7 @@ class TestExportSnapshots(TestCase):
   def _create_ecads(type_):
     """Create all types of external custom attribute definitions for tests."""
     with factories.single_commit():
-      cad = factories.ExternalCustomAttributeDefinitionFactory
+      cad = factories.CustomAttributeDefinitionFactory
       return [
           cad(title="date", definition_type=type_, attribute_type="Date"),
           cad(title="multiselect", definition_type=type_,
@@ -156,7 +156,7 @@ class TestExportSnapshots(TestCase):
     with factories.single_commit():
       controls = [factories.ControlFactory(slug="Control 1")]
       for cad in cads:
-        factories.ExternalCustomAttributeValueFactory(
+        factories.CustomAttributeValueFactory(
             attributable=controls[0],
             custom_attribute=cad,
         )

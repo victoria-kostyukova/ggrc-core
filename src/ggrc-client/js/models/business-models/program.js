@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -12,6 +12,7 @@ import ProgramNotifications from '../mixins/notifications/program-notifications'
 import Proposable from '../mixins/proposable';
 import MegaObject from '../mixins/mega-object';
 import Stub from '../stub';
+import Reviewable from '../mixins/reviewable';
 
 export default Cacheable.extend({
   root_object: 'program',
@@ -29,6 +30,7 @@ export default Cacheable.extend({
     ProgramNotifications,
     Proposable,
     MegaObject,
+    Reviewable,
   ],
   is_custom_attributable: true,
   isRoleable: true,

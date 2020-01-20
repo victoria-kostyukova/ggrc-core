@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for task group task specific export."""
@@ -154,13 +154,13 @@ class TestExportControls(TestCase):
                                     attribute_value):
     """Test exporting of control with filtering by external cad."""
     with factories.single_commit():
-      cad = factories.ExternalCustomAttributeDefinitionFactory(
+      cad = factories.CustomAttributeDefinitionFactory(
           definition_type="control",
           attribute_type=attribute_type,
           multi_choice_options=multi_choice_options,
       )
       control = factories.ControlFactory(slug="Control 1")
-      factories.ExternalCustomAttributeValueFactory(
+      factories.CustomAttributeValueFactory(
           attributable=control,
           custom_attribute=cad,
           attribute_value=attribute_value,

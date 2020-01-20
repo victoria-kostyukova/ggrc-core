@@ -1,11 +1,9 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loLast from 'lodash/last';
 import loIsFunction from 'lodash/isFunction';
-import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -41,7 +39,6 @@ export default canComponent.extend({
     modelType: 'Document',
     tooltip: null,
     instance: {},
-    link_class: '',
     click_event: '',
     confirmationCallback: '',
     disabled: false,
@@ -93,14 +90,14 @@ export default canComponent.extend({
           return this.createDocumentModel(files);
         })
         .then(stopFn)
-        .always(() => {
-          this.attr('isUploading', false);
-        })
-        .fail((err) => {
+        .catch((err) => {
           stopFn(true);
           if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
             $el.trigger('rejected');
           }
+        })
+        .finally(() => {
+          this.attr('isUploading', false);
         });
     },
 
@@ -130,6 +127,16 @@ export default canComponent.extend({
     },
 
     uploadParentHelper(parentFolder, scope) {
+      // This case happens when user have no access to write in audit folder
+      const readOnlyRoles = [
+        'reader',
+        'commenter',
+      ];
+      if (readOnlyRoles.includes(parentFolder.userPermission.role)) {
+        notifier('error', messages[403]);
+        return;
+      }
+
       let stopFn = () => {};
       this.attr('isUploading', true);
       return uploadFiles({
@@ -147,18 +154,13 @@ export default canComponent.extend({
           return this.createDocumentModel(files);
         })
         .then(stopFn)
-        .fail((...args) => {
-          // This case happens when user have no access to write in audit folder
-          let error = loLast(args);
-
+        .catch((error) => {
           stopFn(true);
-          if (error && error.code === 403) {
-            notifier('error', messages[403]);
-          } else if (error && error.type !== GDRIVE_PICKER_ERR_CANCEL) {
+          if (error && error.type !== GDRIVE_PICKER_ERR_CANCEL) {
             notifier('error', error && error.message);
           }
         })
-        .always(() => {
+        .finally(() => {
           this.attr('isUploading', false);
         });
     },
@@ -201,11 +203,12 @@ export default canComponent.extend({
           });
       });
       // waiting for all docs promises
-      return $.when(...dfdDocs).then(() => {
-        return makeArray(arguments);
-      }, (xhr) => {
-        notifierXHR('error', xhr);
-      });
+      return Promise.all(dfdDocs)
+        .then(
+          (docs) => docs,
+          (xhr) => {
+            notifierXHR('error', xhr);
+          });
     },
   }),
 });

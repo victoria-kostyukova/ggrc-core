@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Page objects for child elements of pages"""
 # pylint: disable=too-few-public-methods
@@ -469,28 +469,23 @@ class MultiselectCAActionsStrategy(CAActionsStrategy):
 
   def __init__(self, *args):
     super(MultiselectCAActionsStrategy, self).__init__(*args)
-    self._dropdown = self._root.element(class_name="multiselect-dropdown")
+    self._dropdown = MultiselectDropdown(self._root)
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    return self._dropdown.input().value
+    return self._dropdown.value
 
   def set_lcas_from_inline(self, value):
     """Sets value of inline LCA field."""
-    self._set_value(value)
+    self._dropdown.set_option_status(value)
 
   def set_gcas_from_popup(self, value):
     """Sets value of GCA field."""
-    self._set_value(value)
-
-  def _set_value(self, value):
-    """Sets value of CA field."""
-    self._dropdown.click()
-    self._fill_input_field(value)
+    self._dropdown.set_option_status(value)
 
   def _fill_input_field(self, value):
     """Fills input field."""
-    self._dropdown.label(text=value).click()
+    self._dropdown.set_option_status(value, is_inline=True)
 
 
 class DropdownCAActionsStrategy(CAActionsStrategy):
@@ -569,7 +564,8 @@ class MultiselectDropdown(object):
   @property
   def is_expanded(self):
     """Returns whether dropdown is expanded."""
-    return self._root.element(class_name="dropdown-focus").exists
+    return self._root.element(
+        class_name="multiselect-dropdown__body-wrapper").exists
 
   def expand(self):
     """Expands dropdown if it is not expanded."""
@@ -581,15 +577,22 @@ class MultiselectDropdown(object):
     if self.is_expanded:
       self._root.click()
 
-  def set_option_status(self, option, status=True):
-    """Selects or deselects option according to status value."""
+  def set_option_status(self, option, status=True, is_inline=False):
+    """Selects or deselects option according to status value. Skip collapse
+    action if parameter is_inline is set to True."""
     self.expand()
     self._root.element(text=option).checkbox().set(status)
-    self.collapse()
+    if not is_inline:
+      self.collapse()
 
   def select_all(self):
     """Selects all options by selecting 'Select all' option."""
     self.set_option_status("Select All")
+
+  @property
+  def value(self):
+    """Returns dropdown value."""
+    return self._root.input().value
 
 
 class CollapsiblePanel(object):

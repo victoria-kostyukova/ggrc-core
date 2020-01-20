@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for risk model."""
@@ -23,7 +23,7 @@ from ggrc.models.relationship import Relatable
 
 class Risk(synchronizable.Synchronizable,
            synchronizable.RoleableSynchronizable,
-           mixins.ExternalCustomAttributable,
+           mixins.CustomAttributable,
            Relatable,
            PublicDocumentable,
            comment.ExternalCommentable,

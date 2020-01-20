@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants and procedures to make formatted messages."""
 import copy
@@ -17,6 +17,13 @@ class AssertionMessages(CommonMessages):
   """Class contains constants and methods to make messages after assertion
   procedures.
   """
+  AUTOMAPPING_IN_CHANGE_LOG = ("Automapping of {obj_name} should be tracked in"
+                               " the 'Change log' tab")
+  OBJS_SHOULD_BE_MAPPED_TO_OBJ = ("{mapped_objs_names} should be mapped to"
+                                  " {src_obj_name}")
+  TAB_WITH_NUM_SHOULD_EXIST = "{tab_name} tab with number {num} should exist."
+  MEGA_PROGRAM_ICON = "Blue flag icon should appear near the {title} title"
+
   _line = "\n-----\n"
   _double_diff = "\nExpected:\n{}\nActual:\n{}\n"
   _triple_diff = "\nExpected:\n{}\nActual First:\n{}\nActual Second:\n{}\n"

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Assessments Workflow smoke tests."""
 # pylint: disable=no-self-use
@@ -23,7 +23,8 @@ from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
 from lib.entities.entity import Representation
 from lib.page.widget import object_modal
-from lib.service import rest_facade, rest_service, webui_service
+from lib.service import (rest_facade, rest_service, webui_service,
+                         change_log_ui_service)
 from lib.utils import string_utils
 from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
@@ -89,19 +90,14 @@ class TestAssessmentsWorkflow(base.Test):
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
-  def test_asmt_logs(
-      self, program, audit, assessment, selenium
-  ):
-    """Test for validation of Assessment log pane.
-    Acceptance criteria:
-      1) 3 log items at the log pane
-      2) all items return 'True' for all attrs.
-    """
-    log_items_validation = webui_service.AssessmentsService(
-        selenium).get_log_pane_validation_result(obj=assessment)
-    log_validation_results = [all(item_result.values()) for item_result in
-                              log_items_validation]
-    assert ([True] * 2) == log_validation_results, str(log_items_validation)
+  def test_asmt_logs(self, program, audit, assessment, selenium):
+    """Test for validation of Assessment log pane."""
+    log_items_factory = entities_factory.ChangeLogItemsFactory()
+    exp_log = [log_items_factory.generate_log_entity_for_mapping(audit),
+               log_items_factory.generate_obj_creation_entity(assessment)]
+    actual_log = (change_log_ui_service.ChangeLogService().
+                  get_obj_changelog(assessment))
+    assert exp_log == actual_log, "Actual change log differs from expected."
 
   @pytest.mark.smoke_tests
   def test_raise_issue(
@@ -529,7 +525,6 @@ class TestAssessmentsWorkflow(base.Test):
                           custom_attributes=cas)
     _assert_asmt(asmts_ui_service, exp_asmt)
 
-  @pytest.mark.xfail(reason="Unstable test.")
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "obj, obj_role",

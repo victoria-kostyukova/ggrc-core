@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -16,7 +16,7 @@
 <div class="ggrc-form-item__checkbox-item">
   <label class="input--inline">
     <input
-      type="checkbox" 
+      type="checkbox"
       el:checked:bind="values.Creators"
     />
     Notify creators
@@ -34,8 +34,8 @@
 <div class="ggrc-form-item__checkbox-item">
   <label class="input--inline">
     <input
-      type="checkbox" 
-      el:checked:bind="values.Verifiers" 
+      type="checkbox"
+      el:checked:bind="values.Verifiers"
     />
     Notify verifiers
   </label>

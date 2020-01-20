@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -68,6 +68,7 @@ tree-widget-container {
       a, span {
         font-size: 13px;
         color: $black;
+        white-space: nowrap;
       }
     }
   }
@@ -117,7 +118,7 @@ tree-view {
     &:first-child {
       .open-item {
         margin-top: 0;
-      } 
+      }
     }
     &:last-of-type {
       .open-item {

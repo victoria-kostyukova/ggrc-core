@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -48,6 +48,7 @@ export default canComponent.extend({
     rightRevisionDescription: '',
     compareIt: function () {
       const instance = this.attr('instance');
+
       const view = getInstanceView(instance);
       const that = this;
       const currentRevisionID = this.attr('leftRevisionId');
@@ -219,9 +220,12 @@ export default canComponent.extend({
      * @param {canList} revisions - revisions for comparing
      */
     highlightDifference: loDebounce(function ($target, revisions) {
+      const instance = this.attr('instance');
       this.highlightAttributes($target);
       this.highlightCustomRoles($target);
-      this.highlightAttachments($target, revisions);
+      if (instance.type !== 'Program') {
+        this.highlightAttachments($target, revisions);
+      }
       this.highlightCustomAttributes($target, revisions);
     }, 250),
 
@@ -240,7 +244,7 @@ export default canComponent.extend({
       );
       const tabContent = '.info-pane__main-content';
       const attributesSelector = isProposableExternalAttr ?
-        '.review-status, proposable-attribute > .action-toolbar-container' :
+        '.review-status, external-attribute > .action-toolbar-container' :
         `object-review, ${tabContent} > .row-fluid:not(:has(custom-roles)),
          ${tabContent} > .custom-attr-wrap .row-fluid.wrap-row > *`;
 

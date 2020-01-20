@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#if isAllowedToUnmap}}
@@ -22,24 +22,24 @@
     </unmap-button>
 
   {{else}}
-
-    {{^if isMappableExternally}}
-      <unmap-button
-        source:from="page_instance"
-        destination:from="instance"
-        class="unmap-link">
-          <i class="fa fa-ban"></i>Unmap
-      </unmap-button>
-    {{else}}
+    <unmap-button
+      source:from="page_instance"
+      destination:from="instance"
+      class="unmap-link">
+        <i class="fa fa-ban"></i>Unmap
+    </unmap-button>
+  {{/if}}
+  </li>
+{{else}}
+  {{#if isUnmappableExternally}}
+    <li class="border">
       <questionnaire-mapping-link
         instance:from="page_instance"
         destinationModel:from="instance.constructor"
         type:from="'unmap'">
-          <i class="fa fa-fw fa-external-link"></i>
+          <i class="fa fa-external-link"></i>
           Unmap in new frontend
       </questionnaire-mapping-link>
-    {{/if}}
-
+    </li>
   {{/if}}
-  </li>
 {{/if}}

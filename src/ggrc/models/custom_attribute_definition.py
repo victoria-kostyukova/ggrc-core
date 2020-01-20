@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Custom attribute definition module"""
@@ -21,6 +21,7 @@ from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import attributevalidator
 from ggrc.models.mixins import base
+from ggrc.models.mixins.with_external_mapping import WithExternalMapping
 from ggrc.utils import errors
 from ggrc.utils import validators
 
@@ -74,6 +75,7 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
   mandatory = db.Column(db.Boolean, nullable=True, default=False)
   helptext = db.Column(db.String)
   placeholder = db.Column(db.String)
+  external_name = db.Column(db.String, nullable=True)
 
   _sanitize_html = [
       "multi_choice_options",
@@ -203,7 +205,8 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
       )
 
 
-class CustomAttributeDefinition(CustomAttributeDefinitionBase):
+class CustomAttributeDefinition(WithExternalMapping,
+                                CustomAttributeDefinitionBase):
   """Custom attribute definition model."""
 
   __tablename__ = 'custom_attribute_definitions'
@@ -229,6 +232,7 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
 
   definition_id = db.Column(db.Integer)
   multi_choice_mandatory = db.Column(db.String)
+  previous_id = db.Column(db.Integer, nullable=True)
 
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute',
@@ -248,6 +252,8 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
       'mandatory',
       'helptext',
       'placeholder',
+      'external_name',
+      'previous_id',
   ]
 
   _api_attrs = reflection.ApiAttributes(
@@ -255,9 +261,9 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
                            read=True,
                            create=False,
                            update=False),
-      reflection.Attribute("title", update=False),
+      reflection.Attribute("title", update=True),
       reflection.Attribute("attribute_type", update=False),
-      reflection.Attribute("multi_choice_options", update=False),
+      reflection.Attribute("multi_choice_options", update=True),
       *_include_links)
 
   @property
@@ -460,25 +466,15 @@ class CustomAttributeDefinition(CustomAttributeDefinitionBase):
 
 def init_cad_listeners():
   """Register event listeners for CAD and eCAD models"""
-  from ggrc.models.external_custom_attribute_definition \
-      import ExternalCustomAttributeDefinition
 
   for action in ("before_insert", "before_update", "before_delete"):
     sa.event.listen(CustomAttributeDefinition,
-                    action,
-                    validators.validate_definition_type_cad)
-  for action in ("before_insert", "before_update"):
-    sa.event.listen(ExternalCustomAttributeDefinition,
                     action,
                     validators.validate_definition_type_ecad)
   for action in ("after_insert", "after_update", "after_delete"):
     sa.event.listen(CustomAttributeDefinition,
                     action,
                     attributevalidator.invalidate_gca_cache)
-
-  sa.event.listen(ExternalCustomAttributeDefinition,
-                  "before_delete",
-                  raise_method_is_not_allowed)
 
 
 def raise_method_is_not_allowed(*args, **kwargs):

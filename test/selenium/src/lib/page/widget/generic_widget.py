@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Widgets other than Info widget."""
 
@@ -219,7 +219,7 @@ class TreeView(base.TreeView):
     """
     search_field = self._browser.element(class_name="tree-filter__input")
     search_field.send_keys(obj_str)
-    search_button = self._browser.element(text="Search")
+    search_button = self._browser.button(text="Search")
     search_button.click()
     self.wait_loading_after_actions()
     if len(self.tree_view_items(is_updated=True)) > 1:
@@ -233,7 +233,7 @@ class TreeView(base.TreeView):
     Return: lib.element.tree_view."dropdown_obj"
     """
     # pylint: disable=invalid-name
-    obj = self.find_row(title)
+    obj = self.find_row("title = \"" + title + "\"")
     item_dropdown_button = obj.item_btn
     selenium_utils.hover_over_element(
         self._driver, obj.element)
@@ -297,8 +297,10 @@ class Programs(Widget):
   """Model for Programs generic widgets"""
   def __init__(self, driver=None, obj_name=objects.PROGRAMS):
     self._actual_name = obj_name
-    self.obj_name = (objects.PROGRAMS if obj_name == objects.PROGRAM_PARENTS
-                     else obj_name)
+    if obj_name in (objects.PROGRAM_PARENTS, objects.PROGRAM_CHILDS):
+      self.obj_name = objects.PROGRAMS
+    else:
+      self.obj_name = obj_name
     super(Programs, self).__init__(driver, self.obj_name)
 
   @property
@@ -341,3 +343,7 @@ class CADashboard(widget_bar.Dashboard):
   def active_dashboard_tab_elem(self):
     """Returns iframe content of selected CA dashboard tab."""
     return self._browser.iframe()
+
+
+class Regulations(Widget):
+  """Model for Regulations generic widgets."""

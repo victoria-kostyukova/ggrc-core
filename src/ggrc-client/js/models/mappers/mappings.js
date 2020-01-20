@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -233,6 +233,20 @@ function shouldBeMappedExternally(source, destination) {
   return Object.keys(externalMappings).includes(destination);
 }
 
+/**
+ * Returns object with models which can be unmapped externally only
+ * @param {string} object model name
+ * @return {Object} allowed for external unmapping models
+ */
+function getExternalUnmapModels(object) {
+  return _getModelsFromConfig(object, 'externalUnmap');
+}
+
+function toBeUnmappedExternally(source, destination) {
+  let externalMappings = getExternalUnmapModels(source);
+  return Object.keys(externalMappings).includes(destination);
+}
+
 export {
   getMappingList,
   allowedToCreate,
@@ -242,5 +256,6 @@ export {
   getAllowedToUnmapModels,
   getAvailableMappings,
   shouldBeMappedExternally,
+  toBeUnmappedExternally,
 };
 

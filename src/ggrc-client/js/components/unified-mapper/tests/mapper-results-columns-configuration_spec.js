@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -134,22 +134,5 @@ describe('mapper-results-columns-configuration component', function () {
       viewModel.setColumns();
       expect(viewModel.selectedColumns).toEqual('selectedColumns');
     });
-  });
-
-  describe('stopPropagation() method', function () {
-    let event;
-
-    beforeEach(function () {
-      event = {
-        stopPropagation: function () {},
-      };
-      spyOn(event, 'stopPropagation');
-    });
-
-    it('calls stopPropagation of event',
-      function () {
-        viewModel.stopPropagation({}, {}, event);
-        expect(event.stopPropagation).toHaveBeenCalled();
-      });
   });
 });

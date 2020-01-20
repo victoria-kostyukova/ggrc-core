@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -160,7 +160,7 @@ function prepareCustomAttributes(definitions, values) {
       preconditions_failed: [],
       errorsMap: {
         comment: false,
-        evidence: false,
+        attachment: false,
         url: false,
       },
     };
@@ -175,12 +175,12 @@ function prepareCustomAttributes(definitions, values) {
           empty: errors.indexOf('value') > -1,
           mandatory: def.mandatory,
           valid: errors.indexOf('comment') < 0 &&
-            errors.indexOf('evidence') < 0 &&
+            errors.indexOf('attachment') < 0 &&
             errors.indexOf('url') < 0,
         };
         value.errorsMap = {
           comment: errors.indexOf('comment') > -1,
-          evidence: errors.indexOf('evidence') > -1,
+          attachment: errors.indexOf('attachment') > -1,
           url: errors.indexOf('url') > -1,
         };
         valueData = value;
@@ -388,13 +388,7 @@ function applyChangesToCAValue(values, changes) {
 }
 
 function getLCAPopupTitle(validationMap) {
-  let fixedValidationMap = Object.assign({}, validationMap);
-
-  if (validationMap.evidence) {
-    fixedValidationMap.attachment = true;
-  }
-
-  return LCA_DROPDOWN_TITLES_MAP[ddValidationMapToValue(fixedValidationMap)];
+  return LCA_DROPDOWN_TITLES_MAP[ddValidationMapToValue(validationMap)];
 }
 
 export {

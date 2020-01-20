@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for get all attributes json"""
@@ -42,13 +42,8 @@ class TestGetAttributes(TestCase):
 
   def test_get_attributes_cads(self):
     """Test get attributes json with cads."""
-    factories.CustomAttributeDefinitionFactory(
+    cad = factories.CustomAttributeDefinitionFactory(
         title="cad text",
-        definition_type="control",
-        attribute_type="Text",
-    )
-    ext_cad = factories.ExternalCustomAttributeDefinitionFactory(
-        title="ext cad text",
         definition_type="control",
         attribute_type="Text",
     )
@@ -56,10 +51,10 @@ class TestGetAttributes(TestCase):
     attrs_json = json.loads(attrs_str)
     self.assertEqual(len(attrs_json), 1)
     attr = attrs_json[0]
-    self.assertEqual(attr["external_id"], ext_cad.external_id)
-    self.assertEqual(attr["title"], ext_cad.title)
-    self.assertEqual(attr["definition_type"], ext_cad.definition_type)
-    self.assertEqual(attr["attribute_type"], ext_cad.attribute_type)
+    self.assertEqual(attr["external_name"], cad.external_name)
+    self.assertEqual(attr["title"], cad.title)
+    self.assertEqual(attr["definition_type"], cad.definition_type)
+    self.assertEqual(attr["attribute_type"], cad.attribute_type)
 
   def test_get_all_attributes_cads(self):
     """Test get all attributes json with cads."""
@@ -68,14 +63,8 @@ class TestGetAttributes(TestCase):
         definition_type="control",
         attribute_type="Text",
     )
-    ext_cad = factories.ExternalCustomAttributeDefinitionFactory(
-        title="ext cad text",
-        definition_type="control",
-        attribute_type="Text",
-    )
     attrs_str = get_all_attributes_json(load_custom_attributes=True)
     attrs_json = json.loads(attrs_str)
     attrs_by_type = attrs_json["Control"]
     attrs = (attr["attr_name"] for attr in attrs_by_type)
-    self.assertIn(ext_cad.title, attrs)
     self.assertNotIn(cad.title, attrs)

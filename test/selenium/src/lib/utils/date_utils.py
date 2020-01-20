@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Date utils."""
 import datetime
@@ -88,6 +88,12 @@ def iso8601_to_ui_str_with_zone(iso8601_str):
    (mm/dd/yyyy hh:mm:ss AM/PM) format."""
   return datetime.datetime.strftime(
       iso8601_to_local_datetime(iso8601_str), "%m/%d/%Y %I:%M:%S %p")
+
+
+def iso8601_to_ui_str_date(iso8601_str):
+  """Converts ISO 8601 (yyyy-mm-ddThh:mm:ss) string to (mm/dd/yyyy) format."""
+  return datetime.datetime.strftime(
+      iso8601_to_datetime(iso8601_str), "%m/%d/%Y")
 
 
 def user_timezone_offset():

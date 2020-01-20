@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Base test case for testing snapshotter"""
@@ -72,16 +72,6 @@ class SnapshotterBaseTestCase(TestCase):
               "definition_type": "objective",
               "title": "objective rich field 1",
               "attribute_type": "Rich Text",
-          },
-          {
-              "definition_type": "process",
-              "title": "process date field 1",
-              "attribute_type": "Date",
-          },
-          {
-              "definition_type": "access_group",
-              "title": "access group text field 2",
-              "attribute_type": "Text",
           },
       ]
 

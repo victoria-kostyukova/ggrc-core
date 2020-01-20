@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for log_json method."""
@@ -22,7 +22,8 @@ SET_MODELS_TO_EXCLUDE = {all_models.AttributeDefinitions,
                          all_models.ImportExport,
                          all_models.Maintenance,
                          all_models.Automapping,
-                         all_models.Revision
+                         all_models.Revision,
+                         all_models.ExternalMapping
                          }
 SET_MODELS_WITH_LOG_JSON_METHOD = (SET_ALL_MODELS -
                                    SET_MODELS_TO_EXCLUDE)

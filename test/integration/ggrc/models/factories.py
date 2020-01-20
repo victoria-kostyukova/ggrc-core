@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Factories for ggrc models.
@@ -21,8 +21,9 @@ from contextlib import contextmanager
 import factory
 
 from ggrc import db
+from ggrc.models.mixins import synchronizable
 from ggrc.models import saved_search
-from ggrc.models import all_models
+from ggrc.models import all_models, get_model
 
 from ggrc.access_control import roleable
 
@@ -91,6 +92,12 @@ class TitledFactory(ModelFactory):
   title = factory.LazyAttribute(lambda m: random_str(prefix='title '))
 
 
+class ExternalResourceFactory(ModelFactory):
+  external_id = factory.LazyAttribute(lambda _:
+                                      SynchronizableExternalId.next())
+  external_slug = factory.LazyAttribute(lambda _: random_str())
+
+
 class WithACLandCAFactory(ModelFactory):
   """Factory class to create object with ACL and CA in one step"""
 
@@ -136,6 +143,11 @@ class WithACLandCAFactory(ModelFactory):
     return instance
 
 
+class ExternalMappingFactory(ModelFactory):
+  class Meta:
+    model = all_models.ExternalMapping
+
+
 class CustomAttributeDefinitionFactory(TitledFactory):
 
   class Meta:
@@ -149,11 +161,32 @@ class CustomAttributeDefinitionFactory(TitledFactory):
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Assert definition_type"""
-    return super(CustomAttributeDefinitionFactory, cls)._create(
+    model = get_model(kwargs.get('definition_type'))
+    if issubclass(model, synchronizable.Synchronizable):
+      if "external_id" in kwargs:
+        external_id = kwargs.pop("external_id")
+      else:
+        external_id = SynchronizableExternalId.next()
+
+      if "entity_name" in kwargs:
+        entity_name = kwargs.pop("entity_name")
+      else:
+        entity_name = "{}_{}_123".format(target_class.type, external_id)
+
+    cad = super(CustomAttributeDefinitionFactory, cls)._create(
         target_class,
         *args,
         **kwargs
     )
+    if issubclass(model, synchronizable.Synchronizable):
+      cad._external_info = ExternalMappingFactory(
+          external_id=external_id,
+          object_type=target_class.type,
+          external_type=entity_name,
+          object_id=cad.id
+      )
+
+    return cad
 
 
 class CustomAttributeValueFactory(ModelFactory):
@@ -442,31 +475,31 @@ class RegulationFactory(TitledFactory):
     model = all_models.Regulation
 
 
-class OrgGroupFactory(TitledFactory):
+class OrgGroupFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.OrgGroup
 
 
-class SystemFactory(TitledFactory):
+class SystemFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.System
 
 
-class KeyReportFactory(TitledFactory):
+class KeyReportFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.KeyReport
 
 
-class AccountBalanceFactory(TitledFactory):
+class AccountBalanceFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.AccountBalance
 
 
-class ProcessFactory(TitledFactory):
+class ProcessFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.Process
@@ -478,7 +511,7 @@ class PolicyFactory(TitledFactory):
     model = all_models.Policy
 
 
-class MarketFactory(TitledFactory):
+class MarketFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.Market
@@ -516,21 +549,21 @@ class AccessControlRoleAdminFactory(AccessControlRoleFactory):
   name = "Admin"
 
 
-class AccessGroupFactory(TitledFactory):
+class AccessGroupFactory(ExternalResourceFactory, TitledFactory):
   """Access Group factory class"""
 
   class Meta:
     model = all_models.AccessGroup
 
 
-class DataAssetFactory(TitledFactory):
+class DataAssetFactory(ExternalResourceFactory, TitledFactory):
   """DataAsset factory class"""
 
   class Meta:
     model = all_models.DataAsset
 
 
-class FacilityFactory(TitledFactory):
+class FacilityFactory(ExternalResourceFactory, TitledFactory):
   """Facility factory class"""
 
   class Meta:
@@ -544,7 +577,7 @@ class ObjectPersonFactory(ModelFactory):
     model = all_models.ObjectPerson
 
 
-class ProductFactory(TitledFactory):
+class ProductFactory(ExternalResourceFactory, TitledFactory):
   """Product factory class"""
 
   class Meta:
@@ -567,7 +600,7 @@ class StandardFactory(TitledFactory):
   description = factory.LazyAttribute(lambda _: random_str(length=100))
 
 
-class VendorFactory(TitledFactory):
+class VendorFactory(ExternalResourceFactory, TitledFactory):
   """Vendor factory class"""
 
   class Meta:
@@ -632,13 +665,13 @@ class ReviewFactory(ModelFactory):
   notification_type = all_models.Review.NotificationTypes.EMAIL_TYPE
 
 
-class ProjectFactory(TitledFactory):
+class ProjectFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.Project
 
 
-class TechnologyEnvironmentFactory(TitledFactory):
+class TechnologyEnvironmentFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.TechnologyEnvironment
@@ -666,13 +699,13 @@ class BackgroundOperationFactory(ModelFactory):
     model = all_models.BackgroundOperation
 
 
-class MetricFactory(TitledFactory):
+class MetricFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.Metric
 
 
-class ProductGroupFactory(TitledFactory):
+class ProductGroupFactory(ExternalResourceFactory, TitledFactory):
 
   class Meta:
     model = all_models.ProductGroup

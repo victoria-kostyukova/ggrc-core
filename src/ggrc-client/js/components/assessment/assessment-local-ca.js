@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -15,7 +15,6 @@ import {
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/event-types';
 import tracker from '../../tracker';
 import {isAllowedFor} from '../../permission';
-import isFunction from 'can-util/js/is-function/is-function';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {getPlainText} from '../../plugins/ggrc-utils';
 
@@ -111,7 +110,7 @@ export default canComponent.extend({
       let value = field.value;
       let isMandatory = field.validation.mandatory;
       let errorsMap = field.errorsMap || {
-        evidence: false,
+        attachment: false,
         comment: false,
         url: false,
       };
@@ -142,7 +141,7 @@ export default canComponent.extend({
             requiresUrl),
         },
         errorsMap: {
-          evidence: hasMissingEvidence,
+          attachment: hasMissingEvidence,
           comment: hasMissingComment,
           url: hasMissingUrl,
         },
@@ -250,19 +249,6 @@ export default canComponent.extend({
       $container.animate({
         scrollTop: $(field).offset().top - $body.offset().top,
       }, 500);
-    },
-  },
-  helpers: {
-    isInvalidField: function (show, valid, highlightInvalidFields, options) {
-      show = isFunction(show) ? show() : show;
-      valid = isFunction(valid) ? valid() : valid;
-      highlightInvalidFields = isFunction(highlightInvalidFields) ?
-        highlightInvalidFields() : highlightInvalidFields;
-
-      if (highlightInvalidFields && show && !valid) {
-        return options.fn(options.context);
-      }
-      return options.inverse(options.context);
     },
   },
 });

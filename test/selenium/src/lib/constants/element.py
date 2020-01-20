@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Elements' labels and properties for objects."""
 # pylint: disable=too-few-public-methods
@@ -150,7 +150,7 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   MODIFIED_BY = "Last updated by"
-  CREATED_AT = "Created date"
+  CREATED_AT = "Created Date"
   UPDATED_AT = "Updated at"
   # roles
   OBJECT_ADMINS = "Object Admins"
@@ -202,6 +202,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   PROGRAM_MANAGERS = "Program Managers"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
+  REVIEW_STATUS = "Review Status"
   CREATORS = roles.CREATORS
   ASSIGNEES = roles.ASSIGNEES
   VERIFIERS = roles.VERIFIERS
@@ -270,6 +271,7 @@ class CommonAssessment(Common):
   VERIFIERS = roles.VERIFIERS
   MAPPED_OBJECTS = TransformationSetVisibleFields.MAPPED_OBJECTS
   ASMT_TYPE = "Assessment Type"
+  RECIPIENTS = "Recipients"
   VERIFIED = TransformationSetVisibleFields.VERIFIED
 
 
@@ -459,6 +461,27 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS)
 
 
+class ProgramChildModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+   fields for Child Programs.
+   """
+  DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
+
+
+class RegulationModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Regulations.
+  """
+  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
+  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
+  ADMIN = TransformationSetVisibleFields.ADMIN
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
+      PRIMARY_CONTACTS, ADMIN)
+
+
 class AuditModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Audits.
@@ -518,16 +541,6 @@ class AsmtAttrsTab(object):
   """Common elements' labels of Assessment Attributes Tab on Assessment Info
   Widget."""
   TAB_NAME = AssessmentTabContainer.OTHER_ATTRS_TAB
-
-
-class AsmtLogTab(object):
-  """Common elements' labels of Assessment Log Tab on Assessment Info
-   Widget."""
-  TAB_NAME = AssessmentTabContainer.CHANGE_LOG_TAB
-  FIELD = "Field"
-  ORIGINAL_VALUE = "Original value"
-  NEW_VALUE = "New value"
-  EMPTY_STATEMENT = u"\u2014"  # em-dash
 
 
 class RelatedAsmtsTab(object):

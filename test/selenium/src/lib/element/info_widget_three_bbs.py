@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """3bbs element for info widget."""
 from lib.element import three_bbs
@@ -98,6 +98,10 @@ class WorkflowInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
 
 class ControlInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Control info widget."""
+
+
+class RiskInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Risk info widget."""
 
 
 class PersonTreeItemThreeBbbs(InfoWidgetThreeBbbs):

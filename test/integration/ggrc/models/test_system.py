@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for System model."""
@@ -42,6 +42,8 @@ class TestSoxSystem(TestCase):
     response = self.api.post(all_models.System, {
         "system": {
             "title": "new_system",
+            "external_id": 1,
+            "external_slug": "1111",
             "context": None,
             "access_control_list": {"Admin": [
                 {
@@ -101,6 +103,8 @@ class TestSoxSystem(TestCase):
         "system": {
             "id": system.id,
             "title": "updated system",
+            "external_id": 1,
+            "external_slug": "1111",
             "test_plan": "test plan",
             "notes": "test notes",
             "description": "test description",
@@ -121,6 +125,8 @@ class TestSoxSystem(TestCase):
     data = {
         "system": {
             "title": "new system",
+            "external_id": 1,
+            "external_slug": "1111",
             "test_plan": "test plan",
             "notes": "test notes",
             "description": "test description",

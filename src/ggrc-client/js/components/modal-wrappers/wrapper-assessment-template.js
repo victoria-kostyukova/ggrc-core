@@ -1,10 +1,12 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import canMap from 'can-map';
 import canComponent from 'can-component';
+import {scopingObjects} from '../../plugins/models-types-collections';
+
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
   'Primary Contacts', 'Secondary Contacts', 'Control Operators',
@@ -29,6 +31,16 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
     {value: 'Principal Assignees', title: 'Principal Assignees'},
     {value: 'Secondary Assignees', title: 'Secondary Assignees'},
     {value: 'Risk Owners', title: 'Risk Owners'},
+    {value: 'Other Contacts', title: 'Other Contacts'},
+    {value: 'other', title: 'Others...'},
+  ],
+  scope: [
+    {value: 'Admin', title: 'Object Admins'},
+    {value: 'Audit Lead', title: 'Audit Captain'},
+    {value: 'Auditors', title: 'Auditors'},
+    {value: 'Principal Assignees', title: 'Principal Assignees'},
+    {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+    {value: 'Compliance Contacts', title: 'Compliance Contacts'},
     {value: 'Other Contacts', title: 'Other Contacts'},
     {value: 'other', title: 'Others...'},
   ],
@@ -60,9 +72,12 @@ export default canComponent.extend({
       },
       peopleValues: {
         get() {
-          let options = PEOPLE_VALUES_OPTIONS[
+          const objectType = scopingObjects.includes(
             this.attr('instance.template_object_type')
-          ];
+          ) ? 'scope' : this.attr('instance.template_object_type');
+
+          const options = PEOPLE_VALUES_OPTIONS[objectType];
+
           return options ? options : PEOPLE_VALUES_OPTIONS['defaults'];
         },
       },

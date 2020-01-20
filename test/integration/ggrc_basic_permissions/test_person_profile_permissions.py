@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test access to the PersonProfile."""
@@ -10,6 +10,9 @@ from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -70,3 +73,26 @@ class TestPersonProfilePermissions(TestCase):
     else:
       self.assertEqual(len(api_profiles), 1)
       self.assertEqual(profile_id, api_profile_id)
+
+  def test_program_editor_permissions(self):
+    """Test checks that PE cannot delete objects mapped to program"""
+    creator = all_models.Role.query.filter(
+        all_models.Role.name == 'Creator').one()
+    program_editor_email = 'creator@gmail.ru'
+    issue_slug = 'ISSUE-1'
+    with factories.single_commit():
+      issue = factories.IssueFactory(slug=issue_slug)
+      issue_id = issue.id
+      program_editors = factories.PersonFactory(email=program_editor_email)
+      rbac_factories.UserRoleFactory(role=creator,
+                                     person=program_editors)
+      program = factories.ProgramFactory(title="New program")
+      factories.RelationshipFactory(
+          source=program,
+          destination=issue,
+      )
+      program.add_person_with_role_name(program_editors, "Program Editors")
+    self.api.set_user(program_editors)
+    issue = all_models.Issue.query.get(issue_id)
+    response = self.api.delete(issue)
+    self.assertStatus(response, 403)

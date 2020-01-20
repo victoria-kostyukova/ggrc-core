@@ -1,4 +1,5 @@
-# Copyright (C) 2019 Google Inc.
+# coding=utf-8
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for string operations."""
 import cgi
@@ -25,6 +26,7 @@ class Symbols(object):
   PIPE = "|"
   AT_SIGN = "@"
   PLUS = "+"
+  EM_DASH = u"—"
 
   def __init__(self, additional_exclude=''):
     """Create symbols sets.
@@ -257,3 +259,8 @@ def extract_items(list_of_dicts, *keys_to_keep):
   return ([item[keys_to_keep[0]] for item in list_of_dicts]
           if len(keys_to_keep) == 1 else
           [{key: item[key] for key in keys_to_keep} for item in list_of_dicts])
+
+
+def convert_list_to_str(list_of_items, separator='\n '):
+  """Converts list of any objects to string with separator between items."""
+  return separator.join([str(item) for item in list_of_items])

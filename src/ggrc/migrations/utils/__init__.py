@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -30,6 +30,7 @@ snapshots_table = Snapshot.__table__  # pylint: disable=invalid-name
 Stub = namedtuple("Stub", ["type", "id"])
 
 _USE_DEFAULT_MIGRATOR = object()
+MIGRATION_FAILED_ERROR = "Migration {} was failed"
 
 
 def get_relationships(connection, type_, id_, filter_types=None):

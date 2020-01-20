@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Generate rules for snapshoting"""
@@ -60,6 +60,21 @@ class Types(object):
   }
 
   external = {
+      "AccessGroup",
+      "AccountBalance",
+      "DataAsset",
+      "Facility",
+      "KeyReport",
+      "Market",
+      "Metric",
+      "OrgGroup",
+      "Process",
+      "Product",
+      "ProductGroup",
+      "Project",
+      "System",
+      "Vendor",
+      "TechnologyEnvironment",
       "Control",
       "Risk",
   }

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants for roles."""
 # pylint: disable=too-many-public-methods
@@ -211,6 +211,23 @@ class ACLRolesIDsMetaClass(type):
   def EVIDENCE_ADMINS(cls):
     return cls.id_of_role(
         object_type=objects.get_obj_type(objects.EVIDENCE), name=ADMIN)
+
+  @property
+  def PROJECT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS), name=ADMIN)
+
+  @property
+  def PROJECT_ASSIGNEES(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS),
+        name=objects.get_singular(ASSIGNEES, title=True))
+
+  @property
+  def PROJECT_VERIFIERS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS),
+        name=objects.get_singular(VERIFIERS, title=True))
 
 
 class ACLRolesIDs(object):

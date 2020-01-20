@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test user permissions loading and caching."""
@@ -36,8 +36,49 @@ class TestMemcacheBase(TestCase):
 
   def setUp(self):
     super(TestMemcacheBase, self).setUp()
-
     _lazy_load_module()
+
+  def set_dummy_permissions_in_cache(self, *user_ids):
+    """Set dummy permissions for users in memcache.
+
+    Set dummy permissions for passed users in memcache. Note that this will
+    override permissions present in memcache.
+
+    Args:
+      user_ids (tuple): IDs of users for which permissions should be set.
+    """
+    cached_keys = set("permissions:{}".format(user_id) for user_id in user_ids)
+    self.memcache_client.set("permissions:list", cached_keys)
+
+  def assert_permissions_not_in_memcache(self, *user_ids):
+    """Assert that permissions for users are not present in memcache.
+
+    Check that permissions for users with `user_ids` IDs are not present in
+    memcache. This check will fail if permissions for at least one user are
+    present in memcache.
+
+    Args:
+      user_ids (tuple): IDs of users which permissions should be checked.
+    """
+    cached_keys = self.memcache_client.get("permissions:list")
+    present = any("permissions:{}".format(user_id) in cached_keys
+                  for user_id in user_ids)
+    self.assertFalse(present)
+
+  def assert_permissions_in_memcache(self, *user_ids):
+    """Assert that permissions for users are present in memcache.
+
+    Check that permissions for users with `user_ids` IDs are present in
+    memcache. This check will fail if permissions for at least one user are
+    not present in memcache.
+
+    Args:
+      user_ids (tuple): IDs of users which permissions should be checked.
+    """
+    cached_keys = self.memcache_client.get("permissions:list")
+    present = all("permissions:{}".format(user_id) in cached_keys
+                  for user_id in user_ids)
+    self.assertTrue(present)
 
 
 class TestPermissionsLoading(TestMemcacheBase):
@@ -53,14 +94,6 @@ class TestPermissionsLoading(TestMemcacheBase):
     self.api.set_user(self.user)
     self.user_id = self.user.id
     self.user1_id = self.user1.id
-
-  def set_dummy_permissions_in_cache(self, *user_ids):
-    """Set dummy permissions for users in memcache.
-    This will reset already existing set."""
-    cached_keys = set()
-    for user_id in user_ids:
-      cached_keys.add("permissions:{}".format(user_id))
-    self.memcache_client.set("permissions:list", cached_keys)
 
   def test_permissions_loading(self):
     """Test if permissions created only once for GET requests."""
@@ -668,3 +701,60 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
     self.assertStatus(response, 200)
     cached_keys = self.memcache_client.get("permissions:list")
     self.assertIn(person_permissions_key, cached_keys)
+
+  def _generate_assessment(self, audit, snapshot, template):
+    """Generate Assessment via REST for Audit with Template and Snapshot."""
+    return self.api.post(all_models.Assessment, {
+        "assessment": {
+            "title": ggrc_factories.random_str(),
+            "_generated": True,
+            "audit": {
+                "id": audit.id,
+                "type": audit.type,
+            },
+            "object": {
+                "id": snapshot.id,
+                "type": snapshot.type,
+            },
+            "template": {
+                "id": template.id,
+                "type": template.type,
+            },
+        },
+    })
+
+  def test_permissions_flush_on_asmt_genertation(self):
+    """Test that permissions in memcache are cleaned after asmt generation.
+
+    This test checks that permissions for all affected users are cleaned from
+    memcache on Assessment generation from AssessmentTemplate and Snapshot.
+    """
+    with ggrc_factories.single_commit():
+      user_1 = ggrc_factories.PersonFactory()
+      user_2 = ggrc_factories.PersonFactory()
+      asmt_tmpl = ggrc_factories.AssessmentTemplateFactory(
+          default_people={
+              "assignees": [user_1.id],
+              "verifiers": [user_2.id],
+          },
+      )
+      control = ggrc_factories.ControlFactory()
+      control_snapshot, = self._create_snapshots(
+          audit=asmt_tmpl.audit,
+          objects=[control],
+      )
+
+    user_1_id = user_1.id
+    user_2_id = user_2.id
+
+    self.set_dummy_permissions_in_cache(user_1_id, user_2_id)
+    self.assert_permissions_in_memcache(user_1_id, user_2_id)
+
+    response = self._generate_assessment(
+        audit=asmt_tmpl.audit,
+        snapshot=control_snapshot,
+        template=asmt_tmpl,
+    )
+
+    self.assert201(response)
+    self.assert_permissions_not_in_memcache(user_1_id, user_2_id)

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via UI."""
 import re
@@ -382,15 +382,18 @@ class BaseWebUiService(base.WithBrowser):
     return self.get_list_objs_from_tree_view(src_obj)
 
   def is_obj_mappable_via_tree_view(self, src_obj, obj):
-    """Open dropdown of Tree View Item  by title, an check is object
-    mappable.
-    """
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    dropdown_on_tree_view_item = (objs_widget.tree_view.
-                                  open_tree_actions_dropdown_by_title
-                                  (title=obj.title))
-    element_to_verify = element.DropdownMenuItemTypes.MAP
-    return dropdown_on_tree_view_item.is_item_exist(element_to_verify)
+    """Open dropdown of Tree View Item by title on source object's widget,
+    and check is object mappable."""
+    return (self.open_widget_of_mapped_objs(src_obj).tree_view.
+            open_tree_actions_dropdown_by_title(title=obj.title).
+            is_item_exist(element.DropdownMenuItemTypes.MAP))
+
+  def is_obj_editable_via_tree_view(self, obj):
+    """Open dropdown of Tree View Item by title on dashboard tab of object,
+    and check is object editable."""
+    return (self.open_obj_dashboard_tab().tree_view.
+            open_tree_actions_dropdown_by_title(title=obj.title).
+            is_item_exist(element.DropdownMenuItemTypes.EDIT))
 
   def map_objs_via_tree_view_item(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -527,6 +530,12 @@ class BaseWebUiService(base.WithBrowser):
     """Return review message on info pane."""
     return self.open_info_page_of_obj(obj).get_object_review_txt()
 
+  def open_tab_via_add_tab_btn(self, src_obj, tab_name):
+    """Opens info page of src_obj, clicks Add tab button and chooses tab by
+    it's name."""
+    (self.open_info_page_of_obj(src_obj).click_add_tab_btn().
+        click_item_by_text(text=tab_name))
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -622,13 +631,6 @@ class AssessmentsService(BaseWebUiService):
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
     objs_widget.show_generated_results()
-
-  def get_log_pane_validation_result(self, obj):
-    """Open assessment Info Page. Open Log Pane on Assessment Info Page.
-    And return result of validation of all items.
-    """
-    asmt_page = self.open_info_page_of_obj(obj)
-    return asmt_page.changelog_validation_result()
 
   def get_asmt_related_asmts_titles(self, asmt):
     """Open assessment Info Page. Open Related Assessments Tab on Assessment
@@ -792,7 +794,7 @@ class IssuesService(BaseWebUiService):
 
 class TechnologyEnvironmentService(BaseWebUiService):
   """Class for Technology Environments business layer's services objects."""
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(TechnologyEnvironmentService, self).__init__(
         objects.TECHNOLOGY_ENVIRONMENTS, driver)
 
@@ -800,7 +802,7 @@ class TechnologyEnvironmentService(BaseWebUiService):
 class ProgramsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
 
-  def __init__(self, driver, obj_name=objects.PROGRAMS):
+  def __init__(self, driver=None, obj_name=objects.PROGRAMS):
     self._actual_obj_name = obj_name
     self.obj_name = objects.PROGRAMS
     super(ProgramsService, self).__init__(
@@ -832,6 +834,19 @@ class ProgramsService(BaseWebUiService):
 
 
 class ProductsService(BaseWebUiService):
-  """Class for Programs business layer's services objects."""
+  """Class for Products business layer's services objects."""
   def __init__(self, driver=None):
     super(ProductsService, self).__init__(objects.PRODUCTS, driver)
+
+
+class RegulationsService(BaseWebUiService):
+  """Class for Regulations business layer's services objects."""
+  def __init__(self, driver=None):
+    super(RegulationsService, self).__init__(objects.REGULATIONS, driver)
+
+
+class TechnologyEnvironmentsService(BaseWebUiService):
+  """Class for Technology Environments business layer's services objects."""
+  def __init__(self, driver=None):
+    super(TechnologyEnvironmentsService, self).__init__(
+        objects.TECHNOLOGY_ENVIRONMENTS, driver)

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -270,6 +270,9 @@ def _propagate(parent_acl_ids, user_id):
   for _ in range(PROPAGATION_DEPTH_LIMIT):
 
     child_ids = _handle_acl_step(parent_acl_ids, user_id)
+    user_ids = acl_utils.get_user_ids(
+        all_models.AccessControlList.id.in_(child_ids))
+    getattr(flask.g, "user_ids", set()).update(user_ids)
 
     count_query = child_ids.alias("counts").count()
     child_id_count = db.session.execute(count_query).scalar()
@@ -300,7 +303,7 @@ def _propagate_relationships(relationship_ids, new_acl_ids, user_id):
   user_ids = acl_utils.get_user_ids(
       all_models.AccessControlList.id.in_(child_ids)
   )
-  getattr(flask.g, "user_ids").update(user_ids)
+  getattr(flask.g, "user_ids", set()).update(user_ids)
 
 
 def _delete_orphan_acl_entries(deleted_objects):

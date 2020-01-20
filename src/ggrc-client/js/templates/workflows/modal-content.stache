@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -51,7 +51,7 @@
         {{#if new_object_form}}
           <repeat-on-button-wrapper instance:bind="instance"></repeat-on-button-wrapper>
         {{/if}}
-        <repeat-on-summary unit:from="instance.unit" 
+        <repeat-on-summary unit:from="instance.unit"
                            repeatEvery:from="instance.repeat_every"
                            hideRepeatOff:from="new_object_form">
         </repeat-on-summary>

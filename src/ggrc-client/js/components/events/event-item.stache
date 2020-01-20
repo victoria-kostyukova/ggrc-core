@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -14,7 +14,7 @@
         </li>
       {{/is}}
     {{/revisions_stub}}
-    {{#if hasHiddenRevisions}} 
+    {{#if hasHiddenRevisions}}
       <li>
         <strong>
           + {{hiddenRevisionsCount}} more {{#is(hiddenRevisionsCount, 1)}}revision{{else}}revisions{{/is}}

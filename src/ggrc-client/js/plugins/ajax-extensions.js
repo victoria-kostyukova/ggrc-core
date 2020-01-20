@@ -1,11 +1,9 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {
-  notifier,
-} from '../plugins/utils/notifiers-utils';
+import {connectionLostNotifier} from '../plugins/utils/notifiers-utils';
 import {
   isConnectionLost,
   handleAjaxError,
@@ -148,7 +146,7 @@ $(document).ajaxError(function (event, jqxhr, settings, exception) {
 
   if (!jqxhr.hasFailCallback) {
     if (isConnectionLost()) {
-      notifier('error', 'Internet connection was lost.');
+      connectionLostNotifier();
     } else {
       handleAjaxError(jqxhr, exception);
     }

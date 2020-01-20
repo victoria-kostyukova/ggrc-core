@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -82,7 +82,7 @@
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
   <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount entriesTotalCount}}'" expanded:bind="showResults">
-  
+
     <div class="search-results">
       <div class="{{^if resultsRequested}} hidden {{/if}}">
         <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
@@ -133,6 +133,6 @@
       </div>
     {{/if}}
     </div>
-  
+
   </collapsible-panel>
 </div>

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Locators for all elements."""
 # pylint: disable=too-few-public-methods
@@ -1074,14 +1074,6 @@ class CommentItem(object):
   AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
   DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__header-author-info")
   CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")
-
-
-class AssessmentLogTab(object):
-  """Locators for Log Tab elements on Assessment InfoWidget."""
-  CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
-  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-holder')
-  PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
-  LOG_LIST_CSS = (By.CSS_SELECTOR, ' .w-status')
 
 
 class AssessmentRelatedTable(object):

@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -33,7 +33,7 @@
                                                          singular:from="'AssessmentTemplate'"
                                                          plural:from="'assessment_templates'">
                                       </add-object-button>
-                                      <assessment-generator-button audit:from="instance" 
+                                      <assessment-generator-button audit:from="instance"
                                                                    button:from="true">
                                       </assessment-generator-button>
                                   {{/if}}

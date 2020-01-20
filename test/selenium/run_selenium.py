@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """ Basic selenium test runner.
 This script is used for running all selenium tests against the server defined

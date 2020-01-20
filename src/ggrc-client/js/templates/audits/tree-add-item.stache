@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -17,7 +17,7 @@
          data-object-params='{
            "{{parent_instance.constructor.table_singular}}": {
              "id" : {{parent_instance.id}},
-             "type" : "{{parent_instance.type}}" 
+             "type" : "{{parent_instance.type}}"
            },
            "context": {
              "id" : {{firstnonempty parent_instance.context.id "null"}},

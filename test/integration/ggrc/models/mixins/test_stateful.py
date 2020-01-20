@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration test for Stateful mixin."""
@@ -44,7 +44,7 @@ class TestStatefulMixin(WithQueryApi, TestCase):
       "TechnologyEnvironment",
   )
   def test_update_status(self, model_name):
-    """Test status updating."""
+    """Test status updating for {0}."""
     factory = factories.get_model_factory(model_name)
 
     # pylint: disable=protected-access

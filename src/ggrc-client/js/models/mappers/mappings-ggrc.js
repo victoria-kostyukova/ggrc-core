@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -32,6 +32,8 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
   <externalMap> - models that can be mapped only through external system
     not locally
   <unmap> - models that can be unmapped from source
+  <externalUnmap> - models that can be unmapped only through external system
+    not locally
   <indirectMappings> - models which cannot be directly mapped to object
     through Relationship but linked by another way. Currently used for Mapping
     Filter in Object mapper and Global Search
@@ -53,10 +55,29 @@ const coreObjectConfig = {
 
 const scopingObjectConfig = {
   ...createRule,
-  map: loDifference(businessObjects,
-    ['Assessment', ...externalBusinessObjects, ...externalDirectiveObjects]),
-  externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
-  unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
+  map: loDifference(businessObjects, [
+    'Assessment',
+    ...externalBusinessObjects,
+    ...externalDirectiveObjects,
+    ...scopingObjects,
+  ]),
+  externalMap: [
+    ...externalBusinessObjects,
+    ...externalDirectiveObjects,
+    ...scopingObjects,
+  ],
+  unmap: loDifference(businessObjects, [
+    'Assessment',
+    'Audit',
+    ...externalBusinessObjects,
+    ...externalDirectiveObjects,
+    ...scopingObjects,
+  ]),
+  externalUnmap: [
+    ...externalBusinessObjects,
+    ...externalDirectiveObjects,
+    ...scopingObjects,
+  ],
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
@@ -100,7 +121,14 @@ export default {
     map: loDifference(businessObjects,
       ['Assessment', ...scopingObjects, ...externalDirectiveObjects, 'Risk']),
     externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Risk'],
-    unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
+    unmap: loDifference(businessObjects, [
+      'Assessment',
+      'Audit',
+      ...scopingObjects,
+      ...externalDirectiveObjects,
+      'Risk',
+    ]),
+    externalUnmap: [...scopingObjects, ...externalDirectiveObjects, 'Risk'],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
@@ -121,8 +149,14 @@ export default {
       [...scopingObjects, 'Assessment', 'Regulation',
         ...externalBusinessObjects]),
     externalMap: [...scopingObjects, ...externalBusinessObjects],
-    unmap: loDifference(businessObjects,
-      ['Assessment', 'Audit', 'Regulation']),
+    unmap: loDifference(businessObjects, [
+      'Assessment',
+      'Audit',
+      'Regulation',
+      ...scopingObjects,
+      ...externalBusinessObjects,
+    ]),
+    externalUnmap: [...scopingObjects, ...externalBusinessObjects],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
@@ -131,7 +165,14 @@ export default {
       ...scopingObjects,
       ...externalDirectiveObjects, 'Control']),
     externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Control'],
-    unmap: loDifference(businessObjects, ['Assessment', 'Audit']),
+    unmap: loDifference(businessObjects, [
+      'Assessment',
+      'Audit',
+      ...scopingObjects,
+      ...externalDirectiveObjects,
+      'Control',
+    ]),
+    externalUnmap: [...scopingObjects, ...externalDirectiveObjects, 'Control'],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Standard: {
@@ -140,8 +181,14 @@ export default {
       [...scopingObjects, 'Assessment', 'Standard',
         ...externalBusinessObjects]),
     externalMap: [...scopingObjects, ...externalBusinessObjects],
-    unmap: loDifference(businessObjects,
-      ['Assessment', 'Audit', 'Standard']),
+    unmap: loDifference(businessObjects, [
+      'Assessment',
+      'Audit',
+      'Standard',
+      ...scopingObjects,
+      ...externalBusinessObjects,
+    ]),
+    externalUnmap: [...scopingObjects, ...externalBusinessObjects],
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Threat: {
@@ -150,16 +197,7 @@ export default {
 
   // Scoping objects
   AccessGroup: {
-    ...createRule,
-    map: loDifference(businessObjects,
-      ['Assessment', 'AccessGroup',
-        ...externalBusinessObjects,
-        ...externalDirectiveObjects,
-      ]),
-    externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
-    unmap: loDifference(businessObjects,
-      ['Assessment', 'AccessGroup', 'Audit']),
-    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   AccountBalance: {
     ...scopingObjectConfig,

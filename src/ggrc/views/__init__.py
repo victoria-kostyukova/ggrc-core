@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ggrc.views
@@ -24,7 +24,7 @@ from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
 from ggrc.integrations.synchronization_jobs import one_time_back_sync
 from ggrc.integrations.external_app import constants
-from ggrc.models import background_task, reflection, revision
+from ggrc.models import background_task, reflection, revision, ExternalMapping
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
@@ -301,6 +301,25 @@ def _merge_errors(create_errors, update_errors):
     errors = create_errors.extend(update_errors) \
         if update_errors else create_errors
   return errors
+
+
+def create_external_mapping(obj, src):
+  """
+  Creating external mapping object
+  Args:
+    obj: A list of model instances created from the POSTed JSON.
+    src: A list of original POSTed JSON dictionaries.
+  """
+  mapping_data = {
+      "external_type": src["entity_name"],
+      "external_id": src["external_id"],
+      "object_type": obj.type,
+      "object_id": obj.id,
+  }
+
+  mapping = ExternalMapping(**mapping_data)
+  db.session.add(mapping)
+  db.session.commit()
 
 
 @app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
@@ -615,7 +634,7 @@ def get_attributes_json():
           ~models.CustomAttributeDefinition.definition_type.in_(
               constants.GGRCQ_OBJ_TYPES_FOR_SYNC)
       ).all()
-      ext_attrs = models.ExternalCustomAttributeDefinition.eager_query().all()
+      ext_attrs = models.CustomAttributeDefinition.eager_query().all()
     with benchmark("Get attributes JSON: publish"):
       published = []
       for attr in attrs:
@@ -679,12 +698,6 @@ def get_all_attributes_json(load_custom_attributes=False):
               constants.GGRCQ_OBJ_TYPES_FOR_SYNC)).group_by(
           models.CustomAttributeDefinition.title,
           models.CustomAttributeDefinition.definition_type)
-      for attr in definitions:
-        ca_cache[attr.definition_type].append(attr)
-      ecad = models.ExternalCustomAttributeDefinition
-      definitions = ecad.eager_query().group_by(
-          models.ExternalCustomAttributeDefinition.title,
-          models.ExternalCustomAttributeDefinition.definition_type)
       for attr in definitions:
         ca_cache[attr.definition_type].append(attr)
     for model in models.all_models.all_models:

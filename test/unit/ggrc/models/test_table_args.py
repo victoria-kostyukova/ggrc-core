@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for overridden __table_args__."""
@@ -19,6 +19,7 @@ class TestTableArgs(unittest.TestCase):
       "ObjectTypes",
       "AttributeTemplates",
       "ObjectTemplates",
+      "ExternalMapping",
   }
 
   def test_extra_args_included(self):

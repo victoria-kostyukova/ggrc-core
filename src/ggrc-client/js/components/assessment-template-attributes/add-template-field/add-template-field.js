@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -48,7 +48,9 @@ export default canComponent.extend({
       let type = selected.type && selected.type.trim();
       let values = splitTrim(selected.values, {
         unique: true,
-      }).join(',');
+      })
+        .filter((val) => val)
+        .join(',');
       this.attr('selected.invalidValues', false);
       this.attr('selected.invalidTitleError', '');
 

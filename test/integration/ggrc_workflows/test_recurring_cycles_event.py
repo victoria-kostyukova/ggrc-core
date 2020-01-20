@@ -1,11 +1,14 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests single event creation during start_recurring_cycles job execution."""
 
+import mock
+
 from freezegun import freeze_time
 
 from ggrc import models
+from ggrc.utils import user_generator
 from ggrc_workflows import start_recurring_cycles, models as wf_models
 from integration.ggrc import TestCase
 from integration.ggrc_workflows import WorkflowsGenerator
@@ -48,7 +51,10 @@ class TestRecurringCyclesEvent(TestCase):
     self.cycles_count = wf_models.Cycle.query.count()
 
   def test_event_creation(self):
-    """Test single event creation."""
+    """Test single event creation.
+
+    Cycles will be create every every 1 week (see setUp)
+    """
     with freeze_time('2018-01-24'):
       from ggrc.login import noop
       noop.login()
@@ -62,7 +68,11 @@ class TestRecurringCyclesEvent(TestCase):
     self.assertEqual(len(events[0].revisions), 28)
 
   def test_event_is_not_created(self):
-    """Test no event created."""
+    """Test no event created.
+
+    Cycles won't be create on the next day of workflow creation
+    Cycles will be create every every 1 week (see setUp)
+    """
     revisions_count = models.Revision.query.count()
     with freeze_time('2018-01-18'):
       start_recurring_cycles()
@@ -74,3 +84,21 @@ class TestRecurringCyclesEvent(TestCase):
     self.assertEqual(new_cycles_count, self.cycles_count)
     self.assertEqual(len(events), 0)
     self.assertEqual(new_revisions_count, revisions_count)
+
+  def test_event_created_by_migrator(self):
+    """Test no error occurred and event created with migrator user"""
+
+    with freeze_time('2018-01-24'):
+      with mock.patch("ggrc.login.get_current_user_id", return_value=None):
+        start_recurring_cycles()
+
+    events = models.Event.query.filter(models.Event.action == 'BULK').all()
+    new_cycles_count = wf_models.Cycle.query.count()
+
+    self.assertEqual(new_cycles_count, self.cycles_count + 2)
+    self.assertEqual(len(events), 1)
+    self.assertEqual(
+        events[0].modified_by_id,
+        user_generator.get_migrator_id()
+    )
+    self.assertEqual(len(events[0].revisions), 28)

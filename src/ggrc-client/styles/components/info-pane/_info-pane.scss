@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -7,7 +7,7 @@
 
 %info-pane-saving {
   line-height: 28px;
-  
+
   .loading-status {
     margin-right: 5px;
   }
@@ -198,4 +198,8 @@
 
 .saving-status {
   @extend %info-pane-saving;
+}
+
+a.external-redirect-link {
+  text-decoration: none;
 }

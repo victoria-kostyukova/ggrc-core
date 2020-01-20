@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for AccountBalance object."""
@@ -10,6 +10,7 @@ from ggrc.access_control import roleable
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
+from ggrc.models.mixins import synchronizable
 from ggrc.fulltext import mixin as fulltext_mixin
 from ggrc.models import object_document
 from ggrc.models import object_person
@@ -18,6 +19,7 @@ from ggrc.models import relationship
 
 
 class AccountBalance(
+    synchronizable.Synchronizable,
     mixins.CustomAttributable,
     object_person.Personable,
     roleable.Roleable,

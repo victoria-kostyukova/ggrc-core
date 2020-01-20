@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -59,7 +59,7 @@ describe('Mappings', () => {
   const snapshotableObjects = loDifference(modules.core, ['Project']);
 
   const mappingRules = {
-    AccessGroup: loDifference(coreObjectsRules, ['AccessGroup']),
+    AccessGroup: coreObjectsRules,
     AccountBalance: coreObjectsRules,
     Assessment: [...snapshotableObjects, 'Evidence', 'Audit', 'Person'],
     AssessmentTemplate: ['Audit'],

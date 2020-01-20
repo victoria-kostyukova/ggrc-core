@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create and manipulate objects via REST API."""
 # pylint: disable=too-few-public-methods
@@ -24,9 +24,7 @@ class BaseRestService(object):
   def __init__(self, endpoint):
     self.endpoint = endpoint
     self.client = client.RestClient(self.endpoint)
-    self.entities_factory_cls = factory.get_cls_entity_factory(
-        object_name=objects.CUSTOM_ATTRIBUTES
-        if endpoint == objects.EXTERNAL_CUSTOM_ATTRIBUTES else self.endpoint)
+    self.entities_factory_cls = factory.get_cls_entity_factory(self.endpoint)
 
   def create_list_objs(self, entity_factory, count, attrs_to_factory=None,
                        **attrs_for_template):
@@ -270,12 +268,17 @@ class RisksService(BaseRestService):
     super(RisksService, self).__init__(url.RISKS)
 
 
+class ProjectsService(BaseRestService):
+  """Service for working with Projects entities."""
+  def __init__(self):
+    super(ProjectsService, self).__init__(url.PROJECTS)
+
+
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
-  def __init__(self, is_external=False):
+  def __init__(self):
     super(CustomAttributeDefinitionsService, self).__init__(
-        url.EXTERNAL_CUSTOM_ATTRIBUTES if is_external
-        else url.CUSTOM_ATTRIBUTES)
+        url.CUSTOM_ATTRIBUTES)
 
   def create_dashboard_gcas(self, obj_type, count=1):
     """Create 'Dashboard' CAs via rest according to passed obj_type and count.

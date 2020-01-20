@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Program RBAC Factory."""
@@ -104,7 +104,7 @@ class ProgramRBACFactory(base.BaseRBACFactory):
     """Read project mapped to Program."""
     program = all_models.Program.query.get(self.program_id)
     with factories.single_commit():
-      project = factories.ProjectFactory()
+      project = factories.RegulationFactory()
       factories.RelationshipFactory(source=project, destination=program)
     return self.api.get(project, project.id)
 
@@ -112,7 +112,7 @@ class ProgramRBACFactory(base.BaseRBACFactory):
     """Update project mapped to Program."""
     program = all_models.Program.query.get(self.program_id)
     with factories.single_commit():
-      project = factories.ProjectFactory()
+      project = factories.RegulationFactory()
       factories.RelationshipFactory(source=project, destination=program)
     return self.api.put(project, {"title": factories.random_str()})
 
@@ -120,6 +120,6 @@ class ProgramRBACFactory(base.BaseRBACFactory):
     """Delete project mapped to Program."""
     program = all_models.Program.query.get(self.program_id)
     with factories.single_commit():
-      project = factories.ProjectFactory()
+      project = factories.RegulationFactory()
       factories.RelationshipFactory(source=project, destination=program)
     return self.api.delete(project)

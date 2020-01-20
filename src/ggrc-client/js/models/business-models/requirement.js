@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,6 +10,7 @@ import AccessControlList from '../mixins/access-control-list';
 import BaseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 import Relationship from '../service-models/relationship';
+import Reviewable from '../mixins/reviewable';
 
 export default Cacheable.extend({
   root_object: 'requirement',
@@ -34,6 +35,7 @@ export default Cacheable.extend({
     CaUpdate,
     AccessControlList,
     BaseNotifications,
+    Reviewable,
   ],
   attributes: {
     context: Stub,

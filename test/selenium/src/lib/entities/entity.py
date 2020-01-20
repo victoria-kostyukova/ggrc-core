@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create, description, representation and equal of entities."""
 # pylint: disable=too-many-arguments
@@ -81,7 +81,7 @@ class Representation(object):
     # common for UI and CSV
     result_remap_items = {
         els.TITLE: "title", els.ADMIN: "admins",
-        els.CODE: "slug", els.REVIEW_STATE: "os_state",
+        els.CODE: "slug", els.REVIEW_STATE: "review_status",
         els.OBJECT_REVIEW: "os_state",
         els.STATE: "status"
     }
@@ -91,11 +91,14 @@ class Representation(object):
         els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains",
         els.AUDITORS: "auditors",
+        els.CREATED_AT: "created_at",
         "MAPPED_OBJECTS": "mapped_objects", els.ASSIGNEES: "assignees",
         els.CREATORS: "creators", "VERIFIERS": "verifiers",
         "COMMENTS": "comments", "CREATED_AT": "created_at",
         els.MODIFIED_BY: "modified_by", "LAST_UPDATED_BY": "modified_by",
         "UPDATED_AT": "updated_at", "ASSESSMENT_TYPE": "assessment_type",
+        els.ASMT_TYPE: "assessment_type",
+        els.RECIPIENTS: "recipients",
         "IS_VERIFIED": "verified",
         "CUSTOM_ATTRIBUTES": "custom_attributes",
         "DESCRIPTION": "description",
@@ -109,7 +112,7 @@ class Representation(object):
         "CONTROL_OPERATORS": "control_operators",
         "CONTROL_OWNERS": "control_owners",
         "URL": "url",
-        "ID": "id", "RISK_TYPE": "risk_type",
+        "ID": "id", "Risk Type": "risk_type",
         "REVIEW": "review"
     }
     csv_remap_items = {
@@ -660,7 +663,7 @@ class Entity(Representation):
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
         RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
-        ProductEntity, TechnologyEnvironmentEntity
+        ProductEntity, TechnologyEnvironmentEntity, ChangeLogItemEntity
     )
 
   def __lt__(self, other):
@@ -745,7 +748,7 @@ class CustomAttributeDefinitionEntity(Representation):
         "title", "id", "href", "type", "definition_type", "attribute_type",
         "helptext", "placeholder", "mandatory", "multi_choice_options",
         "created_at", "updated_at", "modified_by", "multi_choice_mandatory",
-        **attrs)
+        "external_name", "entity_name", **attrs)
 
   def __lt__(self, other):
     return self.title < other.title
@@ -813,6 +816,15 @@ class RiskEntity(Entity):
     super(RiskEntity, self).__init__()
     self.set_attrs(
         "risk_type", "threat_source", "threat_event", "vulnerability", **attrs)
+
+
+class ProjectEntity(Entity):
+  """Class that represent model for Project entity."""
+
+  def __init__(self, **attrs):
+    super(ProjectEntity, self).__init__()
+    self.set_attrs(
+        "assignees", "verifiers", **attrs)
 
 
 class OrgGroupEntity(Entity):
@@ -889,6 +901,14 @@ class ReviewEntity(Entity):
         "last_reviewed_by": "Last reviewed by\n{}\non {}".format(
             self.last_reviewed_by, self.last_reviewed_at) if
         self.last_reviewed_by and self.last_reviewed_at else None}
+
+
+class ChangeLogItemEntity(Representation):
+  """Change log item entity from UI."""
+
+  def __init__(self, **attrs):
+    super(ChangeLogItemEntity, self).__init__()
+    self.set_attrs("author", "changes", "additional_info", **attrs)
 
 
 class ProposalEntity(Representation):

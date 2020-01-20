@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -9,16 +9,16 @@ import canComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
-import {
-  getParentUrl,
-} from '../../plugins/utils/snapshot-utils';
 import '../custom-attributes/custom-attributes-field-view';
 import '../related-objects/related-people-access-control';
 import template from './detailed-business-object-list-item.stache';
+import {scopingObjects} from '../../plugins/models-types-collections';
 
 const VISIBLE_ROLES = {
   Control: ['Admin', 'Control Operators', 'Control Owners', 'Other Contacts'],
   Risk: ['Admin', 'Risk Owners', 'Other Contacts'],
+  scope: ['Admin', 'Compliance Contacts', 'Other Contacts'],
+  defaults: ['Admin', 'Primary Contacts', 'Secondary Contacts'],
 };
 
 /**
@@ -45,13 +45,6 @@ export default canComponent.extend({
             this.attr('instance');
         },
       },
-      objectLink: {
-        get: function () {
-          return this.attr('isSnapshot') ?
-            getParentUrl(this.attr('instance')) :
-            this.attr('itemData.viewLink');
-        },
-      },
       objectTitle: {
         get: function () {
           return this.attr('itemData.title') ||
@@ -61,10 +54,11 @@ export default canComponent.extend({
       },
       visibleRoles: {
         get: function () {
-          const defaultList = [
-            'Admin', 'Primary Contacts', 'Secondary Contacts',
-          ];
-          return VISIBLE_ROLES[this.attr('itemData.type')] || defaultList;
+          const objectType = scopingObjects.includes(
+            this.attr('itemData.type')
+          ) ? 'scope' : this.attr('itemData.type');
+
+          return VISIBLE_ROLES[objectType] || VISIBLE_ROLES['defaults'];
         },
       },
     },

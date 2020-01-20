@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -11,7 +11,7 @@
     Create Assessment Template
   </h2>
   <div class="create-new-object">
-    Clone from existing template or 
+    Clone from existing template or
     <a href="javascript://"
         class="btn btn-link create-control"
         rel="tooltip"

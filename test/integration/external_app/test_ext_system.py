@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for System model that synced from external source."""
@@ -16,6 +16,8 @@ class TestSoxSystem(TestCase):
   def setUp(self):
     """Test setup method."""
     super(TestSoxSystem, self).setUp()
+    self.external_id = factories.SynchronizableExternalId.next()
+    self.external_slug = "external_slug-{}".format(self.external_id)
     self.ext_api = external_api_helper.ExternalApiClient()
 
   def test_system_acl_create(self):
@@ -24,6 +26,8 @@ class TestSoxSystem(TestCase):
         "system": {
             "title": "new_system",
             "context": None,
+            "external_id": self.external_id,
+            "external_slug": self.external_slug,
             "access_control_list": {"Admin": [
                 {
                     "email": "user1@example.com",
@@ -81,6 +85,8 @@ class TestSoxSystem(TestCase):
     data = {
         "system": {
             "id": system.id,
+            "external_id": system.external_id,
+            "external_slug": system.external_slug,
             "title": "updated system",
             "test_plan": "test plan",
             "notes": "test notes",
@@ -98,6 +104,8 @@ class TestSoxSystem(TestCase):
     data = {
         "system": {
             "title": "new system",
+            "external_id": self.external_id,
+            "external_slug": self.external_slug,
             "test_plan": "test plan",
             "notes": "test notes",
             "description": "test description",

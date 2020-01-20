@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -11,7 +11,7 @@ import '../issue/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
 import {
   allowedToUnmap,
-  shouldBeMappedExternally,
+  toBeUnmappedExternally,
 } from '../../models/mappers/mappings';
 import {
   isAllObjects,
@@ -67,12 +67,12 @@ export default canComponent.extend({
             && !destination._is_sox_restricted;
         },
       },
-      isMappableExternally: {
+      isUnmappableExternally: {
         get() {
           let source = this.attr('page_instance.type');
           let destination = this.attr('instance.type');
 
-          return shouldBeMappedExternally(source, destination);
+          return toBeUnmappedExternally(source, destination);
         },
       },
     },

@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -61,11 +61,14 @@
       {{#if folder_error}}
         <div class="action-toolbar">
           <small>
-            {{#is folder_error.code 404}}
-              <strong>Error:</strong> The folder was deleted from GDrive, please assign a new folder.
-            {{/else}}
-              <strong>Warning:</strong> You need permission to access {{instance.constructor.title_singular}} folder. <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">Request access.</a>
-            {{/is}}
+            <strong>Error:</strong>
+            The folder is deleted from gDrive or you do not have access to it. <br>
+            Please assign a new folder or
+            {{#if folderId}}
+              <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">request access.</a>
+            {{else}}
+              request access.
+            {{/if}}
           </small>
           <div class="action-toolbar__controls">
             {{^if readonly}}

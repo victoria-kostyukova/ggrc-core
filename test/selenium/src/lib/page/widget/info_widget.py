@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Info widgets."""
 # pylint: disable=useless-super-delegation
@@ -11,7 +11,7 @@ from lib.app_entity_factory import entity_factory_common
 from lib.constants import (
     locator, objects, element, roles, regex, messages)
 from lib.element import (
-    info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
+    info_widget_three_bbs, page_elements, tables, tab_element)
 from lib.page.modal import (
     apply_decline_proposal, set_value_for_asmt_ca, snapshoted_controls_info)
 from lib.page.widget import info_panel, object_modal, object_page, page_mixins
@@ -273,27 +273,6 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     self.list_all_headers_txt.extend(help_utils.convert_to_list(headers))
     self.list_all_values_txt.extend(help_utils.convert_to_list(values))
 
-  def changelog_validation_result(self):
-    """Returns changelog validation result."""
-    self.tabs.ensure_tab(self._changelog_tab_name)
-    return tab_containers.changelog_tab_validate(
-        self._browser.driver, self._active_tab_root.wd)
-
-  def get_changelog_entries(self):
-    """Returns list of entries from changelog."""
-    self.tabs.ensure_tab(self._changelog_tab_name)
-    ui_utils.wait_for_spinner_to_disappear()
-    log_items = []
-    entry_list = self._browser.elements(class_name="w-status")
-    for entry in entry_list:
-      entry_data = {"author": entry.element(tag_name="person-data").text}
-      for row in entry.elements(class_name="clearfix"):
-        data = row.text.split("\n")
-        entry_data.update({data[0]: {"original_value": data[1],
-                                     "new_value": data[2]}})
-      log_items.append(entry_data)
-    return log_items
-
   @property
   def comments_panel(self):
     """Returns comments panel."""
@@ -381,6 +360,8 @@ class Programs(InfoWidget, page_mixins.WithProposals):
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoProgram
   _elements = element.ProgramInfoWidget
+  CHILD_PROGRAMS_TAB_NAME = 'Programs (Child)'
+  PARENT_PROGRAMS_TAB_NAME = 'Programs (Parent)'
 
   def __init__(self, driver=None):
     super(Programs, self).__init__(driver)
@@ -390,6 +371,10 @@ class Programs(InfoWidget, page_mixins.WithProposals):
     self._extend_list_all_scopes(
         self.manager, self.manager_entered)
     self.reference_urls = self._related_urls(self._reference_url_label)
+
+  @property
+  def mega_program_icon(self):
+    return self._root.element(class_name='fa-bookmark')
 
   def description(self):
     """Returns the text of description."""
@@ -842,6 +827,11 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
         roles.CONTROL_OPERATORS, self._root)
 
   @property
+  def role_to_edit(self):
+    """Returns a role for trying to edit."""
+    return self.control_owners
+
+  @property
   def control_owners(self):
     """Returns Control Owners page element."""
     return self._related_people_list(roles.CONTROL_OWNERS, self._root)
@@ -980,6 +970,7 @@ class Markets(InfoWidget):
 
 
 class Risks(page_mixins.WithDisabledProposals,
+            page_mixins.WithDisabledObjectReview,
             page_mixins.WithDisabledVersionHistory, ReadOnlyInfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
@@ -1007,6 +998,11 @@ class Risks(page_mixins.WithDisabledProposals,
   def risk_type(self):
     """Returns the text of risk type."""
     return self._simple_field("Risk Type").text
+
+  @property
+  def role_to_edit(self):
+    """Returns a role for trying to edit."""
+    return self.risk_owners
 
   @property
   def risk_owners(self):

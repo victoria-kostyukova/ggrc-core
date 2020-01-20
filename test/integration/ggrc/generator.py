@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """This module contains object generation utilities."""
@@ -337,8 +337,6 @@ class ObjectGenerator(Generator):
     classes = [
         models.Objective,
         models.Standard,
-        models.System,
-        models.OrgGroup,
     ]
     for _ in range(count):
       obj_class = random.choice(classes)

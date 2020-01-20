@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for Commentable mixin."""
@@ -42,10 +42,8 @@ class TestCommentableMixin(TestCase):
     self.assertEquals("test0", "".join(c.description for c in asmnt_comments))
 
   @ddt.data(factories.AssessmentFactory,
-            factories.ProcessFactory,
             factories.ProgramFactory,
             factories.DocumentFactory,
-            factories.SystemFactory,
             factories.IssueFactory)
   def test_comments_delete(self, object_factory):
     """Test if {} deleted along with comments."""

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module containing comment model and comment related mixins."""
@@ -434,7 +434,7 @@ class ExternalCommentable(object):
 
 
 class CommentInitiator(object):  # pylint: disable=too-few-public-methods
-
+  """Mixin for comment initiating"""
   @sa.ext.declarative.declared_attr
   def initiator_comments(cls):  # pylint: disable=no-self-argument
     """Relationship.
@@ -454,28 +454,6 @@ class CommentInitiator(object):  # pylint: disable=too-few-public-methods
     )
 
 
-class ScopedCommentable(Commentable):
-  """Mixin for commentable scoping objects.
-
-  This is a mixin for adding default options to objects on which people can
-  comment.
-  """
-
-  VALID_RECIPIENTS = frozenset([
-      "Assignees",
-      "Creators",
-      "Verifiers",
-      "Admin",
-      "Primary Contacts",
-      "Secondary Contacts",
-      "Product Managers",
-      "Technical / Program Managers",
-      "Technical Leads",
-      "System Owners",
-      "Legal Counsels",
-      "Assignee",
-      "Verifier",
-      "Compliance Contacts",
-      "Line of Defense One Contacts",
-      "Vice Presidents",
-  ])
+class ScopedCommentable(ExternalCommentable):
+  """Mixin for external commentable scoping objects."""
+  pass

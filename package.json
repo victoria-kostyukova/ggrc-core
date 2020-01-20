@@ -20,7 +20,7 @@
     "can-model": "3.1.0",
     "can-route": "3.3.4",
     "can-simple-observable": "2.4.1",
-    "can-stache": "3.2.0",
+    "can-stache": "^3.15.1",
     "can-util": "^3.14.0",
     "can-validate-legacy": "2.0.0",
     "can-view-model": "3.5.2",

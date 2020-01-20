@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -98,7 +98,8 @@ export default canComponent.extend({
         .map((externalObjectName) =>
           businessModels[externalObjectName].title_plural.toLowerCase())
         .join(', ');
-      const listOfObjects = `scope, ${objects}, standards and regulations`;
+      const listOfObjects =
+        `scope objects, ${objects}, standards and regulations`;
 
       return `${destinationModel.title_singular} creation and mapping
         ${destinationModel.title_plural.toLowerCase()} to ${listOfObjects}

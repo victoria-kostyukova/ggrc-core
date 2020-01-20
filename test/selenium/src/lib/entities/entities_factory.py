@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Factories that create entities."""
 # pylint: disable=too-many-arguments
@@ -11,7 +11,8 @@ import random
 
 from lib import factory, users
 from lib.constants import (
-    objects, roles, value_aliases, messages, object_states)
+    objects, roles, value_aliases, messages, object_states, element,
+    str_formats)
 from lib.constants.element import AdminWidgetCustomAttributes, ReviewStates
 from lib.decorator import lazy_property
 from lib.entities import entity
@@ -330,9 +331,16 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
                        StringMethods.random_list_strings())
     else:
       attrs["multi_choice_options"] = None
-    attrs.setdefault("mandatory", False)
-    if attrs["definition_type"] in objects.EXTERNAL_END_POINTS:
-      attrs["id"] = self.generate_external_id()
+    if attrs["definition_type"] != objects.ASSESSMENTS.title():
+      attrs.setdefault("mandatory", False)
+    if attrs["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS:
+      attrs["id"] = attrs["external_id"] = self.generate_external_id()
+      attrs["external_name"] = "{}_{}_123123".format(
+          attrs["definition_type"].capitalize(),
+          attrs["attribute_type"]
+      )
+      attrs["entity_name"] = objects.get_normal_form(
+          objects.get_singular(objects.CUSTOM_ATTRIBUTES)).replace(" ", "")
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)
     if is_add_rest_attrs:
@@ -393,10 +401,11 @@ class ProductsFactory(EntitiesFactory):
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Product entity."""
-    product_object = self.obj_inst().update_attrs(
-        title=self.obj_title
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_id=self.generate_external_id(),
+        external_slug=self.generate_slug()
     )
-    return product_object
 
 
 class TechnologyEnvironmentsFactory(EntitiesFactory):
@@ -412,7 +421,11 @@ class TechnologyEnvironmentsFactory(EntitiesFactory):
 
   def _create_random_obj(self, is_add_rest_attrs):
     """Create TechnologyEnvironment entity."""
-    return self.obj_inst().update_attrs(title=self.obj_title)
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_id=self.generate_external_id(),
+        external_slug=self.generate_slug()
+    )
 
 
 class ControlsFactory(EntitiesFactory):
@@ -437,10 +450,6 @@ class ControlsFactory(EntitiesFactory):
         external_id=self.generate_external_id(),
         review_status=ReviewStates.UNREVIEWED,
         review_status_display_name=ReviewStates.UNREVIEWED, **attrs)
-    if is_add_rest_attrs:
-      obj.update_attrs(recipients=",".join((
-          unicode(roles.ADMIN), unicode(roles.CONTROL_OPERATORS),
-          unicode(roles.CONTROL_OWNERS))))
     return obj
 
 
@@ -493,6 +502,27 @@ class RisksFactory(EntitiesFactory):
               unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return obj
+
+
+class ProjectsFactory(EntitiesFactory):
+  """Factory class for Projects entities."""
+  def __init__(self):
+    super(ProjectsFactory, self).__init__(objects.PROJECTS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.PROJECT_ADMINS, [users.current_user()]),
+        ("assignees", roles.ACLRolesIDs.PROJECT_ASSIGNEES,
+         [users.current_user()]),
+        ("verifiers", roles.ACLRolesIDs.PROJECT_VERIFIERS,
+         [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Project entity with randomly and predictably filled fields, if
+    'is_add_rest_attrs' then add attributes for REST."""
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id())
 
 
 class OrgGroupsFactory(EntitiesFactory):
@@ -832,3 +862,86 @@ class EvidenceFactory(EntitiesFactory):
     if 'is_add_rest_attrs' then add attributes for REST."""
     return self.obj_inst().update_attrs(
         title=self.obj_title, link=self.obj_title, kind="URL")
+
+
+class ChangeLogItemsFactory(EntitiesFactory):
+  """Factory class for ChangeLogItem entities."""
+
+  def __init__(self):
+    super(ChangeLogItemsFactory, self).__init__(objects.CHANGE_LOG_ITEMS)
+
+  _attrs_to_exclude_from_log = (
+      "tree_view_attrs_to_exclude", "people_attrs_names",
+      "custom_attribute_definitions", "access_control_list", "url",
+      "type", "selfLink", "review_status_display_name", "id", "href",
+      "external_slug", "external_id", "modified_by", "audit",
+      "bulk_update_modal_tree_view_attrs_to_exclude")
+
+  def _generate_creation_entry_dict(self, obj):
+    """Returns dict of obj's attributes that is expected to be displayed
+    in change log entry related to obj creation."""
+    displayed_attrs = {}
+    for attr_name, attr_value in entity.Representation.repr_obj_to_dict(
+            obj).iteritems():
+      if attr_name not in self._attrs_to_exclude_from_log and attr_value:
+        if isinstance(attr_value, list):
+          displayed_attrs.update({attr_name: ", ".join(attr_value)})
+        elif attr_name in ["created_at", "updated_at"]:
+          displayed_attrs.update(
+              {attr_name: date_utils.iso8601_to_ui_str_date(attr_value)})
+        elif attr_name == element.CommonAssessment.RECIPIENTS.lower():
+          # 'recipients' need to be sorted as their order is different in
+          # object from rest and its UI representation
+          displayed_attrs.update(
+              {attr_name: ", ".join(sorted(attr_value.split(",")))})
+        elif attr_name == "custom_attributes" and isinstance(attr_value, dict):
+          displayed_attrs.update(
+              {ca_name: ca_val for ca_name, ca_val in attr_value.iteritems()
+               if ca_val})
+        else:
+          displayed_attrs.update({attr_name: attr_value})
+    return displayed_attrs
+
+  def generate_obj_creation_entity(self, obj):
+    """Create and return expected ChangeLogItemEntity instance for newly
+    created object according to its attributes."""
+    expected_changes = []
+    for attr_name, attr_value in (self._generate_creation_entry_dict(
+                                  obj).iteritems()):
+      expected_changes.append({"attribute_name": attr_name,
+                               "original_value": None,
+                               "new_value": attr_value})
+    return self.obj_inst().update_attrs(author=users.current_user().email,
+                                        changes=sorted(expected_changes))
+
+  def generate_log_entity_for_mapping(self, source_obj):
+    """Create and return expected ChangeLogItem entity for object mapping to
+    source object."""
+    return self.obj_inst().update_attrs(
+        author=users.current_user().email,
+        changes=[{
+            "attribute_name": str_formats.CHANGE_LOG_MAPPING_MSG.format(
+                obj_name=source_obj.type,
+                obj_title=source_obj.title),
+            "original_value": None,
+            "new_value": value_aliases.CREATED}])
+
+  def generate_log_entity_for_automapping(self, src_obj, mapped_obj,
+                                          automapped_obj, user):
+    """Create and return expected ChangeLogItem entity which describes
+    automapping of automapped_obj to src_obj after mapping of mapped_obj to
+    src_obj."""
+    return self.obj_inst().update_attrs(
+        author=roles.SYSTEM,
+        changes=[{
+            "attribute_name": str_formats.CHANGE_LOG_MAPPING_MSG.format(
+                obj_name=automapped_obj.type,
+                obj_title=automapped_obj.title),
+            "original_value": None,
+            "new_value": value_aliases.CREATED}],
+        additional_info=str_formats.CHANGE_LOG_AUTOMAPPING_MSG.format(
+            user_name=user.email,
+            src_obj_name=src_obj.type,
+            src_obj_title=src_obj.title,
+            mapped_obj_name=mapped_obj.type,
+            mapped_obj_title=mapped_obj.title))

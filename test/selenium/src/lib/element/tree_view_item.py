@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Module of TreeViewItem dropdownsMenu presented on Genetic TreeView."""
 from lib.constants import element
@@ -59,6 +59,10 @@ class Programs(CommonDropdownTreeViewItem):
   """Class for Dropdown of Programs TreeViewItem"""
 
 
+class ProgramChilds(CommonDropdownTreeViewItem):
+  """Class for Dropdown of ProgramChilds TreeViewItem"""
+
+
 class DataAssets(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of DataAssets TreeViewItem"""
 
@@ -89,3 +93,7 @@ class OrgGroups(SnapshotsDropdownTreeViewItem):
 
 class Risks(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Risks TreeViewItem"""
+
+
+class Regulations(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Regulations TreeViewItem"""

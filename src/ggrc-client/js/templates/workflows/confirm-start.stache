@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -7,7 +7,7 @@
   {{#instance}}
     <form>
       <p>
-        {{instance.task_groups.length}} task group{{^is(instance.task_groups.length, 1)}}s{{/is}} 
+        {{instance.task_groups.length}} task group{{^is(instance.task_groups.length, 1)}}s{{/is}}
         will be started, tasks will be assigned and notifications will be sent.
       </p>
       <p>

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -29,14 +29,15 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm.session import Session
 
 from ggrc import db
+
 from ggrc.models import reflection
 from ggrc.models import exceptions
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins.base import Base
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.external_customattributable \
     import ExternalCustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
-from ggrc.models.mixins.base import Base
 from ggrc.models.utils import validate_option
 from ggrc.fulltext import attributes
 

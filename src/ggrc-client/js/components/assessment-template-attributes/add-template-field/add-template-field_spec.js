@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -59,6 +59,16 @@ describe('add-template-field component', () => {
       viewModel.attr('selected', selectedObj);
       viewModel.addField();
       expect(viewModel.fields.length).toBe(1);
+    });
+    it('excludes empty values for multi_choice_options', () => {
+      let selectedObj = new canMap({
+        title: 'External Reviewer',
+        type: 'Dropdown',
+        values: '1, ,2',
+      });
+      viewModel.attr('selected', selectedObj);
+      viewModel.addField();
+      expect(viewModel.fields[0].multi_choice_options).toEqual('1,2');
     });
   });
 

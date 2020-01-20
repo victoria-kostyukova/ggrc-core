@@ -1,10 +1,11 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import Directive from './directive';
 import AccessControlList from '../mixins/access-control-list';
+import Reviewable from '../mixins/reviewable';
 
 export default Directive.extend({
   root_object: 'contract',
@@ -20,7 +21,10 @@ export default Directive.extend({
   create: 'POST /api/contracts',
   update: 'PUT /api/contracts/{id}',
   destroy: 'DELETE /api/contracts/{id}',
-  mixins: [AccessControlList],
+  mixins: [
+    AccessControlList,
+    Reviewable,
+  ],
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {

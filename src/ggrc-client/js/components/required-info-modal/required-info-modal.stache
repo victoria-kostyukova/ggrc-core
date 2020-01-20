@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -44,7 +44,7 @@
                 </div>
               </div>
               <div class="action-toolbar__controls">
-                <a href="javascript:void(0)" on:el:click="removeItemByIndex('filesList', @index)">
+                <a href="javascript:void(0)" on:el:click="removeItemByIndex('filesList', scope.index)">
                   <div class="action-toolbar__controls-item">
                     <i class="fa fa-trash"></i>
                   </div>
@@ -80,7 +80,7 @@
                 </div>
               </div>
               <div class="action-toolbar__controls">
-                <a on:el:click="removeItemByIndex('urlsList', @index)">
+                <a on:el:click="removeItemByIndex('urlsList', scope.index)">
                   <div class="action-toolbar__controls-item">
                     <i class="fa fa-trash"></i>
                   </div>

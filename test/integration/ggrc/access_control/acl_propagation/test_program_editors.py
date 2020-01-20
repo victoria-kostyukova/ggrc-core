@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test Access Control roles Program Editors propagation"""
@@ -27,12 +27,12 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "unmap_control": True,
               "read_mapped": True,
               "update_mapped": True,
-              "delete_mapped": True,
+              "delete_mapped": False,
           },
           "Audit": {
               "read": True,
               "update": True,
-              "delete": True,
+              "delete": False,
               "clone": True,
               "read_revisions": True,
               "map_control": True,
@@ -140,12 +140,12 @@ class TestProgramEditorsPropagation(base.TestACLPropagation):
               "unmap_control": True,
               "read_mapped": True,
               "update_mapped": True,
-              "delete_mapped": True,
+              "delete_mapped": False,
           },
           "Audit": {
               "read": True,
               "update": True,
-              "delete": True,
+              "delete": False,
               "clone": True,
               "read_revisions": True,
               "map_control": True,

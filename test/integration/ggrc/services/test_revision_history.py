@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test for revision history api."""
@@ -219,7 +219,7 @@ class TestRevisionHistory(TestCase):
   def test_get_mandatory_cads(self, mandatory):
     """CAD and mandatory meta info if mandatory flag is {0}."""
     control_id = self.control.id
-    cad = factories.ExternalCustomAttributeDefinitionFactory(
+    cad = factories.CustomAttributeDefinitionFactory(
         title="test_name",
         definition_type="control",
         mandatory=mandatory)

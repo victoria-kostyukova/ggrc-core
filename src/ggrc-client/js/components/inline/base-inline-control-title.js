@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -7,6 +7,7 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
+import '../redirects/external-control/external-control';
 import template from './base-inline-control-title.stache';
 
 export default canComponent.extend({

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -19,7 +19,6 @@ import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
 import CustomAttributeDefinition from '../../models/custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../../models/custom-roles/access-control-role';
-import ExternalCADefinition from '../../models/custom-attributes/external-custom-attribute-definition';
 
 const TreeViewControl = TreeLoader.extend({
   // static properties
@@ -189,13 +188,7 @@ const TreeViewControl = TreeLoader.extend({
           });
           break;
         case 'custom_attribute_definitions': {
-          let cadModel = CustomAttributeDefinition;
-
-          if (instance.isChangeableExternally) {
-            cadModel = ExternalCADefinition;
-          }
-
-          dfd = cadModel.findAll({
+          dfd = CustomAttributeDefinition.findAll({
             definition_type: instance.root_object,
             definition_id: null,
           });

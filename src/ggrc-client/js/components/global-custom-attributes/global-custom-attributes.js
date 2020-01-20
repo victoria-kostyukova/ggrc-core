@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2019 Google Inc.
+ Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -10,7 +10,8 @@ import {
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import {isAllowedFor} from '../../permission';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
-import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
+import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
+import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
 /**
  * Global Custom Attributes is a component representing custom attributes.
@@ -23,7 +24,8 @@ export default canComponent.extend({
     define: {
       redirectionEnabled: {
         get() {
-          return isProposableExternally(this.attr('instance'));
+          const instance = this.attr('instance');
+          return isChangeableExternally(instance) && !isSnapshot(instance);
         },
       },
       /**

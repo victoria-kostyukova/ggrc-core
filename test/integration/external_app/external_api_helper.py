@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Simple api client to simulate external app requests"""
@@ -105,7 +105,6 @@ class ExternalApiClient(object):
     if obj_type not in data:
       resp.json[obj_type].update(data)
       data = resp.json
-
     return self.client.put(url, data=json.dumps(data), headers=headers)
 
   def _get_precondition_headers(self, obj_type, obj_id):

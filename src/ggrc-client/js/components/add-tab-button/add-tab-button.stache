@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -49,10 +49,10 @@
               </a>
             {{else}}
               {{#isMappableExternally instance model.model_singular}}
-                <questionnaire-mapping-link 
+                <questionnaire-mapping-link
                   class="external-link"
                   instance:from="instance"
-                  destinationModel:from="model">                  
+                  destinationModel:from="model">
                     <i class="fa fa-fw fa-{{ icon }} color"></i>
                     <span class="external-link__content">
                       {{title}}
@@ -79,7 +79,7 @@
                       {{title}}
                     </div>
                   </a>
-                {{else}} 
+                {{else}}
                   <a href="{{urlPath}}{{ href }}">
                     <div class="oneline">
                       <i class="fa fa-fw fa-{{ icon }} color"></i>
@@ -87,7 +87,7 @@
                     </div>
                   </a>
                 {{/is_allowed_to_map}}
-                
+
               {{/isMappableExternally}}
             {{/shouldCreateObject}}
           </div>

@@ -1,10 +1,11 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import Cacheable from '../cacheable';
 import Proposable from '../mixins/proposable';
+import Reviewable from '../mixins/reviewable';
 import ChangeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
 
@@ -19,6 +20,7 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/risks/{id}',
   mixins: [
     Proposable,
+    Reviewable,
     ChangeableExternally,
   ],
   migrationDate: '06/13/2019',

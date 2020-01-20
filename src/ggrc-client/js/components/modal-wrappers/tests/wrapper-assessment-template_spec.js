@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2019 Google Inc.
+  Copyright (C) 2020 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -19,6 +19,16 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
     {value: 'Secondary Assignees', title: 'Secondary Assignees'},
     {value: 'Control Operators', title: 'Control Operators'},
     {value: 'Control Owners', title: 'Control Owners'},
+    {value: 'Other Contacts', title: 'Other Contacts'},
+    {value: 'other', title: 'Others...'},
+  ],
+  scope: [
+    {value: 'Admin', title: 'Object Admins'},
+    {value: 'Audit Lead', title: 'Audit Captain'},
+    {value: 'Auditors', title: 'Auditors'},
+    {value: 'Principal Assignees', title: 'Principal Assignees'},
+    {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+    {value: 'Compliance Contacts', title: 'Compliance Contacts'},
     {value: 'Other Contacts', title: 'Other Contacts'},
     {value: 'other', title: 'Others...'},
   ],
@@ -84,7 +94,7 @@ describe('wrapper-assessment-template component', function () {
 
     it('returns default values when template_object_type is not Control',
       () => {
-        viewModel.attr('instance.template_object_type', 'Metric');
+        viewModel.attr('instance.template_object_type', 'Objective');
 
         let peopleValues = viewModel.attr('peopleValues');
         expect(peopleValues)

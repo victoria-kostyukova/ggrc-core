@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Elements of search / mapper modal."""
 # pylint: disable=too-few-public-methods
@@ -21,19 +21,28 @@ class SearchFilterArea(object):
         class_name="autocomplete-dropdown__input-container")
     self.filter_operator = self._root.element(
         class_name="filter-attribute__operator")
+    self._save_search_row = self._root.element(
+        css="create-saved-search")
 
   def search_obj(self, obj, filter_value=None,
                  search_attr=element.Common.TITLE,
                  filter_operator=value_aliases.EQUAL_OP):
     """Searches for object by title. Optionally search by any other
     specified attribute."""
+    self.set_search_attributes(obj, filter_value, search_attr,
+                               filter_operator)
+    self._click_search()
+    self._wait_for_search_results()
+
+  def set_search_attributes(self, obj, filter_value=None,
+                            search_attr=element.Common.TITLE,
+                            filter_operator=value_aliases.EQUAL_OP):
+    """Selects attributes for search."""
     if not filter_value:
       filter_value = obj.title
     self._select_obj_type(obj)
     self._select_search_criteria(search_attr, filter_operator)
     self._set_filter_value(filter_value)
-    self._click_search()
-    self._wait_for_search_results()
 
   def _select_obj_type(self, obj):
     """Selects object type."""
@@ -58,6 +67,12 @@ class SearchFilterArea(object):
   def _wait_for_search_results(self):
     """Waits for search results to be refreshed."""
     self._search_btn.wait_until_not(lambda btn: btn.disabled)
+
+  def save_search(self, search_title):
+    """Sets a title of a search and clicks Save Search button. """
+    self._save_search_row.text_field(
+        css="[placeholder*='Save Search']").set(search_title)
+    self._save_search_row.button(text="Save Search").click()
 
 
 class SearchResultsArea(object):
@@ -117,3 +132,27 @@ class _SearchResultRow(object):
     Returns 3bbs element."""
     self.expand()
     return factory.get_cls_3bbs_dropdown_info(object_name=obj_type)(self._root)
+
+
+class SavedSearchesArea(object):
+  """Represents a left filter area of search / mapper modal."""
+
+  def __init__(self, container):
+    self._root = container
+
+  @property
+  def saved_searches(self):
+    """Returns:
+          list of saved searches as elements."""
+    return self._root.elements(
+        class_name='.saved-search-item__title')
+
+  def get_search_by_title(self, search_title):
+    """Returns:
+          a saved search with an expected title."""
+    return self._root.element(title=search_title)
+
+  def is_search_present(self, search_title):
+    """Returns:
+          True if saved search is present."""
+    return self.get_search_by_title(search_title).present

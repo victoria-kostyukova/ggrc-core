@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Google Inc.
+ * Copyright (C) 2020 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -9,6 +9,7 @@ import CaUpdate from '../mixins/ca-update';
 import AccessControlList from '../mixins/access-control-list';
 import BaseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
+import Reviewable from '../mixins/reviewable';
 
 export default Cacheable.extend({
   root_object: 'threat',
@@ -24,6 +25,7 @@ export default Cacheable.extend({
     CaUpdate,
     AccessControlList,
     BaseNotifications,
+    Reviewable,
   ],
   is_custom_attributable: true,
   isRoleable: true,

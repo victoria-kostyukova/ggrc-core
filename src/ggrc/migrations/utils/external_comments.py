@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module contains utils for external comments."""
@@ -340,3 +340,5 @@ def move_to_external_comments(connection, obj_type):
   """
   comments = _get_comments_by_object_type(connection, obj_type)
   _move_comments_to_ext_comments(connection, comments)
+
+  return len(comments)

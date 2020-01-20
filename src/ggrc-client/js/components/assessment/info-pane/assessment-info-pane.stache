@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -211,7 +211,8 @@
                             isLocalCa:from="true"
                             fields:from="fields"
                             editMode:from="canEdit"
-                            on:valueChanged="attributeChanged(scope.event)">
+                            on:valueChanged="attributeChanged(scope.event)"
+                            on:addRequiredInfo="showRequiredInfoModal(scope.event)">
                       </custom-attributes>
                     </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->

@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -14,16 +14,16 @@
 {{#each relevant}}
   <div class="single-line-filter">
     {{^if readOnly}}
-      <i class="fa fa-trash" on:el:click="removeFilter(scope.element, @index)"></i>
+      <i class="fa fa-trash" on:el:click="removeFilter(scope.element, scope.index)"></i>
     {{/if}}
-    {{#if @index}}
+    {{#if scope.index}}
       <dropdown-component optionsList:from="operators"
                 name:bind="operator"
                 class="inline-block">
       </dropdown-component>
     {{/if}}
     Mapped to:
-    <select class="filter-type-selector select-filter{{@index}}"
+    <select class="filter-type-selector select-filter{{scope.index}}"
             {{#if readOnly}}disabled="disabled"{{/if}}
             el:value:bind="model_name">
       {{#menu}}
@@ -41,11 +41,11 @@
           <div class="modal-search objective-selector">
             <input
               {{#if readOnly}}disabled="disabled"{{/if}}
-              class="input-large search-icon search-filter-{{@index}}"
+              class="input-large search-icon search-filter-{{scope.index}}"
               placeholder="Enter text to search for {{model_name}}"
               type="text"
-              data-index="{{@index}}"
-              name="filter_list.{{@index}}.filter"
+              data-index="{{scope.index}}"
+              name="filter_list.{{scope.index}}.filter"
               value="{{firstnonempty filter.name filter.email filter.title}}"
               data-lookup="{{this}}"
               data-template="/{{#is(model_name, 'Person')}}people{{else}}base_objects{{/is}}/autocomplete-result.stache"

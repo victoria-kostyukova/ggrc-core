@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 # pylint: disable=redefined-outer-name
@@ -14,13 +14,14 @@ from sqlalchemy import inspect, orm
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
-from ggrc.login import get_current_user, get_user_date
+from ggrc import login
 from ggrc.models import all_models
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_read_for, is_allowed_update
 from ggrc.access_control import role
 from ggrc.services import signals
 from ggrc.utils import benchmark
+from ggrc.utils import user_generator
 from ggrc.utils.log_event import log_event
 from ggrc_workflows import models, notification
 from ggrc_workflows import services
@@ -202,8 +203,8 @@ def build_cycles(workflow, cycle=None, user=None):
   cycle: Cycle instance (optional). Cycle instance that started at first.
   user: User isntance (optional). User who will be the creator of the cycles.
   """
-  user = user or get_current_user()
-  request_user_date = get_user_date()
+  user = user or login.get_current_user()
+  request_user_date = login.get_user_date()
   if not workflow.next_cycle_start_date:
     workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
         workflow.min_task_start_date)
@@ -787,7 +788,7 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     obj.title = get_copy_title(source_workflow.title, used_titles)
 
   # get the personal context for this logged in user
-  user = get_current_user(use_external_user=False)
+  user = login.get_current_user(use_external_user=False)
   personal_context = user.get_or_create_object_context(context=1)
   workflow_context = obj.get_or_create_object_context(personal_context)
   obj.context = workflow_context
@@ -814,6 +815,9 @@ def start_recurring_cycles():
         models.Workflow.next_cycle_start_date <= today,
         models.Workflow.recurrences == True  # noqa
     )
+    user_id = login.get_current_user_id()
+    if user_id is None:
+      user_id = user_generator.get_migrator_id()
     event = None
     for workflow in workflows:
       # Follow same steps as in model_posted.connect_via(models.Cycle)
@@ -828,7 +832,7 @@ def start_recurring_cycles():
       # 'Cycles' for each 'Workflow' should be committed separately
       # to free memory on each iteration. Single commit exeeded
       # maximum memory limit on AppEngine instance.
-      event = log_event(db.session, event=event)
+      event = log_event(db.session, event=event, current_user_id=user_id)
       db.session.commit()
 
 

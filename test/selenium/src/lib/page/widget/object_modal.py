@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for creating / making changes to objects:
 * New object
@@ -6,7 +6,7 @@
 * Proposal for object
 """
 from lib import base
-from lib.constants import objects, locator
+from lib.constants import objects
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
@@ -328,25 +328,18 @@ class CommonConfirmModal(base.Modal):
   def __init__(self):
     super(CommonConfirmModal, self).__init__()
     self._root = self._browser.element(
-        css="{}[style*='display: block']".format(locator.Common.MODAL_CONFIRM))
-    self.confirm_btn = self._browser.element(
-        css="{} .modal-footer .btn-small".format(locator.Common.MODAL_CONFIRM))
+        css=".modal.hide.undefined.in[style*='display: block']")
+    self.confirm_btn = self._root.element(data_toggle="confirm")
+
+  @property
+  def exists(self):
+    """Returns whether the modal exists."""
+    return self._root.exists
 
   def confirm(self):
     """Clicks confirmation button on modal object."""
+    self.confirm_btn.wait_until_present()
     self.confirm_btn.click()
-
-
-class WarningModal(CommonConfirmModal):
-  """Represents warning object modal."""
-  def __init__(self):
-    super(WarningModal, self).__init__()
-    self.proceed_in_new_tab_btn = self.confirm_btn
-
-  def proceed_in_new_tab(self):
-    """Clicks 'Proceed in new tab' button on modal object."""
-    self.proceed_in_new_tab_btn.wait_until_present()
-    self.proceed_in_new_tab_btn.click()
 
 
 class AuditModal(BaseObjectModal):

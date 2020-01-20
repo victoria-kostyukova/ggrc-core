@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -126,7 +126,7 @@ class TestCreatorProgram(TestCase):
                 "mapped_object": {
                     "get": 200,
                     "put": 200,
-                    "delete": 200
+                    "delete": 403
                 },
                 "unrelated": {
                     "get": 403,
@@ -173,8 +173,7 @@ class TestCreatorProgram(TestCase):
     response = self.api.get(obj.__class__, obj.id)
     if response.status_code == 200:
       return self.api.put(obj, response.json).status_code
-    else:
-      return response.status_code
+    return response.status_code
 
   def map(self, dest):
     """ Map src to dest """
@@ -215,7 +214,7 @@ class TestCreatorProgram(TestCase):
 
     # Use admin owner role to map it with system
     acr_id = all_models.AccessControlRole.query.filter_by(
-        object_type="System",
+        object_type="Regulation",
         name="Admin"
     ).first().id
     self.objects["program"] = all_models.Program.query.get(program_id)
@@ -223,8 +222,8 @@ class TestCreatorProgram(TestCase):
     # Create an object:
     for obj in ("mapped_object", "unrelated"):
       random_title = factories.random_str()
-      response = self.api.post(all_models.System, {
-          "system": {
+      response = self.api.post(all_models.Regulation, {
+          "regulation": {
               "title": random_title,
               "context": None,
               "access_control_list": [
@@ -233,8 +232,8 @@ class TestCreatorProgram(TestCase):
       })
       self.assertEqual(response.status_code, 201,
                        "Creator can't create object")
-      system_id = response.json.get("system").get("id")
-      self.objects[obj] = all_models.System.query.get(system_id)
+      system_id = response.json.get("regulation").get("id")
+      self.objects[obj] = all_models.Regulation.query.get(system_id)
 
     # Map Object to Program
     response = self.api.post(all_models.Relationship, {
@@ -243,7 +242,7 @@ class TestCreatorProgram(TestCase):
             "type": "Program"
         }, "destination": {
             "id": self.objects["mapped_object"].id,
-            "type": "System"
+            "type": "Regulation"
         }, "context": None},
     })
     self.assertEqual(response.status_code, 201,

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -15,7 +15,10 @@ const hideTemplates = [
   'can-component: Assigning a DefineMap or constructor type',
   'No property found for handling',
   'Dispatching a synthetic event on a disabled is problematic in FireFox',
-  'canStache/src/expression.js: Unable to find key or helper',
+  'is not in the current scope, so it is being read from a parent scope.',
+  'is deprecated. Use',
+  'is being called as a function.',
+  'Unable to find key or helper',
 ];
 
 const isHidden = function (text) {

@@ -1,15 +1,13 @@
 /*
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import Cacheable from '../cacheable';
-import UniqueTitle from '../mixins/unique-title';
-import CaUpdate from '../mixins/ca-update';
-import AccessControlList from '../mixins/access-control-list';
-import ScopeObjectNotifications from '../mixins/notifications/scope-object-notifications';
 import Questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
+import ChangeableExternally from '../mixins/changeable-externally';
+import DisableAddComments from '../mixins/disable-add-comments';
 
 export default Cacheable.extend({
   root_object: 'metric',
@@ -21,11 +19,9 @@ export default Cacheable.extend({
   update: 'PUT /api/metrics/{id}',
   destroy: 'DELETE /api/metrics/{id}',
   mixins: [
-    UniqueTitle,
-    CaUpdate,
-    AccessControlList,
-    ScopeObjectNotifications,
     Questionnaire,
+    ChangeableExternally,
+    DisableAddComments,
   ],
   attributes: {
     context: Stub,
@@ -47,8 +43,9 @@ export default Cacheable.extend({
         attr_title: 'Notes',
         attr_name: 'notes',
       }, {
-        attr_title: 'Assessment Procedure',
-        attr_name: 'test_plan',
+        attr_title: 'Created By',
+        attr_name: 'created_by',
+        attr_sort_field: 'created_by',
       },
     ]),
     display_attr_names: ['title', 'status', 'updated_at'],
@@ -64,20 +61,4 @@ export default Cacheable.extend({
     default_filter: ['Product'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-}, {
-  define: {
-    title: {
-      value: '',
-      validate: {
-        required: true,
-        validateUniqueTitle: true,
-      },
-    },
-    _transient_title: {
-      value: '',
-      validate: {
-        validateUniqueTitle: true,
-      },
-    },
-  },
-});
+}, {});

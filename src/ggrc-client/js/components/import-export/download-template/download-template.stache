@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2019 Google Inc.
+    Copyright (C) 2020 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -52,12 +52,12 @@
             <div>
               <autocomplete-component searchItemsType:from="'AssessmentTemplate'"
                                       extraCssClass:from="'search-icon'"
-                                      on:vm:itemSelected="selectTemplate(scope.event.selectedItem, @index)"
-                                      on:vm:itemErased="eraseTemplate(@index)"
+                                      on:vm:itemSelected="selectTemplate(scope.event.selectedItem, scope.index)"
+                                      on:vm:itemErased="eraseTemplate(scope.index)"
                                       placeholder:from="'Enter text to search for Assessment Template'"
                                       class="autocomplete__large">
               </autocomplete-component>
-              <i class="fa fa-trash-o" on:el:click="removeTemplate(@index)"></i>
+              <i class="fa fa-trash-o" on:el:click="removeTemplate(scope.index)"></i>
             </div>
             {{#if isDuplicate}}
               <div class="download-template__template-error">

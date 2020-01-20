@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Relationship model and related classes."""
@@ -290,6 +290,21 @@ class Relationship(base.ContextRBAC, Base, db.Model):
       raise ValidationError(
           u"You do not have the necessary permissions to map and unmap "
           u"risks to scoping objects, controls, standards "
+          u"and regulations in this application."
+          u"Please contact your administrator if you have any questions.")
+
+    # Check Scope Objects
+    scope_external_only_mappings = set(scoping_models_names)
+    scope_external_only_mappings.update(("Regulation",
+                                         "Standard",
+                                         "Control",
+                                         "Risk"))
+    if cls._check_relation_types_group(source_type, destination_type,
+                                       scope_external_only_mappings,
+                                       set(scoping_models_names)):
+      raise ValidationError(
+          u"You do not have the necessary permissions to map and unmap "
+          u"scoping objects to scoping objects, risks, controls, standards "
           u"and regulations in this application."
           u"Please contact your administrator if you have any questions.")
 
