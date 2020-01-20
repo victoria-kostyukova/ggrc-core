@@ -8,10 +8,13 @@ import loGroupBy from 'lodash/groupBy';
 import loIndexOf from 'lodash/indexOf';
 import loFindIndex from 'lodash/findIndex';
 import loMap from 'lodash/map';
+import loSome from 'lodash/some';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {ROLES_CONFLICT} from '../../events/event-types';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
+import {refreshPermissions} from '../../permission';
+import {getCurrentUser} from '../../plugins/utils/user-utils';
 
 export default canComponent.extend({
   tag: 'related-people-access-control',
@@ -32,6 +35,7 @@ export default canComponent.extend({
       Assignee: true,
       Verifier: true,
     }),
+    isCurrentUserPermissionsChanged: false,
 
     updateRoles(args) {
       if (this.attr('deferredSave')) {
@@ -52,26 +56,41 @@ export default canComponent.extend({
       }
     },
     updateAccessControlList(people, roleId) {
-      let instance = this.attr('instance');
+      const instance = this.attr('instance');
+      const accessControlList = instance.attr('access_control_list');
 
       // get people without current role
-      let listWithoutRole = instance
-        .attr('access_control_list').filter((item) => {
-          return item.ac_role_id !== roleId;
-        });
+      const listWithoutRole = accessControlList
+        .filter((item) => item.ac_role_id !== roleId);
 
-      // push update people with current role
-      people.forEach((person) => {
-        listWithoutRole.push({
-          ac_role_id: roleId,
-          person: {id: person.id, type: 'Person'},
-        });
-      });
+      const newListWithRole = people
+        .map(({id}) => ({ac_role_id: roleId, person: {id, type: 'Person'}}));
 
-      instance.attr('access_control_list')
-        .replace(listWithoutRole);
+      if (!this.attr('isNewInstance')) {
+        const oldListWithRole = accessControlList
+          .filter((item) => (item.ac_role_id === roleId));
+
+        this.checkIsCurrentUserPermissionsChanged(
+          oldListWithRole,
+          newListWithRole
+        );
+      }
+
+      instance.attr('access_control_list',
+        listWithoutRole.concat(newListWithRole));
     },
+    checkIsCurrentUserPermissionsChanged(oldListWithRole, newListWithRole) {
+      const currentUserId = getCurrentUser().id;
+      const isCurrentUserHadRole =
+        loSome(oldListWithRole, ({person: {id}}) => currentUserId === id);
+      const isCurrentUserWillHaveRole =
+        loSome(newListWithRole, ({person: {id}}) => currentUserId === id);
 
+      if (isCurrentUserHadRole && !isCurrentUserWillHaveRole
+        || !isCurrentUserHadRole && isCurrentUserWillHaveRole) {
+        this.attr('isCurrentUserPermissionsChanged', true);
+      }
+    },
     checkConflicts(groupTitle) {
       let groups = this.attr('groups');
       let conflictRoles = this.attr('conflictRoles');
@@ -290,6 +309,10 @@ export default canComponent.extend({
       this.viewModel.setupGroups();
     },
     '{viewModel.instance} updated'() {
+      if (this.viewModel.attr('isCurrentUserPermissionsChanged')) {
+        refreshPermissions();
+        this.viewModel.attr('isCurrentUserPermissionsChanged', false);
+      }
       this.viewModel.refreshPeopleInGroups();
       this.viewModel.checkConflicts();
     },

@@ -129,6 +129,7 @@ let handlers = {
     } else {
       instance = model.findInCacheById($trigger.attr('data-object-id'));
     }
+    const isNewInstance = !instance;
 
     objectParams = objectParams ? JSON.parse(objectParams) : {};
     extendNewInstance = extendNewInstance
@@ -209,25 +210,10 @@ let handlers = {
             return;
           }
         }
+        const promise =
+          isNewInstance ? refreshPermissions() : Promise.resolve();
 
-        refreshPermissions().then(function () {
-          let hiddenElement;
-          let tagName;
-
-          // 'is_allowed' helper rerenders an elements
-          // we should trigger event for hidden element
-          if (!$trigger.is(':visible') && option.uniqueId &&
-            $trigger.context) {
-            tagName = $trigger.context.tagName;
-
-            hiddenElement =
-              $(tagName + "[data-unique-id='" + option.uniqueId + "']");
-
-            if (hiddenElement) {
-              $trigger = hiddenElement;
-            }
-          }
-
+        promise.then(() => {
           $trigger.trigger(
             'modal:success', Array.prototype.slice.call(args, 1)
           );

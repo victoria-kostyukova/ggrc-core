@@ -74,10 +74,15 @@ function getUserObjectRoles(person) {
   return allRoleNames;
 }
 
+function getCurrentUser() {
+  return GGRC.current_user;
+}
+
 export {
   cacheCurrentUser,
   getPersonInfo,
   loadPersonProfile,
   getUserSystemRoles,
   getUserObjectRoles,
+  getCurrentUser,
 };

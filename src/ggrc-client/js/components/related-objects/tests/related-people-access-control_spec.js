@@ -7,6 +7,8 @@ import Component from '../related-people-access-control';
 import {getComponentVM, makeFakeInstance} from '../../../../js_specs/spec-helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import Control from '../../../models/business-models/control';
+import * as Permission from '../../../permission';
+import * as userUtils from '../../../plugins/utils/user-utils';
 
 describe('related-people-access-control component', function () {
   let viewModel;
@@ -428,6 +430,100 @@ describe('related-people-access-control component', function () {
       const result = instance.attr('access_control_list');
       expect(result.length).toBe(acl.length - 1);
     });
+
+    it(`calls "checkIsCurrentUserPermissionsChanged" if
+     instance is not new`, () => {
+      spyOn(viewModel, 'checkIsCurrentUserPermissionsChanged');
+      viewModel.attr('isNewInstance', false);
+      viewModel.updateAccessControlList([]);
+
+      expect(viewModel.checkIsCurrentUserPermissionsChanged)
+        .toHaveBeenCalled();
+    });
+
+    it(`does not call "checkIsCurrentUserPermissionsChanged" if
+     instance is new`, () => {
+      spyOn(viewModel, 'checkIsCurrentUserPermissionsChanged');
+      viewModel.attr('isNewInstance', true);
+      viewModel.updateAccessControlList([]);
+
+      expect(viewModel.checkIsCurrentUserPermissionsChanged)
+        .not.toHaveBeenCalled();
+    });
+
+    it(`calls "checkIsCurrentUserPermissionsChanged" with
+     correct arguments`, () => {
+      const spy = spyOn(viewModel, 'checkIsCurrentUserPermissionsChanged');
+      viewModel.attr('isNewInstance', false);
+      const people = [{id: 11}, {id: 22}, {id: 33}];
+      viewModel.updateAccessControlList(people, 1);
+
+      const {args} = spy.calls.mostRecent();
+      const firstArg = args[0].serialize();
+      const secondArg = args[1];
+      const expectedFirstArg = [
+        {ac_role_id: 1, person: {id: 1, type: 'Person'}},
+        {ac_role_id: 1, person: {id: 2, type: 'Person'}},
+      ];
+      const expectedSecongArg = [
+        {ac_role_id: 1, person: {id: 11, type: 'Person'}},
+        {ac_role_id: 1, person: {id: 22, type: 'Person'}},
+        {ac_role_id: 1, person: {id: 33, type: 'Person'}},
+      ];
+      expect(firstArg).toEqual(expectedFirstArg);
+      expect(secondArg).toEqual(expectedSecongArg);
+    });
+  });
+
+  describe('"checkIsCurrentUserPermissionsChanged"', () => {
+    let instance;
+
+    beforeAll(function () {
+      instance = makeFakeInstance({model: Control})();
+      viewModel.attr('infoPaneMode', true);
+    });
+
+    beforeEach(function () {
+      viewModel.attr('instance', instance);
+      viewModel.attr('isCurrentUserPermissionsChanged', false);
+    });
+
+    it(`should set "isCurrentUserPermissionsChanged" flag true if current
+       user get the role`, () => {
+      spyOn(userUtils, 'getCurrentUser').and.returnValue({id: 1});
+      viewModel.checkIsCurrentUserPermissionsChanged(
+        [],
+        [{person: {id: 1}}]
+      );
+      expect(viewModel.attr('isCurrentUserPermissionsChanged')).toBe(true);
+    });
+
+    it(`should set "isCurrentUserPermissionsChanged" flag true if current
+       user leaves the role`, () => {
+      spyOn(userUtils, 'getCurrentUser').and.returnValue({id: 1});
+      viewModel.checkIsCurrentUserPermissionsChanged(
+        [{person: {id: 1}}],
+        []
+      );
+      expect(viewModel.attr('isCurrentUserPermissionsChanged')).toBe(true);
+    });
+
+    it(`should set "isCurrentUserPermissionsChanged" flag false if current
+       user had and will have a role`, () => {
+      spyOn(userUtils, 'getCurrentUser').and.returnValue({id: 1});
+      viewModel.checkIsCurrentUserPermissionsChanged(
+        [{person: {id: 1}}],
+        [{person: {id: 1}}]
+      );
+      expect(viewModel.attr('isCurrentUserPermissionsChanged')).toBe(false);
+    });
+
+    it(`should set "isCurrentUserPermissionsChanged" flag false if current
+       user did not and will not have a role`, () => {
+      spyOn(userUtils, 'getCurrentUser').and.returnValue({id: 1});
+      viewModel.checkIsCurrentUserPermissionsChanged([], []);
+      expect(viewModel.attr('isCurrentUserPermissionsChanged')).toBe(false);
+    });
   });
 
   describe('"buildGroups" method', function () {
@@ -588,6 +684,39 @@ describe('related-people-access-control component', function () {
       expect(groups.length).toBe(1);
       expect(groups[0].title).toEqual('Principal Assignees');
       expect(groups[0].required).toBe(false);
+    });
+  });
+
+  describe('"updated" event', () => {
+    let event;
+    let instance;
+
+    beforeAll(() => {
+      event = Component.prototype.events['{viewModel.instance} updated']
+        .bind({viewModel});
+      viewModel.attr('refreshPeopleInGroups', () => {});
+      viewModel.attr('checkConflicts', () => {});
+    });
+
+    beforeEach(() => {
+      instance = makeFakeInstance({model: Control})();
+      viewModel.attr('instance', instance);
+    });
+
+    it(`should refresh permissions
+       when "currentUserPermissionsChanged" flag is true`, () => {
+      spyOn(Permission, 'refreshPermissions');
+      viewModel.attr('isCurrentUserPermissionsChanged', true);
+      event();
+      expect(Permission.refreshPermissions).toHaveBeenCalled();
+    });
+
+    it(`should not refresh permissions
+       when "currentUserPermissionsChanged" flag is false`, () => {
+      spyOn(Permission, 'refreshPermissions');
+      viewModel.attr('isCurrentUserPermissionsChanged', false);
+      event();
+      expect(Permission.refreshPermissions).not.toHaveBeenCalled();
     });
   });
 });
