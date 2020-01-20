@@ -104,8 +104,10 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
 
   def _select_search_dest_objs(self):
     """Click Search button to search objects according set filters."""
-    base.Button(self.modal_elem, self._locators.BUTTON_SEARCH).click()
-    selenium_utils.wait_for_js_to_load(self._driver)
+    search_button = base.Button(self.modal_elem, self._locators.BUTTON_SEARCH)
+    search_button.click()
+    selenium_utils.wait_until_condition(
+        self._driver, lambda x: search_button.element.is_enabled())
 
   def _select_dest_objs_to_map(self, objs_titles):
     """Select checkboxes regarding to titles from list of checkboxes
@@ -160,7 +162,7 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
         self.add_filter_attr(self._elements.ATTRIBUTE_TITLE, title,
                              operator=operator)
     self._select_search_dest_objs()
-    # Return items or check nothin is returned.
+    # Return items or check nothing is returned.
     if return_tree_items:
       return self.tree_view.get_list_members_as_list_scopes()
     else:
