@@ -706,13 +706,18 @@ class Assessments(InfoWidget):
     base.Button(self.info_widget_elem,
                 locator.WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
 
+  def set_value_of_dropdown_w_required_field(self, dropdown):
+    """Sets value of Assessment dropdown with required url, file or comment.
+
+    After that modal is opened for filling."""
+    self.fill_ca_values({dropdown.title: dropdown.multi_choice_options},
+                        is_global=False, is_inline=True)
+    return set_value_for_asmt_ca.SetValueForAsmtDropdown(self._driver)
+
   def choose_and_fill_dropdown_lca(self, dropdown, **kwargs):
     """Choose and fill comment or url for Assessment dropdown."""
-    self.fill_ca_values({dropdown.title: dropdown.multi_choice_options},
-                        is_global=False,
-                        is_inline=True)
-    set_value_for_asmt_ca.SetValueForAsmtDropdown(
-        self._driver).fill_dropdown_lca(**kwargs)
+    self.set_value_of_dropdown_w_required_field(dropdown).fill_dropdown_lca(
+        **kwargs)
     selenium_utils.get_when_clickable(
         self._driver, locator.WidgetInfoAssessment.BUTTON_COMPLETE)
 
