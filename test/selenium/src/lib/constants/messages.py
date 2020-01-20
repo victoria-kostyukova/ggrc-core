@@ -17,12 +17,15 @@ class AssertionMessages(CommonMessages):
   """Class contains constants and methods to make messages after assertion
   procedures.
   """
+  # pylint: disable=invalid-name
   AUTOMAPPING_IN_CHANGE_LOG = ("Automapping of {obj_name} should be tracked in"
                                " the 'Change log' tab")
   OBJS_SHOULD_BE_MAPPED_TO_OBJ = ("{mapped_objs_names} should be mapped to"
                                   " {src_obj_name}")
   TAB_WITH_NUM_SHOULD_EXIST = "{tab_name} tab with number {num} should exist."
   MEGA_PROGRAM_ICON = "Blue flag icon should appear near the {title} title"
+  ITEM_CHECKBOX_SHOULD_BE_DISABLED = ("{obj_name} item checkbox should be "
+                                      "disabled.")
 
   _line = "\n-----\n"
   _double_diff = "\nExpected:\n{}\nActual:\n{}\n"

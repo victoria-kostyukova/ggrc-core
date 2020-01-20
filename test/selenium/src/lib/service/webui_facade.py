@@ -599,10 +599,9 @@ def check_mega_program_icon_in_unified_mapper(selenium, child_program,
   program_mapper = (webui_service.ProgramsService(
                     obj_name=objects.PROGRAM_PARENTS, driver=selenium)
                     .get_unified_mapper(child_program))
-  parent_program_row = [program for program
-                        in program_mapper.tree_view.tree_view_items()
-                        if parent_program.title in program.text][0]
-  assert parent_program_row.mega_program_icon.exists
+  parent_program_row = program_mapper.tree_view.get_item_by_obj_name(
+      parent_program.title)
+  assert parent_program_row.has_mega_program_icon
 
 
 def open_propose_changes_modal(obj, selenium):
