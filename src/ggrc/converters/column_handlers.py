@@ -4,23 +4,23 @@
 """
 This module provides all column handlers for objects in the ggrc module.
 
-If you want to add column handler you should decide is it handler default
+If you want to add column handler you should decide is it default handler
 or custom for current model.
 If this handler is default than you will add it into _COLUMN_HANDLERS dict in
 subdict by key "DEFAULT_HANDLERS_KEY"
-If this handler is custom for current model you shuld add it in COLUMN_HANDLERS
-dict by key "Model.__name__"
+If this handler is custom for current model you should add it in
+_COLUMN_HANDLERS dict by key "Model.__name__"
 
 You may add column handlers in your extensions.
 To make this you should add "EXTENSION_HANDLERS_ATTR" in __init__.py in your
-extenstion.
+extension.
 It should be callable or dict.
 If you want to add default handler you should add it in you
 extension_handlers_dict by key "DEFAULT_HANDLERS_KEY"
 If it is custom handler for current model, you should add it in
 your "EXTENSION_HANDLERS_ATTR" dict by key "Model.__name__"
 
-If you want to get hendler for your model
+If you want to get handler for your model
 call function model_column_handlers with you model class as argument.
 
 Example:
@@ -31,7 +31,7 @@ It returns all dict like:
         "column_2": HandlerClass2,
         ...
     }
-Thich contain handler for your Model.
+Which contain handler for your Model.
 """
 
 from copy import deepcopy
@@ -169,6 +169,7 @@ EXTENSION_HANDLERS_ATTR = "contributed_column_handlers"
 
 _COLUMN_HANDLERS = {
     DEFAULT_HANDLERS_KEY: _DEFAULT_COLUMN_HANDLERS_DICT,
+    "Assessment": {"sox_302_enabled": boolean.ReadOnlyCheckboxColumnHandler},
 }
 
 
