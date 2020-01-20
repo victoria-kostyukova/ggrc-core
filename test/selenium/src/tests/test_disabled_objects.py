@@ -94,12 +94,14 @@ class TestDisabledObjects(base.Test):
         *entity.Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  def test_disabled_obj_change_log_tab(self, control, soft_assert, selenium):
+  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_disabled_obj_change_log_tab(self, obj, soft_assert, selenium):
     """Check disabled object's Log tab is valid."""
     change_log_ui_facade.soft_assert_obj_creation_entry_is_valid(
-        control, soft_assert)
+        obj, soft_assert)
     change_log_ui_facade.soft_assert_disabled_obj_log_tab_elements_are_valid(
-        control, soft_assert)
+        obj, soft_assert)
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
