@@ -642,3 +642,13 @@ def open_dashboard(selenium):
     Dashboard page objects model."""
   selenium_utils.open_url(url.dashboard())
   return dashboard.Dashboard(selenium)
+
+
+def soft_assert_cannot_update_predefined_field(soft_assert, obj):
+  """Performs soft assert that click on predefined field's pencil icon doesn't
+  open an input field."""
+  field_element = factory.get_cls_webui_service(objects.get_plural(
+      obj.type))().open_info_page_of_obj(obj).predefined_field
+  field_element.inline_edit.open()
+  soft_assert.expect(not field_element.input.exist,
+                     "There should be no input field.")

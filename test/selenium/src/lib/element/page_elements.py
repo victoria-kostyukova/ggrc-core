@@ -64,9 +64,12 @@ class SimpleField(object):
   (with h6 header and a text within the same element).
   """
 
-  def __init__(self, container, label):
+  def __init__(self, container, label, with_inline_edit=False):
     self._label_text = label
     self._container = container
+    if with_inline_edit:
+      self.inline_edit = InlineEdit(self.root)
+      self.input = self.root.input()
 
   @property
   def root(self):
@@ -137,12 +140,8 @@ class AssertionsDropdown(object):
     self._root = container.element(
         class_name="custom-attr-wrap").element(text=self.text)
     self.assertions_values = self._root.parent().text.splitlines()[1:]
-    self._inline_edit = InlineEdit(self._root)
+    self.inline_edit = InlineEdit(self._root)
     self.input = self._root.select(class_name="input-block-level")
-
-  def open_inline_edit(self):
-    """Open element for editing."""
-    self._inline_edit.open()
 
 
 class RelatedPeopleList(object):
