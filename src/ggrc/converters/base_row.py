@@ -425,29 +425,75 @@ class ImportRowConverter(RowConverter):
 
     self.obj.issue_tracker_to_import['issue_tracker'] = self.issue_tracker
 
+  def _is_cav_updating(self, handler):
+    """Check if {handler} going to update CAV for {obj}"""
+    for cav in self.obj.custom_attribute_values:
+      if cav.custom_attribute.display_name == handler.display_name:
+        cav_attribute = cav.attribute_value
+        handler_value = handler.parse_item()
+
+        if cav.custom_attribute.attribute_type == u'Checkbox':
+          cav_attribute = cav_attribute == u'1'
+
+        if cav.custom_attribute.attribute_type == u'Map:Person':
+          cav_attribute = cav.attribute_object.email
+          handler_value = handler.get_value()
+
+        if handler_value is None:
+          handler_value = ''
+        return not json_comparator.fields_equal(cav_attribute, handler_value)
+    return True
+
+  def _is_acl_updating(self, handler):
+    """Check if {handler} going to update ACL for {obj}"""
+    for acr_name, acl_obj in self.obj.acr_name_acl_map.items():
+      if acr_name == handler.display_name:
+        return not json_comparator.fields_equal(
+            [people.email for people in acl_obj.current_people],
+            [people.email for people in handler.parse_item()]
+        )
+    return True
+
+  def _is_field_updating(self, handler):
+    """Check if handler going to update attribute for obj"""
+    return (handler.key in self.obj.import_restrictions and handler.value and
+            not json_comparator.fields_equal(getattr(self.obj,
+                                                     handler.key, None),
+                                             handler.value))
+
   def _check_updating_readonly_fields(self):
     """Check if trying to update fields with SOX restrictions"""
     if self.is_new:
       return
 
-    if isinstance(self.obj, WithCustomRestrictions):
-      if self.obj.is_sox_restricted:
-        ignored_names = list()
-        for attr_name, handler in self.attrs.items():
-          if attr_name in self.obj.import_restrictions and \
-              handler.value and \
-              not json_comparator.fields_equal(
-                  getattr(self.obj, attr_name, None),
-                  handler.value):
-            handler.ignore = True
-            ignored_names.append(attr_name)
+    if isinstance(self.obj, WithCustomRestrictions) and \
+       self.obj.is_sox_restricted:
 
-        if not ignored_names:
+      for handler in self.attrs.values():
+        if self._is_field_updating(handler):
+          self.add_error(errors.PERMISSION_ERROR)
           return
 
-        columns_str = ', '.join("'{}'".format(name)
-                                for name in sorted(ignored_names))
-        self.add_warning(errors.READONLY_ACCESS_WARNING, columns=columns_str)
+      for obj_name, handler in self.objects.items():
+        is_local_restricted = (
+            obj_name.startswith("__object_custom__") and
+            "custom_attributes_values" in self.obj.import_restrictions
+        )
+        is_global_restricted = (
+            obj_name.startswith("__custom__") and
+            "global_custom_attributes_values"
+            in self.obj.import_restrictions)
+
+        if (obj_name.startswith("__acl__") and
+           "access_control_list" in self.obj.import_restrictions):
+          if self._is_acl_updating(handler):
+            self.add_error(errors.PERMISSION_ERROR)
+            return
+
+        if is_local_restricted or is_global_restricted:
+          if self._is_cav_updating(handler):
+            self.add_error(errors.PERMISSION_ERROR)
+            return
 
   def process_row(self):
     """Parse, set, validate and commit data specified in self.row."""

@@ -204,9 +204,9 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     if isinstance(self.row_converter.obj, WithCustomRestrictions):
       if "map: Snapshots" in self.row_converter.obj.mapping_restrictions():
         if to_append_ids:
-          self.add_warning(errors.SOX_SNAPSHOT_MAP_WARNING,
-                           column_name=self.mapping_object.__name__,
-                           object=self.row_converter.obj.__class__.__name__)
+          self.add_error(errors.SOX_SNAPSHOT_MAP_WARNING,
+                         column_name=self.mapping_object.__name__,
+                         object=self.row_converter.obj.__class__.__name__)
           return None
     self.is_valid_creation(to_append_ids)
     return items

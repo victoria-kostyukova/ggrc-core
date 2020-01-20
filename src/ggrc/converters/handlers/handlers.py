@@ -576,7 +576,7 @@ class MappingColumnHandler(ColumnHandler):
           continue
         if isinstance(self.row_converter.obj, WithCustomRestrictions):
           if self.row_converter.obj.is_mapping_restricted(obj):
-            self.add_warning(
+            self.add_error(
                 errors.MAPPING_PERMISSION_ERROR,
                 object_type=class_._inflector.human_singular.title(),
                 slug=slug,
