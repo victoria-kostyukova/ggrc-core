@@ -67,4 +67,4 @@ class TestGetAttributes(TestCase):
     attrs_json = json.loads(attrs_str)
     attrs_by_type = attrs_json["Control"]
     attrs = (attr["attr_name"] for attr in attrs_by_type)
-    self.assertNotIn(cad.title, attrs)
+    self.assertIn(cad.title, attrs)

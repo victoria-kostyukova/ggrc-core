@@ -1333,10 +1333,6 @@ class Resource(ModelView):
           self.is_new = True
           self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
-          import traceback
-          import sys
-          ex_type, ex, tb = sys.exc_info()
-          traceback.print_tb(tb)
           res.append(self._make_error_from_exception(error))
           db.session.rollback()
         except ServiceUnavailable as error:
