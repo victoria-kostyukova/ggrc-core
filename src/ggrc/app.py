@@ -109,7 +109,7 @@ def _setup_maintenance_check():
       return format_api_error_response(503, "GGRC is under maintenance")
 
     # in all other cases redirect user to maintenance page
-    return render_template("maintenance/maintenance.html"), 503
+    return render_template("maintenance_mode/maintenance.html"), 503
 
 
 def setup_error_handlers(app_):
