@@ -112,8 +112,9 @@ class TestControlsPage(base.Test):
     soft_assert.expect(new_tab.url == url.Urls().dashboard_info_tab,
                        "Dashboard info page should be opened in new tab.")
     tab_names = service.open_info_page_of_obj(obj).top_tabs.tab_names
-    soft_assert.expect(not any([name.startswith(regulation.obj_type())
-                                for name in tab_names]),
-                       "There should be no regulation mapped to Control.")
+    soft_assert.expect(not any(
+        [name.startswith(objects.get_normal_form(objects.REGULATIONS))
+         for name in tab_names]),
+        "There should be no regulation mapped to {}.".format(obj.type))
     webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
     soft_assert.assert_expectations()
