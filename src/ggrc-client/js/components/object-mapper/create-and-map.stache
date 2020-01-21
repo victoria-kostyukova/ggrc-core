@@ -36,7 +36,6 @@
           data-modal-class="modal-wide"
           data-object-singular="{{destinationModel.model_singular}}"
           data-object-plural="{{destinationModel.table_plural}}"
-          data-unique-id="{{source.id}}"
           data-join-object-id="{{source.id}}">
 
           {{#if isMegaMapping}}
