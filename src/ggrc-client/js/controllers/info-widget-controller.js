@@ -129,7 +129,8 @@ export default canControl.extend({
 
   // timeout required to let server correctly calculate changed counts
   updateCounts: loDebounce((ev, instance) => {
-    if (/dashboard/.test(window.location)) {
+    // skip refresh for Comment as this object type isn't displayed in the menu
+    if (/dashboard/.test(window.location) && instance.type !== 'Comment') {
       refreshCounts();
     }
   }, 250),
