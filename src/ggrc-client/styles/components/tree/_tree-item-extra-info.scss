@@ -179,7 +179,7 @@ tree-item-extra-info {
       width: 220px;
       background-color: $white;
       list-style-type: none;
-      z-index: 1000;
+      z-index: zIndex(tree-item-actions-ul);
       border: 1px solid $warmGray;
       margin: 0;
       box-shadow: 0 3px 1px rgba(0,0,0,.05);
