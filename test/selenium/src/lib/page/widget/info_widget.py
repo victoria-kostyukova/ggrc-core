@@ -93,10 +93,17 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     """Returns object title."""
     return self._root.element(class_name="pane-header__title").h3().text
 
+  @property
+  def status_label(self):
+    """Returns object's status label element."""
+    return page_elements.StatusLabel(
+        self._root.element(class_name=re.compile("state-value state")),
+        with_inline_edit=(self.child_cls_name.lower()
+                          in objects.DISABLED_OBJECTS))
+
   def status(self):
     """Returns object status."""
-    return self._root.element(
-        class_name=re.compile("state-value state")).text_content
+    return self.status_label.text_content
 
   def code(self):
     """Returns code."""

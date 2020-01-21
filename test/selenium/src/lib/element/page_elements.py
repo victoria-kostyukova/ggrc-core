@@ -612,3 +612,18 @@ class CollapsiblePanel(object):
       self._root.span().click()
       self._root.wait_until(lambda x: self.is_expanded)
     return self
+
+
+class StatusLabel(object):
+  """Represents status label element."""
+
+  def __init__(self, root, with_inline_edit=False):
+    self._root = root
+    self.text_content = root.text_content
+    self._inline_edit = InlineEdit(self._root.parent(
+        class_name="action-toolbar")) if with_inline_edit else None
+
+  def click_edit(self):
+    """Click on 'Edit' icon to edit element's value on new frontend."""
+    if self._inline_edit:
+      self._inline_edit.open()
