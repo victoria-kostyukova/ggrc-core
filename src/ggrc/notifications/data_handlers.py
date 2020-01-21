@@ -255,13 +255,15 @@ def _get_assignable_dict(people, notif, ca_cache=None):
   obj = get_notification_object(notif)
   data = {}
 
-  # we do not use definitions data if notification name not assessment update
   if notif.notification_type.name == "assessment_updated":
     definitions = AttributeInfo.get_object_attr_definitions(obj.__class__,
                                                             ca_cache=ca_cache)
+    updated_data = _get_updated_fields(obj, notif.created_at, definitions,
+                                       _get_assignable_roles(obj))
+    if not updated_data:
+      return data
   else:
-    definitions = None
-  roles = _get_assignable_roles(obj)
+    updated_data = None
 
   for person in people:
     # We should default to today() if no start date is found on the object.
@@ -278,12 +280,7 @@ def _get_assignable_dict(people, notif, ca_cache=None):
                     notif.id: as_user_time(notif.created_at)},
                 "notif_updated_at": {
                     notif.id: as_user_time(notif.updated_at)},
-                "updated_data": _get_updated_fields(obj,
-                                                    notif.created_at,
-                                                    definitions,
-                                                    roles)
-                if notif.notification_type.name == "assessment_updated"
-                else None,
+                "updated_data": updated_data,
             }
         }
     }

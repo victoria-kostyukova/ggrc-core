@@ -274,8 +274,8 @@ class TestAssessmentNotification(TestCase):
         ("user@example.com", "")
     )
 
-  def test_multiply_updates(self):
-    """Test notification for multiply updates"""
+  def test_multiple_updates(self):
+    """Test notification for multiple updates"""
     response = self.api.put(self.assessment, {"test_plan": "steps"})
     self.assert200(response)
 
@@ -293,6 +293,20 @@ class TestAssessmentNotification(TestCase):
         updated[self.assessment.id]["updated_data"]["ASSESSMENT PROCEDURE"],
         ("steps", "")
     )
+
+  # pylint: disable=invalid-name
+  def test_multiple_updates_return_old_value(self):
+    """Test notification for multiple updates if value did not changed"""
+    old_test_plan = self.assessment.test_plan
+    response = self.api.put(self.assessment, {"test_plan": "steps"})
+    self.assert200(response)
+
+    response = self.api.put(self.assessment, {"test_plan": old_test_plan})
+    self.assert200(response)
+
+    notifs, notif_data = common.get_daily_notifications()
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual({}, notif_data)
 
   def test_multiply_mapping(self):
     """Test notification for multiply mapping"""
