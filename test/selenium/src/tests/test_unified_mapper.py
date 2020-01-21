@@ -60,16 +60,18 @@ class TestProgramPage(base.Test):
         soft_assert)
     soft_assert.assert_expectations()
 
-  def test_user_cannot_map_control_to_scope_ojbects_via_add_tab(
-          self, control, soft_assert, selenium):
-    """Tests that user cannot map control to scope objects/directives
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_cannot_map_disabled_obj_to_scope_ojbects_via_add_tab(
+          self, obj, soft_assert, selenium):
+    """Tests that user cannot map disabled object to scope objects/directives
     via 'Add Tab' menu."""
-    service = webui_service.ControlsService(selenium)
-    controls_info_widget = service.open_info_page_of_obj(control)
-    controls_info_widget.click_add_tab_btn()
-    hidden_items = controls_info_widget.get_hidden_items_from_add_tab()
+    info_page = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))().open_info_page_of_obj(obj)
+    info_page.click_add_tab_btn()
+    hidden_items = info_page.get_hidden_items_from_add_tab()
     for h_item in hidden_items:
-      controls_info_widget.click_add_tab_btn()
+      info_page.click_add_tab_btn()
       h_item.click()
       soft_assert.expect(webui_facade.are_tabs_urls_equal(),
                          "Tabs urls should be equal.")
