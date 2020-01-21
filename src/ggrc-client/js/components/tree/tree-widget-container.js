@@ -47,6 +47,7 @@ import {
   initMappedInstances,
   isAllObjects,
   isMyWork,
+  isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
 import {
   initCounts,
@@ -388,6 +389,11 @@ let viewModel = canMap.extend({
       // do not refresh counts for Workflow. There are additional filters
       // for history and active tabs which are handled in workflow components
       if (self.attr('parent_instance').type === 'Workflow') {
+        return;
+      }
+
+      // No need to refresh counts for My Assessments page
+      if (isMyAssessments()) {
         return;
       }
 
