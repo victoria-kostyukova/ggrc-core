@@ -14,7 +14,6 @@ import {isDashboardEnabled} from '../../plugins/utils/dashboards-utils';
 
 export default canComponent.extend({
   tag: 'audit-inner-nav',
-  leakScope: false,
   view: canStache(template),
   viewModel: InnerNavVM.extend({
     priorityTabs: null,

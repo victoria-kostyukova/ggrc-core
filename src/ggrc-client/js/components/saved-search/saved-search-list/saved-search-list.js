@@ -21,7 +21,6 @@ import pubSub from '../../../pub-sub';
 export default canComponent.extend({
   tag: 'saved-search-list',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     pubSub,
     widgetId: '',

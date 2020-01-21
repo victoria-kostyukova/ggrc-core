@@ -31,7 +31,6 @@ import {externalBusinessObjects} from '../../plugins/models-types-collections';
 export default canComponent.extend({
   tag: 'create-and-map',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       destinationType: {

@@ -12,7 +12,6 @@ import template from './multiselect-form-field.stache';
 export default canComponent.extend({
   tag: 'multiselect-form-field',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       inputValue: {

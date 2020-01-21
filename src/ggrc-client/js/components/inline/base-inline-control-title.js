@@ -13,7 +13,6 @@ import template from './base-inline-control-title.stache';
 export default canComponent.extend({
   tag: 'base-inline-control-title',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       isEditIconAllowed: {

@@ -14,7 +14,6 @@ import template from './templates/assessment-people.stache';
 export default canComponent.extend({
   tag: 'assessment-people',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     define: {
       emptyMessage: {

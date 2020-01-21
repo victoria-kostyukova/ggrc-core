@@ -22,7 +22,6 @@ const MENTION_REGEX = {
 export default canComponent.extend({
   tag: 'people-mention',
   view: canStache(template),
-  leakScope: false,
   viewModel: actionKeyable.extend({
     define: {
       editor: {

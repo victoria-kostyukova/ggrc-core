@@ -12,7 +12,6 @@ import template from './people-autocomplete-results.stache';
 export default canComponent.extend({
   tag: 'people-autocomplete-results',
   view: canStache(template),
-  leakScope: false,
   viewModel: baseAutocompleteResults.extend({
     currentValue: null,
     showResults: false,

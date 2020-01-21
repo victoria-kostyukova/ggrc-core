@@ -12,7 +12,6 @@ import {splitTrim} from '../../plugins/ggrc-utils';
 export default canComponent.extend({
   tag: 'assessment-notifications',
   view: canStache(template),
-  leakScope: false,
   viewModel: canMap.extend({
     instance: {},
     values: {},

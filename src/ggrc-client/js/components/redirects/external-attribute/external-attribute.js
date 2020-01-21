@@ -27,7 +27,6 @@ const viewModel = canMap.extend({
 
 export default canComponent.extend({
   tag: 'external-attribute',
-  leakScope: false,
   view: canStache(template),
   viewModel,
 });
