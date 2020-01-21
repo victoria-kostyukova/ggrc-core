@@ -7,7 +7,9 @@
 <li class="tree-item" data-model="true">
   <div class="item-main" {{canData 'model'}}>
     <div class="item-wrap">
-      {{> base_objects/open-close.stache}}
+      <div on:el:click="loadListItem()">
+        {{> base_objects/open-close.stache}}
+      </div>
       <div class="select disabled">
         <div class="item-data">
           <div class="row-fluid">
@@ -28,61 +30,63 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <div class="table-wrap {{#if instance.isChangeableExternally}}table-wrap_type_readonly{{/if}}">
-        <model-loader path:from="'custom-attributes/custom-attribute-definition'">
-        <tree-structure
-          parentModel:from="instance"
-          model:from="loadedModel"
-          modalTitle:from="'Add Attribute to type {{instance.title_singular}}'"
-          contentViewPath:from="'/custom_attribute_definitions/modal-content.stache'"
-        >
-          <table class="table custom-attribute-definitions">
-            <colgroup>
-              <col style="width: 50%"/>
-              <col style="width: 25%"/>
-              <col style="width: 15%"/>
-              <col style="width: 10%"/>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Attribute name</th>
-                <th>Attribute type</th>
-                {{^is(instance.model_singular, "Assessment")}}
-                  <th>Mandatory</th>
-                {{/is}}
-                {{^if instance.isChangeableExternally}}
-                  <th>Edit</th>
-                {{/if}}
-              </tr>
-            </thead>
-            {{#child_options.0}}
-            <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
-            </tbody>
-            {{/child_options.0}}
-            <!-- Custom attribute definitions here -->
-            {{^if instance.isChangeableExternally}}
-            <tfoot class="add-item">
-              <tr>
-                <td colspan="4" class="tree-item tree-item-add">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a
-                        href="javascript://"
-                        class="btn btn-small btn-white"
-                        rel="tooltip"
-                        data-placement="right"
-                        data-original-title="Add Attribute"
-                        on:el:click="showAddNewItemModal(scope.element)">
-                        <i class="fa fa-plus-circle"></i>
-                      </a>
+        {{#if listItemIsLoaded}}
+          <model-loader path:from="'custom-attributes/custom-attribute-definition'">
+          <tree-structure
+            parentModel:from="instance"
+            model:from="loadedModel"
+            modalTitle:from="'Add Attribute to type {{instance.title_singular}}'"
+            contentViewPath:from="'/custom_attribute_definitions/modal-content.stache'"
+          >
+            <table class="table custom-attribute-definitions">
+              <colgroup>
+                <col style="width: 50%"/>
+                <col style="width: 25%"/>
+                <col style="width: 15%"/>
+                <col style="width: 10%"/>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Attribute name</th>
+                  <th>Attribute type</th>
+                  {{^is(instance.model_singular, "Assessment")}}
+                    <th>Mandatory</th>
+                  {{/is}}
+                  {{^if instance.isChangeableExternally}}
+                    <th>Edit</th>
+                  {{/if}}
+                </tr>
+              </thead>
+              {{#child_options.0}}
+              <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
+              </tbody>
+              {{/child_options.0}}
+              <!-- Custom attribute definitions here -->
+              {{^if instance.isChangeableExternally}}
+              <tfoot class="add-item">
+                <tr>
+                  <td colspan="4" class="tree-item tree-item-add">
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <a
+                          href="javascript://"
+                          class="btn btn-small btn-white"
+                          rel="tooltip"
+                          data-placement="right"
+                          data-original-title="Add Attribute"
+                          on:el:click="showAddNewItemModal(scope.element)">
+                          <i class="fa fa-plus-circle"></i>
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-            {{/if}}
-          </table>
-        </tree-structure>
-        </model-loader>
+                  </td>
+                </tr>
+              </tfoot>
+              {{/if}}
+            </table>
+          </tree-structure>
+          </model-loader>
+        {{/if}}
       </div>
     </div>
   </div>
