@@ -624,6 +624,37 @@ class TestWorkflowsApiPost(TestCase):
       workflow = all_models.Workflow.query.get(workflow_id)
       self.assertEqual(workflow.is_verification_needed, flag)
 
+  @ddt.data(
+      (all_models.Workflow.INACTIVE, all_models.Workflow.DRAFT),
+      (all_models.Workflow.INACTIVE, all_models.Workflow.ACTIVE),
+      (all_models.Workflow.DRAFT, all_models.Workflow.INACTIVE),
+      (all_models.Workflow.ACTIVE, all_models.Workflow.DRAFT),
+      (all_models.Workflow.ACTIVE, all_models.Workflow.INACTIVE),
+  )
+  @ddt.unpack
+  # pylint: disable=invalid-name
+  def test_status_change_via_put_for_wf(self, from_stat, to_stat):
+    """Test the possibility of changing wf status from {} to {}
+    via api put for wf."""
+    with freezegun.freeze_time("2017-08-10"):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(
+            status=from_stat,
+            unit=all_models.Workflow.WEEK_UNIT,
+            is_verification_needed=False,
+            repeat_every=1)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=wf_factories.TaskGroupFactory(
+                context=factories.ContextFactory(),
+                workflow=workflow
+            ),
+            # Two cycles should be created
+            start_date=datetime.date(2017, 8, 2),
+            end_date=datetime.date(2017, 8, 5))
+
+      resp = self.api.put(workflow, {"status": to_stat})
+      self.assert400(resp)
+
   @ddt.data(True, False)
   def test_not_change_vf_flag(self, flag):
     """Check is_verification_needed not change on update."""

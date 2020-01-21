@@ -10,6 +10,7 @@ import itertools
 import logging
 from datetime import datetime, date
 from flask import Blueprint
+import sqlalchemy as sa
 from sqlalchemy import inspect, orm
 from werkzeug.exceptions import Forbidden
 
@@ -81,7 +82,7 @@ def _workaround_mixin_injection(model):
       model.__mapper__.add_property(attr_name, getattr(model, attr_name))
 
 
-def get_public_config(current_user):  # noqa
+def get_public_config(current_user):  # pylint:disable=unused-argument
   """Expose additional permissions-dependent config to client.
   """
   return {}
@@ -624,7 +625,7 @@ def handle_cycle_task_group_object_task_put(
     models.CycleTaskGroupObjectTask)
 @signals.Restful.model_deleted.connect_via(
     models.CycleTaskGroupObjectTask)
-# noqa pylint: disable=unused-argument
+# pylint: disable=unused-argument
 def handle_cycle_object_status(
         sender, obj=None, src=None, service=None, event=None,
         initial_state=None):
@@ -676,9 +677,10 @@ def _validate_put_workflow_fields(workflow):
     raise ValueError("OneTime workflow cannot be recurrent")
 
 
-# noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
+# pylint: disable=unused-argument
 @signals.Restful.model_put.connect_via(models.Workflow)
 def handle_workflow_put(sender, obj=None, src=None, service=None):
+  """Define API put calls permissions for WF"""
   _validate_put_workflow_fields(obj)
   if (inspect(obj).attrs.recurrences.history.has_changes() and
           not obj.recurrences):
@@ -695,6 +697,19 @@ def handle_workflow_put(sender, obj=None, src=None, service=None):
       raise ValueError("Workflow with misconfigured "
                        "Task Groups can not be activated.")
     build_cycles(obj)
+
+  if (old, new) == (obj.ACTIVE, obj.INACTIVE) and obj.can_start_cycle:
+    # allow only if it has no task_group with task configured
+    raise ValueError("Workflow with misconfigured "
+                     "Task Groups can not be activated.")
+
+  if (((old, new) == (obj.INACTIVE, obj.ACTIVE)) or
+     ((old, new) == (obj.DRAFT, obj.INACTIVE)) or
+     ((old, new) == (obj.ACTIVE, obj.DRAFT)) or
+     ((old, new) == (obj.INACTIVE, obj.DRAFT))):
+    raise ValueError("Workflow couldn't be moved from {old} "
+                     "state to {new} state."
+                     .format(old=old, new=new))
 
 
 # noqa pylint: disable=unused-argument
@@ -813,7 +828,7 @@ def start_recurring_cycles():
     today = date.today()
     workflows = models.Workflow.query.filter(
         models.Workflow.next_cycle_start_date <= today,
-        models.Workflow.recurrences == True  # noqa
+        models.Workflow.recurrences == sa.true()
     )
     user_id = login.get_current_user_id()
     if user_id is None:
