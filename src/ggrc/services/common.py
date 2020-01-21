@@ -134,6 +134,8 @@ class ModelView(View):
   pk_type = 'int'
 
   _model = None
+  is_new = False
+  needs_update = False
 
   # Simple accessor properties
   @property
@@ -1075,11 +1077,12 @@ class Resource(ModelView):
 
     Returns:
       obj: An instance of current model.
-      needs_update: Flag shows if we need to update obj attributes.
     """
     obj = self.model()
     db.session.add(obj)
-    return obj, True
+    self.needs_update = True
+    self.is_new = True
+    return obj
 
   def _check_post_permissions(self, objects):
     """Check create permissions for a list of objects.append
@@ -1147,9 +1150,9 @@ class Resource(ModelView):
 
       for wrapped_src in body:
         src = self._unwrap_collection_post_src(wrapped_src)
-        obj, needs_update = self._get_model_instance(src)
+        obj = self._get_model_instance(src)
 
-        if not needs_update:
+        if not self.needs_update:
           obj.modified_by = get_current_user()
           db.session.flush()
           object_for_json = {} if no_result else self.object_for_json(obj)
@@ -1190,7 +1193,7 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event for all objects"):
-      if needs_update:
+      if self.is_new:
         event = log_event(db.session, obj, flush=False)
     with benchmark("Update memcache before commit for collection POST"):
       cache_utils.update_memcache_before_commit(
@@ -1207,7 +1210,7 @@ class Resource(ModelView):
       cache_utils.update_memcache_after_commit(self.request)
 
     with benchmark("Send model POSTed - after commit event"):
-      if needs_update:
+      if self.is_new:
         for obj, src in itertools.izip(objects, sources):
           signals.Restful.model_posted_after_commit.send(
               obj.__class__, obj=obj, src=src, service=self, event=event)
@@ -1215,7 +1218,7 @@ class Resource(ModelView):
           # relationships are set, so need to commit the changes
       db.session.commit()
     with benchmark("Send event job"):
-      if needs_update:
+      if self.is_new:
         # global_ac_roles may save a set of ACR objects in the session. If
         # session state is changed, all ACRs will be rerequested one by one.
         # To avoid such behavior link to ACRs objects should be removed
@@ -1326,6 +1329,7 @@ class Resource(ModelView):
         with benchmark("Build stub query cache"):
           self._build_request_stub_cache(body)
         try:
+          self.is_new = True
           self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
           import traceback

@@ -96,25 +96,25 @@ class RelationshipResource(ggrc.services.common.Resource):
 
     Returns:
       obj: An instance of current model.
-      needs_update: Flag shows if we need to update obj attributes.
     """
-    needs_update = True
+    self.needs_update = True
     _, _, is_snapshot = self._parse_snapshot_data(src)
 
     if is_snapshot:
       snapshot = Snapshot()
       db.session.add(snapshot)
 
-      return snapshot, needs_update
+      return snapshot
 
     _relationship = self._get_relationship(src)
 
     if _relationship:
-      needs_update = _relationship.is_external
+      self.is_new = False
+      self.needs_update = _relationship.is_external
     else:
       _relationship = relationship.Relationship()
       db.session.add(_relationship)
-    return _relationship, needs_update
+    return _relationship
 
   def json_create(self, obj, src):
     """For Parent and Snapshottable src and dst, fill in the Snapshot obj."""
