@@ -600,10 +600,12 @@ class TestAssessmentGeneration(TestAssessmentBase):
       template = factories.AssessmentTemplateFactory(
           default_people={"assignees": "Auditors", "verifiers": "Auditors"}
       )
+
     response = self.assessment_post(template)
+
     self.assert_assignees("Creators", response, "user@example.com")
     audit = all_models.Audit.query.get(self.audit_id)
     acp = audit.acr_name_acl_map["Audit Captains"].access_control_people[0]
     # If Auditor is not set, Audit Captain should be used as Assignee
     self.assert_assignees("Assignees", response, acp.person.email)
-    self.assert_assignees("Verifiers", response, acp.person.email)
+    self.assert_assignees("Verifiers", response)
