@@ -14,7 +14,6 @@ import {
   buildParam,
   batchRequests,
 } from '../../../plugins/utils/query-api-utils';
-import QueryParser from '../../../generated/ggrc-filter-query-parser';
 
 export default canComponent.extend({
   tag: 'related-revisions',
@@ -101,9 +100,15 @@ export default canComponent.extend({
     },
 
     getQueryFilter() {
-      const instance = this.attr('instance');
-      return QueryParser.parse(
-        `${instance.type} not_empty_revisions_for ${instance.id}`);
+      const {type, id} = this.attr('instance');
+      return {
+        expression: {
+          op: {name: 'not_empty_revisions'},
+          resource_type: type,
+          resource_id: id,
+          ignore_relationships: true,
+        },
+      };
     },
   }),
   events: {
