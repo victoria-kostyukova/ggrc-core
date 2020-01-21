@@ -549,8 +549,8 @@ class ObjectWidget(object):
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
       By.CSS_SELECTOR,
-      '.object-area .tree-item-element .selectable-attrs '
-      '.attr-cell:first-child .attr-content')
+      '.object-area .widget.treeview:not(.hidden) .tree-item-element '
+      '.selectable-attrs .attr-cell:first-child .attr-content')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 

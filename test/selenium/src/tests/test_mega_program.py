@@ -107,3 +107,21 @@ class TestMegaProgram(base.Test):
     assert program_item.is_checkbox_disabled, (
         messages.AssertionMessages.ITEM_CHECKBOX_SHOULD_BE_DISABLED.format(
             obj_name=program.title))
+
+  def test_manual_unmapping_of_regulation(
+      self, programs_with_regulation, selenium, soft_assert
+  ):
+    """Checks that after unmapping regulation from child program and
+    unmapping child program from parent program regulation remains mapped to
+    parent program."""
+    parent_program, child_program = programs_with_regulation['programs']
+    regulation = programs_with_regulation['regulation']
+    webui_service.RegulationsService(selenium).unmap_via_info_panel(
+        src_obj=child_program, obj=regulation)
+    webui_facade.soft_assert_objects_are_mapped(
+        selenium, soft_assert, src_obj=parent_program, objs=[regulation])
+    (webui_service.ProgramsService(selenium, obj_name=objects.PROGRAM_CHILDS).
+     unmap_via_info_panel(src_obj=parent_program, obj=child_program))
+    webui_facade.soft_assert_objects_are_mapped(
+        selenium, soft_assert, src_obj=parent_program, objs=[regulation])
+    soft_assert.assert_expectations()

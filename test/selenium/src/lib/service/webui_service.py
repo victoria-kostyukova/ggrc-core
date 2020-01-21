@@ -21,16 +21,18 @@ class BaseWebUiService(base.WithBrowser):
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
   # pylint: disable=unused-argument
-  def __init__(self, obj_name, driver=None):
+  def __init__(self, obj_name, driver=None, actual_name=None):
     super(BaseWebUiService, self).__init__()
+    self.actual_name = obj_name if not actual_name else actual_name
     self.obj_name = obj_name
     self.obj_type = objects.get_singular(self.obj_name, title=True)
     self.snapshot_obj_type = None
-    self.generic_widget_cls = factory.get_cls_widget(object_name=self.obj_name)
+    self.generic_widget_cls = factory.get_cls_widget(
+        object_name=self.actual_name)
     self.info_widget_cls = factory.get_cls_widget(
-        object_name=self.obj_name, is_info=True)
+        object_name=self.actual_name, is_info=True)
     self.entities_factory_cls = factory.get_cls_entity_factory(
-        object_name=self.obj_name)
+        object_name=self.actual_name)
     self.url_mapped_objs = (
         "{src_obj_url}" +
         url.Utils.get_widget_name_of_mapped_objs(self.obj_name))
@@ -137,10 +139,11 @@ class BaseWebUiService(base.WithBrowser):
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     # todo fix freezing when navigate through tabs by URLs and using driver.get
     selenium_utils.open_url(generic_widget_url, is_via_js=True)
-    return self.generic_widget_cls(
-        self._driver, self.obj_name, self.is_versions_widget) if hasattr(
-        self, "is_versions_widget") else self.generic_widget_cls(
-        self._driver, self.obj_name)
+    return (self.generic_widget_cls(self._driver, self.actual_name,
+                                    self.is_versions_widget, self.actual_name)
+            if hasattr(self, "is_versions_widget") else
+            self.generic_widget_cls(self._driver, self.obj_name,
+                                    actual_name=self.actual_name))
 
   def open_obj_dashboard_tab(self):
     """Navigates to dashboard tab URL of object according to object name.
@@ -803,23 +806,8 @@ class ProgramsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
 
   def __init__(self, driver=None, obj_name=objects.PROGRAMS):
-    self._actual_obj_name = obj_name
-    self.obj_name = objects.PROGRAMS
     super(ProgramsService, self).__init__(
-        obj_name=self.obj_name, driver=driver)
-    self.url_mapped_objs = (
-        "{src_obj_url}" +
-        url.Utils.get_widget_name_of_mapped_objs(self._actual_obj_name))
-
-  def open_widget_of_mapped_objs(self, src_obj):
-    """Navigates to URL of mapped Programs according to URL of
-    source object.
-    Returns: Programs widget class.
-    """
-    generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
-    # todo fix freezing when navigate through tabs by URLs and using driver.get
-    selenium_utils.open_url(generic_widget_url, is_via_js=True)
-    return generic_widget.Programs(self._driver, self._actual_obj_name)
+        obj_name=obj_name, driver=driver, actual_name=objects.PROGRAMS)
 
 
 class ProductsService(BaseWebUiService):

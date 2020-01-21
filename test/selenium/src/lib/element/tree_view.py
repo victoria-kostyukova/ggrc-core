@@ -56,6 +56,10 @@ class ProgramChilds(CommonDropdownSettings):
   """ProgramChilds 3BBS button/dropdown settings on Tree View."""
 
 
+class ProgramParents(CommonDropdownSettings):
+  """ProgramParents 3BBS button/dropdown settings on Tree View."""
+
+
 class Controls(CommonDropdownSettings):
   """Controls 3BBS button/dropdown settings on Tree View."""
 
