@@ -117,12 +117,17 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
                   "complete": True,
                   "in_progress": True,
                   "not_started": True,
-                  "decline": (False, "unimplemented"),
                   "verify": (False, "unimplemented"),
                   "map_comment": True,
                   "map_evidence": True,
                   "related_assessments": True,
                   "related_objects": True,
+              },
+              ("Creators", "Assignees"): {
+                  "decline": (False, "unimplemented"),
+              },
+              ("Verifiers",): {
+                  "decline": True,
               },
           },
           "Snapshot Assessment": {
