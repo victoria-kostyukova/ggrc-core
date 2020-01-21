@@ -1,6 +1,11 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Test notification for assessments bulk operations"""
+"""
+  Tests cover part of Smoke test in cases "Bulk verify email notification"
+
+  Unable to change without QA Team approval
+"""
+
 import json
 import mock
 
