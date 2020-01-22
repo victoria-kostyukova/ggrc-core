@@ -1547,6 +1547,44 @@ class TestAssessmentImport(TestCase):
 
     self._check_csv_response(response, exp_errors)
 
+  @ddt.data((True, "yes", "Completed", "Completed"),
+            (False, "no", "Completed", "Completed"),
+            (True, "no", "Completed", "In Progress"),
+            (False, "yes", "Completed", "In Progress"))
+  @ddt.unpack
+  def test_assessment_status_import_checkbox_lca(self, init_value,
+                                                 new_value, init_status,
+                                                 expected_status):
+    """Assessment should not change Status if we do not update Checkbox LCA"""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(status=init_status)
+      assessment_id = assessment.id
+      cad = factories.CustomAttributeDefinitionFactory(
+          title="Checkbox LCA",
+          attribute_type="Checkbox",
+          definition_type='assessment',
+          definition_id=assessment_id,
+      )
+      factories.CustomAttributeValueFactory(
+          custom_attribute=cad,
+          attributable=assessment,
+          attribute_value=init_value,
+      )
+
+    assessment_data = collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Title", assessment.title),
+        ("Checkbox LCA", new_value)
+    ])
+
+    response = self.import_data(assessment_data)
+
+    self._check_csv_response(response, {})
+
+    assessment = self.refresh_object(assessment, assessment_id)
+    self.assertEqual(expected_status, assessment.status)
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
