@@ -23,9 +23,10 @@ const isIssueCreated = (instance) => {
   return !!(instance.attr('issue_tracker.issue_url'));
 };
 
-const isIssueTrackerEnabled = (instance) => {
-  return isIssueCreated(instance)
-    && instance.attr('issue_tracker.enabled');
+const isIssueLinked = (instance) => {
+  const issueTracker = instance.attr('issue_tracker');
+  return issueTracker.attr('enabled')
+    && (isIssueCreated(instance) || issueTracker.attr('is_linking'));
 };
 
 /**
@@ -96,8 +97,8 @@ function checkWarnings(instance) {
 export {
   issueTrackerStaticFields,
   isIssueTrackerInitialized,
-  isIssueTrackerEnabled,
   isIssueCreated,
+  isIssueLinked,
   initIssueTrackerObject,
   checkWarnings,
   cleanUpWarnings,

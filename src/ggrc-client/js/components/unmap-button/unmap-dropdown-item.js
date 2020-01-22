@@ -7,7 +7,7 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
-import '../issue/issue-unmap-item';
+import '../issue/issue-unmap-item/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
 import {
   allowedToUnmap,

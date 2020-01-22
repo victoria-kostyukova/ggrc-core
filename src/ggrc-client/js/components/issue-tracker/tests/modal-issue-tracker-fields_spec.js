@@ -105,6 +105,16 @@ describe('modal-issue-tracker-fields component', () => {
 
         expect(viewModel.attr('instance.issue_tracker.issue_id')).toBeNull();
       });
+
+      it('should dispatch "issueTrackerStateChanged" event', () => {
+        spyOn(viewModel, 'dispatch');
+        viewModel.generateNewTicket();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'issueTrackerStateChanged',
+          state: 'generateNew',
+        });
+      });
     });
 
     describe('linkToExistingTicket() method', () => {
@@ -151,6 +161,16 @@ describe('modal-issue-tracker-fields component', () => {
         expect(viewModel.attr('instance.issue_tracker.component_id'))
           .toBeNull();
       });
+
+      it('should dispatch "issueTrackerStateChanged" event', () => {
+        spyOn(viewModel, 'dispatch');
+        viewModel.linkToExistingTicket();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'issueTrackerStateChanged',
+          state: 'linkToExisting',
+        });
+      });
     });
 
     describe('setTicketIdMandatory() method', () => {
@@ -174,44 +194,25 @@ describe('modal-issue-tracker-fields component', () => {
           expect(viewModel.attr('isTicketIdMandatory')).toBe(true);
         });
     });
-
-    describe('statusChanged() method', () => {
-      beforeEach(() => {
-        spyOn(viewModel, 'setTicketIdMandatory');
-        spyOn(viewModel, 'linkToExistingTicket');
-      });
-
-      it('should check whether ticket id is mandatory', () => {
-        viewModel.attr('currentState', state.GENERATE_NEW);
-        viewModel.statusChanged();
-
-        expect(viewModel.setTicketIdMandatory).toHaveBeenCalled();
-        expect(viewModel.linkToExistingTicket).not.toHaveBeenCalled();
-      });
-
-      it('should change view state if it is in GENERATE_NEW state and ' +
-      'ticket id is mandatory', () => {
-        viewModel.attr('currentState', state.GENERATE_NEW);
-        viewModel.attr('isTicketIdMandatory', true);
-
-        viewModel.statusChanged();
-        expect(viewModel.linkToExistingTicket).toHaveBeenCalled();
-      });
-    });
   });
 
   describe('events', () => {
-    describe('inserted event', () => {
-      let inserted;
+    let events;
+    let handler;
 
+    beforeAll(() => {
+      events = Component.prototype.events;
+    });
+
+    describe('inserted event', () => {
       beforeEach(() => {
-        inserted = Component.prototype.events.inserted.bind({viewModel});
+        handler = events.inserted.bind({viewModel});
         spyOn(viewModel, 'setTicketIdMandatory');
         spyOn(viewModel, 'setValidationFlags');
       });
 
       it('should call setTicketIdMandatory', () => {
-        inserted();
+        handler();
 
         expect(viewModel.setTicketIdMandatory).toHaveBeenCalled();
       });
@@ -220,7 +221,7 @@ describe('modal-issue-tracker-fields component', () => {
         viewModel.attr('currentState', state.NOT_SELECTED);
         viewModel.attr('instance').issueCreated.and.returnValue(true);
 
-        inserted();
+        handler();
 
         expect(viewModel.attr('currentState')).toBe(state.LINKED);
         expect(viewModel.setValidationFlags).toHaveBeenCalledWith({
@@ -229,11 +230,25 @@ describe('modal-issue-tracker-fields component', () => {
       });
 
       it('should set validation flags if issue is not exist', () => {
-        inserted();
+        handler();
 
         expect(viewModel.setValidationFlags).toHaveBeenCalledWith({
           initialized: false, linking: false,
         });
+      });
+    });
+
+    describe('{viewModel.instance} status', () => {
+      beforeEach(() => {
+        handler = events['{viewModel.instance} status'].bind({viewModel});
+        spyOn(viewModel, 'setTicketIdMandatory');
+      });
+
+      it('should call setTicketIdMandatory' +
+      'and it is not initialized', () => {
+        handler();
+
+        expect(viewModel.setTicketIdMandatory).toHaveBeenCalled();
       });
     });
   });

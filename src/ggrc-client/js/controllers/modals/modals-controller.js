@@ -16,6 +16,8 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/modal-issue-tracker-config-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
+import '../../components/issue/issue-main-content-wrapper/issue-main-content-wrapper';
+import '../../components/issue/issue-roles-wrapper/issue-roles-wrapper';
 import '../../components/access-control-list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
@@ -52,6 +54,8 @@ import '../../components/modal-autocomplete/modal-autocomplete';
 import '../../components/people-autocomplete-dropdown/people-autocomplete-dropdown';
 import '../../components/person-autocomplete-field/person-autocomplete-field';
 import '../../components/assessment-templates/assessment-template-save-button/assessment-template-save-button';
+import '../../components/inline/inline-form-control';
+import '../../components/inline/inline-edit-control';
 import {
   bindXHRToButton,
   bindXHRToDisableElement,

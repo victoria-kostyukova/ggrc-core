@@ -24,10 +24,10 @@ export default canComponent.extend({
     isProposal: false,
     includeRoles: [],
     excludeRoles: [],
+    disabledRoles: [],
+    rolesTooltips: [],
     readOnly: false,
     orderOfRoles: [],
-    showGroupTooltip: false,
-    groupTooltip: null,
     setAutoPopulatedRoles: function () {
       let instance = this.attr('instance');
       let autoPopulatedRoles =
