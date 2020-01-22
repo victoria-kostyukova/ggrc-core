@@ -6,11 +6,12 @@
 When Audit-Snapshottable Relationship is POSTed, a Snapshot should be created
 instead.
 """
+import collections
 from collections import defaultdict
 
 import sqlalchemy as sa
 
-from werkzeug.exceptions import Forbidden
+from werkzeug import exceptions
 
 from ggrc import db
 from ggrc import models
@@ -46,7 +47,7 @@ class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
     with benchmark("check audit permissions"):
       audit = models.Audit.query.get(id)
       if not permissions.is_allowed_read_for(audit):
-        raise Forbidden()
+        raise exceptions.Forbidden()
     with benchmark("Get audit summary data"):
       #  evidence_relationship => evidence destination
       evidence_relationship_ds = db.session.query(
@@ -128,3 +129,20 @@ class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
       statuses_json.sort(key=lambda k: (k["name"], k["verified"]))
       response_object = {"statuses": statuses_json, "total": total}
       return self.json_success_response(response_object, )
+
+  def snapshot_counts_query(self, id):
+    """Get data for audit mapped objects counts grouped by child_type."""
+    # id name is used as a kw argument and can't be changed here
+    # pylint: disable=invalid-name,redefined-builtin
+
+    with benchmark("Check audit permissions"):
+      obj = self.model.query.get(id)
+      if not obj:
+        raise exceptions.NotFound()
+      if not permissions.is_allowed_read_for(obj):
+        raise exceptions.Forbidden()
+
+    with benchmark("Get snapshots count based on read permissions"):
+      result = collections.Counter([snap.child_type for snap in obj.snapshots
+                                    if permissions.is_allowed_read_for(snap)])
+    return self.json_success_response(result)
