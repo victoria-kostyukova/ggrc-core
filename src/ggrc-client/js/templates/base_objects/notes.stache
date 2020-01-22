@@ -4,9 +4,23 @@
 }}
 
 {{#instance}}
-  {{#if_helpers '\n #if' notes '\n or #if' isRevision}}
-    <div class="row-fluid wrap-row">
-      <div class="span12">
+
+  <div class="row-fluid wrap-row">
+    <div class="span12">
+      {{#if instance.constructor.isChangeableExternally}}
+        <external-attribute
+          instance:from="instance"
+          title:from="'notes'"
+          attrName:from="'notes'"
+        >
+          <div class="rtf-block">
+            <read-more
+              text:from="notes"
+              handleMarkdown:from="instance.constructor.isChangeableExternally">
+            </read-more>
+          </div>
+        </external-attribute>
+      {{else}}
         <h6>Notes</h6>
         <div class="rtf-block">
           <read-more
@@ -14,7 +28,8 @@
             handleMarkdown:from="instance.constructor.isChangeableExternally">
           </read-more>
         </div>
-      </div>
+      {{/if}}
     </div>
-  {{/if_helpers}}
+  </div>
+
 {{/instance}}
