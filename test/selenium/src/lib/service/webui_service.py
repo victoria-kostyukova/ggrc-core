@@ -12,8 +12,7 @@ from lib.entities import entity
 from lib.page import dashboard, export_page
 from lib.page.modal import request_review
 from lib.page.widget import generic_widget, object_modal
-from lib.utils import (
-    selenium_utils, file_utils, test_utils, ui_utils, string_utils)
+from lib.utils import selenium_utils, test_utils, ui_utils, string_utils
 
 
 class BaseWebUiService(base.WithBrowser):
@@ -232,12 +231,9 @@ class BaseWebUiService(base.WithBrowser):
         scope["REVIEW_STATUS_DISPLAY_NAME"] = scope["Review Status"]
     return list_scopes
 
-  def get_list_objs_from_csv(self, path_to_exported_file):
-    """Get and return list of objects from CSV file of exported objects in
-    test's temporary directory 'path_to_export_dir'.
+  def build_objs_from_csv_scopes(self, dict_list_objs_scopes):
+    """Get and return list of objects from CSV file of exported objects.
     """
-    dict_list_objs_scopes = file_utils.get_list_objs_scopes_from_csv(
-        path_to_csv=path_to_exported_file)
     dict_key = dict_list_objs_scopes.iterkeys().next()
     # 'Control' to 'controls', 'Control Snapshot' to 'controls'
     obj_name_from_dict = objects.get_plural(
@@ -325,15 +321,15 @@ class BaseWebUiService(base.WithBrowser):
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     return objs_widget.tree_view.get_list_members_as_list_scopes()
 
-  def exported_objs_via_tree_view(self, path_to_export_dir, widget):
-    """Exports objects to test's temporary directory as CSV file.
-    Returns: list of objects from CSV file in test's temporary directory
-    'path_to_export_dir'."""
+  def export_objs_via_tree_view(self, path_to_export_dir, widget):
+    """Exports objects from tree view on widget and saves csv with them to
+    path_to_export_dir.
+    Returns: path to downloaded csv.
+    """
     widget.tree_view.open_3bbs().select_export()
     page = export_page.ExportPage(self._driver)
     page.open_export_page()
-    return self.get_list_objs_from_csv(
-        page.download_obj_to_csv(path_to_export_dir))
+    return page.download_obj_to_csv(path_to_export_dir)
 
   def get_scope_from_info_page(self, obj):
     """Open Info page of obj and get object scope as dict with titles (keys)

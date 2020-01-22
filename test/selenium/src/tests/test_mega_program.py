@@ -3,12 +3,13 @@
 """Mega program tests."""
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
+# pylint: disable=unused-argument
 import pytest
 
 from lib import base, users
 from lib.service import rest_facade, webui_facade, webui_service
 from lib.ui import mega_program_ui_facade
-from lib.constants import objects, messages
+from lib.constants import objects, messages, files
 
 
 class TestMegaProgram(base.Test):
@@ -108,6 +109,7 @@ class TestMegaProgram(base.Test):
         messages.AssertionMessages.ITEM_CHECKBOX_SHOULD_BE_DISABLED.format(
             obj_name=program.title))
 
+  @pytest.mark.smoke_tests
   def test_manual_unmapping_of_regulation(
       self, programs_with_regulation, selenium, soft_assert
   ):
@@ -125,3 +127,33 @@ class TestMegaProgram(base.Test):
     webui_facade.soft_assert_objects_are_mapped(
         selenium, soft_assert, src_obj=parent_program, objs=[regulation])
     soft_assert.assert_expectations()
+
+  @pytest.mark.smoke_tests
+  def test_mapping_columns_in_exported_csv(
+      self, mapped_programs, create_tmp_dir, selenium
+  ):
+    """Checks that there is no mapping programs columns.
+
+    For e.g. -map/unmap:program; -map/unmap:parent/child program.
+    """
+    parent_program, child_program = mapped_programs
+    dict_obj_scopes = webui_facade.export_obj_scopes(
+        path_to_export_dir=create_tmp_dir, src_obj=child_program,
+        obj_type=parent_program.type, obj_name=objects.PROGRAM_PARENTS)
+    columns = dict_obj_scopes[parent_program.type][0].keys()
+    exp_mapping_objs = (
+        objects.EDITABLE_GGRC_OBJS + objects.DISABLED_OBJECTS +
+        objects.SCOPE_OBJECTS +
+        (objects.ISSUES, objects.CYCLE_TASK_GROUP_OBJECT_TASKS))
+    expected_map_columns = [
+        files.CSVFields.MAP + objects.get_normal_form(
+            objects.get_singular(obj), title=False) for obj in exp_mapping_objs
+    ]
+    expected_unmap_columns = [
+        files.CSVFields.UNMAP + objects.get_normal_form(
+            objects.get_singular(obj), title=False) for obj in exp_mapping_objs
+    ]
+    actual_mapping_columns = [
+        column for column in columns if files.CSVFields.MAP in column]
+    assert (sorted(expected_map_columns + expected_unmap_columns) ==
+            sorted(actual_mapping_columns))

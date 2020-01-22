@@ -17,7 +17,8 @@ from lib.page.widget import (generic_widget, object_modal, import_page,
 from lib.rest_facades import roles_rest_facade
 from lib.service import (webui_service, rest_service, rest_facade,
                          admin_webui_service, change_log_ui_service)
-from lib.utils import selenium_utils, ui_utils, string_utils, test_utils
+from lib.utils import (
+    selenium_utils, ui_utils, string_utils, test_utils, file_utils)
 
 
 def create_control_in_program_scope(selenium, program):
@@ -377,17 +378,33 @@ def soft_assert_no_modals_present(modal_obj, soft_assert):
                        "tab number {}.".format(tab_num))
 
 
-def export_objects(path_to_export_dir, obj_type, src_obj=None,
-                   is_versions_widget=False):
+def export_obj_scopes(path_to_export_dir, obj_type, src_obj=None,
+                      is_versions_widget=False, **kwargs):
   """Opens generic widget of objects or mapped objects
-    and exports objects to test's temporary directory as CSV file.
-    Returns: list of objects from CSV file in test's temporary directory
-    'path_to_export_dir'."""
+  and exports objects to test's temporary directory as CSV file.
+  Returns: list of objects scopes (dicts with keys as exportable field
+  names, values as values of this field for current instance)."""
   ui_service = factory.get_cls_webui_service(
-      objects.get_plural(singular=obj_type, title=True))(is_versions_widget)
+      objects.get_plural(singular=obj_type, title=True))(
+          is_versions_widget, **kwargs)
   widget = (ui_service.open_widget_of_mapped_objs(src_obj) if src_obj
             else ui_service.open_obj_dashboard_tab())
-  return ui_service.exported_objs_via_tree_view(path_to_export_dir, widget)
+  return file_utils.get_list_objs_scopes_from_csv(
+      ui_service.export_objs_via_tree_view(path_to_export_dir, widget))
+
+
+def export_objects(path_to_export_dir, obj_type, src_obj=None,
+                   is_versions_widget=False, **kwargs):
+  """Opens generic widget of objects or mapped objects
+  and exports objects to test's temporary directory as CSV file.
+  Returns: list of objects from CSV file in test's temporary directory
+  'path_to_export_dir'."""
+  ui_service = factory.get_cls_webui_service(
+      objects.get_plural(singular=obj_type, title=True))(
+          is_versions_widget, **kwargs)
+  dict_list_objs_scopes = export_obj_scopes(
+      path_to_export_dir, obj_type, src_obj, is_versions_widget, **kwargs)
+  return ui_service.build_objs_from_csv_scopes(dict_list_objs_scopes)
 
 
 def soft_assert_gca_fields_disabled_for_editing(soft_assert, ca_type):
