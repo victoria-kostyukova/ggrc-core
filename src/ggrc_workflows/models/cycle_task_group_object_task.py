@@ -418,21 +418,28 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     prv_states = new_prv_state_map[new_state]
     all_ids = {item['id'] for item in src}
     # Eagerly loading is needed to get user permissions for CycleTask faster
-    updatable_objects = cls.eager_query().filter(
+    updatable_objects = [obj for obj in cls.eager_query().filter(
         cls.id.in_(list(all_ids)),
-        cls.status.in_(prv_states))
+        cls.status.in_(prv_states))]
+
+    updated_objects = []
+    update_forbidden_objects = []
     if new_state in (cls.VERIFIED, cls.DECLINED):
       updatable_objects = [obj for obj in updatable_objects
                            if obj.cycle.is_verification_needed]
     # Bulk update works only on MyTasks page. Don't need to check for
     # WorkflowMembers' permissions here. User should update only his own tasks.
-    updatable_objects = [obj for obj in updatable_objects
-                         if obj.current_user_wfa_or_assignee()]
-    # Queries count is constant because we are using eager query for objects.
     for obj in updatable_objects:
+      if obj.current_user_wfa_or_assignee():
+        updated_objects.append(obj)
+      else:
+        update_forbidden_objects.append(obj)
+
+    # Queries count is constant because we are using eager query for objects.
+    for obj in updated_objects:
       obj.status = new_state
       obj.modified_by_id = login.get_current_user_id()
-    return updatable_objects
+    return updated_objects, update_forbidden_objects
 
 
 class CycleTaskable(object):

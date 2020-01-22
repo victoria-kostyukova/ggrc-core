@@ -375,7 +375,8 @@ class TestStatusApiPatch(TestCase):
       ),
       (
           [FINISHED, FINISHED, FINISHED],
-          {0: 'skipped', 1: 'skipped', 2: 'skipped'},
+          {0: 'not allowed status', 1: 'not allowed status',
+           2: 'not allowed status'},
           [ASSIGNED, ASSIGNED, ASSIGNED]
       )
   )
@@ -407,7 +408,9 @@ class TestStatusApiPatch(TestCase):
     all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee = (
         MagicMock(return_value=False))
     self.assertItemsEqual(
-        self._get_exp_response({0: 'skipped', 1: 'skipped', 2: 'skipped'}),
+        self._get_exp_response({0: 'forbidden',
+                                1: 'forbidden',
+                                2: 'forbidden'}),
         self._update_ct_via_patch([self.IN_PROGRESS,
                                    self.IN_PROGRESS,
                                    self.IN_PROGRESS]))
