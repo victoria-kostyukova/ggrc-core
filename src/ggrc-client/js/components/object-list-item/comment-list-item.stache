@@ -38,7 +38,7 @@
     <div class="comment-object-item__text">
       <read-more
         text:from="commentText"
-        handleMarkdown:from="instance.constructor.isChangeableExternally">
+        handleMarkdown:from="handleMarkdown">
       </read-more>
     </div>
 </div>
