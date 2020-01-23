@@ -347,13 +347,13 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
 
   def get_dropdown_value(self):
     """Get valid value of the dropdown field."""
+    if self.raw_value == "":
+      return None  # ignore empty fields
     definition = self.get_ca_definition()
     choices_list = definition.multi_choice_options.split(",")
     valid_choices = [val.strip() for val in choices_list]
     choice_map = {choice.lower(): choice for choice in valid_choices}
     value = choice_map.get(self.raw_value.lower())
-    if self.raw_value == "":
-      return None  # ignore empty fields
     if value is None and self.raw_value != "":
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return value

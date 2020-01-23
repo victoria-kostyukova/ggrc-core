@@ -1620,11 +1620,8 @@ class TestAssessmentImport(TestCase):
         ("test_lca", ""),
     ]))
 
-    self.assertEqual(response[0]["row_errors"], [])
-    self.assertEqual(response[0]["row_warnings"], [])
-    self.assertEqual(response[0]["block_errors"], [])
-    self.assertEqual(response[0]["block_warnings"], [])
-    self.assertEqual(response[0]["created"], 1)
+    self._check_csv_response(response, {})
+    self.assertEquals(all_models.Assessment.query.count(), 1)
 
   @ddt.data(
       ("Text", None),
@@ -1658,11 +1655,7 @@ class TestAssessmentImport(TestCase):
         ("test_lca", ""),
     ]))
 
-    self.assertEqual(response[0]["row_errors"], [])
-    self.assertEqual(response[0]["row_warnings"], [])
-    self.assertEqual(response[0]["block_errors"], [])
-    self.assertEqual(response[0]["block_warnings"], [])
-    self.assertEqual(response[0]["updated"], 1)
+    self._check_csv_response(response, {})
 
   @ddt.data(
       ("Text", None, "test_value", True),
@@ -1677,8 +1670,8 @@ class TestAssessmentImport(TestCase):
       ("Checkbox", None, "1", False),
       ("Multiselect", "1,2,3", "1", True),
       ("Multiselect", "1,2,3", "1", False),
-      ("Map:Person", None, "Person", True),
-      ("Map:Person", None, "Person", False)
+      ("Map:Person", None, "user@example.com", True),
+      ("Map:Person", None, "user@example.com", False)
   )
   @ddt.unpack
   def test_update_lca_empty_value(self, type_lca, options, value_lca,
@@ -1708,11 +1701,7 @@ class TestAssessmentImport(TestCase):
     ]))
     updated_cav = db.session.query(all_models.CustomAttributeValue).get(cav_id)
 
-    self.assertEqual(response[0]["row_errors"], [])
-    self.assertEqual(response[0]["row_warnings"], [])
-    self.assertEqual(response[0]["block_errors"], [])
-    self.assertEqual(response[0]["block_warnings"], [])
-    self.assertEqual(response[0]["updated"], 1)
+    self._check_csv_response(response, {})
     self.assertEqual(updated_cav.attribute_value, value_lca)
 
   @ddt.data(
@@ -1748,11 +1737,14 @@ class TestAssessmentImport(TestCase):
         ("test_lca", value)
     ]))
 
-    warning = (u"Line 3: Field 'test_lca' contains invalid data. The"
-               u" value will be ignored.")
+    warning = errors.WRONG_VALUE.format(line=3, column_name='test_lca')
+    expected_messages = {
+        "Assessment": {
+            "row_warnings": {warning},
+        }
+    }
 
-    self.assertEqual(response[0]["row_warnings"], [warning])
-    self.assertEqual(response[0]["updated"], 1)
+    self._check_csv_response(response, expected_messages)
 
 
 @ddt.ddt
