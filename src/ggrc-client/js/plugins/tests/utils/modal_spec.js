@@ -3,98 +3,64 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {bindXHRToButton} from '../../utils/modals';
+import * as ModalsUtils from '../../utils/modals';
 
 describe('modal utils', () => {
   describe('bindXHRToButton() method', () => {
-    let dfd;
+    let element;
+    let actualInnerHtml;
+    let promise;
 
     beforeEach(() => {
-      dfd = new $.Deferred();
+      actualInnerHtml = 'actualInnerHtml';
+      element = $('<button>' + actualInnerHtml + '</button>');
+      promise = new Promise(() => {});
     });
 
-    const callBindXHRToButton = (done, actualInnerHtml, newtext, disable) => {
-      let element = $('<button>' + actualInnerHtml + '</button>');
+    it('sets true to "disabled" attribute', () => {
+      expect(element[0].disabled).toBe(false);
 
-      // call bindXHRToButton()
-      bindXHRToButton(dfd, element, newtext, disable);
+      ModalsUtils.bindXHRToButton(promise, element, 'newtext');
 
-      // button should have 'disabled' class after call bindXHRToButton
-      expect(element.hasClass('disabled')).toEqual(true);
-
-      if (disable) {
-        // button should have 'disabled' attr after call bindXHRToButton
-        expect(element.attr('disabled')).toEqual('disabled');
-      }
-
-      if (newtext) {
-        // button should have 'newText' before dfd.resolve()
-        expect(element[0].innerHTML).toEqual(newtext);
-      }
-
-      dfd.then(
-        setTimeout(() => {
-          expect(element[0].innerHTML).toEqual(actualInnerHtml);
-
-          // button should not have 'disabled' class after dfd.resolve()
-          expect(element.hasClass('disabled')).toEqual(false);
-
-          if (disable) {
-            // button should not have 'disabled' attr after call bindXHRToButton
-            expect(element.attr('disabled')).toEqual(undefined);
-          }
-          done();
-        }, 3)
-      );
-
-      dfd.resolve();
-    };
-
-    it('bindXHRToButton() should save text of button', (done) => {
-      callBindXHRToButton(done, 'HELLO WORLD');
+      expect(element[0].disabled).toBe(true);
     });
 
-    it('bindXHRToButton() should save icon inside button', (done) => {
-      callBindXHRToButton(done, '<i class="fa fa-icon"></i>');
+    it('adds "disabled" class to element', () => {
+      expect(element[0].getAttribute('class')).toBe(null);
+
+      ModalsUtils.bindXHRToButton(promise, element, 'newtext');
+
+      expect(element[0].getAttribute('class')).toBe('disabled');
     });
 
-    it('bindXHRToButton() should save icon and text inside button', (done) => {
-      callBindXHRToButton(done, '<i class="fa fa-icon"></i>My text');
+    it('add new text inside element', () => {
+      expect(element[0].innerHTML).toBe('actualInnerHtml');
+
+      ModalsUtils.bindXHRToButton(promise, element, 'newtext');
+
+      expect(element[0].innerHTML).toBe('newtext');
     });
 
-    it('bindXHRToButton() should save text of button. Disable button',
-      (done) => {
-        callBindXHRToButton(done, 'HELLO WORLD', '', true);
-      }
-    );
+    it('sets false to "disabled" attribute after promise has resolved',
+      async () => {
+        await ModalsUtils
+          .bindXHRToButton(Promise.resolve(), element, 'newtext');
 
-    it('bindXHRToButton() should save icon inside button. New text',
-      (done) => {
-        callBindXHRToButton(done, '<i class="fa fa-icon"></i>', 'My new text');
-      }
-    );
+        expect(element[0].disabled).toBe(false);
+      });
 
-    it('bindXHRToButton() should save text of button. New text. Disable button',
-      (done) => {
-        callBindXHRToButton(done, 'HELLO WORLD', '<i class="fa"></i>', true);
-      }
-    );
+    it('removes class "disabled" attribute after promise has resolved',
+      async () => {
+        await ModalsUtils
+          .bindXHRToButton(Promise.resolve(), element, 'newtext');
 
-    it('bindXHRToButton() should resolve empty element', (done) => {
-      let element = $('');
+        expect(element[0].getAttribute('class')).toBe('');
+      });
 
-      // call bindXHRToButton()
-      bindXHRToButton(dfd, element);
+    it('saves text inside element', async () => {
+      await ModalsUtils.bindXHRToButton(Promise.resolve(), element, 'newtext');
 
-      dfd.then(
-        setTimeout(() => {
-          // button should not have 'disabled' class after dfd.resolve()
-          expect(element.hasClass('disabled')).toEqual(false);
-          done();
-        }, 3)
-      );
-
-      dfd.resolve();
+      expect(element[0].innerHTML).toBe(actualInnerHtml);
     });
   });
 });

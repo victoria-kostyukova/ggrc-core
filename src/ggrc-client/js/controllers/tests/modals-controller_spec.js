@@ -7,6 +7,8 @@ import canMap from 'can-map';
 import ModalsController from '../modals/modals-controller';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
 import Person from '../../models/business-models/person';
+import * as ModalsUtils from '../../../js/plugins/utils/modals';
+import * as ModelsUtils from '../../../js/plugins/utils/models-utils';
 import * as currentPageUtils from '../../plugins/utils/current-page-utils';
 
 describe('ModalsController', function () {
@@ -368,6 +370,215 @@ describe('ModalsController', function () {
       });
 
       resetFormDfd.resolve();
+    });
+  });
+
+  describe('triggerSave() method', () => {
+    let ctrlInst;
+    let triggerSave;
+
+    beforeEach(() => {
+      ctrlInst = {
+        element: {
+          find: jasmine.createSpy()
+            .withArgs('a.btn[data-toggle=modal-submit]')
+            .and.returnValue('saveCloseBtn')
+            .withArgs('.modal-dismiss > .fa-times')
+            .and.returnValue('modalCloseBtn')
+            .withArgs('a.btn[data-toggle=modal-ajax-deleteform]')
+            .and.returnValue('deleteBtn')
+            .withArgs('a.btn[data-toggle=modal-submit-addmore]')
+            .and.returnValue('saveAddmoreBtn'),
+          data: jasmine.createSpy()
+            .withArgs('modal_form')
+            .and.returnValue({
+              $backdrop: 'modalBackdrop',
+            }),
+        },
+        options: new canMap({
+          instance: 'instance',
+          new_object_form: 'new_object_form',
+        }),
+      };
+
+      triggerSave = Ctrl.prototype.triggerSave.bind(ctrlInst);
+    });
+
+    it('calls wasDestroyed() method', () => {
+      ctrlInst.wasDestroyed = jasmine.createSpy().and.returnValue(true);
+
+      triggerSave();
+
+      expect(ctrlInst.wasDestroyed).toHaveBeenCalled();
+    });
+
+    it('does nothing if wasDestroyed() method returns true', () => {
+      ctrlInst.wasDestroyed = jasmine.createSpy().and.returnValue(true);
+      ctrlInst.disableEnableContentUI = jasmine.createSpy();
+
+      triggerSave();
+
+      expect(ctrlInst.disableEnableContentUI).not.toHaveBeenCalled();
+    });
+
+    describe('if wasDestroyed() method returns false', () => {
+      let el;
+      let dfdSave;
+
+      beforeEach(() => {
+        ctrlInst.wasDestroyed = jasmine.createSpy().and.returnValue(false);
+        ctrlInst.disableEnableContentUI = jasmine.createSpy();
+        spyOn(ModalsUtils, 'bindXHRToButton');
+        spyOn(ModalsUtils, 'bindXHRToDisableElement');
+        el = $('<div>');
+        dfdSave = $.Deferred();
+      });
+
+      it('calls disableEnableContentUI() method', () => {
+        el.addClass('disabled');
+
+        triggerSave(el);
+
+        expect(ctrlInst.disableEnableContentUI).toHaveBeenCalledWith(true);
+      });
+
+      it('does nothing if element has "disabled" class', () => {
+        ctrlInst.save_instance = jasmine.createSpy();
+        el.addClass('disabled');
+
+        triggerSave(el);
+
+        expect(ctrlInst.save_instance).not.toHaveBeenCalled();
+      });
+
+      it('calls save_instance() method', () => {
+        ctrlInst.save_instance =
+          jasmine.createSpy().and.returnValue(undefined);
+
+        triggerSave(el);
+
+        expect(ctrlInst.save_instance).toHaveBeenCalled();
+      });
+
+      it('does nothing if save_instance() method has returned falsy value',
+        () => {
+          ctrlInst.save_instance =
+            jasmine.createSpy().and.returnValue(undefined);
+
+          triggerSave(el);
+
+          expect(ModalsUtils.bindXHRToButton).not.toHaveBeenCalled();
+          expect(ModalsUtils.bindXHRToDisableElement).not.toHaveBeenCalled();
+        });
+
+      describe('if save_instance() method returns truthy value', () => {
+        beforeEach(() => {
+          ctrlInst.save_instance =
+            jasmine.createSpy().and.returnValue(dfdSave.promise());
+        });
+
+        it('calls element.find() and element.data()', () => {
+          triggerSave(el);
+
+          expect(ctrlInst.element.find).toHaveBeenCalledWith(
+            'a.btn[data-toggle=modal-submit]');
+          expect(ctrlInst.element.find).toHaveBeenCalledWith(
+            '.modal-dismiss > .fa-times');
+          expect(ctrlInst.element.find).toHaveBeenCalledWith(
+            'a.btn[data-toggle=modal-ajax-deleteform]');
+          expect(ctrlInst.element.find).toHaveBeenCalledWith(
+            'a.btn[data-toggle=modal-submit-addmore]');
+          expect(ctrlInst.element.data).toHaveBeenCalledWith(
+            'modal_form');
+          expect(ctrlInst.element.find).toHaveBeenCalledTimes(4);
+        });
+
+        it('sets true to "isSaving" attribute of options', () => {
+          ctrlInst.options.attr('isSaving', false);
+
+          triggerSave(el);
+
+          expect(ctrlInst.options.attr('isSaving')).toBe(true);
+        });
+
+        it('calls bindXHRToButton() util if options has add_more field', () => {
+          ctrlInst.options.add_more = {};
+
+          triggerSave(el);
+
+          expect(ModalsUtils.bindXHRToButton).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'saveCloseBtn');
+          expect(ModalsUtils.bindXHRToButton).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'saveAddmoreBtn', 'Saving, please wait...');
+        });
+
+        it('calls bindXHRToButton() util' +
+         'if options doesn\'t have add_more field', () => {
+          triggerSave(el);
+
+          expect(ModalsUtils.bindXHRToButton).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'saveCloseBtn', 'Saving, please wait...');
+          expect(ModalsUtils.bindXHRToButton).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'saveAddmoreBtn');
+        });
+
+        it('calls bindXHRToDisableElement() util', () => {
+          triggerSave(el);
+
+          expect(ModalsUtils.bindXHRToDisableElement).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'deleteBtn');
+          expect(ModalsUtils.bindXHRToDisableElement).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'modalBackdrop');
+          expect(ModalsUtils.bindXHRToDisableElement).toHaveBeenCalledWith(
+            jasmine.any(Promise), 'modalCloseBtn');
+        });
+      });
+
+      describe('if save_instance() has resolved', () => {
+        beforeEach(() => {
+          ctrlInst.save_instance =
+            jasmine.createSpy().and.returnValue(dfdSave.resolve());
+          spyOn(ModelsUtils, 'initAuditTitle');
+        });
+
+        it('sets false to "isSaving" attribute of options', async () => {
+          ctrlInst.options.attr('isSaving', true);
+
+          await triggerSave(el);
+
+          expect(ctrlInst.options.attr('isSaving')).toBe(false);
+        });
+
+        it('calls initAuditTitle() util', async () => {
+          await triggerSave(el);
+
+          expect(ModelsUtils.initAuditTitle).toHaveBeenCalledWith(
+            'instance', 'new_object_form');
+        });
+      });
+
+      describe('if save_instance() has rejected', () => {
+        beforeEach(() => {
+          ctrlInst.save_instance =
+            jasmine.createSpy().and.returnValue(dfdSave.reject());
+          spyOn(ModelsUtils, 'initAuditTitle');
+        });
+
+        it('sets false to "isSaving" attribute of options', async () => {
+          ctrlInst.options.attr('isSaving', true);
+
+          await triggerSave(el);
+
+          expect(ctrlInst.options.attr('isSaving')).toBe(false);
+        });
+
+        it('calls initAuditTitle() util', async () => {
+          await triggerSave(el);
+
+          expect(ModelsUtils.initAuditTitle).toHaveBeenCalledWith(
+            'instance', 'new_object_form');
+        });
+      });
     });
   });
 });

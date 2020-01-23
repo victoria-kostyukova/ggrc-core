@@ -16,40 +16,47 @@ export default ModalsController.extend({
   init: function () {
     this._super();
   },
-  '{$footer} a.btn[data-toggle=delete]:not(:disabled) click'(el, ev) {
-    let that = this;
+  '{$footer} a.btn[data-toggle=delete]:not(:disabled) click'(el) {
     // Disable the cancel button.
-    let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
+    let cancelButton = this.element.find('a[data-dismiss=modal]');
     let modalBackdrop = this.element.data('modal_form').$backdrop;
 
-    bindXHRToButton(this.options.instance.refresh()
-      .then(function (instance) {
-        return instance.destroy();
-      }).then(function (instance) {
-        // If this modal is spawned from an edit modal, make sure that one does
-        // not refresh the instance post-delete.
-        let parentController = $(that.options.$trigger)
-          .closest('.modal').control();
-        let msg;
-        if (parentController) {
-          parentController.options.skip_refresh = true;
-        }
+    const promise = new Promise((resolve, reject) => {
+      this.options.instance.refresh()
+        .then(resolve)
+        .catch(reject);
+    });
 
-        msg = instance.display_name() + ' deleted successfully';
-        $(document.body).trigger('ajax:flash', {success: msg});
-        if (that.element) {
-          that.element.trigger('modal:success', that.options.instance);
-        }
+    bindXHRToButton(
+      promise
+        .then((instance) => instance.destroy())
+        .then((instance) => {
+          // If this modal is spawned from an edit modal, make sure that one does
+          // not refresh the instance post-delete.
+          let parentController = $(this.options.$trigger)
+            .closest('.modal').control();
+          let msg;
+          if (parentController) {
+            parentController.options.skip_refresh = true;
+          }
 
-        pubSub.dispatch({
-          type: 'objectDeleted',
-          instance,
-        });
+          msg = instance.display_name() + ' deleted successfully';
+          $(document.body).trigger('ajax:flash', {success: msg});
+          if (this.element) {
+            this.element.trigger('modal:success', this.options.instance);
+          }
 
-        return new $.Deferred(); // on success, just let the modal be destroyed or navigation happen.
-        // Do not re-enable the form elements.
-      }).fail(function (xhr) {
-        notifierXHR('error', xhr);
-      }), el.add(cancelButton).add(modalBackdrop));
+          pubSub.dispatch({
+            type: 'objectDeleted',
+            instance,
+          });
+
+          return new Promise(() => {}); // on success, just let the modal be destroyed or navigation happen.
+          // Do not re-enable the form elements.
+        }).catch((xhr) => {
+          notifierXHR('error', xhr);
+        }),
+      el.add(cancelButton).add(modalBackdrop)
+    );
   },
 });

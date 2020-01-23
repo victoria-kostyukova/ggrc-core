@@ -175,20 +175,18 @@ describe('ggrc-gdrive-picker-launcher', function () {
   });
 
   describe('trigger_upload_parent() method', () => {
-    let parentFolderDfd;
-    let parentFolderStub;
+    let parentFolder;
     let errorMessage;
 
     beforeEach(() => {
-      parentFolderStub = {id: 'id'};
-      parentFolderDfd = $.Deferred();
+      parentFolder = {id: 'id'};
 
-      spyOn(PickerUtils, 'findGDriveItemById').and.returnValue(parentFolderDfd);
       spyOn(viewModel, 'uploadParentHelper').and.returnValue(Promise.resolve());
       spyOn($.fn, 'trigger').and.callThrough();
     });
 
     it('uses transient folder as parent folder if it exists', () => {
+      spyOn(PickerUtils, 'findGDriveItemById');
       viewModel.instance.attr('_transient.folder', 'folder');
 
       viewModel.trigger_upload_parent(viewModel);
@@ -196,6 +194,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
     });
 
     it('calls findGDriveItemById() if transient folder doesn\'t exist', () => {
+      spyOn(PickerUtils, 'findGDriveItemById');
       let folderId = 123;
       viewModel.instance.attr('_transient.folder', undefined);
       viewModel.instance.attr('folder', folderId);
@@ -205,24 +204,25 @@ describe('ggrc-gdrive-picker-launcher', function () {
     });
 
 
-    it('calls uploadParentHelper() method', (done) => {
-      parentFolderDfd.resolve(parentFolderStub);
+    it('calls uploadParentHelper() method', async () => {
+      spyOn(PickerUtils, 'findGDriveItemById')
+        .and.returnValue(Promise.resolve(parentFolder));
 
-      viewModel.trigger_upload_parent(viewModel).then(() => {
-        expect(viewModel.uploadParentHelper).toHaveBeenCalled();
-        done();
-      });
+      await viewModel.trigger_upload_parent(viewModel);
+
+      expect(viewModel.uploadParentHelper)
+        .toHaveBeenCalledWith({id: 'id'}, viewModel);
     });
 
-    it('displays error message if gdrive hasn\'t found', (done) => {
-      parentFolderDfd.reject();
+    it('displays error message if gdrive hasn\'t found', async () => {
       errorMessage = 'Can\'t upload: No GDrive folder found';
+      spyOn(PickerUtils, 'findGDriveItemById')
+        .and.returnValue(Promise.reject());
 
-      viewModel.trigger_upload_parent(viewModel).fail(() => {
-        expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
-          warning: errorMessage,
-        });
-        done();
+      await viewModel.trigger_upload_parent(viewModel);
+
+      expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
+        warning: errorMessage,
       });
     });
   });
