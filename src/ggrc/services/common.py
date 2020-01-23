@@ -713,7 +713,9 @@ class Resource(ModelView):
         obj.validate_acl()
     with benchmark("Send PUT event"):
       signals.Restful.model_put.send(
-          obj.__class__, obj=obj, src=src, service=self)
+          obj.__class__, obj=obj, src=src, service=self,
+          initial_state=initial_state
+      )
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Update custom attribute values"):

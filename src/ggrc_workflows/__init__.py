@@ -533,7 +533,9 @@ def calculate_new_next_cycle_start_date(workflow):
 
 @signals.Restful.model_put.connect_via(models.TaskGroupTask)
 @signals.Restful.model_posted.connect_via(models.TaskGroupTask)
-def handle_task_group_task_put_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+# noqa pylint: disable=unused-argument
+def handle_task_group_task_put_post(sender, obj=None, src=None, service=None,
+                                    initial_state=None):
   start_end_date_validator(obj)
 
   # If relative days were change we must update workflow next cycle start date
@@ -593,8 +595,10 @@ def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa 
   calculate_new_next_cycle_start_date(workflow)
 
 
+# noqa pylint: disable=unused-argument
 @signals.Restful.model_put.connect_via(models.TaskGroup)
-def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+def handle_task_group_put(sender, obj=None, src=None, service=None,
+                          initial_state=None):
   if inspect(obj).attrs.contact.history.has_changes():
     obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
@@ -602,7 +606,7 @@ def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pyl
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+        sender, obj=None, src=None, service=None, initial_state=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
     # TODO: check why update_cycle_object_parent_state destroys object history
     # when accepting the only task in a cycle. The listener below is a
@@ -637,7 +641,7 @@ def handle_cycle_object_status(
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+        sender, obj=None, src=None, service=None, initial_state=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_task_child_state(obj)
 
@@ -653,7 +657,7 @@ def update_workflow_state(workflow):
 
 @signals.Restful.model_put.connect_via(models.Cycle)
 def handle_cycle_put(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+        sender, obj=None, src=None, service=None, initial_state=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.is_current.history.has_changes():
     update_workflow_state(obj.workflow)
 
@@ -679,7 +683,8 @@ def _validate_put_workflow_fields(workflow):
 
 # pylint: disable=unused-argument
 @signals.Restful.model_put.connect_via(models.Workflow)
-def handle_workflow_put(sender, obj=None, src=None, service=None):
+def handle_workflow_put(sender, obj=None, src=None, service=None,
+                        initial_state=None):
   """Define API put calls permissions for WF"""
   _validate_put_workflow_fields(obj)
   if (inspect(obj).attrs.recurrences.history.has_changes() and

@@ -13,7 +13,7 @@ class WithPutHandable(object):
   """Mixin that adds PUT handler"""
   __lazy_init__ = True
 
-  def handle_put(self):
+  def handle_put(self, initial_state):
     """PUT handler"""
     raise NotImplementedError
 
@@ -24,7 +24,7 @@ class WithPutHandable(object):
     @signals.Restful.model_put.connect_via(model)
     def model_put(*args, **kwargs):
       """PUT handler"""
-      model.handle_put(kwargs["obj"])
+      model.handle_put(kwargs["obj"], kwargs["initial_state"])
 
 
 class WithPutAfterCommitHandable(object):

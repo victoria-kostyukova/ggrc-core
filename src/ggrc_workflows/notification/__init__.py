@@ -43,9 +43,10 @@ def contributed_notifications():
 
 
 def register_listeners():
-
+  # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(Workflow)
-  def workflow_put_listener(sender, obj=None, src=None, service=None):
+  def workflow_put_listener(sender, obj=None, src=None, service=None,
+                            initial_state=None):
     handle_workflow_modify(sender, obj, src, service)
     if not inspect(obj).attrs.status.history.has_changes():
       return
@@ -56,16 +57,20 @@ def register_listeners():
       handle_cycle_created(obj.cycles[0], False)
 
   @signals.Restful.model_put.connect_via(CycleTaskGroupObjectTask)
+  # noqa pylint: disable=unused-argument
   def cycle_task_group_object_task_put_listener(
-          sender, obj=None, src=None, service=None):
+          sender, obj=None, src=None, service=None, initial_state=None):
     with benchmark("update notifications on CycleTask put"):
       handle_cycle_task_group_object_task_put(obj)
 
   @signals.Restful.model_put.connect_via(Cycle)
-  def cycle_put_listener(sender, obj=None, src=None, service=None):
+  # noqa pylint: disable=unused-argument
+  def cycle_put_listener(sender, obj=None, src=None, service=None,
+                         initial_state=None):
     handle_cycle_modify(obj)
 
   @signals.Restful.model_posted.connect_via(Cycle)
+  # noqa pylint: disable=unused-argument
   def cycle_post_listener(sender, obj=None, src=None, service=None):
     handle_cycle_created(obj, True)
 

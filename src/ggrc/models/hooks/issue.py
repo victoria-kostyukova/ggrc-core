@@ -14,7 +14,8 @@ def init_hook():
   """Initialize Issue-related hooks."""
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Issue)
-  def handle_issue_put(sender, obj=None, src=None, service=None):
+  def handle_issue_put(sender, obj=None, src=None, service=None,
+                       initial_state=None):
     # pylint: disable=unused-argument
     common.ensure_field_not_changed(obj, "audit")
 

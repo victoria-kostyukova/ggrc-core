@@ -730,7 +730,8 @@ class ImportRowConverter(RowConverter):
           self.object_class, obj=self.obj, src={}, service=service_class)
     else:
       signals.Restful.model_put.send(
-          self.object_class, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          initial_state=self.initial_state)
 
   def insert_object(self):
     """Add the row object to the current database session."""

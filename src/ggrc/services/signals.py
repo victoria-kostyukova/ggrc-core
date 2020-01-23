@@ -62,6 +62,8 @@ class Restful(object):
         :obj: The model instance updated from the PUT JSON.
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
+        :initial_state: A named tuple of initial values of an object before
+          applying any change.
       """,
   )
   model_put_before_commit = signals.signal(

@@ -217,7 +217,7 @@ class Reviewable(rest_handable.WithPutHandable,
     from ggrc.snapshotter.rules import Types
     return bool(counterparty.type in Types.all)
 
-  def handle_put(self):
+  def handle_put(self, initial_state):
     self._update_status_on_attr()
     self._update_status_on_custom_attrs()
 
@@ -354,7 +354,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
     """Checks whether the status has changed."""
     return inspect(self).attrs.status.history.has_changes()
 
-  def handle_put(self):
+  def handle_put(self, initial_state):
     """Handle PUT request."""
     if not self.is_status_changed() and self.email_message:
       self._add_comment_about(self.email_message)

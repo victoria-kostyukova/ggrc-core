@@ -365,8 +365,10 @@ class AutoStatusChangeable(object):
       model: Class on which handlers will be set up.
     """
 
+    # pylint: disable=unused-variable
     @signals.Restful.model_put.connect_via(model)
-    def handle_object_put(sender, obj=None, src=None, service=None):
+    def handle_object_put(sender, obj=None, src=None, service=None,
+                          initial_state=None):
       """Handles object PUT operation
 
       Handles edit operation submitted to object.
@@ -417,8 +419,10 @@ class AutoStatusChangeable(object):
         target_object._need_status_reset = True
         target_object._reset_to_status = target_object.PROGRESS_STATE
 
+    # pylint: disable=unused-variable
     @signals.Restful.model_put.connect_via(evidence.Evidence)
-    def handle_evidence_relationship(sender, obj=None, src=None, service=None):
+    def handle_evidence_relationship(sender, obj=None, src=None, service=None,
+                                     initial_state=None):
       """Handle PUT of Evidence.
 
         See blinker library documentation for other parameters (all necessary).
