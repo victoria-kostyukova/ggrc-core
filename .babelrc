@@ -2,11 +2,7 @@
   "env": {
     "production": {
       "plugins": [
-        "@babel/plugin-transform-runtime",
-        "@babel/plugin-syntax-dynamic-import",
-        "@babel/plugin-proposal-object-rest-spread",
-        "@babel/plugin-transform-strict-mode",
-        "@babel/plugin-proposal-optional-catch-binding"
+        "@babel/plugin-syntax-dynamic-import"
       ],
       "presets": [
         [
@@ -27,11 +23,7 @@
     },
     "development": {
       "plugins": [
-        "@babel/plugin-transform-runtime",
-        "@babel/plugin-syntax-dynamic-import",
-        "@babel/plugin-proposal-object-rest-spread",
-        "@babel/plugin-transform-strict-mode",
-        "@babel/plugin-proposal-optional-catch-binding"
+        "@babel/plugin-syntax-dynamic-import"
       ],
       "presets": [
         [
