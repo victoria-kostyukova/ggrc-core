@@ -16,7 +16,7 @@
           <div class="rtf-block">
             <read-more
               text:from="notes"
-              handleMarkdown:from="instance.constructor.isChangeableExternally">
+              handleMarkdown:from="true">
             </read-more>
           </div>
         </external-attribute>
@@ -24,8 +24,7 @@
         <h6>Notes</h6>
         <div class="rtf-block">
           <read-more
-            text:from="notes"
-            handleMarkdown:from="instance.constructor.isChangeableExternally">
+            text:from="notes">
           </read-more>
         </div>
       {{/if}}
