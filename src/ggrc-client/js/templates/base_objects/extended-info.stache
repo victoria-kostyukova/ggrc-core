@@ -25,7 +25,7 @@
       >
         <div class="rtf-block">
           <read-more
-            text:from="description"
+            text:from="instance.description"
             handleMarkdown:from="true">
           </read-more>
         </div>
