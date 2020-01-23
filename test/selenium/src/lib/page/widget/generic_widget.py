@@ -12,7 +12,7 @@ from lib.element import three_bbs
 from lib.page import widget_bar
 from lib.page.modal import unified_mapper
 from lib.page.widget import page_mixins
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, test_utils
 
 
 class Widget(base.Widget):
@@ -221,6 +221,8 @@ class TreeView(base.TreeView):
     """
     search_field = self._browser.element(class_name="tree-filter__input")
     search_field.send_keys(obj_str)
+    test_utils.wait_for(lambda: self._browser.element(
+        class_name="tree-filter_is-expression valid").exists)
     search_button = self._browser.button(text="Search")
     search_button.click()
     self.wait_loading_after_actions()
