@@ -16,6 +16,7 @@ import * as Mappings from '../../../models/mappers/mappings';
 describe('object-mapper component', function () {
   let events;
   let viewModel;
+  let parentViewModel;
   let handler;
   let helpers;
 
@@ -24,17 +25,17 @@ describe('object-mapper component', function () {
     helpers = Component.prototype.helpers;
   });
 
-  describe('viewModel() method', function () {
-    let parentViewModel;
-    beforeEach(function () {
-      parentViewModel = new canMap({
-        general: {
-          useSnapshots: false,
-        },
-        special: [],
-      });
+  beforeEach(() => {
+    parentViewModel = new canMap({
+      general: {
+        useSnapshots: false,
+      },
+      special: [],
     });
+    viewModel = new Component.prototype.viewModel({}, parentViewModel)();
+  });
 
+  describe('viewModel() method', function () {
     it(`initializes join_object_id with "join-object-id"
     if isNew flag is not passed`,
     function () {
@@ -82,9 +83,6 @@ describe('object-mapper component', function () {
     });
 
     describe('isLoadingOrSaving() method', function () {
-      beforeEach(function () {
-        viewModel = new Component.prototype.viewModel({}, parentViewModel)();
-      });
       it('returns true if it is saving', function () {
         viewModel.attr('is_saving', true);
         expect(viewModel.isLoadingOrSaving()).toEqual(true);
@@ -121,11 +119,8 @@ describe('object-mapper component', function () {
     });
 
     describe('onSubmit() method', function () {
-      let vm;
-
       beforeEach(function () {
-        vm = new Component.prototype.viewModel({}, parentViewModel)();
-        vm.attr({
+        viewModel.attr({
           freezedConfigTillSubmit: null,
           currConfig: {
             a: 1,
@@ -136,33 +131,27 @@ describe('object-mapper component', function () {
 
       it('sets freezedConfigTillSubmit to currConfig',
         function () {
-          vm.onSubmit();
+          viewModel.onSubmit();
 
-          expect(vm.attr('freezedConfigTillSubmit')).toEqual(
-            vm.attr('currConfig')
+          expect(viewModel.attr('freezedConfigTillSubmit')).toEqual(
+            viewModel.attr('currConfig')
           );
         });
     });
 
     describe('onDestroyItem() method', function () {
-      let vm;
-
-      beforeEach(function () {
-        vm = new Component.prototype.viewModel({}, parentViewModel)();
-      });
-
       it('should remove item from deferred_to.list',
         function () {
           const item = {id: 1};
-          vm.attr({
+          viewModel.attr({
             deferred_to: {
               instance: {},
               list: [{id: 1}, {id: 2}],
             },
           });
-          vm.onDestroyItem(item);
-          expect(vm.attr('deferred_to.list').length).toBe(1);
-          expect(vm.attr('deferred_to.list')).not.toContain(
+          viewModel.onDestroyItem(item);
+          expect(viewModel.attr('deferred_to.list').length).toBe(1);
+          expect(viewModel.attr('deferred_to.list')).not.toContain(
             jasmine.objectContaining(item)
           );
         });
@@ -170,7 +159,7 @@ describe('object-mapper component', function () {
       it('should remove item from deferred_to.instance.list',
         function () {
           const item = {id: 1, type: 'a'};
-          vm.attr({
+          viewModel.attr({
             deferred_to: {
               instance: {
                 list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
@@ -178,9 +167,9 @@ describe('object-mapper component', function () {
               list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
             },
           });
-          vm.onDestroyItem(item);
-          expect(vm.attr('deferred_to.instance.list').length).toBe(1);
-          expect(vm.attr('deferred_to.instance.list')).not.toContain(
+          viewModel.onDestroyItem(item);
+          expect(viewModel.attr('deferred_to.instance.list').length).toBe(1);
+          expect(viewModel.attr('deferred_to.instance.list')).not.toContain(
             jasmine.objectContaining(item)
           );
         });
@@ -188,7 +177,7 @@ describe('object-mapper component', function () {
       it('should not remove non-existent item',
         function () {
           const item = {id: 3, type: 'c'};
-          vm.attr({
+          viewModel.attr({
             deferred_to: {
               instance: {
                 list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
@@ -196,15 +185,15 @@ describe('object-mapper component', function () {
               list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
             },
           });
-          vm.onDestroyItem(item);
-          expect(vm.attr('deferred_to.instance.list').length).toBe(2);
-          expect(vm.attr('deferred_to.list').length).toBe(2);
+          viewModel.onDestroyItem(item);
+          expect(viewModel.attr('deferred_to.instance.list').length).toBe(2);
+          expect(viewModel.attr('deferred_to.list').length).toBe(2);
         });
 
       it('dispatches UNMAP_DESTROYED_OBJECT',
         function () {
           const item = {id: 1, type: 'a'};
-          vm.attr({
+          viewModel.attr({
             deferred_to: {
               instance: {
                 list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
@@ -212,11 +201,11 @@ describe('object-mapper component', function () {
               list: [{id: 1, type: 'a'}, {id: 2, type: 'b'}],
             },
           });
-          const object = vm.attr('deferred_to.list')[0];
-          spyOn(vm.attr('deferred_to.instance'), 'dispatch');
-          vm.onDestroyItem(item);
+          const object = viewModel.attr('deferred_to.list')[0];
+          spyOn(viewModel.attr('deferred_to.instance'), 'dispatch');
+          viewModel.onDestroyItem(item);
 
-          expect(vm.attr('deferred_to.instance').dispatch)
+          expect(viewModel.attr('deferred_to.instance').dispatch)
             .toHaveBeenCalledWith({
               ...UNMAP_DESTROYED_OBJECT,
               object,
@@ -581,16 +570,6 @@ describe('object-mapper component', function () {
   });
 
   describe('isSnapshotMapping() method', function () {
-    let originalVM;
-
-    beforeAll(function () {
-      originalVM = viewModel.attr();
-    });
-
-    afterAll(function () {
-      viewModel.attr(originalVM);
-    });
-
     it('returns false if is an audit-scope model', function () {
       let result;
       spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
