@@ -7,8 +7,8 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import template from './templates/evidence-item.stache';
-import {notifier} from '../../../plugins/utils/notifiers-utils';
-import * as businessModels from '../../../models/business-models';
+import {notifier} from '../../plugins/utils/notifiers-utils';
+import * as businessModels from '../../models/business-models';
 
 export default canComponent.extend({
   tag: 'evidence-item',
