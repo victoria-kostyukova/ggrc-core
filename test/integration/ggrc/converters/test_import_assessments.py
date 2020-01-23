@@ -1585,6 +1585,167 @@ class TestAssessmentImport(TestCase):
     assessment = self.refresh_object(assessment, assessment_id)
     self.assertEqual(expected_status, assessment.status)
 
+  @ddt.data(
+      ("Text", None),
+      ("Rich Text", None),
+      ("Date", None),
+      ("Dropdown", "1,2,3"),
+      ("Checkbox", None),
+      ("Multiselect", "1,2,3"),
+      ("Map:Person", None)
+  )
+  @ddt.unpack
+  def test_create_asmt_from_template(self, type_lca, options):
+    """Test creating assessment with empty mandatory lca via import"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment_template = factories.AssessmentTemplateFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title='test_lca',
+          definition_type='assessment_template',
+          definition_id=assessment_template.id,
+          attribute_type=type_lca,
+          multi_choice_options=options,
+          mandatory=True
+      )
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Template", assessment_template.slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test Assessment"),
+        ("test_lca", ""),
+    ]))
+
+    self._check_csv_response(response, {})
+    self.assertEquals(all_models.Assessment.query.count(), 1)
+
+  @ddt.data(
+      ("Text", None),
+      ("Rich Text", None),
+      ("Date", None),
+      ("Dropdown", "1,2,3"),
+      ("Checkbox", None),
+      ("Multiselect", "1,2,3"),
+      ("Map:Person", None)
+  )
+  @ddt.unpack
+  def test_update_asmt_with_empty_lca(self, type_lca, options):
+    """Test updating assessment via import when mandatory lca is empty"""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      factories.CustomAttributeDefinitionFactory(
+          title='test_lca',
+          definition_type='assessment',
+          definition_id=asmt.id,
+          attribute_type=type_lca,
+          multi_choice_options=options,
+          mandatory=True
+      )
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmt.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test Assessment"),
+        ("test_lca", ""),
+    ]))
+
+    self._check_csv_response(response, {})
+
+  @ddt.data(
+      ("Text", None, "test_value", True),
+      ("Text", None, "test_value", False),
+      ("Rich Text", None, "test_value", True),
+      ("Rich Text", None, "test_value", False),
+      ("Date", None, "01/17/2020", True),
+      ("Date", None, "01/17/2020", False),
+      ("Dropdown", "1,2,3", "1", True),
+      ("Dropdown", "1,2,3", "1", False),
+      ("Checkbox", None, "1", True),
+      ("Checkbox", None, "1", False),
+      ("Multiselect", "1,2,3", "1", True),
+      ("Multiselect", "1,2,3", "1", False),
+      ("Map:Person", None, "user@example.com", True),
+      ("Map:Person", None, "user@example.com", False)
+  )
+  @ddt.unpack
+  def test_update_lca_empty_value(self, type_lca, options, value_lca,
+                                  is_mandatory):
+    """Test no changes when lca updated by empty value"""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      cad = factories.CustomAttributeDefinitionFactory(
+          title='test_lca',
+          definition_type='assessment',
+          definition_id=asmt.id,
+          attribute_type=type_lca,
+          multi_choice_options=options,
+          mandatory=is_mandatory
+      )
+      cav = factories.CustomAttributeValueFactory(
+          custom_attribute=cad,
+          attributable=asmt,
+          attribute_value=value_lca,
+      )
+      cav_id = cav.id
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmt.slug),
+        ("test_lca", "")
+    ]))
+    updated_cav = db.session.query(all_models.CustomAttributeValue).get(cav_id)
+
+    self._check_csv_response(response, {})
+    self.assertEqual(updated_cav.attribute_value, value_lca)
+
+  @ddt.data(
+      ("Date", None, "date", True),
+      ("Date", None, "date", False),
+      ("Dropdown", "1,2,3", "5", True),
+      ("Dropdown", "1,2,3", "5", False),
+      ("Checkbox", None, "Checkbox", True),
+      ("Checkbox", None, "Checkbox", False),
+      ("Multiselect", "1,2,3", "5", True),
+      ("Multiselect", "1,2,3", "5", False),
+      ("Map:Person", None, "Person", True),
+      ("Map:Person", None, "Person", False)
+  )
+  @ddt.unpack
+  def test_update_lca_wrong_value(self, type_lca, options, value,
+                                  is_mandatory):
+    """Test import with wrong values in lca"""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      factories.CustomAttributeDefinitionFactory(
+          title='test_lca',
+          definition_type='assessment',
+          definition_id=asmt.id,
+          attribute_type=type_lca,
+          multi_choice_options=options,
+          mandatory=is_mandatory
+      )
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmt.slug),
+        ("test_lca", value)
+    ]))
+
+    warning = errors.WRONG_VALUE.format(line=3, column_name='test_lca')
+    expected_messages = {
+        "Assessment": {
+            "row_warnings": {warning},
+        }
+    }
+
+    self._check_csv_response(response, expected_messages)
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
