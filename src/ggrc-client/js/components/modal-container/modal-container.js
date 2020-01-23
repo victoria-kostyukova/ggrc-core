@@ -2,6 +2,8 @@
  Copyright (C) 2020 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import '../../components/gca-controls/gca-controls';
 import canComponent from 'can-component';
 import canMap from 'can-map';
 import canStache from 'can-stache';
@@ -31,6 +33,11 @@ const viewModel = canMap.extend({
         window.queueMicrotask(() => {
           this.restoreUiStatus();
         });
+      },
+    },
+    showCustomAttributes: {
+      get() {
+        return this.attr('instance').constructor.is_custom_attributable;
       },
     },
     isModalSaving: {

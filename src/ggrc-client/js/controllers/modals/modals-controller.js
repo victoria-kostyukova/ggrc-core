@@ -83,8 +83,6 @@ import preloadView from '../modals/templates/modal-preload-view.stache';
 export default canControl.extend({
   defaults: {
     header_view: '/modals/modal-header.stache',
-    custom_attributes_view:
-      '/custom_attributes/modal-content.stache',
     button_view: BUTTON_VIEW_DONE,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
@@ -187,9 +185,7 @@ export default canControl.extend({
       const content = getView(this.options.content_view);
       const header = getView(this.options.header_view);
       const footer = getView(this.options.button_view);
-      const customAttributes =
-        getView(this.options.custom_attributes_view);
-      this.draw(content, header, footer, customAttributes, context);
+      this.draw(content, header, footer, context);
     });
   },
 
@@ -278,15 +274,10 @@ export default canControl.extend({
     return this.fetch_templates(this.fetch_data());
   },
 
-  draw: function (content, header, footer, customAttributes, context) {
+  draw(content, header, footer, context) {
     if (this.wasDestroyed()) {
       return;
     }
-
-    let modalTitle = this.options.modal_title;
-    let isProposal = this.options.isProposal;
-    let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
-      modalTitle.indexOf('New') === 0);
 
     if (Array.isArray(content)) {
       content = content[0];
@@ -296,9 +287,6 @@ export default canControl.extend({
     }
     if (Array.isArray(footer)) {
       footer = footer[0];
-    }
-    if (Array.isArray(customAttributes)) {
-      customAttributes = customAttributes[0];
     }
     if (header !== null) {
       header = canStache(header)(context);
@@ -311,10 +299,6 @@ export default canControl.extend({
     if (footer !== null) {
       footer = canStache(footer)(context);
       $(this.options.footerEl).html(footer);
-    }
-    if (customAttributes !== null && (isObjectModal || isProposal)) {
-      customAttributes = canStache(customAttributes)(context);
-      $(this.options.contentEl).append(customAttributes);
     }
   },
 

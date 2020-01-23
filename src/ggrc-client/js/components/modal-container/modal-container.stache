@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2020 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<content />
+
+{{#if showCustomAttributes}}
+  <div class="ggrc-form">
+    {{! Rerender each time when instance is changed in order to
+    refresh list of GCAs (rerendering is happened when "Save & Add another"
+    button is clicked) }}
+    {{#instance}}
+      <gca-controls instance:from="instance" allowHide:from="true" />
+    {{/instance}}
+  </div>
+{{/if}}
