@@ -371,6 +371,14 @@ class ProgramsFactory(EntitiesFactory):
          [users.current_user()])
     ]
 
+  def obj_inst(self):
+    """Create program's instance and set value for attributes type, children
+    and parents."""
+    obj = self.obj_entity_cls().update_attrs(
+        is_allow_none=False, type=self.obj_type)
+    obj.parents, obj.children = [], []
+    return obj
+
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Program entity with randomly and predictably filled fields, if
     'is_add_rest_attrs' then add attributes for REST."""
@@ -379,6 +387,7 @@ class ProgramsFactory(EntitiesFactory):
         status=unicode(object_states.DRAFT),
         review=ReviewsFactory().default_review()
     )
+    program_obj.parents, program_obj.children = [], []
     if is_add_rest_attrs:
       program_obj.update_attrs(
           recipients=",".join((

@@ -7,6 +7,7 @@ from lib.constants import objects, messages
 from lib.page.modal import unified_mapper
 from lib.page.widget import object_modal, info_widget
 from lib.service import webui_service, webui_facade
+from lib.utils import ui_utils
 
 
 def map_programs_via_add_tab_button(
@@ -27,6 +28,15 @@ def map_programs_via_add_tab_button(
       dest_objs_type=mapped_programs[0].type.title(),
       dest_objs_titles=[program.title for program in mapped_programs]))
   object_modal.CommonConfirmModal().confirm()
+  if map_as_parent:
+    src_program.parents = mapped_programs
+    for program in mapped_programs:
+      program.children.append(src_program)
+  else:
+    src_program.children = mapped_programs
+    for program in mapped_programs:
+      program.parents.append(src_program)
+  ui_utils.wait_for_spinner_to_disappear()
 
 
 def soft_assert_mega_program_icon_exists(program, soft_assert):
@@ -37,14 +47,42 @@ def soft_assert_mega_program_icon_exists(program, soft_assert):
       messages.AssertionMessages.MEGA_PROGRAM_ICON.format(title=program.title))
 
 
-def soft_assert_mapping_child_program_and_automapping(
-    selenium, parent_program, child_program, mapped_obj, user, soft_assert
+def soft_assert_programs_are_mapped(
+    selenium, soft_assert, parent_program, child_program
 ):
-  """Soft assert mapping of child_program to parent_program and automapping of
-  mapped to child_program mapped_obj."""
+  """Soft assert that Programs(Child) tab and Programs(Parent) tab appear on
+  parent and child program info pages respectively with mapped programs and
+  that tab number is updated."""
+  info_page = webui_service.ProgramsService().open_info_page_of_obj(
+      child_program)
+  webui_facade.soft_assert_tab_with_number_exists(
+      info_page, soft_assert, info_page.PARENT_PROGRAMS_TAB_NAME,
+      len([parent_program]))
   webui_facade.soft_assert_objects_are_mapped(
-      selenium, soft_assert, src_obj=parent_program,
-      objs=[child_program], obj_name=objects.PROGRAM_CHILDS)
+      selenium, soft_assert, src_obj=child_program, objs=[parent_program],
+      obj_name=objects.PROGRAM_PARENTS)
+  info_page = webui_service.ProgramsService().open_info_page_of_obj(
+      parent_program)
+  webui_facade.soft_assert_tab_with_number_exists(
+      info_page, soft_assert, info_page.CHILD_PROGRAMS_TAB_NAME,
+      len([child_program]))
+  webui_facade.soft_assert_objects_are_mapped(
+      selenium, soft_assert, src_obj=parent_program, objs=[child_program],
+      obj_name=objects.PROGRAM_CHILDS)
+
+
+def soft_assert_mapping_program_and_automapping(
+    selenium, soft_assert, src_program, mapped_program, mapped_obj, user,
+    is_mapped_as_parent=False
+):
+  """Soft assert mapping of child program to parent program and parent program
+  to child program and automapping of mapped to child program mapped_obj."""
+  if is_mapped_as_parent:
+    parent_program, child_program = mapped_program, src_program
+  else:
+    parent_program, child_program = src_program, mapped_program
+  soft_assert_programs_are_mapped(
+      selenium, soft_assert, parent_program, child_program)
   soft_assert_mega_program_icon_exists(parent_program, soft_assert)
   webui_facade.soft_assert_objects_are_mapped(
       selenium, soft_assert, src_obj=parent_program, objs=[mapped_obj])
