@@ -241,6 +241,7 @@ class AttributeInfo(object):
       "Product",
       "ProductGroup",
       "Project",
+      "Policy",
       "System",
       "TechnologyEnvironment",
       "Vendor",
