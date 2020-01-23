@@ -19,7 +19,6 @@
         {{else}}
           <external-control
             instance:from="instance"
-            attrName:from="redirectionAttrName"
           ></external-control>
         {{/if}}
       </div>

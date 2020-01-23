@@ -27,7 +27,6 @@
                     {{else}}
                       <external-control
                         instance:from="instance"
-                        attrName:from="'title'"
                       ></external-control>
                     {{/if}}
                   </div>
@@ -55,7 +54,6 @@
                   {{else}}
                     <external-control
                       instance:from="instance"
-                      attrName:from="'status'"
                     ></external-control>
                   {{/if}}
                 </div>
