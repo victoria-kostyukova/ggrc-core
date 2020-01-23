@@ -49,7 +49,10 @@
           Repeat Workflow
         </label>
         {{#if new_object_form}}
-          <repeat-on-button-wrapper instance:bind="instance"></repeat-on-button-wrapper>
+          <repeat-on-button
+            instance:from="instance"
+            unit:from="instance.unit"
+            repeatEvery:from="instance.repeat_every" />
         {{/if}}
         <repeat-on-summary unit:from="instance.unit"
                            repeatEvery:from="instance.repeat_every"

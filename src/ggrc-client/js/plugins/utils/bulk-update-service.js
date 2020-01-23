@@ -21,22 +21,21 @@ const toBulkModel = (instances, targetProps) => {
 };
 
 export default {
-  update: function (model, instances, targetProps) {
+  update(model, instances, targetProps) {
     const url = '/api/' + model.table_plural;
-    const dfd = $.Deferred();
     instances = toBulkModel(instances, targetProps);
-
-    ggrcAjax({
-      url: url,
-      method: 'PATCH',
-      data: JSON.stringify(instances),
-      contentType: 'application/json',
-    }).done(function (res) {
-      dfd.resolve(res);
-    }).fail(function (err) {
-      dfd.reject(err);
+    return new Promise((resolve, reject) => {
+      ggrcAjax({
+        url: url,
+        method: 'PATCH',
+        data: JSON.stringify(instances),
+        contentType: 'application/json',
+      }).done((res) => {
+        resolve(res);
+      }).fail((err) => {
+        reject(err);
+      });
     });
-    return dfd;
   },
 };
 

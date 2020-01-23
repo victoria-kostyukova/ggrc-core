@@ -16,7 +16,7 @@ import '../components/workflow/cycle-end-cycle';
 import '../components/workflow/workflow-activate';
 import '../components/workflow/workflow-start-cycle';
 import '../components/workflow/workflow-deactivate';
-import '../components/workflow/repeat-on-button-wrapper';
+import '../components/workflow/repeat-on-button';
 import '../components/workflow/repeat-on-summary';
 import '../components/workflow/cycle-task-group-object-task/cycle-task-group-object-task';
 import '../components/workflow/task-group/task-group';

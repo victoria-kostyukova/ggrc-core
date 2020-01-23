@@ -175,7 +175,7 @@ describe('TreeViewUtils module', function () {
     });
   });
 
-  describe('loadFirstTierItems() method', function () {
+  describe('loadFirstTierItems() method', () => {
     let modelName;
     let parent;
     let pageInfo;
@@ -200,11 +200,11 @@ describe('TreeViewUtils module', function () {
 
       spyOn(QueryApiUtils, 'buildParam')
         .and.returnValue({object_name: 'testName'});
-      spyOn(QueryApiUtils, 'batchRequests')
-        .and.returnValue($.Deferred().resolve({testName: {values: [source]}}));
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise')
+        .and.returnValue(Promise.resolve({testName: {values: [source]}}));
     });
 
-    it('returns correct result', function (done) {
+    it('returns correct result', (done) => {
       let expectedResult = {
         values: [jasmine.objectContaining(source)],
       };
@@ -223,9 +223,9 @@ describe('TreeViewUtils module', function () {
     });
   });
 
-  describe('makeRelevantExpression() method', function () {
+  describe('makeRelevantExpression() method', () => {
     it('returns expression for load items for 1st level of tree view',
-      function () {
+      () => {
         let result = module.makeRelevantExpression(
           'Audit', 'Program', 123, 'owned');
         expect(result).toEqual({
@@ -293,7 +293,7 @@ describe('TreeViewUtils module', function () {
 
   describe('loadItemsForSubTier() method', () => {
     beforeEach(() => {
-      spyOn(QueryApiUtils, 'batchRequests');
+      spyOn(QueryApiUtils, 'batchRequestsWithPromise');
       spyOn(CurrentPageUtils, 'initMappedInstances')
         .and.returnValue($.Deferred().resolve());
       spyOn(SnapshotUtils, 'isSnapshotRelated');
@@ -351,12 +351,13 @@ describe('TreeViewUtils module', function () {
 
     it('should make requests in the correct order: first - count requests, ' +
       'then object requests', (done) => {
-      QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+      QueryApiUtils.batchRequestsWithPromise
+        .and.callFake(notEmptyBatchResponse);
 
       let widgetIds = ['Metric', 'Contract'];
       module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
         .then(() => {
-          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+          let queries = QueryApiUtils.batchRequestsWithPromise.calls.allArgs();
 
           expect(queries.length).toBe(4);
 
@@ -381,12 +382,13 @@ describe('TreeViewUtils module', function () {
     });
 
     it('should make correct counts request', (done) => {
-      QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+      QueryApiUtils.batchRequestsWithPromise.and.callFake(emptyBatchResponse);
 
       let widgetIds = ['Metric', 'Contract'];
       module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
         .then(() => {
-          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+          let queries = QueryApiUtils
+            .batchRequestsWithPromise.calls.allArgs();
 
           expect(queries[0][0]).toEqual({
             object_name: 'Metric',
@@ -417,12 +419,14 @@ describe('TreeViewUtils module', function () {
     });
 
     it('should make correct objects requests', (done) => {
-      QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+      QueryApiUtils.batchRequestsWithPromise
+        .and.callFake(notEmptyBatchResponse);
 
       let widgetIds = ['Metric', 'Contract'];
       module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
         .then(() => {
-          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+          let queries = QueryApiUtils
+            .batchRequestsWithPromise.calls.allArgs();
 
           expect(queries.length).toBe(4);
 
@@ -458,11 +462,13 @@ describe('TreeViewUtils module', function () {
       ['Cycle', 'CycleTaskGroup', 'CycleTaskGroupObjectTask']
         .forEach((model) => {
           it(`should not make counts requests (${model})`, (done) => {
-            QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+            QueryApiUtils.batchRequestsWithPromise
+              .and.callFake(emptyBatchResponse);
 
             module.loadItemsForSubTier(['Metric', 'Policy'], model, 1, null, {})
               .then(() => {
-                let queries = QueryApiUtils.batchRequests.calls.allArgs();
+                let queries = QueryApiUtils
+                  .batchRequestsWithPromise.calls.allArgs();
 
                 queries.forEach((args) => {
                   expect(args[0].type).not.toBe('count');
@@ -473,11 +479,13 @@ describe('TreeViewUtils module', function () {
           });
 
           it(`should make correct objects requests (${model})`, (done) => {
-            QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+            QueryApiUtils.batchRequestsWithPromise
+              .and.callFake(notEmptyBatchResponse);
 
             module.loadItemsForSubTier(['Metric'], model, 1, null, {})
               .then(() => {
-                let queries = QueryApiUtils.batchRequests.calls.allArgs();
+                let queries = QueryApiUtils
+                  .batchRequestsWithPromise.calls.allArgs();
 
                 expect(queries[0][0]).toEqual({
                   object_name: 'Metric',
@@ -499,12 +507,14 @@ describe('TreeViewUtils module', function () {
 
     describe('for object versions objects (Issue)', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(emptyBatchResponse);
 
         let widgetIds = ['Metric', 'Metric_version'];
         module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries[0][0]).toEqual({
               object_name: 'Metric',
@@ -539,12 +549,14 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(notEmptyBatchResponse);
 
         let widgetIds = ['Metric', 'Metric_version'];
         module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries.length).toBe(4);
 
@@ -584,13 +596,15 @@ describe('TreeViewUtils module', function () {
 
     describe('for snapshot related objects', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(emptyBatchResponse);
 
         SnapshotUtils.isSnapshotRelated.and.returnValue(true);
 
         module.loadItemsForSubTier(['Metric'], 'Audit', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries.length).toBe(1);
 
@@ -615,14 +629,16 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(notEmptyBatchResponse);
 
         SnapshotUtils.isSnapshotRelated.and.returnValue(true);
 
         let widgetIds = ['Metric'];
         module.loadItemsForSubTier(widgetIds, 'Audit', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries.length).toBe(2);
 
@@ -649,14 +665,16 @@ describe('TreeViewUtils module', function () {
 
     describe('for mega objects', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(emptyBatchResponse);
 
         MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
 
         let widgetIds = ['Program_child', 'Program_parent'];
         module.loadItemsForSubTier(widgetIds, 'Program', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries.length).toBe(2);
 
@@ -690,14 +708,16 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequestsWithPromise
+          .and.callFake(notEmptyBatchResponse);
 
         MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
 
         let widgetIds = ['Program_child', 'Program_parent'];
         module.loadItemsForSubTier(widgetIds, 'Program', 1, null, {})
           .then(() => {
-            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+            let queries = QueryApiUtils
+              .batchRequestsWithPromise.calls.allArgs();
 
             expect(queries.length).toBe(4);
 
