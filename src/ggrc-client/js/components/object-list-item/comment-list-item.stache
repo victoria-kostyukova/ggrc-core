@@ -33,7 +33,18 @@
       </div>
     </div>
     {{#if hasRevision}}
-      <div class="comment-list__ca-description">{{customAttributeData}}</div>
+      <tooltip-content
+        class="oneline"
+        placement:from="'bottom'"
+        content:from="customAttributeData"
+      >
+        <div
+          class="comment-list__ca-description"
+          data-trim-target="true"
+        >
+          {{customAttributeData}}
+        </div>
+      </tooltip-content>
     {{/if}}
     <div class="comment-object-item__text">
       <read-more
