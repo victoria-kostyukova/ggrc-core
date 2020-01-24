@@ -163,15 +163,16 @@ class CustomAttributeDefinitionFactory(TitledFactory):
     """Assert definition_type"""
     model = get_model(kwargs.get('definition_type'))
     if issubclass(model, synchronizable.Synchronizable):
+
       if "external_id" in kwargs:
-        external_id = kwargs.pop("external_id")
+        external_id = int(kwargs.pop("external_id"))
       else:
         external_id = SynchronizableExternalId.next()
 
-      if "entity_name" in kwargs:
-        entity_name = kwargs.pop("entity_name")
+      if "external_type" in kwargs:
+        external_type = kwargs.pop("external_type")
       else:
-        entity_name = "{}_{}_123".format(target_class.type, external_id)
+        external_type = "custom_attribute_definition"
 
     cad = super(CustomAttributeDefinitionFactory, cls)._create(
         target_class,
@@ -180,10 +181,10 @@ class CustomAttributeDefinitionFactory(TitledFactory):
     )
     if issubclass(model, synchronizable.Synchronizable):
       cad._external_info = ExternalMappingFactory(
-          external_id=external_id,
+          external_id=int(external_id),
           object_type=target_class.type,
-          external_type=entity_name,
-          object_id=cad.id
+          external_type=external_type,
+          object_id=int(cad.id)
       )
 
     return cad

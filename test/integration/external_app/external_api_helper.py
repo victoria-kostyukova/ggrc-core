@@ -5,6 +5,7 @@
 
 import json
 from email.utils import parseaddr
+import urllib
 
 from flask import g
 
@@ -48,12 +49,14 @@ class ExternalApiClient(object):
     headers.update(self.user_headers)
     return headers
 
-  def get(self, obj=None, obj_id=None, url=None):
+  def get(self, obj=None, obj_id=None, url=None, params=None):
     """Simulates ext_app GET request"""
     if not url:
       obj_type = self._get_object_type(obj)
       url = self._build_api_link(obj_type, obj_id)
     headers = self._build_headers()
+    if params:
+      url = "?".join([url, urllib.urlencode(params)])
     return self.client.get(url, headers=headers)
 
   @staticmethod

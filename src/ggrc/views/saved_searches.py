@@ -9,10 +9,11 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc.app import app
-from ggrc.query.views import json_success_response, validate_post_data_keys
+from ggrc.query.views import json_success_response
 from ggrc.utils.error_handlers import make_error_response
 from ggrc.models.saved_search import SavedSearch
 from ggrc.models.exceptions import ValidationError
+from ggrc.views.utils import validate_request_data_keys
 
 
 @app.route("/api/saved_searches/<int:saved_search_id>", methods=["GET"])
@@ -135,7 +136,7 @@ def delete_saved_search(saved_search_id):
 
 
 @app.route("/api/saved_searches", methods=["POST"])
-@validate_post_data_keys(["object_type", "search_type"])
+@validate_request_data_keys(["object_type", "search_type"])
 def create_saved_search():
   """Create a saved search.
 

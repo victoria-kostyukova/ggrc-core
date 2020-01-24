@@ -3,7 +3,12 @@
 
 """Helpers for views"""
 
+from functools import wraps
 from werkzeug import exceptions
+
+from flask import request
+
+from ggrc.login import is_external_app_user
 
 
 class DocumentEndpoint(object):
@@ -112,3 +117,41 @@ class DocumentEndpoint(object):
           "updated": False
       })
     return response
+
+
+def external_user_only(func):
+  """Decorator for functions that require be used only as external user."""
+  # pylint: disable=missing-docstring
+  @wraps(func)
+  def wrapped(*args, **kwargs):
+    if not is_external_app_user():
+      raise exceptions.Forbidden()
+    return func(*args, **kwargs)
+  return wrapped
+
+
+def validate_request_data_keys(required_keys_list):
+  """
+    Post request parameters validator. Validates presence
+    of all required keys in json data supplied within request.
+  """
+  # pylint: disable=missing-docstring
+  def wrap(decorated_function):
+    @wraps(decorated_function)
+    def wrapper(*args, **kwargs):
+      error_message = ""
+      request_data = {}
+      if request.method in ("POST", "PUT"):
+        request_data = request.get_json()
+      elif request.method == "GET":
+        request_data = request.args
+      for key in required_keys_list:
+        if key not in request_data:
+          error_message = (u"Key '{}' is missing "
+                           u"in request data".format(key))
+          break
+      if error_message:
+        raise exceptions.BadRequest(error_message)
+      return decorated_function(*args, **kwargs)
+    return wrapper
+  return wrap
