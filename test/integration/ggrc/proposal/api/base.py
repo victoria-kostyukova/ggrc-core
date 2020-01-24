@@ -12,7 +12,7 @@ from integration.ggrc.api_helper import Api
 
 
 class BaseTestProposalApi(TestCase):
-  """Base TestCase class proposal apip tests."""
+  """Base TestCase class proposal api tests."""
 
   def setUp(self):
     super(BaseTestProposalApi, self).setUp()

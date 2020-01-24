@@ -122,3 +122,15 @@ class TestProposalRelationship(TestCase):
     response = self.api.delete(proposal)
     self.assert200(response)
     self.assertEqual(0, self.proposal_relationships(program).count())
+
+  def test_delete_proposal(self):
+    """Test delete proposal if program is removed"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      factories.ProposalFactory(instance=program,
+                                context_id=program.context_id,
+                                content={"Some text"})
+
+    response = self.api.delete(program)
+    self.assert200(response)
+    self.assertEqual(0, db.session.query(all_models.Proposal).count())
