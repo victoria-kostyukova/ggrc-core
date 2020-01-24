@@ -11,7 +11,7 @@ import template from './issue-unmap-item.stache';
 import Pagination from '../../base-objects/pagination';
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../../plugins/utils/query-api-utils';
 import {
   getPageInstance,
@@ -59,7 +59,7 @@ export default canComponent.extend({
       open: false,
     },
     processRelatedSnapshots() {
-      this.loadRelatedObjects().done(() => {
+      this.loadRelatedObjects().then(() => {
         if (this.attr('total')) {
           this.showModal();
         } else {
@@ -82,28 +82,27 @@ export default canComponent.extend({
         }
       );
     },
-    loadRelatedObjects() {
-      const snapshotsQuery = this.buildQuery('Snapshot');
-      const auditsQuery = this.buildQuery('Audit');
+    async loadRelatedObjects() {
+      try {
+        const snapshotsQuery = this.buildQuery('Snapshot');
+        const auditsQuery = this.buildQuery('Audit');
 
-      this.attr('isLoading', true);
-      return $.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
-        .done((snapshotsResponse, auditsResponse) => {
-          const snapshots = snapshotsResponse.Snapshot;
-          const audits = auditsResponse.Audit;
-          this.attr('total', snapshots.total + audits.total);
-          this.attr('relatedAudit', audits.values[0]);
-          this.attr('relatedSnapshots', snapshots.values);
-          this.attr('paging.total', snapshots.total);
-        })
-        .fail(() => {
-          notifier(
-            'error',
-            'There was a problem with retrieving related objects.');
-        })
-        .always(() => {
-          this.attr('isLoading', false);
-        });
+        this.attr('isLoading', true);
+        const [snapshotsResponse, auditsResponse] = await Promise.all(
+          [batchRequests(snapshotsQuery), batchRequests(auditsQuery)]);
+        const snapshots = snapshotsResponse.Snapshot;
+        const audits = auditsResponse.Audit;
+        this.attr('total', snapshots.total + audits.total);
+        this.attr('relatedAudit', audits.values[0]);
+        this.attr('relatedSnapshots', snapshots.values);
+        this.attr('paging.total', snapshots.total);
+      } catch {
+        notifier(
+          'error',
+          'There was a problem with retrieving related objects.');
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     showModal() {
       const total = this.attr('total');

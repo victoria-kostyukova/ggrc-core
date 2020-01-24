@@ -16,54 +16,99 @@ describe('assessment-mapped-controls component', () => {
   });
 
   describe('loadItems() method', () => {
-    let pendingRequest;
+    let params;
     beforeEach(() => {
-      pendingRequest = $.Deferred();
-      spyOn(SnapshotUtils, 'toObject').and.callFake((obj) => obj);
-      spyOn(QueryAPI, 'batchRequests')
-        .and.returnValue(pendingRequest);
-      spyOn(viewModel, 'getParams').and.returnValue([{
+      params = [{
         type: 'testType',
         request: 'mockRequest',
-      }]);
+      },
+      {
+        type: 'testType2',
+        request: 'mockRequest2',
+      }];
+
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+      spyOn(viewModel, 'getParams')
+        .withArgs(10)
+        .and.returnValue(params);
     });
 
-    it('sets items when appropriate data returned', (done) => {
-      let items = ['i1', 'i2'];
-      let response = {
-        Snapshot: {
-          values: items,
-        },
-      };
+    it('calls getParams() method', () => {
+      viewModel.loadItems(10);
 
-      let loadItemsChain = viewModel.loadItems(1);
+      expect(viewModel.getParams).toHaveBeenCalledWith(10);
+    });
 
-      expect(viewModel.getParams).toHaveBeenCalled();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
+    it('sets "isLoading" attribute to true', () => {
+      viewModel.attr('isLoading', false);
 
-      pendingRequest.resolve(response).then(() => {
-        loadItemsChain.then(() => {
-          expect(viewModel.attr('isLoading')).toBeFalsy();
-          expect(viewModel.attr('testType').attr()).toEqual(items);
-          done();
-        });
+      viewModel.loadItems(10);
+
+      expect(viewModel.attr('isLoading')).toBe(true);
+    });
+
+    describe('after batchRequests() success', () => {
+      it('sets items when appropriate data returned', async () => {
+        const items = ['i1', 'i2'];
+        const items2 = ['i3', 'i4'];
+        const response = {
+          Snapshot: {
+            values: items,
+          },
+        };
+        const response2 = {
+          Snapshot: {
+            values: items2,
+          },
+        };
+
+        spyOn(SnapshotUtils, 'toObject').and.callFake((obj) => obj);
+        QueryAPI.batchRequestsWithPromise
+          .withArgs('mockRequest')
+          .and.returnValue(Promise.resolve(response))
+          .withArgs('mockRequest2')
+          .and.returnValue(Promise.resolve(response2));
+
+        await viewModel.loadItems(10);
+
+        expect(viewModel.attr('testType').attr()).toEqual(items);
+        expect(viewModel.attr('testType2').attr()).toEqual(items2);
       });
+
+      it('sets "isLoading" attribute to false',
+        async () => {
+          QueryAPI.batchRequestsWithPromise
+            .and.returnValue(Promise.resolve());
+          viewModel.attr('isLoading', true);
+
+          await viewModel.loadItems(10);
+
+          expect(viewModel.attr('isLoading')).toBe(false);
+        });
     });
 
-    it('turns off spinner when request fails', (done) => {
-      spyOn(NotifiersUtils, 'notifier');
+    describe('if batchRequests() was failed', () => {
+      beforeEach(() => {
+        QueryAPI.batchRequestsWithPromise
+          .and.returnValue(Promise.reject());
+      });
 
-      let loadItemsChain = viewModel.loadItems(1);
+      it('sets "isLoading" attribute to false',
+        async () => {
+          viewModel.attr('isLoading', true);
 
-      expect(viewModel.attr('isLoading')).toBeTruthy();
+          await viewModel.loadItems(10);
 
-      pendingRequest.reject().then(null, () => {
-        loadItemsChain.then(() => {
-          expect(viewModel.attr('isLoading')).toBeFalsy();
-          expect(NotifiersUtils.notifier)
-            .toHaveBeenCalledWith('error', 'Failed to fetch related objects.');
-          done();
+          expect(viewModel.attr('isLoading')).toBe(false);
         });
+
+      it('calls notifier()', async () => {
+        spyOn(NotifiersUtils, 'notifier');
+
+        await viewModel.loadItems(10);
+
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', 'Failed to fetch related objects.');
       });
     });
   });
