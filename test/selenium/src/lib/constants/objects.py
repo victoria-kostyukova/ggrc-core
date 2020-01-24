@@ -67,9 +67,14 @@ SCOPE_OBJECTS = (ACCESS_GROUPS, ACCOUNT_BALANCES, DATA_ASSETS, FACILITIES,
                  PRODUCTS, PRODUCT_GROUPS, PROJECTS, SYSTEMS,
                  TECHNOLOGY_ENVIRONMENTS, VENDORS)
 
-DISABLED_OBJECTS = (CONTROLS, RISKS)
+TESTABLE_DISABLED_SCOPE_OBJECTS = (PROJECTS, KEY_REPORTS)
 
-ALL_DISABLED_OBJECTS = (CONTROLS, RISKS,) + SCOPE_OBJECTS
+DISABLED_CONTROLS_RISKS = (CONTROLS, RISKS)
+
+ALL_DISABLED_OBJECTS = DISABLED_CONTROLS_RISKS + SCOPE_OBJECTS
+
+ALL_TESTABLE_DISABLED_OBJS = (DISABLED_CONTROLS_RISKS +
+                              TESTABLE_DISABLED_SCOPE_OBJECTS)
 
 ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJS + ALL_DISABLED_OBJECTS
 
@@ -134,15 +139,15 @@ def _get_plural(singulars):
   return plurals
 
 
-def get_singular(plural, title=False):
+def get_singular(plural, title=False, titleize=False):
   """Transform object name to singular and lower or title form.
  Example: product_groups -> product_group
  """
   _singular = _get_singular([plural])[0]
-  if title:
-    _singular = inflection.camelize(_singular.lower())
-  else:
-    _singular = _singular.lower()
+  _singular = (inflection.camelize(_singular.lower()) if title
+               else _singular.lower())
+  if titleize:
+    _singular = inflection.titleize(_singular)
   return _singular
 
 
@@ -184,5 +189,5 @@ def get_obj_type(obj_name):
 
 EXTERNAL_END_POINTS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]
 
-SINGULAR_DISABLED_OBJS = [get_singular(x) for x in DISABLED_OBJECTS]
+SINGULAR_DISABLED_OBJS = [get_singular(x) for x in DISABLED_CONTROLS_RISKS]
 ALL_SINGULAR_DISABLED_OBJS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]
