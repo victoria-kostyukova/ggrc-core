@@ -287,4 +287,5 @@ class Proposalable(object):  # pylint: disable=too-few-public-methods
         Proposal,
         primaryjoin=join_function,
         backref=Proposal.INSTANCE_TMPL.format(cls.__name__),
+        cascade="all, delete-orphan",
     )

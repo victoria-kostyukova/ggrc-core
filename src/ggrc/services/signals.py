@@ -101,8 +101,8 @@ class Restful(object):
       "Model DELETEd",
       """
       Indicates that a model object was DELETEd and will be removed from the
-      databse. The sender in the signal will be the model class of the DELETEd
-      resource. The followin garguments will be sent along with the signal:
+      database. The sender in the signal will be the model class of the DELETEd
+      resource. The following arguments will be sent along with the signal:
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
@@ -113,7 +113,7 @@ class Restful(object):
       """
       Indicates that a model object was DELETEd and has been removed from the
       database. The sender in the signal will be the model class of the DELETEd
-      resource. The followin garguments will be sent along with the signal:
+      resource. The following arguments will be sent along with the signal:
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
