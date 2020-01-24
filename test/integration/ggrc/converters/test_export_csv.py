@@ -319,19 +319,6 @@ class TestExportEmptyTemplate(TestCase):
         all_models.SystemOrProcess.NZ_OPTIONS)), response.data)
 
   @ddt.data("Assessment", "Issue")
-  def test_delete_tip_in_export_csv(self, model):
-    """Tests if delete column has tip message in export file for {}"""
-    data = {
-        "export_to": "csv",
-        "objects": [
-            {"object_name": model, "fields": "all"},
-        ],
-    }
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-    self.assertIn("Allowed value is:\nYes", response.data)
-
-  @ddt.data("Assessment", "Issue")
   def test_ga_tip_people_type(self, model):
     """Tests if Predefined GA of people type  has tip message for {}"""
     data = {

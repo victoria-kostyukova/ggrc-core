@@ -193,44 +193,43 @@ function isSnapshotType(instance) {
  * @param {Object} instance - Object instance
  * @return {Promise} Promise
  */
-function getSnapshotsCounts(widgets, instance) {
-  let url = `${instance.selfLink}/snapshot_counts`;
-
-  let widgetsObject = widgets.filter((widget) => {
-    return isSnapshotRelated(instance.attr('type'), widget.name) ||
-      widget.isObjectVersion;
-  });
-
-  // return empty object as no widgets to update count
-  if (!widgetsObject.length) {
-    return $.Deferred().resolve({});
-  }
-
+async function getSnapshotsCounts(widgets, instance) {
   const stopFn = tracker.start(
     tracker.FOCUS_AREAS.COUNTS,
     tracker.USER_JOURNEY_KEYS.API,
     tracker.USER_ACTIONS[instance.type.toUpperCase()].SNAPSHOTS_COUNT);
 
-  return ggrcGet(url)
-    .then((counts) => {
-      stopFn();
-      let countsMap = {};
-      Object.keys(counts).forEach((name) => {
-        let widget = loFind(widgetsObject, (widgetObj) => {
-          return widgetObj.name === name;
-        });
+  try {
+    let url = `${instance.selfLink}/snapshot_counts`;
 
-        if (widget) {
-          let countsName = widget.countsName || widget.name;
-          countsMap[countsName] = counts[name];
-        }
+    let widgetsObject = widgets.filter((widget) => {
+      return isSnapshotRelated(instance.attr('type'), widget.name) ||
+        widget.isObjectVersion;
+    });
+
+    // return empty object as no widgets to update count
+    if (!widgetsObject.length) {
+      return Promise.resolve({});
+    }
+
+    const counts = await ggrcGet(url);
+    stopFn();
+    let countsMap = {};
+    Object.keys(counts).forEach((name) => {
+      let widget = loFind(widgetsObject, (widgetObj) => {
+        return widgetObj.name === name;
       });
 
-      return countsMap;
-    })
-    .fail(() => {
-      stopFn(true);
+      if (widget) {
+        let countsName = widget.countsName || widget.name;
+        countsMap[countsName] = counts[name];
+      }
     });
+
+    return countsMap;
+  } catch {
+    stopFn(true);
+  }
 }
 
 /**

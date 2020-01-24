@@ -101,23 +101,25 @@ class TestDisabledObjectsPage(base.Test):
     assert not map_modal.is_present, (
         "There should be no modal windows in new browser tab.")
 
-  def test_cannot_map_control_via_um_create_new_obj(self, control,
-                                                    dashboard_controls_tab,
-                                                    soft_assert, selenium):
-    """Tests that user cannot map control to scope objects/directives
+  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_cannot_map_created_disabled_obj_via_um(self, obj,
+                                                  soft_assert, selenium):
+    """Tests that user cannot map disabled object to scope objects/directives
     via unified mapper (create a new scope/directive object)."""
-    dashboard_controls_tab.get_control(control).select_map_to_this_object()
+    obj_name = objects.get_plural(obj.type)
+    service = factory.get_cls_webui_service(obj_name)()
+    (service.open_obj_dashboard_tab().tree_view
+     .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
         entities_factory.RegulationsFactory().create(), create_new_obj=True)
-    new_tab = browsers.get_browser().windows()[1]
+    _, new_tab = browsers.get_browser().windows()
     soft_assert.expect(new_tab.url == url.Urls().dashboard_info_tab,
                        "Dashboard info page should be opened in new tab.")
-    soft_assert.expect(
-        not(objects.get_normal_form(objects.REGULATIONS)
-            in webui_service.ControlsService(selenium).open_info_page_of_obj(
-            control).top_tabs.tab_names),
-        "There should be no scope/directive object mapped to Control.")
-    new_tab.use()
-    soft_assert.expect(not map_modal.is_present,
-                       "There should be no modal windows in new browser tab.")
+    tab_names = service.open_info_page_of_obj(obj).top_tabs.tab_names
+    soft_assert.expect(not any(
+        [name.startswith(objects.get_normal_form(objects.REGULATIONS))
+         for name in tab_names]),
+        "There should be no regulation mapped to {}.".format(obj.type))
+    webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
     soft_assert.assert_expectations()

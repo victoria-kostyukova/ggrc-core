@@ -61,11 +61,14 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  def test_cannot_make_and_view_proposals_for_control(self, control,
-                                                      soft_assert, selenium):
-    """Confirm that user cannot make and view Proposals for Control."""
-    info_page = webui_service.ControlsService(
-        selenium).open_info_page_of_obj(control)
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+                           indirect=True)
+  def test_cannot_make_and_view_proposals_for_disabled_obj(
+      self, obj, soft_assert, selenium
+  ):
+    """Confirm that user cannot make and view Proposals for disabled object."""
+    info_page = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))().open_info_page_of_obj(obj)
     webui_facade.soft_assert_cannot_make_proposal(info_page, soft_assert)
     webui_facade.soft_assert_cannot_view_proposals(info_page, soft_assert)
     soft_assert.assert_expectations()

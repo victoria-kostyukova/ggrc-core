@@ -40,13 +40,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
-    "@babel/plugin-proposal-object-rest-spread": "^7.7.4",
-    "@babel/plugin-proposal-optional-catch-binding": "^7.7.4",
     "@babel/plugin-syntax-dynamic-import": "^7.7.4",
-    "@babel/plugin-transform-runtime": "^7.7.4",
-    "@babel/plugin-transform-strict-mode": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
-    "@babel/runtime": "^7.7.4",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "compass-mixins": "~0.12.10",
@@ -74,7 +69,7 @@
     "raw-loader": "^0.5.1",
     "sass-loader": "^7.1.0",
     "url-loader": "~1.0.1",
-    "webpack": "^4.20.2",
+    "webpack": "^4.41.4",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.2",
     "webpack-manifest-plugin": "^2.0.3"

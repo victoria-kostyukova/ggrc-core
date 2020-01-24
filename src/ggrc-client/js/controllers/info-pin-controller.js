@@ -116,27 +116,26 @@ export default canControl.extend({
 
     this.setHtml(opts, view, confirmEdit, options, maximizedState);
   },
-  setInstance: function (opts, el, maximizedState) {
-    let instance = opts.attr('instance');
-    let infoPaneOpenDfd = $.Deferred();
-    let isSubtreeItem = opts.attr('options.isSubTreeItem');
+  setInstance(opts, el, maximizedState) {
+    return new Promise((resolve) => {
+      let instance = opts.attr('instance');
+      let isSubtreeItem = opts.attr('options.isSubTreeItem');
 
-    opts.attr('options.isDirectlyRelated',
-      !isSubtreeItem ||
-      TreeViewUtils.isDirectlyRelated(instance));
+      opts.attr('options.isDirectlyRelated',
+        !isSubtreeItem ||
+        TreeViewUtils.isDirectlyRelated(instance));
 
-    this.prepareView(opts, el, maximizedState);
+      this.prepareView(opts, el, maximizedState);
 
-    if (instance.infoPanePreload) {
-      instance.infoPanePreload();
-    }
+      if (instance.infoPanePreload) {
+        instance.infoPanePreload();
+      }
 
-    this.changeMaximizedState(maximizedState);
+      this.changeMaximizedState(maximizedState);
 
-    // Temporary solution...
-    setTimeout(infoPaneOpenDfd.resolve, 1000);
-
-    return infoPaneOpenDfd;
+      // Temporary solution...
+      setTimeout(resolve, 1000);
+    });
   },
   changeMaximizedState(maximizedState) {
     this.element
@@ -149,30 +148,30 @@ export default canControl.extend({
       this.element.addClass(pinContentMinimizedClass);
     }
   },
-  updateInstance: function (selector, instance) {
+  updateInstance(selector, instance) {
     let vm = this.element.find(selector).viewModel();
 
     vm.attr('instance', instance);
   },
-  setLoadingIndicator: function (selector, isLoading) {
+  setLoadingIndicator(selector, isLoading) {
     this.element.toggleClass('loading');
 
     this.element.find(selector)
       .viewModel()
       .attr('isLoading', isLoading);
   },
-  confirmEdit: function (instance, modalDetails) {
-    let confirmDfd = $.Deferred();
-    let renderer = canStache(modalDetails.description);
-    confirm({
-      modal_description: renderer(instance).textContent,
-      modal_confirm: modalDetails.button,
-      modal_title: modalDetails.title,
-      button_view: '/quick_form/confirm-buttons.stache',
-    }, confirmDfd.resolve);
-    return confirmDfd;
+  confirmEdit(instance, modalDetails) {
+    return new Promise((resolve) => {
+      const renderer = canStache(modalDetails.description);
+      confirm({
+        modal_description: renderer(instance).textContent,
+        modal_confirm: modalDetails.button,
+        modal_title: modalDetails.title,
+        button_view: '/quick_form/confirm-buttons.stache',
+      }, resolve);
+    });
   },
-  close: function () {
+  close() {
     let visibleWidget = $('.widget-area .widget:visible');
 
     visibleWidget.find('.item-active')

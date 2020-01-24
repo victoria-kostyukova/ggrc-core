@@ -54,12 +54,14 @@ export default canComponent.extend({
 
         new ModalsController($target, modalSettings);
         $target.on('click', '[data-toggle="delete"]', () => {
-          const dfd = this.onConfirm();
+          const promise = new Promise((resolve) => {
+            this.onConfirm().then(resolve);
+          });
 
-          bindXHRToButton(dfd, $target.find('[data-dismiss="modal"]'));
-          bindXHRToButton(dfd, $target.find('[data-toggle="delete"]'));
+          bindXHRToButton(promise, $target.find('[data-dismiss="modal"]'));
+          bindXHRToButton(promise, $target.find('[data-toggle="delete"]'));
 
-          dfd.always(() => {
+          promise.finally(() => {
             $target.modal('hide').remove();
           });
         }).on('click.modal-form.close', '[data-dismiss="modal"]', () => {

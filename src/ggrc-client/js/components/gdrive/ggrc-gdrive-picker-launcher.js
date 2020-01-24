@@ -103,23 +103,20 @@ export default canComponent.extend({
 
     trigger_upload_parent: function (scope, el) {
       // upload files with a parent folder (audits and workflows)
-      let parentFolderDfd;
-      let folderId;
+      const promise = new Promise((resolve) => {
+        if (this.instance.attr('_transient.folder')) {
+          resolve({instance: this.instance.attr('_transient.folder')});
+        } else {
+          const folderId = this.instance.attr('folder');
+          resolve(findGDriveItemById(folderId));
+        }
+      });
 
-      if (this.instance.attr('_transient.folder')) {
-        parentFolderDfd = $.when(
-          [{instance: this.instance.attr('_transient.folder')}]
-        );
-      } else {
-        folderId = this.instance.attr('folder');
+      bindXHRToButton(promise, el);
 
-        parentFolderDfd = findGDriveItemById(folderId);
-      }
-      bindXHRToButton(parentFolderDfd, el);
-
-      return parentFolderDfd
-        .done((parentFolder) => this.uploadParentHelper(parentFolder, scope))
-        .fail(() => {
+      return promise
+        .then((parentFolder) => this.uploadParentHelper(parentFolder, scope))
+        .catch(() => {
           $(el).trigger('ajax:flash', {
             warning: 'Can\'t upload: No GDrive folder found',
           });

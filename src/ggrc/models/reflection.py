@@ -226,6 +226,41 @@ class AttributeInfo(object):
       "issue_type",
   )
 
+  DELETE_COLUMN_IGNORED_MODELS = (
+      "AccessGroup",
+      "AccountBalance",
+      "Contract",
+      "DataAsset",
+      "Directive",
+      "Facility",
+      "KeyReport",
+      "Market",
+      "Metric",
+      "OrgGroup",
+      "Process",
+      "Product",
+      "ProductGroup",
+      "Project",
+      "Policy",
+      "System",
+      "TechnologyEnvironment",
+      "Vendor",
+      "Threat",
+      "Objective",
+      "Issue",
+      "Regulation",
+      "Requirement",
+      "Standard",
+      "Audit",
+      "Program",
+      "Assessment",
+      "AssessmentTemplate",
+      "TaskGroup",
+      "TaskGroupTask",
+      "Workflow",
+      "Person",
+  )
+
   class Type(object):
     """Types of model attributes."""
     # TODO: change to enum.
@@ -515,7 +550,8 @@ class AttributeInfo(object):
     aliases = AttributeInfo.gather_visible_aliases(object_class).items()
 
     # push the extra delete column at the end to override any custom behavior
-    if hasattr(object_class, "slug"):
+    if hasattr(object_class, "slug") and \
+            object_class.__name__ not in cls.DELETE_COLUMN_IGNORED_MODELS:
       aliases.append(("delete", {
           "display_name": "Delete",
           "description": "Allowed value is:\nYes",

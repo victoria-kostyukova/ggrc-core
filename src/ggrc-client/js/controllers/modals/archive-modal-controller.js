@@ -16,19 +16,26 @@ export default ModalsController.extend({
   },
   'a.btn[data-toggle=archive]:not(:disabled) click': function (el) {
     // Disable the cancel button.
-    let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
+    let cancelButton = this.element.find('a[data-dismiss=modal]');
     let modalBackdrop = this.element.data('modal_form').$backdrop;
-    const dfd = this.options.instance.refresh();
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        await this.options.instance.refresh();
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
     bindXHRToButton(
-      this.notifyArchivingResult(dfd),
+      this.notifyArchivingResult(promise),
       el.add(cancelButton).add(modalBackdrop)
     );
   },
-  notifyArchivingResult(dfd) {
-    return dfd
+  notifyArchivingResult(promise) {
+    return promise
       .then(() => this.archive())
       .then(() => this.displaySuccessNotify())
-      .fail((xhr, status) => {
+      .catch((xhr, status) => {
         this.displayErrorNotify(xhr, status);
       });
   },

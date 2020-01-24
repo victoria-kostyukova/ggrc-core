@@ -182,7 +182,11 @@ export default canComponent.extend({
 
       this.triggerSearchPermalink(false);
     },
-    applyAdvancedFilters() {
+    applyAdvancedFilters(clearSavedSearchParam = true) {
+      if (clearSavedSearchParam) {
+        // clean up url param from previous search
+        this.cleanUpUrl();
+      }
       const filters = this.attr('advancedSearch.filterItems').serialize();
       const mappings = this.attr('advancedSearch.mappingItems').serialize();
       const parents = this.attr('advancedSearch.parentItems').serialize();
@@ -284,6 +288,7 @@ export default canComponent.extend({
       this.attr('advancedSearch.request', canList());
       this.attr('advancedSearch.filter', null);
       this.attr('advancedSearch.open', false);
+      this.cleanUpUrl();
       this.resetAppliedSavedSearch();
       this.onFilter();
     },
@@ -322,6 +327,9 @@ export default canComponent.extend({
         request: advancedSearchRequest,
       });
     },
+    cleanUpUrl() {
+      router.removeAttr('saved_search');
+    },
   }),
   events: {
     inserted() {
@@ -343,7 +351,8 @@ export default canComponent.extend({
       this.viewModel.attr('filterIsDirty', true);
     },
     '{viewModel.router} saved_search'() {
-      if (isLoadSavedSearch(this.viewModel)) {
+      if (isLoadSavedSearch(this.viewModel)
+      && this.viewModel.attr('loading') === false) {
         loadSavedSearch(this.viewModel);
       }
     },
@@ -384,7 +393,6 @@ export const loadSavedSearch = (viewModel) => {
   viewModel.attr('loading', true);
 
   return SavedSearch.findOne({id: searchId}).then((response) => {
-    viewModel.attr('loading', false);
     const savedSearch = response.SavedSearch;
 
     if (savedSearch &&
@@ -399,14 +407,15 @@ export const loadSavedSearch = (viewModel) => {
         viewModel.attr('advancedSearch'),
         parsedSavedSearch
       );
-      viewModel.applyAdvancedFilters();
+      viewModel.applyAdvancedFilters(false);
     } else {
       // clear filter and apply default
       processNotExistedSearch(viewModel);
     }
   }).fail(() => {
-    viewModel.attr('loading', false);
     processNotExistedSearch(viewModel);
+  }).always(() => {
+    viewModel.attr('loading', false);
   });
 };
 

@@ -137,50 +137,49 @@ describe('repeat-on-button component', function () {
       });
   });
 
-  describe('save method', function () {
-    let saveDfd;
-    beforeEach(function () {
-      saveDfd = $.Deferred();
-      viewModel.attr('onSaveRepeat', function () {
-        return saveDfd;
-      });
+  describe('save method', () => {
+    let unit;
+    let repeatEvery;
+
+    beforeEach(() => {
+      unit = 'day';
+      repeatEvery = '2';
+      viewModel.attr('state.result.unit', unit);
+      viewModel.attr('state.result.repeatEvery', repeatEvery);
     });
 
-    it('should notify with selected values when repeat is enabled',
-      function (done) {
-        let unit = 'day';
-        let repeatEvery = '2';
-        viewModel.attr('state.result.unit', unit);
-        viewModel.attr('state.result.repeatEvery', repeatEvery);
-        viewModel.attr('repeatEnabled', true);
+    it('sets chosen unit and repeat_every properties to instance' +
+    'if repeat enabled', () => {
+      viewModel.attr('repeatEnabled', true);
+      viewModel.attr('instance.unit', null);
+      viewModel.attr('instance.repeat_every', null);
 
-        let saveChain = viewModel.save();
+      viewModel.save();
 
-        expect(viewModel.attr('isSaving')).toBeTruthy();
+      expect(viewModel.instance.attr('unit')).toBe(unit);
+      expect(viewModel.instance.attr('repeat_every')).toBe(repeatEvery);
+    });
 
-        saveDfd.resolve().then(() => {
-          saveChain.then(() => {
-            expect(viewModel.attr('isSaving')).toBeFalsy();
-            expect(viewModel.attr('state.open')).toBeFalsy();
-            done();
-          });
-        });
-      });
+    it('sets null to unit and repeat_every attributes of instance' +
+    'if repeat disabled', () => {
+      viewModel.attr('repeatEnabled', false);
 
-    it('should notify with empty values when repeat is disabled',
-      function (done) {
-        let saveChain = viewModel.save();
+      viewModel.attr('instance.unit', unit);
+      viewModel.attr('instance.repeat_every', repeatEvery);
 
-        expect(viewModel.attr('isSaving')).toBeTruthy();
+      viewModel.save();
 
-        saveDfd.resolve().then(() => {
-          saveChain.then(() => {
-            expect(viewModel.attr('isSaving')).toBeFalsy();
-            expect(viewModel.attr('state.open')).toBeFalsy();
-            done();
-          });
-        });
-      });
+      expect(viewModel.instance.attr('unit')).toBe(null);
+      expect(viewModel.instance.attr('repeat_every')).toBe(null);
+    });
+
+    it('sets false to state.open attribute', () => {
+      viewModel.attr('state.open', true);
+
+      viewModel.save();
+
+      viewModel.attr('state.open', false);
+    });
   });
 
   describe('unit update event', function () {

@@ -73,24 +73,24 @@ describe('issue-unmap-item component', () => {
   describe('processRelatedSnapshots() method', () => {
     beforeEach(() => {
       spyOn(viewModel, 'loadRelatedObjects')
-        .and.returnValue($.Deferred().resolve());
+        .and.returnValue(Promise.resolve());
       spyOn(viewModel, 'showModal');
       spyOn(viewModel, 'unmap');
     });
 
-    it('shows modal if there are items to unmap', () => {
+    it('shows modal if there are items to unmap', async () => {
       viewModel.attr('total', 2);
 
-      viewModel.processRelatedSnapshots();
+      await viewModel.processRelatedSnapshots();
 
       expect(viewModel.showModal).toHaveBeenCalled();
       expect(viewModel.unmap).not.toHaveBeenCalled();
     });
 
-    it('unmaps issue if there are no related items', () => {
+    it('unmaps issue if there are no related items', async () => {
       viewModel.attr('total', 0);
 
-      viewModel.processRelatedSnapshots();
+      await viewModel.processRelatedSnapshots();
 
       expect(viewModel.showModal).not.toHaveBeenCalled();
       expect(viewModel.unmap).toHaveBeenCalledWith();
@@ -98,69 +98,152 @@ describe('issue-unmap-item component', () => {
   });
 
   describe('loadRelatedObjects() method', () => {
-    let reqDeferred;
-    let snapshotsResponse;
-    let auditsResponse;
-
     beforeEach(() => {
-      snapshotsResponse = {
-        Snapshot: {
-          values: [{}, {}],
-          total: 10,
-        },
-      };
-      auditsResponse = {
-        Audit: {
-          values: [{}],
-          total: 1,
-        },
-      };
-      reqDeferred = $.Deferred();
-      spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
-      spyOn(QueryAPI, 'batchRequests');
-      spyOn($, 'when').and.returnValue(reqDeferred);
-      spyOn($.prototype, 'trigger');
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+      spyOn(viewModel, 'buildQuery')
+        .withArgs('Snapshot')
+        .and.returnValue('snapshotQuery')
+        .withArgs('Audit')
+        .and.returnValue('auditQuery');
     });
 
-    it('should change "isLoading" flag in case of success', () => {
+    it('calls buildQuery() method', () => {
+      viewModel.loadRelatedObjects();
+
+      expect(viewModel.buildQuery).toHaveBeenCalledWith('Snapshot');
+      expect(viewModel.buildQuery).toHaveBeenCalledWith('Audit');
+    });
+
+    it('sets true to "isLoading" attribute', () => {
       viewModel.attr('isLoading', false);
 
       viewModel.loadRelatedObjects();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
 
-      reqDeferred.resolve(snapshotsResponse, auditsResponse);
-      expect(viewModel.attr('isLoading')).toBeFalsy();
+      expect(viewModel.attr('isLoading')).toBe(true);
     });
 
-    it('should change "isLoading" flag in case of error', () => {
-      viewModel.attr('isLoading', false);
-
-      viewModel.loadRelatedObjects();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
-
-      reqDeferred.reject();
-      expect(viewModel.attr('isLoading')).toBeFalsy();
-    });
-
-    it('should load snapshots correctly', () => {
-      viewModel.loadRelatedObjects();
-      reqDeferred.resolve(snapshotsResponse, auditsResponse);
-
-      expect(viewModel.attr('total')).toBe(11);
-      expect(viewModel.attr('relatedSnapshots.length')).toBe(2);
-      expect(viewModel.attr('paging.total')).toBe(10);
-    });
-
-    it('should handle server errors correctly', () => {
-      spyOn(NotifiersUtils, 'notifier');
-      reqDeferred.reject();
+    it('calls batchRequests() util twice', () => {
+      QueryAPI.batchRequestsWithPromise
+        .and.returnValue(Promise.resolve());
 
       viewModel.loadRelatedObjects();
 
-      expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
-        'error',
-        'There was a problem with retrieving related objects.'
-      );
+      expect(QueryAPI.batchRequestsWithPromise)
+        .toHaveBeenCalledWith('snapshotQuery');
+      expect(QueryAPI.batchRequestsWithPromise)
+        .toHaveBeenCalledWith('auditQuery');
+    });
+
+    describe('after batchRequests() success', () => {
+      let snapshotsResponse;
+      let auditsResponse;
+
+      beforeEach(() => {
+        snapshotsResponse = {
+          Snapshot: {
+            values: [{
+              name: 'fake_snapshot1',
+            }, {
+              name: 'fake_snapshot2',
+            }],
+            total: 10,
+          },
+        };
+        auditsResponse = {
+          Audit: {
+            values: [{
+              name: 'fake_audit',
+            },
+            {
+              fake: 'fake',
+            }],
+            total: 1,
+          },
+        };
+
+        QueryAPI.batchRequestsWithPromise
+          .withArgs('snapshotQuery')
+          .and.returnValue(Promise.resolve(snapshotsResponse))
+          .withArgs('auditQuery')
+          .and.returnValue(Promise.resolve(auditsResponse));
+      });
+
+      it('sets total counts to "total" attribute', async () => {
+        viewModel.attr('total', null);
+
+        await viewModel.loadRelatedObjects();
+
+        const total = snapshotsResponse.Snapshot.total +
+          auditsResponse.Audit.total;
+
+        expect(viewModel.attr('total')).toBe(total);
+      });
+
+      it('sets audits to "relatedAudit" attribute',
+        async () => {
+          viewModel.attr('relatedAudit', null);
+
+          await viewModel.loadRelatedObjects();
+
+          expect(viewModel.attr('relatedAudit').attr())
+            .toEqual(auditsResponse.Audit.values[0]);
+        });
+
+      it('sets snapshots to "relatedSnapshots" attribute', async () => {
+        viewModel.attr('relatedSnapshots', null);
+
+        await viewModel.loadRelatedObjects();
+
+        expect(viewModel.attr('relatedSnapshots').attr()).toEqual([{
+          name: 'fake_snapshot1',
+        }, {
+          name: 'fake_snapshot2',
+        }]);
+      });
+
+      it('sets total snapshots counts to paging.total', async () => {
+        viewModel.attr('paging.total', null);
+
+        await viewModel.loadRelatedObjects();
+
+        const total = snapshotsResponse.Snapshot.total;
+
+        expect(viewModel.attr('paging.total')).toBe(total);
+      });
+
+      it('sets false to "isLoading" attribute', async () => {
+        viewModel.attr('isLoading', true);
+
+        await viewModel.loadRelatedObjects();
+
+        expect(viewModel.attr('isLoading')).toBe(false);
+      });
+    });
+
+    describe('if batchRequests() was failed', () => {
+      beforeEach(() => {
+        QueryAPI.batchRequestsWithPromise
+          .and.returnValue(Promise.reject());
+      });
+
+      it('sets false to "isLoading" attribute', async () => {
+        viewModel.attr('isLoading', true);
+
+        await viewModel.loadRelatedObjects();
+
+        expect(viewModel.attr('isLoading')).toBe(false);
+      });
+
+      it('calls notifier()', async () => {
+        spyOn(NotifiersUtils, 'notifier');
+
+        await viewModel.loadRelatedObjects();
+
+        expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
+          'error',
+          'There was a problem with retrieving related objects.'
+        );
+      });
     });
   });
 

@@ -542,15 +542,12 @@ describe('assessment-info-pane component', () => {
   });
 
   describe('requestQuery() method', () => {
-    let dfd;
-
-    beforeEach(function () {
-      dfd = $.Deferred();
-      spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
+    beforeEach(() => {
+      spyOn(queryApiUtils, 'batchRequestsWithPromise');
     });
 
     it('sets "isUpdating{<passed capitalized type>}" property to true before ' +
-    'resolving a request', function () {
+    'resolving a request', () => {
       const type = 'type';
       const expectedProp = `isUpdating${loCapitalize(type)}`;
       vm.attr(expectedProp, false);
@@ -558,39 +555,47 @@ describe('assessment-info-pane component', () => {
       expect(vm.attr(expectedProp)).toBe(true);
     });
 
-    it('makes request with help passed query', function () {
+    it('makes request with help passed query', () => {
       const query = {
         param1: '',
         param2: '',
       };
       vm.requestQuery(query);
-      expect(queryApiUtils.batchRequests).toHaveBeenCalledWith(query);
+      expect(queryApiUtils.batchRequestsWithPromise)
+        .toHaveBeenCalledWith(query);
     });
 
     describe('when request was resolved', () => {
       let response;
+      let query;
 
-      beforeEach(function () {
+      beforeEach(() => {
+        query = {
+          header: 'header',
+          data: {},
+        };
+
         response = {
           type1: {
-            values: [],
+            values: ['data1'],
           },
           type2: {
-            values: [],
+            values: ['data2'],
           },
         };
 
-        dfd.resolve(response);
+        queryApiUtils.batchRequestsWithPromise.withArgs(query)
+          .and.returnValue(Promise.resolve(response));
       });
 
-      it('returns values from first response object', async function (done) {
-        const resp = await vm.requestQuery({});
+      it('returns values from first response object', async (done) => {
+        const resp = await vm.requestQuery(query);
         expect(resp).toBe(response.type1.values);
         done();
       });
 
       it('sets "isUpdating{<passed capitalized type>}" property to false ',
-        async function (done) {
+        async (done) => {
           const type = 'type';
           const expectedProp = `isUpdating${loCapitalize(type)}`;
           await vm.requestQuery({}, type);
@@ -600,18 +605,19 @@ describe('assessment-info-pane component', () => {
     });
 
     describe('when request was rejected', () => {
-      beforeEach(function () {
-        dfd.reject();
+      beforeEach(() => {
+        queryApiUtils.batchRequestsWithPromise
+          .and.returnValue(Promise.reject());
       });
 
-      it('returns empty array', async function (done) {
+      it('returns empty array', async (done) => {
         const resp = await vm.requestQuery({});
         expect(resp).toEqual([]);
         done();
       });
 
       it('sets "isUpdating{<passed capitalized type>}" property to false ',
-        async function (done) {
+        async (done) => {
           const type = 'type';
           const expectedProp = `isUpdating${loCapitalize(type)}`;
           await vm.requestQuery({}, type);
