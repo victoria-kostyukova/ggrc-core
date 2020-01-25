@@ -255,8 +255,7 @@ class AutoStatusChangeable(object):
       obj (db.Model): Object on which we will perform manipulation.
     """
     # pylint: disable=protected-access
-    if not isinstance(obj, (mixins.CustomAttributable,
-                            mixins.ExternalCustomAttributable)):
+    if not isinstance(obj, mixins.CustomAttributable):
       return
     monitor_states = []
     local_ca = []

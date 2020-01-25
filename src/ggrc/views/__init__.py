@@ -312,10 +312,7 @@ def update_cad_related_objects(task):
       id=task.parameters.get("event_id")
   ).first()
   model = models.get_model(task.parameters.get("model_name"))
-  if issubclass(model, models.mixins.ExternalCustomAttributable):
-    cad_model = models.all_models.ExternalCustomAttributeDefinition
-  else:
-    cad_model = models.all_models.CustomAttributeDefinition
+  cad_model = models.all_models.CustomAttributeDefinition
   cad = cad_model.query.filter_by(id=event.resource_id).first()
   query = db.session.query(model
                            if task.parameters.get("need_revisions")
