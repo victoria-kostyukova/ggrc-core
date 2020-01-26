@@ -67,14 +67,8 @@ class AttributeValidator(object):
   @classmethod
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object"""
-    model = ggrc.models.get_model(definition_type)
-    if model and issubclass(model,
-                            ggrc.models.mixins.ExternalCustomAttributable):
-      cad = ggrc.models.all_models.ExternalCustomAttributeDefinition
-      query_filter = []
-    else:
-      cad = ggrc.models.all_models.CustomAttributeDefinition
-      query_filter = [cad.definition_id.is_(None)]
+    cad = ggrc.models.all_models.CustomAttributeDefinition
+    query_filter = [cad.definition_id.is_(None)]
     definition_types = [definition_type]
     if definition_type == "assessment_template":
       definition_types.append("assessment")
@@ -92,17 +86,6 @@ class AttributeValidator(object):
       }
 
     return flask.g.global_cad_names[definition_type]
-
-  @classmethod
-  def _get_global_ecad_names(cls, definition_type):
-    """Get names of external cad for a given object"""
-    ecad = ggrc.models.all_models.ExternalCustomAttributeDefinition
-    if not getattr(flask.g, "global_ecad_names", set()):
-      query = db.session.query(ecad.title, ecad.id).filter(
-          ecad.definition_type == definition_type
-      )
-      flask.g.global_ecad_names = {name.lower(): id_ for name, id_ in query}
-    return flask.g.global_ecad_names
 
 
 def invalidate_gca_cache(mapper, content, target):

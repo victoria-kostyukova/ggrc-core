@@ -143,8 +143,7 @@ class RecordBuilder(object):
 
   def _get_cav_properties(self, obj):
     """Return cav properties for sent object."""
-    if not isinstance(obj, (mixins.CustomAttributable,
-                            mixins.ExternalCustomAttributable)):
+    if not isinstance(obj, mixins.CustomAttributable):
       return {}
     properties = {}
     cavs = {v.custom_attribute_id: v for v in obj.custom_attribute_values}

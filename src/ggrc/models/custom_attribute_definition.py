@@ -31,8 +31,7 @@ class CustomAttributeDefinitionBase(attributevalidator.AttributeValidator,
                                     mixins.Base,
                                     mixins.Titled,
                                     db.Model):
-  """CustomAttributeDefinition and ExternalCustomAttributeDefinition base class
-  """
+  """CustomAttributeDefinition base class."""
   __abstract__ = True
 
   class ValidTypes(object):

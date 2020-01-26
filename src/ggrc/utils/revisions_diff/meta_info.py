@@ -80,8 +80,7 @@ class MetaInfo(object):
   @cached_property.cached_property
   def cads(self):
     """Return CADs for sent instance."""
-    if not isinstance(self.instance, (mixins.CustomAttributable,
-                                      mixins.ExternalCustomAttributable)):
+    if not isinstance(self.instance, mixins.CustomAttributable):
       return set()
     return set(self.instance.custom_attribute_definitions)
 
