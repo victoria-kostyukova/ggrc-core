@@ -4,7 +4,7 @@
 }}
 
 {{#if editMode}}
-  <div class="editable-evidence-item">
+  <div class="editable-evidence-item edit-mode">
     <div class="document-object-item editable-evidence-item__content">
       <div class="document-object-item__body">
         <a class="editable-evidence-item__content__link"
@@ -33,7 +33,7 @@
   </div>
 {{else}}
   <div class="action-toolbar action-toolbar-align">
-    <div class="action-toolbar__item-control-content flex-box">
+    <div class="editable-evidence-item">
       <div class="related-documents__spinner">
         <spinner-component toggle:from="isLoading"/>
       </div>

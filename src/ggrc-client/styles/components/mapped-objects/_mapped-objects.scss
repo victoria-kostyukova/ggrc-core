@@ -150,7 +150,9 @@
 }
 
 .editable-evidence-item {
-  margin-bottom: 16px;
+  &.edit-mode {
+    margin-bottom: 16px;
+  }
 
   &__note {
     font-style: italic;
@@ -190,7 +192,7 @@
 }
 
 .info .editable-evidence-item {
-  width: 60%;
+  max-width: 60%;
 }
 
 .comment-object-item {
