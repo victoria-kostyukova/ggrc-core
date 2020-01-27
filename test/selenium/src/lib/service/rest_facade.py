@@ -174,7 +174,8 @@ def map_objs(src_obj, dest_obj):
   def _is_external(src_obj, dest_obj):
     """Check if one of objects to map is external."""
     singular_title_external_objs = [
-        objects.get_singular(x, title=True) for x in objects.DISABLED_OBJECTS]
+        objects.get_singular(x, title=True)
+        for x in objects.DISABLED_CONTROLS_RISKS]
     objects_list = [src_obj, ]
     dest_ojbect_list = dest_obj if isinstance(dest_obj,
                                               (tuple, list)) else [dest_obj, ]

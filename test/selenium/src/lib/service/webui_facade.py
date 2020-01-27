@@ -257,7 +257,8 @@ def perform_disabled_mapping(
                              return_tree_items=return_tree_items)
   if create_new_obj:
     dest_obj_modal = map_modal.click_create_and_map_obj()
-    if objects.get_plural(dest_obj.type) not in objects.DISABLED_OBJECTS:
+    if objects.get_plural(
+       dest_obj.type) not in objects.DISABLED_CONTROLS_RISKS:
       dest_obj_modal.submit_obj(dest_obj)
     object_modal.CommonConfirmModal().confirm()
   else:

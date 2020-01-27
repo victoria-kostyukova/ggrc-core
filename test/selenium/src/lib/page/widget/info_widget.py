@@ -99,7 +99,7 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     return page_elements.StatusLabel(
         self._root.element(class_name=re.compile("state-value state")),
         with_inline_edit=(self.child_cls_name.lower()
-                          in objects.DISABLED_OBJECTS))
+                          in objects.DISABLED_CONTROLS_RISKS))
 
   def status(self):
     """Returns object status."""
