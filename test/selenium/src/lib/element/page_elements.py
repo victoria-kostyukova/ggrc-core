@@ -207,7 +207,7 @@ class AssessmentEvidenceUrls(object):
   def get_urls(self):
     """Get urls"""
     return [el.text for el in self._root.elements(
-        class_name="item-edit-control__content__link")]
+        class_name="editable-evidence-item__content__link")]
 
 
 class CustomAttributeManager(object):
