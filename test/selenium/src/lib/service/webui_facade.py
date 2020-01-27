@@ -676,3 +676,20 @@ def soft_assert_cannot_update_predefined_field(soft_assert, obj):
   field_element.inline_edit.open()
   soft_assert.expect(not field_element.input.exist,
                      "There should be no input field.")
+
+
+def check_order_and_removing_of_searches(soft_assert, objs, search_modal):
+  """Create searches for objs (order shoud be descending, so list of
+  titles is reversed after creating searches) -> verify order is correct ->
+  verify search can be removed."""
+  created_searches_by_desc = search_modal.create_and_save_searches(objs)[::-1]
+  actual_searches = search_modal.saved_searches_titles[slice(len(
+      created_searches_by_desc))]
+  soft_assert.expect(created_searches_by_desc == actual_searches,
+                     messages.AssertionMessages.format_err_msg_equal(
+                         actual_searches, created_searches_by_desc))
+  search_to_remove = created_searches_by_desc[0]
+  search_modal.remove_saved_search(search_to_remove)
+  soft_assert.expect(search_to_remove not in
+                     search_modal.saved_searches_titles,
+                     "Saved search is not removed.")
