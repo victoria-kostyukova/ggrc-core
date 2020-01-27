@@ -10,12 +10,14 @@ import template from './templates/external-attribute.stache';
 import {isChangeableExternally} from '../../../plugins/utils/ggrcq-utils';
 import '../proposable-control/proposable-control';
 import '../external-control/external-control';
+import {isSnapshot} from '../../../plugins/utils/snapshot-utils';
 
 const viewModel = canMap.extend({
   define: {
     showToolbarControls: {
       get() {
-        return isChangeableExternally(this.attr('instance'));
+        const instance = this.attr('instance');
+        return isChangeableExternally(instance) && !isSnapshot(instance);
       },
     },
   },
