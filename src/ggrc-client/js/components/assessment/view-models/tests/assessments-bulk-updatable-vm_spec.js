@@ -209,7 +209,9 @@ describe('assessments-bulk-updatable-vm component', () => {
       expect(NotifierUtils.notifier).toHaveBeenCalledWith(
         'success',
         'Bulk update is finished successfully. {reload_link}',
-        {reloadLink: window.location.href});
+        {reloadLink: window.location.origin
+          + window.location.pathname
+          + '#!assessment&state%5B%5D=Completed+and+Verified'});
     });
   });
 

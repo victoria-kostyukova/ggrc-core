@@ -71,7 +71,9 @@ export default ObjectOperationsBaseVM.extend({
     }
   },
   onSuccessHandler() {
-    const reloadLink = window.location.href;
+    const reloadLink = window.location.origin
+    + window.location.pathname
+    + '#!assessment&state%5B%5D=Completed+and+Verified';
     notifier('success', 'Bulk update is finished successfully. {reload_link}',
       {reloadLink});
   },
