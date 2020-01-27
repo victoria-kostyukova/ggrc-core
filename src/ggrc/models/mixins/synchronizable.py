@@ -79,6 +79,14 @@ class Synchronizable(ChangesSynchronized,
 
     return value
 
+  @validates('created_by_id')
+  def validate_created_by_id(self, _, value):  # pylint: disable=no-self-use
+    """Add explicit non-nullable validation."""
+    if value is None:
+      raise ValidationError("Created_by ID for the object is not specified")
+
+    return value
+
 
 class RoleableSynchronizable(roleable.Roleable):
   """Overrided Roleable mixin for Synchronizable models.
