@@ -21,7 +21,7 @@ import {reify as reifyUtil, isReifiable} from '../../plugins/utils/reify-utils';
 
 import {
   buildParam,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import QueryParser from '../../generated/ggrc-filter-query-parser';
 import Pagination from '../base-objects/pagination';
@@ -65,29 +65,26 @@ export default canComponent.extend({
     review: null,
     isLoading: false,
     revisions: null,
-    fetchItems: function () {
-      this.attr('isLoading', true);
-      this.attr('revisions', null);
-
+    async fetchItems() {
       const stopFn = tracker.start(
         this.attr('instance.type'),
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
-
-      return this.fetchRevisions()
-        .then(this.fetchAdditionalInfoForRevisions.bind(this))
-        .then(this.composeRevisionsData.bind(this))
-        .done((revisionsData) => {
-          this.attr('revisions', revisionsData);
-          stopFn();
-        })
-        .fail(function () {
-          stopFn(true);
-          notifier('error', 'Failed to fetch revision history data.');
-        })
-        .always(function () {
-          this.attr('isLoading', false);
-        }.bind(this));
+      try {
+        this.attr('isLoading', true);
+        this.attr('revisions', null);
+        const fetchedRevisions = await this.fetchRevisions();
+        const revisions
+          = await this.fetchAdditionalInfoForRevisions(fetchedRevisions);
+        const revisionsData = await this.composeRevisionsData(revisions);
+        this.attr('revisions', revisionsData);
+        stopFn();
+      } catch {
+        stopFn(true);
+        notifier('error', 'Failed to fetch revision history data.');
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     fetchRevisions() {
       const filter = this.getQueryFilter();

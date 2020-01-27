@@ -14,53 +14,59 @@ describe('mapped-counter component', () => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('deferredUpdateCounter() method', () => {
-    it('dispatches deferredUpdateCounter event with the callback', () => {
+  describe('updateCounter() method', () => {
+    it('dispatches updateCounter event with the callback', () => {
       spyOn(viewModel, 'dispatch');
-      viewModel.deferredUpdateCounter();
+      viewModel.updateCounter();
       expect(viewModel.dispatch).toHaveBeenCalledWith({
-        type: 'deferredUpdateCounter',
-        deferredCallback: jasmine.any(Function),
+        type: 'updateCounter',
+        callback: jasmine.any(Function),
       });
     });
 
-    it('sets "lockUntilDeferredUpdate" field to true before deferred update',
+    it('sets "lockUntilUpdate" field to true before update',
       () => {
-        viewModel.attr('lockUntilDeferredUpdate', false);
-        viewModel.deferredUpdateCounter();
-        expect(viewModel.attr('lockUntilDeferredUpdate')).toBe(true);
+        viewModel.attr('lockUntilUpdate', false);
+        viewModel.updateCounter();
+        expect(viewModel.attr('lockUntilUpdate')).toBe(true);
       });
 
-    describe('dispatches event with deferred callback which', () => {
-      let deferredCallback;
-      let loadDfd;
-
+    describe('dispatches event with callback which', () => {
+      let callback;
       beforeEach(() => {
         spyOn(viewModel, 'dispatch');
-        viewModel.deferredUpdateCounter();
-        deferredCallback = viewModel.dispatch.calls.argsFor(0)[0]
-          .deferredCallback;
-        loadDfd = new $.Deferred();
-        spyOn(viewModel, 'load').and.returnValue(loadDfd);
+        viewModel.updateCounter();
+        callback = viewModel.dispatch.calls.argsFor(0)[0]
+          .callback;
       });
 
       it('calls load() method', () => {
-        deferredCallback();
+        spyOn(viewModel, 'load').and.returnValue(Promise.resolve());
+
+        callback();
+
         expect(viewModel.load).toHaveBeenCalled();
       });
 
-      describe('always after "load" operation', () => {
-        beforeEach(() => {
-          loadDfd.resolve();
+      it('sets "lockUntilUpdate" field to false after load() method success',
+        async () => {
+          spyOn(viewModel, 'load').and.returnValue(Promise.resolve());
+          viewModel.attr('lockUntilUpdate', true);
+
+          await callback();
+
+          expect(viewModel.attr('lockUntilUpdate')).toBe(false);
         });
 
-        it('sets "lockUntilDeferredUpdate" field to false',
-          () => {
-            viewModel.attr('lockUntilDeferredUpdate', true);
-            deferredCallback();
-            expect(viewModel.attr('lockUntilDeferredUpdate')).toBe(false);
-          });
-      });
+      it('sets "lockUntilUpdate" field to false if load() method was failed',
+        async () => {
+          spyOn(viewModel, 'load').and.returnValue(Promise.reject());
+          viewModel.attr('lockUntilUpdate', true);
+
+          await expectAsync(callback()).toBeRejected();
+
+          expect(viewModel.attr('lockUntilUpdate')).toBe(false);
+        });
     });
   });
 
@@ -79,25 +85,25 @@ describe('mapped-counter component', () => {
           handler = events[
             `{viewModel.instance} ${REFRESH_MAPPED_COUNTER.type}`
           ].bind({viewModel});
-          spyOn(viewModel, 'deferredUpdateCounter');
+          spyOn(viewModel, 'updateCounter');
         });
 
-        it('calls deferredUpdateCounter() method when viewModel\'s type ' +
+        it('calls updateCounter() method when viewModel\'s type ' +
         'equals to passed type of the model', () => {
           const type = 'SomeType';
 
           viewModel.attr('type', type);
           handler([{}], {modelType: type});
 
-          expect(viewModel.deferredUpdateCounter).toHaveBeenCalled();
+          expect(viewModel.updateCounter).toHaveBeenCalled();
         });
 
-        it('doesn\'t call deferredUpdateCounter() method when viewModel\'s ' +
+        it('doesn\'t call updateCounter() method when viewModel\'s ' +
         'type doesn\'t equal to passed type of the model', () => {
           viewModel.attr('type', 'Type1');
           handler([{}], {modelType: 'Type2'});
 
-          expect(viewModel.deferredUpdateCounter).not.toHaveBeenCalled();
+          expect(viewModel.updateCounter).not.toHaveBeenCalled();
         });
       });
   });
