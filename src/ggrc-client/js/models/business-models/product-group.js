@@ -23,6 +23,7 @@ export default Cacheable.extend({
     ChangeableExternally,
     DisableAddComments,
   ],
+  migrationDate: '02/24/2020',
   attributes: {
     context: Stub,
     modified_by: Stub,

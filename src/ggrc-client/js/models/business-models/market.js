@@ -23,6 +23,7 @@ export default Cacheable.extend({
     ChangeableExternally,
     DisableAddComments,
   ],
+  migrationDate: '02/24/2020',
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
