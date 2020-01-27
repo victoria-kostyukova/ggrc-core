@@ -8,7 +8,6 @@ import {
   externalDirectiveObjects,
   scopingObjects,
 } from '../../plugins/models-types-collections';
-import {isSnapshot} from './snapshot-utils';
 
 /**
  * Util methods for integration with GGRCQ.
@@ -48,18 +47,6 @@ function isMappableExternally(source, destination) {
     scopingObjects.includes(destination.model_singular)) ||
     (scopingObjects.includes(source.model_singular) &&
     externalDirectiveObjects.includes(destination.model_singular))
-  );
-}
-/**
- * Determine whether instance is proposable externally.
- * @param {*} instance the model instance
- * @return {Boolean} true or false
- */
-function isProposableExternally(instance) {
-  return (
-    instance.constructor.isProposable &&
-    isChangeableExternally(instance) &&
-    !isSnapshot(instance)
   );
 }
 
@@ -344,5 +331,4 @@ export {
   getProposalsUrl,
   getChangeLogUrl,
   getProposalAttrUrl,
-  isProposableExternally,
 };
