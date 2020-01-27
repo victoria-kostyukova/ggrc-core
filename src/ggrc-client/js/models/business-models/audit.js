@@ -12,6 +12,7 @@ import CaUpdate from '../mixins/ca-update';
 import IssueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 import Program from './program';
+import {validateInputValue} from '../../plugins/utils/validation-utils';
 
 export default Cacheable.extend({
   root_object: 'audit',
@@ -133,6 +134,9 @@ export default Cacheable.extend({
       value: null,
       validate: {
         required: true,
+        validateAutosuggestFieldValue() {
+          return validateInputValue('program', this);
+        },
       },
     },
     issue_tracker: {
@@ -143,6 +147,11 @@ export default Cacheable.extend({
     },
     audit_firm: {
       value: null,
+      validate: {
+        validateAutosuggestFieldValue() {
+          return validateInputValue('audit_firm', this);
+        },
+      },
     },
   },
   clone: function (options) {

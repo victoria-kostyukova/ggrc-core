@@ -152,6 +152,7 @@
                 isQueryAutocompleteEnabled:from="true"
                 pathToField:from="'cycle_task_group.id'">
                 <input {{^if instance.cycle}}disabled{{/if}}
+                    {{#instance.computed_errors.workflow}}disabled{{/instance.computed_errors.workflow}}
                     class="input-block-level required"
                     name="{{pathToField}}"
                     data-lookup="CycleTaskGroup"

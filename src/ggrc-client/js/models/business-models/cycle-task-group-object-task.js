@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import loOrderBy from 'lodash/orderBy';
 import loFilter from 'lodash/filter';
 import moment from 'moment';
@@ -19,6 +20,7 @@ import CycleTaskNotifications from '../mixins/notifications/cycle-task-notificat
 import Stub from '../stub';
 import {reify} from '../../plugins/utils/reify-utils';
 import {refreshAll} from '../../models/refresh-queue';
+import {validateInputValue} from '../../plugins/utils/validation-utils';
 
 function populateFromWorkflow(form, workflow) {
   if (!workflow || typeof workflow === 'string') {
@@ -55,9 +57,16 @@ function populateFromWorkflow(form, workflow) {
     activeCycleList = loOrderBy(
       activeCycleList, ['start_date'], ['desc']);
     activeCycle = activeCycleList[0];
-    form.attr('workflow', {id: workflow.id, type: 'Workflow'});
+    form.attr('workflow',
+      {id: workflow.id, type: 'Workflow', title: workflow.title});
     form.attr('context', {id: workflow.context.id, type: 'Context'});
     form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
+
+    if (!form._transient) {
+      form.attr('_transient', canMap());
+    }
+    form.attr('_transient.workflow',
+      {id: workflow.id, type: 'Workflow', title: workflow.title});
 
     // reset cycle task group after workflow updating
     form.attr('cycle_task_group', null);
@@ -208,6 +217,9 @@ export default Cacheable.extend({
       value: null,
       validate: {
         required: true,
+        validateAutosuggestFieldValue() {
+          return validateInputValue('workflow', this);
+        },
       },
     },
     cycle: {
@@ -220,6 +232,9 @@ export default Cacheable.extend({
       value: null,
       validate: {
         required: true,
+        validateAutosuggestFieldValue() {
+          return validateInputValue('cycle_task_group', this);
+        },
       },
     },
     start_date: {
