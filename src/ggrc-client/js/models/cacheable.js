@@ -158,7 +158,7 @@ export default canModel.extend({
       loForEach(staticProps.mixins, function (mixin) {
         mixin.addTo(that);
       });
-      delete this.mixins;
+      delete this._mixins;
     }
 
     return this._super(...arguments);
