@@ -950,3 +950,7 @@ class ChangeLogItemsFactory(EntitiesFactory):
             src_obj_title=src_obj.title,
             mapped_obj_name=mapped_obj.type,
             mapped_obj_title=mapped_obj.title))
+
+
+class KeyReportsFactory(EntitiesFactory):
+  """"Factory class for Key Reports entities."""

@@ -823,3 +823,15 @@ class TechnologyEnvironmentsService(BaseWebUiService):
   def __init__(self, driver=None):
     super(TechnologyEnvironmentsService, self).__init__(
         objects.TECHNOLOGY_ENVIRONMENTS, driver)
+
+
+class ProjectsService(BaseWebUiService):
+  """Class for Projects business layer's services objects."""
+  def __init__(self, driver=None):
+    super(ProjectsService, self).__init__(objects.PROJECTS, driver)
+
+
+class KeyReportsService(BaseWebUiService):
+  """Class for Key Reports business layer's services objects."""
+  def __init__(self, driver=None):
+    super(KeyReportsService, self).__init__(objects.KEY_REPORTS, driver)
