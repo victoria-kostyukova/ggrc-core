@@ -50,7 +50,7 @@ class CycleTaskResource(common.Resource):
       return current_app.make_response(
           ('Content-Type must be application/json', 415, []))
     with utils.benchmark("Do bulk update"):
-      updated_objects = self.model.bulk_update(src)
+      updated_objects, update_forbidden_objects = self.model.bulk_update(src)
     with utils.benchmark("Status propagation on bulk update"):
       self.propagate_status(updated_objects)
     with utils.benchmark("Log Event"):
@@ -59,8 +59,14 @@ class CycleTaskResource(common.Resource):
       db.session.commit()
     with utils.benchmark("Make response"):
       updated_ids = {u.id for u in updated_objects}
-      skipped_ids = {int(item['id']) for item in src
-                     if int(item["id"]) not in updated_ids}
+      forbidden_ids = {ufo.id for ufo in update_forbidden_objects}
+      not_allowed_state_ids = {
+          int(item['id']) for item in src
+          if int(item["id"]) not in updated_ids | forbidden_ids}
       result = [{'status': 'updated', 'id': idx} for idx in updated_ids]
-      result.extend([{'status': 'skipped', 'id': idx} for idx in skipped_ids])
+      result.extend(
+          [{'status': 'forbidden', 'id': idx} for idx in forbidden_ids])
+      result.extend(
+          [{'status': 'not allowed status', 'id': idx}
+           for idx in not_allowed_state_ids])
       return self.json_success_response(result, datetime.datetime.utcnow())
