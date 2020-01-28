@@ -952,7 +952,8 @@ class ChangeLogItemsFactory(EntitiesFactory):
       "custom_attribute_definitions", "access_control_list", "url",
       "type", "selfLink", "review_status_display_name", "id", "href",
       "external_slug", "external_id", "modified_by", "audit",
-      "bulk_update_modal_tree_view_attrs_to_exclude")
+      "bulk_update_modal_tree_view_attrs_to_exclude", "context", "kind",
+      "review")
 
   def _generate_creation_entry_dict(self, obj):
     """Returns dict of obj's attributes that is expected to be displayed

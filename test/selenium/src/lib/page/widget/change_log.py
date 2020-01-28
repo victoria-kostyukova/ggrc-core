@@ -7,7 +7,7 @@ import re
 from lib import base
 from lib.constants import regex
 from lib.entities import entity
-from lib.utils import string_utils
+from lib.utils import string_utils, ui_utils
 
 
 class ChangeLog(base.WithBrowser):
@@ -15,12 +15,22 @@ class ChangeLog(base.WithBrowser):
 
   def __init__(self):
     super(ChangeLog, self).__init__()
-    self._root = self._browser.element(class_name="tab-container")
+    self._root = self._browser.element(class_name="tab-pane active")
+    self.pagination = base.Pagination(self._root)
+
+  def _get_items_from_page(self):
+    """Returns a list of all entries at current page in changelog."""
+    return [ChangeLogEntry(entry_el).change_log_item for entry_el in
+            self._root.elements(class_name="w-status")]
 
   def get_changelog_items(self):
-    """Returns a list of changelog entries."""
-    return [ChangeLogEntry(entry_el).change_log_item
-            for entry_el in self._root.elements(class_name="w-status")]
+    """Returns a list of all entries at all pages in changelog."""
+    changelog_items = self._get_items_from_page()
+    for _ in xrange(self.pagination.total_pages - 1):
+      self.pagination.next_page_btn.click()
+      ui_utils.wait_for_spinner_to_disappear()
+      changelog_items.extend(self._get_items_from_page())
+    return changelog_items
 
   def get_object_creation_entry(self):
     """Return changelog entry that is related to object creation."""

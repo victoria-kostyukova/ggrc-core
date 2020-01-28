@@ -3,7 +3,7 @@
 """Base classes."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
-
+import math
 import random
 import re
 
@@ -18,7 +18,7 @@ from lib import constants, exception, mixin, environment, browsers, users
 from lib.constants import messages
 from lib.decorator import lazy_property
 from lib.entities import entity
-from lib.utils import selenium_utils, help_utils
+from lib.utils import selenium_utils, help_utils, ui_utils
 
 
 class InstanceRepresentation(object):
@@ -1020,8 +1020,7 @@ class CommentItem(object):
   def link_values_from_text(self):
     """Returns link's href attribute values form the comment content."""
     try:
-      return [el.get_attribute("href") for el in
-              self.content.links()]
+      return [el.get_attribute("href") for el in self.content.links()]
     except exceptions.NoSuchElementException:
       return []
 
@@ -1068,6 +1067,67 @@ class MentionEmailDropdown(object):
     email = item_to_choose.text
     item_to_choose.click()
     return email
+
+
+class Pagination(object):
+  """Represents pagination element."""
+
+  def __init__(self, container):
+    self._root = container.element(tag_name='tree-pagination')
+
+  @property
+  def next_page_btn(self):
+    """Returns element of next page button."""
+    return self._root.element(class_name='fa fa-angle-right').parent(
+        class_name='pagination-item')
+
+  @property
+  def total_items(self):
+    """Returns number of items."""
+    return int(self._root.element(class_name='pagination-item_list').text.
+               split("of ")[1])
+
+  @property
+  def total_pages(self):
+    """Returns number of pages."""
+    return int(math.ceil(self.total_items / float(self.page_size)))
+
+  @property
+  def page_size_options(self):
+    """Returns possible page size options."""
+    self._page_size_btn.click()
+    page_size_options = [
+        int(el.text) for el in self._page_size_popover.elements(
+            class_name='dropdown-container__item')]
+    self._page_size_btn.click()
+    return page_size_options
+
+  @property
+  def _page_size_btn(self):
+    """Returns element of page size button."""
+    return self._root.element(class_name='simple-popover__button')
+
+  @property
+  def _page_size_popover(self):
+    """Returns element of page sizes popover."""
+    return self._root.element(text='Items per page:').parent()
+
+  @property
+  def page_size(self):
+    """Return current page size."""
+    return int(self._page_size_btn.text)
+
+  def change_page_size(self, page_size):
+    """Changes page size.
+
+    Raises: ValueError if wrong page_size is given."""
+    page_size_options = self.page_size_options
+    if page_size not in page_size_options:
+      raise ValueError(
+          'Invalid page size. Possible sizes: {}'.format(page_size_options))
+    self._page_size_btn.click()
+    self._page_size_popover.element(text=str(page_size)).click()
+    ui_utils.wait_for_spinner_to_disappear()
 
 
 class ListCheckboxes(Component):
