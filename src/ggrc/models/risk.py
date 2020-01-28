@@ -220,7 +220,6 @@ class Risk(with_external_created_by.WithExternalCreatedBy,
 
   def log_json(self):
     res = super(Risk, self).log_json()
-    res["created_by"] = ggrc_utils.created_by_stub(self)
     res["last_submitted_by"] = ggrc_utils.last_submitted_by_stub(self)
     res["last_verified_by"] = ggrc_utils.last_verified_by_stub(self)
     return res

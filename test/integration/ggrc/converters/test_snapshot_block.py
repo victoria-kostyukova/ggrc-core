@@ -76,6 +76,7 @@ class TestSnapshotBlockConverter(TestCase):
     block = SnapshotBlockConverter(converter, [])
     block.child_type = "Control"
     expected_attrs = [
+
         ('slug', 'Code'),
         ('audit', 'Audit'),  # inserted attribute
         ('revision_date', 'Revision Date'),  # inserted attribute
@@ -101,6 +102,8 @@ class TestSnapshotBlockConverter(TestCase):
         ('modified_by', 'Last Updated By'),
         ('created_at', 'Created Date'),
         ('folder', "GDrive Folder ID"),
+        ('created_by', 'Created By'),
+
     ]
     ac_roles = db.session.query(all_models.AccessControlRole.name).filter(
         all_models.AccessControlRole.object_type == "Control",

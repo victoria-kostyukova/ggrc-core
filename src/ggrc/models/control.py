@@ -178,7 +178,6 @@ class Control(with_external_created_by.WithExternalCreatedBy,
 
   def log_json(self):
     out_json = super(Control, self).log_json()
-    out_json["created_by"] = ggrc_utils.created_by_stub(self)
     out_json["last_submitted_by"] = ggrc_utils.last_submitted_by_stub(self)
     out_json["last_verified_by"] = ggrc_utils.last_verified_by_stub(self)
     # so that event log can refer to deleted directive

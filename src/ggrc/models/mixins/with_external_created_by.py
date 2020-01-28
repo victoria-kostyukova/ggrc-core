@@ -3,6 +3,7 @@
 
 """ Module for WithExternalCreatedBy mixin."""
 
+from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -11,7 +12,7 @@ from ggrc.models import reflection
 from ggrc.models import utils
 
 
-class WithExternalCreatedBy:
+class WithExternalCreatedBy(object):
   """Mixin for external created_by_id attribute"""
 
   created_by_id = db.Column(db.Integer, nullable=False)
@@ -37,3 +38,15 @@ class WithExternalCreatedBy:
   def created_by(cls):
     """Relationship to user referenced by created_by_id."""
     return utils.person_relationship(cls.__name__, "created_by_id")
+
+  def log_json(self):
+    res = super(WithExternalCreatedBy, self).log_json()
+    res["created_by"] = ggrc_utils.created_by_stub(self)
+    return res
+
+  @classmethod
+  def eager_query(cls, **kwargs):
+    query = super(WithExternalCreatedBy, cls).eager_query(**kwargs)
+    return cls.eager_inclusions(query, cls._include_links).options(
+        orm.joinedload('created_by'),
+    )
