@@ -213,7 +213,8 @@ def init_hook():  # noqa: ignore=C901
 
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)
-  def handle_assessment_put(sender, obj=None, src=None, service=None):
+  def handle_assessment_put(sender, obj=None, src=None, service=None,
+                            initial_state=None):
     """Handles assessment update event."""
     del sender, src, service  # Unused
     common.ensure_field_not_changed(obj, 'audit')

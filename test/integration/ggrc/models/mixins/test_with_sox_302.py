@@ -1095,3 +1095,33 @@ class TestStatusFlowWithSOX302(BaseTestWithSOX302):
     self._check_csv_response(response, {})
     asmt = self._refresh_object(asmt.__class__, asmt_id)
     self._assert_status_field(asmt, end_status)
+
+  def test_sox_302_status_flow_revision(self):
+    """Test status change and right status value in revision."""
+    with ggrc_factories.single_commit():
+      asmt = ggrc_factories.AssessmentFactory(
+          sox_302_enabled=True,
+          status="Not Started",
+      )
+      verifier = ggrc_factories.PersonFactory()
+      asmt.add_person_with_role_name(verifier, "Verifiers")
+    asmt_id = asmt.id
+
+    self._login()
+    response = self.api.put(
+        asmt,
+        {
+            "status": "Completed",
+        },
+    )
+
+    self.assert200(response)
+    asmt = self._refresh_object(asmt.__class__, asmt_id)
+    self._assert_status_field(asmt, "Completed")
+
+    revision_content = all_models.Revision.query.filter_by(
+        resource_type=asmt.type,
+        resource_id=asmt.id,
+        action="modified"
+    ).one().content
+    self.assertEqual(revision_content['status'], "Completed")

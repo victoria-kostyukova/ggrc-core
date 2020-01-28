@@ -14,7 +14,7 @@ from ggrc.models.mixins import rest_handable
 from ggrc.models.mixins import statusable
 
 
-class WithSOX302Flow(rest_handable.WithPutBeforeCommitHandable):
+class WithSOX302Flow(rest_handable.WithPutHandable):
   """Mixin which adds a support of SOX 302 flow."""
 
   @sa_declarative.declared_attr
@@ -118,11 +118,11 @@ class WithSOX302Flow(rest_handable.WithPutBeforeCommitHandable):
     ):
       self.status = statusable.Statusable.FINAL_STATE
 
-  def handle_put_before_commit(self, initial_state):
+  def handle_put(self, initial_state):
     # type: (collections.namedtuple) -> None
-    """Handle `model_put_before_commit` signals.
+    """Handle `model_put` signals.
 
-    This method is called after `model_put_before_commit` signal is being sent.
+    This method is called after `model_put` signal is being sent.
     Triggers SOX 302 status change flow.
 
     Args:

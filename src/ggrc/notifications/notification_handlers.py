@@ -460,8 +460,10 @@ def register_handlers():  # noqa: C901
           " Assessment: %s.\n Error: %s", obj.id, ex.message
       )
 
+  # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(models.Assessment)
-  def assignable_modified_listener(sender, obj=None, src=None, service=None):
+  def assignable_modified_listener(sender, obj=None, src=None, service=None,
+                                   initial_state=None):
     """Listener for modification of assessments."""
     try:
       handle_assignable_modified(obj)
@@ -494,8 +496,10 @@ def register_handlers():  # noqa: C901
           " Assessments: %s.\n Error: %s", object_ids, ex.message
       )
 
+  # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(models.Assessment)
-  def assessment_send_reminder(sender, obj=None, src=None, service=None):
+  def assessment_send_reminder(sender, obj=None, src=None, service=None,
+                               initial_state=None):
     """Assessment put listener."""
     reminder_type = src.get("reminderType", False)
     if reminder_type:

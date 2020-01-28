@@ -255,7 +255,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
     self.decline_datetime = datetime.datetime.utcnow()
     self._add_comment_about(self.STATES.DECLINED, self.decline_reason)
 
-  def handle_put(self):
+  def handle_put(self, initial_state):
     """PUT handler."""
     if self.is_status_changed_to(self.STATES.APPLIED):
       self._apply_proposal()

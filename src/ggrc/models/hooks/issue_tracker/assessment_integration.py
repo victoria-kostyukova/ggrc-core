@@ -2784,7 +2784,9 @@ def _hook_audit_issue_post(sender, objects=None, sources=None):
       tracker_handler.handle_audit_create(audit, issue_info)
 
 
-def _hook_audit_issue_put(sender, obj=None, src=None, service=None):
+# pylint: disable=unused-variable
+def _hook_audit_issue_put(sender, obj=None, src=None, service=None,
+                          initial_state=None):
   """Handle updating audit issue related info."""
   del sender, service
 
