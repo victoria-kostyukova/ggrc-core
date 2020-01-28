@@ -23,7 +23,10 @@ import {
   isSnapshotRelated,
 } from '../../plugins/utils/snapshot-utils';
 import {getAsmtCountForVerify} from '../../plugins/utils/bulk-update-service';
-import {isAllowed} from '../../permission';
+import {
+  isAllowed,
+  isAllowedFor,
+} from '../../permission';
 import template from './templates/tree-actions.stache';
 import pubSub from '../../pub-sub';
 
@@ -35,9 +38,10 @@ export default canComponent.extend({
     define: {
       addItem: {
         type: String,
-        get: function () {
+        get() {
           return (this.attr('options.objectVersion')
-            || this.attr('parentInstance._is_sox_restricted'))
+            || this.attr('parentInstance._is_sox_restricted')
+            || this.isUpdateDenied())
             ? false
             : this.attr('options').add_item_view ||
             this.attr('model').tree_view_options.add_item_view ||
@@ -100,7 +104,10 @@ export default canComponent.extend({
             this.attr('parentInstance.status') === 'Active';
           const isOneTimeWorkfow =
             this.attr('parentInstance.repeat') === 'off';
-          return isActiveWorkflow && isOneTimeWorkfow && isActiveTab;
+          return isActiveWorkflow
+            && isOneTimeWorkfow
+            && isActiveTab
+            && !this.isUpdateDenied();
         },
       },
       showImport: {
@@ -156,6 +163,11 @@ export default canComponent.extend({
         type: 'applySavedSearchPermalink',
         widgetId: this.attr('options.widgetId'),
       });
+    },
+    isUpdateDenied() {
+      const instance = this.attr('parentInstance');
+      return (instance.type === 'Workflow')
+        && !isAllowedFor('update', instance);
     },
   }),
   events: {
