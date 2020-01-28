@@ -70,6 +70,79 @@ def _get_custom_roles(contact_id, model_names):
   return custom_roles_query
 
 
+def _get_tasks_in_cycle(model, contact_id=None):
+  """Filter tasks with current user cycle."""
+  task_query = db.session.query(
+      model.id.label('id'),
+      literal(model.__name__).label('type'),
+      literal(None).label('context_id'),
+  ).join(
+      Cycle,
+      Cycle.id == model.cycle_id
+  ).join(
+      all_models.AccessControlList,
+      sa.and_(
+          all_models.AccessControlList.object_type ==
+          all_models.CycleTaskGroupObjectTask.__name__,
+          all_models.AccessControlList.object_id ==
+          all_models.CycleTaskGroupObjectTask.id,
+      ),
+  ).join(
+      all_models.AccessControlPerson,
+      all_models.AccessControlPerson.ac_list_id ==
+      all_models.AccessControlList.id
+  ).join(
+      all_models.AccessControlRole,
+      sa.and_(
+          all_models.AccessControlRole.id ==
+          all_models.AccessControlList.ac_role_id,
+          all_models.AccessControlRole.object_type ==
+          all_models.CycleTaskGroupObjectTask.__name__,
+          all_models.AccessControlRole.name.in_(
+              ("Task Assignees", "Task Secondary Assignees")),
+      )
+  ).filter(
+      and_(
+          Cycle.is_current == sa.true(),
+          all_models.AccessControlRole.read == sa.true(),
+          all_models.AccessControlRole.internal == sa.false(),
+          all_models.AccessControlPerson.person_id == contact_id,
+      )
+  )
+  return task_query
+
+
+def _get_audits_query(model, contact_id=None):
+  """
+  Filter audits by user permissions for audits and their assessments.
+
+  Get audits for which the user is owner and audits which have
+  assessment where user in creator/assignee/verifier, but not an auditor
+  or an audit captain.
+  """
+  res_asmnt = db.session.query(
+      get_myobjects_query(
+          types=["Assessment"],
+          contact_id=contact_id,
+      ).alias().c.id
+  )
+  res_asmnt = res_asmnt.all()
+  res_asmnt = [el[0] for el in res_asmnt]
+  if not res_asmnt:
+    return None
+
+  audit_query = db.session.query(
+      model.id.label('id'),
+      literal(all_models.Audit.__name__).label('type'),
+      literal(None).label('context_id'),
+  ).filter(
+      all_models.Audit.id == all_models.Assessment.audit_id,
+      all_models.Assessment.id.in_(res_asmnt),
+  )
+
+  return audit_query
+
+
 def get_myobjects_query(types=None, contact_id=None):  # noqa
   """Filters by "myview" for a given person.
 
@@ -83,52 +156,13 @@ def get_myobjects_query(types=None, contact_id=None):  # noqa
   model_names = [model.__name__ for model in type_models]
   type_union_queries = []
 
-  def _get_tasks_in_cycle(model):
-    """Filter tasks with current user cycle."""
-    task_query = db.session.query(
-        model.id.label('id'),
-        literal(model.__name__).label('type'),
-        literal(None).label('context_id'),
-    ).join(
-        Cycle,
-        Cycle.id == model.cycle_id
-    ).join(
-        all_models.AccessControlList,
-        sa.and_(
-            all_models.AccessControlList.object_type ==
-            all_models.CycleTaskGroupObjectTask.__name__,
-            all_models.AccessControlList.object_id ==
-            all_models.CycleTaskGroupObjectTask.id,
-        ),
-    ).join(
-        all_models.AccessControlPerson,
-        all_models.AccessControlPerson.ac_list_id ==
-        all_models.AccessControlList.id
-    ).join(
-        all_models.AccessControlRole,
-        sa.and_(
-            all_models.AccessControlRole.id ==
-            all_models.AccessControlList.ac_role_id,
-            all_models.AccessControlRole.object_type ==
-            all_models.CycleTaskGroupObjectTask.__name__,
-            all_models.AccessControlRole.name.in_(
-                ("Task Assignees", "Task Secondary Assignees")),
-        )
-    ).filter(
-        and_(
-            Cycle.is_current == sa.true(),
-            all_models.AccessControlRole.read == sa.true(),
-            all_models.AccessControlRole.internal == sa.false(),
-            all_models.AccessControlPerson.person_id == contact_id,
-        )
-    )
-    return task_query
-
   def _get_model_specific_query(model):
     """Prepare query specific for a particular model."""
     model_type_query = None
     if model is all_models.CycleTaskGroupObjectTask:
-      model_type_query = _get_tasks_in_cycle(model)
+      model_type_query = _get_tasks_in_cycle(model, contact_id)
+    if model is all_models.Audit:
+      model_type_query = _get_audits_query(model, contact_id)
     return model_type_query
 
   type_union_queries.extend((
