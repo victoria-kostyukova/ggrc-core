@@ -36,3 +36,5 @@ import 'can-validate-legacy/shims/validatejs';
 import 'can-jquery';
 import 'can-jquery/legacy';
 import 'can-map-define';
+import 'can-define/list/list';
+import 'can-define/map/map';

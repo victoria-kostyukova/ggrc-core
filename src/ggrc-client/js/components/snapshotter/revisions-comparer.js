@@ -569,9 +569,14 @@ export default canComponent.extend({
       function extractPeopleIds($grantees) {
         let peopleIds = {};
         $grantees.each(function (i, personInfo) {
-          let personId = $(personInfo)
-            .viewModel().attr('person.id');
-          peopleIds[personId] = true;
+          const person = $(personInfo).viewModel().person;
+
+          // person can be undefined in case when 'revision-comparer' modal
+          // is closed before all content loaded
+          // (that function will be called from 'debounce')
+          if (person) {
+            peopleIds[person.attr('id')] = true;
+          }
         });
         return peopleIds;
       }
@@ -588,7 +593,12 @@ export default canComponent.extend({
       function highlightPersons($grantees, comparisonIds) {
         $grantees.each(function (i, grantee) {
           let $grantee = $(grantee);
-          let personId = $grantee.viewModel().attr('person.id');
+          const person = $grantee.viewModel().person;
+
+          // person can be undefined in case when 'revision-comparer' modal
+          // is closed before all content loaded
+          // (that function will be called from 'debounce')
+          const personId = person && person.attr('id');
 
           if (!(personId in comparisonIds)) {
             $grantee.addClass(HIGHLIGHT_CLASS);

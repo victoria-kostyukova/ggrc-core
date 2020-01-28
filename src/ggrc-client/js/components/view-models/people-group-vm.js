@@ -3,32 +3,45 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import canMap from 'can-map';
-export default canMap.extend({
-  define: {
-    emptyListMessage: {
-      get: function () {
-        return this.attr('showEmptyMessage') ? 'None' : '';
-      },
+import canDefineMap from 'can-define/map/map';
+
+export default canDefineMap.extend({
+  emptyListMessage: {
+    get() {
+      return this.showEmptyMessage ? 'None' : '';
     },
   },
-  showEmptyMessage: true,
-  required: '',
-  people: [],
-  groupId: '',
-  canUnmap: true,
-  instance: {},
-  isLoading: false,
+  showEmptyMessage: {
+    value: true,
+  },
+  required: {
+    value: '',
+  },
+  people: {
+    value: () => [],
+  },
+  groupId: {
+    value: '',
+  },
+  canUnmap: {
+    value: true,
+  },
+  instance: {
+    value: () => ({}),
+  },
+  isLoading: {
+    value: false,
+  },
   unmapablePerson: function () {
     let required;
     let peopleLength;
 
-    if (!this.attr('canUnmap')) {
+    if (!this.canUnmap) {
       return false;
     }
 
-    required = this.attr('required');
-    peopleLength = this.attr('people.length');
+    required = this.required;
+    peopleLength = this.people.length;
 
     if (required) {
       if (peopleLength > 1) {
@@ -42,7 +55,7 @@ export default canMap.extend({
     this.dispatch({
       type: 'unmap',
       person: person,
-      groupId: this.attr('groupId'),
+      groupId: this.groupId,
     });
   },
 });
