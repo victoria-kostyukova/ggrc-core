@@ -9,25 +9,40 @@ import {
   getFormattedUtcDate,
   formatDate,
 } from '../utils/date-utils';
+import moment from 'moment';
 
 describe('GGRC DateUtil', () => {
   describe('getClosestWeekday() method', () => {
-    it('adjusts to Friday when weekend provided', () => {
-      let date = new Date(2017, 11, 24);
-      let actual;
+    it('adjusts to Friday when weekend provided (with moment)', () => {
+      const date = moment({years: 2017, months: 11, date: 24});
 
-      actual = getClosestWeekday(date);
+      const actual = getClosestWeekday(date);
 
-      expect(actual.getDate()).toEqual(22);
+      expect(actual.get('date')).toEqual(22);
     });
 
-    it('leaves date as is when week day provided', () => {
-      let date = new Date(2017, 11, 20);
-      let actual;
+    it('leaves date as is when week day provided (with moment)', () => {
+      const date = moment({years: 2017, months: 11, date: 20});
 
-      actual = getClosestWeekday(date);
+      const actual = getClosestWeekday(date);
 
-      expect(actual.getDate()).toEqual(20);
+      expect(actual.get('date')).toEqual(20);
+    });
+
+    it('adjusts to Friday when weekend provided (with string)', () => {
+      const date = moment('2017-12-24');
+
+      const actual = getClosestWeekday(date);
+
+      expect(actual.get('date')).toEqual(22);
+    });
+
+    it('leaves date as is when week day provided (with string)', () => {
+      const date = moment('2017-12-20');
+
+      const actual = getClosestWeekday(date);
+
+      expect(actual.get('date')).toEqual(20);
     });
   });
 

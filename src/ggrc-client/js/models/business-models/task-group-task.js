@@ -7,7 +7,7 @@ import moment from 'moment';
 import Cacheable from '../cacheable';
 import Workflow from './workflow';
 import TaskGroup from './task-group';
-import {getClosestWeekday} from '../../plugins/utils/date-utils';
+import {getClosestWeekday, DATE_FORMAT} from '../../plugins/utils/date-utils';
 import Contactable from '../mixins/contactable';
 import AccessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
@@ -97,21 +97,23 @@ export default Cacheable.extend({
       },
     },
   },
-  init: function () {
-    // default start and end date
-    let startDate = this.attr('start_date') || new Date();
-    let endDate = this.attr('end_date') ||
-      new Date(moment().add(7, 'days').format());
+  init() {
     if (this._super) {
       this._super(...arguments);
     }
+    // default start and end date
+    const startDate = this.attr('start_date') || moment();
+    const endDate = this.attr('end_date') || moment().add(7, 'days');
 
-    startDate = getClosestWeekday(startDate);
-    endDate = getClosestWeekday(endDate);
+    const formattedStartDate = getClosestWeekday(startDate)
+      .format(DATE_FORMAT.MOMENT_ISO_DATE);
+    const formattedEndDate = getClosestWeekday(endDate)
+      .format(DATE_FORMAT.MOMENT_ISO_DATE);
+
     // Add base values to this property
     this.attr('response_options', []);
-    this.attr('start_date', startDate);
-    this.attr('end_date', endDate);
+    this.attr('start_date', formattedStartDate);
+    this.attr('end_date', formattedEndDate);
   },
   _refresh_workflow_people: function () {
     //  TaskGroupTask assignment may add mappings and role assignments in
