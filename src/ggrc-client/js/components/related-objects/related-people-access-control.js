@@ -57,7 +57,7 @@ const ViewModel = canDefineMap.extend({
     value: false,
   },
   singleUserRoles: {
-    value: Object.freeze({
+    value: () => ({
       Assignee: true,
       Verifier: true,
     }),
