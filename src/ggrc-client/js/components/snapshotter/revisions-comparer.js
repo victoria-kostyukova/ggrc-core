@@ -28,6 +28,7 @@ import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
 import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
+import {setActualGCAs} from '../../plugins/utils/revision-utils';
 
 const HIGHLIGHT_CLASS = 'diff-highlighted';
 
@@ -146,7 +147,7 @@ export default canComponent.extend({
     },
     prepareInstances: function (data) {
       return data.map((value, index) => {
-        let content = value.content;
+        let content = setActualGCAs(value.content, this.attr('instance'));
         let revision = {};
         const proposalContent = this.attr('rightRevision.content');
         const model = businessModels[value.resource_type];
