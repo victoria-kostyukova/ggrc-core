@@ -614,6 +614,12 @@ def project():
 
 
 @pytest.fixture()
+def key_report():
+  """Creates a key report."""
+  return rest_facade.create_key_report()
+
+
+@pytest.fixture()
 def mapped_programs(programs):
   """Creates 2 programs and maps the second program to the first
   one as a child"""
@@ -875,6 +881,12 @@ def app_control():
 def standard():
   """Creates a Standard."""
   return rest_facade.create_standard()
+
+
+@pytest.fixture()
+def regulation():
+  """Creates a Regulation."""
+  return rest_facade.create_regulation()
 
 
 @pytest.fixture()

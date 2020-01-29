@@ -489,9 +489,39 @@ class RegulationModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS, ADMIN)
 
 
+class StandardModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Standards.
+  """
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY)
+
+
 class ProductModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
   fields for Products.
+  """
+  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+
+
+class ProjectModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Projects.
+  """
+  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+
+
+class KeyReportModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Key Reports.
   """
   LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
   DEFAULT_SET_FIELDS = (

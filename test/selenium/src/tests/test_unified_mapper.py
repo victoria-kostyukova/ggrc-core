@@ -60,7 +60,7 @@ class TestProgramPage(base.Test):
         soft_assert)
     soft_assert.assert_expectations()
 
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_map_disabled_obj_to_scope_ojbects_via_add_tab(
           self, obj, soft_assert, selenium):
@@ -89,19 +89,19 @@ class TestDisabledObjectsPage(base.Test):
   @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
                            indirect=True)
   def test_cannot_map_disabled_obj_via_unified_mapper(self, obj, selenium):
-    """Tests that user cannot map disabled object to Scope Objects/Directives
-    via Unified Mapper (existent new scope/directive object)"""
+    """Tests that user cannot map disabled object to Standard/Regulation
+    via Unified Mapper (existent new Standard/Regulation object)."""
     obj_name = objects.get_plural(obj.type)
     service = factory.get_cls_webui_service(obj_name)()
     (service.open_obj_dashboard_tab().tree_view
      .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
-        entities_factory.ProductsFactory().create())
+        entities_factory.StandardsFactory().create())
     browsers.get_browser().windows()[1].use()
     assert not map_modal.is_present, (
         "There should be no modal windows in new browser tab.")
 
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_map_created_disabled_obj_via_um(self, obj,
                                                   soft_assert, selenium):

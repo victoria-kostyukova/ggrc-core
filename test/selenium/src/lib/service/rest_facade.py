@@ -146,6 +146,11 @@ def create_project(**attrs):
   return _create_obj_in_program_scope("Projects", None, **attrs)
 
 
+def create_key_report(**attrs):
+  """Create a key report."""
+  return _create_obj_in_program_scope("KeyReports", None, **attrs)
+
+
 @decorator.check_that_obj_is_created
 def create_user():
   """Create a user"""
@@ -173,9 +178,8 @@ def map_objs(src_obj, dest_obj):
 
   def _is_external(src_obj, dest_obj):
     """Check if one of objects to map is external."""
-    singular_title_external_objs = [
-        objects.get_singular(x, title=True)
-        for x in objects.DISABLED_CONTROLS_RISKS]
+    singular_title_external_objs = [objects.get_singular(x, title=True)
+                                    for x in objects.ALL_DISABLED_OBJECTS]
     objects_list = [src_obj, ]
     dest_ojbect_list = dest_obj if isinstance(dest_obj,
                                               (tuple, list)) else [dest_obj, ]

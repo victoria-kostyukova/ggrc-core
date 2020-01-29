@@ -529,6 +529,23 @@ class ProjectsFactory(EntitiesFactory):
         external_id=self.generate_external_id())
 
 
+class KeyReportsFactory(EntitiesFactory):
+  """Factory class for Key Reports entities."""
+  def __init__(self):
+    super(KeyReportsFactory, self).__init__(objects.KEY_REPORTS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.KEY_REPORT_ADMINS,
+         [users.current_user()])]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Key Report entity with randomly and predictably filled fields,
+     if 'is_add_rest_attrs' then add attributes for REST."""
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id())
+
+
 class OrgGroupsFactory(EntitiesFactory):
   """Factory class for Org Groups entities."""
 
@@ -950,7 +967,3 @@ class ChangeLogItemsFactory(EntitiesFactory):
             src_obj_title=src_obj.title,
             mapped_obj_name=mapped_obj.type,
             mapped_obj_title=mapped_obj.title))
-
-
-class KeyReportsFactory(EntitiesFactory):
-  """"Factory class for Key Reports entities."""

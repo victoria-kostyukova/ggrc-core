@@ -833,6 +833,10 @@ class ProjectEntity(Entity):
         "assignees", "verifiers", **attrs)
 
 
+class KeyReportEntity(Entity):
+  """Class that represent model for Key Report entity."""
+
+
 class OrgGroupEntity(Entity):
   """Class that represent model for Org Group entity."""
 
