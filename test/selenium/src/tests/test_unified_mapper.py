@@ -14,6 +14,7 @@ from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.page.modal import unified_mapper
 from lib.service import webui_service, webui_facade
+from lib.utils import test_utils
 
 
 class TestProgramPage(base.Test):
@@ -60,12 +61,13 @@ class TestProgramPage(base.Test):
         soft_assert)
     soft_assert.assert_expectations()
 
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
                            indirect=True)
-  def test_cannot_map_disabled_obj_to_scope_ojbects_via_add_tab(
+  def test_objects_mapping_via_add_tab_restrictions(
           self, obj, soft_assert, selenium):
-    """Tests that user cannot map disabled object to scope objects/directives
-    via 'Add Tab' menu."""
+    """Tests that user cannot map disabled objects to scope objects/directives
+    and standard/regulation objects to scope/disabled objects via 'Add Tab'
+    menu."""
     info_page = factory.get_cls_webui_service(objects.get_plural(
         obj.type))().open_info_page_of_obj(obj)
     info_page.click_add_tab_btn()
@@ -73,6 +75,8 @@ class TestProgramPage(base.Test):
     for h_item in hidden_items:
       info_page.click_add_tab_btn()
       h_item.click()
+      test_utils.wait_for(lambda: browsers.get_browser().windows()[1]
+                          .url.endswith(url.Widget.INFO))
       soft_assert.expect(webui_facade.are_tabs_urls_equal(),
                          "Tabs urls should be equal.")
       webui_facade.soft_assert_no_modals_present(
