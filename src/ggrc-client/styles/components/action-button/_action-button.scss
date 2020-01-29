@@ -81,14 +81,14 @@
   }
 
   &.btn-darkBlue {
-    background: $createBtn;
-    border-color: $createBtn;
+    background: $darkBlueBtn;
+    border-color: $darkBlueBtn;
     color: $white;
 
     &:hover,
     &:focus,
     &:active {
-      background: mix($white, $createBtn, 30%);
+      background: mix($white, $darkBlueBtn, 30%);
     }
   }
 

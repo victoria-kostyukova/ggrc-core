@@ -15,6 +15,7 @@ import QueryParser from '../../../generated/ggrc-filter-query-parser';
 import SavedSearch from '../../../models/service-models/saved-search';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
 import Control from '../../../models/business-models/control';
+import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 
 describe('tree-view-filter component', () => {
   let viewModel;
@@ -210,6 +211,26 @@ describe('tree-view-filter component', () => {
 
       viewModel.applyAdvancedFilters();
       expect(viewModel.applySavedSearch).not.toHaveBeenCalled();
+    });
+
+    it('should call "setEmailImportSearchId" when ' +
+    '"isSavedSearchFromRoute" is true', () => {
+      spyOn(CurrentPageUtils, 'isMyWork').and.returnValue(true);
+      spyOn(viewModel, 'setEmailImportSearchId');
+      viewModel.applyAdvancedFilters(true);
+      expect(viewModel.setEmailImportSearchId).toHaveBeenCalled();
+    });
+
+    it('should call "cleanUpRoute" and "resetEmailImportSearchId" when ' +
+    '"isSavedSearchFromRoute" is false', () => {
+      spyOn(CurrentPageUtils, 'isMyWork').and.returnValue(true);
+      spyOn(viewModel, 'cleanUpRoute');
+      spyOn(viewModel, 'resetEmailImportSearchId');
+
+      viewModel.applyAdvancedFilters(false);
+
+      expect(viewModel.cleanUpRoute).toHaveBeenCalled();
+      expect(viewModel.resetEmailImportSearchId).toHaveBeenCalled();
     });
   });
 
@@ -648,6 +669,57 @@ describe('tree-view-filter component', () => {
       expect(QueryApiUtils.concatFilters).toHaveBeenCalled();
     });
   });
+
+  describe('setEmailImportSearchId() method', () => {
+    beforeEach(() => {
+      spyOn(NotifierUtils, 'notifier');
+    });
+
+    describe('should set "emailImportSearchId" and call "notifier"', () => {
+      it('when router has "saved_search" and "labels", which equals ' +
+      '"Import Email"', () => {
+        const router = new canMap({
+          saved_search: '1',
+          labels: 'Import Email',
+        });
+
+        viewModel.setEmailImportSearchId(router);
+        expect(viewModel.attr('emailImportSearchId')).toBe(1);
+        expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+          'info',
+          'The filter query refers to the '
+            + 'report you\'ve received on your email.'
+        );
+      });
+    });
+
+    describe('should set "emailImportSearchId" to NULL and NOT call "notifier"',
+      () => {
+        it('when router has "saved_search" and "labels", which does NOT ' +
+        'equal "Import Email"', () => {
+          const router = new canMap({
+            saved_search: '1',
+            labels: 'Export Email',
+          });
+
+          viewModel.setEmailImportSearchId(router);
+          expect(viewModel.attr('emailImportSearchId')).toBe(null);
+          expect(NotifierUtils.notifier).not.toHaveBeenCalled();
+        });
+
+        it('when router does NOT have "saved_search" and "labels", which ' +
+        'equals "Import Email"', () => {
+          const router = new canMap({
+            labels: 'Import Email',
+          });
+
+          viewModel.setEmailImportSearchId(router);
+          expect(viewModel.attr('emailImportSearchId')).toBe(null);
+          expect(NotifierUtils.notifier).not.toHaveBeenCalled();
+        });
+      }
+    );
+  });
 });
 
 describe('loadSavedSearch() function', () => {
@@ -763,7 +835,7 @@ describe('loadSavedSearch() function', () => {
       spyOn(AdvancedSearch, 'parseFilterJson');
 
       treeFunction(viewModel).then(() => {
-        expect(viewModel.applyAdvancedFilters).toHaveBeenCalled();
+        expect(viewModel.applyAdvancedFilters).toHaveBeenCalledWith(true);
         done();
       });
 
