@@ -120,19 +120,16 @@ const buildModifiedListField = (currentField, modifiedItem) => {
 const getValueAndDefinition = (values, definitions, attrId) => {
   const value = values
     .find((val) => val.custom_attribute_id === attrId);
-  const definition = definitions
+  const def = definitions
     .find((def) => def.id === attrId);
 
-  return {
-    value: value,
-    def: definition,
-  };
+  return {value, def};
 };
 
 const getModifiedValue = (modifiedAttr, attr) => {
-  let value = attr.value;
+  let {value, def: {id}} = attr;
 
-  if (!modifiedAttr || !modifiedAttr.attribute_value) {
+  if (!modifiedAttr) {
     return value;
   }
 
@@ -141,7 +138,7 @@ const getModifiedValue = (modifiedAttr, attr) => {
   } else {
     value = {
       attribute_value: modifiedAttr.attribute_value,
-      custom_attribute_id: attr.def.id,
+      custom_attribute_id: id,
     };
   }
 
@@ -153,12 +150,9 @@ const buildModifiedAttValues = (values, definitions, modifiedAttrs) => {
   const valueKeys = values.map((val) => `${val.custom_attribute_id}`);
   const caKeys = canMap.keys(modifiedAttrs);
   const modifiedValues = loUnion(valueKeys, caKeys).map((attrId) => {
-    let attr;
-    let modifiedAttr;
     attrId = Number(attrId);
-
-    attr = getValueAndDefinition(values, definitions, attrId);
-    modifiedAttr = modifiedAttrs[attrId];
+    const attr = getValueAndDefinition(values, definitions, attrId);
+    const modifiedAttr = modifiedAttrs[attrId];
 
     // attr was deleted
     if (!attr.def) {

@@ -7,10 +7,12 @@ import {
   buildRoleACL,
   buildModifiedListField,
   getInstanceView,
+  buildModifiedAttValues,
 } from '../utils/object-history-utils';
 import {makeFakeInstance} from '../../../js_specs/spec-helpers';
 import Vendor from '../../models/business-models/vendor';
 import Risk from '../../models/business-models/risk';
+import canMap from 'can-map';
 
 describe('"buildModifiedACL" method', () => {
   it('should not add duplicates', () => {
@@ -187,5 +189,144 @@ describe('"getInstanceView" method', () => {
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
+  });
+});
+
+describe('"buildModifiedAttValues" method', () => {
+  let values;
+  let definitions;
+
+  beforeEach(() => {
+    values = [
+      {
+        custom_attribute_id: 11,
+        attribute_value: '',
+        someProperty: 'some value 1',
+      },
+      {
+        custom_attribute_id: 22,
+        attribute_value: 'old value 2',
+        someProperty: 'some value 2',
+      },
+      {
+        custom_attribute_id: 33,
+        attribute_value: 'old value 3',
+        someProperty: 'some value 3',
+      },
+    ];
+
+    definitions = [{id: 11}, {id: 22}, {id: 33}];
+  });
+
+  it('should return array without values that have no definitions',
+    () => {
+      const modifiedAttributes = new canMap({});
+      definitions = [{id: 11}, {id: 33}];
+
+      const expectedModifiedValue = [
+        {
+          custom_attribute_id: 11,
+          attribute_value: '',
+          someProperty: 'some value 1',
+        },
+        {
+          custom_attribute_id: 33,
+          attribute_value: 'old value 3',
+          someProperty: 'some value 3',
+        },
+      ];
+
+      const modifiedValues =
+        buildModifiedAttValues(values, definitions, modifiedAttributes);
+
+      expect(modifiedValues).toEqual(expectedModifiedValue);
+    });
+
+  it('should return array without changes if "modifiedAttr" is empty', () => {
+    const modifiedAttributes = new canMap({});
+
+    const expectedModifiedValue = [
+      {
+        custom_attribute_id: 11,
+        attribute_value: '',
+        someProperty: 'some value 1',
+      },
+      {
+        custom_attribute_id: 22,
+        attribute_value: 'old value 2',
+        someProperty: 'some value 2',
+      },
+      {
+        custom_attribute_id: 33,
+        attribute_value: 'old value 3',
+        someProperty: 'some value 3',
+      },
+    ];
+
+    const modifiedValues =
+      buildModifiedAttValues(values, definitions, modifiedAttributes);
+
+    expect(modifiedValues).toEqual(expectedModifiedValue);
+  });
+
+  it(`should return array with modified "attribute_value" fields
+  if fields were empty and became filled`,
+  () => {
+    const modifiedAttributes = new canMap({
+      '11': {attribute_value: 'new value 1'},
+    });
+
+    const expectedModifiedValue = [
+      {
+        custom_attribute_id: 11,
+        attribute_value: 'new value 1',
+      },
+      {
+        custom_attribute_id: 22,
+        attribute_value: 'old value 2',
+        someProperty: 'some value 2',
+      },
+      {
+        custom_attribute_id: 33,
+        attribute_value: 'old value 3',
+        someProperty: 'some value 3',
+      },
+    ];
+
+    const modifiedValues =
+      buildModifiedAttValues(values, definitions, modifiedAttributes);
+
+    expect(modifiedValues).toEqual(expectedModifiedValue);
+  });
+
+  it(`should return array with modified attribute_value
+  if the current field value has changed to another`,
+  () => {
+    const modifiedAttributes = new canMap({
+      '33': {attribute_value: 'new value 3'},
+    });
+
+    const expectedModifiedValue = [
+      {
+        custom_attribute_id: 11,
+        attribute_value: '',
+        someProperty: 'some value 1',
+      },
+      {
+        custom_attribute_id: 22,
+        attribute_value: 'old value 2',
+        someProperty: 'some value 2',
+      },
+      {
+        custom_attribute_id: 33,
+        attribute_value: 'new value 3',
+        someProperty: 'some value 3',
+      },
+    ];
+
+    const modifiedValues =
+      buildModifiedAttValues(values, definitions, modifiedAttributes);
+
+    expect(modifiedValues).toEqual(expectedModifiedValue);
   });
 });

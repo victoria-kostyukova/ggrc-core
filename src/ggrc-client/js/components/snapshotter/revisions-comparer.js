@@ -467,7 +467,7 @@ export default canComponent.extend({
         let value1 = ca1 ? ca1.attribute_value : null;
         if (value0 !== value1) {
           [$ca0, $ca1].forEach(($ca) => {
-            if ($ca && $ca.html() && !$ca.find('.empty-message').length) {
+            if ($ca && $ca.html()) {
               $ca.find('readonly-inline-content').addClass(HIGHLIGHT_CLASS);
             }
           });
