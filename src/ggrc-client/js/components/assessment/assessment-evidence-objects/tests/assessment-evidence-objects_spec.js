@@ -7,6 +7,7 @@ import Component from '../assessment-evidence-objects';
 import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import * as QueryApiUtils from '../../../../plugins/utils/query-api-utils';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
+import Evidence from '../../../../models/business-models/evidence';
 
 describe('assessment-evidence-objects component', () => {
   let viewModel;
@@ -164,14 +165,14 @@ describe('assessment-evidence-objects component', () => {
 
         expect(viewModel.attr('evidenceUrls').serialize())
           .toEqual([
-            {
+            new Evidence({
               kind: 'URL',
               value: 'url1',
-            },
-            {
+            }).serialize(),
+            new Evidence({
               kind: 'URL',
               value: 'url2',
-            },
+            }).serialize(),
           ]);
       });
 
@@ -182,10 +183,10 @@ describe('assessment-evidence-objects component', () => {
 
         expect(viewModel.attr('evidenceFiles').serialize())
           .toEqual([
-            {
+            new Evidence({
               kind: 'FILE',
               value: 'file1',
-            },
+            }).serialize(),
           ]);
       });
     });
