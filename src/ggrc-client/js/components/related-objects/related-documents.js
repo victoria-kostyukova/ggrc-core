@@ -23,6 +23,7 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -39,6 +40,7 @@ export default canComponent.extend({
     documents: [],
     isLoading: false,
     pubSub,
+    pendingDestroy: [],
     define: {
 
       // automatically refresh instance on related document create/remove
@@ -79,7 +81,11 @@ export default canComponent.extend({
       let modelType = this.attr('modelType');
       return batchRequests(query).then((response) => {
         const documents = response[modelType].values;
-        this.attr('documents').replace(documents);
+
+        this.attr('documents').replace(
+          documents.map((document) => this.getDocumentModel(document))
+        );
+
         this.attr('isLoading', false);
       });
     },
@@ -154,34 +160,66 @@ export default canComponent.extend({
         });
     },
     removeRelatedDocument: async function (document) {
-      let self = this;
-      let documents;
-      let relationship = await Relationship.findRelationship(
-        document, this.instance);
-      if (!relationship.id) {
-        console.warn('Unable to find relationship');
+      let documents = this.attr('documents').filter((item) =>
+        item.id !== document.id
+      );
+
+      if (documents.length === this.attr('documents').length) {
+        return $.Deferred().resolve();
+      }
+
+      this.attr('documents', documents);
+      this.addPendingDestroy(document);
+
+      let relationship;
+      try {
+        relationship = await Relationship.findRelationship(
+          document, this.attr('instance'));
+        if (!relationship) {
+          throw new Error();
+        }
+      } catch (e) {
+        notifier('error', 'Unable to find relationship');
+        this.attr('documents').unshift(document);
+        this.removePendingDestroy(document);
+
         return $.Deferred().reject({
           error: 'Unable to find relationship',
         });
       }
 
-      documents = this.attr('documents').filter(function (item) {
-        return item.id !== document.id;
-      });
-
-      this.attr('isLoading', true);
-      this.attr('documents', documents);
-
       return relationship.destroy()
-        .then(function () {
-          self.refreshRelatedDocuments();
+        .fail(() => {
+          notifier(
+            'error',
+            `Unable to remove related document: ${document.title}`
+          );
+          this.attr('documents').unshift(document);
+          this.removePendingDestroy(document);
         })
-        .fail(function (err) {
-          console.error(`Unable to remove related document: ${err}`);
-        })
-        .done(function () {
-          self.attr('isLoading', false);
+        .always(() => {
+          this.removePendingDestroy(document);
         });
+    },
+    addPendingDestroy({id, kind}) {
+      this.attr('isLoading', true);
+      this.attr('pendingDestroy').push({
+        id,
+        kind,
+      });
+    },
+    removePendingDestroy({id, kind}) {
+      const index = this.attr('pendingDestroy')
+        .serialize()
+        .findIndex((document) => document.id === id && document.kind === kind);
+
+      if (index !== -1) {
+        this.attr('pendingDestroy').splice(index, 1);
+      }
+
+      if (!this.attr('pendingDestroy').length) {
+        this.attr('isLoading', false);
+      }
     },
     markDocumentForDeletion: function (document) {
       let documents = this.attr('documents').filter(function (item) {
@@ -222,6 +260,10 @@ export default canComponent.extend({
         pageInstance.type,
         pageInstance.id
       );
+    },
+    getDocumentModel(document) {
+      const Model = businessModels[this.attr('modelType')];
+      return Model.findInCacheById(document.id) || new Model(document);
     },
   }),
   init: function () {

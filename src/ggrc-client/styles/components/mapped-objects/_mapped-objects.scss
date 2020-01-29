@@ -149,8 +149,15 @@
   }
 }
 
-.item-edit-control {
-  margin-bottom: 16px;
+.editable-evidence-item {
+  &.edit-mode {
+    margin-bottom: 16px;
+  }
+
+  &__note {
+    font-style: italic;
+    word-break: break-word;
+  }
 
   &__content {
     padding: 8px 10px;
@@ -184,8 +191,8 @@
   }
 }
 
-.info .item-edit-control {
-  width: 60%;
+.info .editable-evidence-item {
+  max-width: 60%;
 }
 
 .comment-object-item {

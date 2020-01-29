@@ -21,17 +21,20 @@ export default canComponent.extend({
     isEditIconDenied: false,
     isConfirmationNeeded: true,
     onStateChangeDfd: $.Deferred().resolve(),
-    openEditMode() {
+    openEditMode(event) {
       return this.attr('onStateChangeDfd').then(() => {
         if (this.isInEditableState()) {
-          this.dispatch('setEditMode');
+          this.dispatch({
+            ...event,
+            type: 'setEditMode',
+          });
         }
       });
     },
     isInEditableState() {
       return EDITABLE_STATES.includes(this.attr('instance.status'));
     },
-    showConfirm() {
+    showConfirm(event) {
       confirm({
         modal_title: 'Confirm moving Assessment to "In Progress"',
         modal_description: 'You are about to move Assessment from "' +
@@ -40,15 +43,16 @@ export default canComponent.extend({
         button_view: '/modals/prompt-buttons.stache',
       }, () => {
         this.dispatch('setInProgress');
-        this.openEditMode();
+        this.openEditMode(event);
       });
     },
-    confirmEdit() {
+    confirmEdit(event) {
       if (this.attr('isConfirmationNeeded') && !this.isInEditableState()) {
-        this.showConfirm();
+        this.showConfirm(event);
       } else {
         // send 'isLastOpenInline' when inline is opening without confirm
         this.dispatch({
+          ...event,
           type: 'setEditMode',
           isLastOpenInline: true,
         });

@@ -35,6 +35,7 @@ import '../components/review-state/review-state';
 import '../components/redirects/proposable-control/proposable-control';
 import '../components/redirects/external-attribute/external-attribute';
 import '../components/general-page-header/general-page-header';
+import '../components/evidence-item/evidence-item';
 import '../components/inline/inline-form-control';
 import '../components/inline/inline-edit-control';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
