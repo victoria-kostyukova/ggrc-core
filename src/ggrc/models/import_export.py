@@ -64,10 +64,12 @@ class ImportExport(Identifiable, db.Model):
   content = db.Column(mysql.LONGTEXT)
   gdrive_metadata = db.Column('gdrive_metadata', db.Text)
 
-  def log_json(self, is_default=False):
+  def log_json(self, is_default=False, is_export=False):
     """JSON representation"""
     if is_default:
       columns = self.DEFAULT_COLUMNS
+      if is_export:
+        columns.append("results")
     else:
       columns = (column.name for column in self.__table__.columns
                  if column.name not in ('content', 'gdrive_metadata'))
@@ -83,6 +85,11 @@ class ImportExport(Identifiable, db.Model):
         res[column] = getattr(self, column)
 
     return res
+
+  @property
+  def is_export(self):
+    """Checking ie_job is export or not"""
+    return self.job_type == self.EXPORT_JOB_TYPE
 
 
 def create_import_export_entry(**kwargs):
@@ -111,7 +118,8 @@ def get_jobs(job_type, ids=None):
                 ImportExport.job_type == job_type]
   if ids:
     conditions.append(ImportExport.id.in_(ids))
-  return [ie.log_json(is_default=True)
+
+  return [ie.log_json(is_default=True, is_export=ie.is_export)
           for ie in ImportExport.query.filter(*conditions)]
 
 

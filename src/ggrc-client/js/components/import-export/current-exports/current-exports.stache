@@ -18,9 +18,17 @@
   {{#each exports}}
     <div class="flex-box flex-col current-exports__item {{#isDisabled id}}disabled{{/isDisabled}}">
       {{#is(status, "Failed")}}
-        <span class="status-failed">
-          Export failed due to server error. Please try again or contact our support team.
-        </span>
+        {{#if results.errors.length}}
+          <ul class="current-exports__error-list">
+            {{#results.errors}}
+              <li class="status-failed">{{.}}</li>
+            {{/results.errors}}
+          </ul>
+        {{else}}
+          <span class="status-failed">
+            Export failed due to server error. Please try again or contact our support team.
+          </span>
+        {{/if}}
       {{/is}}
       <h4>
         {{firstnonempty title 'export_objects.csv'}}

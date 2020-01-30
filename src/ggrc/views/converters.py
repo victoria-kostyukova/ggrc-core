@@ -24,6 +24,7 @@ from flask import current_app
 from flask import json
 from flask import render_template
 from flask import request
+from sqlalchemy import exc as sa_exc
 from werkzeug import exceptions as wzg_exceptions
 
 
@@ -270,6 +271,7 @@ def make_import(csv_data, dry_run, ie_job=None, bulk_import=False):
 @background_task.queued_task
 def run_export(task):
   """Run export"""
+  info = {'errors': [], 'warnings': []}
   user = login.get_current_user()
   ie_id = task.parameters.get("ie_id")
   objects = task.parameters.get("objects")
@@ -281,6 +283,7 @@ def run_export(task):
     db.session.refresh(ie_job)
     if ie_job.status == "Stopped":
       return utils.make_simple_response()
+    ie_job.results = json.dumps(info)
     ie_job.status = "Finished"
     ie_job.end_at = datetime.utcnow()
     ie_job.content = content
@@ -290,6 +293,18 @@ def run_export(task):
                           ie_job.title, ie_id)
   except models_exceptions.ExportStoppedException:
     logger.info("Export was stopped by user.")
+  except sa_exc.OperationalError as e:
+    db.session.rollback()
+    logger.exception("Export failed: %s", e.message)
+    ie_job = import_export.get(ie_id)
+    ie_job.status = "Failed"
+    info['errors'].append('Too many items. The export cannot be processed. '
+                          'Please contact our support team.')
+    ie_job.results = json.dumps(info)
+    ie_job.end_at = datetime.utcnow()
+    db.session.commit()
+    job_emails.send_email(job_emails.EXPORT_CRASHED_TOO_MANY_ITEMS, user.email)
+    return utils.make_simple_response(e.message)
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
     ie_job = import_export.get(ie_id)
@@ -624,6 +639,7 @@ def handle_export_post(**kwargs):
         status="In Progress",
         title=filename,
         start_at=datetime.utcnow(),
+        results={'errors': [], 'warnings': []}
     )
     run_background_export(ie.id, objects, exportable_objects)
     return make_import_export_response(ie.log_json())
