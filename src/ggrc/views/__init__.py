@@ -768,6 +768,9 @@ def object_browser():
 
 
 @app.route("/admin/reindex_snapshots", methods=["POST"])
+@ggrc_utils.deprecated_endpoint(description=(
+    "Endpoint is deprecated. Please consider using '/admin/reindex' instead."
+))
 @login.login_required
 @login.admin_required
 def admin_reindex_snapshots():
@@ -802,6 +805,9 @@ def admin_reindex():
 
 
 @app.route("/admin/full_reindex", methods=["POST"])
+@ggrc_utils.deprecated_endpoint(description=(
+    "Endpoint is deprecated. Please consider using '/admin/reindex' instead."
+))
 @login.login_required
 @login.admin_required
 def admin_full_reindex():
