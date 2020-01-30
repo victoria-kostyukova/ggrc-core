@@ -500,8 +500,8 @@ class CustomAttributable(CustomAttributableBase):
     """
     Process custom attribute definitions
 
-    If present, delete all related custom attribute definition and insert new
-    custom attribute definitions in the order provided.
+    At the first stage, all CADs that were deleted from the object are deleted.
+    In the second stage, new CADs are added that have been added to the object.
 
     Args:
       definitions: Ordered list of (dict) custom attribute definitions
@@ -513,14 +513,24 @@ class CustomAttributable(CustomAttributableBase):
       return
 
     if self.id is not None:
-      db.session.query(CADef).filter(
-          CADef.definition_id == self.id,
-          CADef.definition_type == self._inflector.table_singular
-      ).delete()
-      db.session.flush()
-      db.session.expire_all()
+      cads_id = [cad.id for cad in self.custom_attribute_definitions]   # noqa pylint: disable=not-an-iterable
+    else:
+      cads_id = []
 
+    definition_cad_ids = [definition.get('id') for definition in definitions]
+    for cad in self.custom_attribute_definitions:   # noqa pylint: disable=not-an-iterable
+      # Remove CAD that is not in the definitions
+      if cad.id not in definition_cad_ids:
+        db.session.query(CADef).filter(CADef.id == cad.id).delete()
+        db.session.commit()
+
+    processed_definitions = []
     for definition in definitions:
+      # Add new CAD that is not in the object
+      if definition.get("id") not in cads_id:
+        processed_definitions.append(definition)
+
+    for definition in processed_definitions:
       definition['context'] = getattr(self, "context", None)
       self.insert_definition(definition)
 
@@ -695,6 +705,7 @@ class CustomAttributable(CustomAttributableBase):
 
     res = super(CustomAttributable, self).log_json()
 
+    definition_type = self._inflector.table_singular  # noqa pylint: disable=protected-access
     if self.custom_attribute_values:
 
       self._values_map_by_custom_attribute = {
@@ -709,7 +720,7 @@ class CustomAttributable(CustomAttributableBase):
       # fetch definitions form database because `self.custom_attribute`
       # may not be populated
       defs = CustomAttributeDefinition.query.filter(
-          CustomAttributeDefinition.definition_type == self._inflector.table_singular,  # noqa # pylint: disable=protected-access
+          CustomAttributeDefinition.definition_type == definition_type,
           CustomAttributeDefinition.id.in_([
               value.custom_attribute_id
               for value in self.custom_attribute_values
@@ -719,8 +730,22 @@ class CustomAttributable(CustomAttributableBase):
       res["custom_attribute_definitions"] = [
           definition.log_json() for definition in defs]
     else:
-      res["custom_attribute_definitions"] = []
-      res["custom_attribute_values"] = []
+      defs = CustomAttributeDefinition.query.filter(
+          sa.and_(
+              CustomAttributeDefinition.definition_type == definition_type,
+              sa.or_(
+                  CustomAttributeDefinition.definition_id == self.id,
+                  CustomAttributeDefinition.definition_id.is_(None)
+              ),
+          )
+      ).all()
+      if defs:
+        res["custom_attribute_definitions"] = [
+            definition.log_json() for definition in defs]
+        res["custom_attribute_values"] = []
+      else:
+        res["custom_attribute_definitions"] = []
+        res["custom_attribute_values"] = []
 
     return res
 

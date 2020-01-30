@@ -670,3 +670,71 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
 
     self.assertIn("created_by", revision.content)
     self.assertEqual(None, revision.content["created_by"])
+
+  def test_assessment_template(self):
+    """Test changes in revision for assessment template with lca"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+
+    lca_1 = {
+        'mandatory': False,
+        'title': 'text_lca',
+        'attribute_type': 'Text',
+        'multi_choice_options': '',
+        'attribute_name': 'Text'
+    }
+    lca_2 = {
+        'mandatory': False,
+        'title': 'new_text_lca',
+        'attribute_type': 'Text',
+        'multi_choice_options': '',
+        'attribute_name': 'Text'
+    }
+    template_data = {
+        'assessment_template': {
+            'issue_tracker': {'enable': False},
+            'audit': {'id': audit.id},
+            'context': {'id': audit.context.id, 'type': 'Context'},
+            'title': 'test_template',
+            'sox_302_enabled': False,
+            'can_use_issue_tracker': False,
+            'custom_attribute_definitions': [lca_1],
+            'default_people': {
+                'verifiers': 'Auditors',
+                'assignees': 'Principal Assignees'
+            },
+            'template_object_type': 'Control',
+            'test_plan_procedure': True,
+            'errors': {}
+        }
+    }
+
+    response = self.api_helper.post(all_models.AssessmentTemplate,
+                                    template_data)
+    self.assert201(response)
+
+    template = all_models.AssessmentTemplate.query.get(
+        response.json['assessment_template']['id']
+    )
+    revision = _get_revisions(template)
+    self.assertEqual(len(revision), 1)
+
+    cad_from_revision = revision[0].content['custom_attribute_definitions']
+    self.assertGreaterEqual(cad_from_revision[0], lca_1)
+
+    response = self.api_helper.put(
+        template,
+        {'custom_attribute_definitions': [lca_1, lca_2]}
+    )
+    self.assert200(response)
+
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == template.id,
+        all_models.Revision.action == 'modified'
+    ).one()
+    cad_from_revision = revision.content['custom_attribute_definitions']
+
+    self.assertEqual(len(cad_from_revision), 2)
+    self.assertGreaterEqual(cad_from_revision[0], lca_1)
+    self.assertGreaterEqual(cad_from_revision[1], lca_2)
+>>>>>>> Add LCA to assessment template revision

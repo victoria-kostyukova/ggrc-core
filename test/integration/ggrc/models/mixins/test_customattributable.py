@@ -540,3 +540,120 @@ class TestCADUpdate(TestCase):
     }
     response = self.api.put(assessment, data=empty_cav_data)
     self.assert200(response)
+
+  def test_create_cad_via_put(self):
+    """Test creation CAD via PUT for Assessment Template"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      template = factories.AssessmentTemplateFactory(audit=audit)
+
+    lca_1 = {
+        'mandatory': False,
+        'title': 'test_lca',
+        'attribute_type': 'Text',
+        'multi_choice_options': '',
+        'attribute_name': 'Text'
+    }
+
+    response = self.api.put(
+        template,
+        {'custom_attribute_definitions': [lca_1]}
+    )
+    self.assert200(response)
+
+  def test_no_changes_cad_id_add(self):
+    """Test no changes CAD id when add CAD to Assessment Template"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      template = factories.AssessmentTemplateFactory(audit=audit)
+      cad_1 = factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca',
+          definition_id=template.id,
+      )
+
+    cad_1 = models.CustomAttributeDefinition.query.get(cad_1.id)
+    cad_2 = {
+        'mandatory': False,
+        'title': 'test_lca_2',
+        'attribute_type': 'Text',
+        'multi_choice_options': '',
+        'attribute_name': 'Text'
+    }
+
+    response = self.api.put(
+        template,
+        {'custom_attribute_definitions': [cad_1, cad_2]}
+    )
+    self.assert200(response)
+
+    updated_cad = models.CustomAttributeDefinition.query.filter(
+        models.CustomAttributeDefinition.definition_id == template.id,
+        models.CustomAttributeDefinition.title == cad_1.title
+    ).one()
+    self.assertEqual(cad_1.id, updated_cad.id)
+
+  def test_no_changes_cad_id_delete(self):
+    """Test no changes CAD id when remove CAD from Assessment Template"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      template = factories.AssessmentTemplateFactory(audit=audit)
+      cad_1 = factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca',
+          definition_id=template.id,
+      )
+      factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca_2',
+          definition_id=template.id,
+      )
+
+    cad_1 = models.CustomAttributeDefinition.query.get(cad_1.id)
+    response = self.api.put(
+        template,
+        {'custom_attribute_definitions': [cad_1]}
+    )
+    self.assert200(response)
+
+    resp_template = response.json['assessment_template']
+    resp_cad = resp_template['custom_attribute_definitions']
+
+    self.assertEqual(len(resp_cad), 1)
+    self.assertEqual(cad_1.id, resp_cad[0]['id'])
+
+  def test_no_changes_cad_id_update(self):
+    """Test no changes CAD id when remove and add CAD to Assessment Template"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      template = factories.AssessmentTemplateFactory(audit=audit)
+      cad_1 = factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca',
+          definition_id=template.id,
+      )
+      factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca_2',
+          definition_id=template.id,
+      )
+
+    cad_1 = models.CustomAttributeDefinition.query.get(cad_1.id)
+    cad_2 = {
+        'mandatory': False,
+        'title': 'test_lca_3',
+        'attribute_type': 'Text',
+        'multi_choice_options': '',
+        'attribute_name': 'Text'
+    }
+    response = self.api.put(
+        template,
+        {'custom_attribute_definitions': [cad_1, cad_2]}
+    )
+    self.assert200(response)
+
+    resp_template = response.json['assessment_template']
+    resp_cad = resp_template['custom_attribute_definitions']
+
+    self.assertEqual(len(resp_cad), 2)
+    self.assertEqual(cad_1.id, resp_cad[0]['id'])
