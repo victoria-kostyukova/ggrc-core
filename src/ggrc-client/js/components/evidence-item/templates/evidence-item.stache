@@ -47,10 +47,12 @@
           >
             {{evidence.title}}
           </a>
-          <div class="editable-evidence-item__note">
-            {{evidence.notes}}
-          </div>
           <span class="date">{{localize_date evidence.updated_at}}</span>
+          {{#if evidence.notes}}
+            <div class="editable-evidence-item__note">
+              <read-more text:from="evidence.notes" />
+            </div>
+          {{/if}}
         </div>
       </div>
     </div>
