@@ -23,7 +23,7 @@ from ggrc.cache import utils as cache_utils
 from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
 from ggrc.integrations.synchronization_jobs import one_time_back_sync
-from ggrc.models import background_task, reflection, revision, ExternalMapping
+from ggrc.models import background_task, reflection, revision
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
@@ -33,6 +33,7 @@ from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
 from ggrc.utils import empty_revisions
 from ggrc.utils.contributed_objects import CONTRIBUTED_OBJECTS
+from ggrc.views import external_mappings  # noqa: F401
 from ggrc.views import saved_searches  # noqa: F401
 from ggrc.views import bulk_operations  # noqa: F401
 from ggrc.views import converters, cron, filters, notifications, registry, \
@@ -302,25 +303,6 @@ def _merge_errors(create_errors, update_errors):
   return errors
 
 
-def create_external_mapping(obj, src):
-  """
-  Creating external mapping object
-  Args:
-    obj: A list of model instances created from the POSTed JSON.
-    src: A list of original POSTed JSON dictionaries.
-  """
-  mapping_data = {
-      "external_type": src["entity_name"],
-      "external_id": src["external_id"],
-      "object_type": obj.type,
-      "object_id": obj.id,
-  }
-
-  mapping = ExternalMapping(**mapping_data)
-  db.session.add(mapping)
-  db.session.commit()
-
-
 @app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
 @background_task.queued_task
 @helpers.without_sqlalchemy_cache
@@ -330,10 +312,7 @@ def update_cad_related_objects(task):
       id=task.parameters.get("event_id")
   ).first()
   model = models.get_model(task.parameters.get("model_name"))
-  if issubclass(model, models.mixins.ExternalCustomAttributable):
-    cad_model = models.all_models.ExternalCustomAttributeDefinition
-  else:
-    cad_model = models.all_models.CustomAttributeDefinition
+  cad_model = models.all_models.CustomAttributeDefinition
   cad = cad_model.query.filter_by(id=event.resource_id).first()
   query = db.session.query(model
                            if task.parameters.get("need_revisions")

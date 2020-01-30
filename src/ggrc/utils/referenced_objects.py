@@ -11,7 +11,6 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.models import inflector
 from ggrc.models.mixins import customattributable as ca
-from ggrc.models.mixins import external_customattributable as e_ca
 
 
 def get(type_, id_, raise_exception=False):
@@ -122,14 +121,7 @@ def _skip_cads(type_, query, skip_cad=False, **_):
             "CustomAttributeDefinition_complete"
         )
     )
-  if issubclass(type_, e_ca.ExternalCustomAttributable) and not skip_cad:
-    query = query.options(
-        orm.Load(type_).subqueryload(
-            "custom_attribute_definitions"
-        ).undefer_group(
-            "ExternalCustomAttributeDefinition_complete"
-        )
-    )
+
   return query
 
 

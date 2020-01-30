@@ -17,11 +17,13 @@ from ggrc.models import reflection
 from ggrc.models import utils
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import with_external_created_by
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.relationship import Relatable
 
 
-class Risk(synchronizable.Synchronizable,
+class Risk(with_external_created_by.WithExternalCreatedBy,
+           synchronizable.Synchronizable,
            synchronizable.RoleableSynchronizable,
            mixins.CustomAttributable,
            Relatable,
@@ -40,20 +42,14 @@ class Risk(synchronizable.Synchronizable,
   # GGRCQ attributes
   external_id = db.Column(db.Integer, nullable=False)
   due_date = db.Column(db.Date, nullable=True)
-  created_by_id = db.Column(db.Integer, nullable=False)
   review_status = deferred(db.Column(db.String, nullable=True), "Risk")
   review_status_display_name = deferred(db.Column(db.String, nullable=True),
                                         "Risk")
 
-  # pylint: disable=no-self-argument
-  @declared_attr
-  def created_by(cls):
-    """Relationship to user referenced by created_by_id."""
-    return utils.person_relationship(cls.__name__, "created_by_id")
-
   last_submitted_at = db.Column(db.DateTime, nullable=True)
   last_submitted_by_id = db.Column(db.Integer, nullable=True)
 
+  # pylint: disable=no-self-argument
   @declared_attr
   def last_submitted_by(cls):
     """Relationship to user referenced by last_submitted_by_id."""
@@ -63,6 +59,7 @@ class Risk(synchronizable.Synchronizable,
   last_verified_at = db.Column(db.DateTime, nullable=True)
   last_verified_by_id = db.Column(db.Integer, nullable=True)
 
+  # pylint: disable=no-self-argument
   @declared_attr
   def last_verified_by(cls):
     """Relationship to user referenced by last_verified_by_id."""
@@ -140,7 +137,6 @@ class Risk(synchronizable.Synchronizable,
   ]
 
   _custom_publish = {
-      'created_by': ggrc_utils.created_by_stub,
       'last_submitted_by': ggrc_utils.last_submitted_by_stub,
       'last_verified_by': ggrc_utils.last_verified_by_stub,
   }
@@ -152,8 +148,6 @@ class Risk(synchronizable.Synchronizable,
       'vulnerability',
       'external_id',
       'due_date',
-      reflection.ExternalUserAttribute('created_by',
-                                       force_create=True),
       reflection.ExternalUserAttribute('last_submitted_by',
                                        force_create=True),
       reflection.ExternalUserAttribute('last_verified_by',
@@ -206,10 +200,6 @@ class Risk(synchronizable.Synchronizable,
           "display_name": "Due Date",
           "mandatory": False,
       },
-      "created_by": {
-          "display_name": "Created By",
-          "mandatory": False,
-      },
       "last_submitted_at": {
           "display_name": "Last Owner Reviewed Date",
           "mandatory": False,
@@ -230,7 +220,6 @@ class Risk(synchronizable.Synchronizable,
 
   def log_json(self):
     res = super(Risk, self).log_json()
-    res["created_by"] = ggrc_utils.created_by_stub(self)
     res["last_submitted_by"] = ggrc_utils.last_submitted_by_stub(self)
     res["last_verified_by"] = ggrc_utils.last_verified_by_stub(self)
     return res

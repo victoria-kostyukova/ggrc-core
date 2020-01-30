@@ -14,8 +14,6 @@ owner_base = [
     "Option",
     "CustomAttributeDefinition",
     "CustomAttributeValue",
-    "ExternalCustomAttributeDefinition",
-    "ExternalCustomAttributeValue",
     "NotificationConfig",
 ]
 owner_read = owner_base + [

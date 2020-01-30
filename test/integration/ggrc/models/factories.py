@@ -30,14 +30,6 @@ from ggrc.access_control import roleable
 from integration.ggrc.models.model_factory import ModelFactory
 
 
-def is_external_custom_attributable(_type):
-  """Check whether given _type is ExternalCustomAttributable"""
-  from ggrc.models import get_model
-  from ggrc.models.mixins import external_customattributable
-  return issubclass(get_model(_type),
-                    external_customattributable.ExternalCustomAttributable)
-
-
 def random_str(length=8, prefix="", chars=None, suppress_whitespace=True):
   """Generate random string.
 
@@ -126,15 +118,8 @@ class WithACLandCAFactory(ModelFactory):
             attribute_object_id=cav.get("attribute_object_id"),
             custom_attribute_id=cav.get("custom_attribute_id"),
         ))
-      elif isinstance(instance, all_models.mixins.ExternalCustomAttributable):
-        db.session.add(all_models.ExternalCustomAttributeValue(
-            attributable=instance,
-            attribute_value=cav.get("attribute_value"),
-            custom_attribute_id=cav.get("custom_attribute_id"),
-        ))
 
-    if isinstance(instance, (all_models.CustomAttributeValue,
-                             all_models.ExternalCustomAttributeValue)):
+    if isinstance(instance, all_models.CustomAttributeValue):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
       cls._log_event(instance)
@@ -163,15 +148,16 @@ class CustomAttributeDefinitionFactory(TitledFactory):
     """Assert definition_type"""
     model = get_model(kwargs.get('definition_type'))
     if issubclass(model, synchronizable.Synchronizable):
+
       if "external_id" in kwargs:
-        external_id = kwargs.pop("external_id")
+        external_id = int(kwargs.pop("external_id"))
       else:
         external_id = SynchronizableExternalId.next()
 
-      if "entity_name" in kwargs:
-        entity_name = kwargs.pop("entity_name")
+      if "external_type" in kwargs:
+        external_type = kwargs.pop("external_type")
       else:
-        entity_name = "{}_{}_123".format(target_class.type, external_id)
+        external_type = "custom_attribute_definition"
 
     cad = super(CustomAttributeDefinitionFactory, cls)._create(
         target_class,
@@ -180,10 +166,10 @@ class CustomAttributeDefinitionFactory(TitledFactory):
     )
     if issubclass(model, synchronizable.Synchronizable):
       cad._external_info = ExternalMappingFactory(
-          external_id=external_id,
+          external_id=int(external_id),
           object_type=target_class.type,
-          external_type=entity_name,
-          object_id=cad.id
+          external_type=external_type,
+          object_id=int(cad.id)
       )
 
     return cad
@@ -201,57 +187,23 @@ class CustomAttributeValueFactory(ModelFactory):
   attribute_object_id = None
 
 
-class ExternalCustomAttributeDefinitionFactory(TitledFactory):
-
-  class Meta:
-    model = all_models.ExternalCustomAttributeDefinition
-
-  definition_type = None
-  attribute_type = "Text"
-  multi_choice_options = None
-
-  @classmethod
-  def _generate_id(cls, _id=None):
-    """Return id next after biggest or provided as _id argument"""
-    if _id:
-      if _id > getattr(cls, "_biggest_id", 0):
-        cls._biggest_id = _id
-      return _id
-    else:
-      cls._biggest_id = getattr(cls, "_biggest_id", 0) + 1
-      return cls._biggest_id
-
-  @classmethod
-  def _create(cls, target_class, *args, **kwargs):
-    """Assign id attribute since it is not autoincremental"""
-    assert is_external_custom_attributable(kwargs["definition_type"]), \
-        "Please use CustomAttributeDefinitionFactory"
-    ecad_id = cls._generate_id(kwargs.pop('id', None))
-    ecad_external_id = kwargs.pop('external_id', ecad_id + 1)
-    return super(ExternalCustomAttributeDefinitionFactory, cls)._create(
-        target_class,
-        id=ecad_id,
-        external_id=ecad_external_id,
-        *args,
-        **kwargs
-    )
-
-
-class ExternalCustomAttributeValueFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.ExternalCustomAttributeValue
-
-  custom_attribute = None
-  attributable_id = None
-  attributable_type = None
-  attribute_value = None
-
-
 class DirectiveFactory(TitledFactory):
 
   class Meta:
     model = all_models.Directive
+
+
+class PersonFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.Person
+
+  email = factory.LazyAttribute(
+      lambda _: random_str(chars=string.ascii_letters) + "@example.com"
+  )
+  name = factory.LazyAttribute(
+      lambda _: random_str(prefix="Person", chars=string.ascii_letters)
+  )
 
 
 class ControlFactory(TitledFactory):
@@ -264,6 +216,8 @@ class ControlFactory(TitledFactory):
   external_id = factory.LazyAttribute(lambda m:
                                       SynchronizableExternalId.next())
   external_slug = factory.LazyAttribute(lambda m: random_str())
+  created_by = factory.SubFactory(PersonFactory)
+  created_by_id = factory.SelfAttribute("created_by.id")
   review_status = all_models.Review.STATES.UNREVIEWED
   review_status_display_name = "some status"
 
@@ -391,23 +345,6 @@ class RelationshipFactory(ModelFactory):
     """Create a relationship with randomly shuffled source and destination."""
     obj1, obj2 = random.sample(args, 2)
     return cls(source=obj1, destination=obj2)
-
-
-class PersonFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.Person
-
-  email = factory.LazyAttribute(
-      lambda _: random_str(chars=string.ascii_letters) + "@example.com"
-  )
-  name = factory.LazyAttribute(
-      lambda _: random_str(prefix="Person")
-  )
-
-  name = factory.LazyAttribute(
-      lambda _: random_str(chars=string.ascii_letters)
-  )
 
 
 class CommentFactory(ModelFactory):

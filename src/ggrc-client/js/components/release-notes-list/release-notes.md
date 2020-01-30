@@ -1,6 +1,8 @@
-[//]: <> (updated 01/10/2020)
+[//]: <> (updated 02/24/2020)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
+
+## Disable scope objects in the old interface (v2.25.0, 02/24/2020)
 
 ## An access to the maintenance schedules from the UI (v2.24.0, 01/10/2020)
 
@@ -123,6 +125,10 @@ Our product team is working hard to engineer compliance @ scale and make your da
 ## Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)
 
 ## Performance improvements
+
+### Disable scope objects in the old interface (v2.25.0, 02/24/2020)
+
+From now, you cannot create, update, delete and deprecate scope objects in the old interface. You can do it only in the new interface. But you still can view the scope objects in the old interface. The scope objects include: System, Product, Process, Market, Data Asset, Facility, Org Group, Metric, Technology Environment, Product Group, Projects, Vendors, Access Groups, Key Report, Account Balance.
 
 ### An access to the maintenance schedules from the UI (v2.24.0, 01/10/2020)
 

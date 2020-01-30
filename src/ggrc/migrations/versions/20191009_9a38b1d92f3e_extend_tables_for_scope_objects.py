@@ -30,6 +30,7 @@ def upgrade():
                                   autoincrement=False, nullable=True))
     op.add_column(name, sa.Column('external_slug', sa.String(255),
                                   autoincrement=False, nullable=True))
+    op.add_column(name, sa.Column('created_by_id', sa.Integer, nullable=True))
     op.create_unique_constraint('uq_external_id', name, ['external_id'])
     op.create_unique_constraint('uq_external_slug', name, ['external_slug'])
 

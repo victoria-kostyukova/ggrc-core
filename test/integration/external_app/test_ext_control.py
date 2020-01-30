@@ -101,7 +101,7 @@ class TestSyncServiceControl(TestCase):
         "multi_choice_mandatory": None,
         "multi_choice_options": "",
         "placeholder": "Placeholder",
-        "selfLink": "/api/external_custom_attribute_definitions/1",
+        "selfLink": "/api/custom_attribute_definitions/1",
         "title": "Attribute title",
         "type": "CustomAttributeDefinition",
         "updated_at": "2019-08-05T07:44:23",
@@ -127,7 +127,7 @@ class TestSyncServiceControl(TestCase):
         "custom_attribute_id": 444,
         "modified_by": None,
         "preconditions_failed": None,
-        "type": "ExternalCustomAttributeValue",
+        "type": "CustomAttributeValue",
         "updated_at": "2019-08-05T07:45:19",
     }
 

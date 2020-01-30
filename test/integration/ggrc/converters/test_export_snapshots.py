@@ -166,6 +166,7 @@ class TestExportSnapshots(TestCase):
     control_dicts = {
         control.slug: self._control_dict({
             # normal fields
+
             "Code": "*" + control.slug,
             "Revision Date":
                 snapshot.revision.created_at.strftime(DATE_FORMAT_US),
@@ -182,6 +183,7 @@ class TestExportSnapshots(TestCase):
             "Assertions": u",".join(json.loads(control.assertions)),
 
             'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+            "Created By": u"{}".format(control.created_by.email),
             'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
         })
         for snapshot, control in zip(snapshots, controls)
@@ -342,6 +344,7 @@ class TestExportSnapshots(TestCase):
           "Audit": audit.slug,
           "Assertions": u",".join(json.loads(control.assertions)),
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),
+          "Created By": control.created_by.email,
           'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           "Archived": u"yes" if audit.archived else u"no",
       })

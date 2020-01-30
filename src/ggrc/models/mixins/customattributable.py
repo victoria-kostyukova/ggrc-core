@@ -27,7 +27,7 @@ logger = getLogger(__name__)
 
 # pylint: disable=attribute-defined-outside-init; CustomAttributable is a mixin
 class CustomAttributableBase(object):
-  """CustomAttributable and ExternalCustomAttributable base class"""
+  """CustomAttributable base class."""
   _api_attrs = reflection.ApiAttributes(
       'custom_attribute_values',
       reflection.Attribute('custom_attribute_definitions',

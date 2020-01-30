@@ -102,10 +102,7 @@ def _get_custom_attribute_dict():
   """
   # pylint: disable=protected-access
   cads = defaultdict(list)
-
   _gather_cads_of(Types.internal_types(), cads)
-  _gather_cads_of(Types.external_types(), cads,
-                  cad_model=models.ExternalCustomAttributeDefinition)
 
   return cads
 

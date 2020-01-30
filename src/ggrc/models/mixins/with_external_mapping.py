@@ -49,7 +49,7 @@ class WithExternalMapping(object):
     return None
 
   @property
-  def entity_type(self):
+  def external_type(self):
     """External type getter"""
     if self._external_info:
       return self._external_info.external_type

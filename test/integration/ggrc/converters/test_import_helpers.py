@@ -653,6 +653,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "GDrive Folder ID",
+        "Created By",
     }
 
     # Control has additional mandatory field - Assertions

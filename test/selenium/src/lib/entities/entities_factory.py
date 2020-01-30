@@ -339,7 +339,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
           attrs["definition_type"].capitalize(),
           attrs["attribute_type"]
       )
-      attrs["entity_name"] = objects.get_normal_form(
+      attrs["external_type"] = objects.get_normal_form(
           objects.get_singular(objects.CUSTOM_ATTRIBUTES)).replace(" ", "")
     obj = self.obj_inst()
     obj.update_attrs(is_allow_none=False, **attrs)

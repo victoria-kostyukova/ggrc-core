@@ -127,11 +127,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     for ca_value in self.row_converter.obj.custom_attribute_values:
       if ca_value.custom_attribute_id == ca_definition.id:
         return ca_value
-    if isinstance(self.row_converter.obj,
-                  models.mixins.ExternalCustomAttributable):
-      cav = models.all_models.ExternalCustomAttributeValue
-    else:
-      cav = models.all_models.CustomAttributeValue
+    cav = models.all_models.CustomAttributeValue
     ca_value = cav(
         custom_attribute=ca_definition,
         attributable=self.row_converter.obj,

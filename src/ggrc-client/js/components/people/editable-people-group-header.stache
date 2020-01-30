@@ -33,7 +33,6 @@
           {{else}}
             <external-control
               instance:from="instance"
-              attrName:from="'linkAttrName'"
             ></external-control>
           {{/if}}
         </role-attr-names-provider>

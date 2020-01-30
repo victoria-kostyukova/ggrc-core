@@ -27,8 +27,7 @@ class ModelFactory(factory.Factory, object):
   def _create(cls, target_class, *args, **kwargs):
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
-    if isinstance(instance, (models.CustomAttributeValue,
-                             models.ExternalCustomAttributeValue)):
+    if isinstance(instance, models.CustomAttributeValue):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
       cls._log_event(instance)

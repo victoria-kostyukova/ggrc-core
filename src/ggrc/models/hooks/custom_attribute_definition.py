@@ -5,8 +5,9 @@
 
 from ggrc import models, views
 from ggrc.services import signals
-from ggrc.models import get_model
 from ggrc.models import custom_attribute_definition as cad
+from ggrc.models import external_mapper
+from ggrc.models import get_model
 from ggrc.models.mixins import synchronizable
 
 
@@ -18,10 +19,6 @@ def init_hook():
       models.all_models.CustomAttributeDefinition)
   @signals.Restful.model_posted_after_commit.connect_via(
       models.all_models.CustomAttributeDefinition)
-  @signals.Restful.model_put_after_commit.connect_via(
-      models.all_models.ExternalCustomAttributeDefinition)
-  @signals.Restful.model_posted_after_commit.connect_via(
-      models.all_models.ExternalCustomAttributeDefinition)
   def handle_cad_creating_editing(sender, obj=None, src=None, service=None,
                                   event=None, initial_state=None):
     """Make reindex without creating revisions for related objects after
@@ -72,4 +69,4 @@ def init_hook():
     """
     model = get_model(obj.definition_type)
     if issubclass(model, synchronizable.Synchronizable):
-      views.create_external_mapping(obj, src)
+      external_mapper.create_external_mapping(obj, src)
