@@ -193,6 +193,19 @@ class DirectiveFactory(TitledFactory):
     model = all_models.Directive
 
 
+class PersonFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.Person
+
+  email = factory.LazyAttribute(
+      lambda _: random_str(chars=string.ascii_letters) + "@example.com"
+  )
+  name = factory.LazyAttribute(
+      lambda _: random_str(prefix="Person", chars=string.ascii_letters)
+  )
+
+
 class ControlFactory(TitledFactory):
 
   class Meta:
@@ -203,6 +216,8 @@ class ControlFactory(TitledFactory):
   external_id = factory.LazyAttribute(lambda m:
                                       SynchronizableExternalId.next())
   external_slug = factory.LazyAttribute(lambda m: random_str())
+  created_by = factory.SubFactory(PersonFactory)
+  created_by_id = factory.SelfAttribute("created_by.id")
   review_status = all_models.Review.STATES.UNREVIEWED
   review_status_display_name = "some status"
 
@@ -330,23 +345,6 @@ class RelationshipFactory(ModelFactory):
     """Create a relationship with randomly shuffled source and destination."""
     obj1, obj2 = random.sample(args, 2)
     return cls(source=obj1, destination=obj2)
-
-
-class PersonFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.Person
-
-  email = factory.LazyAttribute(
-      lambda _: random_str(chars=string.ascii_letters) + "@example.com"
-  )
-  name = factory.LazyAttribute(
-      lambda _: random_str(prefix="Person")
-  )
-
-  name = factory.LazyAttribute(
-      lambda _: random_str(chars=string.ascii_letters)
-  )
 
 
 class CommentFactory(ModelFactory):
