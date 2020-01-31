@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""This module handles bulk assessment update notifications"""
+"""This module handles bulk assessment update notifications."""
 from ggrc import db
 from ggrc import login
 from ggrc import settings
@@ -15,7 +15,7 @@ BULK_UPDATE_TITLE = "Bulk update of Assessments is finished"
 
 
 def _create_notif_data(assessments):
-  """Create data in format applicable for template rendering"""
+  """Create data in format applicable for template rendering."""
   result = [
       {"title": assessment.title,
        "url": get_object_url(assessment)} for assessment in assessments
@@ -23,9 +23,19 @@ def _create_notif_data(assessments):
   return result
 
 
+def _create_notif_data_was_deleted(assessments_ids):
+  """Create data in format applicable for template rendering
+  for asmnts, deleted during bulk operation."""
+  result = [
+      {"id": assessments_id} for assessments_id in assessments_ids
+  ]
+  return result
+
+
 def send_notification(update_errors, partial_errors, asmnt_ids):
   """Send bulk complete job finished."""
 
+  # pylint: disable=too-many-locals
   not_updated_asmnts = []
   if update_errors:
     not_updated_asmnts = db.session.query(all_models.Assessment).filter(
@@ -48,10 +58,19 @@ def send_notification(update_errors, partial_errors, asmnt_ids):
         all_models.Assessment.id.in_(success_ids)
     ).all()
 
+  # check whether any asmnt was deleted during bulk operation
+  deleted_asmnts = []
+
+  if len(success_asmnts) != len(success_ids):
+    revisited_success_asmnts = [asmnt.id for asmnt in success_asmnts]
+    deleted_asmnts = [idx for idx in success_ids
+                      if idx not in revisited_success_asmnts]
+
   bulk_data = {
       "update_errors": _create_notif_data(not_updated_asmnts),
       "partial_errors": _create_notif_data(partially_upd_asmnts),
       "succeeded": _create_notif_data(success_asmnts),
+      "deleted": _create_notif_data_was_deleted(deleted_asmnts),
   }
   body = settings.EMAIL_BULK_COMPLETE.render(sync_data=bulk_data)
   common.send_email(login.get_current_user().email, BULK_UPDATE_TITLE, body)

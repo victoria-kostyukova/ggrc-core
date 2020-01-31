@@ -18,7 +18,7 @@ class AssessmentStub(object):
     self.urls = []
     self.comments = []
     self.cavs = {}
-    self.slug = ""
+    self.slug = u""
     self.needs_verification = False
 
   def __str__(self):
