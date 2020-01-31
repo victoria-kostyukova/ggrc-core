@@ -6,6 +6,9 @@
 
 import re
 import time
+
+import inflection
+
 from lib import base
 from lib.app_entity_factory import entity_factory_common
 from lib.constants import (
@@ -98,7 +101,7 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     """Returns object's status label element."""
     return page_elements.StatusLabel(
         self._root.element(class_name=re.compile("state-value state")),
-        with_inline_edit=(self.child_cls_name.lower()
+        with_inline_edit=(inflection.underscore(self.child_cls_name)
                           in objects.ALL_DISABLED_OBJECTS))
 
   def status(self):
