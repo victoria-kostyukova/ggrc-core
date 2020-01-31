@@ -114,20 +114,23 @@ class Risk(with_external_created_by.WithExternalCreatedBy,
       'threat_event',
       'vulnerability',
       'review_status_display_name',
-      attributes.DateFullTextAttr('due_date', 'due_date'),
-      attributes.DatetimeFullTextAttr('last_submitted_at',
-                                      'last_submitted_at'),
-      attributes.DatetimeFullTextAttr('last_verified_at',
-                                      'last_verified_at'),
-      attributes.FullTextAttr(
-          "created_by",
-          "created_by",
-          ["email", "name"]
+
+      attributes.DateFullTextAttr(
+          'due_date',
+          'due_date',
+      ),
+      attributes.DatetimeFullTextAttr(
+          'last_submitted_at',
+          'last_submitted_at',
       ),
       attributes.FullTextAttr(
           "last_submitted_by",
           "last_submitted_by",
           ["email", "name"]
+      ),
+      attributes.DatetimeFullTextAttr(
+          'last_verified_at',
+          'last_verified_at',
       ),
       attributes.FullTextAttr(
           "last_verified_by",

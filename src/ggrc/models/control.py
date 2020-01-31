@@ -132,11 +132,6 @@ class Control(with_external_created_by.WithExternalCreatedBy,
           "due_date",
           "due_date",
       ),
-      attributes.FullTextAttr(
-          "created_by",
-          "created_by",
-          ["email", "name"],
-      ),
       attributes.DatetimeFullTextAttr(
           "last_submitted_at",
           "last_submitted_at",

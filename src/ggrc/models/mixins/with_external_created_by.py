@@ -8,12 +8,13 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
 from ggrc import utils as ggrc_utils
+from ggrc.fulltext import attributes
 from ggrc.models import reflection
 from ggrc.models import utils
 
 
 class WithExternalCreatedBy(object):
-  """Mixin for external created_by_id attribute"""
+  """Mixin which adds external `created_by_id` attribute."""
 
   created_by_id = db.Column(db.Integer, nullable=False)
 
@@ -33,20 +34,45 @@ class WithExternalCreatedBy(object):
       },
   }
 
-  # pylint: disable=no-self-argument
+  _fulltext_attrs = [
+      attributes.FullTextAttr(
+          "created_by",
+          "created_by",
+          ["email", "name"],
+      ),
+  ]
+
   @declared_attr
-  def created_by(cls):
-    """Relationship to user referenced by created_by_id."""
+  def created_by(cls):  # pylint: disable=no-self-argument
+    """Relationship to user referenced by `created_by_id`."""
     return utils.person_relationship(cls.__name__, "created_by_id")
 
   def log_json(self):
+    """Return JSON representation of the instance."""
     res = super(WithExternalCreatedBy, self).log_json()
     res["created_by"] = ggrc_utils.created_by_stub(self)
     return res
 
   @classmethod
   def eager_query(cls, **kwargs):
+    """Return `sqlalchemy.Query` with eagerly loaded `created_by`."""
     query = super(WithExternalCreatedBy, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, cls._include_links).options(
-        orm.joinedload('created_by'),
+        orm.joinedload(
+            "created_by",
+        ),
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    """Return `sqlalchemy.Query` with eagerly loaded `created_by`."""
+    query = super(WithExternalCreatedBy, cls).indexed_query()
+    return query.options(
+        orm.Load(cls).joinedload(
+            "created_by",
+        ).load_only(
+            "id",
+            "email",
+            "name",
+        ),
     )
