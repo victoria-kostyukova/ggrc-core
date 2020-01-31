@@ -20,6 +20,10 @@ describe('tree-actions component', () => {
   });
 
   describe('addItem get() method', () => {
+    beforeEach(() => {
+      spyOn(vm, 'isUpdateDenied').and.returnValue(false);
+    });
+
     describe('if there is options.objectVersion', () => {
       beforeEach(() => {
         vm.attr('options', {objectVersion: {data: 1}});
@@ -58,6 +62,13 @@ describe('tree-actions component', () => {
       vm.attr('parentInstance', {_is_sox_restricted: true});
       expect(vm.attr('addItem')).toBe(false);
     });
+
+    it('if user doesn\'t have permissions for update returns false',
+      () => {
+        vm.isUpdateDenied.and.returnValue(true);
+
+        expect(vm.attr('addItem')).toBe(false);
+      });
   });
 
   describe('isSnapshot get() method', () => {
@@ -309,5 +320,46 @@ describe('tree-actions component', () => {
         });
       });
     });
+  });
+
+  describe('isUpdateDenied() method', () => {
+    beforeEach(() => {
+      spyOn(Permission, 'isAllowedFor');
+    });
+
+    it('return false if parentInstance type doesn\'t equal "Workflow"', () => {
+      vm.attr('parentInstance', {
+        type: 'test_type',
+      });
+
+      const result = vm.isUpdateDenied();
+
+      expect(result).toBe(false);
+    });
+
+    it('return false if user have permission for update Workflow', () => {
+      Permission.isAllowedFor.and.returnValue(true);
+
+      vm.attr('parentInstance', {
+        type: 'Workflow',
+      });
+
+      const result = vm.isUpdateDenied();
+
+      expect(result).toBe(false);
+    });
+
+    it('return true if user doesn\'t have permission for update Workflow',
+      () => {
+        Permission.isAllowedFor.and.returnValue(false);
+
+        vm.attr('parentInstance', {
+          type: 'Workflow',
+        });
+
+        const result = vm.isUpdateDenied();
+
+        expect(result).toBe(true);
+      });
   });
 });
