@@ -298,19 +298,18 @@ class TestPeopleMentions(TestCase):
                                             expected_title, body)
 
   @mock.patch("ggrc.notifications.common.send_email")
-  # pylint: disable=no-self-use
-  def test_assessment_comment(self, send_email_mock):
+  def test_assessment_comment(self, send_email_mock):  # noqa pylint: disable=no-self-use
     """Test mention in assessment comment"""
     with factories.single_commit():
       person = factories.PersonFactory(email="author@example.com")
       assessment = factories.AssessmentFactory(title='Assessment_1')
       comment = factories.CommentFactory(
           description=u"One <a href=\"mailto:user@example.com\"></a>",
+          modified_by_id=person.id,
+          created_at=datetime.datetime(2020, 1, 20, 13, 27, 00)
       )
-      comment.modified_by_id = person.id
-      comment.created_at = datetime.datetime(2020, 1, 20, 13, 27, 00)
-      url = urljoin(get_url_root(), utils.view_url_for(assessment))
 
+    url = urljoin(get_url_root(), utils.view_url_for(assessment))
     people_mentions.handle_comment_mapped(assessment, [comment])
     expected_title = (u"author@example.com mentioned you "
                       u"on a comment within Assessment_1")
@@ -327,8 +326,7 @@ class TestPeopleMentions(TestCase):
                                             expected_title, body)
 
   @mock.patch("ggrc.notifications.common.send_email")
-  # pylint: disable=no-self-use
-  def test_mention_in_propose_change(self, send_email_mock):
+  def test_mention_in_propose_change(self, send_email_mock):  # noqa pylint: disable=no-self-use
     """Test mention a person in Propose Changes"""
     with factories.single_commit():
       person = factories.PersonFactory(email="author@example.com")
@@ -344,12 +342,12 @@ class TestPeopleMentions(TestCase):
               proposal.agenda
           ),
           initiator_instance_id=proposal.id,
-          initiator_instance_type="Proposal"
+          initiator_instance_type="Proposal",
+          modified_by_id=person.id,
+          created_at=datetime.datetime(2020, 1, 20, 13, 27, 00)
       )
-      comment.modified_by_id = person.id
-      comment.created_at = datetime.datetime(2020, 1, 20, 13, 27, 00)
-      url = urljoin(get_url_root(), utils.view_url_for(program))
 
+    url = urljoin(get_url_root(), utils.view_url_for(program))
     people_mentions.handle_comment_mapped(program, [comment])
     expected_title = (u"author@example.com mentioned you "
                       u"on a comment within Program_1")
@@ -367,8 +365,7 @@ class TestPeopleMentions(TestCase):
                                             expected_title, body)
 
   @mock.patch("ggrc.notifications.common.send_email")
-  # pylint: disable=no-self-use
-  def test_mention_in_lca(self, send_email_mock):
+  def test_mention_in_lca(self, send_email_mock):  # noqa pylint: disable=no-self-use
     """Test mention a person in Comment LCA"""
     with factories.single_commit():
       person = factories.PersonFactory(email="author@example.com")
@@ -392,8 +389,8 @@ class TestPeopleMentions(TestCase):
           created_at=datetime.datetime(2020, 1, 20, 13, 27, 00),
           custom_attribute_definition_id=cad.id
       )
-      url = urljoin(get_url_root(), utils.view_url_for(assessment))
 
+    url = urljoin(get_url_root(), utils.view_url_for(assessment))
     people_mentions.handle_comment_mapped(assessment, [comment])
     expected_title = (u"author@example.com mentioned you "
                       u"on a comment within Assessment_1")
