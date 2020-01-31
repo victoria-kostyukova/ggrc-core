@@ -150,6 +150,8 @@
 }
 
 .editable-evidence-item {
+  max-width: 100%;
+
   &.edit-mode {
     margin-bottom: 16px;
   }
