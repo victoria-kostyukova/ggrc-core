@@ -13,7 +13,7 @@ import mock
 from ggrc import db
 from ggrc import models
 from ggrc import settings
-from ggrc.converters import errors
+from ggrc.converters import errors, base
 from ggrc.converters.handlers import issue_tracker
 from ggrc.integrations import constants
 from ggrc.integrations import issuetracker_bulk_sync
@@ -1304,12 +1304,18 @@ class TestImportIssueTrackedNotif(ggrc.TestCase):
       response = self.import_data(*assessment_data)
 
     self._check_csv_response(response, {})
+
     it_bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater
+
+    # pylint: disable=protected-access
+    converter_messages = \
+        base.ImportConverter._TICKET_UPDATE_NOTIFICATION_MESSAGES
+
     mocked_send_email.assert_called_with(
         self.current_user_email,
         it_bulk_updater.ISSUETRACKER_SYNC_TITLE,
         settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data={
-            "title": it_bulk_updater.SUCCESS_TITLE.format(filename=""),
-            "email_text": it_bulk_updater.SUCCESS_TEXT,
+            "title": converter_messages["success"]["title"],
+            "email_text": converter_messages["success"]["body"],
         }),
     )
