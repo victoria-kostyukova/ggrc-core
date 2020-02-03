@@ -32,6 +32,11 @@ class BulkVerifyModal(BaseBulkUpdateModal):
         self._root)
 
   @property
+  def cancel_button(self):
+    """Returns 'Cancel' button."""
+    return self._root.button(text='Cancel')
+
+  @property
   def verify_button(self):
     """Returns whether 'Verify' button."""
     return self._root.button(text='Verify')
@@ -44,6 +49,10 @@ class BulkVerifyModal(BaseBulkUpdateModal):
   def click_verify(self):
     """Clicks 'Verify' button."""
     self.verify_button.click()
+
+  def click_cancel(self):
+    """Clicks 'Cancel' button."""
+    self.cancel_button.click()
 
 
 class FilterSection(page_elements.CollapsiblePanel):
