@@ -57,25 +57,23 @@ const ViewModel = canDefineMap.extend({
   },
   initUiArray() {
     // Update UI status array
-    let $form = this.element.find('form');
-    let tabList = $form.find('[tabindex]');
+    const tabList = this.element.find('form').find('[tabindex]');
+
     let hidableTabs = 0;
-    for (let i = 0; i < tabList.length; i++) {
-      if ($(tabList[i]).attr('tabindex') > 0) {
+    tabList.each((index, el) => {
+      if ($(el).attr('tabindex') > 0) {
         hidableTabs++;
       }
-    }
+    });
+
     // Add extra space for skipped numbers
-    let storableUI = hidableTabs + 20;
-    for (let i = 0; i < storableUI; i++) {
-      // When we start, all the ui elements are visible
-      this.uiArray.push(0);
-    }
+    // When we start, all the ui elements are visible
+    const uiArray = Array(hidableTabs + 20).fill(0);
+    this.uiArray.push(...uiArray);
   },
   saveUiStatus() {
     let modelName = this.model.model_singular;
-    let resetVisible = this.resetVisible ?
-      this.resetVisible : false;
+    let resetVisible = this.resetVisible || false;
     let uiArray = this.uiArray || [];
     let displayState = {
       reset_visible: resetVisible,
@@ -105,37 +103,31 @@ const ViewModel = canDefineMap.extend({
     this.restoreUiStatus();
   },
   restoreUiStatus() {
-    let $selected;
-    let str;
-    let tabindex;
-    let i;
-    let $form;
-    let $body;
+    if (!this.resetVisible) {
+      return;
+    }
 
     // walk through the uiArray, for the one values,
     // select the element with tab index and hide it
+    // some elements are hidden
+    const $body = this.element
+      .find('form')
+      .closest('.modal-body');
 
-    if (this.resetVisible) {// some elements are hidden
-      $form = this.element.find('form');
-      $body = $form.closest('.modal-body');
-      const uiArray = this.uiArray;
-
-      for (i = 0; i < uiArray.length; i++) {
-        if (uiArray[i] === 1) {
-          tabindex = i + 1;
-          str = '[tabindex=' + tabindex + ']';
-          $selected = $body.find(str);
-
-          if ($selected) {
-            $selected.closest('.hidable').addClass('hidden');
-            $selected.attr({
-              uiindex: tabindex,
-              tabindex: '-1',
-            });
-          }
-        }
+    this.uiArray.forEach((uiItem, index) => {
+      if (uiItem !== 1) {
+        return;
       }
-    }
+
+      const uiindex = index + 1;
+      const $selected = $body.find(`[tabindex=${uiindex}]`);
+
+      $selected.closest('.hidable').addClass('hidden');
+      $selected.attr({
+        uiindex,
+        tabindex: '-1',
+      });
+    });
   },
 });
 
@@ -148,21 +140,17 @@ const events = {
   },
   'a.field-hide click'(el, ev) { // field hide
     const viewModel = this.viewModel;
-    let $el = $(el);
-    let totalInner = $el.closest('.hide-wrap.hidable')
+    const $el = $(el);
+    const totalInner = $el.closest('.hide-wrap.hidable')
       .find('.inner-hide').length;
-    let totalHidden;
-    let uiUnit;
-    let i;
-    let tabValue;
-    let $hidable = [
+    const $hidable = [
       'span',
       'ggrc-form-item',
     ].map((className) => $el.closest(`[class*="${className}"].hidable`))
       .find((item) => item.length > 0);
 
     $el.closest('.inner-hide').addClass('inner-hidable');
-    totalHidden = $el.closest('.hide-wrap.hidable')
+    const totalHidden = $el.closest('.hide-wrap.hidable')
       .find('.inner-hidable').length;
 
     $hidable.addClass('hidden');
@@ -171,15 +159,19 @@ const events = {
 
     // update ui array
     const uiArray = viewModel.uiArray;
-    uiUnit = $hidable.find('[tabindex]');
-    for (i = 0; i < uiUnit.length; i++) {
-      tabValue = $(uiUnit[i]).attr('tabindex');
-      if (tabValue > 0) {
-        uiArray[tabValue - 1] = 1;
-        $(uiUnit[i]).attr('tabindex', '-1');
-        $(uiUnit[i]).attr('uiindex', tabValue);
+
+    $hidable.find('[tabindex]').each((index, el) => {
+      const $el = $(el);
+      const uiindex = $el.attr('tabindex');
+
+      if (uiindex > 0) {
+        uiArray[uiindex - 1] = 1;
+        $el.attr({
+          tabindex: '-1',
+          uiindex,
+        });
       }
-    }
+    });
 
     if (totalInner === totalHidden) {
       $el.closest('.inner-hide').parent('.hidable').addClass('hidden');
@@ -191,16 +183,9 @@ const events = {
     const viewModel = this.viewModel;
     const uiArray = viewModel.uiArray;
     const element = viewModel.element;
+    const $hidables = element.find('.hidable');
 
-    let i;
-    let uiArrLength = uiArray.length;
-    let $hidables = element.find('.hidable');
-    let hiddenElements = $hidables.find('[tabindex]');
-    let $hiddenElement;
-    let tabValue;
-    for (i = 0; i < uiArrLength; i++) {
-      uiArray[i] = 0;
-    }
+    uiArray.fill(0);
 
     viewModel.resetVisible = true;
 
@@ -208,53 +193,47 @@ const events = {
     element.find('.inner-hide').addClass('inner-hidable');
 
     // Set up the hidden elements index to 1
-    for (i = 0; i < hiddenElements.length; i++) {
-      $hiddenElement = $(hiddenElements[i]);
-      tabValue = $hiddenElement.attr('tabindex');
+    $hidables.find('[tabindex]').each((index, el) => {
+      const $hiddenElement = $(el);
+      const uiindex = $hiddenElement.attr('tabindex');
+
       // The UI array index start from 0, and tab-index is from 1
-      if (tabValue > 0) {
-        uiArray[tabValue - 1] = 1;
+      if (uiindex > 0) {
+        uiArray[uiindex - 1] = 1;
         $hiddenElement.attr({
           tabindex: '-1',
-          uiindex: tabValue,
+          uiindex,
         });
       }
-    }
+    });
 
     return false;
   },
   '#formRestore click'() {
     const viewModel = this.viewModel;
-    const uiArray = viewModel.uiArray;
     const element = viewModel.element;
 
     // Update UI status array to initial state
-    let i;
-    let uiArrLength = uiArray.length;
-    let $form = element.find('form');
-    let $body = $form.closest('.modal-body');
-    let uiElements = $body.find('[uiindex]');
-    let $el;
-    let tabVal;
-
-    for (i = 0; i < uiArrLength; i++) {
-      uiArray[i] = 0;
-    }
+    viewModel.uiArray.fill(0);
 
     // Set up the correct tab index for tabbing
     // Get all the ui elements with 'uiindex' set to original tabindex
     // Restore the original tab index
 
-    for (i = 0; i < uiElements.length; i++) {
-      $el = $(uiElements[i]);
-      tabVal = $el.attr('uiindex');
-      $el.attr('tabindex', tabVal);
-    }
+    element
+      .find('form')
+      .closest('.modal-body')
+      .find('[uiindex]')
+      .each((index, el) => {
+        const $el = $(el);
+        $el.attr('tabindex', $el.attr('uiindex'));
+      });
 
-    viewModel.resetVisible = false; // ?
+    viewModel.resetVisible = false;
 
     element.find('.hidden').removeClass('hidden');
     element.find('.inner-hide').removeClass('inner-hidable');
+
     return false;
   },
 };
