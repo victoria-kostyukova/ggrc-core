@@ -1032,19 +1032,17 @@ class AssessmentTrackerHandler(object):
     Returns:
         List with "custom fields" for issue tracker
     """
-    custom_fields = []
+    due_date_value = None
 
-    if fields.get("due_date"):
-      custom_fields.append(
-          {
-              "name": constants.CustomFields.DUE_DATE,
-              "value": fields["due_date"].strftime("%Y-%m-%d"),
-              "type": "DATE",
-              "display_string": constants.CustomFields.DUE_DATE
-          }
-      )
+    if fields.get('due_date'):
+      due_date_value = fields["due_date"].strftime("%Y-%m-%d")
 
-    return custom_fields
+    return [{
+        "name": constants.CustomFields.DUE_DATE,
+        "value": due_date_value,
+        "type": "DATE",
+        "display_string": constants.CustomFields.DUE_DATE
+    }]
 
   @classmethod
   def _get_create_comment(cls, assessment):
@@ -2657,6 +2655,9 @@ class AssessmentTrackerHandler(object):
     # type: (Dict[str, Any], Dict[str, Any]) -> bool
     """Check that issue's custom fields are the same in GGRC and Issue Tracker.
 
+    Since we have only one custom field this method is written only
+    for due_date field.
+
     Args:
         issue_payload (Dict[str, Any]): Issue information from GGRC.
         issue_tracker_info (Dict[str, Any]): Issue information from
@@ -2665,10 +2666,15 @@ class AssessmentTrackerHandler(object):
     Returns:
         Boolean indicator for custom fields validation.
     """
-    custom_fields_ggrc = issue_payload.get("custom_fields") or []
-    custom_fields_tracker = issue_tracker_info.get("custom_fields") or []
+    custom_fields_ggrc = issue_payload.get("custom_fields", [])
+    custom_fields_tracker = issue_tracker_info.get("custom_fields", [])
 
-    if any(custom_fields_ggrc):
+    # Fix for GGRC-6207
+    #
+    # Currently custom_fields_ggrc may contain only one dict representing
+    # due_date.The value of due_date may be None and this is valid behavior.
+    # We can't use None for date reformatting thus the check.
+    if any(custom_fields_ggrc) and custom_fields_ggrc[0]["value"]:
       due_date_payload = datetime.datetime.strptime(
           custom_fields_ggrc[0]["value"].strip(),
           "%Y-%m-%d"

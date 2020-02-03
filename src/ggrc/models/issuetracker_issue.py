@@ -194,7 +194,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
     self.issue_url = info['issue_url']
 
     if 'due_date' in info:
-      self.due_date = info.get('due_date')
+      self.due_date = info['due_date']
 
     self.people_sync_enabled = info['people_sync_enabled']
 
