@@ -3,6 +3,7 @@
 """Disabled objects tests."""
 
 # pylint: disable=redefined-outer-name
+import inflection
 import pytest
 
 from lib import base, browsers, factory, url
@@ -122,13 +123,14 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_user_cannot_update_custom_attribute(self, obj, selenium,
                                                soft_assert):
     """Tests that user cannot update custom attribute."""
     cad = rest_facade.create_gcad(
-        definition_type=obj.type.lower(),
+        definition_type=inflection.underscore(obj.type),
         attribute_type=element.AdminWidgetCustomAttributes.RICH_TEXT)
     soft_assert.expect(
         not factory.get_cls_webui_service(objects.get_plural(
