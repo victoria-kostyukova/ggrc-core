@@ -236,7 +236,11 @@ class Relationship(base.ContextRBAC, Base, db.Model):
   # pylint:disable=unused-argument
   @classmethod
   def validate_delete(cls, mapper, connection, target):
-    """Validates is delete of Relationship is allowed."""
+    """Validates is delete of Relationship is allowed.
+    Target relationship can have is_duplicate flag that was set while deletion
+    that allows external app delete mirrored relationship if True
+    We should delete mirrored relationships in any case
+    """
     from ggrc.utils.user_generator import is_ext_app_request
 
     if target.is_orphan:
@@ -247,6 +251,8 @@ class Relationship(base.ContextRBAC, Base, db.Model):
     cls.validate_relation_by_type(target.source_type,
                                   target.destination_type)
     if is_ext_app_request() and not target.is_external:
+      if hasattr(target, 'is_duplicate') and target.is_duplicate:
+        return
       raise ValidationError(
           'External application can delete only external relationships.')
 
