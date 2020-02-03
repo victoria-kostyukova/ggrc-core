@@ -277,9 +277,26 @@ export default canComponent.extend({
       });
     },
     savePermalinkToClipboard(savedSearchPermalink) {
-      navigator.clipboard.writeText(savedSearchPermalink).then(() => {
+      const notify = () =>
         notifier('info', 'Link has been copied to your clipboard.');
-      });
+      if (navigator.clipboard) {
+        // navigator.clipboard is only supported for pages served over HTTPS and for localhost
+        navigator.clipboard.writeText(savedSearchPermalink).then(() => {
+          notify();
+        });
+      } else {
+        const elem = document.createElement('textarea');
+        elem.style.position = 'absolute';
+        elem.style.left = '-9999px';
+        elem.setAttribute('readonly', '');
+        elem.value = savedSearchPermalink;
+
+        document.body.appendChild(elem);
+        elem.select();
+        document.execCommand('copy');
+        document.body.removeChild(elem);
+        notify();
+      }
       this.attr('savedSearchPermalink', savedSearchPermalink);
     },
     removeAdvancedFilters() {
