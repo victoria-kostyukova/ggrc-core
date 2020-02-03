@@ -93,12 +93,8 @@ const ViewModel = canDefineMap.extend({
 
     // set up reset_visible and ui_array
     if (displayState !== null) {
-      if (displayState.reset_visible) {
-        this.resetVisible = displayState.reset_visible;
-      }
-      if (displayState.ui_array) {
-        this.uiArray = displayState.ui_array.serialize();
-      }
+      this.resetVisible = displayState.reset_visible;
+      this.uiArray = displayState.ui_array.serialize();
     }
     this.restoreUiStatus();
   },
