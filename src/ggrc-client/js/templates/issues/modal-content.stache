@@ -7,208 +7,208 @@
   instance:from="instance"
   model:from="model"
   isModalSaving:from="isSaving">
-<div class="hideable-holder">
-  {{#instance}}
-    <issue-main-content-wrapper instance:from="instance" isIssueLinked:from="instance.issueLinked">
-      <form action="javascript://">
-        {{> base_objects/form-restore.stache}}
+  <div class="hideable-holder">
+    {{#instance}}
+      <issue-main-content-wrapper instance:from="instance" isIssueLinked:from="instance.issueLinked">
+        <form action="javascript://">
+          {{> base_objects/form-restore.stache}}
 
-        <div class="row-fluid">
-          <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-            <label class="form-label">
-              Title
-              <i class="fa fa-asterisk"></i>
-              <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_plural}} a name that's easy to search for and indicates the main goals of this {{model.title_singular}}."></i>
-            </label>
-            <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
-            {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span6 hidable">
-            <label>
-              Description
-              <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
-            </label>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            <div class="rich-text">
-                <rich-text
-                  tabindex="2"
-                  hiddenToolbar:from="true"
-                  placeholder:from="'Enter Description'"
-                  content:bind="instance.description">
-                </rich-text>
-            </div>
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span6 hidable">
-            <label>
-              Remediation Plan
-              <i class="fa fa-question-circle" rel="tooltip" title="Provide a remediation plan for this {{model.model_singular}}."></i>
-            </label>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            <div class="rich-text">
-                <rich-text
-                  tabindex="2"
-                  hiddenToolbar:from="true"
-                  placeholder:from="'Enter Remediation Plan'"
-                  content:bind="instance.test_plan">
-                </rich-text>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="span12 hide-wrap">
-            <issue-roles-wrapper
-              disable:from="disableIssueTrackerDependentFields">
-              <access-control-list-roles-helper
-                instance:from="instance"
-                isNewInstance:from="new_object_form"
-                disabledRoles:from="disabledRoles"
-                rolesTooltips:from="rolesTooltips">
-              </access-control-list-roles-helper>
-            </issue-roles-wrapper>
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span6 hidable">
-            <label>
-              Notes
-              <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
-            </label>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            <div class="rich-text">
-                <rich-text
-                  tabindex="5"
-                  hiddenToolbar:from="true"
-                  placeholder:from="'Enter Notes'"
-                  content:bind="instance.notes">
-                </rich-text>
-            </div>
-          </div>
-          <div class="span6 hide-wrap hidable">
-            <div class="row-fluid inner-hide">
-              {{> base_objects/modal-content-reference-urls.stache}}
-            </div>
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span6 hidable">
-            <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="6">
-            </ggrc-gdrive-folder-picker>
-          </div>
-        </div>
-
-        <div>
           <div class="row-fluid">
-            {{^if new_object_form}}
-              <div class="span4 hidable">
-                <label>
-                  Code
-                </label>
-                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                <input disabled class="input-block-level" type="text" value="{{slug}}">
-              </div>
-            {{/if}}
-            <div class="span4 hidable input-block-level">
-              <effective-dates instance:from="instance"></effective-dates>
-            </div>
-            <div class="span4 input-block-level {{#instance.computed_errors.due_date}}field-failure{{/instance.computed_errors.due_date}}">
-              <datepicker-component id="issue-due-date" date:bind="instance.due_date" 
-                                    label:from="'Due Date'" required:from="true" tabindex="21">
-              </datepicker-component>
-              {{#instance.computed_errors.due_date}}
-                <label class="help-inline">{{this}}</label>
-              {{/instance.computed_errors.due_date}}
+            <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+              <label class="form-label">
+                Title
+                <i class="fa fa-asterisk"></i>
+                <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_plural}} a name that's easy to search for and indicates the main goals of this {{model.title_singular}}."></i>
+              </label>
+              <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+              {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
             </div>
           </div>
+
           <div class="row-fluid">
-            <div id="state" class="span4 hidable"
-              {{#if disableIssueTrackerDependentFields}}
-                rel="tooltip"
-                data-original-title="Please go to the ticket and make changes there"
-                data-placement="bottom"
-              {{/if}}>
+            <div class="span6 hidable">
               <label>
-                State
-                <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
+                Description
+                <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
               </label>
               <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-              <dropdown-component optionsList:from="model.statuses"
-                        noValue:from="true"
-                        noValueLabel:from="'---'"
-                        name:bind="instance.status"
-                        isDisabled:from="disableIssueTrackerDependentFields"
-                        tabindex="23">
-              </dropdown-component>
-            </div>
-          </div>
-        </div>
-      </form>
-      <div class="ggrc-form">
-        <div class="ggrc-form-item">
-          {{#if instance.audit.title}}
-            <div class="ggrc-form-item__multiple-row">
-              <label class="ggrc-form-item__label">
-                Audit
-              </label>
-              <div>
-                {{instance.audit.title}}
+              <div class="rich-text">
+                  <rich-text
+                    tabindex="2"
+                    hiddenToolbar:from="true"
+                    placeholder:from="'Enter Description'"
+                    content:bind="instance.description">
+                  </rich-text>
               </div>
             </div>
-          {{/if}}
-          {{#if assessment.title}}
-            <div class="ggrc-form-item__multiple-row">
-              <label class="ggrc-form-item__label">
-                Assessment
+          </div>
+
+          <div class="row-fluid">
+            <div class="span6 hidable">
+              <label>
+                Remediation Plan
+                <i class="fa fa-question-circle" rel="tooltip" title="Provide a remediation plan for this {{model.model_singular}}."></i>
               </label>
-              <div>
-                {{assessment.title}}
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              <div class="rich-text">
+                  <rich-text
+                    tabindex="2"
+                    hiddenToolbar:from="true"
+                    placeholder:from="'Enter Remediation Plan'"
+                    content:bind="instance.test_plan">
+                  </rich-text>
               </div>
             </div>
-          {{/if}}
-        </div>
-      </div>
-      {{#if instance.can_use_issue_tracker}}
-        <div class="expanded-area">
-          <div class="expand-link">
-            <a class="show-hidden-fields info-show-hide active" href="javascript://">
-              <span class="out">
-                <i class="fa fa-caret-right"></i>
-                SHOW
-              </span>
-              <span class="in">
-                <i class="fa fa-caret-down"></i>
-                HIDE
-              </span>
-              TICKET TRACKER INFO
-            </a>
           </div>
-          <div class="hidden-fields-area">
-            <div class="ggrc-form">
-              <issue-tracker-switcher
-                instance:from="instance"
-                isIntegrationEnabled:bind="instance.issue_tracker.enabled"
-                setIssueTitle:from="true"
-                defaultTitle:from="instance.title">
-                  <modal-issue-tracker-fields
-                    instance:from="instance"
-                    mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;Fixed&quot;, &quot;Fixed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.'"
-                    note:from="'Turns on Ticket Tracker integration. Any subsequent updates to admins, primary contacts, secondary contacts and state fields should be made through tracking system and will be synced automatically to GGRC.'"
-                    on:vm:issueTrackerStateChanged="updateIssueTrackerState(scope.event)">
-                  </modal-issue-tracker-fields>
-              </issue-tracker-switcher>
+
+          <div class="row">
+            <div class="span12 hide-wrap">
+              <issue-roles-wrapper
+                disable:from="disableIssueTrackerDependentFields">
+                <access-control-list-roles-helper
+                  instance:from="instance"
+                  isNewInstance:from="new_object_form"
+                  disabledRoles:from="disabledRoles"
+                  rolesTooltips:from="rolesTooltips">
+                </access-control-list-roles-helper>
+              </issue-roles-wrapper>
             </div>
           </div>
+
+          <div class="row-fluid">
+            <div class="span6 hidable">
+              <label>
+                Notes
+                <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
+              </label>
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              <div class="rich-text">
+                  <rich-text
+                    tabindex="5"
+                    hiddenToolbar:from="true"
+                    placeholder:from="'Enter Notes'"
+                    content:bind="instance.notes">
+                  </rich-text>
+              </div>
+            </div>
+            <div class="span6 hide-wrap hidable">
+              <div class="row-fluid inner-hide">
+                {{> base_objects/modal-content-reference-urls.stache}}
+              </div>
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div class="span6 hidable">
+              <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="6">
+              </ggrc-gdrive-folder-picker>
+            </div>
+          </div>
+
+          <div>
+            <div class="row-fluid">
+              {{^if new_object_form}}
+                <div class="span4 hidable">
+                  <label>
+                    Code
+                  </label>
+                  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                  <input disabled class="input-block-level" type="text" value="{{slug}}">
+                </div>
+              {{/if}}
+              <div class="span4 hidable input-block-level">
+                <effective-dates instance:from="instance"></effective-dates>
+              </div>
+              <div class="span4 input-block-level {{#instance.computed_errors.due_date}}field-failure{{/instance.computed_errors.due_date}}">
+                <datepicker-component id="issue-due-date" date:bind="instance.due_date"
+                                      label:from="'Due Date'" required:from="true" tabindex="21">
+                </datepicker-component>
+                {{#instance.computed_errors.due_date}}
+                  <label class="help-inline">{{this}}</label>
+                {{/instance.computed_errors.due_date}}
+              </div>
+            </div>
+            <div class="row-fluid">
+              <div id="state" class="span4 hidable"
+                {{#if disableIssueTrackerDependentFields}}
+                  rel="tooltip"
+                  data-original-title="Please go to the ticket and make changes there"
+                  data-placement="bottom"
+                {{/if}}>
+                <label>
+                  State
+                  <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
+                </label>
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                <dropdown-component optionsList:from="model.statuses"
+                          noValue:from="true"
+                          noValueLabel:from="'---'"
+                          name:bind="instance.status"
+                          isDisabled:from="disableIssueTrackerDependentFields"
+                          tabindex="23">
+                </dropdown-component>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="ggrc-form">
+          <div class="ggrc-form-item">
+            {{#if instance.audit.title}}
+              <div class="ggrc-form-item__multiple-row">
+                <label class="ggrc-form-item__label">
+                  Audit
+                </label>
+                <div>
+                  {{instance.audit.title}}
+                </div>
+              </div>
+            {{/if}}
+            {{#if assessment.title}}
+              <div class="ggrc-form-item__multiple-row">
+                <label class="ggrc-form-item__label">
+                  Assessment
+                </label>
+                <div>
+                  {{assessment.title}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
         </div>
-      {{/if}}
-    </issue-main-content-wrapper>
-  {{/instance}}
-</div>
+        {{#if instance.can_use_issue_tracker}}
+          <div class="expanded-area">
+            <div class="expand-link">
+              <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                <span class="out">
+                  <i class="fa fa-caret-right"></i>
+                  SHOW
+                </span>
+                <span class="in">
+                  <i class="fa fa-caret-down"></i>
+                  HIDE
+                </span>
+                TICKET TRACKER INFO
+              </a>
+            </div>
+            <div class="hidden-fields-area">
+              <div class="ggrc-form">
+                <issue-tracker-switcher
+                  instance:from="instance"
+                  isIntegrationEnabled:bind="instance.issue_tracker.enabled"
+                  setIssueTitle:from="true"
+                  defaultTitle:from="instance.title">
+                    <modal-issue-tracker-fields
+                      instance:from="instance"
+                      mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;Fixed&quot;, &quot;Fixed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.'"
+                      note:from="'Turns on Ticket Tracker integration. Any subsequent updates to admins, primary contacts, secondary contacts and state fields should be made through tracking system and will be synced automatically to GGRC.'"
+                      on:vm:issueTrackerStateChanged="updateIssueTrackerState(scope.event)">
+                    </modal-issue-tracker-fields>
+                </issue-tracker-switcher>
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      </issue-main-content-wrapper>
+    {{/instance}}
+  </div>
 </modal-container>

@@ -7,84 +7,84 @@
   instance:from="instance"
   model:from="model"
   isModalSaving:from="isSaving">
-<div class="hideable-holder">
-{{#instance}}
-<person-modal instance:from="instance" isNewInstance:from="new_object_form">
-  <form action="javascript://">
-    {{> base_objects/form-restore.stache}}
+  <div class="hideable-holder">
+  {{#instance}}
+  <person-modal instance:from="instance" isNewInstance:from="new_object_form">
+    <form action="javascript://">
+      {{> base_objects/form-restore.stache}}
 
-    <div class="row-fluid">
-      <div class="span4">
-        <label for="person_name" class="form-label">
-          Name
-          <i class="fa fa-asterisk"></i>
-        </label>
-        <input tabindex="1"
-          class="span12"
-          id="person_name"
-          name="name"
-          placeholder="John Doe"
-          size="30"
-          type="text"
-          value="{{name}}"
-          {{#if isNameReadOnly}}disabled{{/if}}
-          autofocus>
-        <br>
+      <div class="row-fluid">
+        <div class="span4">
+          <label for="person_name" class="form-label">
+            Name
+            <i class="fa fa-asterisk"></i>
+          </label>
+          <input tabindex="1"
+            class="span12"
+            id="person_name"
+            name="name"
+            placeholder="John Doe"
+            size="30"
+            type="text"
+            value="{{name}}"
+            {{#if isNameReadOnly}}disabled{{/if}}
+            autofocus>
+          <br>
+        </div>
+        <div class="span4">
+          <label for="person_email" class="form-label">
+            Email
+            <i class="fa fa-asterisk"></i>
+          </label>
+          <person-autocomplete-field personEmail:bind="email"
+            personName:bind="name"
+            inputId:from="'person_email'"
+            placeholder:from="'email@company.com'"
+            tabindex:from="2"
+            on:vm:personSelected="personSelected(scope.event)"
+            on:vm:keyUp="onEmailFieldKeyUp(scope.event)"
+            {{^if_config_exist 'external_services.Person'}}
+              autocompleteEnabled:from="false"
+            {{/if_config_exist}}>
+          </person-autocomplete-field>
+          <span class="help-inline">
+          </span>
+          <br>
+        </div>
       </div>
-      <div class="span4">
-        <label for="person_email" class="form-label">
-          Email
-          <i class="fa fa-asterisk"></i>
-        </label>
-        <person-autocomplete-field personEmail:bind="email"
-          personName:bind="name"
-          inputId:from="'person_email'"
-          placeholder:from="'email@company.com'"
-          tabindex:from="2"
-          on:vm:personSelected="personSelected(scope.event)"
-          on:vm:keyUp="onEmailFieldKeyUp(scope.event)"
-          {{^if_config_exist 'external_services.Person'}}
-            autocompleteEnabled:from="false"
-          {{/if_config_exist}}>
-        </person-autocomplete-field>
-        <span class="help-inline">
-        </span>
-        <br>
+      <div class="row-fluid">
+        <div class="span12 hidable">
+          <label for="person_company">
+            Company
+          </label>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          <input tabindex="4" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
+          <span class="help-inline">
+          </span>
+          <br>
+        </div>
       </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span12 hidable">
-        <label for="person_company">
-          Company
-        </label>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input tabindex="4" class="span12" id="person_company" name="company" placeholder="Acme, Inc." size="30" type="text" value="{{company}}">
-        <span class="help-inline">
-        </span>
-        <br>
-      </div>
-    </div>
-    <div class="ggrc-form">
-      <div class="ggrc-form-item">
-        <div class="ggrc-form-item__row">
-          <h6 class="ggrc-form-item__title">
-            Calendar events
-          </h6>
-          <div class="ggrc-form-item__checkbox-item">
-            <label class="input--inline">
-              <input
-                class="ggrc-form-item__checkbox-item"
-                type="checkbox"
-                checked:bind="turnOnCalendarEvents"
-              >
-              Turn on calendar events
-            </label>
+      <div class="ggrc-form">
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row">
+            <h6 class="ggrc-form-item__title">
+              Calendar events
+            </h6>
+            <div class="ggrc-form-item__checkbox-item">
+              <label class="input--inline">
+                <input
+                  class="ggrc-form-item__checkbox-item"
+                  type="checkbox"
+                  checked:bind="turnOnCalendarEvents"
+                >
+                Turn on calendar events
+              </label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </form>
-</person-modal>
-{{/instance}}
-</div>
+    </form>
+  </person-modal>
+  {{/instance}}
+  </div>
 </modal-container>
