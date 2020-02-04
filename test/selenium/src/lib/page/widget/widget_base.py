@@ -85,6 +85,11 @@ class EditCustomAttributeModal(object_modal.BaseFormModal):
         name="multi_choice_options")
     self._fields = ["mandatory", "helptext", "placeholder"]
 
+  @property
+  def mandatory_checkbox(self):
+    """Return mandatory checkbox."""
+    return self._root.checkbox(name="mandatory")
+
   def set_helptext(self, value):
     """Sets helptext field with value."""
     self._root.text_field(name="helptext").set(value)
@@ -95,7 +100,7 @@ class EditCustomAttributeModal(object_modal.BaseFormModal):
 
   def set_mandatory(self, value):
     """Sets mandatory checkbox according to the value."""
-    self._root.checkbox(name="mandatory").set(bool(value))
+    self.mandatory_checkbox.set(bool(value))
 
   def get_custom_attribute_dict(self):
     """Return dict with custom attribute parameters according to visible fields

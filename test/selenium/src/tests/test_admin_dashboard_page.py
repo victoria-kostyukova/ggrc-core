@@ -332,20 +332,19 @@ class TestCAAdministration(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "ca_type",
-      element.AdminWidgetCustomAttributes.ALL_GCA_TYPES
-  )
-  def test_add_global_ca(self, selenium, ca_type):
-    """Create different types of Custom Attribute on Admin Dashboard."""
-    def_type = objects.get_normal_form(random.choice(objects.EDITABLE_CA_OBJS))
-    expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
-        attribute_type=ca_type, definition_type=def_type)
-    ca_admin_service = admin_webui_service.CustomAttributeWebUiService(
-        selenium)
-    ca_admin_service.create_custom_attribute(new_ca=expected_ca)
-    actual_cas = ca_admin_service.ca_widget.get_custom_attributes_list(
-        obj_type=expected_ca.definition_type)
-    self.general_contain_assert(expected_ca, actual_cas,
-                                "multi_choice_options")
+      element.AdminWidgetCustomAttributes.ALL_GCA_TYPES)
+  @pytest.mark.parametrize("is_assessment", [True, False])
+  def test_add_global_ca(self, selenium, ca_type, is_assessment, soft_assert):
+    """Create different types of Custom Attribute on Admin Dashboard.
+    Check a Mandatory checkbox is visible for all the objects except
+    assessments."""
+    webui_facade.check_ca_creating(
+        soft_assert=soft_assert, selenium=selenium,
+        def_type=objects.get_normal_form(
+            objects.ASSESSMENTS if is_assessment
+            else random.choice(objects.OBJS_SUPPORTING_MANDATORY_CA)),
+        ca_type=ca_type)
+    soft_assert.assert_expectations()
 
   @pytest.mark.parametrize(
       'ca_type', element.AdminWidgetCustomAttributes.ALL_GCA_TYPES)

@@ -733,3 +733,25 @@ def start_and_cancel_bulk_verifying(page):
   modal.select_assessments_section.click_select_all()
   modal.click_cancel()
   browsers.get_browser().refresh()
+
+
+def check_ca_creating(soft_assert, selenium, def_type, ca_type):
+  """Creates custom attribute. Checks a mandatory checkbox visibility."""
+  expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
+      attribute_type=ca_type, definition_type=def_type)
+  ca_admin_service = admin_webui_service.CustomAttributeWebUiService(
+      selenium)
+  add_ca_modal = ca_admin_service.ca_widget.expand_collapse_group(
+      def_type, expand=True).open_add_new_ca_modal()
+  soft_assert.expect(
+      add_ca_modal.mandatory_checkbox.exists
+      if def_type != objects.get_normal_form(objects.ASSESSMENTS)
+      else not add_ca_modal.mandatory_checkbox.exists,
+      "Mandatory checkbox should {} be visible.".format(
+          "" if def_type != objects.get_normal_form(
+              objects.ASSESSMENTS) else "not"))
+  add_ca_modal.submit_obj(expected_ca)
+  actual_cas = ca_admin_service.ca_widget.get_custom_attributes_list(
+      obj_type=expected_ca.definition_type)
+  base.Test.general_contain_soft_assert(soft_assert, expected_ca, actual_cas,
+                                        "multi_choice_options")
