@@ -170,7 +170,7 @@ def _add_people(connection, person_id, acl_id):
     person_id: An integer value of people id.
     acl_id: An integer value of access control list id.
   """
-  connection.execute(
+  result = connection.execute(
       text("""
         INSERT INTO `access_control_people`
         (`person_id`, `ac_list_id`, `updated_at`,  `created_at`)
@@ -179,6 +179,7 @@ def _add_people(connection, person_id, acl_id):
       """),
       person_id=person_id,
       acl_id=acl_id)
+  return result.inserted_primary_key[0]
 
 
 def _add_compliance_contact(connection, acl_id, compliance_contacts):
@@ -191,13 +192,15 @@ def _add_compliance_contact(connection, acl_id, compliance_contacts):
   """
   person_ids = _get_people_by_emails(connection, compliance_contacts)
 
+  acp_ids = []
   for person_id in person_ids:
-    _add_people(connection, person_id, acl_id)
+    acp_id = _add_people(connection, person_id, acl_id)
+    acp_ids.append(acp_id)
 
-  if person_ids:
+  if acp_ids:
     utils.add_to_objects_without_revisions_bulk(
         connection,
-        person_ids,
+        acp_ids,
         'AccessControlPerson',
         'created'
     )
