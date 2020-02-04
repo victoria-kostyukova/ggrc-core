@@ -50,7 +50,7 @@ class TestWorkflowState(unittest.TestCase):
     with patch(u"ggrc.access_control.role.get_ac_roles_for", return_value={}):
       self.assertEqual(
           result,
-          workflow.WorkflowState._get_state([
+          workflow.Workflow._get_state([
               cycle_task.CycleTaskGroupObjectTask(status=s)
               for s in task_states
           ])
@@ -71,7 +71,7 @@ class TestWorkflowState(unittest.TestCase):
       ]
       with freeze_time("2015-02-01 13:39:20"):
         self.assertEqual(
-            "Overdue", workflow.WorkflowState.get_object_state(tasks_on_object)
+            "Overdue", workflow.Workflow.get_object_state(tasks_on_object)
         )
 
   @ddt.data(

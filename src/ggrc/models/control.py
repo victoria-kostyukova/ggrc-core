@@ -41,6 +41,7 @@ class Control(with_external_created_by.WithExternalCreatedBy,
               WithSimilarityScore,
               base.ContextRBAC,
               mixins.BusinessObject,
+              mixins.WithWorkflowState,
               Indexed,
               mixins.Folderable,
               db.Model):

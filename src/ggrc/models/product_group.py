@@ -26,6 +26,7 @@ class ProductGroup(mixins.CustomAttributable,
                    mixins.base.ContextRBAC,
                    mixins.ScopeObject,
                    mixins.Folderable,
+                   mixins.WithWorkflowState,
                    db.Model,
                    Indexed):
   """Representation for ProductGroup model."""

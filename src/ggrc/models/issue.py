@@ -40,6 +40,7 @@ class Issue(Roleable,
             mixins.base.ContextRBAC,
             mixins.BusinessObject,
             mixins.Folderable,
+            mixins.WithWorkflowState,
             Indexed,
             db.Model):
   """Issue Model."""

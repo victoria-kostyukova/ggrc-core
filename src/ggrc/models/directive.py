@@ -31,6 +31,7 @@ class Directive(mixins.LastDeprecatedTimeboxed,
                 mixins.base.ContextRBAC,
                 mixins.BusinessObject,
                 mixins.Folderable,
+                mixins.WithWorkflowState,
                 db.Model):
   """Directive model"""
 

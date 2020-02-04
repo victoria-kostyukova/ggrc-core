@@ -51,7 +51,6 @@ blueprint = Blueprint(
 
 _INJECTABLE_MIXINS = (
     models.cycle_task_group_object_task.CycleTaskable,
-    models.workflow.WorkflowState,
 )
 
 
@@ -636,7 +635,18 @@ def handle_cycle_object_status(
   """Calculate status of cycle and cycle task group"""
   with benchmark("calculate status of Cycle and CycleTaskGroup"):
     update_cycle_task_tree([obj])
-    # db.session.commit()
+
+
+def handle_model_workflow_state(ctgot):
+  """Calculate workflow_state of objects mapped to CycleTaskGroupObjectTask."""
+  with benchmark("calculate workflow_state"):
+    wf_state = ctgot.workflow.get_workflow_state(ctgot.workflow.cycles)
+    ctgot.workflow.workflow_state = wf_state
+
+    for _obj in ctgot.related_objects():
+      if _obj.__class__.__name__ in WORKFLOW_OBJECT_TYPES:
+        _obj.workflow_state = ctgot.workflow.get_object_state(
+            _obj.cycle_task_group_object_tasks)
 
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
@@ -767,6 +777,7 @@ def handle_cycle_task_status_change(sender, objs=None):
       else:
         obj.instance.finished_date = None
         obj.instance.verified_date = None
+      handle_model_workflow_state(obj.instance)
 
 
 def _validate_post_workflow_fields(workflow):

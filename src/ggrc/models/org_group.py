@@ -24,6 +24,7 @@ class OrgGroup(synchronizable.Synchronizable,
                mixins.base.ContextRBAC,
                mixins.ScopeObject,
                mixins.Folderable,
+               mixins.WithWorkflowState,
                Indexed,
                db.Model):
   """Class representing OrgGroup."""
