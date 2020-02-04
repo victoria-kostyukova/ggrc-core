@@ -10,7 +10,6 @@ import pytest
 
 from lib import base, browsers, url, factory
 from lib.constants import objects
-from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.page.modal import unified_mapper
 from lib.service import webui_service, webui_facade
@@ -57,15 +56,19 @@ class TestDisabledObjectsPage(base.Test):
   @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
                            [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
-  def test_cannot_map_disabled_obj_via_unified_mapper(self, obj, selenium):
-    """Tests that user cannot map disabled object to Standard/Regulation
-    via Unified Mapper (existent new Standard/Regulation object)."""
+  @pytest.mark.parametrize("mapped_obj", [
+      objects.STANDARDS, objects.REGULATIONS,
+      objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR))])
+  def test_cannot_map_disabled_obj_via_unified_mapper(self, obj, mapped_obj,
+                                                      selenium):
+    """Tests that user cannot map disabled object to existent "mapped_obj"
+    via Unified Mapper."""
     obj_name = objects.get_plural(obj.type)
     service = factory.get_cls_webui_service(obj_name)()
     (service.open_obj_dashboard_tab().tree_view
      .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
-        entities_factory.StandardsFactory().create())
+        factory.get_cls_entity_factory(mapped_obj)().create())
     browsers.get_browser().windows()[1].use()
     assert not map_modal.is_present, (
         "There should be no modal windows in new browser tab.")
@@ -73,24 +76,28 @@ class TestDisabledObjectsPage(base.Test):
   @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
                            [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
-  def test_cannot_map_created_disabled_obj_via_um(self, obj, soft_assert,
-                                                  selenium):
-    """Tests that user cannot map disabled objects to Standard/Regulation
-     objects via Unified Mapper. (create Standard/Regulation object)."""
+  @pytest.mark.parametrize("mapped_obj", [
+      objects.STANDARDS, objects.REGULATIONS,
+      objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR))])
+  def test_cannot_map_created_disabled_obj_via_um(self, obj, mapped_obj,
+                                                  soft_assert, selenium):
+    """Tests that user cannot map disabled object to newly created "mapped_obj"
+    via Unified Mapper."""
     service = factory.get_cls_webui_service(objects.get_plural(obj.type))()
     (service.open_obj_dashboard_tab().tree_view
      .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
-        entities_factory.RegulationsFactory().create(), create_new_obj=True)
+        factory.get_cls_entity_factory(mapped_obj)().create(),
+        create_new_obj=True)
     _, new_tab = browsers.get_browser().windows()
+    test_utils.wait_for(lambda: new_tab.url.endswith(url.Widget.INFO))
     soft_assert.expect(new_tab.url == url.Urls().dashboard_info_tab,
                        "Dashboard info page should be opened in new tab.")
     webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
     soft_assert.expect(not any(
-        [name.startswith(objects.get_normal_form(objects.REGULATIONS))
+        [name.startswith(objects.get_normal_form(mapped_obj))
          for name in service.open_info_page_of_obj(obj).top_tabs.tab_names]),
-        "There should be no {} mapped to {}.".format(objects.REGULATIONS,
-                                                     obj.type))
+        "There should be no {} mapped to {}.".format(mapped_obj, obj.type))
     soft_assert.assert_expectations()
 
   @pytest.mark.parametrize("obj", objects.CONTROLS_AND_RISKS)
