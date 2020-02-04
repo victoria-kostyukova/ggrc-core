@@ -67,7 +67,7 @@ class TestExternalMapper(TestCase):
   @staticmethod
   def _get_mapping_get_data(external_type):
     return {
-        "external_id": 2,
+        "external_ids": [2],
         "external_type": external_type,
     }
 
@@ -113,7 +113,7 @@ class TestExternalMapper(TestCase):
         external_type="custom_attribute_definition"
     )
     params = {
-        "external_id": 2,
+        "external_ids": [2],
         "external_type": "custom_attribute_definition"
     }
     response = self.ext_api.get(url="/api/external_mappings", params=params)
@@ -121,7 +121,7 @@ class TestExternalMapper(TestCase):
     self.assert200(response)
 
     mapping = all_models.ExternalMapping.query.first()
-    response_data = response.json['external_mapping']
+    response_data = response.json['external_mapping'][0]
 
     self.assertEqual(response_data["object_type"], mapping.object_type)
     self.assertEqual(response_data["object_id"], mapping.object_id)
@@ -227,11 +227,11 @@ class TestExternalMapper(TestCase):
 
     data = self._get_mapping_get_data("custom_attribute_definition")
 
-    data.pop("external_id")
+    data.pop("external_ids")
 
     response = self.ext_api.get(url="/api/external_mappings", params=data)
     self.assert400(response)
-    self.assertIn("Key 'external_id' is missing", response.data)
+    self.assertIn("Key 'external_ids' is missing", response.data)
 
   @ddt.data("external_id", "object_id")
   def test_validate_ids_fields(self, key):
