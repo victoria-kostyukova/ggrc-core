@@ -124,9 +124,9 @@ class ImportConverter(BaseConverter):
     self.csv_data = csv_data or []
     self._bulk_import = bulk_import
     self.indexer = get_indexer()
-    self.comment_created_notif_type = all_models.NotificationType.query. \
-        filter_by(name="comment_created").one().id
+
     super(ImportConverter, self).__init__(ie_job)
+
     self.exportable.update(get_importables())
     self.bulk_import = bulk_import
     self.failed_slugs = []

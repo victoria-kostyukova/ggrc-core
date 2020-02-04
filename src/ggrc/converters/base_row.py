@@ -606,10 +606,6 @@ class ImportRowConverter(RowConverter):
       people_mentions.handle_comment_mapped(obj=self.obj,
                                             comments=self.comments)
 
-  def _get_comment_created_notif_type(self):
-    """Get comment created notification type id"""
-    return self.block_converter.converter.comment_created_notif_type
-
   def create_comment_notifications(self):
     """Create comment notifications."""
     import datetime
@@ -619,7 +615,8 @@ class ImportRowConverter(RowConverter):
         notification = all_models.Notification(
             object=comment,
             send_on=datetime.datetime.utcnow(),
-            notification_type_id=self._get_comment_created_notif_type(),
+            notification_type_id=all_models.NotificationType.query.
+            filter_by(name="comment_created").one().id,
         )
         db.session.add(notification)
 
