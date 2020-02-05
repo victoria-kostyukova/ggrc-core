@@ -14,7 +14,7 @@ const ViewModel = canDefineMap.extend({
     value: () => [],
   },
   sort() {
-    this.sortedItems = this.items.sort();
+    this.sortedItems = this.items.serialize().sort();
   },
 });
 
@@ -23,7 +23,7 @@ export default canComponent.extend({
   leakScope: true,
   ViewModel,
   events: {
-    '{viewModel.items} change'() {
+    '{viewModel.items} length'() {
       this.viewModel.sort();
     },
     init() {
