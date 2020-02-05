@@ -80,7 +80,7 @@ export default canComponent.extend({
       this.viewModel.refreshItems();
     },
     // this event is called when object was updated with data
-    '{viewModel} source.id'() {
+    '{viewModel.source} id'() {
       this.viewModel.refreshItems();
     },
   },
