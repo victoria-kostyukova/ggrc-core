@@ -14,7 +14,7 @@ from ggrc.migrations.utils.acr_propagation import update_acr_propagation_tree
 
 # revision identifiers, used by Alembic.
 revision = 'd0f2f2dcde8d'
-down_revision = '14891a489a2d'
+down_revision = 'aee8f6a09419'
 
 
 EVIDENCE_COMMENTS_PERMISSIONS = {
