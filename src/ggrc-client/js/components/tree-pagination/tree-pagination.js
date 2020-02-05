@@ -76,23 +76,6 @@ const ViewModel = canDefineMap.extend({
 export default canComponent.extend({
   tag: 'tree-pagination',
   view: canStache(template),
-  init() {
-    /**
-     * Entrance object validation
-     *
-     * paging = {
-     *  current: {Number}, - current page number
-     *  pageSize: {Number}, - amount elements on the page
-     *  total: {Number}, - total amount of elements
-     *  count: {Number}, - total amount of pages
-     *  pageSizeSelect: {Array} - array of numbers that used for pageSize popover
-     *  disabled: {Boolean} - true if frontend doesn't finish request to the server otherwise false
-     * }
-     */
-    if (!this.viewModel.paging) {
-      throw new Error('Paging object didn\'t init');
-    }
-  },
   leakScope: true,
   ViewModel,
 });
