@@ -170,7 +170,7 @@ def _add_people(connection, person_id, acl_id):
     person_id: An integer value of people id.
     acl_id: An integer value of access control list id.
   """
-  result = connection.execute(
+  connection.execute(
       text("""
         INSERT INTO `access_control_people`
         (`person_id`, `ac_list_id`, `updated_at`,  `created_at`)
@@ -179,7 +179,7 @@ def _add_people(connection, person_id, acl_id):
       """),
       person_id=person_id,
       acl_id=acl_id)
-  return result.inserted_primary_key[0]
+  return utils.last_insert_id(connection)
 
 
 def _add_compliance_contact(connection, acl_id, compliance_contacts):
