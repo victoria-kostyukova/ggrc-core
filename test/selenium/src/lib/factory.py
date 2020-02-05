@@ -65,7 +65,8 @@ def get_fields_to_set(object_name):
   """
   cls_name = objects.get_singular(object_name) + "ModalSetVisibleFields"
   base_cls = element.CommonModalSetVisibleFields
-  set_fields_modal_cls = _factory(cls_name=cls_name, parent_cls=base_cls)
+  set_fields_modal_cls = _factory(cls_name=cls_name, parent_cls=base_cls,
+                                  search_nested_subclasses=True)
   return set_fields_modal_cls().DEFAULT_SET_FIELDS
 
 

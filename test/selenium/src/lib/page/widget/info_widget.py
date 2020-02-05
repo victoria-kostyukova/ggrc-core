@@ -20,7 +20,7 @@ from lib.utils import selenium_utils, help_utils, ui_utils
 
 class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
                          object_page.ObjectPage):
-  """Abstract class for disabled object's Info pages and Info panels
+  """Common class for disabled object's Info pages and Info panels
   which don't have edit elements."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
@@ -293,8 +293,7 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
 
 
 class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
-  """Abstract class of common info for active object's Info pages and Info
-  panels."""
+  """Common class for active object's Info pages and Info panels."""
   # pylint: disable=too-many-public-methods
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=protected-access
@@ -875,111 +874,72 @@ class Objectives(page_mixins.WithAssignFolder, InfoWidget):
     scope.update(admin=self.admins.get_people_emails())
 
 
-class OrgGroups(InfoWidget):
-  """Model for Org Group object Info pages and Info panels."""
-  _locators = locator.WidgetInfoOrgGroup
+class ScopeObjectsInfoWidget(ReadOnlyInfoWidget):
+  """Common class for Scope object's Info pages and Info panels."""
 
-  def __init__(self, driver):
-    super(OrgGroups, self).__init__(driver)
+
+class OrgGroups(ScopeObjectsInfoWidget):
+  """Model for Org Group object Info pages and Info panels."""
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""
     scope.update(admin=self.admins.get_people_emails())
 
 
-class Vendors(InfoWidget):
+class Vendors(ScopeObjectsInfoWidget):
   """Model for Vendor object Info pages and Info panels."""
-  _locators = locator.WidgetInfoVendor
-
-  def __init__(self, driver):
-    super(Vendors, self).__init__(driver)
 
 
-class TechnologyEnvironments(InfoWidget):
+class TechnologyEnvironments(ScopeObjectsInfoWidget):
   """Model for Technology Environment object Info pages and Info panels."""
 
-  def __init__(self, driver):
-    super(TechnologyEnvironments, self).__init__(driver)
 
-
-class AccessGroup(InfoWidget):
+class AccessGroups(ScopeObjectsInfoWidget):
   """Model for Access Group object Info pages and Info panels."""
-  _locators = locator.WidgetInfoAccessGroup
-
-  def __init__(self, driver):
-    super(AccessGroup, self).__init__(driver)
 
 
-class AccountBalance(InfoWidget):
+class AccountBalances(ScopeObjectsInfoWidget):
   """Model for Account Balance object Info pages and Info panels."""
-  _locators = locator.WidgetInfoAccessGroup
-
-  def __init__(self, driver):
-    super(AccountBalance, self).__init__(driver)
 
 
-class Systems(InfoWidget):
+class Systems(ScopeObjectsInfoWidget):
   """Model for System object Info pages and Info panels."""
-  _locators = locator.WidgetInfoSystem
-
-  def __init__(self, driver):
-    super(Systems, self).__init__(driver)
 
 
-class Processes(InfoWidget):
+class Processes(ScopeObjectsInfoWidget):
   """Model for Process object Info pages and Info panels."""
-  _locators = locator.WidgetInfoProcess
-
-  def __init__(self, driver):
-    super(Processes, self).__init__(driver)
 
 
-class DataAssets(InfoWidget):
+class DataAssets(ScopeObjectsInfoWidget):
   """Model for Data Asset object Info pages and Info panels."""
-  _locators = locator.WidgetInfoDataAsset
-
-  def __init__(self, driver):
-    super(DataAssets, self).__init__(driver)
 
 
-class Products(InfoWidget):
+class Products(ScopeObjectsInfoWidget):
   """Model for Product object Info pages and Info panels."""
-  _locators = locator.WidgetInfoProduct
-
-  def __init__(self, driver):
-    super(Products, self).__init__(driver)
 
 
-class Projects(InfoWidget):
+class Projects(ScopeObjectsInfoWidget):
   """Model for Project object Info pages and Info panels."""
-  _locators = locator.WidgetInfoProject
-
-  def __init__(self, driver):
-    super(Projects, self).__init__(driver)
 
 
-class Facilities(InfoWidget):
+class Facilities(ScopeObjectsInfoWidget):
   """Model for Facility object Info pages and Info panels."""
-  _locators = locator.WidgetInfoFacility
-
-  def __init__(self, driver):
-    super(Facilities, self).__init__(driver)
 
 
-class KeyReports(InfoWidget):
+class KeyReports(ScopeObjectsInfoWidget):
   """Model for Key Report object Info pages and Info panels."""
-  _locators = locator.WidgetInfoKeyReport
-
-  def __init__(self, driver):
-    super(KeyReports, self).__init__(driver)
 
 
-class Markets(InfoWidget):
+class Markets(ScopeObjectsInfoWidget):
   """Model for Market object Info pages and Info panels."""
-  _locators = locator.WidgetInfoMarket
 
-  def __init__(self, driver):
-    super(Markets, self).__init__(driver)
+
+class Metrics(ScopeObjectsInfoWidget):
+  """Model for Metric object Info pages and Info panels."""
+
+
+class ProductGroups(ScopeObjectsInfoWidget):
+  """Model for Product object Info pages and Info panels."""
 
 
 class Risks(page_mixins.WithDisabledProposals,

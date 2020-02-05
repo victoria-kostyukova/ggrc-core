@@ -7,6 +7,8 @@ Reasons for a facade:
 """
 import re
 
+import inflection
+
 from lib import factory, decorator, users
 from lib.constants import roles, objects, element, value_aliases
 from lib.entities import entities_factory
@@ -32,7 +34,8 @@ def create_regulation(program=None, **attrs):
 
 def create_objective(program=None, **attrs):
   """Create an objective (optionally map to a `program`)."""
-  return _create_obj_in_program_scope("Objectives", program, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.OBJECTIVES), program, **attrs)
 
 
 def create_standard(program=None, **attrs):
@@ -42,17 +45,20 @@ def create_standard(program=None, **attrs):
 
 def create_control(**attrs):
   """Create an control."""
-  return _create_obj_in_program_scope("Controls", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.CONTROLS), None, **attrs)
 
 
 def create_technology_environment(**attrs):
   """Create a technology environment."""
-  return _create_obj_in_program_scope("TechnologyEnvironments", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.TECHNOLOGY_ENVIRONMENTS), None, **attrs)
 
 
 def create_product(**attrs):
   """Create a product."""
-  return _create_obj_in_program_scope("Products", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PRODUCTS), None, **attrs)
 
 
 def create_control_mapped_to_program(program, **attrs):
@@ -138,17 +144,86 @@ def create_issue(obj=None):
 
 def create_risk(**attrs):
   """Create an risk."""
-  return _create_obj_in_program_scope("Risks", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.RISKS), None, **attrs)
 
 
 def create_project(**attrs):
   """Create an project."""
-  return _create_obj_in_program_scope("Projects", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PROJECTS), None, **attrs)
 
 
 def create_key_report(**attrs):
   """Create a key report."""
-  return _create_obj_in_program_scope("KeyReports", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.KEY_REPORTS), None, **attrs)
+
+
+def create_account_balance(**attrs):
+  """Create an account balance."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ACCOUNT_BALANCES), None, **attrs)
+
+
+def create_access_group(**attrs):
+  """Create an access group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ACCESS_GROUPS), None, **attrs)
+
+
+def create_data_asset(**attrs):
+  """Create a data asset."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.DATA_ASSETS), None, **attrs)
+
+
+def create_facility(**attrs):
+  """Create a facility."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.FACILITIES), None, **attrs)
+
+
+def create_market(**attrs):
+  """Create a market."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.MARKETS), None, **attrs)
+
+
+def create_metric(**attrs):
+  """Create a metric."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.METRICS), None, **attrs)
+
+
+def create_org_group(**attrs):
+  """Create an org group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ORG_GROUPS), None, **attrs)
+
+
+def create_process(**attrs):
+  """Create a process."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PROCESSES), None, **attrs)
+
+
+def create_product_group(**attrs):
+  """Create a product group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PRODUCT_GROUPS), None, **attrs)
+
+
+def create_system(**attrs):
+  """Create a system."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.SYSTEMS), None, **attrs)
+
+
+def create_vendor(**attrs):
+  """Create a vendor."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.VENDORS), None, **attrs)
 
 
 @decorator.check_that_obj_is_created

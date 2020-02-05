@@ -1,6 +1,7 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixtures."""
+# pylint: disable=too-many-lines
 # pylint: disable=invalid-name
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
@@ -617,6 +618,72 @@ def project():
 def key_report():
   """Creates a key report."""
   return rest_facade.create_key_report()
+
+
+@pytest.fixture()
+def account_balance():
+  """Creates an account balance."""
+  return rest_facade.create_account_balance()
+
+
+@pytest.fixture()
+def access_group():
+  """Creates an access group."""
+  return rest_facade.create_access_group()
+
+
+@pytest.fixture()
+def data_asset():
+  """Creates a data asset."""
+  return rest_facade.create_data_asset()
+
+
+@pytest.fixture()
+def facility():
+  """Creates a facility."""
+  return rest_facade.create_facility()
+
+
+@pytest.fixture()
+def market():
+  """Creates a market."""
+  return rest_facade.create_market()
+
+
+@pytest.fixture()
+def metric():
+  """Creates a metric."""
+  return rest_facade.create_metric()
+
+
+@pytest.fixture()
+def org_group():
+  """Creates an org group."""
+  return rest_facade.create_org_group()
+
+
+@pytest.fixture()
+def process():
+  """Creates a process."""
+  return rest_facade.create_process()
+
+
+@pytest.fixture()
+def product_group():
+  """Creates a product group."""
+  return rest_facade.create_product_group()
+
+
+@pytest.fixture()
+def system():
+  """Creates a system."""
+  return rest_facade.create_system()
+
+
+@pytest.fixture()
+def vendor():
+  """Creates a vendor."""
+  return rest_facade.create_vendor()
 
 
 @pytest.fixture()

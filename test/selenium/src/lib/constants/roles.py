@@ -234,6 +234,56 @@ class ACLRolesIDsMetaClass(type):
     return cls.id_of_role(
         object_type=objects.get_obj_type(objects.KEY_REPORTS), name=ADMIN)
 
+  @property
+  def ACCOUNT_BALANCE_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ACCOUNT_BALANCES), name=ADMIN)
+
+  @property
+  def ACCESS_GROUP_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ACCESS_GROUPS), name=ADMIN)
+
+  @property
+  def DATA_ASSET_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.DATA_ASSETS), name=ADMIN)
+
+  @property
+  def FACILITY_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.FACILITIES), name=ADMIN)
+
+  @property
+  def MARKET_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.MARKETS), name=ADMIN)
+
+  @property
+  def METRIC_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.METRICS), name=ADMIN)
+
+  @property
+  def PROCESS_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROCESSES), name=ADMIN)
+
+  @property
+  def PRODUCT_GROUP_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PRODUCT_GROUPS), name=ADMIN)
+
+  @property
+  def SYSTEM_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.SYSTEMS), name=ADMIN)
+
+  @property
+  def VENDOR_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.VENDORS), name=ADMIN)
+
 
 class ACLRolesIDs(object):
   """Access Control List Roles IDs."""

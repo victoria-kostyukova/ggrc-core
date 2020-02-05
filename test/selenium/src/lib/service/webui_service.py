@@ -532,7 +532,7 @@ class BaseWebUiService(base.WithBrowser):
   def open_tab_via_add_tab_btn(self, src_obj, tab_name):
     """Opens info page of src_obj, clicks Add tab button and chooses tab by
     it's name."""
-    (self.open_info_page_of_obj(src_obj).click_add_tab_btn().
+    (self.open_info_page_of_obj(src_obj).open_add_tab_dropdown().
         click_item_by_text(text=tab_name))
 
 
@@ -812,6 +812,12 @@ class ProductsService(BaseWebUiService):
     super(ProductsService, self).__init__(objects.PRODUCTS, driver)
 
 
+class ProductGroupsService(BaseWebUiService):
+  """Class for Product Groups business layer's services objects."""
+  def __init__(self, driver=None):
+    super(ProductGroupsService, self).__init__(objects.PRODUCT_GROUPS, driver)
+
+
 class RegulationsService(BaseWebUiService):
   """Class for Regulations business layer's services objects."""
   def __init__(self, driver=None):
@@ -841,3 +847,58 @@ class KeyReportsService(BaseWebUiService):
   """Class for Key Reports business layer's services objects."""
   def __init__(self, driver=None):
     super(KeyReportsService, self).__init__(objects.KEY_REPORTS, driver)
+
+
+class AccessGroupsService(BaseWebUiService):
+  """Class for Access Groups business layer's services objects."""
+  def __init__(self, driver=None):
+    super(AccessGroupsService, self).__init__(objects.ACCESS_GROUPS, driver)
+
+
+class AccountBalancesService(BaseWebUiService):
+  """Class for Account Balances business layer's services objects."""
+  def __init__(self, driver=None):
+    super(AccountBalancesService, self).__init__(objects.ACCOUNT_BALANCES,
+                                                 driver)
+
+
+class DataAssetsService(BaseWebUiService):
+  """Class for Data Assets business layer's services objects."""
+  def __init__(self, driver=None):
+    super(DataAssetsService, self).__init__(objects.DATA_ASSETS, driver)
+
+
+class FacilitiesService(BaseWebUiService):
+  """Class for Facilities business layer's services objects."""
+  def __init__(self, driver=None):
+    super(FacilitiesService, self).__init__(objects.FACILITIES, driver)
+
+
+class MarketsService(BaseWebUiService):
+  """Class for Markets business layer's services objects."""
+  def __init__(self, driver=None):
+    super(MarketsService, self).__init__(objects.MARKETS, driver)
+
+
+class MetricsService(BaseWebUiService):
+  """Class for Metrics business layer's services objects."""
+  def __init__(self, driver=None):
+    super(MetricsService, self).__init__(objects.METRICS, driver)
+
+
+class ProcessesService(BaseWebUiService):
+  """Class for Processes business layer's services objects."""
+  def __init__(self, driver=None):
+    super(ProcessesService, self).__init__(objects.PROCESSES, driver)
+
+
+class SystemsService(BaseWebUiService):
+  """Class for Systems business layer's services objects."""
+  def __init__(self, driver=None):
+    super(SystemsService, self).__init__(objects.SYSTEMS, driver)
+
+
+class VendorsService(BaseWebUiService):
+  """Class for Vendors business layer's services objects."""
+  def __init__(self, driver=None):
+    super(VendorsService, self).__init__(objects.VENDORS, driver)

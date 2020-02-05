@@ -424,24 +424,6 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS, ADMIN)
 
 
-class TechnologyEnvironmentModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for Modal to Set visible
- fields for Technology Environments.
- """
-  # pylint: disable=too-many-instance-attributes
-  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      objects.get_normal_form(objects.get_singular(
-          objects.TECHNOLOGY_ENVIRONMENTS)))
-  ADMIN = TransformationSetVisibleFields.ADMIN
-  ASSIGNEE = objects.get_singular(roles.ASSIGNEES)
-  VERIFIER = objects.get_singular(roles.VERIFIERS)
-  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
-  DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS,
-      ADMIN, ASSIGNEE, VERIFIER)
-
-
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Programs.
@@ -499,34 +481,97 @@ class StandardModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED_BY)
 
 
-class ProductModalSetVisibleFields(CommonModalSetVisibleFields):
+class CommonScopeObjModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
-  fields for Products.
-  """
+ fields for Scope objects."""
+  ADMIN = TransformationSetVisibleFields.ADMIN
+  ASSIGNEE = objects.get_singular(roles.ASSIGNEES)
+  VERIFIER = objects.get_singular(roles.VERIFIERS)
   LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS,
+      ADMIN, ASSIGNEE, VERIFIER)
 
 
-class ProjectModalSetVisibleFields(CommonModalSetVisibleFields):
+class TechnologyEnvironmentModalSetVisibleFields(
+    CommonScopeObjModalSetVisibleFields
+):
   """Common elements' labels and properties for Modal to Set visible
-  fields for Projects.
-  """
-  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
-  DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+ fields for Technology Environments."""
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      objects.get_normal_form(objects.get_singular(
+          objects.TECHNOLOGY_ENVIRONMENTS)))
 
 
-class KeyReportModalSetVisibleFields(CommonModalSetVisibleFields):
+class ProductModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
-  fields for Key Reports.
-  """
-  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
-  DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS)
+  fields for Products."""
+
+
+class ProductGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Product Groups."""
+
+
+class ProjectModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Projects."""
+
+
+class KeyReportModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Key Reports."""
+
+
+class AccountBalanceModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Account Balances."""
+
+
+class AccessGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Access Groups."""
+
+
+class DataAssetModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Data Assets."""
+
+
+class FacilityModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Facilities."""
+
+
+class MarketModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Markets."""
+
+
+class MetricModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Metrics."""
+
+
+class OrgGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Org Groups."""
+
+
+class ProcessModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Processes."""
+
+
+class SystemModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Systems."""
+
+
+class VendorModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Vendors."""
 
 
 class AuditModalSetVisibleFields(CommonModalSetVisibleFields):

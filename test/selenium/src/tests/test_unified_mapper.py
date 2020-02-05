@@ -18,7 +18,7 @@ from lib.utils import test_utils
 
 
 class TestProgramPage(base.Test):
-  """Tests of unified mapper."""
+  """Tests of unified mapper for Program."""
 
   @pytest.mark.smoke_tests
   def test_destructive_mapping_controls_to_program_via_unified_mapper(
@@ -45,52 +45,17 @@ class TestProgramPage(base.Test):
         sorted(expected_controls), sorted(actual_controls),
         *Representation.tree_view_attrs_to_exclude)
 
-  @pytest.mark.parametrize("obj", objects.DISABLED_CONTROLS_RISKS)
-  def test_cannot_create_disabled_obj_from_mapper(self, obj, program,
-                                                  soft_assert, selenium):
-    """Check that 'New object' modal is not opened when creator adds
-    disabled object to a program."""
-    info_widget = webui_service.ProgramsService().open_info_page_of_obj(
-        program)
-    info_widget.click_add_tab_btn().click_item_by_text(
-        text=objects.get_normal_form(obj))
-    webui_facade.soft_assert_no_modals_present(
-        webui_facade.perform_disabled_mapping(
-            factory.get_cls_entity_factory(obj)().create(),
-            return_tree_items=True, create_new_obj=True),
-        soft_assert)
-    soft_assert.assert_expectations()
-
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
-                           indirect=True)
-  def test_objects_mapping_via_add_tab_restrictions(
-          self, obj, soft_assert, selenium):
-    """Tests that user cannot map disabled objects to scope objects/directives
-    and standard/regulation objects to scope/disabled objects via 'Add Tab'
-    menu."""
-    info_page = factory.get_cls_webui_service(objects.get_plural(
-        obj.type))().open_info_page_of_obj(obj)
-    info_page.click_add_tab_btn()
-    hidden_items = info_page.get_hidden_items_from_add_tab()
-    for h_item in hidden_items:
-      info_page.click_add_tab_btn()
-      h_item.click()
-      test_utils.wait_for(lambda: browsers.get_browser().windows()[1]
-                          .url.endswith(url.Widget.INFO))
-      soft_assert.expect(webui_facade.are_tabs_urls_equal(),
-                         "Tabs urls should be equal.")
-      webui_facade.soft_assert_no_modals_present(
-          unified_mapper.BaseUnifiedMapperModal(), soft_assert)
-      old_tab, new_tab = browsers.get_browser().windows()
-      old_tab.use()
-      new_tab.close()
-    soft_assert.assert_expectations()
-
 
 class TestDisabledObjectsPage(base.Test):
-  """Tests of unified mapper for disabled objects."""
+  """Tests of unified mapper for disabled objects.
 
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_OBJS,
+  Test cases are parametrized with the type of objects under test.
+  As there is too much disabled objects to test all of them, in each test case
+  one object of each disabled objects section is used.
+  """
+
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_map_disabled_obj_via_unified_mapper(self, obj, selenium):
     """Tests that user cannot map disabled object to Standard/Regulation
@@ -105,7 +70,8 @@ class TestDisabledObjectsPage(base.Test):
     assert not map_modal.is_present, (
         "There should be no modal windows in new browser tab.")
 
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_map_created_disabled_obj_via_um(self, obj,
                                                   soft_assert, selenium):
@@ -126,4 +92,42 @@ class TestDisabledObjectsPage(base.Test):
          for name in tab_names]),
         "There should be no regulation mapped to {}.".format(obj.type))
     webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
+    soft_assert.assert_expectations()
+
+  @pytest.mark.parametrize("obj", objects.CONTROLS_AND_RISKS)
+  def test_cannot_create_disabled_obj_from_mapper(self, obj, program,
+                                                  soft_assert, selenium):
+    """Check that 'New object' modal is not opened when creator adds
+    disabled object to a program."""
+    webui_service.ProgramsService().open_tab_via_add_tab_btn(
+        program, objects.get_normal_form(obj))
+    webui_facade.soft_assert_no_modals_present(
+        webui_facade.perform_disabled_mapping(
+            factory.get_cls_entity_factory(obj)().create(),
+            return_tree_items=True, create_new_obj=True),
+        soft_assert)
+    soft_assert.assert_expectations()
+
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
+                           indirect=True)
+  def test_objects_mapping_via_add_tab_restrictions(
+          self, obj, soft_assert, selenium):
+    """Tests that user cannot map disabled objects to scope objects/directives
+    and standard/regulation objects to scope/disabled objects via 'Add Tab'
+    menu."""
+    info_page = factory.get_cls_webui_service(objects.get_plural(
+        obj.type))().open_info_page_of_obj(obj)
+    for h_item in info_page.get_hidden_items_from_add_tab():
+      info_page.open_add_tab_dropdown()
+      h_item.click()
+      test_utils.wait_for(lambda: browsers.get_browser().windows()[1]
+                          .url.endswith(url.Widget.INFO))
+      soft_assert.expect(webui_facade.are_tabs_urls_equal(),
+                         "Tabs urls should be equal.")
+      webui_facade.soft_assert_no_modals_present(
+          unified_mapper.BaseUnifiedMapperModal(), soft_assert)
+      old_tab, new_tab = browsers.get_browser().windows()
+      old_tab.use()
+      new_tab.close()
     soft_assert.assert_expectations()
