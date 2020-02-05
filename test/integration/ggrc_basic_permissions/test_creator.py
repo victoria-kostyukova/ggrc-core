@@ -4,6 +4,8 @@
 """
 Test Program Creator role
 """
+import json
+
 import ddt
 
 from ggrc.models import get_model
@@ -389,3 +391,34 @@ class TestCreator(TestCase):
 
     self.assert200(response)
     self.assertEqual(response.json[0]["Revision"]["count"], 0)
+
+  @ddt.data(
+      ("creator", "creator", 1),
+      ("admin", "creator", 0)
+  )
+  @ddt.unpack
+  def test_comment_access_query(self, creator_role, access_role, count):
+    """Test possibility to access comments through query API for GC."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      factories.AccessControlPersonFactory(
+          ac_list=program.acr_name_acl_map["Program Managers"],
+          person=self.users[creator_role],
+      )
+      comment = factories.CommentFactory(description="Test comment",)
+      factories.RelationshipFactory(source=program, destination=comment)
+
+    self.api.set_user(self.users[access_role])
+    query_data = [{
+        "limit": [0, 5],
+        "object_name": all_models.Comment.__name__,
+        "order_by": [{"name": "updated_at", "desc": True}],
+        "filters": {"expression": {}}
+    }]
+    headers = {"Content-Type": "application/json", }
+    response = self.api.client.post("/query",
+                                    data=json.dumps(query_data),
+                                    headers=headers)
+
+    self.assert200(response)
+    self.assertEqual(response.json[0]["Comment"]["count"], count)

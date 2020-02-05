@@ -248,6 +248,28 @@ class QueryHelper(object):
     )
 
   @staticmethod
+  def _get_comments_type_query(model, permission_type):
+    """Filter model based on availability of related objects.
+
+    This method is used to request comments related to objects
+    that the user has access to.
+
+    Args:
+      model: Model for which will be built sqlalchemy filter.
+      permission_type: permission type (e.g. 'update', 'read' and e.t.c.).
+
+    Returns:
+      sqlalchemy filter for comments related to objects
+        that the user has access to.
+    """
+    allowed_resources = permissions.all_resources(permission_type)
+    if not allowed_resources:
+      return sa.false()
+
+    return sa.tuple_(model.__name__, model.id).in_(allowed_resources)
+
+
+  @staticmethod
   def _get_type_query(model, permission_type, filter_ids=None):
     """Filter by contexts and resources
 
@@ -263,7 +285,11 @@ class QueryHelper(object):
     if model.__name__ == "Revision":
       # Since revision contains all object data, query API should query only
       # revisions of objects user has right permission on.
-      return QueryHelper._get_revision_type_query(model, permission_type, filter_ids)
+      return QueryHelper._get_revision_type_query(model, permission_type,
+                                                  filter_ids)
+
+    if model.__name__ == "Comment":
+      return QueryHelper._get_comments_type_query(model, permission_type)
 
     contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
