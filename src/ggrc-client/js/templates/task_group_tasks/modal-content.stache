@@ -3,128 +3,133 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<form action="javascript://" class="form">
-  {{> base_objects/form-restore.stache}}
+<modal-container
+  instance:from="instance"
+  model:from="model"
+  isModalSaving:from="isSaving">
+  <form action="javascript://" class="form">
+    {{> base_objects/form-restore.stache}}
 
-  <div class="row-fluid">
-    <div class="span8">
-      <div class="row-fluid">
-        <div class="span12">
-          <label class="form-label">
-            Task Title
-            <i class="fa fa-asterisk"></i>
-            <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_singular}} a title that is easy to search for and indicates the main goals of this {{model.title_singular}}"></i>
-          </label>
-          <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span12 hidable">
-          <div class="form-header-container">
+    <div class="row-fluid">
+      <div class="span8">
+        <div class="row-fluid">
+          <div class="span12">
             <label class="form-label">
-              Task Type
+              Task Title
+              <i class="fa fa-asterisk"></i>
+              <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_singular}} a title that is easy to search for and indicates the main goals of this {{model.title_singular}}"></i>
             </label>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
           </div>
-          <select name="task_type" tabindex="2">
-            <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
-            <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
-          </select>
         </div>
-      </div>
-      <div class="row-fluid">
-        {{#is(instance.task_type, "text")}}
+        <div class="row-fluid">
           <div class="span12 hidable">
             <div class="form-header-container">
               <label class="form-label">
-                Task Description
-                <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
+                Task Type
               </label>
               <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </div>
-            <div class="rich-text">
-                <rich-text
-                  tabindex="3"
-                  hiddenToolbar:from="true"
-                  placeholder:from="'Enter Description'"
-                  content:bind="instance.description">
-                </rich-text>
-            </div>
-          </div>
-        {{/is}}
-        {{#is(instance.task_type, "checkbox")}}
-          <div class="span12">
-            <label class="form-label">
-              Checkbox Options (Comma Separated)
-              <i class="fa fa-asterisk"></i>
-              <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
-            </label>
-            <textarea-array array:bind="instance.response_options"
-                            placeholder:from="'Enter Values'"
-                            className:from="'span12 double'">
-            </textarea-array>
-          </div>
-        {{/is}}
-        <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
-        <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
-      </div>
-      {{^if new_object_form}}
-        <div class="row-fluid">
-          <div class="span6 hidable">
-            <div class="form-header-container">
-              <label class="form-label">
-                Code
-              </label>
-              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            </div>
-            <input disabled class="input-block-level" type="text" value="{{instance.slug}}">
+            <select name="task_type" tabindex="2">
+              <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
+              <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
+            </select>
           </div>
         </div>
-      {{/if}}
-    </div>
-    <div class="span4">
-      <access-control-list-roles-helper instance:from="instance"
-                                        isNewInstance:from="new_object_form">
-      </access-control-list-roles-helper>
-      <object-loader path:from="instance.task_group">
-        <object-loader path:from="loadedObject.workflow">
-          <div class="frequency-wrap">
-            <label class="form-label">
-                Repeat
-                <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
-            </label>
-            <repeat-on-summary unit:from="loadedObject.unit"
-                               repeatEvery:from="loadedObject.repeat_every"
-                               hideRepeatOff:from="false">
-            </repeat-on-summary>
-            <label class="smaller">
+        <div class="row-fluid">
+          {{#is(instance.task_type, "text")}}
+            <div class="span12 hidable">
+              <div class="form-header-container">
+                <label class="form-label">
+                  Task Description
+                  <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
+                </label>
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              </div>
+              <div class="rich-text">
+                  <rich-text
+                    tabindex="3"
+                    hiddenToolbar:from="true"
+                    placeholder:from="'Enter Description'"
+                    content:bind="instance.description">
+                  </rich-text>
+              </div>
+            </div>
+          {{/is}}
+          {{#is(instance.task_type, "checkbox")}}
+            <div class="span12">
               <label class="form-label">
-                  Task Start Date
-                  <i class="fa fa-asterisk"></i>
+                Checkbox Options (Comma Separated)
+                <i class="fa fa-asterisk"></i>
+                <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
               </label>
-              <datepicker-component id="repeate-start-date"
-                          date:bind="instance.start_date"
-                          required:from="true"
-                          noWeekends:from="true"
-                          readonly:from="true">
-              </datepicker-component>
-            </label>
-            <label class="smaller">
-              <label class="form-label">
-                  Task Due Date
-                  <i class="fa fa-asterisk"></i>
-              </label>
-              <datepicker-component id="repeate-end-date"
-                          setMinDate:from="instance.start_date"
-                          date:bind="instance.end_date"
-                          required:from="true"
-                          noWeekends:from="true"
-                          readonly:from="true">
-              </datepicker-component>
-            </label>
+              <textarea-array array:bind="instance.response_options"
+                              placeholder:from="'Enter Values'"
+                              className:from="'span12 double'">
+              </textarea-array>
+            </div>
+          {{/is}}
+          <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
+          <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
+        </div>
+        {{^if new_object_form}}
+          <div class="row-fluid">
+            <div class="span6 hidable">
+              <div class="form-header-container">
+                <label class="form-label">
+                  Code
+                </label>
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              </div>
+              <input disabled class="input-block-level" type="text" value="{{instance.slug}}">
+            </div>
           </div>
+        {{/if}}
+      </div>
+      <div class="span4">
+        <access-control-list-roles-helper instance:from="instance"
+                                          isNewInstance:from="new_object_form">
+        </access-control-list-roles-helper>
+        <object-loader path:from="instance.task_group">
+          <object-loader path:from="loadedObject.workflow">
+            <div class="frequency-wrap">
+              <label class="form-label">
+                  Repeat
+                  <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
+              </label>
+              <repeat-on-summary unit:from="loadedObject.unit"
+                                repeatEvery:from="loadedObject.repeat_every"
+                                hideRepeatOff:from="false">
+              </repeat-on-summary>
+              <label class="smaller">
+                <label class="form-label">
+                    Task Start Date
+                    <i class="fa fa-asterisk"></i>
+                </label>
+                <datepicker-component id="repeate-start-date"
+                            date:bind="instance.start_date"
+                            required:from="true"
+                            noWeekends:from="true"
+                            readonly:from="true">
+                </datepicker-component>
+              </label>
+              <label class="smaller">
+                <label class="form-label">
+                    Task Due Date
+                    <i class="fa fa-asterisk"></i>
+                </label>
+                <datepicker-component id="repeate-end-date"
+                            setMinDate:from="instance.start_date"
+                            date:bind="instance.end_date"
+                            required:from="true"
+                            noWeekends:from="true"
+                            readonly:from="true">
+                </datepicker-component>
+              </label>
+            </div>
+          </object-loader>
         </object-loader>
-      </object-loader>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</modal-container>

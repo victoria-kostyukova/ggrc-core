@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {exists, filteredMap, getView, getFragment} from '../../plugins/ggrc-utils';
+import {exists, filteredMap, getView} from '../../plugins/ggrc-utils';
 import loIsFunction from 'lodash/isFunction';
 import loForEach from 'lodash/forEach';
 import loFilter from 'lodash/filter';
@@ -57,6 +57,7 @@ import '../../components/assessment-templates/assessment-template-save-button/as
 import '../../components/evidence-item/evidence-item';
 import '../../components/inline/inline-form-control';
 import '../../components/inline/inline-edit-control';
+import '../../components/modal-container/modal-container';
 import {
   bindXHRToButton,
   bindXHRToDisableElement,
@@ -69,10 +70,6 @@ import {
 import {
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
-import {
-  getModalState,
-  setModalState,
-} from '../../plugins/utils/display-prefs-utils';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import {
@@ -81,20 +78,16 @@ import {
 } from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {refreshAll} from '../../models/refresh-queue';
+import preloadView from '../modals/templates/modal-preload-view.stache';
 
 export default canControl.extend({
   defaults: {
-    preload_view: '/dashboard/modal-preload.stache',
     header_view: '/modals/modal-header.stache',
-    custom_attributes_view:
-      '/custom_attributes/modal-content.stache',
     button_view: BUTTON_VIEW_DONE,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
     add_more: false,
-    ui_array: [],
-    reset_visible: false,
     // used for revision-comparer
     extraCssClass: '',
     afterFetch: function () {},
@@ -108,8 +101,9 @@ export default canControl.extend({
     }
 
     if (!this.element.find('.modal-body').length) {
-      let frag = getFragment(this.options.preload_view);
+      let frag = canStache(preloadView)();
       this.after_preload(frag);
+
       return;
     }
 
@@ -166,7 +160,6 @@ export default canControl.extend({
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
-          this.restore_ui_status_from_storage();
           initAuditTitle(this.options.instance, this.options.new_object_form);
         }
       })
@@ -192,9 +185,7 @@ export default canControl.extend({
       const content = getView(this.options.content_view);
       const header = getView(this.options.header_view);
       const footer = getView(this.options.button_view);
-      const customAttributes =
-        getView(this.options.custom_attributes_view);
-      this.draw(content, header, footer, customAttributes, context);
+      this.draw(content, header, footer, context);
     });
   },
 
@@ -226,6 +217,7 @@ export default canControl.extend({
         }.bind(this));
       }
     } else {
+      // case when modal is opened via confirm() util
       this.options.attr('instance', {});
       that.on();
       dfd = new $.Deferred().resolve(instance);
@@ -282,15 +274,10 @@ export default canControl.extend({
     return this.fetch_templates(this.fetch_data());
   },
 
-  draw: function (content, header, footer, customAttributes, context) {
+  draw(content, header, footer, context) {
     if (this.wasDestroyed()) {
       return;
     }
-
-    let modalTitle = this.options.modal_title;
-    let isProposal = this.options.isProposal;
-    let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
-      modalTitle.indexOf('New') === 0);
 
     if (Array.isArray(content)) {
       content = content[0];
@@ -300,9 +287,6 @@ export default canControl.extend({
     }
     if (Array.isArray(footer)) {
       footer = footer[0];
-    }
-    if (Array.isArray(customAttributes)) {
-      customAttributes = customAttributes[0];
     }
     if (header !== null) {
       header = canStache(header)(context);
@@ -315,26 +299,6 @@ export default canControl.extend({
     if (footer !== null) {
       footer = canStache(footer)(context);
       $(this.options.footerEl).html(footer);
-    }
-    if (customAttributes !== null && (isObjectModal || isProposal)) {
-      customAttributes = canStache(customAttributes)(context);
-      $(this.options.contentEl).append(customAttributes);
-    }
-
-    // Update UI status array
-    let $form = $(this.element).find('form');
-    let tabList = $form.find('[tabindex]');
-    let hidableTabs = 0;
-    for (let i = 0; i < tabList.length; i++) {
-      if ($(tabList[i]).attr('tabindex') > 0) {
-        hidableTabs++;
-      }
-    }
-    // ui_array index is used as the tab_order, Add extra space for skipped numbers
-    let storableUI = hidableTabs + 20;
-    for (let i = 0; i < storableUI; i++) {
-      // When we start, all the ui elements are visible
-      this.options.ui_array.push(0);
     }
   },
 
@@ -472,7 +436,6 @@ export default canControl.extend({
         return;
       }
       this.options.attr('add_more', true);
-      this.save_ui_status();
       this.triggerSave(el, ev);
     },
 
@@ -510,189 +473,6 @@ export default canControl.extend({
       }, saveInstance);
     } else {
       saveInstance();
-    }
-  },
-
-  '{contentEl} a.field-hide click': function (el) {// field hide
-    let $el = $(el);
-    let totalInner = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hide').length;
-    let totalHidden;
-    let uiUnit;
-    let i;
-    let tabValue;
-    let $hidable = [
-      'span',
-      'ggrc-form-item',
-    ].map((className) => $el.closest(`[class*="${className}"].hidable`))
-      .find((item) => item.length > 0);
-
-    $el.closest('.inner-hide').addClass('inner-hidable');
-    totalHidden = $el.closest('.hide-wrap.hidable')
-      .find('.inner-hidable').length;
-
-    $hidable.addClass('hidden');
-    this.options.attr('reset_visible', true);
-    // update ui array
-    uiUnit = $hidable.find('[tabindex]');
-    for (i = 0; i < uiUnit.length; i++) {
-      tabValue = $(uiUnit[i]).attr('tabindex');
-      if (tabValue > 0) {
-        this.options.ui_array[tabValue - 1] = 1;
-        $(uiUnit[i]).attr('tabindex', '-1');
-        $(uiUnit[i]).attr('uiindex', tabValue);
-      }
-    }
-
-    if (totalInner === totalHidden) {
-      $el.closest('.inner-hide').parent('.hidable').addClass('hidden');
-    }
-
-    return false;
-  },
-
-  '{contentEl} #formHide click': function () {
-    if (this.wasDestroyed()) {
-      return false;
-    }
-
-    let i;
-    let uiArrLength = this.options.ui_array.length;
-    let $hidables = this.element.find('.hidable');
-    let hiddenElements = $hidables.find('[tabindex]');
-    let $hiddenElement;
-    let tabValue;
-    for (i = 0; i < uiArrLength; i++) {
-      this.options.ui_array[i] = 0;
-    }
-
-    this.options.attr('reset_visible', true);
-
-    $hidables.addClass('hidden');
-    this.element.find('.inner-hide').addClass('inner-hidable');
-
-    // Set up the hidden elements index to 1
-    for (i = 0; i < hiddenElements.length; i++) {
-      $hiddenElement = $(hiddenElements[i]);
-      tabValue = $hiddenElement.attr('tabindex');
-      // The UI array index start from 0, and tab-index/io-index is from 1
-      if (tabValue > 0) {
-        this.options.ui_array[tabValue - 1] = 1;
-        $hiddenElement.attr({
-          tabindex: '-1',
-          uiindex: tabValue,
-        });
-      }
-    }
-
-    return false;
-  },
-
-  '{contentEl} #formRestore click': function () {
-    if (this.wasDestroyed()) {
-      return false;
-    }
-
-    // Update UI status array to initial state
-    let i;
-    let uiArrLength = this.options.ui_array.length;
-    let $form = this.element.find('form');
-    let $body = $form.closest('.modal-body');
-    let uiElements = $body.find('[uiindex]');
-    let $el;
-    let tabVal;
-
-    for (i = 0; i < uiArrLength; i++) {
-      this.options.ui_array[i] = 0;
-    }
-
-    // Set up the correct tab index for tabbing
-    // Get all the ui elements with 'uiindex' set to original tabindex
-    // Restore the original tab index
-
-    for (i = 0; i < uiElements.length; i++) {
-      $el = $(uiElements[i]);
-      tabVal = $el.attr('uiindex');
-      $el.attr('tabindex', tabVal);
-    }
-
-    this.options.attr('reset_visible', false);
-    this.element.find('.hidden').removeClass('hidden');
-    this.element.find('.inner-hide').removeClass('inner-hidable');
-    return false;
-  },
-
-  save_ui_status: function () {
-    if (!this.options.model) {
-      return;
-    }
-    let modelName = this.options.model.model_singular;
-    let resetVisible = this.options.reset_visible ?
-      this.options.reset_visible : false;
-    let uiArray = this.options.ui_array ? this.options.ui_array : [];
-    let displayState = {
-      reset_visible: resetVisible,
-      ui_array: uiArray,
-    };
-
-    setModalState(modelName, displayState);
-  },
-
-  restore_ui_status_from_storage: function () {
-    if (!this.options.model) {
-      return;
-    }
-    let modelName = this.options.model.model_singular;
-    let displayState = getModalState(modelName);
-
-    // set up reset_visible and ui_array
-    if (displayState !== null) {
-      if (displayState.reset_visible) {
-        this.options.attr('reset_visible', displayState.reset_visible);
-      }
-      if (displayState.ui_array) {
-        this.options.ui_array = displayState.ui_array.slice();
-      }
-    }
-    this.restore_ui_status();
-  },
-
-  restore_ui_status: function () {
-    if (this.wasDestroyed()) {
-      return;
-    }
-
-    let $selected;
-    let str;
-    let tabindex;
-    let i;
-    let $form;
-    let $body;
-
-    // walk through the ui_array, for the one values,
-    // select the element with tab index and hide it
-
-    if (this.options.attr('reset_visible')) {// some elements are hidden
-      $form = this.element.find('form');
-      $body = $form.closest('.modal-body');
-
-      for (i = 0; i < this.options.ui_array.length; i++) {
-        if (this.options.ui_array[i] === 1) {
-          tabindex = i + 1;
-          str = '[tabindex=' + tabindex + ']';
-          $selected = $body.find(str);
-
-          if ($selected) {
-            $selected.closest('.hidable').addClass('hidden');
-            $selected.attr({
-              uiindex: tabindex,
-              tabindex: '-1',
-            });
-          }
-        }
-      }
-
-      return false;
     }
   },
 
@@ -763,8 +543,6 @@ export default canControl.extend({
       this.serialize_form();
       this.options.attr('instance').backup();
     });
-
-    this.restore_ui_status();
   },
 
   prepareInstance: function () {
@@ -822,7 +600,7 @@ export default canControl.extend({
         that.update_hash_fragment();
       }
     }).catch(this.save_error.bind(this));
-    this.save_ui_status();
+
     return ajd;
   },
 

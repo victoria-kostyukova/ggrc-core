@@ -139,4 +139,5 @@
       </div>
     {{/if}}
   </form>
+  <gca-controls instance:from="instance" />
 </div>
