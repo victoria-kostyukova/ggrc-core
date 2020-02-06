@@ -226,6 +226,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):  # noqa pylint:
     raise ValueError("Workflow with misconfigured "
                      "Task Groups can not be activated.")
   build_cycles(workflow, obj)
+  handle_cycle_change_workflow_state(obj)
 
 
 def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user):
@@ -635,18 +636,59 @@ def handle_cycle_object_status(
   """Calculate status of cycle and cycle task group"""
   with benchmark("calculate status of Cycle and CycleTaskGroup"):
     update_cycle_task_tree([obj])
+    handle_workflow_state(obj)
+
+
+def handle_workflow_state_after_put(workflow):
+  """Calculate workflow_state of workflow and objects mapped to
+  CycleTaskGroupObjectTask.
+
+  Args:
+    workflow: instance of Workflow.
+  """
+  with benchmark("calculate workflow_state"):
+    workflow.workflow_state = workflow.get_workflow_state(workflow.cycles)
+    for cycle in workflow.cycles:
+      for ctgot in cycle.cycle_task_group_object_tasks:
+        handle_model_workflow_state(ctgot)
+
+
+def handle_workflow_state(ctgot):
+  """Calculate workflow_state of workflow and objects mapped to
+  CycleTaskGroupObjectTask.
+
+  Args:
+    ctgot: instance of CycleTaskGroupObjectTask.
+  """
+  with benchmark("calculate workflow_state"):
+    workflow = ctgot.workflow
+    workflow.workflow_state = workflow.get_workflow_state(workflow.cycles)
+    handle_model_workflow_state(ctgot)
 
 
 def handle_model_workflow_state(ctgot):
-  """Calculate workflow_state of objects mapped to CycleTaskGroupObjectTask."""
-  with benchmark("calculate workflow_state"):
-    wf_state = ctgot.workflow.get_workflow_state(ctgot.workflow.cycles)
-    ctgot.workflow.workflow_state = wf_state
+  """Calculate workflow_state objects mapped to CycleTaskGroupObjectTask.
 
-    for _obj in ctgot.related_objects():
-      if _obj.__class__.__name__ in WORKFLOW_OBJECT_TYPES:
-        _obj.workflow_state = ctgot.workflow.get_object_state(
-            _obj.cycle_task_group_object_tasks)
+  Args:
+    ctgot: instance of CycleTaskGroupObjectTask.
+  """
+  for _obj in ctgot.related_objects():
+    if _obj.type in WORKFLOW_OBJECT_TYPES:
+      _obj.workflow_state = ctgot.workflow.get_object_state(
+          _obj.cycle_task_group_object_tasks)
+
+
+def handle_cycle_change_workflow_state(cycle):
+  """Calculate workflow_state of workflow and objects mapped to
+  CycleTaskGroupObjectTask.
+
+  Args:
+    cycle: instance of Cycle.
+  """
+  workflow = cycle.workflow
+  workflow.workflow_state = workflow.get_workflow_state(workflow.cycles)
+  for ctgot in cycle.cycle_task_group_object_tasks:
+    handle_model_workflow_state(ctgot)
 
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroup)
@@ -670,6 +712,7 @@ def handle_cycle_put(
         sender, obj=None, src=None, service=None, initial_state=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.is_current.history.has_changes():
     update_workflow_state(obj.workflow)
+  handle_cycle_change_workflow_state(obj)
 
 # Check if workflow should be Inactive after recurrence change
 
@@ -725,6 +768,7 @@ def handle_workflow_put(sender, obj=None, src=None, service=None,
     raise ValueError("Workflow couldn't be moved from {old} "
                      "state to {new} state."
                      .format(old=old, new=new))
+  handle_workflow_state_after_put(obj)
 
 
 # noqa pylint: disable=unused-argument
@@ -777,7 +821,6 @@ def handle_cycle_task_status_change(sender, objs=None):
       else:
         obj.instance.finished_date = None
         obj.instance.verified_date = None
-      handle_model_workflow_state(obj.instance)
 
 
 def _validate_post_workflow_fields(workflow):
