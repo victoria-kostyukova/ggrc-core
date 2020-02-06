@@ -29,8 +29,7 @@ const ViewModel = canDefineMap.extend({
   },
   questionsUrl: {
     get() {
-      let instance = this.attr('instance');
-      return getQuestionsUrl(instance);
+      return getQuestionsUrl(this.instance);
     },
   },
 });
