@@ -294,6 +294,12 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     """Returns whether comments panel exists on the page."""
     return self.comments_panel.is_present
 
+  @property
+  def predefined_field(self):
+    """Returns description element as a predefined field for object."""
+    return page_elements.SimpleField(
+        self._root, element.Common.DESCRIPTION, with_inline_edit=True)
+
 
 class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
   """Common class for active object's Info pages and Info panels."""
@@ -850,11 +856,6 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
     """Returns Control Owners page element."""
     return self._related_people_list(roles.CONTROL_OWNERS, self._root)
 
-  @property
-  def predefined_field(self):
-    """Returns assertions element as a predefined field for controls."""
-    return self.assertions
-
 
 class Objectives(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Objective object Info pages and Info panels."""
@@ -877,11 +878,7 @@ class Objectives(page_mixins.WithAssignFolder, InfoWidget):
     scope.update(admin=self.admins.get_people_emails())
 
 
-class ScopeObjectsInfoWidget(ReadOnlyInfoWidget):
-  """Common class for Scope object's Info pages and Info panels."""
-
-
-class OrgGroups(ScopeObjectsInfoWidget):
+class OrgGroups(ReadOnlyInfoWidget):
   """Model for Org Group object Info pages and Info panels."""
 
   def update_obj_scope(self, scope):
@@ -889,59 +886,59 @@ class OrgGroups(ScopeObjectsInfoWidget):
     scope.update(admin=self.admins.get_people_emails())
 
 
-class Vendors(ScopeObjectsInfoWidget):
+class Vendors(ReadOnlyInfoWidget):
   """Model for Vendor object Info pages and Info panels."""
 
 
-class TechnologyEnvironments(ScopeObjectsInfoWidget):
+class TechnologyEnvironments(ReadOnlyInfoWidget):
   """Model for Technology Environment object Info pages and Info panels."""
 
 
-class AccessGroups(ScopeObjectsInfoWidget):
+class AccessGroups(ReadOnlyInfoWidget):
   """Model for Access Group object Info pages and Info panels."""
 
 
-class AccountBalances(ScopeObjectsInfoWidget):
+class AccountBalances(ReadOnlyInfoWidget):
   """Model for Account Balance object Info pages and Info panels."""
 
 
-class Systems(ScopeObjectsInfoWidget):
+class Systems(ReadOnlyInfoWidget):
   """Model for System object Info pages and Info panels."""
 
 
-class Processes(ScopeObjectsInfoWidget):
+class Processes(ReadOnlyInfoWidget):
   """Model for Process object Info pages and Info panels."""
 
 
-class DataAssets(ScopeObjectsInfoWidget):
+class DataAssets(ReadOnlyInfoWidget):
   """Model for Data Asset object Info pages and Info panels."""
 
 
-class Products(ScopeObjectsInfoWidget):
+class Products(ReadOnlyInfoWidget):
   """Model for Product object Info pages and Info panels."""
 
 
-class Projects(ScopeObjectsInfoWidget):
+class Projects(ReadOnlyInfoWidget):
   """Model for Project object Info pages and Info panels."""
 
 
-class Facilities(ScopeObjectsInfoWidget):
+class Facilities(ReadOnlyInfoWidget):
   """Model for Facility object Info pages and Info panels."""
 
 
-class KeyReports(ScopeObjectsInfoWidget):
+class KeyReports(ReadOnlyInfoWidget):
   """Model for Key Report object Info pages and Info panels."""
 
 
-class Markets(ScopeObjectsInfoWidget):
+class Markets(ReadOnlyInfoWidget):
   """Model for Market object Info pages and Info panels."""
 
 
-class Metrics(ScopeObjectsInfoWidget):
+class Metrics(ReadOnlyInfoWidget):
   """Model for Metric object Info pages and Info panels."""
 
 
-class ProductGroups(ScopeObjectsInfoWidget):
+class ProductGroups(ReadOnlyInfoWidget):
   """Model for Product object Info pages and Info panels."""
 
 
@@ -984,12 +981,6 @@ class Risks(page_mixins.WithDisabledProposals,
   def risk_owners(self):
     """Returns Risk Owners page element."""
     return self._related_people_list(roles.RISK_OWNERS, self._root)
-
-  @property
-  def predefined_field(self):
-    """Returns description element as a predefined field for risk."""
-    return page_elements.SimpleField(
-        self._root, element.Common.DESCRIPTION, with_inline_edit=True)
 
 
 class Threat(InfoWidget):
