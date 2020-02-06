@@ -596,43 +596,20 @@ class TestOther(TestMixinAutoStatusChangeableBase):
                                                status=from_status,
                                                assessment_type='Contract')
       factories.RelationshipFactory(source=audit, destination=assessment)
-      issue = factories.IssueFactory(title='test Issue')
+    response = self.api.post(models.all_models.Issue, data={
+        "issue": {
+            "title": "test Issue title",
+            "context": None,
+            "due_date": "02/20/2020",
+            "assessment": {
+                        "id": assessment.id,
+                        "type": "Assessment"
+            },
+        },
+    })
 
-    response, _ = self.objgen.generate_relationship(
-        source=assessment,
-        destination=issue,
-        context=None,
-    )
+    self.assert201(response)
     assessment = self.refresh_object(assessment)
-    self.assertStatus(response, 201)
-    self.assertEqual(from_status, assessment.status)
-
-  @ddt.data(models.Assessment.DONE_STATE,
-            models.Assessment.FINAL_STATE,
-            models.Assessment.PROGRESS_STATE,
-            models.Assessment.REWORK_NEEDED
-            )
-  def test_unmapping_issue_not_change_status(self, from_status):
-    """Assessment '{0}' NOT changed when un map Issue."""
-    with factories.single_commit():
-      audit = factories.AuditFactory()
-      assessment = factories.AssessmentFactory(audit=audit)
-      factories.RelationshipFactory(source=audit, destination=assessment)
-      issue = factories.IssueFactory(title='test Issue')
-      self.update_assessment_verifiers(assessment, from_status)
-    assessment_id = assessment.id
-    response, relationship = self.objgen.generate_relationship(
-        source=assessment,
-        destination=issue,
-        context=None,
-    )
-    assessment = self.refresh_object(assessment, assessment_id)
-    assessment = self.change_status(assessment, from_status)
-    assessment = self.refresh_object(assessment, assessment_id)
-    self.assertEqual(from_status, assessment.status)
-    response = self.api.delete(relationship)
-    assessment = self.refresh_object(assessment, assessment_id)
-    self.assertStatus(response, 200)
     self.assertEqual(from_status, assessment.status)
 
   @ddt.data(models.Assessment.DONE_STATE,
@@ -646,14 +623,21 @@ class TestOther(TestMixinAutoStatusChangeableBase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
-      issue = factories.IssueFactory(title='test Issue')
       self.update_assessment_verifiers(assessment, from_status)
+    response = self.api.post(models.all_models.Issue, data={
+        "issue": {
+            "title": "test Issue title",
+            "context": None,
+            "due_date": "02/20/2020",
+            "assessment": {
+                "id": assessment.id,
+                "type": "Assessment"
+            },
+        },
+    })
+    self.assert201(response)
+    issue = models.all_models.Issue.query.first()
     assessment_id = assessment.id
-    self.objgen.generate_relationship(
-        source=assessment,
-        destination=issue,
-        context=None,
-    )
     assessment = self.refresh_object(assessment, assessment_id)
     assessment = self.change_status(assessment, from_status)
     assessment = self.refresh_object(assessment, assessment_id)

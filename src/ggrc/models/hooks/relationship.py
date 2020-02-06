@@ -401,6 +401,18 @@ def init_hook():  # noqa
               obj.source_id == obj.destination_id):
         raise BadRequest("The mapping of object on itself is not possible")
 
+  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
+  def forbid_map_issue_to_assessment(sender, objects=None, **kwargs):
+    """Validate that user can't map Issue to Assessment"""
+    # pylint: disable=unused-argument
+    for obj in objects:
+      if (obj.source_type in ("Issue", "Assessment") and
+              obj.destination_type in ("Issue", "Assessment")):
+        if obj.source_type != obj.destination_type:
+          error = "{0} cannot be mapped to {1}.".format(obj.source_type,
+                                                        obj.destination_type)
+          raise BadRequest(error)
+
   # pylint: disable=unused-argument
   @signals.Restful.collection_posted.connect_via(all_models.Relationship)
   def validate_external_creation(sender, objects=None, **kwargs):
