@@ -19,6 +19,7 @@ from werkzeug.exceptions import (
     InternalServerError
 )
 
+from ggrc.models import exceptions
 from ggrc.converters.import_helper import read_csv_file
 from ggrc.gdrive import get_http_auth
 from ggrc.gdrive import handle_token_error
@@ -100,6 +101,9 @@ def get_gdrive_file_data(file_data):
     handle_token_error('Try to reload /import page')
   except HttpError as ex:
     handle_http_error(ex)
+  except exceptions.WrongDelimiterError as ex:
+    logger.error(ex.message)
+    raise BadRequest(errors.WRONG_DELIMITER_IN_CSV)
   except Exception as ex:
     logger.error(ex.message)
     raise InternalServerError(errors.INTERNAL_SERVER_ERROR)

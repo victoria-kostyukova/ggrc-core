@@ -290,7 +290,7 @@ class Api(object):
         status="Not Started",
         created_by=user,
         created_at=datetime.datetime.now(),
-        content="\n".join(content),
+        content="\r\n".join(content),
     )
     self.headers.update(self.user_headers)
     return self.client.put(

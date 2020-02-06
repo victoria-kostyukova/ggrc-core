@@ -9,8 +9,10 @@ import chardet
 from flask import g
 
 from ggrc.app import app
+from ggrc.gdrive import errors as gdrive_err
 from ggrc.data_platform import computed_attributes
 from ggrc.models import person
+from ggrc.models import exceptions
 from ggrc.models.reflection import AttributeInfo
 from ggrc.converters import errors
 from ggrc.converters import get_exportables
@@ -169,9 +171,46 @@ def generate_2d_array(width, height, value=None):
 
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
   """ Reader for csv files """
-  reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
+  reader = csv.reader(
+      utf_8_encoder(csv_data),
+      delimiter=find_delimiter(csv_data),
+      dialect=dialect,
+      **kwargs
+  )
   for row in reader:
     yield [unicode(cell, 'utf-8') for cell in row]  # noqa
+
+
+# pylint: disable=inconsistent-return-statements
+def find_delimiter(csv_data):
+  """Find delimiter used in given csv file.
+
+  Args:
+    csv_data - csv file, where delimiter should be determined.
+
+  Returns:
+    delimiter - possible values are , or ;
+    It also counts as valid delimiter "\r", because line terminators
+    can vary on different OS.
+
+  Raises:
+    WrongDelimiterError, If delimiter not in (",", ";").
+  """
+  sample = ""
+  while sample.strip(",;\n\r") == "":
+    sample = csv_data.readline()
+  csv_data.seek(0)
+  dict_ = {
+      ";": sample.find('Object type;'),
+      ",": sample.find('Object type,'),
+      "\r": sample.find('Object type\r')
+  }
+  dict_ = {k: v for k, v in dict_.items() if v != -1}
+
+  if dict_:
+    delim = min(dict_, key=dict_.get)
+    return delim if delim != "\r" else ","
+  raise exceptions.WrongDelimiterError(gdrive_err.WRONG_DELIMITER_IN_CSV)
 
 
 def read_csv_file(csv_file):
