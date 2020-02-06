@@ -12,7 +12,7 @@ import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
 import {
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
   buildParam,
 } from './query-api-utils';
 import {
@@ -155,7 +155,7 @@ function initWidgetCounts(widgets, type, id) {
  * @param {Array|Object} widgets - list of widgets
  * @param {String} type - Type of parent object
  * @param {Number} id - ID of parent object
- * @return {$.Deferred} - resolved deferred object
+ * @return {Promise} - resolved Promise
  */
 function _initWidgetCounts(widgets, type, id) {
   // Request params generation logic should be moved in
@@ -189,10 +189,10 @@ function _initWidgetCounts(widgets, type, id) {
 
   // Perform requests only if params are defined
   if (!params.length) {
-    return $.Deferred().resolve();
+    return Promise.resolve();
   }
 
-  return $.when(...params).then((...data) => {
+  return Promise.all(params).then((data) => {
     let countsMap = {};
     data.forEach(function (info, i) {
       let widget = widgetsObject[i];
@@ -211,7 +211,7 @@ function refreshCounts() {
   let location = window.location.pathname;
 
   if (!pageInstance) {
-    return $.Deferred().resolve();
+    return Promise.resolve();
   }
 
   widgets = getWidgetModels(pageInstance.constructor.model_singular, location);

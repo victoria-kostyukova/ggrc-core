@@ -89,17 +89,17 @@ export default canComponent.extend({
       this.attr('allSelected', true);
       // Replace with actual items loaded from Query API
       this.attr('allItems')
-        .done(function (allItems) {
-          selectedItems = allItems.filter(function (item) {
+        .then((allItems) => {
+          selectedItems = allItems.filter((item) => {
             return disabledIds.indexOf(item.id) < 0;
           });
           this.attr('selectedItems').replace(selectedItems);
           // Add visual selection
           this.toggleItems(true);
-        }.bind(this))
-        .fail(function () {
+        })
+        .catch(() => {
           this.clearSelection();
-        }.bind(this));
+        });
     },
   }),
   events: {

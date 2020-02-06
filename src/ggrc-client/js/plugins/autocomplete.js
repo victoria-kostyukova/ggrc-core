@@ -11,7 +11,7 @@ import loForEach from 'lodash/forEach';
 import canMap from 'can-map';
 import {
   buildRelevantIdsQuery,
-  batchRequests,
+  batchRequestsWithPromise as batchRequests,
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh-queue';
 import Search from '../models/service-models/search';
@@ -276,7 +276,6 @@ $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
       let queryField = this.element.attr('data-query-field') || 'title';
       let queryRelevantType = this.element.attr('data-query-relevant-type');
       let queryRelevantId = this.element.attr('data-query-relevant-id');
-      let dfd = $.Deferred();
       let objName = this.options.searchtypes[0];
       let relevant;
       let filter = {expression: {
@@ -295,17 +294,17 @@ $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
 
       query = buildRelevantIdsQuery(objName, {}, relevant, filter);
 
-      batchRequests(query)
-        .done((responseArr) => {
-          let ids = responseArr[objName].ids;
-          let model = businessModels[objName];
+      return new Promise((resolve) => {
+        batchRequests(query)
+          .then((responseArr) => {
+            const ids = responseArr[objName].ids;
+            const model = businessModels[objName];
 
-          let res = filteredMap(ids, (id) =>
-            getInstance(model.model_singular, id));
-          dfd.resolve(res);
-        });
-
-      return dfd;
+            const res = filteredMap(ids, (id) =>
+              getInstance(model.model_singular, id));
+            resolve(res);
+          });
+      });
     },
   },
 });

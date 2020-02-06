@@ -6,10 +6,8 @@
 import * as AjaxExtensions from '../../../plugins/ajax-extensions';
 import * as TreeViewUtils from '../../utils/tree-view-utils';
 import * as SnapshotUtils from '../../utils/snapshot-utils';
-import * as CurrentPageUtils from '../../utils/current-page-utils';
 import * as WidgetsUtils from '../../utils/widgets-utils';
 import * as QueryAPI from '../../utils/query-api-utils';
-import * as Mappings from '../../../models/mappers/mappings';
 import * as WidgetList from '../../../modules/widget-list';
 import QueryParser from '../../../generated/ggrc-filter-query-parser';
 
@@ -155,14 +153,10 @@ describe('GGRC Utils Widgets', function () {
 
   describe('initCounts() method', () => {
     let method;
-    let queryDfd;
     let getCounts;
-    let snapshotCountsDfd;
     let id = 1;
 
     beforeEach(() => {
-      queryDfd = $.Deferred();
-      snapshotCountsDfd = $.Deferred();
       method = WidgetsUtils.initCounts;
       getCounts = WidgetsUtils.getCounts;
 
@@ -173,177 +167,82 @@ describe('GGRC Utils Widgets', function () {
           operation: 'owned',
         });
       spyOn(SnapshotUtils, 'isSnapshotRelated')
-        .and.callFake((type, widgetType) => widgetType === 'Control');
-      spyOn(QueryAPI, 'buildParam')
-        .and.callFake((objName) => {
-          return {
-            objectName: objName,
-          };
+        .and.callFake((type, widgetType) => {
+          return widgetType === 'Control';
         });
+      spyOn(QueryAPI, 'buildParam')
+        .and.callFake((objName) => ({
+          objectName: objName,
+        }));
 
       spyOn(QueryParser, 'parse')
         .and.returnValue({});
-
-      spyOn(QueryAPI, 'batchRequests').and.returnValue(queryDfd);
-
-      spyOn(SnapshotUtils, 'getSnapshotsCounts')
-        .and.returnValue(snapshotCountsDfd);
     });
 
     it('should not make request when no widget was provided', () => {
+      spyOn(QueryAPI, 'batchRequestsWithPromise');
+
       method([], 'Control', 1);
 
-      expect(QueryAPI.batchRequests).not.toHaveBeenCalled();
+      expect(QueryAPI.batchRequestsWithPromise).not.toHaveBeenCalled();
     });
 
     it('should init counts for snapshotable objects', async () => {
-      let result;
-
-      queryDfd.resolve();
-      snapshotCountsDfd.resolve({
-        Control: 11,
-      });
+      spyOn(SnapshotUtils, 'getSnapshotsCounts')
+        .and.returnValue(Promise.resolve({
+          Control: 11,
+        }));
 
       await method(['Control'], 'Assessment', 1);
 
-      result = getCounts();
+      const result = getCounts();
+
       expect(result.Control).toEqual(11);
     });
 
     it('should init counts for non-snapshotable objects',
       async () => {
-        let result;
-
-        queryDfd.resolve({
-          Assessment: {
-            total: 10,
-          },
-        });
-        snapshotCountsDfd.resolve({});
+        spyOn(SnapshotUtils, 'getSnapshotsCounts')
+          .and.returnValue(Promise.resolve({}));
+        spyOn(QueryAPI, 'batchRequestsWithPromise')
+          .withArgs({
+            type: 'count',
+            objectName: 'Assessment',
+          })
+          .and.returnValue(Promise.resolve({
+            Assessment: {
+              total: 10,
+            },
+          }));
 
         await method(['Assessment'], 'Control', 1);
 
-        expect(QueryAPI.batchRequests)
-          .toHaveBeenCalledWith({
-            type: 'count',
-            objectName: 'Assessment',
-          }
-          );
-
-        result = getCounts();
+        const result = getCounts();
 
         expect(result.Assessment).toEqual(10);
       });
 
     it('should init counts for virtual objects', async () => {
-      let result;
-
-      queryDfd.resolve({
+      spyOn(SnapshotUtils, 'getSnapshotsCounts')
+        .and.returnValue(Promise.resolve({}));
+      spyOn(QueryAPI, 'batchRequestsWithPromise').withArgs({
+        type: 'count',
+        objectName: 'Cycle',
+      }).and.returnValue(Promise.resolve({
         Cycle: {
           total: 10,
         },
-      });
-      snapshotCountsDfd.resolve({});
+      }));
 
       await method([{
         name: 'Cycle',
         countsName: 'ActiveCycle',
       }], 'Control', 1);
 
-      expect(QueryAPI.batchRequests)
-        .toHaveBeenCalledWith({
-          type: 'count',
-          objectName: 'Cycle',
-        });
-
-      result = getCounts();
+      const result = getCounts();
 
       expect(result.ActiveCycle).toEqual(10);
     });
-  });
-
-  describe('initMappedInstances() method', function () {
-    let requestDfds = [];
-    let method;
-
-    beforeEach(function () {
-      let requestDfd;
-
-      spyOn(QueryAPI, 'buildRelevantIdsQuery')
-        .and.callFake(function (objName, page, relevant, additionalFilter) {
-          return {
-            model: objName,
-            operation: 'relevant',
-          };
-        });
-
-      spyOn(SnapshotUtils, 'isSnapshotRelated')
-        .and.callFake(function (parent, child) {
-          return child === 'Control';
-        });
-
-      spyOn(SnapshotUtils, 'transformQueryToSnapshot')
-        .and.callFake(function (query) {
-          return query;
-        });
-
-      spyOn(QueryAPI, 'batchRequests')
-        .and.callFake(function () {
-          requestDfd = $.Deferred();
-          requestDfds.push(requestDfd);
-          return requestDfd;
-        });
-      method = CurrentPageUtils.initMappedInstances;
-    });
-
-    it('should init mappings for snapshotable objects',
-      function (done) {
-        let snapshotIds = [1, 2, 3];
-
-        function validateResult(result) {
-          snapshotIds.forEach(function (id) {
-            expect(result.Control[id]).toBeTruthy();
-          });
-          done();
-        }
-
-        spyOn(Mappings, 'getMappingList')
-          .and.returnValue(['Control']);
-
-        method().then(validateResult);
-        requestDfds.forEach(function (dfd) {
-          dfd.resolve({
-            Snapshot: {
-              ids: snapshotIds,
-            },
-          });
-        });
-      });
-
-    it('should init mappings for non-snapshotable objects',
-      function (done) {
-        let nonSnapshotIds = [4, 5, 6];
-
-        function validateResult(result) {
-          nonSnapshotIds.forEach(function (id) {
-            expect(result.Assessment[id]).toBeTruthy();
-          });
-
-          done();
-        }
-
-        spyOn(Mappings, 'getMappingList')
-          .and.returnValue(['Assessment']);
-
-        method().then(validateResult);
-        requestDfds.forEach(function (dfd) {
-          dfd.resolve({
-            Assessment: {
-              ids: nonSnapshotIds,
-            },
-          });
-        });
-      });
   });
 
   describe('refreshCounts() method', function () {
