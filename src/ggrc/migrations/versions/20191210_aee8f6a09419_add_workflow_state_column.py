@@ -73,18 +73,36 @@ CTGOTS_WF_QUERY = """
 """
 
 
+TABLES = (
+    "access_groups",
+    "account_balances",
+    "assessments",
+    "controls",
+    "data_assets",
+    "directives",
+    "facilities",
+    "issues",
+    "key_reports",
+    "markets",
+    "metrics",
+    "objectives",
+    "org_groups",
+    "products",
+    "product_groups",
+    "programs",
+    "projects",
+    "requirements",
+    "risks",
+    "systems",
+    "technology_environments",
+    "threats",
+    "vendors",
+    "workflows",
+)
+
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-
-def get_tables():
-  """Get tables in which to insert workflow_state column."""
-  tables = set()
-  for type_ in wf_models.WORKFLOW_OBJECT_TYPES:
-    model = getattr(all_models, type_)
-    tables.add(model.__tablename__)
-  tables.add(wf_models.Workflow.__tablename__)
-  return tables
 
 
 def fetch_ctgots_for(connection, type_):
@@ -198,8 +216,7 @@ def add_to_objs_without_revs(objs):
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
-  tables = get_tables()
-  for table in tables:
+  for table in TABLES:
     alter_table(connection, table)
   objs = populate_wf_state(connection)
   add_to_objs_without_revs(objs)
