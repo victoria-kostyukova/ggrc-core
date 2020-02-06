@@ -9,10 +9,12 @@ import unittest
 from datetime import datetime
 
 import mock
+import ddt
 
 from ggrc.notifications import common
 
 
+@ddt.ddt
 class TestSortComments(unittest.TestCase):
   """Tests for the as_user_time() helper function."""
   # pylint: disable=invalid-name
@@ -71,6 +73,15 @@ class TestSortComments(unittest.TestCase):
                     return_value=content):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(expected_data, notif_data)
+
+  @ddt.data("йцукен", "测试", "qwerty", u"йцукен", u"qwerйцук")
+  def test_prefix_subject(self, subject):
+    """Test that prefix_subject returns unicode str"""
+    expected = u"[prefix] " + subject.decode("utf-8") \
+        if isinstance(subject, str) else u"[prefix] " + subject
+    with mock.patch("ggrc.settings.NOTIFICATION_PREFIX", new="prefix"):
+      subj = common.prefix_subject(subject)
+      self.assertEqual(expected, subj)
 
 
 class TestSendMailLocally(unittest.TestCase):
