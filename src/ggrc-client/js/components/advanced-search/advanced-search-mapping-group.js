@@ -14,7 +14,7 @@ import template from './advanced-search-mapping-group.stache';
  * Contains logic used in Mapping Group component.
  * @constructor
  */
-let viewModel = AdvancedSearchContainer.extend({
+const ViewModel = AdvancedSearchContainer.extend({
   /**
    * Contains specific model name.
    * @type {string}
@@ -22,17 +22,21 @@ let viewModel = AdvancedSearchContainer.extend({
    * Requirement
    * Regulation
    */
-  modelName: null,
+  modelName: {
+    value: null,
+  },
   /**
    * Indicates that Group is created on the root level.
    * @type {boolean}
    */
-  root: false,
+  root: {
+    value: false,
+  },
   /**
    * Adds Filter Operator and Mapping Criteria to the collection.
    */
-  addMappingCriteria: function () {
-    let items = this.attr('items');
+  addMappingCriteria() {
+    let items = this.items;
     items.push(AdvancedSearch.create.operator('AND'));
     items.push(AdvancedSearch.create.mappingCriteria());
   },
@@ -45,5 +49,5 @@ export default canComponent.extend({
   tag: 'advanced-search-mapping-group',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });

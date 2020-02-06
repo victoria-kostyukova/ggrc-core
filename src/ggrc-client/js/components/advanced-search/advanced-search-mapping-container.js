@@ -17,7 +17,7 @@ import template from './advanced-search-mapping-container.stache';
  * Contains logic used in Mapping Container component
  * @constructor
  */
-let viewModel = AdvancedSearchContainer.extend({
+const ViewModel = AdvancedSearchContainer.extend({
   /**
    * Contains specific model name.
    * @type {string}
@@ -25,13 +25,15 @@ let viewModel = AdvancedSearchContainer.extend({
    * Requirement
    * Regulation
    */
-  modelName: null,
+  modelName: {
+    value: null,
+  },
   /**
    * Adds Mapping Criteria and Operator to the collection.
    * Adds only Mapping Criteria if collection is empty.
    */
-  addMappingCriteria: function () {
-    let items = this.attr('items');
+  addMappingCriteria() {
+    let items = this.items;
     if (items.length) {
       items.push(AdvancedSearch.create.operator('AND'));
     }
@@ -41,8 +43,8 @@ let viewModel = AdvancedSearchContainer.extend({
    * Transforms Mapping Criteria to Mapping Group.
    * @param {canMap} criteria - Mapping Criteria.
    */
-  createGroup: function (criteria) {
-    let items = this.attr('items');
+  createGroup(criteria) {
+    let items = this.items;
     let index = items.indexOf(criteria);
     items.attr(index, AdvancedSearch.create.group([
       criteria,
@@ -61,7 +63,9 @@ let viewModel = AdvancedSearchContainer.extend({
    * Indicates that it is in assessment-template-clone-modal
    * @type {boolean}
    */
-  isClone: false,
+  isClone: {
+    value: false,
+  },
 });
 
 /**
@@ -71,5 +75,5 @@ export default canComponent.extend({
   tag: 'advanced-search-mapping-container',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });

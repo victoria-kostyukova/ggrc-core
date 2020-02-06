@@ -5,6 +5,7 @@
 
 import loSortBy from 'lodash/sortBy';
 import canStache from 'can-stache';
+import canDefineMap from 'can-define/map/map';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../simple-popover/simple-popover';
@@ -19,65 +20,59 @@ import * as businessModels from '../../models/business-models';
  * Contains logic used in Mapping Criteria component.
  * @constructor
  */
-let viewModel = canMap.extend({
-  define: {
-    /**
-     * Contains object represents criteria.
-     * Contains the following fields: objectName, filter, mappedTo.
-     * Initializes filter with Filter Attribute model.
-     * @type {canMap}
-     */
-    criteria: {
-      type: '*',
-      Value: canMap,
-      set: function (criteria) {
-        if (!criteria.filter) {
-          criteria.attr('filter',
-            AdvancedSearch.create.attribute());
-        }
-        return criteria;
-      },
-    },
-    /**
-     * Indicates that criteria can be transformed to Mapping Group.
-     * @type {boolean}
-     */
-    canBeGrouped: {
-      type: 'boolean',
-      value: false,
-      get: function () {
-        return this.attr('extendable') &&
-         !(this.attr('criteria.mappedTo') && !this.attr('childCanBeGrouped'));
-      },
-    },
-    /**
-     * Indicates that child Mapping Criteria can be added.
-     * @type {boolean}
-     */
-    canAddMapping: {
-      type: 'boolean',
-      value: false,
-      get: function () {
-        return !this.attr('criteria.mappedTo');
-      },
-    },
-    /**
-     * Indicates that popover should be displayed.
-     * @type {boolean}
-     */
-    showPopover: {
-      type: 'boolean',
-      value: false,
-      get: function () {
-        return this.attr('canBeGrouped') && this.attr('canAddMapping');
-      },
+const ViewModel = canDefineMap.extend({
+  /**
+   * Contains object represents criteria.
+   * Contains the following fields: objectName, filter, mappedTo.
+   * Initializes filter with Filter Attribute model.
+   * @type {canMap}
+   */
+  criteria: {
+    Type: canMap,
+    Value: canMap,
+    set(criteria) {
+      if (!criteria.filter) {
+        criteria.attr('filter',
+          AdvancedSearch.create.attribute());
+      }
+      return criteria;
     },
   },
   /**
-   * Indicates that child Mappping Criteria can be transformed to Mapping Group.
+   * Indicates that criteria can be transformed to Mapping Group.
    * @type {boolean}
    */
-  childCanBeGrouped: false,
+  canBeGrouped: {
+    get() {
+      return this.extendable &&
+        !(this.criteria.attr('mappedTo') && !this.childCanBeGrouped);
+    },
+  },
+  /**
+   * Indicates that child Mapping Criteria can be added.
+   * @type {boolean}
+   */
+  canAddMapping: {
+    get() {
+      return !this.criteria.attr('mappedTo');
+    },
+  },
+  /**
+   * Indicates that popover should be displayed.
+   * @type {boolean}
+   */
+  showPopover: {
+    get() {
+      return this.canBeGrouped && this.canAddMapping;
+    },
+  },
+  /**
+   * Indicates that child Mapping Criteria can be transformed to Mapping Group.
+   * @type {boolean}
+   */
+  childCanBeGrouped: {
+    value: false,
+  },
   /**
    * Contains specific model name.
    * @type {string}
@@ -85,46 +80,54 @@ let viewModel = canMap.extend({
    * Requirement
    * Regulation
    */
-  modelName: null,
+  modelName: {
+    value: null,
+  },
   /**
    * Indicates that Criteria is created on the root level.
    * Used for displaying correct label.
    */
-  root: false,
+  root: {
+    value: false,
+  },
   /**
    * Indicates that Criteria can be transformed to Mapping Group.
    * @type {boolean}
    */
-  extendable: false,
+  extendable: {
+    value: false,
+  },
   /**
    * Indicates that it is in assessment-template-clone-modal
    * @type {boolean}
    */
-  isClone: false,
+  isClone: {
+    value: false,
+  },
   /**
    * Returns a list of available attributes for specific model.
    * @return {canList} - List of available attributes.
    */
-  availableAttributes: function () {
-    return getAvailableAttributes(this.attr('criteria.objectName'));
+  availableAttributes() {
+    return getAvailableAttributes(this.criteria.attr('objectName'));
   },
   /**
    * Returns a list of available mapping types for specific model.
    * @return {Array} - List of available mapping types.
    */
-  mappingTypes: function () {
-    if (this.attr('isClone')) {
-      let modelName = this.attr('modelName');
+  mappingTypes() {
+    if (this.isClone) {
+      let modelName = this.modelName;
 
-      this.attr('criteria.objectName', modelName);
+      this.criteria.attr('objectName', modelName);
       return [businessModels[modelName]];
     }
 
-    let mappings = getAvailableMappings(this.attr('modelName'));
+    let mappings = getAvailableMappings(this.modelName);
     let types = loSortBy(mappings, 'model_singular');
 
-    if (!this.attr('criteria.objectName')) {
-      this.attr('criteria.objectName', types[0].model_singular);
+    if (!this.criteria.attr('objectName')) {
+      this.criteria.attr('objectName', types[0].model_singular);
     }
 
     return types;
@@ -133,49 +136,51 @@ let viewModel = canMap.extend({
    * Returns a criteria title.
    * @return {string} - Criteria title.
    */
-  title: function () {
-    if (this.attr('root')) {
+  title() {
+    if (this.root) {
       return 'Mapped To';
     }
     return 'Where ' +
-            businessModels[this.attr('modelName')].title_singular +
+            businessModels[this.modelName].title_singular +
             ' is mapped to';
   },
   /**
    * Dispatches event meaning that the component should be removed from parent container.
    */
-  remove: function () {
+  remove() {
     this.dispatch('remove');
   },
   /**
    * Dispatches event meaning that the component should be transformed to Mapping Group.
    */
-  createGroup: function () {
+  createGroup() {
     this.dispatch('createGroup');
   },
   /**
    * Creates the child Mapping Criteria.
    */
-  addRelevant: function () {
-    this.attr('criteria.mappedTo',
-      AdvancedSearch.create.mappingCriteria());
+  addRelevant() {
+    this.criteria.attr('mappedTo',
+      AdvancedSearch.create.mappingCriteria()
+    );
   },
   /**
    * Removes the child Mapping Criteria.
    */
-  removeRelevant: function () {
-    this.removeAttr('criteria.mappedTo');
+  removeRelevant() {
+    this.criteria.removeAttr('mappedTo');
   },
   /**
    * Transforms child Mapping Criteria to Mapping Group.
    */
-  relevantToGroup: function () {
-    this.attr('criteria.mappedTo',
+  relevantToGroup() {
+    this.criteria.attr('mappedTo',
       AdvancedSearch.create.group([
-        this.attr('criteria.mappedTo'),
+        this.criteria.attr('mappedTo'),
         AdvancedSearch.create.operator('AND'),
         AdvancedSearch.create.mappingCriteria(),
-      ]));
+      ])
+    );
   },
 });
 
@@ -185,5 +190,5 @@ let viewModel = canMap.extend({
 export default canComponent.extend({
   tag: 'advanced-search-mapping-criteria',
   view: canStache(template),
-  viewModel: viewModel,
+  ViewModel,
 });

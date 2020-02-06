@@ -7,22 +7,19 @@ import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../advanced-search-filter-group';
 
-describe('advanced-search-filter-group component', function () {
-  'use strict';
-
+describe('advanced-search-filter-group component', () => {
   let viewModel;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('addFilterCriterion() method', function () {
-    it('adds operator and attribute', function () {
-      let items;
-      viewModel.attr('items', [AdvancedSearch.create.attribute()]);
+  describe('addFilterCriterion() method', () => {
+    it('adds operator and attribute', () => {
+      viewModel.items = [AdvancedSearch.create.attribute()];
       viewModel.addFilterCriterion();
 
-      items = viewModel.attr('items');
+      let items = viewModel.items;
       expect(items.length).toBe(3);
       expect(items[0].type).toBe('attribute');
       expect(items[1].type).toBe('operator');

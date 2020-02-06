@@ -8,59 +8,57 @@ import canEvent from 'can-event';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../multiselect-dropdown';
 
-describe('multiselect-dropdown component', function () {
-  'use strict';
-
+describe('multiselect-dropdown component', () => {
   let events;
   let viewModel;
 
-  beforeAll(function () {
+  beforeAll(() => {
     events = Component.prototype.events;
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('_displayValue attribute', function () {
-    beforeEach(function () {
+  describe('_displayValue attribute', () => {
+    beforeEach(() => {
       const visibleOptions = [
         {value: 'Select All', checked: false, isSelectAll: true},
         {value: 'Draft', checked: false},
         {value: 'Active', checked: false},
         {value: 'Open', checked: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
     });
 
-    it('check "_displayValue" after updateSelected()', function () {
-      viewModel.attr('visibleOptions')[1].attr('checked', true);
+    it('check "_displayValue" after updateSelected()', () => {
+      viewModel.visibleOptions[1].checked = true;
       viewModel.updateSelected();
 
-      expect(viewModel.attr('_displayValue'))
+      expect(viewModel._displayValue)
         .toEqual('Draft, Open');
     });
 
-    it('check "_displayValue" after remove item from "selected"', function () {
-      viewModel.attr('visibleOptions')[1].attr('checked', false);
+    it('check "_displayValue" after remove item from "selected"', () => {
+      viewModel.visibleOptions[1].checked = false;
 
       viewModel.updateSelected();
 
-      expect(viewModel.attr('_displayValue'))
+      expect(viewModel._displayValue)
         .toEqual('Open');
     }
     );
   });
 
-  describe('setVisibleOptions() method', function () {
+  describe('setVisibleOptions() method', () => {
     it('sets visibleOptions from options and one additional internal option',
-      function () {
+      () => {
         const options = [
           {value: 1, checked: true},
           {value: 2, checked: false},
           {value: 3, checked: true},
         ];
-        viewModel.attr('options', options);
+        viewModel.options = options;
 
         spyOn(viewModel, 'isAllSelected').and.returnValue(false);
 
@@ -88,93 +86,93 @@ describe('multiselect-dropdown component', function () {
           },
         ];
 
-        viewModel.setVisibleOptions(viewModel.attr('options'));
+        viewModel.setVisibleOptions(viewModel.options);
 
-        expect(viewModel.attr('visibleOptions').serialize())
+        expect(viewModel.visibleOptions.serialize())
           .toEqual(expectedVisibleOptions);
       });
   });
 
-  describe('isAllSelected() method', function () {
+  describe('isAllSelected() method', () => {
     let options;
 
-    it('returns true if all options are checked', function () {
+    it('returns true if all options are checked', () => {
       options = [
         {value: 1, checked: true},
         {value: 2, checked: true},
         {value: 3, checked: true},
       ];
-      viewModel.attr('options', options);
+      viewModel.options = options;
 
       expect(viewModel.isAllSelected()).toBe(true);
     });
 
-    it('returns false if not all options are checked', function () {
+    it('returns false if not all options are checked', () => {
       options = [
         {value: 1, checked: true},
         {value: 2, checked: false},
         {value: 3, checked: true},
       ];
-      viewModel.attr('options', options);
+      viewModel.options = options;
 
       expect(viewModel.isAllSelected()).toBe(false);
     });
   });
 
-  describe('getHighlightedOptionIndex() method', function () {
-    it('returns index of the highlighted option', function () {
+  describe('getHighlightedOptionIndex() method', () => {
+    it('returns index of the highlighted option', () => {
       const visibleOptions = [
         {value: 1, checked: true, highlighted: false},
         {value: 2, checked: false, highlighted: true},
         {value: 3, checked: true, highlighted: false},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       expect(viewModel.getHighlightedOptionIndex()).toBe(1);
     });
 
-    it('returns -1 if there is no highlighted option ', function () {
+    it('returns -1 if there is no highlighted option ', () => {
       const visibleOptions = [
         {value: 1, checked: true, highlighted: false},
         {value: 2, checked: false, highlighted: false},
         {value: 3, checked: true, highlighted: false},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       expect(viewModel.getHighlightedOptionIndex()).toBe(-1);
     });
   });
 
-  describe('updateSelected() method', function () {
+  describe('updateSelected() method', () => {
     let visibleOptions;
 
-    beforeEach(function () {
+    beforeEach(() => {
       visibleOptions = [
         {value: 1, checked: true},
         {value: 2, checked: false},
         {value: 3, checked: true},
         {value: 4, checked: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
     });
 
     it('sets _stateWasUpdated attr to true', () => {
-      viewModel.attr('_stateWasUpdated', false);
+      viewModel._stateWasUpdated = false;
 
       viewModel.updateSelected();
 
-      expect(viewModel.attr('_stateWasUpdated')).toBe(true);
+      expect(viewModel._stateWasUpdated).toBe(true);
     });
 
     it('assigns new list into selected from visibleOptions', () => {
       const expectedSelected = visibleOptions.filter((item) =>
         !item.isSelectAll && item.checked);
 
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       viewModel.updateSelected();
 
-      expect(viewModel.attr('selected').serialize()).toEqual(expectedSelected);
+      expect(viewModel.selected.serialize()).toEqual(expectedSelected);
     });
 
     it('dispatches "selectedChanged" with selected options', () => {
@@ -184,13 +182,13 @@ describe('multiselect-dropdown component', function () {
 
       expect(viewModel.dispatch).toHaveBeenCalledWith({
         type: 'selectedChanged',
-        selected: viewModel.attr('selected'),
+        selected: viewModel.selected,
       });
     });
   });
 
-  describe('dropdownClosed() method', function () {
-    it('calls removeHighlight method', function () {
+  describe('dropdownClosed() method', () => {
+    it('calls removeHighlight method', () => {
       spyOn(viewModel, 'removeHighlight');
 
       viewModel.dropdownClosed();
@@ -199,29 +197,29 @@ describe('multiselect-dropdown component', function () {
     });
 
     it('dispatches "dropdownClose" with selected options ' +
-    'if _stateWasUpdated attr is true', function () {
-      viewModel.attr('_stateWasUpdated', true);
+    'if _stateWasUpdated attr is true', () => {
+      viewModel._stateWasUpdated = true;
       spyOn(viewModel, 'dispatch');
 
       viewModel.dropdownClosed();
 
       expect(viewModel.dispatch).toHaveBeenCalledWith({
         type: 'dropdownClose',
-        selected: viewModel.attr('selected'),
+        selected: viewModel.selected,
       });
     });
 
-    it('sets _stateWasUpdated attr to false if it is true', function () {
-      viewModel.attr('_stateWasUpdated', true);
+    it('sets _stateWasUpdated attr to false if it is true', () => {
+      viewModel._stateWasUpdated = true;
 
       viewModel.dropdownClosed();
 
-      expect(viewModel.attr('_stateWasUpdated')).toBe(false);
+      expect(viewModel._stateWasUpdated).toBe(false);
     });
 
     it('does not dispatch "dropdownClose" if _stateWasUpdated attr is false',
-      function () {
-        viewModel.attr('_stateWasUpdated', false);
+      () => {
+        viewModel._stateWasUpdated = false;
         spyOn(viewModel, 'dispatch');
 
         viewModel.dropdownClosed();
@@ -230,88 +228,88 @@ describe('multiselect-dropdown component', function () {
       });
   });
 
-  describe('changeOpenCloseState() method', function () {
-    beforeEach(function () {
-      viewModel.attr('options', [{value: 'someOption'}]);
+  describe('changeOpenCloseState() method', () => {
+    beforeEach(() => {
+      viewModel.options = [{value: 'someOption'}];
       spyOn(viewModel, 'dispatch');
     });
 
     it('open dropdown',
-      function () {
+      () => {
         // click on dropdown input
         viewModel.openDropdown();
 
         // "window.click" event is triggered after click on dropdown input
         viewModel.changeOpenCloseState();
-        expect(viewModel.attr('isOpen')).toEqual(true);
-        expect(viewModel.attr('canBeOpen')).toEqual(false);
+        expect(viewModel.isOpen).toEqual(true);
+        expect(viewModel.canBeOpen).toEqual(false);
       }
     );
 
     it('close dropdown without changing of options',
-      function () {
+      () => {
         spyOn(canEvent, 'trigger');
-        viewModel.attr('isOpen', true);
-        viewModel.attr('_stateWasUpdated', false);
+        viewModel.isOpen = true;
+        viewModel._stateWasUpdated = false;
 
         // simulate "window.click" event
         viewModel.changeOpenCloseState();
 
-        expect(viewModel.attr('isOpen')).toEqual(false);
-        expect(viewModel.attr('canBeOpen')).toEqual(false);
+        expect(viewModel.isOpen).toEqual(false);
+        expect(viewModel.canBeOpen).toEqual(false);
         expect(viewModel.dispatch.calls.count()).toEqual(0);
       }
     );
 
     it('close dropdown with changing of options',
-      function () {
+      () => {
         spyOn(canEvent, 'trigger');
-        viewModel.attr('isOpen', true);
-        viewModel.attr('_stateWasUpdated', false);
+        viewModel.isOpen = true;
+        viewModel._stateWasUpdated = false;
 
         viewModel.updateSelected();
 
         // simulate "window.click" event
         viewModel.changeOpenCloseState();
 
-        expect(viewModel.attr('isOpen')).toEqual(false);
-        expect(viewModel.attr('canBeOpen')).toEqual(false);
+        expect(viewModel.isOpen).toEqual(false);
+        expect(viewModel.canBeOpen).toEqual(false);
         expect(viewModel.dispatch).toHaveBeenCalledWith({
           type: 'dropdownClose',
-          selected: viewModel.attr('selected'),
+          selected: viewModel.selected,
         });
       }
     );
   });
 
-  describe('openDropdown() method', function () {
-    it('sets "canBeOpen" to true if component is not disabled', function () {
-      viewModel.attr('canBeOpen', false);
-      viewModel.attr('disabled', false);
+  describe('openDropdown() method', () => {
+    it('sets "canBeOpen" to true if component is not disabled', () => {
+      viewModel.canBeOpen = false;
+      viewModel.disabled = false;
 
       viewModel.openDropdown();
 
-      expect(viewModel.attr('canBeOpen')).toBe(true);
+      expect(viewModel.canBeOpen).toBe(true);
     });
 
-    it('does not set "canBeOpen" if component is disabled', function () {
-      viewModel.attr('canBeOpen', false);
-      viewModel.attr('disabled', true);
+    it('does not set "canBeOpen" if component is disabled', () => {
+      viewModel.canBeOpen = false;
+      viewModel.disabled = true;
 
       viewModel.openDropdown();
 
-      expect(viewModel.attr('canBeOpen')).toBe(false);
+      expect(viewModel.canBeOpen).toBe(false);
     });
   });
 
-  describe('selectAll() method', function () {
-    it('sets "checked" to true for all options', function () {
+  describe('selectAll() method', () => {
+    it('sets "checked" to true for all options', () => {
       const visibleOptions = [
         {value: 1, checked: true},
         {value: 2, checked: false},
         {value: 3, checked: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       const expectedVisibleOptions = [
         {value: 1, checked: true},
@@ -321,19 +319,19 @@ describe('multiselect-dropdown component', function () {
 
       viewModel.selectAll();
 
-      expect(viewModel.attr('visibleOptions').serialize())
+      expect(viewModel.visibleOptions.serialize())
         .toEqual(expectedVisibleOptions);
     });
   });
 
-  describe('unselectAll() method', function () {
-    it('sets "checked" to false for all options', function () {
+  describe('unselectAll() method', () => {
+    it('sets "checked" to false for all options', () => {
       const visibleOptions = [
         {value: 1, checked: true},
         {value: 2, checked: false},
         {value: 3, checked: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       const expectedVisibleOptions = [
         {value: 1, checked: false},
@@ -343,140 +341,140 @@ describe('multiselect-dropdown component', function () {
 
       viewModel.unselectAll();
 
-      expect(viewModel.attr('visibleOptions').serialize())
+      expect(viewModel.visibleOptions.serialize())
         .toEqual(expectedVisibleOptions);
     });
   });
 
-  describe('selectAllOptionChange() method', function () {
+  describe('selectAllOptionChange() method', () => {
     it('calls selectAll method if internal option "checked" attr is false',
-      function () {
+      () => {
         const visibleOptions = [
           {value: 1, checked: true},
           {value: 2, checked: false},
           {value: 3, checked: false, isSelectAll: true},
         ];
-        viewModel.attr('visibleOptions', visibleOptions);
+        viewModel.visibleOptions = visibleOptions;
         spyOn(viewModel, 'selectAll');
 
-        viewModel.selectAllOptionChange(viewModel.attr('visibleOptions')[2]);
+        viewModel.selectAllOptionChange(viewModel.visibleOptions[2]);
 
         expect(viewModel.selectAll).toHaveBeenCalled();
       });
 
     it('calls unselectAll method if internal option "checked" attr is true',
-      function () {
+      () => {
         const visibleOptions = [
           {value: 1, checked: true},
           {value: 2, checked: true},
           {value: 3, checked: true, isSelectAll: true},
         ];
-        viewModel.attr('visibleOptions', visibleOptions);
+        viewModel.visibleOptions = visibleOptions;
         spyOn(viewModel, 'unselectAll');
 
-        viewModel.selectAllOptionChange(viewModel.attr('visibleOptions')[2]);
+        viewModel.selectAllOptionChange(viewModel.visibleOptions[2]);
 
         expect(viewModel.unselectAll).toHaveBeenCalled();
       });
   });
 
-  describe('optionChange() method', function () {
-    beforeEach(function () {
+  describe('optionChange() method', () => {
+    beforeEach(() => {
       const visibleOptions = [
         {value: '1', checked: false, highlighted: false},
         {value: '2', checked: true, highlighted: true},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
     });
 
-    it('sets "checked" attr to opposite value', function () {
-      viewModel.optionChange(viewModel.attr('visibleOptions')[0]);
+    it('sets "checked" attr to opposite value', () => {
+      viewModel.optionChange(viewModel.visibleOptions[0]);
 
-      expect(viewModel.attr('visibleOptions')[0].checked).toBe(true);
+      expect(viewModel.visibleOptions[0].checked).toBe(true);
     });
 
-    it('calls updateSelected method', function () {
+    it('calls updateSelected method', () => {
       spyOn(viewModel, 'updateSelected');
 
-      viewModel.optionChange(viewModel.attr('visibleOptions')[0]);
+      viewModel.optionChange(viewModel.visibleOptions[0]);
 
       expect(viewModel.updateSelected).toHaveBeenCalled();
     });
 
     it('sets "checked" attr for internal option to true ' +
-    'if all option are selected', function () {
+    'if all option are selected', () => {
       spyOn(viewModel, 'isAllSelected').and.returnValue(true);
 
-      viewModel.optionChange(viewModel.attr('visibleOptions')[0]);
+      viewModel.optionChange(viewModel.visibleOptions[0]);
 
-      expect(viewModel.attr('visibleOptions')[2].checked).toBe(true);
+      expect(viewModel.visibleOptions[2].checked).toBe(true);
       expect(viewModel.isAllSelected).toHaveBeenCalled();
     });
 
     it('sets "checked" attr for internal option to false ' +
-    'if not all option are selected', function () {
+    'if not all option are selected', () => {
       spyOn(viewModel, 'isAllSelected').and.returnValue(false);
 
-      viewModel.optionChange(viewModel.attr('visibleOptions')[0]);
+      viewModel.optionChange(viewModel.visibleOptions[0]);
 
-      expect(viewModel.attr('visibleOptions')[2].checked).toBe(false);
+      expect(viewModel.visibleOptions[2].checked).toBe(false);
       expect(viewModel.isAllSelected).toHaveBeenCalled();
     });
   });
 
-  describe('visibleOptionChange() method', function () {
-    beforeEach(function () {
+  describe('visibleOptionChange() method', () => {
+    beforeEach(() => {
       const visibleOptions = [
         {value: '1', checked: false, highlighted: false},
         {value: '2', checked: true, highlighted: true},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       spyOn(viewModel, 'scrollTop');
     });
 
     it('calls chooseOption method ' +
-    'if "highlighted" attr of passed option is false', function () {
+    'if "highlighted" attr of passed option is false', () => {
       spyOn(viewModel, 'chooseOption');
 
-      viewModel.visibleOptionChange(viewModel.attr('visibleOptions')[0]);
+      viewModel.visibleOptionChange(viewModel.visibleOptions[0]);
 
       expect(viewModel.chooseOption)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[0]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[0]);
     });
 
     it('calls selectAllOptionChange method ' +
-    'if "isSelectAll" attr of passed option is true', function () {
+    'if "isSelectAll" attr of passed option is true', () => {
       spyOn(viewModel, 'selectAllOptionChange');
 
-      viewModel.visibleOptionChange(viewModel.attr('visibleOptions')[2]);
+      viewModel.visibleOptionChange(viewModel.visibleOptions[2]);
 
       expect(viewModel.selectAllOptionChange)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[2]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[2]);
     });
 
     it('calls optionChange method ' +
-    'if "isSelectAll" attr of passed option is false', function () {
+    'if "isSelectAll" attr of passed option is false', () => {
       spyOn(viewModel, 'optionChange');
 
-      viewModel.visibleOptionChange(viewModel.attr('visibleOptions')[0]);
+      viewModel.visibleOptionChange(viewModel.visibleOptions[0]);
 
       expect(viewModel.optionChange)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[0]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[0]);
     });
   });
 
-  describe('selectOption() method', function () {
+  describe('selectOption() method', () => {
     it('calls visibleOptionChange method if find option with ' +
-    '"highlighted" attr is true', function () {
+    '"highlighted" attr is true', () => {
       const visibleOptions = [
         {value: 1, checked: true, highlighted: false},
         {value: 2, checked: false, highlighted: true},
         {value: 3, checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'visibleOptionChange');
 
       viewModel.selectOption();
@@ -485,13 +483,13 @@ describe('multiselect-dropdown component', function () {
     });
 
     it('does not call visibleOptionChange method if does not find option ' +
-    'with "highlighted" attr is true', function () {
+    'with "highlighted" attr is true', () => {
       const visibleOptions = [
         {value: 1, checked: true, highlighted: false},
         {value: 2, checked: false, highlighted: false},
         {value: 3, checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'visibleOptionChange');
 
       viewModel.selectOption();
@@ -500,49 +498,49 @@ describe('multiselect-dropdown component', function () {
     });
   });
 
-  describe('highlightNext() method', function () {
+  describe('highlightNext() method', () => {
     it('calls chooseOption methods if highlighted option is found ' +
-    'and it is not last option ', function () {
+    'and it is not last option ', () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: true},
         {value: '2', checked: false, highlighted: false},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(0);
       spyOn(viewModel, 'chooseOption');
 
       viewModel.highlightNext();
 
       expect(viewModel.chooseOption)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[1]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[1]);
     });
 
     it('calls chooseOption method for the first option ' +
-    'if highlighted option is not found', function () {
+    'if highlighted option is not found', () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: false},
         {value: '2', checked: false, highlighted: false},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(-1);
       spyOn(viewModel, 'chooseOption');
 
       viewModel.highlightNext();
 
       expect(viewModel.chooseOption)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[0]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[0]);
     });
 
     it('does not call chooseOption method if highlighted option is found ' +
-    'and it is the last option', function () {
+    'and it is the last option', () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: false},
         {value: '2', checked: false, highlighted: false},
         {value: '3', checked: false, highlighted: true, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(2);
       spyOn(viewModel, 'chooseOption');
 
@@ -551,33 +549,33 @@ describe('multiselect-dropdown component', function () {
     });
   });
 
-  describe('highlightPrevious() method', function () {
+  describe('highlightPrevious() method', () => {
     it('calls chooseOption method if highlighted option is found ' +
     'and it is not the first option',
-    function () {
+    () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: false},
         {value: '2', checked: false, highlighted: true},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(1);
       spyOn(viewModel, 'chooseOption');
 
       viewModel.highlightPrevious();
 
       expect(viewModel.chooseOption)
-        .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[0]);
+        .toHaveBeenCalledWith(viewModel.visibleOptions[0]);
     });
 
     it('does not call chooseOption method if highlighted option is found ' +
-    'and it is the first option', function () {
+    'and it is the first option', () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: true},
         {value: '2', checked: false, highlighted: false},
         {value: '3', checked: false, highlighted: false, isSelectAll: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
       spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(0);
       spyOn(viewModel, 'chooseOption');
 
@@ -585,13 +583,13 @@ describe('multiselect-dropdown component', function () {
     });
 
     it('does not call chooseOption method if highlighted option is not found',
-      function () {
+      () => {
         const visibleOptions = [
           {value: '1', checked: true, highlighted: false},
           {value: '2', checked: false, highlighted: false},
           {value: '3', checked: false, highlighted: false, isSelectAll: true},
         ];
-        viewModel.attr('visibleOptions', visibleOptions);
+        viewModel.visibleOptions = visibleOptions;
         spyOn(viewModel, 'getHighlightedOptionIndex').and.returnValue(-1);
         spyOn(viewModel, 'chooseOption');
 
@@ -599,40 +597,40 @@ describe('multiselect-dropdown component', function () {
       });
   });
 
-  describe('processUserInput() method', function () {
-    beforeEach(function () {
+  describe('processUserInput() method', () => {
+    beforeEach(() => {
       const visibleOptions = [
         {value: 'Select All', checked: false, isSelectAll: true},
         {value: 'Assessment', checked: true},
         {value: 'Standards', checked: false},
         {value: 'Stands', checked: false},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
     });
 
     it('adds to "userInput" attr new passed value ' +
-    'and clears it when timeout ends', function () {
+    'and clears it when timeout ends', () => {
       jasmine.clock().install();
 
       viewModel.processUserInput('T');
       jasmine.clock().tick(100);
-      expect(viewModel.attr('userInput')).toEqual('t');
+      expect(viewModel.userInput).toEqual('t');
 
       viewModel.processUserInput('h');
       jasmine.clock().tick(100);
-      expect(viewModel.attr('userInput')).toEqual('th');
+      expect(viewModel.userInput).toEqual('th');
 
       viewModel.processUserInput('r');
       jasmine.clock().tick(700);
-      expect(viewModel.attr('userInput')).toEqual('');
+      expect(viewModel.userInput).toEqual('');
 
       jasmine.clock().uninstall();
     });
 
     it('calls chooseOption method if find option ' +
     'whose "value" attr starts with passed value' +
-    'excluding an additional internal option', function () {
-      const foundOption = viewModel.attr('visibleOptions')[2];
+    'excluding an additional internal option', () => {
+      const foundOption = viewModel.visibleOptions[2];
 
       spyOn(viewModel, 'chooseOption');
 
@@ -643,7 +641,7 @@ describe('multiselect-dropdown component', function () {
 
     it('does not call chooseOption method if does not find option ' +
     'whose "value" attr starts with passed value',
-    function () {
+    () => {
       spyOn(viewModel, 'chooseOption');
 
       viewModel.processUserInput('I');
@@ -652,8 +650,8 @@ describe('multiselect-dropdown component', function () {
     });
   });
 
-  describe('highlightOption() method', function () {
-    it('sets "highlighted" attr to true for passed option', function () {
+  describe('highlightOption() method', () => {
+    it('sets "highlighted" attr to true for passed option', () => {
       const visibleOptions = new canMap({
         value: 'Assessment',
         checked: true,
@@ -666,46 +664,46 @@ describe('multiselect-dropdown component', function () {
     });
   });
 
-  describe('removeHighlight() method', function () {
-    it('sets "highlighted" attr to false for all visibleOptions', function () {
+  describe('removeHighlight() method', () => {
+    it('sets "highlighted" attr to false for all visibleOptions', () => {
       const visibleOptions = [
         {value: '1', checked: true, highlighted: true},
         {value: '2', checked: false, highlighted: true},
       ];
-      viewModel.attr('visibleOptions', visibleOptions);
+      viewModel.visibleOptions = visibleOptions;
 
       viewModel.removeHighlight(visibleOptions);
 
-      viewModel.attr('visibleOptions').forEach((option) => {
-        expect(option.attr('highlighted')).toBe(false);
+      viewModel.visibleOptions.forEach((option) => {
+        expect(option.highlighted).toBe(false);
       });
     });
   });
 
-  describe('chooseOption() method', function () {
+  describe('chooseOption() method', () => {
     it('calls removeHighlight, highlightOption and scrollTop methods',
-      function () {
+      () => {
         const visibleOptions = [
           {value: '1', checked: true, highlighted: true},
           {value: '2', checked: false, highlighted: true},
         ];
-        viewModel.attr('visibleOptions', visibleOptions);
+        viewModel.visibleOptions = visibleOptions;
 
         spyOn(viewModel, 'removeHighlight');
         spyOn(viewModel, 'highlightOption');
         spyOn(viewModel, 'scrollTop');
 
-        viewModel.chooseOption(viewModel.attr('visibleOptions')[0]);
+        viewModel.chooseOption(viewModel.visibleOptions[0]);
 
         expect(viewModel.removeHighlight).toHaveBeenCalled();
         expect(viewModel.highlightOption)
-          .toHaveBeenCalledWith(viewModel.attr('visibleOptions')[0]);
+          .toHaveBeenCalledWith(viewModel.visibleOptions[0]);
         expect(viewModel.scrollTop).toHaveBeenCalled();
       });
   });
 
-  describe('dropdownBodyClick() method', function () {
-    it('calls stopPropagation for passed event', function () {
+  describe('dropdownBodyClick() method', () => {
+    it('calls stopPropagation for passed event', () => {
       const event = {
         stopPropagation: jasmine.createSpy('stopPropagation'),
       };
@@ -716,16 +714,16 @@ describe('multiselect-dropdown component', function () {
     });
   });
 
-  describe('events', function () {
-    describe('"inserted" handler', function () {
+  describe('events', () => {
+    describe('"inserted" handler', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         handler = events['inserted'].bind({viewModel});
       });
 
       it('calls setVisibleOptions method',
-        function () {
+        () => {
           spyOn(viewModel, 'setVisibleOptions');
 
           handler();
@@ -734,15 +732,15 @@ describe('multiselect-dropdown component', function () {
         });
     });
 
-    describe('"{viewModel} options" handler', function () {
+    describe('"{viewModel} options" handler', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         handler = events['{viewModel} options'].bind({viewModel});
       });
 
       it('calls setVisibleOptions method',
-        function () {
+        () => {
           spyOn(viewModel, 'setVisibleOptions');
 
           handler();
@@ -751,16 +749,16 @@ describe('multiselect-dropdown component', function () {
         });
     });
 
-    describe('"{window} click" handler', function () {
+    describe('"{window} click" handler', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         handler = events['{window} click'].bind({viewModel});
       });
 
       it('calls changeOpenCloseState method if "disabled" attr is false',
-        function () {
-          viewModel.attr('disabled', false);
+        () => {
+          viewModel.disabled = false;
 
           spyOn(viewModel, 'changeOpenCloseState');
 
@@ -770,8 +768,8 @@ describe('multiselect-dropdown component', function () {
         });
 
       it('does not call changeOpenCloseState method if "disabled" attr is true',
-        function () {
-          viewModel.attr('disabled', true);
+        () => {
+          viewModel.disabled = true;
 
           spyOn(viewModel, 'changeOpenCloseState');
 
@@ -781,14 +779,14 @@ describe('multiselect-dropdown component', function () {
         });
     });
 
-    describe('"keyup" handler', function () {
+    describe('"keyup" handler', () => {
       const ESCAPE_KEY = 'Escape';
       const ENTER_KEY = 'Enter';
       let element;
       let event;
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         handler = events['keyup'].bind({viewModel});
         event = {
           stopPropagation: jasmine.createSpy('stopPropagation'),
@@ -796,8 +794,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls stopPropagation for passed event if "isOpen" attr is true ' +
-      'and event.key is "Enter"', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key is "Enter"', () => {
+        viewModel.isOpen = true;
 
         event.key = ENTER_KEY;
 
@@ -807,8 +805,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls changeOpenCloseState and stopPropagation for passed event ' +
-      'if "isOpen" attr is true and event.key is "Escape"', function () {
-        viewModel.attr('isOpen', true);
+      'if "isOpen" attr is true and event.key is "Escape"', () => {
+        viewModel.isOpen = true;
 
         event.key = ESCAPE_KEY;
 
@@ -822,8 +820,8 @@ describe('multiselect-dropdown component', function () {
 
       it('does not call changeOpenCloseState and stopPropagation ' +
       'for passed event if "isOpen" attr is false ' +
-      'and event.key is "Escape"', function () {
-        viewModel.attr('isOpen', false);
+      'and event.key is "Escape"', () => {
+        viewModel.isOpen = false;
 
         event.key = ESCAPE_KEY;
 
@@ -836,12 +834,12 @@ describe('multiselect-dropdown component', function () {
       });
     });
 
-    describe('"{window} keydown" handler', function () {
+    describe('"{window} keydown" handler', () => {
       let element;
       let event;
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         handler = events['{window} keydown'].bind({viewModel});
         event = {
           preventDefault: jasmine.createSpy('preventDefault'),
@@ -850,8 +848,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls selectOption if "isOpen" attr is true ' +
-      'and event.key is "Enter"', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key is "Enter"', () => {
+        viewModel.isOpen = true;
 
         event.key = 'Enter';
 
@@ -863,8 +861,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls highlightNext if "isOpen" attr is true ' +
-      'and event.key is "ArrowDown"', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key is "ArrowDown"', () => {
+        viewModel.isOpen = true;
 
         event.key = 'ArrowDown';
 
@@ -876,8 +874,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls highlightPrevious if "isOpen" attr is true ' +
-      'and event.key is "ArrowUp"', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key is "ArrowUp"', () => {
+        viewModel.isOpen = true;
 
         event.key = 'ArrowUp';
 
@@ -889,8 +887,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls processUserInput if "isOpen" attr is true ' +
-      'and event.key passes regExp test', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key passes regExp test', () => {
+        viewModel.isOpen = true;
 
         event.key = 'S';
 
@@ -902,8 +900,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('does not call processUserInput if "isOpen" attr is true ' +
-      'and event.key does not pass regExp test', function () {
-        viewModel.attr('isOpen', true);
+      'and event.key does not pass regExp test', () => {
+        viewModel.isOpen = true;
 
         event.key = 'Tab';
 
@@ -915,8 +913,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('calls preventDefault and stopPropagation for any event.key ' +
-      'if "isOpen" attr is true', function () {
-        viewModel.attr('isOpen', true);
+      'if "isOpen" attr is true', () => {
+        viewModel.isOpen = true;
 
         event.key = 'Enter';
 
@@ -927,8 +925,8 @@ describe('multiselect-dropdown component', function () {
       });
 
       it('does not call preventDefault and stopPropagation for any event.key ' +
-      'if "isOpen" attr is false', function () {
-        viewModel.attr('isOpen', false);
+      'if "isOpen" attr is false', () => {
+        viewModel.isOpen = false;
 
         event.key = 'Enter';
 
@@ -940,17 +938,17 @@ describe('multiselect-dropdown component', function () {
     });
 
     describe('".multiselect-dropdown__element mouseenter" handler',
-      function () {
+      () => {
         let handler;
         let element;
         let event;
 
-        beforeEach(function () {
+        beforeEach(() => {
           const visibleOptions = [
             {value: 'Assessment', checked: true},
             {value: 'Programs', checked: false},
           ];
-          viewModel.attr('visibleOptions', visibleOptions);
+          viewModel.visibleOptions = visibleOptions;
 
           element = $('<li class="multiselect-dropdown__element"></li>');
 
@@ -963,7 +961,7 @@ describe('multiselect-dropdown component', function () {
 
         it('does not call removeHighlight and highlightOption ' +
         'if does not find option with "value" attr equal to ' +
-        'event.currentTarget.innerText', function () {
+        'event.currentTarget.innerText', () => {
           event = {
             currentTarget: {
               innerText: 'Active',

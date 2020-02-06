@@ -11,9 +11,7 @@ import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../advanced-search-filter-state';
 import * as ModelsUtils from '../../../plugins/utils/models-utils';
 
-describe('advanced-search-filter-state component', function () {
-  'use strict';
-
+describe('advanced-search-filter-state component', () => {
   let viewModel;
 
   beforeEach(() => {
@@ -24,13 +22,13 @@ describe('advanced-search-filter-state component', function () {
     it('with "Launch Status" if it is scoping object', () => {
       spyOn(ModelsUtils, 'isScopeModel').and.returnValue(true);
 
-      expect(viewModel.attr('label')).toBe('Launch Status');
+      expect(viewModel.label).toBe('Launch Status');
     });
 
     it('with "State" if it is not scoping object', () => {
       spyOn(ModelsUtils, 'isScopeModel').and.returnValue(false);
 
-      expect(viewModel.attr('label')).toBe('State');
+      expect(viewModel.label).toBe('State');
     });
   });
 
@@ -44,13 +42,13 @@ describe('advanced-search-filter-state component', function () {
 
     it('initializes all "filterStates" unchecked ' +
        'if "stateModel.items" is empty', () => {
-      viewModel.attr('modelName', 'Requirement');
+      viewModel.modelName = 'Requirement';
 
-      viewModel.attr('stateModel', new canMap({
+      viewModel.stateModel = new canMap({
         items: [],
-      }));
+      });
 
-      const result = viewModel.attr('filterStates');
+      const result = viewModel.filterStates;
       expect(result.length).toBe(states.length);
 
       loForEach(result, (item) => {
@@ -59,30 +57,29 @@ describe('advanced-search-filter-state component', function () {
     });
 
     it('initializes "filterStates" checked with items from "stateModel"',
-      function () {
-        viewModel.attr('modelName', 'Requirement');
-        viewModel.attr('stateModel', new canMap({
+      () => {
+        viewModel.modelName = 'Requirement';
+        viewModel.stateModel = new canMap({
           items: ['state1'],
-        }));
+        });
 
-        const selectedItems = loFilter(viewModel.attr('filterStates'),
+        const selectedItems = loFilter(viewModel.filterStates,
           (it) => it.checked);
         expect(selectedItems.length).toBe(1);
         expect(selectedItems[0].value).toBe('state1');
       });
   });
 
-  describe('saveTreeStates() method', function () {
-    it('updates items collection', function () {
-      let items;
+  describe('saveTreeStates() method', () => {
+    it('updates items collection', () => {
       let selectedStates = [{value: 'Active'}, {value: 'Draft'}];
-      viewModel.attr('stateModel', new canMap({
+      viewModel.stateModel = new canMap({
         items: [],
-      }));
+      });
 
       viewModel.saveTreeStates(selectedStates);
 
-      items = viewModel.attr('stateModel.items');
+      let items = viewModel.stateModel.attr('items');
       expect(items.length).toBe(2);
       expect(items[0]).toBe('Active');
       expect(items[1]).toBe('Draft');

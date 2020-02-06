@@ -52,7 +52,7 @@ export default canComponent.extend({
       this.dispatch({
         type: 'valueChanged',
         fieldId: this.fieldId,
-        value: newValue.selected.map((item) => item.attr('value')).join(','),
+        value: newValue.selected.map((item) => item.value).join(','),
       });
     },
   }),

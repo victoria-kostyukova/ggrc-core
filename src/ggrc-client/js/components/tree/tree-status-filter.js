@@ -4,7 +4,7 @@
  */
 
 import loDifference from 'lodash/difference';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import router from '../../router';
@@ -13,37 +13,46 @@ import {
   setTreeViewStates,
 } from '../../plugins/utils/display-prefs-utils';
 
-let viewModel = canMap.extend({
-  disabled: false,
-  filterStates: [],
-  widgetId: null,
-  modelName: null,
-  define: {
-    currentStates: {
-      get() {
-        let states = this.attr('filterStates')
-          .filter((state) => state.checked)
-          .map((state) => state.value);
-        return states;
-      },
+const ViewModel = canDefineMap.extend({
+  router: {
+    value: null,
+  },
+  disabled: {
+    value: false,
+  },
+  filterStates: {
+    value: () => [],
+  },
+  widgetId: {
+    value: null,
+  },
+  modelName: {
+    value: null,
+  },
+  currentStates: {
+    get() {
+      let states = this.filterStates
+        .filter((state) => state.checked)
+        .map((state) => state.value);
+      return states;
     },
-    allStates: {
-      get() {
-        let modelName = this.attr('modelName');
-        let states = StateUtils.getStatesForModel(modelName);
-        return states;
-      },
+  },
+  allStates: {
+    get() {
+      let modelName = this.modelName;
+      let states = StateUtils.getStatesForModel(modelName);
+      return states;
     },
   },
   getDefaultStates() {
-    let widgetId = this.attr('widgetId');
+    let widgetId = this.widgetId;
     // Get the status list from local storage
     let savedStates = getTreeViewStates(widgetId);
     // Get the status list from query string
     let queryStates = router.attr('state');
 
-    let modelName = this.attr('modelName');
-    let allStates = this.attr('allStates');
+    let modelName = this.modelName;
+    let allStates = this.allStates;
 
     let defaultStates = (queryStates || savedStates).filter((state) => {
       return allStates.includes(state);
@@ -56,21 +65,21 @@ let viewModel = canMap.extend({
     return defaultStates;
   },
   saveTreeStates(selectedStates) {
-    let widgetId = this.attr('widgetId');
+    let widgetId = this.widgetId;
     setTreeViewStates(widgetId, selectedStates);
   },
   setStatesDropdown(states) {
-    let statuses = this.attr('filterStates').map((item) => {
-      item.attr('checked', (states.indexOf(item.value) > -1));
+    let statuses = this.filterStates.map((item) => {
+      item.checked = (states.indexOf(item.value) > -1);
 
       return item;
     });
 
-    // need to trigget change event for 'filterStates' attr
-    this.attr('filterStates', statuses);
+    // need to trigger change event for 'filterStates' attr
+    this.filterStates = statuses;
   },
   setStatesRoute(states) {
-    let allStates = this.attr('allStates');
+    let allStates = this.allStates;
 
     if (states.length && loDifference(allStates, states).length) {
       router.attr('state', states);
@@ -79,8 +88,8 @@ let viewModel = canMap.extend({
     }
   },
   buildSearchQuery(states) {
-    let allStates = this.attr('allStates');
-    let modelName = this.attr('modelName');
+    let allStates = this.allStates;
+    let modelName = this.modelName;
     let query = (states.length && loDifference(allStates, states).length) ?
       StateUtils.buildStatusFilter(states, modelName) :
       null;
@@ -107,20 +116,21 @@ let viewModel = canMap.extend({
 export default canComponent.extend({
   tag: 'tree-status-filter',
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
   events: {
     inserted() {
       let vm = this.viewModel;
 
-      vm.attr('router', router);
+      vm.router = router;
 
       // Setup key-value pair items for dropdown
-      let filterStates = vm.attr('allStates').map((state) => {
+      let filterStates = vm.allStates.map((state) => {
         return {
           value: state,
+          checked: false,
         };
       });
-      vm.attr('filterStates', filterStates);
+      vm.filterStates = filterStates;
 
       let defaultStates = vm.getDefaultStates();
       vm.buildSearchQuery(defaultStates);
@@ -133,7 +143,7 @@ export default canComponent.extend({
       });
     },
     '{viewModel} disabled'() {
-      if (this.viewModel.attr('disabled')) {
+      if (this.viewModel.disabled) {
         this.viewModel.setStatesDropdown([]);
         this.viewModel.setStatesRoute([]);
       } else {
@@ -148,10 +158,10 @@ export default canComponent.extend({
         return;
       }
 
-      let isCurrent = this.viewModel.attr('widgetId') === router.attr('widget');
-      let isEnabled = !this.viewModel.attr('disabled');
+      let isCurrent = this.viewModel.widgetId === router.attr('widget');
+      let isEnabled = !this.viewModel.disabled;
 
-      let currentStates = this.viewModel.attr('currentStates');
+      let currentStates = this.viewModel.currentStates;
       let isChanged =
         loDifference(currentStates, newStatuses).length ||
         loDifference(newStatuses, currentStates).length;
@@ -163,12 +173,12 @@ export default canComponent.extend({
       }
     },
     '{viewModel.router} widget'([router]) {
-      let isCurrent = this.viewModel.attr('widgetId') === router.attr('widget');
-      let isEnabled = !this.viewModel.attr('disabled');
+      let isCurrent = this.viewModel.widgetId === router.attr('widget');
+      let isEnabled = !this.viewModel.disabled;
       let routeStatuses = router.attr('state');
 
       if (isCurrent && isEnabled && !routeStatuses) {
-        let statuses = this.viewModel.attr('currentStates');
+        let statuses = this.viewModel.currentStates;
         this.viewModel.setStatesRoute(statuses);
       }
     },

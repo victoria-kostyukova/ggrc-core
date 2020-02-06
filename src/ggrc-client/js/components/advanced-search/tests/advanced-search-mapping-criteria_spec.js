@@ -11,37 +11,35 @@ import Component from '../advanced-search-mapping-criteria';
 import * as Mappings from '../../../models/mappers/mappings';
 import Audit from '../../../models/business-models/audit';
 
-describe('advanced-search-mapping-criteria component', function () {
-  'use strict';
-
+describe('advanced-search-mapping-criteria component', () => {
   let viewModel;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('criteria set() method', function () {
+  describe('criteria set() method', () => {
     it('initializes "criteria.filter" property with new attribute model',
-      function () {
-        viewModel.attr('criteria', canMap());
+      () => {
+        viewModel.criteria = canMap();
 
-        expect(viewModel.attr('criteria.filter').type).toBe('attribute');
+        expect(viewModel.criteria.attr('filter').type).toBe('attribute');
       });
 
     it('does not intialize "criteria.filter" when it is already initialized',
-      function () {
-        viewModel.attr('criteria', new canMap({
+      () => {
+        viewModel.criteria = new canMap({
           filter: {
             type: 'test',
           },
-        }));
+        });
 
-        expect(viewModel.attr('criteria.filter').type).toBe('test');
+        expect(viewModel.criteria.attr('filter').type).toBe('test');
       });
   });
 
-  describe('remove() method', function () {
-    it('dispatches "remove" event', function () {
+  describe('remove() method', () => {
+    it('dispatches "remove" event', () => {
       spyOn(viewModel, 'dispatch');
 
       viewModel.remove();
@@ -50,30 +48,30 @@ describe('advanced-search-mapping-criteria component', function () {
     });
   });
 
-  describe('addRelevant() method', function () {
-    it('adds mapping criteria', function () {
-      viewModel.attr('criteria', canMap());
+  describe('addRelevant() method', () => {
+    it('adds mapping criteria', () => {
+      viewModel.criteria = canMap();
 
       viewModel.addRelevant();
 
-      expect(viewModel.attr('criteria.mappedTo').type).toBe('mappingCriteria');
+      expect(viewModel.criteria.attr('mappedTo').type).toBe('mappingCriteria');
     });
   });
 
-  describe('removeRelevant() method', function () {
-    it('removes mapping criteria', function () {
-      viewModel.attr('criteria', new canMap({
+  describe('removeRelevant() method', () => {
+    it('removes mapping criteria', () => {
+      viewModel.criteria = new canMap({
         mappedTo: {},
-      }));
+      });
 
       viewModel.removeRelevant();
 
-      expect(viewModel.attr('criteria.mappedTo')).toBe(undefined);
+      expect(viewModel.criteria.attr('mappedTo')).toBe(undefined);
     });
   });
 
-  describe('createGroup() method', function () {
-    it('dispatches "createGroup" event', function () {
+  describe('createGroup() method', () => {
+    it('dispatches "createGroup" event', () => {
       spyOn(viewModel, 'dispatch');
 
       viewModel.createGroup();
@@ -82,17 +80,16 @@ describe('advanced-search-mapping-criteria component', function () {
     });
   });
 
-  describe('relevantToGroup() method', function () {
+  describe('relevantToGroup() method', () => {
     it('transforms criteria to group with 2 criteria and operator inside',
-      function () {
-        let relevant;
-        viewModel.attr('criteria.mappedTo',
+      () => {
+        viewModel.criteria.attr('mappedTo',
           AdvancedSearch.create.mappingCriteria()
         );
 
         viewModel.relevantToGroup();
 
-        relevant = viewModel.attr('criteria.mappedTo');
+        let relevant = viewModel.criteria.attr('mappedTo');
         expect(relevant.type).toBe('group');
         expect(relevant.value[0].type).toBe('mappingCriteria');
         expect(relevant.value[1].type).toBe('operator');
@@ -100,8 +97,8 @@ describe('advanced-search-mapping-criteria component', function () {
       });
   });
 
-  describe('mappingTypes() method', function () {
-    beforeEach(function () {
+  describe('mappingTypes() method', () => {
+    beforeEach(() => {
       spyOn(Mappings, 'getAvailableMappings').and.returnValue({
         type1: {
           model_singular: '3',
@@ -119,11 +116,11 @@ describe('advanced-search-mapping-criteria component', function () {
       let modelName;
 
       beforeEach(() => {
-        viewModel.attr('isClone', true);
+        viewModel.isClone = true;
       });
 
       it('returns only model with name as modelName attribute', () => {
-        viewModel.attr('modelName', 'Audit');
+        viewModel.modelName = 'Audit';
 
         expect(viewModel.mappingTypes()).toEqual([Audit]);
       });
@@ -131,16 +128,16 @@ describe('advanced-search-mapping-criteria component', function () {
       it('sets modelName attribute to criteria.objectName', () => {
         modelName = 'Audit';
 
-        viewModel.attr('criteria', new canMap());
-        viewModel.attr('modelName', modelName);
+        viewModel.criteria = new canMap();
+        viewModel.modelName = modelName;
         viewModel.mappingTypes();
 
-        expect(viewModel.attr('criteria.objectName')).toBe(modelName);
+        expect(viewModel.criteria.attr('objectName')).toBe(modelName);
       });
     });
 
-    it('retrieves available mappings for correct model', function () {
-      viewModel.attr('modelName', 'testModel');
+    it('retrieves available mappings for correct model', () => {
+      viewModel.modelName = 'testModel';
 
       viewModel.mappingTypes();
 
@@ -148,7 +145,7 @@ describe('advanced-search-mapping-criteria component', function () {
         .toHaveBeenCalledWith('testModel');
     });
 
-    it('returns correct filtered and sorted types', function () {
+    it('returns correct filtered and sorted types', () => {
       let result = viewModel.mappingTypes();
 
       expect(result).toEqual([
@@ -164,30 +161,30 @@ describe('advanced-search-mapping-criteria component', function () {
       ]);
     });
 
-    it('sets criteria.objectName if objectName is not defined', function () {
-      viewModel.attr('criteria.objectName', undefined);
+    it('sets criteria.objectName if objectName is not defined', () => {
+      viewModel.criteria.attr('objectName', undefined);
 
       viewModel.mappingTypes();
 
-      expect(viewModel.attr('criteria.objectName')).toBe('1');
+      expect(viewModel.criteria.attr('objectName')).toBe('1');
     });
 
     it('does not set criteria.objectName if objectName is defined',
-      function () {
-        viewModel.attr('criteria.objectName', 'test');
+      () => {
+        viewModel.criteria.attr('objectName', 'test');
 
         viewModel.mappingTypes();
 
-        expect(viewModel.attr('criteria.objectName')).toBe('test');
+        expect(viewModel.criteria.attr('objectName')).toBe('test');
       });
   });
 
-  describe('availableAttributes() method', function () {
-    it('returns available attributes', function () {
+  describe('availableAttributes() method', () => {
+    it('returns available attributes', () => {
       let attributes = ['attr1', 'attr2'];
       spyOn(TreeViewUtils, 'getAvailableAttributes')
         .and.returnValue(attributes);
-      viewModel.attr('criteria.objectName', 'test');
+      viewModel.criteria.attr('objectName', 'test');
 
       expect(viewModel.availableAttributes()).toBe(attributes);
       expect(TreeViewUtils.getAvailableAttributes).toHaveBeenCalledWith('test');

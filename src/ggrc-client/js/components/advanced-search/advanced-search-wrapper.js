@@ -4,78 +4,97 @@
  */
 
 import canMap from 'can-map';
+import canList from 'can-list';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import pubSub from '../../pub-sub';
 
+const ViewModel = canDefineMap.extend({
+  hasStatusFilter: {
+    get() {
+      return StateUtils.hasFilter(this.modelName);
+    },
+  },
+  modelName: {
+    value: null,
+  },
+  modelDisplayName: {
+    value: null,
+  },
+  filterItems: {
+    Type: canList,
+    value: () => [AdvancedSearch.create.attribute()],
+  },
+  mappingItems: {
+    Type: canList,
+    value: () => [],
+  },
+  statusItem: {
+    Type: canMap,
+    value: () => AdvancedSearch.create.state(),
+  },
+  relevantTo: {
+    value: () => [],
+  },
+  pubSub: {
+    value: () => pubSub,
+  },
+  selectSavedSearchFilter(savedSearch) {
+    this.filterItems = savedSearch.filterItems || [];
+    this.mappingItems = savedSearch.mappingItems || [];
+    this.statusItem = savedSearch.statusItem;
+
+    if (savedSearch.modelName && savedSearch.modelDisplayName) {
+      this.modelName = savedSearch.modelName;
+      this.modelDisplayName = savedSearch.modelDisplayName;
+    }
+  },
+  availableAttributes() {
+    return getAvailableAttributes(this.modelName);
+  },
+  addFilterAttribute() {
+    let items = this.filterItems;
+    if (items.length) {
+      items.push(AdvancedSearch.create.operator('AND'));
+    }
+    items.push(AdvancedSearch.create.attribute());
+  },
+  addMappingFilter() {
+    let items = this.mappingItems;
+    if (items.length) {
+      items.push(AdvancedSearch.create.operator('AND'));
+    }
+    items.push(AdvancedSearch.create.mappingCriteria());
+  },
+  resetFilters() {
+    this.filterItems = [AdvancedSearch.create.attribute()];
+    this.mappingItems = [];
+    this.setDefaultStatusItem();
+  },
+  setDefaultStatusItem() {
+    if (this.hasStatusFilter) {
+      const defaultStatusItem = AdvancedSearch.setDefaultStatusConfig(
+        this.modelName
+      );
+      this.statusItem.attr('value').attr(defaultStatusItem);
+    } else {
+      this.statusItem = AdvancedSearch.create.state();
+    }
+  },
+  modelNameChanged(ev) {
+    this.modelName = ev.modelName;
+    this.resetFilters();
+  },
+});
+
 export default canComponent.extend({
   tag: 'advanced-search-wrapper',
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      hasStatusFilter: {
-        get: function () {
-          return StateUtils.hasFilter(this.attr('modelName'));
-        },
-      },
-    },
-    modelName: null,
-    modelDisplayName: null,
-    filterItems: [AdvancedSearch.create.attribute()],
-    mappingItems: [],
-    statusItem: AdvancedSearch.create.state(),
-    relevantTo: [],
-    pubSub,
-    selectSavedSearchFilter(savedSearch) {
-      this.attr('filterItems', savedSearch.filterItems || []);
-      this.attr('mappingItems', savedSearch.mappingItems || []);
-      this.attr('statusItem', savedSearch.statusItem);
-
-      if (savedSearch.modelName && savedSearch.modelDisplayName) {
-        this.attr('modelName', savedSearch.modelName);
-        this.attr('modelDisplayName', savedSearch.modelDisplayName);
-      }
-    },
-    availableAttributes: function () {
-      return getAvailableAttributes(this.attr('modelName'));
-    },
-    addFilterAttribute: function () {
-      let items = this.attr('filterItems');
-      if (items.length) {
-        items.push(AdvancedSearch.create.operator('AND'));
-      }
-      items.push(AdvancedSearch.create.attribute());
-    },
-    addMappingFilter: function () {
-      let items = this.attr('mappingItems');
-      if (items.length) {
-        items.push(AdvancedSearch.create.operator('AND'));
-      }
-      items.push(AdvancedSearch.create.mappingCriteria());
-    },
-    resetFilters: function () {
-      this.attr('filterItems', [AdvancedSearch.create.attribute()]);
-      this.attr('mappingItems', []);
-      this.setDefaultStatusItem();
-    },
-    setDefaultStatusItem: function () {
-      if (this.attr('hasStatusFilter')) {
-        const defaultStatusItem = AdvancedSearch.setDefaultStatusConfig(
-          this.attr('modelName')
-        );
-        this.attr('statusItem.value').attr(defaultStatusItem);
-      } else {
-        this.attr('statusItem', AdvancedSearch.create.state());
-      }
-    },
-    modelNameChanged(ev) {
-      this.attr('modelName', ev.modelName);
-      this.resetFilters();
-    },
-  }),
-  init: function () {
+  ViewModel,
+  init() {
     this.viewModel.setDefaultStatusItem();
   },
   events: {

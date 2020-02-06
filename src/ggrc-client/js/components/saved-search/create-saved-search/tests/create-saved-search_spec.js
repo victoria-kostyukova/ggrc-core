@@ -25,12 +25,12 @@ describe('create-saved-search component', () => {
     });
 
     beforeEach(() => {
-      viewModel.attr('isDisabled', false);
-      viewModel.attr('searchName', 'my saved search');
+      viewModel.isDisabled = false;
+      viewModel.searchName = 'my saved search';
     });
 
     it('should NOT trigger "save" when component is disabled', () => {
-      viewModel.attr('isDisabled', true);
+      viewModel.isDisabled = true;
 
       spyOn(SavedSearch.prototype, 'save');
       method();
@@ -39,7 +39,7 @@ describe('create-saved-search component', () => {
     });
 
     it('should NOT trigger "save" when "searchName" is empty', () => {
-      viewModel.attr('searchName', '');
+      viewModel.searchName = '';
       spyOn(SavedSearch.prototype, 'save');
       spyOn(NotifierUtils, 'notifier');
 
@@ -55,10 +55,10 @@ describe('create-saved-search component', () => {
 
       const saveDfd = method();
 
-      expect(viewModel.attr('isDisabled')).toBeTruthy();
+      expect(viewModel.isDisabled).toBe(true);
 
       saveDfd.then(() => {
-        expect(viewModel.attr('isDisabled')).toBeFalsy();
+        expect(viewModel.isDisabled).toBe(false);
         done();
       });
 
@@ -73,7 +73,7 @@ describe('create-saved-search component', () => {
       spyOn(pubSub, 'dispatch');
 
       method().then(() => {
-        expect(viewModel.attr('searchName')).toBe('');
+        expect(viewModel.searchName).toBe('');
         expect(pubSub.dispatch).toHaveBeenCalledWith({
           type: 'savedSearchCreated',
           search: {...savedSearchResponse},

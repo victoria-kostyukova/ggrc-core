@@ -6,25 +6,23 @@
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import AdvancedSearchContainer from '../../view-models/advanced-search-container-vm';
 
-describe('advanced-search-container viewModel', function () {
-  'use strict';
-
+describe('advanced-search-container viewModel', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
+    AdvancedSearchContainer.seal = false;
     viewModel = new AdvancedSearchContainer();
   });
 
-  describe('removeItem() method', function () {
+  describe('removeItem() method', () => {
     it('removes attribute and operator behind if item is first',
-      function () {
-        let viewItems;
-        viewModel.attr('items', [
+      () => {
+        viewModel.items = [
           AdvancedSearch.create.attribute({field: 'first'}),
           AdvancedSearch.create.operator(),
           AdvancedSearch.create.attribute({field: 'second'}),
-        ]);
-        viewItems = viewModel.attr('items');
+        ];
+        let viewItems = viewModel.items;
 
         viewModel.removeItem(viewItems[0]);
 
@@ -34,14 +32,13 @@ describe('advanced-search-container viewModel', function () {
       });
 
     it('removes attribute and operator in front if item is not first',
-      function () {
-        let viewItems;
-        viewModel.attr('items', [
+      () => {
+        viewModel.items = [
           AdvancedSearch.create.attribute({field: 'first'}),
           AdvancedSearch.create.operator(),
           AdvancedSearch.create.attribute({field: 'second'}),
-        ]);
-        viewItems = viewModel.attr('items');
+        ];
+        let viewItems = viewModel.items;
 
         viewModel.removeItem(viewItems[2]);
 
@@ -51,12 +48,11 @@ describe('advanced-search-container viewModel', function () {
       });
 
     it('calls remove() if it is group and single attribute was removed',
-      function () {
-        let viewItems;
-        viewModel.attr('items', [
+      () => {
+        viewModel.items = [
           AdvancedSearch.create.attribute({field: 'single'}),
-        ]);
-        viewItems = viewModel.attr('items');
+        ];
+        let viewItems = viewModel.items;
         spyOn(viewModel, 'remove');
 
         viewModel.removeItem(viewItems[0], true);
@@ -66,12 +62,11 @@ describe('advanced-search-container viewModel', function () {
 
     it('does not calls remove() if it is not group' +
       ' and single attribute was removed',
-    function () {
-      let viewItems;
-      viewModel.attr('items', [
+    () => {
+      viewModel.items = [
         AdvancedSearch.create.attribute({field: 'single'}),
-      ]);
-      viewItems = viewModel.attr('items');
+      ];
+      let viewItems = viewModel.items;
       spyOn(viewModel, 'remove');
 
       viewModel.removeItem(viewItems[0]);

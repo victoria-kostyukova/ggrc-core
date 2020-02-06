@@ -6,6 +6,7 @@
 import canComponent from 'can-component';
 import canStache from 'can-stache';
 import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import template from './saved-search-list.stache';
 import {
   buildSearchPermalink,
@@ -18,112 +19,131 @@ import SavedSearch from '../../../models/service-models/saved-search';
 import * as BusinessModels from '../../../models/business-models';
 import pubSub from '../../../pub-sub';
 
+const ViewModel = canDefineMap.extend({
+  pubSub: {
+    value: () => pubSub,
+  },
+  widgetId: {
+    value: '',
+  },
+  objectType: {
+    value: '',
+  },
+  searchType: {
+    value: '',
+  },
+  searches: {
+    value: () => [],
+  },
+  disabled: {
+    value: false,
+  },
+  selectedSearchId: {
+    value: null,
+  },
+  advancedSearch: {
+    value: null,
+  },
+  isLoading: {
+    value: false,
+  },
+  isGlobalSearch: {
+    get() {
+      return this.searchType === 'GlobalSearch';
+    },
+  },
+  isPagingShown: {
+    get() {
+      const total = this.searchesPaging.attr('total');
+      const pageSize = this.searchesPaging.attr('pageSize');
+
+      return total > pageSize;
+    },
+  },
+  searchesPaging: {
+    Type: canMap,
+    value: () => {
+      return new Pagination({
+        pageSize: 10, pageSizeSelect: [10],
+      });
+    },
+  },
+  selectSearch(search) {
+    const filter = parseFilterJson(search.filters);
+    const model = BusinessModels[search.object_type];
+    const selectedSavedSearch = {
+      ...filter,
+      id: search.id,
+    };
+
+    if (model) {
+      selectedSavedSearch.modelName = model.model_singular;
+      selectedSavedSearch.modelDisplayName = model.title_plural;
+    }
+
+    // Can be set from parent component.
+    // For example: tree-widget-container
+    this.selectedSearchId = search.id;
+
+    pubSub.dispatch({
+      type: 'savedSearchSelected',
+      savedSearch: selectedSavedSearch,
+      searchType: this.searchType,
+    });
+  },
+  loadSavedSearches() {
+    // do NOT set type for global search
+    const type = this.isGlobalSearch ?
+      null :
+      this.objectType;
+
+    const searchType = this.searchType;
+    this.isLoading = true;
+
+    return SavedSearch.findBy(searchType, this.searchesPaging, type)
+      .then(({total, values}) => {
+        this.searchesPaging.attr('total', total);
+
+        const searches = values.map((value) => new SavedSearch(value));
+        this.searches = searches;
+      }).always(() => {
+        this.isLoading = false;
+      });
+  },
+  removeSearch(search, event) {
+    event.stopPropagation();
+
+    return search.destroy().done(() => {
+      const paging = this.searchesPaging;
+
+      const needToGoToPrevPage = (
+        paging.attr('current') > 1 &&
+        this.searches.length === 1
+      );
+
+      if (needToGoToPrevPage) {
+        // move to prev page when current page contains only one item (it was removed)
+        // "loadSavedSearches" will be
+        // triggered by "'{viewModel.searchesPaging} current'" handler
+        paging.attr('current', paging.attr('current') - 1);
+      } else {
+        this.loadSavedSearches();
+      }
+    });
+  },
+  isSelectedSearch(search) {
+    return search.id === this.selectedSearchId;
+  },
+  copyLink(permalink, el, event) {
+    // prevent select
+    event.stopPropagation();
+  },
+});
+
 export default canComponent.extend({
   tag: 'saved-search-list',
   view: canStache(template),
-  viewModel: canMap.extend({
-    pubSub,
-    widgetId: '',
-    objectType: '',
-    searchType: '',
-    searches: [],
-    disabled: false,
-    selectedSearchId: null,
-    advancedSearch: null,
-    isLoading: false,
-    define: {
-      isGlobalSearch: {
-        get() {
-          return this.attr('searchType') === 'GlobalSearch';
-        },
-      },
-      isPagingShown: {
-        get() {
-          const total = this.attr('searchesPaging.total');
-          const pageSize = this.attr('searchesPaging.pageSize');
-
-          return total > pageSize;
-        },
-      },
-      searchesPaging: {
-        value() {
-          return new Pagination({
-            pageSize: 10, pageSizeSelect: [10],
-          });
-        },
-      },
-    },
-    selectSearch(search) {
-      const filter = parseFilterJson(search.filters);
-      const model = BusinessModels[search.object_type];
-      const selectedSavedSearch = {
-        ...filter,
-        id: search.id,
-      };
-
-      if (model) {
-        selectedSavedSearch.modelName = model.model_singular;
-        selectedSavedSearch.modelDisplayName = model.title_plural;
-      }
-
-      // Can be set from parent component.
-      // For example: tree-widget-container
-      this.attr('selectedSearchId', search.id);
-
-      pubSub.dispatch({
-        type: 'savedSearchSelected',
-        savedSearch: selectedSavedSearch,
-        searchType: this.attr('searchType'),
-      });
-    },
-    loadSavedSearches() {
-      // do NOT set type for global search
-      const type = this.attr('isGlobalSearch') ?
-        null :
-        this.attr('objectType');
-
-      const searchType = this.attr('searchType');
-      this.attr('isLoading', true);
-
-      return SavedSearch.findBy(searchType, this.attr('searchesPaging'), type)
-        .then(({total, values}) => {
-          this.attr('searchesPaging.total', total);
-
-          const searches = values.map((value) => new SavedSearch(value));
-          this.attr('searches', searches);
-        }).always(() => {
-          this.attr('isLoading', false);
-        });
-    },
-    removeSearch(search, event) {
-      event.stopPropagation();
-
-      return search.destroy().done(() => {
-        const paging = this.attr('searchesPaging');
-
-        const needToGoToPrevPage = (
-          paging.attr('current') > 1 &&
-          this.attr('searches.length') === 1
-        );
-
-        if (needToGoToPrevPage) {
-          // move to prev page when current page contains only one item (it was removed)
-          // "loadSavedSearches" will be
-          // triggered by "'{viewModel.searchesPaging} current'" handler
-          paging.attr('current', paging.attr('current') - 1);
-        } else {
-          this.loadSavedSearches();
-        }
-      });
-    },
-    isSelectedSearch(search) {
-      return search.id === this.attr('selectedSearchId');
-    },
-    copyLink(permalink, el, event) {
-      // prevent select
-      event.stopPropagation();
-    },
-  }),
+  ViewModel,
   events: {
     '{viewModel.searchesPaging} current'() {
       this.viewModel.loadSavedSearches();
@@ -137,7 +157,7 @@ export default canComponent.extend({
       });
     },
     '{pubSub} resetSelectedSavedSearch'() {
-      this.viewModel.attr('selectedSearchId', null);
+      this.viewModel.selectedSearchId = null;
     },
   },
   helpers: {
@@ -146,7 +166,7 @@ export default canComponent.extend({
         savedSearch = savedSearch();
       }
 
-      const link = buildSearchPermalink(savedSearch.id, this.attr('widgetId'));
+      const link = buildSearchPermalink(savedSearch.id, this.widgetId);
       return options.fn({permalink: link});
     },
   },

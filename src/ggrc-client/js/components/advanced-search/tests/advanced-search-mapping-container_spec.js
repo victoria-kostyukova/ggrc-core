@@ -8,34 +8,29 @@ import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../advanced-search-mapping-container';
 
-describe('advanced-search-mapping-container component', function () {
-  'use strict';
-
+describe('advanced-search-mapping-container component', () => {
   let viewModel;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('addMappingCriteria() method', function () {
-    it('adds only criteria if list is empty', function () {
-      let items;
-      viewModel.attr('items', canList());
+  describe('addMappingCriteria() method', () => {
+    it('adds only criteria if list is empty', () => {
+      viewModel.items = canList();
 
       viewModel.addMappingCriteria();
 
-      items = viewModel.attr('items');
+      let items = viewModel.items;
       expect(items.length).toBe(1);
       expect(items[0].type).toBe('mappingCriteria');
     });
 
-    it('adds operator and criteria if list is not empty', function () {
-      let items;
-      viewModel.attr('items',
-        [AdvancedSearch.create.mappingCriteria()]);
+    it('adds operator and criteria if list is not empty', () => {
+      viewModel.items = [AdvancedSearch.create.mappingCriteria()];
       viewModel.addMappingCriteria();
 
-      items = viewModel.attr('items');
+      let items = viewModel.items;
       expect(items.length).toBe(3);
       expect(items[0].type).toBe('mappingCriteria');
       expect(items[1].type).toBe('operator');
@@ -43,16 +38,15 @@ describe('advanced-search-mapping-container component', function () {
     });
   });
 
-  describe('createGroup() method', function () {
+  describe('createGroup() method', () => {
     it('transforms criteria to group with 2 criteria and operator inside',
-      function () {
-        let viewItems;
-        viewModel.attr('items', new canList([
+      () => {
+        viewModel.items = new canList([
           AdvancedSearch.create.mappingCriteria({field: 'first'}),
           AdvancedSearch.create.operator(),
           AdvancedSearch.create.mappingCriteria({field: 'second'}),
-        ]));
-        viewItems = viewModel.attr('items');
+        ]);
+        let viewItems = viewModel.items;
 
         viewModel.createGroup(viewItems[0]);
 

@@ -386,7 +386,7 @@ function concatFilters(filter, options) {
   if (filter) {
     filter = QueryParser.joinQueries(
       filter,
-      options.query.attr(),
+      options.query,
       'AND');
   } else if (options.query) {
     filter = options.query;
