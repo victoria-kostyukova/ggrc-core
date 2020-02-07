@@ -17,8 +17,6 @@ from alembic import op
 import sqlalchemy as sa
 
 from ggrc.migrations import utils
-from ggrc.models import all_models
-from ggrc_workflows import models as wf_models
 
 # revision identifiers, used by Alembic.
 revision = 'aee8f6a09419'
@@ -73,32 +71,35 @@ CTGOTS_WF_QUERY = """
 """
 
 
-TABLES = (
-    "access_groups",
-    "account_balances",
-    "assessments",
-    "controls",
-    "data_assets",
-    "directives",
-    "facilities",
-    "issues",
-    "key_reports",
-    "markets",
-    "metrics",
-    "objectives",
-    "org_groups",
-    "products",
-    "product_groups",
-    "programs",
-    "projects",
-    "requirements",
-    "risks",
-    "systems",
-    "technology_environments",
-    "threats",
-    "vendors",
-    "workflows",
-)
+TYPE_TABLE_MAP = {
+    "AccessGroup": "access_groups",
+    "AccountBalance": "account_balances",
+    "Assessment": "assessments",
+    "Control": "controls",
+    "DataAsset": "data_assets",
+    "Policy": "directives",
+    "Regulation": "directives",
+    "Standard": "directives",
+    "Contract": "directives",
+    "Facility": "facilities",
+    "Issue": "issues",
+    "KeyReport": "key_reports",
+    "Market": "markets",
+    "Metric": "metrics",
+    "Objective": "objectives",
+    "OrgGroup": "org_groups",
+    "Product": "products",
+    "ProductGroup": "product_groups",
+    "Program": "programs",
+    "Project": "projects",
+    "Requirement": "requirements",
+    "Risk": "risks",
+    "System": "systems",
+    "TechnologyEnvironment": "technology_environments",
+    "Threat": "threats",
+    "Vendor": "vendors",
+    "Workflow": "workflows",
+}
 
 
 logger = logging.getLogger(__name__)
@@ -183,17 +184,16 @@ def update_wf_state(connection, table_name, _id, wf_state):
 def populate_wf_state(connection):
   """Populate 'workflow_state' column for objects."""
   obj_for_revs = collections.defaultdict(list)
-  obj_types = set(wf_models.WORKFLOW_OBJECT_TYPES)
-  obj_types.add("Workflow")
-  for type_ in obj_types:
-    model = getattr(all_models, type_)
+
+  for type_, table in TYPE_TABLE_MAP.iteritems():
     obj_ctgots = fetch_ctgots_for(connection, type_)
 
     for obj_id in obj_ctgots:
       wf_state = get_object_state({state for _, state in obj_ctgots[obj_id]})
       if wf_state:
-        update_wf_state(connection, model.__tablename__, obj_id, wf_state)
+        update_wf_state(connection, table, obj_id, wf_state)
         obj_for_revs[type_].append(obj_id)
+
     if obj_for_revs[type_]:
       logger.info("Workflow State was calculated for %s %s objects.",
                   len(obj_for_revs[type_]), type_)
@@ -216,7 +216,7 @@ def add_to_objs_without_revs(objs):
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
-  for table in TABLES:
+  for table in set(TYPE_TABLE_MAP.values()):
     alter_table(connection, table)
   objs = populate_wf_state(connection)
   add_to_objs_without_revs(objs)
