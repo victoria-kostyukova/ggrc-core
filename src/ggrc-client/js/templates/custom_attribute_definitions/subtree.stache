@@ -11,7 +11,9 @@
   {{#instance}}
   <td>{{title}}</td>
   <td>{{attribute_type}}</td>
-  <td>{{#if mandatory}}Yes{{else}}No{{/if}}</td>
+  {{^is(parent_instance.model_singular, "Assessment")}}
+    <td>{{#if mandatory}}Yes{{else}}No{{/if}}</td>
+  {{/is}}          
   {{^if parent_instance.isChangeableExternally}}
     <td>
       <ul class="tree-action-list">

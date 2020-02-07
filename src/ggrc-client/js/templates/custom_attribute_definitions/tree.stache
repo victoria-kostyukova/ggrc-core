@@ -42,7 +42,9 @@
               <colgroup>
                 <col style="width: 50%"/>
                 <col style="width: 25%"/>
-                <col style="width: 15%"/>
+                {{^is(instance.model_singular, "Assessment")}}
+                  <col style="width: 15%"/>
+                {{/is}}
                 <col style="width: 10%"/>
               </colgroup>
               <thead>
@@ -53,7 +55,7 @@
                     <th>Mandatory</th>
                   {{/is}}
                   {{^if instance.isChangeableExternally}}
-                    <th>Edit</th>
+                    <th class="right">Edit</th>
                   {{/if}}
                 </tr>
               </thead>
