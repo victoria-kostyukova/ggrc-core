@@ -6,6 +6,8 @@ import copy
 import random
 import re
 
+import inflection
+
 from lib import url, users, base, browsers, factory
 from lib.constants import (objects, element, str_formats, messages,
                            object_states, roles)
@@ -648,18 +650,23 @@ def open_request_review_modal(obj, selenium):
   return modal
 
 
-def soft_assert_cannot_add_comment(soft_assert, obj):
-  """Performs soft assert that comment input field is not displayed when
-  'Add Comment' button is clicked."""
-  info_page = factory.get_cls_webui_service(
-      objects.get_plural(obj.type))().open_info_page_of_obj(obj)
-  info_page.comments_panel.click_add_button()
-  # wait until new tab contains info page url
-  _, new_tab = browsers.get_browser().windows()
-  test_utils.wait_for(lambda: new_tab.url.endswith(url.Widget.INFO))
+def soft_assert_cannot_add_comment(soft_assert, info_page):
+  """Performs soft assert that user can't add a comment:
+    - input field is not displayed
+    - "Add Comment" button is not displayed for Scope objects and opens a new
+     browser tab for other disabled objects."""
   soft_assert.expect(
       not info_page.comments_panel.comment_input.exists,
       "There should be no input field in comments panel.")
+  if inflection.underscore(info_page.child_cls_name) in objects.SCOPE_OBJECTS:
+    soft_assert.expect(not info_page.comments_panel.add_btn.exists,
+                       "'Add Comment' button should not be displayed.")
+  else:
+    info_page.comments_panel.click_add_button()
+    # wait until new tab contains info page url
+    _, new_tab = browsers.get_browser().windows()
+    test_utils.wait_for(lambda: new_tab.url.endswith(url.Widget.INFO))
+    soft_assert.expect(are_tabs_urls_equal(), "Tabs urls should be equal.")
 
 
 def open_dashboard(selenium):

@@ -195,14 +195,17 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_add_comment(self, obj, soft_assert, selenium):
-    """Check that user can't add a comment: input field is not displayed and
-    "Add Comment" button opens a new browser tab."""
-    webui_facade.soft_assert_cannot_add_comment(soft_assert, obj)
-    soft_assert.expect(
-        webui_facade.are_tabs_urls_equal(), "Tabs urls should be equal.")
+    """Check that user can't add a comment:
+    - input field is not displayed
+    - "Add Comment" button is not displayed for Scope objects and opens a new
+     browser tab for other disabled objects."""
+    info_page = factory.get_cls_webui_service(
+        objects.get_plural(obj.type))().open_info_page_of_obj(obj)
+    webui_facade.soft_assert_cannot_add_comment(soft_assert, info_page)
     soft_assert.assert_expectations()
 
   @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
