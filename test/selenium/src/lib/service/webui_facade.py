@@ -693,3 +693,32 @@ def check_order_and_removing_of_searches(soft_assert, objs, search_modal):
   soft_assert.expect(search_to_remove not in
                      search_modal.saved_searches_titles,
                      "Saved search is not removed.")
+
+
+def soft_assert_permalink_of_search_works(soft_assert, selenium, permalink,
+                                          filtered_objs, src_obj):
+  """Open permalink in a new tab -> assert filter's page is opened (tree view
+  contains only expected items)."""
+  selenium_utils.open_url_in_new_tab(permalink)
+  actual_objs_in_tree_view = (
+      factory.get_cls_webui_service(objects.get_plural(filtered_objs[0].type))(
+          driver=selenium).
+      get_list_objs_from_tree_view(src_obj=src_obj))
+  for actual, expected in zip(actual_objs_in_tree_view, filtered_objs):
+    soft_assert.expect(expected.tree_item_representation() == actual,
+                       messages.AssertionMessages.format_err_msg_equal(
+                           expected.title, actual.title))
+
+
+def check_permalink_of_advanced_search_works(soft_assert, selenium,
+                                             search_modal, filtered_objs,
+                                             src_obj):
+  """Clicks a permalink button near the saved search title. Pastes to
+  input_to_paste_link and value of the input is used like url to open. Verifies
+  if there are only expected items in a tree view on an opened page."""
+  search_modal.saved_searches_area.saved_searches[0].permalink.click()
+  input_to_paste_link = search_modal.search_filter_area.filter_value
+  selenium_utils.paste_from_clipboard(input_to_paste_link)
+  soft_assert_permalink_of_search_works(soft_assert, selenium,
+                                        input_to_paste_link.value,
+                                        filtered_objs, src_obj)

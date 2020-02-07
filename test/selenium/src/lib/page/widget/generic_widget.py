@@ -10,7 +10,7 @@ from lib import base, factory
 from lib.constants import locator, regex, element, counters, messages, objects
 from lib.element import three_bbs
 from lib.page import widget_bar
-from lib.page.modal import unified_mapper
+from lib.page.modal import unified_mapper, search_modal
 from lib.page.widget import page_mixins
 from lib.utils import selenium_utils, test_utils
 
@@ -32,9 +32,8 @@ class Widget(base.Widget):
         driver, text_box_locator=self._locators_filter.TXTFIELD_TO_FILTER_CSS,
         bt_submit_locator=self._locators_filter.FILTER_BTN_CSS)
     super(Widget, self).__init__(driver)
-    self._root = self._browser.element(
-        class_name="widget governance treeview",
-        id=objects.get_singular(self.obj_name))
+    self._root = self._browser.element(class_name="widget",
+                                       id=objects.get_singular(self.obj_name))
     # Tree View
     self.tree_view = TreeView(driver, self.info_widget_cls, self.obj_name)
     # Tab count
@@ -154,6 +153,12 @@ class Widget(base.Widget):
   def three_bbs(self):
     """ThreeBbs objcect on widget."""
     return three_bbs.ThreeBbs(self._root)
+
+  def open_advanced_search(self):
+    """Clicks the Advanced Filter button.
+    Return: Advanced Search modal."""
+    self.filter.advanced_filter_btn.click()
+    return search_modal.AdvancedSearch()
 
 
 class TreeView(base.TreeView):

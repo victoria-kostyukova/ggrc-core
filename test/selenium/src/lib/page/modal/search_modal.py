@@ -1,23 +1,18 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Global search modal."""
+"""Search modals."""
 from lib import base
 from lib.page.modal import search_modal_elements
 from lib.utils import selenium_utils
 
 
-class GlobalSearch(base.WithBrowser):
-  """Global search modal."""
+class BaseSearch(base.WithBrowser):
+  """Base search modal."""
   # pylint: disable=too-few-public-methods
 
   def __init__(self):
-    super(GlobalSearch, self).__init__()
+    super(BaseSearch, self).__init__()
     self._root = self._browser.element(tag_name="object-search")
-
-  @property
-  def search_results_area(self):
-    """Returns a search results area."""
-    return search_modal_elements.SearchResultsArea(self._root)
 
   @property
   def search_filter_area(self):
@@ -34,15 +29,9 @@ class GlobalSearch(base.WithBrowser):
     """Returns list of titles of saved searches."""
     return [search.title for search in self.saved_searches_area.saved_searches]
 
-  def search_obj(self, obj):
-    """Search object via Global Search.
-    Returns found object item."""
-    self.search_filter_area.search_obj(obj)
-    return self.search_results_area.get_result_by(title=obj.title)
-
   def create_and_save_searches(self, objs):
     """Creates searches for each obj.
-    Returns list of searches titles """
+    Returns list of searches titles."""
     return [self.create_and_save_search(obj) for obj in objs]
 
   def create_and_save_search(self, obj):
@@ -60,3 +49,31 @@ class GlobalSearch(base.WithBrowser):
     self.saved_searches_area.get_search_by_title(
         search_title).click_remove()
     selenium_utils.wait_for_js_to_load(self._driver)
+
+
+class GlobalSearch(BaseSearch):
+  """Global search modal."""
+
+  @property
+  def search_results_area(self):
+    """Returns a search results area."""
+    return search_modal_elements.SearchResultsArea(self._root)
+
+  def search_obj(self, obj):
+    """Search object via Global Search.
+    Returns found object item."""
+    self.search_filter_area.search_obj(obj)
+    return self.search_results_area.get_result_by(title=obj.title)
+
+
+class AdvancedSearch(BaseSearch):
+  """Advanced search modal."""
+
+  def __init__(self):
+    super(AdvancedSearch, self).__init__()
+    self._root = self._browser.element(class_name="advanced-search__modal")
+
+  @property
+  def search_filter_area(self):
+    """Returns a search filter area."""
+    return search_modal_elements.AdvancedSearchFilterArea(self._root)
