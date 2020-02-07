@@ -7,7 +7,7 @@ import loUniq from 'lodash/uniq';
 import loMap from 'lodash/map';
 import loFilter from 'lodash/filter';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh-queue';
@@ -16,17 +16,23 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import BackgroundTask from '../../models/service-models/background-task';
 import Assessment from '../../models/business-models/assessment';
 
+const ViewModel = canDefineMap.extend({
+  audit: {
+    value: null,
+  },
+  button: {
+    value: '',
+  },
+});
+
 export default canComponent.extend({
   tag: 'assessment-generator-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    audit: null,
-    button: '',
-  }),
+  ViewModel,
   events: {
-    'a click': function (el, ev) {
-      let instance = this.viewModel.attr('audit') || getPageInstance();
+    'a click'(el) {
+      let instance = this.viewModel.audit || getPageInstance();
       this._results = null;
       tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
         tracker.USER_JOURNEY_KEYS.LOADING,
@@ -48,7 +54,7 @@ export default canComponent.extend({
           });
         });
     },
-    showFlash: function (status) {
+    showFlash(status) {
       let flash = {};
       let type;
       let redirectLink;
@@ -70,7 +76,7 @@ export default canComponent.extend({
       flash[type] = messages[type];
       $('body').trigger('ajax:flash', [flash, redirectLink]);
     },
-    updateStatus: function (id, count) {
+    updateStatus(id, count) {
       let wait = [2, 4, 8, 16, 32, 64];
       if (count >= wait.length) {
         count = wait.length - 1;
@@ -91,7 +97,7 @@ export default canComponent.extend({
           }.bind(this), wait[count] * 1000);
         }.bind(this));
     },
-    generateAssessments: function (list, options) {
+    generateAssessments(list, options) {
       let que = new RefreshQueue();
 
       this._results = null;
@@ -118,9 +124,9 @@ export default canComponent.extend({
           }.bind(this));
       }.bind(this));
     },
-    generateModel: function (object, template) {
+    generateModel(object, template) {
       let assessmentModel;
-      let audit = this.viewModel.attr('audit');
+      let audit = this.viewModel.audit;
       let title = 'Generated Assessment for ' + audit.title;
       let data = {
         _generated: true,
@@ -150,7 +156,7 @@ export default canComponent.extend({
 
       return assessmentModel.save();
     },
-    notify: function () {
+    notify() {
       let success;
       let errors;
       let msg;

@@ -6,32 +6,30 @@
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../tree-item';
 
-describe('tree-item component', function () {
-  'use strict';
-
+describe('tree-item component', () => {
   let vm;
 
-  beforeEach(function () {
+  beforeEach(() => {
     vm = getComponentVM(Component);
   });
 
-  describe('selectableSize property', function () {
-    it('selectedColumns.length < 4', function () {
-      vm.attr('selectedColumns', ['a', 'b', 'c']);
+  describe('selectableSize property', () => {
+    it('selectedColumns.length < 4', () => {
+      vm.selectedColumns = ['a', 'b', 'c'];
 
-      expect(vm.attr('selectableSize')).toEqual(1);
+      expect(vm.selectableSize).toEqual(1);
     });
 
-    it('selectedColumns.length = 5', function () {
-      vm.attr('selectedColumns', ['a', 'b', 'c', 'd', 'e']);
+    it('selectedColumns.length = 5', () => {
+      vm.selectedColumns = ['a', 'b', 'c', 'd', 'e'];
 
-      expect(vm.attr('selectableSize')).toEqual(2);
+      expect(vm.selectableSize).toEqual(2);
     });
 
-    it('selectedColumns.length > 7', function () {
-      vm.attr('selectedColumns', ['a', 'b', 'c', 'd', 'e', 'f', 'g']);
+    it('selectedColumns.length > 7', () => {
+      vm.selectedColumns = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 
-      expect(vm.attr('selectableSize')).toEqual(3);
+      expect(vm.selectableSize).toEqual(3);
     });
   });
 });

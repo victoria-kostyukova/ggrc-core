@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import loDifference from 'lodash/difference';
 import moment from 'moment';
 import {getComponentVM, makeFakeInstance} from '../../../../js_specs/spec-helpers';
@@ -27,16 +28,16 @@ describe('tree-item-extra-info component', function () {
 
   describe('is active if', function () {
     it('workflow_state is defined', function () {
-      viewModel.attr('instance', {workflow_state: 'far'});
-      expect(viewModel.attr('isActive')).toBeTruthy();
+      viewModel.instance = new canMap({workflow_state: 'far'});
+      expect(viewModel.isActive).toBeTruthy();
     });
 
     activeModel.forEach(function (model) {
       it('instance is ' + model, function () {
-        viewModel.attr('instance', makeFakeInstance(
+        viewModel.instance = makeFakeInstance(
           {model: businessModels[model]}
-        )());
-        expect(viewModel.attr('isActive')).toBeTruthy();
+        )();
+        expect(viewModel.isActive).toBeTruthy();
       });
     });
   });
@@ -46,17 +47,17 @@ describe('tree-item-extra-info component', function () {
     let notActiveModels = loDifference(allModels, activeModel);
 
     it('workflow_state is not defined', function () {
-      viewModel.attr('instance', {title: 'FooBar'});
-      expect(viewModel.attr('isActive')).toBeFalsy();
+      viewModel.instance = new canMap({title: 'FooBar'});
+      expect(viewModel.isActive).toBeFalsy();
     });
 
     notActiveModels.forEach(function (model) {
       if (businessModels[model]) {
         it('instance is ' + model, function () {
-          viewModel.attr('instance', makeFakeInstance(
+          viewModel.instance = makeFakeInstance(
             {model: businessModels[model]}
-          )());
-          expect(viewModel.attr('isActive')).toBeFalsy();
+          )();
+          expect(viewModel.isActive).toBeFalsy();
         });
       }
     });
@@ -65,22 +66,22 @@ describe('tree-item-extra-info component', function () {
   describe('isOverdue property', function () {
     it('returns true if workflow_status is "Overdue"', function () {
       let result;
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         workflow_state: 'Overdue',
       });
 
-      result = viewModel.attr('isOverdue');
+      result = viewModel.isOverdue;
 
       expect(result).toBe(true);
     });
 
     it('returns false if workflow_status is not "Overdue"', function () {
       let result;
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         workflow_state: 'AnyState',
       });
 
-      result = viewModel.attr('isOverdue');
+      result = viewModel.isOverdue;
 
       expect(result).toBe(false);
     });
@@ -91,9 +92,9 @@ describe('tree-item-extra-info component', function () {
         model: CycleTaskGroupObjectTask,
       })();
       instance.attr('end_date', moment().subtract(5, 'd'));
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      result = viewModel.attr('isOverdue');
+      result = viewModel.isOverdue;
 
       expect(result).toBe(true);
     });
@@ -105,9 +106,9 @@ describe('tree-item-extra-info component', function () {
           model: CycleTaskGroupObjectTask,
         })();
         instance.attr('end_date', moment().add(5, 'd'));
-        viewModel.attr('instance', instance);
+        viewModel.instance = instance;
 
-        result = viewModel.attr('isOverdue');
+        result = viewModel.isOverdue;
 
         expect(result).toBe(false);
       });
@@ -117,10 +118,10 @@ describe('tree-item-extra-info component', function () {
     let result;
 
     it('returns "Today" for today', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         end_date: new Date(),
       });
-      result = viewModel.attr('endDate');
+      result = viewModel.endDate;
       expect(result).toEqual('Today');
     });
 
@@ -128,10 +129,10 @@ describe('tree-item-extra-info component', function () {
       let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
       let expected = moment(tomorrow).format('MM/DD/YYYY');
 
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         end_date: tomorrow,
       });
-      result = viewModel.attr('endDate');
+      result = viewModel.endDate;
       expect(result).toEqual(expected);
     });
 
@@ -139,26 +140,26 @@ describe('tree-item-extra-info component', function () {
       let yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
       let expected = moment(yesterday).format('MM/DD/YYYY');
 
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         end_date: yesterday,
       });
-      result = viewModel.attr('endDate');
+      result = viewModel.endDate;
       expect(result).toEqual(expected);
     });
 
     it('returns date string when date is passed in', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         end_date: new Date(2000, 2, 2),
       });
-      result = viewModel.attr('endDate');
+      result = viewModel.endDate;
       expect(result).toEqual('03/02/2000');
     });
 
     it('returns "Today" for falsey', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         end_date: null,
       });
-      result = viewModel.attr('endDate');
+      result = viewModel.endDate;
       expect(result).toEqual('Today');
     });
   });
@@ -173,11 +174,11 @@ describe('tree-item-extra-info component', function () {
         () => Promise.resolve(),
         () => Promise.resolve(),
       ];
-      viewModel.attr('pendingContent').push(...pendingContent);
+      viewModel.pendingContent.push(...pendingContent);
 
       viewModel.processPendingContent();
 
-      expect(viewModel.attr('pendingContent.length')).toBe(0);
+      expect(viewModel.pendingContent.length).toBe(0);
     });
 
     it('calls addContent() with resolved pending content', () => {
@@ -186,7 +187,7 @@ describe('tree-item-extra-info component', function () {
         Promise.resolve('Content 2'),
       ];
       const pendingContent = expected.map((promise) => () => promise);
-      viewModel.attr('pendingContent').push(...pendingContent);
+      viewModel.pendingContent.push(...pendingContent);
 
       viewModel.processPendingContent();
 
@@ -199,11 +200,11 @@ describe('tree-item-extra-info component', function () {
       const event = {
         callback: () => Promise.resolve(),
       };
-      viewModel.attr('pendingContent', []);
+      viewModel.pendingContent = [];
 
       viewModel.addPromiseContent(event);
 
-      expect(viewModel.attr('pendingContent').serialize()).toEqual([
+      expect(viewModel.pendingContent.serialize()).toEqual([
         event.callback,
       ]);
     });
@@ -216,7 +217,7 @@ describe('tree-item-extra-info component', function () {
 
     it('sets spin field to true', () => {
       viewModel.addContent();
-      expect(viewModel.attr('spin')).toBe(true);
+      expect(viewModel.spin).toBe(true);
     });
 
     it('pushes passed deferred objects to contentPromises', () => {
@@ -227,7 +228,7 @@ describe('tree-item-extra-info component', function () {
 
       viewModel.addContent(...promises);
 
-      expect(viewModel.attr('contentPromises').serialize()).toEqual(promises);
+      expect(viewModel.contentPromises.serialize()).toEqual(promises);
     });
 
     it('updates dfdReady field with updated contentPromises', () => {
@@ -238,7 +239,7 @@ describe('tree-item-extra-info component', function () {
 
       viewModel.addContent(promises);
 
-      expect(viewModel.attr('dfdReady')).toEqual(jasmine.any(Promise));
+      expect(viewModel.dfdReady).toEqual(jasmine.any(Promise));
     });
 
     describe('after resolving of contentPromises', () => {
@@ -249,9 +250,9 @@ describe('tree-item-extra-info component', function () {
       it('sets spin field to false', async (done) => {
         viewModel.addContent();
 
-        await viewModel.attr('dfdReady');
+        await viewModel.dfdReady;
 
-        expect(viewModel.attr('spin')).toBe(false);
+        expect(viewModel.spin).toBe(false);
         done();
       });
     });

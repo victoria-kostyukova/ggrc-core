@@ -33,7 +33,6 @@
                  availableColumns:from="columns.available"
                  mandatory:from="columns.mandatory"
                  disableConfiguration:from="columns.disableConfiguration"
-                 sortingInfo:from="sortingInfo"
                  model:from="model"
                  on:vm:sort="onSort(scope.event)"
                  on:vm:updateColumns="onUpdateColumns(scope.event)">

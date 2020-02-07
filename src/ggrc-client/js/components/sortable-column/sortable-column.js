@@ -4,49 +4,51 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './sortable-column.stache';
+
+const ViewModel = canDefineMap.extend({
+  sort: {
+    value: () => ({}),
+  },
+  sortField: {
+    value: '',
+  },
+  isSorted: {
+    get() {
+      return this.sort.field === this.sortField;
+    },
+  },
+  isSortedAsc: {
+    get() {
+      return this.sort.direction === 'asc';
+    },
+  },
+  applySort() {
+    if (this.isSorted) {
+      this.toggleSortDirection();
+    } else {
+      this.sort.field = this.sortField;
+      this.sort.direction = 'asc';
+    }
+
+    this.sort.dispatch('changed');
+  },
+  toggleSortDirection() {
+    if (this.sort.direction === 'asc') {
+      this.sort.direction = 'desc';
+    } else {
+      this.sort.direction = 'asc';
+    }
+  },
+});
 
 export default canComponent.extend({
   tag: 'sortable-column',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      isSorted: {
-        type: Boolean,
-        get() {
-          return this.attr('sort.field') === this.attr('sortField');
-        },
-      },
-      isSortedAsc: {
-        type: Boolean,
-        get() {
-          return this.attr('sort.direction') === 'asc';
-        },
-      },
-    },
-    sort: null,
-    sortField: '',
-    applySort() {
-      if (this.attr('isSorted')) {
-        this.toggleSortDirection();
-      } else {
-        this.attr('sort.field', this.attr('sortField'));
-        this.attr('sort.direction', 'asc');
-      }
-
-      this.attr('sort').dispatch('changed');
-    },
-    toggleSortDirection() {
-      if (this.attr('sort.direction') === 'asc') {
-        this.attr('sort.direction', 'desc');
-      } else {
-        this.attr('sort.direction', 'asc');
-      }
-    },
-  }),
+  ViewModel,
   events: {
     '{$content} click'() {
       this.viewModel.applySort();

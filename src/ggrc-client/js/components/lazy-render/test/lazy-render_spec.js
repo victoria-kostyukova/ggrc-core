@@ -6,43 +6,41 @@
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../lazy-render';
 
-describe('lazy-render component', function () {
-  'use strict';
+describe('lazy-render component', () => {
+  let ViewModel;
 
-  let viewModel;
-
-  beforeEach(function () {
-    viewModel = getComponentVM(Component);
+  beforeEach(() => {
+    ViewModel = getComponentVM(Component);
   });
 
-  it('should set "activated" to true if "trigger" is true', () => {
-    viewModel.attr('activated', false);
+  it('should set "activated" to true if "activate" is true', () => {
+    ViewModel.activated = false;
 
-    viewModel.attr('trigger', true);
-    expect(viewModel.attr('activated')).toBe(true);
+    ViewModel.activate = true;
+    expect(ViewModel.activated).toBe(true);
   });
 
-  it('should NOT change "activated" if "trigger" is true ' +
+  it('should NOT change "activated" if "activate" is true ' +
   'and panel was activated', () => {
-    viewModel.attr('activated', true);
+    ViewModel.activated = true;
 
-    viewModel.attr('trigger', true);
-    expect(viewModel.attr('activated')).toBe(true);
+    ViewModel.activate = true;
+    expect(ViewModel.activated).toBe(true);
   });
 
-  it('should NOT change "activated" if "trigger" is false ' +
+  it('should NOT change "activated" if "activate" is false ' +
   'and panel was activated', () => {
-    viewModel.attr('activated', true);
+    ViewModel.activated = true;
 
-    viewModel.attr('trigger', false);
-    expect(viewModel.attr('activated')).toBe(true);
+    ViewModel.activate = false;
+    expect(ViewModel.activated).toBe(true);
   });
 
-  it('should NOT change "activated" if "trigger" is false ' +
+  it('should NOT change "activated" if "activate" is false ' +
   'and panel was NOT activated', () => {
-    viewModel.attr('activated', false);
+    ViewModel.activated = false;
 
-    viewModel.attr('trigger', false);
-    expect(viewModel.attr('activated')).toBe(false);
+    ViewModel.activate = false;
+    expect(ViewModel.activated).toBe(false);
   });
 });

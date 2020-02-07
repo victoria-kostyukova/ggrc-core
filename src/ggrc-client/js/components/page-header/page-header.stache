@@ -43,7 +43,7 @@
 
 <ul class="menu">
   <li class="menu__item">
-    <a 
+    <a
       href="javascript://"
       class="btn btn-small btn-lightBlue menu__search search"
       data-toggle="unified-search"
@@ -91,7 +91,7 @@
     </a>
   </li>
   <li class="menu__item">
-    <a 
+    <a
       class="menu__link"
       id="allObjectView"
       href="/objectBrowser#!regulation"
@@ -111,8 +111,8 @@
   <li class="menu__item user user-dropdown dropdown">
     <a
       href="javascript:void(0)"
-      class="menu__link dropdown-toggle" 
-      data-toggle="dropdown" 
+      class="menu__link dropdown-toggle"
+      data-toggle="dropdown"
       role="button"
       on:el:click="handleMenuOpening">
       <div class="oneline">
@@ -159,7 +159,7 @@
         </li>
       {{/if}}
       <li class="dropdown-menu__item dropdown-menu__info-option">
-        <lazy-render trigger:from="menuInitialized">
+        <lazy-render activate:from="menuInitialized">
           <notifications-menu-item>
           </notifications-menu-item>
         </lazy-render>

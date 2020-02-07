@@ -3,14 +3,18 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import {isMyAssessments} from '../../../plugins/utils/current-page-utils';
 
-export default canMap.extend({
-  isButtonView: false,
-  parentInstance: null,
+export default canDefineMap.extend({
+  isButtonView: {
+    value: false,
+  },
+  parentInstance: {
+    value: null,
+  },
   getModalConfig() {
-    const parentInstance = this.attr('parentInstance');
+    const parentInstance = this.parentInstance;
     return {
       isMyAssessmentsView: isMyAssessments(),
       mappedToItems: parentInstance ? [{

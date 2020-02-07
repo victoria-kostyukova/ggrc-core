@@ -10,7 +10,7 @@
       <i class="fa fa-caret-down"></i>
     </a>
     <ul>
-      <lazy-render trigger:from="activated">
+      <lazy-render activate:from="activated">
         <!-- Link for open instance on info panel at bottom -->
         <li>
           <a href="javascript://" on:el:click="maximizeObject">

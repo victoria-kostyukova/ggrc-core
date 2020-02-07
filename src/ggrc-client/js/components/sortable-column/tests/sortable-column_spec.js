@@ -20,12 +20,12 @@ describe('sortable-column component', () => {
         field: 'status',
       };
 
-      viewModel.attr('sort', orderBy);
-      spyOn(viewModel.attr('sort'), 'dispatch');
+      viewModel.sort = orderBy;
+      spyOn(viewModel.sort, 'dispatch');
     });
 
     it('should toggle sort direction when column is already sorted', () => {
-      viewModel.attr('sortField', 'status');
+      viewModel.sortField = 'status';
 
       spyOn(viewModel, 'toggleSortDirection');
       viewModel.applySort();
@@ -37,11 +37,11 @@ describe('sortable-column component', () => {
       () => {
         const sortField = 'any sort field';
 
-        viewModel.attr('sortField', sortField);
+        viewModel.sortField = sortField;
         viewModel.applySort();
 
-        const resultField = viewModel.attr('sort.field');
-        const resultDirection = viewModel.attr('sort.direction');
+        const resultField = viewModel.sort.field;
+        const resultDirection = viewModel.sort.direction;
 
         expect(resultField).toEqual(sortField);
         expect(resultDirection).toEqual('asc');
@@ -49,12 +49,12 @@ describe('sortable-column component', () => {
 
     it('should notify that sorting is changed if column is already sorted',
       () => {
-        viewModel.attr('sortField', 'status');
+        viewModel.sortField = 'status';
 
         spyOn(viewModel, 'toggleSortDirection');
         viewModel.applySort();
 
-        const sort = viewModel.attr('sort');
+        const sort = viewModel.sort;
         expect(sort.dispatch).toHaveBeenCalledWith('changed');
       });
 
@@ -62,10 +62,10 @@ describe('sortable-column component', () => {
       () => {
         const sortField = 'any field';
 
-        viewModel.attr('sortField', sortField);
+        viewModel.sortField = sortField;
         viewModel.applySort();
 
-        const sort = viewModel.attr('sort');
+        const sort = viewModel.sort;
 
         expect(sort.dispatch).toHaveBeenCalledWith('changed');
       });
@@ -79,20 +79,20 @@ describe('sortable-column component', () => {
 
     it('should change sort direction with value "asc" on value "desc"',
       () => {
-        viewModel.attr('sort.direction', direction.asc);
+        viewModel.sort.direction = direction.asc;
         viewModel.toggleSortDirection();
 
-        const resultDirection = viewModel.attr('sort.direction');
+        const resultDirection = viewModel.sort.direction;
 
         expect(resultDirection).toEqual(direction.desc);
       });
 
     it('should change sort direction with value "desc" on value "asc"',
       () => {
-        viewModel.attr('sort.direction', direction.desc);
+        viewModel.sort.direction = direction.desc;
         viewModel.toggleSortDirection();
 
-        const resultDirection = viewModel.attr('sort.direction');
+        const resultDirection = viewModel.sort.direction;
 
         expect(resultDirection).toEqual(direction.asc);
       });

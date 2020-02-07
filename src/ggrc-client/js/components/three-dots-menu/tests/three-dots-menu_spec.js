@@ -6,28 +6,28 @@
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../three-dots-menu';
 
-describe('three-dots-menu component', function () {
+describe('three-dots-menu component', () => {
   let vm;
 
-  beforeEach(function () {
+  beforeEach(() => {
     vm = getComponentVM(Component);
   });
 
-  describe('manageEmptyList() method', function () {
+  describe('manageEmptyList() method', () => {
     let menuNode;
 
     it('sets disabled field to true if the menu node does not contain <li>',
-      function () {
+      () => {
         menuNode = $(`
           <ul role="menu">
             <empty-component></empty-component>
           </ul>`);
         vm.manageEmptyList(menuNode);
-        expect(vm.attr('disabled')).toBe(true);
+        expect(vm.disabled).toBe(true);
       });
 
     it('sets disabled field to false if the menu node contains <li>',
-      function () {
+      () => {
         menuNode = $(`
           <ul role="menu">
             <not-empty-component>
@@ -35,19 +35,19 @@ describe('three-dots-menu component', function () {
             </not-empty-component>
           </ul>`);
         vm.manageEmptyList(menuNode);
-        expect(vm.attr('disabled')).toBe(false);
+        expect(vm.disabled).toBe(false);
       });
   });
 
-  describe('mutationCallback() method', function () {
+  describe('mutationCallback() method', () => {
     let mutationList;
 
-    beforeEach(function () {
+    beforeEach(() => {
       mutationList = [];
     });
 
     it('calls manageEmptyList method for each mutation with passed menu node',
-      function () {
+      () => {
         spyOn(vm, 'manageEmptyList');
 
         mutationList.push(
@@ -63,37 +63,37 @@ describe('three-dots-menu component', function () {
       });
   });
 
-  describe('initObserver() method', function () {
+  describe('initObserver() method', () => {
     let element;
 
-    beforeEach(function () {
+    beforeEach(() => {
       [element] = $('<ul role="menu"></ul>');
     });
 
     it('sets observer field to the new instance of MutationObserver object',
-      function () {
+      () => {
         vm.initObserver(element);
-        expect(vm.attr('observer')).toEqual(jasmine.any(MutationObserver));
+        expect(vm.observer).toEqual(jasmine.any(MutationObserver));
       });
 
-    describe('calls observe method which', function () {
+    describe('calls observe method which', () => {
       let observer;
 
-      beforeEach(function () {
+      beforeEach(() => {
         observer = {
           observe: jasmine.createSpy('observe'),
         };
         spyOn(window, 'MutationObserver').and.returnValue(observer);
       });
 
-      it('observes passed menu node', function () {
+      it('observes passed menu node', () => {
         const MENU_NODE_ARG_ORDER = 0;
         vm.initObserver(element);
         expect(observer.observe.calls.argsFor(0)[MENU_NODE_ARG_ORDER])
           .toBe(element);
       });
 
-      it('watches only childList changes', function () {
+      it('watches only childList changes', () => {
         const CONFIG_ARG_ORDER = 1;
         const expectedConfig = {childList: true};
         vm.initObserver(element);
@@ -107,18 +107,18 @@ describe('three-dots-menu component', function () {
     let events;
     let eventsContext;
 
-    beforeEach(function () {
+    beforeEach(() => {
       events = Component.prototype.events;
       eventsContext = {
         viewModel: vm,
       };
     });
 
-    describe('inserted() event', function () {
+    describe('inserted() event', () => {
       let method;
       let $element;
 
-      beforeEach(function () {
+      beforeEach(() => {
         $element = $(
           `<div>
             <ul role="menu"></ul>
@@ -126,12 +126,12 @@ describe('three-dots-menu component', function () {
         );
       });
 
-      beforeEach(function () {
+      beforeEach(() => {
         method = events.inserted.bind(eventsContext);
       });
 
       it('calls viewModel.initObserver() method with passed menu node',
-        function () {
+        () => {
           const [menuNode] = $element.find('[role=menu]');
           spyOn(vm, 'initObserver');
           method($element);
@@ -139,7 +139,7 @@ describe('three-dots-menu component', function () {
         });
 
       it('calls viewModel.manageEmptyList() method with passed menu node',
-        function () {
+        () => {
           const [menuNode] = $element.find('[role=menu]');
           spyOn(vm, 'manageEmptyList');
           method($element);
@@ -147,18 +147,18 @@ describe('three-dots-menu component', function () {
         });
     });
 
-    describe('removed() event', function () {
+    describe('removed() event', () => {
       let method;
 
-      beforeEach(function () {
+      beforeEach(() => {
         method = events.removed.bind(eventsContext);
       });
 
-      it('calls disconnect method for observer field', function () {
+      it('calls disconnect method for observer field', () => {
         const observer = {
           disconnect: jasmine.createSpy('disconnect'),
         };
-        vm.attr('observer', observer);
+        vm.observer = observer;
         method();
         expect(observer.disconnect).toHaveBeenCalled();
       });

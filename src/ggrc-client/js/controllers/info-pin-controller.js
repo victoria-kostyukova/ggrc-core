@@ -58,9 +58,6 @@ export default canControl.extend({
   isPinVisible() {
     return !this.element.hasClass(pinContentHiddenClass);
   },
-  findOptions: function (el) {
-    return el.closest('.tree-item-element').viewModel();
-  },
   hideInstance: function () {
     this.unsetInstance();
     $(window).trigger('resize');
@@ -102,20 +99,14 @@ export default canControl.extend({
   },
   prepareView: function (opts, el, maximizedState) {
     let instance = opts.attr('instance');
-    let options = this.findOptions(el);
-    let populatedOpts = opts.attr('options');
     let confirmEdit = instance.constructor.confirmEditModal || {};
     let view = getInstanceView(instance);
-
-    if (populatedOpts && !options.attr('result')) {
-      options = populatedOpts;
-    }
 
     if (!loIsEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;
     }
 
-    this.setHtml(opts, view, confirmEdit, options, maximizedState);
+    this.setHtml(opts, view, confirmEdit, opts.attr('options'), maximizedState);
   },
   setInstance(opts, el, maximizedState) {
     return new Promise((resolve) => {

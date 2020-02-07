@@ -44,7 +44,7 @@
     <tree-item-extra-info instance:from="instance"></tree-item-extra-info>
   </div>
 
-  <lazy-render trigger:from="expanded">
+  <lazy-render activate:from="expanded">
     <div class="sub-tier">
       <sub-tree-wrapper parent:from="instance"
                         limitDepthTree:from="limitDepthTree"

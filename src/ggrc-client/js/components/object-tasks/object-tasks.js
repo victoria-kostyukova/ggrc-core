@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   buildParam,
@@ -22,13 +22,19 @@ const REQUIRED_FIELDS = Object.freeze([
   'is_verification_needed',
 ]);
 
-let viewModel = canMap.extend({
-  instanceId: null,
-  instanceType: null,
-  tasks: [],
+const ViewModel = canDefineMap.extend({
+  instanceId: {
+    value: null,
+  },
+  instanceType: {
+    value: null,
+  },
+  tasks: {
+    value: () => [],
+  },
   loadTasks: function () {
-    let id = this.attr('instanceId');
-    let type = this.attr('instanceType');
+    let id = this.instanceId;
+    let type = this.instanceType;
     let params = buildParam(
       REQUIRED_TYPE,
       {},
@@ -40,15 +46,15 @@ let viewModel = canMap.extend({
       REQUIRED_FIELDS);
 
     return batchRequests(params)
-      .then(function (response) {
+      .then((response) => {
         let tasks = [];
 
-        response[REQUIRED_TYPE].values.forEach(function (item) {
+        response[REQUIRED_TYPE].values.forEach((item) => {
           tasks.push(CycleTaskGroupObjectTask.model(item));
         });
 
-        this.attr('tasks', tasks);
-      }.bind(this));
+        this.tasks = tasks;
+      });
   },
 });
 
@@ -56,7 +62,7 @@ export default canComponent.extend({
   tag: 'object-tasks',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     inserted: function () {
       this.viewModel.addContent(this.viewModel.loadTasks());

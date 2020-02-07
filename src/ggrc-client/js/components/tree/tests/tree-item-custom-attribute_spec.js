@@ -88,7 +88,7 @@ describe('tree-item-custom-attribute component', () => {
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
 
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', fakeInstance);
+    viewModel.instance = fakeInstance;
   });
 
   describe('value getter', () => {
@@ -97,25 +97,25 @@ describe('tree-item-custom-attribute component', () => {
         const caId = 3;
         const value = 'correctValue';
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe(value);
+        expect(viewModel.value).toBe(value);
       });
 
     describe('return an empty string', () => {
       it('if ca value is empty', function () {
         const caId = 3;
         fakeInstance.customAttr(caId, null);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe('');
+        expect(viewModel.value).toBe('');
       });
 
       it('if caObject was not found', function () {
         const caId = 10000;
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe('');
+        expect(viewModel.value).toBe('');
       });
     });
 
@@ -124,18 +124,18 @@ describe('tree-item-custom-attribute component', () => {
         function () {
           const caId = 4;
           fakeInstance.customAttr(caId, true);
-          viewModel.attr('customAttributeId', caId);
+          viewModel.customAttributeId = caId;
 
-          expect(viewModel.attr('value')).toEqual('Yes');
+          expect(viewModel.value).toEqual('Yes');
         });
 
       it('returns "No" if ca value is false',
         function () {
           const caId = 4;
           fakeInstance.customAttr(caId, false);
-          viewModel.attr('customAttributeId', caId);
+          viewModel.customAttributeId = caId;
 
-          expect(viewModel.attr('value')).toEqual('No');
+          expect(viewModel.value).toEqual('No');
         });
     });
 
@@ -144,8 +144,8 @@ describe('tree-item-custom-attribute component', () => {
         const caId = 11;
         const value = 'Option 1, Option 2';
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
-        expect(viewModel.attr('value')).toBe(value);
+        viewModel.customAttributeId = caId;
+        expect(viewModel.value).toBe(value);
       });
     });
 
@@ -158,9 +158,9 @@ describe('tree-item-custom-attribute component', () => {
           .and.returnValue(expected);
 
         fakeInstance.customAttr(caId, attrValue);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe(expected);
+        expect(viewModel.value).toBe(expected);
         expect(DateUtils.formatDate)
           .toHaveBeenCalledWith(attrValue, true);
       });
@@ -171,9 +171,9 @@ describe('tree-item-custom-attribute component', () => {
         const caId = 10;
         const value = 'Choice 1';
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe(value);
+        expect(viewModel.value).toBe(value);
       });
     });
 
@@ -182,9 +182,9 @@ describe('tree-item-custom-attribute component', () => {
         const caId = 6;
         const value = 'Some text';
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe(value);
+        expect(viewModel.value).toBe(value);
       });
     });
 
@@ -193,9 +193,9 @@ describe('tree-item-custom-attribute component', () => {
         const caId = 7;
         const value = '<strong>some text</strong>';
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe(value);
+        expect(viewModel.value).toBe(value);
       });
     });
 
@@ -207,9 +207,9 @@ describe('tree-item-custom-attribute component', () => {
         const value = '<strong>some text</strong>';
         fakeInstance.constructor.isChangeableExternally = true;
         fakeInstance.customAttr(caId, value);
-        viewModel.attr('customAttributeId', caId);
+        viewModel.customAttributeId = caId;
 
-        expect(viewModel.attr('value')).toBe('some markdown');
+        expect(viewModel.value).toBe('some markdown');
         expect(MarkdownUtils.convertMarkdownToHtml)
           .toHaveBeenCalledWith(value);
       });

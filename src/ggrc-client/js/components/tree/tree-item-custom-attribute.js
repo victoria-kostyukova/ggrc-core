@@ -5,7 +5,7 @@
 
 import loHas from 'lodash/has';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
@@ -52,23 +52,23 @@ const getCustomAttrValue = (instance, customAttributeId) => {
   return customAttrValue || '';
 };
 
-const viewModel = canMap.extend({
-  define: {
-    value: {
-      get() {
-        let instance = this.attr('instance');
-        let attrId = this.attr('customAttributeId');
-        return getCustomAttrValue(instance, attrId);
-      },
+const ViewModel = canDefineMap.extend({
+  value: {
+    get() {
+      return getCustomAttrValue(this.instance, this.customAttributeId);
     },
   },
-  instance: null,
-  customAttributeId: null,
+  instance: {
+    value: null,
+  },
+  customAttributeId: {
+    value: null,
+  },
 });
 
 export default canComponent.extend({
   tag: 'tree-item-custom-attribute',
   view: canStache('{{{value}}}'),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

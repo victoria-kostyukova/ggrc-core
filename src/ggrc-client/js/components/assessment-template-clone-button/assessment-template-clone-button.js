@@ -4,46 +4,57 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './assessment-template-clone-button.stache';
 import router from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
+const ViewModel = canDefineMap.extend({
+  model: {
+    value: null,
+  },
+  text: {
+    value: null,
+  },
+  parentId: {
+    value: null,
+  },
+  parentType: {
+    value: null,
+  },
+  objectType: {
+    value: null,
+  },
+  openCloneModal(el) {
+    let $el = $(el);
+    import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
+      .then((mapper) => {
+        mapper.AssessmentTemplateClone.launch($el, {
+          object: this.parentType,
+          type: this.objectType,
+          join_object_id: this.parentId,
+          refreshTreeView: this.refreshTreeView.bind(this),
+        });
+      });
+  },
+  refreshTreeView() {
+    if (getPageInstance().type === 'Audit') {
+      if (router.attr('widget') === 'assessment_template') {
+        this.dispatch('refreshTree');
+      } else {
+        router.attr({
+          widget: 'assessment_template',
+          refetch: true,
+        });
+      }
+    }
+  },
+});
+
 export default canComponent.extend({
   tag: 'assessment-template-clone-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    model: null,
-    text: null,
-    parentId: null,
-    parentType: null,
-    objectType: null,
-    openCloneModal(el) {
-      let that = this;
-      let $el = $(el);
-      import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
-        .then((mapper) => {
-          mapper.AssessmentTemplateClone.launch($el, {
-            object: that.attr('parentType'),
-            type: that.attr('objectType'),
-            join_object_id: that.attr('parentId'),
-            refreshTreeView: that.refreshTreeView.bind(that),
-          });
-        });
-    },
-    refreshTreeView() {
-      if (getPageInstance().type === 'Audit') {
-        if (router.attr('widget') === 'assessment_template') {
-          this.dispatch('refreshTree');
-        } else {
-          router.attr({
-            widget: 'assessment_template',
-            refetch: true,
-          });
-        }
-      }
-    },
-  }),
+  ViewModel,
 });

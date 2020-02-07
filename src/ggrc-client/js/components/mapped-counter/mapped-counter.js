@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   buildCountParams,
@@ -25,41 +25,52 @@ let titlesMap = {
   },
 };
 
-let viewModel = canMap.extend({
-  define: {
-    icon: {
-      type: 'string',
-      get: function () {
-        let type = this.attr('type') ? this.attr('type') : 'Total';
-        let icon = titlesMap[type] ? titlesMap[type].icon : type;
+const ViewModel = canDefineMap.extend({
+  icon: {
+    type: 'string',
+    get() {
+      let type = this.type || 'Total';
+      let icon = titlesMap[type] ? titlesMap[type].icon : type;
 
-        return icon.toLowerCase();
-      },
-    },
-    title: {
-      type: 'string',
-      get: function () {
-        let title = this.attr('type') ? this.attr('type') : 'Total';
-
-        return titlesMap[title] ? titlesMap[title].title : title;
-      },
+      return icon.toLowerCase();
     },
   },
-  instance: null,
-  isSpinnerVisible: false,
-  isTitleVisible: true,
-  extraCssClass: '',
-  type: '',
-  count: 0,
+  title: {
+    type: 'string',
+    get() {
+      let title = this.type || 'Total';
+      return titlesMap[title] ? titlesMap[title].title : title;
+    },
+  },
+  instance: {
+    value: null,
+  },
+  isSpinnerVisible: {
+    value: false,
+  },
+  isTitleVisible: {
+    value: true,
+  },
+  extraCssClass: {
+    value: '',
+  },
+  type: {
+    value: '',
+  },
+  count: {
+    value: 0,
+  },
   /**
    * Just to avoid multiple dispatching of updateCounter event,
    * we lock it. It helps us to avoid extra queries, which might be produced
    * by load method.
    */
-  lockUntilUpdate: false,
+  lockUntilUpdate: {
+    value: false,
+  },
   load() {
-    let instance = this.attr('instance');
-    let type = this.attr('type');
+    let instance = this.instance;
+    let type = this.type;
     let relevant = {
       id: instance.id,
       type: instance.type,
@@ -74,22 +85,22 @@ let viewModel = canMap.extend({
         return count + counts[ind][type].total;
       }, 0);
 
-      this.attr('isSpinnerVisible', false);
-      this.attr('count', total);
+      this.isSpinnerVisible = false;
+      this.count = total;
     });
   },
   updateCounter() {
-    const isLocked = this.attr('lockUntilUpdate');
+    const isLocked = this.lockUntilUpdate;
 
     if (isLocked) {
       return;
     }
 
-    this.attr('lockUntilUpdate', true);
+    this.lockUntilUpdate = true;
 
     const callback = () => this.load()
       .finally(() => {
-        this.attr('lockUntilUpdate', false);
+        this.lockUntilUpdate = false;
       });
 
     this.dispatch({
@@ -103,7 +114,7 @@ export default canComponent.extend({
   tag: 'mapped-counter',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     inserted: function () {
       let vm = this.viewModel;
@@ -118,7 +129,7 @@ export default canComponent.extend({
     }) {
       const viewModel = this.viewModel;
 
-      if (viewModel.attr('type') === modelType) {
+      if (viewModel.type === modelType) {
         viewModel.updateCounter();
       }
     },

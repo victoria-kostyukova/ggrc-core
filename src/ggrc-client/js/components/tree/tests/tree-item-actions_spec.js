@@ -14,12 +14,12 @@ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as Mapper from '../../../models/mappers/mappings';
 import Cacheable from '../../../models/cacheable';
 
-describe('tree-item-actions component', function () {
+describe('tree-item-actions component', () => {
   let viewModel;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', new canMap());
+    viewModel.instance = new canMap();
   });
 
   describe('isAllowedToMap get() method', () => {
@@ -30,16 +30,16 @@ describe('tree-item-actions component', function () {
       it('if there is no objects to map to instance type', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(Mapper, 'getMappingList').and.returnValue([]);
-        viewModel.attr('instance.type', 'Workflow');
+        viewModel.instance.attr('type', 'Workflow');
 
-        let result = viewModel.attr('isAllowedToMap');
+        let result = viewModel.isAllowedToMap;
 
         expect(result).toBe(false);
       });
 
       it('if user has no rights to update instance', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(false);
-        let result = viewModel.attr('isAllowedToMap');
+        let result = viewModel.isAllowedToMap;
 
         expect(result).toBe(false);
       });
@@ -50,9 +50,9 @@ describe('tree-item-actions component', function () {
         'user has permissions to update instance', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(Mapper, 'getMappingList').and.returnValue(['Object1']);
-        viewModel.attr('instance.type', 'Type');
+        viewModel.instance.attr('type', 'Type');
 
-        let result = viewModel.attr('isAllowedToMap');
+        let result = viewModel.isAllowedToMap;
 
         expect(result).toBe(true);
       });
@@ -64,40 +64,40 @@ describe('tree-item-actions component', function () {
       it('if instance is archived', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-        viewModel.attr('instance.type', 'Type');
-        viewModel.attr('instance.archived', true);
+        viewModel.instance.attr('type', 'Type');
+        viewModel.instance.attr('archived', true);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
 
       it('if instance is snapshot', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(true);
-        viewModel.attr('instance.type', 'Type');
-        viewModel.attr('instance.archived', false);
+        viewModel.instance.attr('type', 'Type');
+        viewModel.instance.attr('archived', false);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
 
       it('if instance type is in forbiddenEditList', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-        viewModel.attr('instance.type', 'Cycle');
-        viewModel.attr('instance.archived', false);
+        viewModel.instance.attr('type', 'Cycle');
+        viewModel.instance.attr('archived', false);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
 
       it('if user has not permissions to update instance', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(false);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-        viewModel.attr('instance.type', 'Type');
-        viewModel.attr('instance.archived', false);
+        viewModel.instance.attr('type', 'Type');
+        viewModel.instance.attr('archived', false);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
 
@@ -114,20 +114,20 @@ describe('tree-item-actions component', function () {
           archived: false,
         });
 
-        viewModel.attr('instance', instance);
+        viewModel.instance = instance;
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
 
       it('if instance is readonly', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-        viewModel.attr('instance.type', 'Type');
-        viewModel.attr('instance.archived', false);
-        viewModel.attr('instance.readonly', true);
+        viewModel.instance.attr('type', 'Type');
+        viewModel.instance.attr('archived', false);
+        viewModel.instance.attr('readonly', true);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
     });
@@ -136,11 +136,11 @@ describe('tree-item-actions component', function () {
       it('if allowed to edit instance', () => {
         spyOn(Permission, 'isAllowedFor').and.returnValue(true);
         spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-        viewModel.attr('instance.type', 'Type');
-        viewModel.attr('instance.archived', false);
-        viewModel.attr('instance.readonly', false);
+        viewModel.instance.attr('type', 'Type');
+        viewModel.instance.attr('archived', false);
+        viewModel.instance.attr('readonly', false);
 
-        let result = viewModel.attr('isAllowedToEdit');
+        let result = viewModel.isAllowedToEdit;
         expect(result).toBe(true);
       });
     });

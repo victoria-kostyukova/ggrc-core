@@ -4,17 +4,21 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/three-dots-menu.stache';
 
-const viewModel = canMap.extend({
-  disabled: true,
-  observer: null,
+const ViewModel = canDefineMap.extend({
+  disabled: {
+    value: true,
+  },
+  observer: {
+    value: null,
+  },
   manageEmptyList(menuNode) {
     // check to avoid rendering empty components
     const isEmpty = $(menuNode).find('li').length === 0;
-    this.attr('disabled', isEmpty);
+    this.disabled = isEmpty;
   },
   mutationCallback(mutationsList) {
     mutationsList.forEach((mutation) => {
@@ -26,7 +30,7 @@ const viewModel = canMap.extend({
     const config = {childList: true};
     const observer = new MutationObserver(this.mutationCallback.bind(this));
     observer.observe(menuNode, config);
-    this.attr('observer', observer);
+    this.observer = observer;
   },
 });
 
@@ -37,7 +41,7 @@ const events = {
     this.viewModel.manageEmptyList(menuNode);
   },
   removed() {
-    this.viewModel.attr('observer').disconnect();
+    this.viewModel.observer.disconnect();
   },
 };
 
@@ -45,6 +49,6 @@ export default canComponent.extend({
   tag: 'three-dots-menu',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events,
 });

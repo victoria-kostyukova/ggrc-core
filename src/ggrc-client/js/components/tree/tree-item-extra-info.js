@@ -5,7 +5,7 @@
 
 import moment from 'moment';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
@@ -17,174 +17,175 @@ import Cycle from '../../models/business-models/cycle';
 import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.stache';
 
-let viewModel = canMap.extend({
-  define: {
-    isActive: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('drawStatuses') ||
-          this.attr('isDirective') ||
-          this.attr('isCycleTasks') ||
-          this.attr('isRequirement');
-      },
-    },
-    isDirective: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('instance') instanceof Directive;
-      },
-    },
-    isRequirement: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('instance') instanceof Requirement;
-      },
-    },
-    isCycleTaskGroupObjectTask: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('instance') instanceof CycleTaskGroupObjectTask;
-      },
-    },
-    isCycleTaskGroup: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('instance') instanceof CycleTaskGroup;
-      },
-    },
-    isCycleTasks: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('isCycleTaskGroup') ||
-          this.attr('isCycleTaskGroupObjectTask') ||
-          this.attr('instance') instanceof Cycle;
-      },
-    },
-    isLoading: {
-      type: 'boolean',
-      value: false,
-    },
-    readyStatus: {
-      type: 'boolean',
-      value: false,
-    },
-    raisePopover: {
-      type: 'boolean',
-      value: false,
-      get: function () {
-        return this.attr('hovered') || this.attr('readyStatus');
-      },
-    },
-    disablePopover: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('instance') instanceof Cycle;
-      },
-    },
-    drawStatuses: {
-      type: 'boolean',
-      get: function () {
-        return !!this.attr('instance.workflow_state');
-      },
-    },
-    isShowOverdue: {
-      type: 'boolean',
-      get: function () {
-        return this.attr('isCycleTaskGroup') ||
-          this.attr('isCycleTaskGroupObjectTask');
-      },
-    },
-    isOverdue: {
-      type: 'boolean',
-      get: function () {
-        let isWorkflowOverdue =
-          this.attr('drawStatuses') &&
-          this.attr('instance.workflow_state') === 'Overdue';
-
-        let isCycleTasksOverdue =
-          this.attr('isCycleTasks') &&
-          this.attr('instance.isOverdue');
-
-        return isWorkflowOverdue || isCycleTasksOverdue;
-      },
-    },
-    endDate: {
-      type: String,
-      get() {
-        let date = this.attr('instance.end_date');
-        let today = moment().startOf('day');
-        let startOfDate = moment(date).startOf('day');
-        if (!date || today.diff(startOfDate, 'days') === 0) {
-          return 'Today';
-        }
-        return formatDate(date, true);
-      },
-    },
-    cssClasses: {
-      type: 'string',
-      get: function () {
-        let classes = [];
-
-        if (this.attr('isOverdue')) {
-          classes.push('state-overdue');
-        }
-
-        if (this.attr('spin')) {
-          classes.push('fa-spinner');
-          classes.push('fa-spin');
-        } else if (this.attr('active')) {
-          classes.push('active');
-          classes.push('fa-info-circle');
-        } else {
-          classes.push('fa-info-circle');
-        }
-
-        return classes.join(' ');
-      },
+const ViewModel = canDefineMap.extend({
+  triggered: {
+    value: false,
+  },
+  active: {
+    value: false,
+  },
+  spin: {
+    value: false,
+  },
+  pendingContent: {
+    value: () => [],
+  },
+  contentPromises: {
+    value: () => [],
+  },
+  dfdReady: {
+    value: () => $.Deferred(),
+  },
+  classes: {
+    value: () => [],
+  },
+  instance: {
+    value: null,
+  },
+  isLoading: {
+    type: 'boolean',
+    value: false,
+  },
+  readyStatus: {
+    type: 'boolean',
+    value: false,
+  },
+  isActive: {
+    get() {
+      return this.drawStatuses
+        || this.isDirective
+        || this.isCycleTasks
+        || this.isRequirement;
     },
   },
-  onEnter: function () {
+  isDirective: {
+    get() {
+      return this.instance instanceof Directive;
+    },
+  },
+  isRequirement: {
+    get() {
+      return this.instance instanceof Requirement;
+    },
+  },
+  isCycleTaskGroupObjectTask: {
+    get() {
+      return this.instance instanceof CycleTaskGroupObjectTask;
+    },
+  },
+  isCycleTaskGroup: {
+    get() {
+      return this.instance instanceof CycleTaskGroup;
+    },
+  },
+  isCycleTasks: {
+    get() {
+      return this.isCycleTaskGroup
+        || this.isCycleTaskGroupObjectTask
+        || this.instance instanceof Cycle;
+    },
+  },
+  raisePopover: {
+    value: false,
+    get() {
+      return this.hovered || this.readyStatus;
+    },
+  },
+  disablePopover: {
+    get() {
+      return this.instance instanceof Cycle;
+    },
+  },
+  drawStatuses: {
+    get() {
+      return !!this.instance.attr('workflow_state');
+    },
+  },
+  isShowOverdue: {
+    get() {
+      return this.isCycleTaskGroup || this.isCycleTaskGroupObjectTask;
+    },
+  },
+  isOverdue: {
+    get() {
+      let isWorkflowOverdue =
+        this.drawStatuses && this.instance.attr('workflow_state') === 'Overdue';
+
+      let isCycleTasksOverdue = this.isCycleTasks
+        && this.instance.attr('isOverdue');
+
+      return isWorkflowOverdue || isCycleTasksOverdue;
+    },
+  },
+  endDate: {
+    get() {
+      let date = this.instance.attr('end_date');
+      let today = moment().startOf('day');
+      let startOfDate = moment(date).startOf('day');
+      if (!date || today.diff(startOfDate, 'days') === 0) {
+        return 'Today';
+      }
+      return formatDate(date, true);
+    },
+  },
+  cssClasses: {
+    get() {
+      let classes = [];
+
+      if (this.isOverdue) {
+        classes.push('state-overdue');
+      }
+
+      if (this.spin) {
+        classes.push('fa-spinner');
+        classes.push('fa-spin');
+      } else if (this.active) {
+        classes.push('active');
+        classes.push('fa-info-circle');
+      } else {
+        classes.push('fa-info-circle');
+      }
+
+      return classes.join(' ');
+    },
+  },
+  onEnter() {
     this.processPendingContent();
-    this.attr('active', true);
-    if (!this.attr('triggered')) {
-      this.attr('triggered', true);
+    this.active = true;
+    if (!this.triggered) {
+      this.triggered = true;
     }
   },
-  onLeave: function () {
-    this.attr('active', false);
+  onLeave() {
+    this.active = false;
   },
   processPendingContent() {
-    const extractedPendingContent = this.attr('pendingContent').splice(0);
+    const extractedPendingContent = this.pendingContent.splice(0);
     const resolvedContent = extractedPendingContent.map((pending) => pending());
 
     this.addContent(...Array.from(resolvedContent));
   },
   addPromiseContent({callback}) {
-    this.attr('pendingContent').push(callback);
+    this.pendingContent.push(callback);
   },
   addContent(...dataPromises) {
-    let dfds = this.attr('contentPromises');
-    let dfdReady = this.attr('dfdReady');
+    let dfds = this.contentPromises;
+    let dfdReady = this.dfdReady;
 
-    this.attr('spin', true);
+    this.spin = true;
     dfds.push(...dataPromises);
 
     dfdReady = $.when(...Array.from(dfds)).then(() => {
-      this.attr('spin', false);
+      this.spin = false;
     });
 
-    this.attr('dfdReady', dfdReady);
+    this.dfdReady = dfdReady;
   },
-  pendingContent: [],
-  contentPromises: [],
-  dfdReady: $.Deferred(),
-  classes: [],
-  instance: null,
 });
 
 export default canComponent.extend({
   tag: 'tree-item-extra-info',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

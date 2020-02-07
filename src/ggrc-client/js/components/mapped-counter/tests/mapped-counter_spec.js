@@ -26,9 +26,9 @@ describe('mapped-counter component', () => {
 
     it('sets "lockUntilUpdate" field to true before update',
       () => {
-        viewModel.attr('lockUntilUpdate', false);
+        viewModel.lockUntilUpdate = false;
         viewModel.updateCounter();
-        expect(viewModel.attr('lockUntilUpdate')).toBe(true);
+        expect(viewModel.lockUntilUpdate).toBe(true);
       });
 
     describe('dispatches event with callback which', () => {
@@ -51,21 +51,21 @@ describe('mapped-counter component', () => {
       it('sets "lockUntilUpdate" field to false after load() method success',
         async () => {
           spyOn(viewModel, 'load').and.returnValue(Promise.resolve());
-          viewModel.attr('lockUntilUpdate', true);
+          viewModel.lockUntilUpdate = true;
 
           await callback();
 
-          expect(viewModel.attr('lockUntilUpdate')).toBe(false);
+          expect(viewModel.lockUntilUpdate).toBe(false);
         });
 
       it('sets "lockUntilUpdate" field to false if load() method was failed',
         async () => {
           spyOn(viewModel, 'load').and.returnValue(Promise.reject());
-          viewModel.attr('lockUntilUpdate', true);
+          viewModel.lockUntilUpdate = true;
 
           await expectAsync(callback()).toBeRejected();
 
-          expect(viewModel.attr('lockUntilUpdate')).toBe(false);
+          expect(viewModel.lockUntilUpdate).toBe(false);
         });
     });
   });
@@ -92,7 +92,7 @@ describe('mapped-counter component', () => {
         'equals to passed type of the model', () => {
           const type = 'SomeType';
 
-          viewModel.attr('type', type);
+          viewModel.type = type;
           handler([{}], {modelType: type});
 
           expect(viewModel.updateCounter).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe('mapped-counter component', () => {
 
         it('doesn\'t call updateCounter() method when viewModel\'s ' +
         'type doesn\'t equal to passed type of the model', () => {
-          viewModel.attr('type', 'Type1');
+          viewModel.type = 'Type1';
           handler([{}], {modelType: 'Type2'});
 
           expect(viewModel.updateCounter).not.toHaveBeenCalled();

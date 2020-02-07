@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
@@ -17,57 +17,61 @@ import {isAllowedFor} from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-let viewModel = canMap.extend({
-  define: {
-    cycle: {
-      get: function () {
-        return this.attr('instance').cycle;
-      },
-    },
-    workflow: {
-      get: function () {
-        return this.attr('instance.cycle.workflow');
-      },
-    },
-    cssClasses: {
-      type: String,
-      get: function () {
-        let classes = [];
-
-        if (this.attr('disabled')) {
-          classes.push('disabled');
-        }
-
-        return classes.join(' ');
-      },
-    },
-    isShowActionButtons: {
-      get: function () {
-        const pageType = getPageType();
-        const instance = this.attr('instance');
-
-        let showButtons = isAllowedFor('update', instance);
-
-        if (pageType === 'Workflow') {
-          return showButtons && reify(this.attr('cycle')).attr('is_current');
-        }
-
-        return showButtons;
-      },
-    },
-    isAllowedToUpdateWorkflow: {
-      get: function () {
-        const workflow = this.attr('instance.workflow');
-        return isAllowedFor('update', workflow);
-      },
+const ViewModel = canDefineMap.extend({
+  cycle: {
+    get() {
+      return this.instance.attr('cycle');
     },
   },
-  instance: null,
-  disabled: false,
-  oldValues: [],
+  workflow: {
+    get() {
+      return this.instance.attr('cycle.workflow');
+    },
+  },
+  cssClasses: {
+    type: 'string',
+    get() {
+      let classes = [];
+
+      if (this.disabled) {
+        classes.push('disabled');
+      }
+
+      return classes.join(' ');
+    },
+  },
+  isShowActionButtons: {
+    get() {
+      const pageType = getPageType();
+      const instance = this.instance;
+
+      let showButtons = isAllowedFor('update', instance);
+
+      if (pageType === 'Workflow') {
+        return showButtons && reify(this.cycle).attr('is_current');
+      }
+
+      return showButtons;
+    },
+  },
+  isAllowedToUpdateWorkflow: {
+    get() {
+      const workflow = this.instance.attr('workflow');
+      return isAllowedFor('update', workflow);
+    },
+  },
+  instance: {
+    value: null,
+  },
+  disabled: {
+    value: false,
+  },
+  oldValues: {
+    value: () => [],
+  },
   async changeStatus(ctx, el, ev) {
     let status = $(el).data('value');
-    let instance = this.attr('instance');
+    let instance = this.instance;
     let oldValue = {
       status: instance.attr('status'),
     };
@@ -75,25 +79,25 @@ let viewModel = canMap.extend({
     ev.stopPropagation();
     const result = await this.setStatus(status);
     if (result) {
-      this.attr('oldValues').unshift(oldValue);
+      this.oldValues.unshift(oldValue);
     }
   },
   async undo(ctx, el, ev) {
     ev.stopPropagation();
-    let previousValue = this.attr('oldValues.0');
+    let previousValue = this.oldValues[0];
     const result = await this.setStatus(previousValue.status);
     if (result) {
-      this.attr('oldValues').shift();
+      this.oldValues.shift();
     }
   },
   async setStatus(status) {
-    const instance = this.attr('instance');
+    const instance = this.instance;
     const stopFn = tracker.start(
       instance.type,
       tracker.USER_JOURNEY_KEYS.LOADING,
       tracker.USER_ACTIONS.CYCLE_TASK.CHANGE_STATUS
     );
-    this.attr('disabled', true);
+    this.disabled = true;
     try {
       await updateStatus(instance, status);
       return true;
@@ -104,7 +108,7 @@ let viewModel = canMap.extend({
       );
       return false;
     } finally {
-      this.attr('disabled', false);
+      this.disabled = false;
       stopFn();
     }
   },
@@ -117,9 +121,5 @@ export default canComponent.extend({
   tag: 'cycle-task-actions',
   view: canStache(template),
   leakScope: true,
-  viewModel,
-  events: {
-    inserted: function () {
-    },
-  },
+  ViewModel,
 });

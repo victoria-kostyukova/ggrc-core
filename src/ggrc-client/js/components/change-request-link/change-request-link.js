@@ -4,16 +4,14 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/change-request-link.stache';
 
-const viewModel = canMap.extend({
-  define: {
-    link: {
-      get() {
-        return GGRC.config.CHANGE_REQUEST_URL;
-      },
+const ViewModel = canDefineMap.extend({
+  link: {
+    get() {
+      return GGRC.config.CHANGE_REQUEST_URL;
     },
   },
 });
@@ -22,5 +20,5 @@ export default canComponent.extend({
   tag: 'change-request-link',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

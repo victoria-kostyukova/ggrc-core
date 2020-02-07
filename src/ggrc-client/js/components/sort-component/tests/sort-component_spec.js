@@ -7,20 +7,20 @@ import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../sort-component';
 
 describe('sort-component component', () => {
-  let viewModel;
+  let ViewModel;
 
   beforeAll(() => {
-    viewModel = getComponentVM(Component);
+    ViewModel = getComponentVM(Component);
   });
 
   describe('"sort()" method', () => {
     const testItems = ['B', 'C', 'A'];
 
     it('should sort items', () => {
-      viewModel.attr('items', testItems);
-      viewModel.sort();
+      ViewModel.items = testItems;
+      ViewModel.sort();
 
-      const sortedItems = viewModel.attr('sortedItems');
+      const sortedItems = ViewModel.sortedItems;
       expect(sortedItems.length).toBe(3);
       expect(sortedItems[0]).toEqual('A');
       expect(sortedItems[1]).toEqual('B');

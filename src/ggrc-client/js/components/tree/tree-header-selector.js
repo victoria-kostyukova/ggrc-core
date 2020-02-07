@@ -3,19 +3,28 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
+
+const ViewModel = canDefineMap.extend({
+  controller: {
+    value: null,
+  },
+  $rootEl: {
+    value: null,
+  },
+});
+
 export default canComponent.extend({
   tag: 'tree-header-selector',
   leakScope: true,
-  viewModel: canMap.extend({}),
+  ViewModel,
   events: {
-    init: function (element, options) {
-      this.viewModel.attr('controller', this);
-      this.viewModel.attr('$rootEl', $(element));
+    init(element) {
+      this.viewModel.controller = this;
+      this.viewModel.$rootEl = $(element);
     },
-
-    disable_attrs: function () {
+    disable_attrs() {
       let MAX_ATTR = 7;
       let $check = this.element.find('.attr-checkbox');
       let $mandatory = $check.filter('.mandatory');
@@ -33,21 +42,17 @@ export default canComponent.extend({
           .closest('li').addClass('disabled');
       }
     },
-
-    'input.attr-checkbox click': function (el, ev) {
+    'input.attr-checkbox click'(el, ev) {
       this.disable_attrs(el, ev);
       ev.stopPropagation();
     },
-
-    '.dropdown-menu-form click': function (el, ev) {
+    '.dropdown-menu-form click'(el, ev) {
       ev.stopPropagation();
     },
-
-    '.tview-dropdown-toggle click': function (el, ev) {
+    '.tview-dropdown-toggle click'(el, ev) {
       this.disable_attrs(el, ev);
     },
-
-    '.set-tree-attrs,.close-dropdown click': function () {
+    '.set-tree-attrs,.close-dropdown click'() {
       this.viewModel.$rootEl.removeClass('open');
       this.viewModel.$rootEl.parents('.dropdown-menu')
         .parent().removeClass('open');

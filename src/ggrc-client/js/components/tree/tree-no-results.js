@@ -4,27 +4,27 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/tree-no-results.stache';
+
+const ViewModel = canDefineMap.extend({
+  text: {
+    value: 'No results, please check your filter criteria',
+    set(value) {
+      return value || 'No results...';
+    },
+    show: {
+      set(value) {
+        return value || false;
+      },
+    },
+  },
+});
 
 export default canComponent.extend({
   tag: 'tree-no-results',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      text: {
-        value: 'No results, please check your filter criteria',
-        set: function (value) {
-          return value || 'No results...';
-        },
-      },
-      show: {
-        set: function (value) {
-          return value || false;
-        },
-      },
-    },
-  }),
+  ViewModel,
 });

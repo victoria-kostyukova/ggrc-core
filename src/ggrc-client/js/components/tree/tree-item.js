@@ -12,60 +12,63 @@ import './tree-item-custom-attribute';
 import BaseTreeItemVM from './tree-item-base-vm';
 import template from './templates/tree-item.stache';
 
-let viewModel = BaseTreeItemVM.extend({
-  define: {
-    extraClasses: {
-      type: String,
-      get() {
-        let classes = [];
-        let instance = this.attr('instance');
+let ViewModel = BaseTreeItemVM.extend({
+  extraClasses: {
+    get() {
+      let classes = [];
+      let instance = this.instance;
 
-        if (instance.snapshot) {
-          classes.push('snapshot');
-        }
+      if (instance.snapshot) {
+        classes.push('snapshot');
+      }
 
-        if (instance.workflow_state) {
-          classes.push('t-' + instance.workflow_state);
-        }
+      if (instance.workflow_state) {
+        classes.push('t-' + instance.workflow_state);
+      }
 
-        if (this.attr('expanded')) {
-          classes.push('open-item');
-        }
+      if (this.expanded) {
+        classes.push('open-item');
+      }
 
-        return classes.join(' ');
-      },
-    },
-    selectableSize: {
-      type: Number,
-      get() {
-        let attrCount = this.attr('selectedColumns').length;
-        let result = 3;
-
-        if (attrCount < 4) {
-          result = 1;
-        } else if (attrCount < 7) {
-          result = 2;
-        }
-
-        return result;
-      },
+      return classes.join(' ');
     },
   },
-  instance: null,
-  selectedColumns: [],
-  mandatory: [],
-  disableConfiguration: null,
-  itemSelector: '.tree-item-content',
+  selectableSize: {
+    get() {
+      let attrCount = this.selectedColumns.length;
+      let result = 3;
+
+      if (attrCount < 4) {
+        result = 1;
+      } else if (attrCount < 7) {
+        result = 2;
+      }
+
+      return result;
+    },
+  },
+  selectedColumns: {
+    value: () => [],
+  },
+  mandatory: {
+    value: () => [],
+  },
+  disableConfiguration: {
+    value: null,
+  },
+  itemSelector: {
+    value: '.tree-item-content',
+  },
 });
 
 export default canComponent.extend({
   tag: 'tree-item',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     inserted() {
-      this.viewModel.attr('$el', this.element.find('.tree-item-wrapper'));
+      this.viewModel.$el = this.element.find('.tree-item-wrapper');
     },
   },
 });

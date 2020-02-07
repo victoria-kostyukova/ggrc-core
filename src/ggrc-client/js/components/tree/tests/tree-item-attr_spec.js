@@ -13,11 +13,11 @@ describe('tree-item-attr component', () => {
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', new canMap());
+    viewModel.instance = new canMap();
   });
 
   it('returns an empty string if the attribute is missing', () => {
-    viewModel.attr({name: 'does_not_exist'});
+    viewModel.name = 'does_not_exist';
 
     let result = viewModel.getDefaultValue();
     expect(result).toEqual('');
@@ -25,36 +25,24 @@ describe('tree-item-attr component', () => {
 
   describe('retrieving a "default" (non-date) attribute', () => {
     it('returns a correct value through the .attr() method', () => {
-      viewModel.attr({
-        name: 'slug',
-        instance: {
-          slug: 'DATAASSET-2',
-        },
-      });
+      viewModel.name = 'slug';
+      viewModel.instance = new canMap({slug: 'DATAASSET-2'});
 
       let result = viewModel.getDefaultValue();
       expect(result).toEqual('DATAASSET-2');
     });
 
     it('returns "true" string when boolean attr value is true', () => {
-      viewModel.attr({
-        name: 'archived',
-        instance: {
-          archived: true,
-        },
-      });
+      viewModel.name = 'archived';
+      viewModel.instance = new canMap({archived: true});
 
       let result = viewModel.getDefaultValue();
       expect(result).toEqual('true');
     });
 
     it('returns "false" string when boolean attr value is false', () => {
-      viewModel.attr({
-        name: 'archived',
-        instance: {
-          archived: false,
-        },
-      });
+      viewModel.name = 'archived';
+      viewModel.instance = new canMap({archived: false});
 
       let result = viewModel.getDefaultValue();
       expect(result).toEqual('false');
@@ -64,16 +52,13 @@ describe('tree-item-attr component', () => {
   describe('retrieving a date-like attribute', () => {
     it('returns a correctly formatted value through the .attr() method',
       () => {
-        viewModel.attr({
-          name: 'start_date',
-          instance: {
-            start_date: '1980-05-17',
-          },
-        });
-        spyOn(viewModel.attr('instance'), 'attr').and.returnValue('2016-01-22');
+        viewModel.name = 'start_date';
+        viewModel.instance = new canMap({start_date: '1980-05-17'});
+
+        spyOn(viewModel.instance, 'attr').and.returnValue('2016-01-22');
 
         let result = viewModel.getDefaultValue();
-        expect(viewModel.attr('instance').attr)
+        expect(viewModel.instance.attr)
           .toHaveBeenCalledWith('start_date');
         expect(result).toEqual('01/22/2016');
       }
@@ -82,17 +67,14 @@ describe('tree-item-attr component', () => {
 
   describe('retrieving a rich text attribute', () => {
     it('returns a correctly formatted value through the .attr() method', () => {
-      viewModel.attr({
-        name: 'notes',
-        instance: {
-          notes: 'Notes',
-        },
-      });
-      spyOn(viewModel.attr('instance'), 'attr')
+      viewModel.name = 'notes';
+      viewModel.instance = new canMap({notes: 'Notes'});
+
+      spyOn(viewModel.instance, 'attr')
         .and.returnValue('<p><strong>Example</strong></p><p>Notes</p>');
 
       let result = viewModel.getDefaultValue();
-      expect(viewModel.attr('instance').attr).toHaveBeenCalledWith('notes');
+      expect(viewModel.instance.attr).toHaveBeenCalledWith('notes');
       expect(result).toEqual('Example \n Notes');
     });
 
@@ -102,12 +84,8 @@ describe('tree-item-attr component', () => {
           spyOn(viewModel, 'isMarkdown').and.returnValue(true);
           spyOn(MarkdownUtils, 'convertMarkdownToHtml')
             .and.returnValue('<strong>Example for markdown</strong>');
-          viewModel.attr({
-            name: 'notes',
-            instance: {
-              notes: 'some markdown notes',
-            },
-          });
+          viewModel.name = 'notes';
+          viewModel.instance = new canMap({notes: 'some markdown notes'});
 
           const result = viewModel.getDefaultValue();
 

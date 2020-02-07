@@ -9,29 +9,28 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import BaseTreeItemVM from '../tree-item-base-vm';
 
 describe('tree-item-base viewModel', function () {
-  'use strict';
-
   let vm;
 
   beforeEach(function () {
+    BaseTreeItemVM.seal = false;
     vm = new BaseTreeItemVM();
   });
 
   describe('onExpand() method', function () {
     it('converts expanded property to the opposite value', function () {
-      vm.attr('expanded', true);
+      vm.expanded = true;
 
       vm.onExpand();
 
-      expect(vm.attr('expanded')).toBeFalsy();
+      expect(vm.expanded).toBeFalsy();
     });
 
     it('converts expanded property to the opposite value', function () {
-      vm.attr('expanded', false);
+      vm.expanded = false;
 
       vm.onExpand();
 
-      expect(vm.attr('expanded')).toBeTruthy();
+      expect(vm.expanded).toBeTruthy();
     });
   });
 
@@ -65,9 +64,9 @@ describe('tree-item-base viewModel', function () {
 
     describe('if instance is Cycle', () => {
       beforeEach(() => {
-        vm.attr('instance', new canMap({
+        vm.instance = new canMap({
           type: 'Cycle',
-        }));
+        });
       });
 
       describe('toggle "expanded" option if page is "Workflow"', () => {
@@ -76,27 +75,25 @@ describe('tree-item-base viewModel', function () {
             .and.returnValue('Workflow');
         });
         it('when option was false', () => {
-          vm.attr('expanded', false);
+          vm.expanded = false;
 
           vm.onClick('element', event);
 
-          expect(vm.attr('expanded')).toBe(true);
+          expect(vm.expanded).toBe(true);
         });
 
         it('when option was true', () => {
-          vm.attr('expanded', true);
+          vm.expanded = true;
 
           vm.onClick('element', event);
 
-          expect(vm.attr('expanded')).toBe(false);
+          expect(vm.expanded).toBe(false);
         });
       });
 
       it('call select() if page is not Workflow', () => {
         spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
-        vm.attr('result', true);
-
         vm.onClick('element', event);
 
         expect(vm.select).toHaveBeenCalledWith('element');
@@ -105,9 +102,9 @@ describe('tree-item-base viewModel', function () {
 
     describe('if instance is CycleTaskGroup', () => {
       beforeEach(() => {
-        vm.attr('instance', new canMap({
+        vm.instance = new canMap({
           type: 'CycleTaskGroup',
-        }));
+        });
       });
 
       describe('toggle "expanded" option if page is "Workflow"', () => {
@@ -117,26 +114,25 @@ describe('tree-item-base viewModel', function () {
         });
 
         it('when option was false', () => {
-          vm.attr('expanded', false);
+          vm.expanded = false;
 
           vm.onClick('element', event);
 
-          expect(vm.attr('expanded')).toBe(true);
+          expect(vm.expanded).toBe(true);
         });
 
         it('when option was true', () => {
-          vm.attr('expanded', true);
+          vm.expanded = true;
 
           vm.onClick('element', event);
 
-          expect(vm.attr('expanded')).toBe(false);
+          expect(vm.expanded).toBe(false);
         });
       });
 
       it('call select() if page is not Workflow', () => {
         spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
-        vm.attr('result', true);
 
         vm.onClick('element', event);
 
@@ -153,8 +149,8 @@ describe('tree-item-base viewModel', function () {
         closest: jasmine.createSpy().and.returnValue('closest'),
       };
       spyOn(canEvent, 'trigger');
-      vm.attr('instance', 'fakeInstance');
-      vm.attr('itemSelector', 'fakeSelector');
+      vm.instance = 'fakeInstance';
+      vm.itemSelector = 'fakeSelector';
     });
 
     it('looks for correct element', () => {

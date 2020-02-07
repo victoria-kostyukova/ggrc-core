@@ -4,105 +4,105 @@
   */
 
 import loEvery from 'lodash/every';
-import canList from 'can-list';
+import canDefineList from 'can-define/list/list';
 import canMap from 'can-map';
-import {viewModel, events} from '../sub-tree-models';
+import {ViewModel, events} from '../sub-tree-models';
 import childModelsMap from '../child-models-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import {
   getWidgetConfig,
 } from '../../../plugins/utils/widgets-utils';
 
-describe('sub-tree-models component', function () {
+describe('sub-tree-models component', () => {
   let vm;
   let originalInit;
 
-  beforeEach(function () {
-    originalInit = viewModel.prototype.init;
-    vm = viewModel.extend({
+  beforeEach(() => {
+    originalInit = ViewModel.prototype.init;
+    vm = ViewModel.extend({seal: false}, {
       init: undefined,
       originalInit: originalInit,
     })();
   });
 
-  describe('setter for selectedModels', function () {
+  describe('setter for selectedModels', () => {
     let selectedModels;
     let modelsList;
     let expectedResult;
 
-    beforeEach(function () {
+    beforeEach(() => {
       modelsList = [
         {name: 'Audit', display: false},
         {name: 'Control', display: false},
         {name: 'Objective', display: false},
         {name: 'Market', display: false},
       ];
-      vm.attr('modelsList', new canList(modelsList));
+      vm.modelsList = new canDefineList(modelsList);
     });
-    it('updates values of modelsList', function () {
+    it('updates values of modelsList', () => {
       selectedModels = ['Audit', 'Market'];
-      expectedResult = modelsList.map(function (item) {
+      expectedResult = modelsList.map((item) => {
         item.display = (selectedModels.indexOf(item.name) !== -1);
         return item;
       });
-      vm.attr('selectedModels', selectedModels);
-      expect(vm.attr('modelsList').serialize()).toEqual(expectedResult);
+      vm.selectedModels = selectedModels;
+      expect(vm.modelsList.serialize()).toEqual(expectedResult);
     });
   });
 
-  describe('init() method', function () {
+  describe('init() method', () => {
     let modelsList = 'mockList';
     let defaultModels = {selected: 'mockDefaultModels'};
 
-    beforeEach(function () {
+    beforeEach(() => {
       spyOn(vm, 'getDisplayModels').and.returnValue(modelsList);
       spyOn(TreeViewUtils, 'getModelsForSubTier')
         .and.returnValue(defaultModels);
-      spyOn(childModelsMap.attr('container'), 'bind');
+      spyOn(childModelsMap.container, 'bind');
     });
 
-    it('sets modelsList', function () {
-      vm.attr('type', 'Program');
-      vm.attr('modelsList', undefined);
+    it('sets modelsList', () => {
+      vm.type = 'Program';
+      vm.modelsList = undefined;
       vm.originalInit();
-      expect(vm.attr('modelsList')).toEqual(modelsList);
+      expect(vm.modelsList).toEqual(modelsList);
     });
 
     it('subscribes for changes of childModelsMap.container for its type',
-      function () {
+      () => {
         vm.originalInit();
-        expect(childModelsMap.attr('container').bind)
-          .toHaveBeenCalledWith(vm.attr('type'), jasmine.any(Function));
+        expect(childModelsMap.container.bind)
+          .toHaveBeenCalledWith(vm.type, jasmine.any(Function));
       });
   });
 
-  describe('get() of displayModelsList', function () {
-    it('splits widgetNames', function () {
+  describe('get() of displayModelsList', () => {
+    it('splits widgetNames', () => {
       let result;
-      vm.attr('modelsList', new canList([
+      vm.modelsList = new canDefineList([
         {widgetName: 'Child Programs'},
         {widgetName: 'MockName'},
         {widgetName: 'Singlelinename'},
-      ]));
+      ]);
 
-      result = vm.attr('displayModelsList');
+      result = vm.displayModelsList;
 
       expect(result[0].displayName).toEqual('Child Programs');
       expect(result[1].displayName).toEqual('Mock Name');
       expect(result[2].displayName).toEqual('Singlelinename');
     });
 
-    it('sorts model names', function () {
+    it('sorts model names', () => {
       let result;
-      vm.attr('modelsList', new canList([
+      vm.modelsList = new canDefineList([
         {widgetName: 'Metrics'},
         {widgetName: 'Control'},
         {widgetName: 'Risk'},
         {widgetName: 'Audit'},
         {widgetName: 'Child Programs'},
-      ]));
+      ]);
 
-      result = vm.attr('displayModelsList');
+      result = vm.displayModelsList;
 
       expect(result[0].displayName).toEqual('Audit');
       expect(result[1].displayName).toEqual('Child Programs');
@@ -112,51 +112,52 @@ describe('sub-tree-models component', function () {
     });
   });
 
-  describe('activate() method', function () {
-    it('sets true to viewModel.isActive', function () {
-      vm.attr('isActive', false);
+  describe('activate() method', () => {
+    it('sets true to ViewModel.isActive', () => {
+      vm.isActive = false;
 
       vm.activate();
-      expect(vm.attr('isActive')).toBe(true);
+      expect(vm.isActive).toBe(true);
     });
   });
 
-  describe('setVisibility() method', function () {
+  describe('setVisibility() method', () => {
     let event;
     let selectedModels;
 
-    beforeEach(function () {
+    beforeEach(() => {
       selectedModels = 'models';
       event = {
         stopPropagation: jasmine.createSpy(),
       };
-      spyOn(vm, 'getSelectedModels').and.returnValue(selectedModels);
-      vm.attr('type', 'Program');
+      spyOn(vm, 'getSelectedModels')
+        .and.returnValue(selectedModels);
+      vm.type = 'Program';
       spyOn(childModelsMap, 'setModels');
     });
 
-    it('sets selectedModels to childModelsMap', function () {
+    it('sets selectedModels to childModelsMap', () => {
       vm.setVisibility(event);
 
       expect(childModelsMap.setModels)
-        .toHaveBeenCalledWith(vm.attr('type'), selectedModels);
+        .toHaveBeenCalledWith(vm.type, selectedModels);
     });
 
-    it('sets false to viewModel.isActive', function () {
-      vm.attr('isActive', true);
+    it('sets false to ViewModel.isActive', () => {
+      vm.isActive = true;
 
       vm.setVisibility(event);
-      expect(vm.attr('isActive')).toBe(false);
+      expect(vm.isActive).toBe(false);
     });
   });
 
-  describe('getDisplayModels() method', function () {
+  describe('getDisplayModels() method', () => {
     let defaultModels;
     let expectedResult;
     let savedModels;
     let spy;
     function generateResult(availableModels, selectedModels) {
-      return availableModels.map(function (model) {
+      return availableModels.map((model) => {
         return {
           widgetName: getWidgetConfig(model).widgetName,
           name: model,
@@ -165,19 +166,19 @@ describe('sub-tree-models component', function () {
       });
     }
 
-    beforeEach(function () {
+    beforeEach(() => {
       defaultModels = {
         available: ['Audit', 'Control', 'Objective', 'Market'],
         selected: ['Audit'],
       };
-      vm.attr('type', 'Program');
+      vm.type = 'Program';
       spyOn(TreeViewUtils, 'getModelsForSubTier')
         .and.returnValue(defaultModels);
       spy = spyOn(childModelsMap, 'getModels');
     });
 
     it('returns generated displayList using savedModels if it is defined',
-      function () {
+      () => {
         savedModels = ['Objective', 'Market'];
         spy.and.returnValue(savedModels);
         expectedResult = generateResult(defaultModels.available, savedModels);
@@ -185,7 +186,7 @@ describe('sub-tree-models component', function () {
       });
 
     it('returns generated displayList using defaultModels' +
-    ' if savedModels is undefined', function () {
+    ' if savedModels is undefined', () => {
       spy.and.returnValue(null);
       expectedResult =
         generateResult(defaultModels.available, defaultModels.selected);
@@ -193,77 +194,77 @@ describe('sub-tree-models component', function () {
     });
   });
 
-  describe('getSelectedModels() method', function () {
-    beforeEach(function () {
-      const modelsList = new canList([
+  describe('getSelectedModels() method', () => {
+    beforeEach(() => {
+      const modelsList = new canDefineList([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},
         {name: 'Market', display: true},
       ]);
-      vm.attr('modelsList', modelsList);
+      vm.modelsList = modelsList;
     });
 
-    it('returns selected models widgetIds', function () {
+    it('returns selected models widgetIds', () => {
       const expectedResult = ['Audit', 'Control', 'Market'];
       expect(vm.getSelectedModels().serialize()).toEqual(expectedResult);
     });
   });
 
-  describe('selectAll(), selectNone() methods', function () {
+  describe('selectAll(), selectNone() methods', () => {
     let modelsList;
     let event;
 
-    beforeEach(function () {
-      modelsList = new canList([
+    beforeEach(() => {
+      modelsList = new canDefineList([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},
         {name: 'Market', display: true},
       ]);
-      vm.attr('modelsList', modelsList);
+      vm.modelsList = modelsList;
       event = {
         stopPropagation: jasmine.createSpy(),
       };
     });
 
-    it('selectAll() sets display true to all models in list', function () {
+    it('selectAll() sets display true to all models in list', () => {
       let result;
 
       vm.selectAll(event);
-      result = loEvery(vm.attr('modelsList'), function (item) {
+      result = loEvery(vm.modelsList, (item) => {
         return item.display === true;
       });
       expect(result).toBe(true);
     });
 
-    it('selectNone() sets display false to all models in list', function () {
+    it('selectNone() sets display false to all models in list', () => {
       let result;
 
       vm.selectNone(event);
-      result = loEvery(vm.attr('modelsList'), function (item) {
+      result = loEvery(vm.modelsList, (item) => {
         return item.display === false;
       });
       expect(result).toBe(true);
     });
   });
 
-  describe('".sub-tree-models mouseleave" handler', function () {
+  describe('".sub-tree-models mouseleave" handler', () => {
     let handler;
-    let viewModel;
+    let ViewModel;
 
-    beforeEach(function () {
-      viewModel = new canMap();
+    beforeEach(() => {
+      ViewModel = new canMap();
       handler = events['.sub-tree-models mouseleave'].bind({
-        viewModel: viewModel,
+        viewModel: ViewModel,
       });
     });
 
-    it('sets false to viewModel.isActive', function () {
-      viewModel.attr('isActive', true);
+    it('sets false to ViewModel.isActive', () => {
+      ViewModel.isActive = true;
 
       handler();
-      expect(viewModel.attr('isActive', false));
+      expect(ViewModel.isActive = false);
     });
   });
 });
