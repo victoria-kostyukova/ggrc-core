@@ -3,7 +3,7 @@
 
 """This module provides endpoints for all_models.ExternalMapping model"""
 
-
+import json
 import logging
 
 from flask import request
@@ -32,11 +32,12 @@ def get_external_mapping_by_data():
       ExternalMapping or error message if error occurred.
   """
 
-  logger.info("Get external mapping: external_id %s, external_type %s",
+  logger.info("Get external mapping: external_ids %s, external_type %s",
               request.args["external_ids"], request.args["external_type"])
+  external_ids = json.loads(request.args["external_ids"])
   external_mapping = ExternalMapping.query.filter(
       sa.and_(
-          ExternalMapping.external_id.in_(request.args["external_ids"]),
+          ExternalMapping.external_id.in_(external_ids),
           ExternalMapping.external_type == request.args["external_type"]
       )
   ).all()
