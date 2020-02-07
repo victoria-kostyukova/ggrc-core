@@ -506,20 +506,20 @@ def not_empty_revisions(exp, object_class, target_class, query):
   without any actual changes is performed.
 
   Args:
-      exp: dict contains:
-        resource_type: resource type of queried revisions
-        resource_id: resource_id of queried revisions
-        ignore_relationships(optional):
-          ignore relationship revisions if True (False for default)
-      object_class: model object of queried object type
-      target_class: model object of queried target object type
-      query: full query filter from request
+    exp (dict): A dictionary containing operator's arguments:
+      - resource_type (str): A type of the resource of queried revisions;
+      - resource_id (int): An ID of the resource of queried revisions;
+      - ignore_relationships (bool): A flag indicating whether relationship's
+          revision should be ignored or not. Defaults to `False`.
+    object_class (db.Model): A model object of queried object type.
+    target_class (db.Model): A model object of queried target object type.
+    query (dict): A dictionary containing full query filter from request.
 
   Returns:
-      Sqlalchemy.Query containing filters to get not empty revisions
+    A sqlalchemy.Query containing filters to get not empty revisions.
 
   Raises:
-      BadQueryException: An error occurred if there is no such resource class
+    BadQueryException: An error occurred if there is no such resource class.
   """
   if object_class is not revision.Revision:
     raise BadQueryException("'not_empty_revisions' operator works with "
@@ -550,11 +550,21 @@ def not_empty_revisions(exp, object_class, target_class, query):
         sqlalchemy.and_(
             revision.Revision.source_type == resource_type,
             revision.Revision.source_id == resource_id,
+            # Modified Revisions for Relationships are created due to the
+            # specifics of sync service (it duplicates POST requests for
+            # Relationships during the sync) and does not have any particular
+            # meaning thus should be ignored here.
+            revision.Revision.action != "modified",
             sqlalchemy.not_(revision.Revision.is_empty),
         ),
         sqlalchemy.and_(
             revision.Revision.destination_type == resource_type,
             revision.Revision.destination_id == resource_id,
+            # Modified Revisions for Relationships are created due to the
+            # specifics of sync service (it duplicates POST requests for
+            # Relationships during the sync) and does not have any particular
+            # meaning thus should be ignored here.
+            revision.Revision.action != "modified",
             sqlalchemy.not_(revision.Revision.is_empty),
         ),
     )

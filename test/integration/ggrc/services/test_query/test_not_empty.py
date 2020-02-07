@@ -18,13 +18,9 @@ from integration.ggrc import review
 class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
   """Test for correctness of `not_empty_revisions` operator."""
 
-  @classmethod
-  def setUpClass(cls):  # pylint: disable=missing-docstring
-    super(TestNotEmptyRevisions, cls).setUpClass()
-    cls.api = api_helper.Api()
-
-  def setUp(self):
+  def setUp(self):  # pylint: disable=missing-docstring
     super(TestNotEmptyRevisions, self).setUp()
+    self.api = api_helper.Api()
     self.client.get("/login")
 
   def _turn_on_bg_indexing(self):
@@ -129,13 +125,19 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
     self.assertEqual(len(not_empty_revisions), 3)
 
   @ddt.data(
-      (True, 1),
-      (False, 3)
+      {"ignore_relationships": True, "exp_revs_count": 1},
+      {"ignore_relationships": False, "exp_revs_count": 3},
   )
   @ddt.unpack
-  def test_ignore_relationships(self, ignore_relationships, revs_count):
-    """Test 'not_empty_revisions' ignore_relationships flag
-    works as expected"""
+  def test_ignore_relationships(self, ignore_relationships, exp_revs_count):
+    """Test `ignore_relationships` flag works as expected.
+
+    If `ignore_relationships` is passed with `True` value, the query API
+    operator should return only Revisions of the resource.
+    If `ignore_relationships` is passed with `False` value, the query API
+    operator should return Revisions of the resource as well as of it's
+    Relationships.
+    """
     with factories.single_commit():
       objective = factories.ObjectiveFactory()
       data_asset = factories.DataAssetFactory()
@@ -147,4 +149,36 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
         objective, ignore_relationships
     )
 
-    self.assertEqual(len(not_empty_revisions), revs_count)
+    self.assertEqual(len(not_empty_revisions), exp_revs_count)
+
+  def test_ignore_modified_relationship_revs(self):  # noqa pylint: disable=invalid-name
+    """Test `not_empty_revisions` ignores modified relationship's revisions."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      comment = factories.CommentFactory()
+      progam_comment_rel = factories.RelationshipFactory(
+          source=program,
+          destination=comment,
+      )
+      factories.RevisionFactory(
+          obj=progam_comment_rel,
+          action="modified",
+      )
+
+    program_id = program.id
+    progam_comment_rel_id = progam_comment_rel.id
+
+    not_empty_program_revisions = self._query_not_empty_revisions(
+        instance=program, ignore_relationships=False)
+
+    program = self._refresh_instance(program.type, program_id)
+    progam_comment_rel = self._refresh_instance(
+        progam_comment_rel.type, progam_comment_rel_id)
+    self.assertEqual(
+        len(not_empty_program_revisions),
+        (
+            self._count_revisions(program) +
+            self._count_revisions(progam_comment_rel) -
+            1  # "modified" Revisions of the Relationship
+        )
+    )
