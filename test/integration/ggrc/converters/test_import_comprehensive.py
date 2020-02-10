@@ -123,7 +123,7 @@ class TestComprehensiveSheets(TestCase):
     prog = Program.query.filter_by(slug="prog-8").first()
     self.assertEqual(prog.title, "program 8")
     self.assertEqual(prog.status, "Draft")
-    self.assertEqual(prog.description, "test")
+    self.assertEqual(prog.description, u"<p>test</p>")
 
     custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
     expected_custom_vals = ['0', 'a', '2015-12-12', 'test1']

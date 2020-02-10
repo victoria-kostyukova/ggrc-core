@@ -25,14 +25,14 @@ class TestMixinAutoStatusChangeableBase(test_assessment.TestAssessmentBase):
   def create_assignees_restful(self, obj, persons):
     """Add assignees via RESTful API instead of directly via backend.
 
-    Used for addind assignees after object has already been created.
+    Used for adding assignees after object has already been created.
 
     Args:
       obj: Assignable object.
       persons: [("(string) email", "Assignee roles"), ...] A list of people
         and their roles
     Returns:
-      List of relationship.
+      List of relationships.
     """
 
     relationships = []
@@ -50,12 +50,12 @@ class TestMixinAutoStatusChangeableBase(test_assessment.TestAssessmentBase):
     return relationships
 
   def modify_assignee(self, obj, email, new_roles):
-    """Modfiy assignee type.
+    """Modify assignee type.
 
     Args:
       obj: Object
       email: Person's email
-      new_role: New roles for AssigneeType
+      new_roles: New roles for AssigneeType
     """
     person = models.Person.query.filter_by(email=email).first()
     ac_roles = {
@@ -217,6 +217,57 @@ class TestFirstClassAttributes(TestMixinAutoStatusChangeableBase):
     self.assertEqual(expected_status, assessment.status)
 
   @ddt.data(
+      (
+          'test_plan',
+          'test_plan v2',
+          '<p>test_plan v2</p>',
+          models.Assessment.DONE_STATE),
+      (
+          'test_plan',
+          'test_plan v2',
+          '<p>test_plan v2</p><p></p>',
+          models.Assessment.FINAL_STATE),
+      (
+          'notes',
+          'new note',
+          '<p>new <br>note</p>',
+          models.Assessment.DONE_STATE),
+      (
+          'notes',
+          'new note',
+          'new\n note\n',
+          models.Assessment.FINAL_STATE),
+      (
+          'description',
+          'some description',
+          'some<br> description',
+          models.Assessment.DONE_STATE),
+      (
+          'description',
+          'some description',
+          '\nsome\n description\n',
+          models.Assessment.FINAL_STATE),
+  )
+  @ddt.unpack
+  def test_rich_text_field_check_status(self, field_name, old_value, new_value,
+                                        from_status):
+    """Test that Assessment doesn't change status from '{3}' to 'In Progress'
+    when field '{0}' have the same text but different formatting
+    (tags and \n)."""
+
+    kwargs = {field_name: old_value}
+    assessment = factories.AssessmentFactory(status=from_status,
+                                             **kwargs)
+
+    self.api.modify_object(assessment, {
+        field_name: new_value,
+    })
+    assessment = self.refresh_object(assessment)
+
+    self.assertEqual(new_value, getattr(assessment, field_name))
+    self.assertEqual(from_status, assessment.status)
+
+  @ddt.data(
       ('title', 'new title', models.Assessment.START_STATE),
       ('title', 'new title', models.Assessment.REWORK_NEEDED),
       ('test_plan', 'test_plan v2', models.Assessment.START_STATE),
@@ -290,7 +341,7 @@ class TestSnapshots(TestMixinAutoStatusChangeableBase):
   )
   @ddt.unpack
   def test_unmapping_snapshot_status_check(self, from_status, expected_status):
-    """Move Assessment from '{0}' from '{1}' when un map snapshot.
+    """Move Assessment from '{0}' from '{1}' when unmap snapshot.
 
         Snapshot type = assessment type
     """
@@ -359,7 +410,7 @@ class TestSnapshots(TestMixinAutoStatusChangeableBase):
   @ddt.unpack
   def test_unmapping_snapshot_not_assessment_type(self, from_status,
                                                   expected_status):
-    """Move Assessment from '{0}' from '{1}' when un map snapshot.
+    """Move Assessment from '{0}' from '{1}' when unmap snapshot.
 
         Snapshot type != assessment type
     """
@@ -753,7 +804,7 @@ class TestOther(TestMixinAutoStatusChangeableBase):
   )
   @ddt.unpack
   def test_change_acl_no_status_sw(self, acr_name, start_state):
-    """Change in ACL does not swith status from `start_state`."""
+    """Change in ACL does not switch status from `start_state`."""
     with factories.single_commit():
       assessment = factories.AssessmentFactory(status=start_state)
       person = factories.PersonFactory()
