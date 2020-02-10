@@ -89,14 +89,29 @@ class Test(InstanceRepresentation):
     attributes' names
     (compare objects' collections w/ attributes' values set to None).
     """
-    expected_obj_wo_excluded_attrs = (
-        entity.Representation.extract_objs_wo_excluded_attrs(
-            help_utils.convert_to_list(expected_obj), *exclude_attrs)[0])
-    actual_objs_wo_excluded_attrs = (
-        entity.Representation.extract_objs_wo_excluded_attrs(
+    expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        entity.Representation.extract_objs(
+            help_utils.convert_to_list(expected_obj),
             help_utils.convert_to_list(actual_objs), *exclude_attrs))
-    assert (expected_obj_wo_excluded_attrs in
+    assert (expected_obj_wo_excluded_attrs[0] in
             actual_objs_wo_excluded_attrs), (
+        messages.AssertionMessages.format_err_msg_contains(
+            expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
+
+  @staticmethod
+  def general_contain_soft_assert(soft_assert, expected_obj, actual_objs,
+                                  *exclude_attrs):
+    """Perform general soft contain assert for deepcopy converted expected
+    object and actual objects according to '*exclude_attrs' tuple of excluding
+    attributes' names
+    (compare objects' collections w/ attributes' values set to None).
+    """
+    expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        entity.Representation.extract_objs(
+            help_utils.convert_to_list(expected_obj),
+            help_utils.convert_to_list(actual_objs), *exclude_attrs))
+    soft_assert.expect(
+        expected_obj_wo_excluded_attrs[0] in actual_objs_wo_excluded_attrs,
         messages.AssertionMessages.format_err_msg_contains(
             expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
 

@@ -104,12 +104,6 @@ class CustomAttributeWebUiService(AdminWebUiService):
     selenium_utils.open_url(url.Urls().admin_dashboard)
     return dashboard.AdminDashboard(self._driver).select_custom_attributes()
 
-  def create_custom_attribute(self, new_ca):
-    """Create new custom attribute on Custom Attributes widget."""
-    ca_item_content = self.ca_widget.expand_collapse_group(
-        objects.get_normal_form(new_ca.definition_type), expand=True)
-    ca_item_content.open_add_new_ca_modal().submit_obj(new_ca)
-
   def edit_custom_attribute(self, ca_to_edit, new_ca):
     """Open Custom Attribute Definition Modal window for ca_to_edit (found
     by title) and submit form with ca_to_edit data.
