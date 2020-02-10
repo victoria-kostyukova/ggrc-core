@@ -235,10 +235,10 @@ class BaseWebUiService(base.WithBrowser):
     """Get and return list of objects from CSV file of exported objects.
     """
     dict_key = dict_list_objs_scopes.iterkeys().next()
-    # 'Control' to 'controls', 'Control Snapshot' to 'controls'
-    obj_name_from_dict = objects.get_plural(
-        string_utils.StringMethods.get_first_word_from_str(dict_key))
-    if self.obj_name == obj_name_from_dict:
+    obj_type_from_dict = string_utils.remove_from_end(
+        dict_key, objects.get_singular(plural=objects.SNAPSHOTS, title=True),
+        strict=False).replace(" ", "")
+    if self.obj_type == obj_type_from_dict:
       list_scopes = self._normalize_list_scopes_from_csv(
           dict_list_objs_scopes[dict_key])
       return self._create_list_objs(

@@ -203,11 +203,6 @@ class StringMethods(object):
     return all(item in dest_dict.iteritems() for item in src_dict.iteritems())
 
   @staticmethod
-  def get_first_word_from_str(line):
-    """Get first word from string."""
-    return line.split(None, 1)[0]
-
-  @staticmethod
   def dict_keys_to_upper_case(dictionary):
     """Convert keys of dictionary to upper case."""
     return {k.upper(): v for k, v in dictionary.iteritems()}
@@ -234,12 +229,22 @@ def escape_html(str_to_escape):
   return cgi.escape(str_to_escape)
 
 
-def remove_from_end(the_str, str_to_remove):
-  """Removes `str_to_remove` from the end of `the_str`."""
+def remove_from_end(the_str, str_to_remove, strict=True):
+  """Tries to remove `str_to_remove` from the end of `the_str`.
+
+  If `the_str` ends with `str_to_remove` then removes it from the end of
+  `the_str`. Otherwise if 'strict' then raises Value Error else leaves string
+  without changes.
+
+  Returns:
+    Result string."""
   if the_str.endswith(str_to_remove):
     return the_str[:-len(str_to_remove)]
-  raise ValueError("String `{}` doesn't end with `{}`".format(
-      the_str, str_to_remove))
+  elif strict:
+    raise ValueError("String `{}` doesn't end with `{}`".format(
+        the_str, str_to_remove))
+  else:
+    return the_str
 
 
 def parse_str_by_reg_exp(str_to_parse, reg_exp, return_as_dict):
