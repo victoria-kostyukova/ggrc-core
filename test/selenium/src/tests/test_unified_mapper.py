@@ -73,12 +73,11 @@ class TestDisabledObjectsPage(base.Test):
   @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
                            [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
-  def test_cannot_map_created_disabled_obj_via_um(self, obj,
-                                                  soft_assert, selenium):
-    """Tests that user cannot map disabled object to scope objects/directives
-    via unified mapper (create a new scope/directive object)."""
-    obj_name = objects.get_plural(obj.type)
-    service = factory.get_cls_webui_service(obj_name)()
+  def test_cannot_map_created_disabled_obj_via_um(self, obj, soft_assert,
+                                                  selenium):
+    """Tests that user cannot map disabled objects to Standard/Regulation
+     objects via Unified Mapper. (create Standard/Regulation object)."""
+    service = factory.get_cls_webui_service(objects.get_plural(obj.type))()
     (service.open_obj_dashboard_tab().tree_view
      .open_tree_actions_dropdown_by_title(title=obj.title).select_map())
     map_modal = webui_facade.perform_disabled_mapping(
@@ -86,12 +85,12 @@ class TestDisabledObjectsPage(base.Test):
     _, new_tab = browsers.get_browser().windows()
     soft_assert.expect(new_tab.url == url.Urls().dashboard_info_tab,
                        "Dashboard info page should be opened in new tab.")
-    tab_names = service.open_info_page_of_obj(obj).top_tabs.tab_names
+    webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
     soft_assert.expect(not any(
         [name.startswith(objects.get_normal_form(objects.REGULATIONS))
-         for name in tab_names]),
-        "There should be no regulation mapped to {}.".format(obj.type))
-    webui_facade.soft_assert_no_modals_present(map_modal, soft_assert)
+         for name in service.open_info_page_of_obj(obj).top_tabs.tab_names]),
+        "There should be no {} mapped to {}.".format(objects.REGULATIONS,
+                                                     obj.type))
     soft_assert.assert_expectations()
 
   @pytest.mark.parametrize("obj", objects.CONTROLS_AND_RISKS)
