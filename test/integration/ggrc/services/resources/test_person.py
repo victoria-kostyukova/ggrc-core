@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from ggrc.models import all_models
 from ggrc.utils import create_stub
 
+from integration.ggrc import generator
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
@@ -439,7 +440,29 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
   ]
 
   def setUp(self):
+    super(TestPersonResourcePopulated, self).setUp()
     self.client.get("/login")
+    self.api = Api()
+    self.objgen = generator.ObjectGenerator()
+
+  def get_counts_query(self, user_id):
+    """Returns counts query for all objects in MY_WORK_OBJECTS."""
+    return [
+        {
+            "object_name": object_name,
+            "type": "count",
+            "filters": {
+                "expression": {
+                    "object_name": "Person",
+                    "op": {"name": "owned"},
+                    "ids": [user_id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            },
+        }
+        for object_name in self.MY_WORK_OBJECTS
+    ]
 
   @ddt.data(*[
       (user.id, user.email, user.name)
@@ -451,30 +474,13 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
 
     This test is meant to be run manually on a fully populated database.
     """
-    def get_query(user_id):
-      return [
-          {
-              "object_name": object_name,
-              "filters": {
-                  "expression": {
-                      "object_name": "Person",
-                      "op": {"name": "owned"},
-                      "ids": [user_id]
-                  },
-                  "keys": [],
-                  "order_by": {"keys": [], "order": "", "compare": None}
-              },
-              "type": "count"
-          }
-          for object_name in self.MY_WORK_OBJECTS
-      ]
 
     user_headers = {
         "X-ggrc-user": json.dumps({"name": user_name, "email": user_email})
     }
     self.client.get("/login", headers=user_headers)
 
-    query = get_query(user_id)
+    query = self.get_counts_query(user_id)
     url = "/api/people/{}/my_work_count".format(user_id)
     response = self._post(query)
     counts = {
@@ -493,6 +499,104 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
         (user_id, user_email, counts),
         (user_id, user_email, my_work_count),
     )
+
+  @ddt.data("Creator", "Reader", "Editor", "Administrator")
+  def test_my_work_counts_for_audits(self, role):
+    """Test compares my work counts with query API response for Audits.
+
+    For current user should return Audits where user is owner and
+    Audits that have user-owned Assessments.
+    Actual test - create 2 audits with different persons as Audit Captains,
+    For second audit create asmnt with user1 as creator.
+    Should return both audits for user1 as owner."""
+    # pylint: disable=too-many-locals
+
+    _, person = self.objgen.generate_person(user_role=role)
+    person_name, person_id, person_email =\
+        person.name, person.id, person.email
+    _, another_person = self.objgen.generate_person(user_role="Administrator")
+    another_person_id = another_person.id
+
+    audit_captain_role = all_models.AccessControlRole.query.filter_by(
+        name="Audit Captains",
+        object_type="Audit"
+    ).one()
+    audit_captain_role_id = audit_captain_role.id
+    creator_role = all_models.AccessControlRole.query.filter_by(
+        name="Creators",
+        object_type="Assessment"
+    ).one()
+    creator_role_id = creator_role.id
+
+    program = factories.ProgramFactory()
+
+    audit1 = self.api.post(all_models.Audit, {
+        "audit": {
+            "title": "audit1",
+            'program': {'id': program.id, "type": "Program"},
+            "access_control_list": [{
+                "ac_role_id": audit_captain_role_id,
+                "person": {
+                    "id": person_id,
+                    "type": "Person"
+                }
+            }]
+        }
+    })
+    self.assert201(audit1)
+
+    audit2 = self.api.post(all_models.Audit, {
+        "audit": {
+            "title": "audit2",
+            'program': {'id': program.id, "type": "Program"},
+            "access_control_list": [{
+                "ac_role_id": audit_captain_role_id,
+                "person": {
+                    "id": another_person_id,
+                    "type": "Person"
+                }
+            }]
+        }
+    })
+    self.assert201(audit2)
+    audit2_id = audit2.json.get("audit").get("id")
+
+    assessment = self.api.post(
+        all_models.Assessment,
+        {
+            "assessment": {
+                "title": "Assessment2",
+                "audit": {"id": audit2_id, "type": "Audit"},
+                "access_control_list": [{
+                    "ac_role_id": creator_role_id,
+                    "person": {
+                        "id": person_id,
+                        "type": "Person"
+                    },
+                }],
+            },
+        }
+    )
+    self.assert201(assessment)
+
+    self.client.get(
+        "/login",
+        headers={
+            "X-ggrc-user": json.dumps({"name": person_name,
+                                       "email": person_email})
+        },
+    )
+
+    response = self._post(self.get_counts_query(person_id))
+    counts = {
+        item.values()[0]["object_name"]: item.values()[0]["count"]
+        for item in response.json
+    }
+
+    url = "/api/people/{}/my_work_count".format(person_id)
+    my_work_counts = self.client.get(url).json
+
+    self.assertEqual(counts, my_work_counts)
 
   @ddt.data(*[
       (user.id, user.email, user.name)

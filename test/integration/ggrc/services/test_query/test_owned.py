@@ -64,3 +64,41 @@ class TestOwned(TestCase, WithQueryApi):
       self.assertEqual(ids, [control_id])
     else:
       self.assertEqual(ids, [])
+
+  def test_audit_count(self):
+    """Test for Audit counts in My Work panel.
+
+    For current user should return Audits where user is owner and
+    Audits that have user-owned Assessments.
+    Actual test - create 2 audits with different persons as Audit Captains,
+    For second audits create asmnt with user1 as creator.
+    Should return both audits for user1 as owner."""
+
+    with factories.single_commit():
+      another_person = factories.PersonFactory()
+      audit_ids = []
+      audit1 = factories.AuditFactory()
+      audit1.add_person_with_role_name(self.person, "Audit Captains")
+      audit_ids.append(audit1.id)
+      audit2 = factories.AuditFactory()
+      audit2.add_person_with_role_name(another_person, "Audit Captains")
+      audit_ids.append(audit2.id)
+
+      asmnt = factories.AssessmentFactory(audit=audit2)
+      asmnt.add_person_with_role_name(self.person, "Creators")
+
+    ids = self._get_first_result_set(
+        {
+            "object_name": "Audit",
+            "type": "ids",
+            "filters": {
+                "expression": {
+                    "object_name": "Person",
+                    "op": {"name": "owned"},
+                    "ids": [self.person.id]
+                }
+            }
+        },
+        "Audit", "ids"
+    )
+    self.assertEqual(ids, audit_ids)
