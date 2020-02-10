@@ -110,3 +110,63 @@ class PersonTreeItemThreeBbbs(InfoWidgetThreeBbbs):
   def select_edit_authorizations(self):
     """Selects `Edit Authorizations` option."""
     self._three_bbs.option_by_text("Edit System Authorizations").click()
+
+
+class AccessGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Access Group info widget."""
+
+
+class AccountBalanceInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Account Balance info widget."""
+
+
+class DataAssetInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Data Asset info widget."""
+
+
+class FacilityInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Facility info widget."""
+
+
+class KeyReportInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Key Report info widget."""
+
+
+class MarketInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Market info widget."""
+
+
+class MetricInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Metric info widget."""
+
+
+class OrgGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Org Group info widget."""
+
+
+class ProcessInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Process info widget."""
+
+
+class ProductInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Product info widget."""
+
+
+class ProductGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Product Group info widget."""
+
+
+class ProjectInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Project info widget."""
+
+
+class SystemInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for System info widget."""
+
+
+class TechnologyEnvironmentInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Technology Environment info widget."""
+
+
+class VendorInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Vendor info widget."""
