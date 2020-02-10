@@ -533,7 +533,8 @@ def soft_assert_bulk_verify_for_in_review_state(page, asmt, soft_assert,
 
 
 def bulk_verify_all(widget, wait_for_completion=True):
-  """Bulk verify all available assessments in specified widget."""
+  """Bulk verify all available assessments in specified widget. Refreshes page
+  after actions to see actual items."""
   bulk_verify_modal = bulk_update.BulkVerifyModal()
   if not bulk_verify_modal.is_displayed:
     widget.open_bulk_verify_modal()
@@ -542,20 +543,21 @@ def bulk_verify_all(widget, wait_for_completion=True):
   if wait_for_completion:
     widget.submit_message.wait_until(lambda e: e.exists)
     widget.finish_message.wait_until(lambda e: e.exists)
-
-
-def soft_assert_verified_state_after_bulk_verify(page, src_obj, soft_assert):
-  """Soft assert that assessments statuses actually have been updated after
-  bulk verify has been completed."""
-  bulk_verify_all(page)
-  # reload page to see actual assessments state
   browsers.get_browser().refresh()
+
+
+def soft_assert_statuses_on_tree_view(status, is_verified, src_obj,
+                                      soft_assert):
+  """Soft assert that statuses of items on tree view are correct and items are
+  verified if expected."""
   asmts_from_ui = (webui_service.AssessmentsService()
                    .get_list_objs_from_tree_view(src_obj))
   soft_assert.expect(
-      all([asmt.status == object_states.COMPLETED and asmt.verified is True
+      all([asmt.status == status and asmt.verified is is_verified
            for asmt in asmts_from_ui]),
-      "All assessments should be verified and have 'Completed' state.")
+      "All assessments should {} be verified and have '{}' state.".format(
+          "not" if is_verified is False else "",
+          status))
 
 
 def soft_assert_bulk_verify_filter_ui_elements(modal, soft_assert):
@@ -722,3 +724,12 @@ def check_permalink_of_advanced_search_works(soft_assert, selenium,
   soft_assert_permalink_of_search_works(soft_assert, selenium,
                                         input_to_paste_link.value,
                                         filtered_objs, src_obj)
+
+
+def start_and_cancel_bulk_verifying(page):
+  """Opens a Bulk Verify modal, selects all the items and cancels the modal.
+  Refreshes page after actions to see actual items."""
+  modal = page.open_bulk_verify_modal()
+  modal.select_assessments_section.click_select_all()
+  modal.click_cancel()
+  browsers.get_browser().refresh()
