@@ -3,7 +3,7 @@
 
 """This module provides endpoints for all_models.ExternalMapping model"""
 
-
+import json
 import logging
 
 from flask import request
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 @app.route("/api/external_mappings", methods=["GET"])
-@validate_request_data_keys(["external_id", "external_type"])
+@validate_request_data_keys(["external_ids", "external_type"])
 @external_user_only
 def get_external_mapping_by_data():
   """
@@ -32,12 +32,15 @@ def get_external_mapping_by_data():
       ExternalMapping or error message if error occurred.
   """
 
-  logger.info("Get external mapping: external_id %s, external_type %s",
-              request.args["external_id"], request.args["external_type"])
+  logger.info("Get external mapping: external_ids %s, external_type %s",
+              request.args["external_ids"], request.args["external_type"])
+  external_ids = json.loads(request.args["external_ids"])
   external_mapping = ExternalMapping.query.filter(
-      sa.and_(ExternalMapping.external_id == request.args["external_id"],
-              ExternalMapping.external_type == request.args["external_type"])
-  ).first()
+      sa.and_(
+          ExternalMapping.external_id.in_(external_ids),
+          ExternalMapping.external_type == request.args["external_type"]
+      )
+  ).all()
 
   if external_mapping:
     response_data = {
