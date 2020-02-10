@@ -116,7 +116,13 @@ class TestExportSnapshots(TestCase):
                     "Other Contacts": u"",
                     "Principal Assignees": u"",
                     "Secondary Assignees": u"",
-                    "Admin": u""}
+                    "Admin": u"",
+                    "Due Date": u"",
+                    "Created By": u"",
+                    "Last Owner Reviewed Date": u"",
+                    "Last Owner Reviewed By": u"",
+                    "Last Compliance Reviewed Date": u"",
+                    "Last Compliance Reviewed By": u""}
     control_dict.update(new_values)
     return control_dict
 
