@@ -205,7 +205,8 @@ class TestDisabledObjects(base.Test):
         webui_facade.are_tabs_urls_equal(), "Tabs urls should be equal.")
     soft_assert.assert_expectations()
 
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_upd_disabled_obj_status(self, obj, selenium):
     """Check that user cannot update disabled object status."""
