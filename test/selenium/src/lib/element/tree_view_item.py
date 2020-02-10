@@ -109,3 +109,31 @@ class Standards(SnapshotsDropdownTreeViewItem):
 
 class KeyReports(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Key Reports TreeViewItem"""
+
+
+class AccessGroups(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Access Groups TreeViewItem."""
+
+
+class AccountBalances(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Account Balances TreeViewItem."""
+
+
+class Facilities(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Facilities TreeViewItem."""
+
+
+class Markets(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Markets TreeViewItem."""
+
+
+class Metrics(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Metrics TreeViewItem."""
+
+
+class ProductGroups(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Product Groups TreeViewItem."""
+
+
+class Vendors(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Vendors TreeViewItem."""

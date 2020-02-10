@@ -280,6 +280,72 @@ class KeyReportsService(BaseRestService):
     super(KeyReportsService, self).__init__(url.KEY_REPORTS)
 
 
+class AccountBalancesService(BaseRestService):
+  """Service for working with Account Balances entities."""
+  def __init__(self):
+    super(AccountBalancesService, self).__init__(url.ACCOUNT_BALANCES)
+
+
+class AccessGroupsService(BaseRestService):
+  """Service for working with Access Groups entities."""
+  def __init__(self):
+    super(AccessGroupsService, self).__init__(url.ACCESS_GROUPS)
+
+
+class DataAssetsService(BaseRestService):
+  """Service for working with Data Assets entities."""
+  def __init__(self):
+    super(DataAssetsService, self).__init__(url.DATA_ASSETS)
+
+
+class FacilitiesService(BaseRestService):
+  """Service for working with Facilities entities."""
+  def __init__(self):
+    super(FacilitiesService, self).__init__(url.FACILITIES)
+
+
+class MarketsService(BaseRestService):
+  """Service for working with Markets entities."""
+  def __init__(self):
+    super(MarketsService, self).__init__(url.MARKETS)
+
+
+class MetricsService(BaseRestService):
+  """Service for working with Metrics entities."""
+  def __init__(self):
+    super(MetricsService, self).__init__(url.METRICS)
+
+
+class OrgGroupsService(BaseRestService):
+  """Service for working with Org Groups entities."""
+  def __init__(self):
+    super(OrgGroupsService, self).__init__(url.ORG_GROUPS)
+
+
+class ProcessesService(BaseRestService):
+  """Service for working with Processes entities."""
+  def __init__(self):
+    super(ProcessesService, self).__init__(url.PROCESSES)
+
+
+class ProductGroupsService(BaseRestService):
+  """Service for working with Product Groups entities."""
+  def __init__(self):
+    super(ProductGroupsService, self).__init__(url.PRODUCT_GROUPS)
+
+
+class SystemsService(BaseRestService):
+  """Service for working with Systems entities."""
+  def __init__(self):
+    super(SystemsService, self).__init__(url.SYSTEMS)
+
+
+class VendorsService(BaseRestService):
+  """Service for working with Vendors entities."""
+  def __init__(self):
+    super(VendorsService, self).__init__(url.VENDORS)
+
+
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
   def __init__(self):

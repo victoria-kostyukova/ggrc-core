@@ -60,11 +60,19 @@ class ObjectPage(base.WithBrowser):
     current_url = self._browser.url
     return current_url.split("#!")[1]
 
-  def click_add_tab_btn(self):
-    """Clicks 'Add Tab' button."""
-    self._browser.element(data_test_id="button_widget_add_2c925d94").click()
+  @property
+  def _add_tab_button(self):
+    """Returns 'Add Tab' button."""
+    return self._browser.element(data_test_id="button_widget_add_2c925d94")
+
+  def open_add_tab_dropdown(self):
+    """Opens 'Add Tab' dropdown if it is not opened.
+    Returns:
+        CreateObjectDropdown object."""
+    if "open" not in self._add_tab_button.classes:
+      self._add_tab_button.click()
     return dashboard.CreateObjectDropdown()
 
   def get_hidden_items_from_add_tab(self):
     """Returns all hidden items from 'Add Tab' dropdown."""
-    return self.click_add_tab_btn().get_all_hidden_items()
+    return self.open_add_tab_dropdown().get_all_hidden_items()

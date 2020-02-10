@@ -205,7 +205,9 @@ class TestMyWorkPage(base.Test):
       )
     assert hnb_objects.issubset(lhn_objects) is True
 
-  @pytest.mark.parametrize("obj_name", objects.ALL_TESTABLE_DISABLED_OBJS)
+  @pytest.mark.parametrize(
+      "obj_name", objects.CONTROLS_AND_RISKS +
+      (objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)),))
   def test_cannot_create_disabled_obj_from_lhn(self, obj_name,
                                                soft_assert, selenium):
     """Tests that 'New object' modal for disabled object cannot be opened
@@ -216,7 +218,9 @@ class TestMyWorkPage(base.Test):
                                                soft_assert)
     soft_assert.assert_expectations()
 
-  @pytest.mark.parametrize("obj_name", objects.ALL_TESTABLE_DISABLED_OBJS)
+  @pytest.mark.parametrize(
+      "obj_name", objects.CONTROLS_AND_RISKS +
+      (objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)),))
   def test_cannot_create_disabled_obj_from_dashboard(self, obj_name,
                                                      soft_assert, selenium):
     """Confirm that no modal present after starting disabled object

@@ -144,7 +144,7 @@ class TestMegaProgram(base.Test):
         obj_type=parent_program.type, obj_name=objects.PROGRAM_PARENTS)
     columns = dict_obj_scopes[parent_program.type][0].keys()
     exp_mapping_objs = (
-        objects.EDITABLE_GGRC_OBJS + objects.DISABLED_CONTROLS_RISKS +
+        objects.EDITABLE_GGRC_OBJS + objects.CONTROLS_AND_RISKS +
         objects.SCOPE_OBJECTS +
         (objects.ISSUES, objects.CYCLE_TASK_GROUP_OBJECT_TASKS))
     expected_map_columns = [

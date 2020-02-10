@@ -1,6 +1,7 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Factories that create entities."""
+# pylint: disable=too-many-lines
 # pylint: disable=too-many-arguments
 # pylint: disable=invalid-name
 # pylint: disable=redefined-builtin
@@ -399,44 +400,6 @@ class ProgramsFactory(EntitiesFactory):
     return program_obj
 
 
-class ProductsFactory(EntitiesFactory):
-  """Factory class for Products entities."""
-  def __init__(self):
-    super(ProductsFactory, self).__init__(objects.PRODUCTS)
-    self._acl_roles = [
-        ("managers", roles.ACLRolesIDs.PRODUCT_MANAGERS,
-         [users.current_user()])
-    ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create Product entity."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title,
-        external_id=self.generate_external_id(),
-        external_slug=self.generate_slug()
-    )
-
-
-class TechnologyEnvironmentsFactory(EntitiesFactory):
-  """Factory class for Technology Environments entities."""
-  def __init__(self):
-    super(TechnologyEnvironmentsFactory, self).__init__(
-        objects.TECHNOLOGY_ENVIRONMENTS)
-    self._acl_roles = [
-        ("admins",
-         roles.ACLRolesIDs.TECHNOLOGY_ENVIRONMENT_ADMINS,
-         [users.current_user()])
-    ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create TechnologyEnvironment entity."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title,
-        external_id=self.generate_external_id(),
-        external_slug=self.generate_slug()
-    )
-
-
 class ControlsFactory(EntitiesFactory):
   """Factory class for Controls entities."""
   def __init__(self):
@@ -508,7 +471,39 @@ class RisksFactory(EntitiesFactory):
     return obj
 
 
-class ProjectsFactory(EntitiesFactory):
+class ScopeObjectsFactory(EntitiesFactory):
+  """Common factory class for Scope objects entities."""
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Scope object entity with randomly and predictably filled
+    fields."""
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        status=unicode(object_states.DRAFT),
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id())
+
+
+class TechnologyEnvironmentsFactory(ScopeObjectsFactory):
+  """Factory class for Technology Environments entities."""
+  def __init__(self):
+    super(TechnologyEnvironmentsFactory, self).__init__(
+        objects.TECHNOLOGY_ENVIRONMENTS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.TECHNOLOGY_ENVIRONMENT_ADMINS,
+         [users.current_user()])]
+
+
+class ProductsFactory(ScopeObjectsFactory):
+  """Factory class for Products entities."""
+  def __init__(self):
+    super(ProductsFactory, self).__init__(objects.PRODUCTS)
+    self._acl_roles = [
+        ("managers", roles.ACLRolesIDs.PRODUCT_MANAGERS,
+         [users.current_user()])]
+
+
+class ProjectsFactory(ScopeObjectsFactory):
   """Factory class for Projects entities."""
   def __init__(self):
     super(ProjectsFactory, self).__init__(objects.PROJECTS)
@@ -517,19 +512,10 @@ class ProjectsFactory(EntitiesFactory):
         ("assignees", roles.ACLRolesIDs.PROJECT_ASSIGNEES,
          [users.current_user()]),
         ("verifiers", roles.ACLRolesIDs.PROJECT_VERIFIERS,
-         [users.current_user()])
-    ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Creates Project entity with randomly and predictably filled fields, if
-    'is_add_rest_attrs' then add attributes for REST."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title,
-        external_slug=self.generate_slug(),
-        external_id=self.generate_external_id())
+         [users.current_user()])]
 
 
-class KeyReportsFactory(EntitiesFactory):
+class KeyReportsFactory(ScopeObjectsFactory):
   """Factory class for Key Reports entities."""
   def __init__(self):
     super(KeyReportsFactory, self).__init__(objects.KEY_REPORTS)
@@ -537,16 +523,98 @@ class KeyReportsFactory(EntitiesFactory):
         ("admins", roles.ACLRolesIDs.KEY_REPORT_ADMINS,
          [users.current_user()])]
 
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Creates Key Report entity with randomly and predictably filled fields,
-     if 'is_add_rest_attrs' then add attributes for REST."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title,
-        external_slug=self.generate_slug(),
-        external_id=self.generate_external_id())
+
+class AccessGroupsFactory(ScopeObjectsFactory):
+  """Factory class for Access Groups entities."""
+  def __init__(self):
+    super(AccessGroupsFactory, self).__init__(objects.ACCESS_GROUPS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.ACCESS_GROUP_ADMINS,
+         [users.current_user()])]
 
 
-class OrgGroupsFactory(EntitiesFactory):
+class AccountBalancesFactory(ScopeObjectsFactory):
+  """Factory class for Account Balances entities."""
+
+  def __init__(self):
+    super(AccountBalancesFactory, self).__init__(objects.ACCOUNT_BALANCES)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.ACCOUNT_BALANCE_ADMINS,
+         [users.current_user()])]
+
+
+class DataAssetsFactory(ScopeObjectsFactory):
+  """Factory class for Data Assets entities."""
+
+  def __init__(self):
+    super(DataAssetsFactory, self).__init__(objects.DATA_ASSETS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.DATA_ASSET_ADMINS,
+         [users.current_user()])]
+
+
+class FacilitiesFactory(ScopeObjectsFactory):
+  """Factory class for Facilities entities."""
+
+  def __init__(self):
+    super(FacilitiesFactory, self).__init__(objects.FACILITIES)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.FACILITY_ADMINS, [users.current_user()])]
+
+
+class MarketsFactory(ScopeObjectsFactory):
+  """Factory class for Markets entities."""
+
+  def __init__(self):
+    super(MarketsFactory, self).__init__(objects.MARKETS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.MARKET_ADMINS, [users.current_user()])]
+
+
+class MetricsFactory(ScopeObjectsFactory):
+  """Factory class for Metrics entities."""
+
+  def __init__(self):
+    super(MetricsFactory, self).__init__(objects.METRICS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.METRIC_ADMINS, [users.current_user()])]
+
+
+class ProcessesFactory(ScopeObjectsFactory):
+  """Factory class for Processes entities."""
+
+  def __init__(self):
+    super(ProcessesFactory, self).__init__(objects.PROCESSES)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.PROCESS_ADMINS, [users.current_user()])]
+
+
+class ProductGroupsFactory(ScopeObjectsFactory):
+  """Factory class for Products Groups entities."""
+  def __init__(self):
+    super(ProductGroupsFactory, self).__init__(objects.PRODUCT_GROUPS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.PRODUCT_GROUP_ADMINS,
+         [users.current_user()])]
+
+
+class SystemsFactory(ScopeObjectsFactory):
+  """Factory class for Systems entities."""
+  def __init__(self):
+    super(SystemsFactory, self).__init__(objects.SYSTEMS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.SYSTEM_ADMINS, [users.current_user()])]
+
+
+class VendorsFactory(ScopeObjectsFactory):
+  """Factory class for Vendors entities."""
+  def __init__(self):
+    super(VendorsFactory, self).__init__(objects.VENDORS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.VENDOR_ADMINS, [users.current_user()])]
+
+
+class OrgGroupsFactory(ScopeObjectsFactory):
   """Factory class for Org Groups entities."""
 
   def __init__(self):
@@ -554,19 +622,6 @@ class OrgGroupsFactory(EntitiesFactory):
     self._acl_roles = [
         ("admins", roles.ACLRolesIDs.ORG_GROUPS_ADMINS, [users.current_user()])
     ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Creates OrgGroup entity with randomly and predictably filled fields, if
-    'is_add_rest_attrs' then add attributes for REST."""
-    obj = self.obj_inst().update_attrs(
-        title=self.obj_title,
-        status=unicode(object_states.DRAFT))
-    if is_add_rest_attrs:
-      obj.update_attrs(
-          recipients=",".join((
-              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
-              unicode(roles.SECONDARY_CONTACTS))))
-    return obj
 
 
 class AuditsFactory(EntitiesFactory):

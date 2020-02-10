@@ -38,7 +38,7 @@ class RestClient(object):
 
   def is_endpoint_external(self):
     """Checks if endpoint is external."""
-    return self.endpoint in objects.EXTERNAL_END_POINTS
+    return self.endpoint in objects.ALL_SINGULAR_DISABLED_OBJS
 
   def is_relationship_types_external(self, obj_dict):
     """Check if source or destination objects type is external."""

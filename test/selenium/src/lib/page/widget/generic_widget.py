@@ -367,3 +367,31 @@ class Standards(Widget):
 
 class KeyReports(Widget):
   """Model for Key Reports generic widgets."""
+
+
+class AccessGroups(Widget):
+  """Model for Access Groups generic widgets."""
+
+
+class AccountBalances(Widget):
+  """Model for Account Balances generic widgets."""
+
+
+class Facilities(Widget):
+  """Model for Facilities generic widgets."""
+
+
+class Markets(Widget):
+  """Model for Markets generic widgets."""
+
+
+class Metrics(Widget):
+  """Model for Metrics generic widgets."""
+
+
+class ProductGroups(Widget):
+  """Model for Product Groups generic widgets."""
+
+
+class Vendors(Widget):
+  """Model for Vendors generic widgets."""

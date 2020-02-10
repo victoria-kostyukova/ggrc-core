@@ -681,10 +681,6 @@ class WidgetInfoRisk(WidgetSnapshotsInfoPanel):
   """Locators for Risk Info widgets."""
 
 
-class WidgetInfoOrgGroup(WidgetSnapshotsInfoPanel):
-  """Locators for Org Group Info widgets."""
-
-
 class WidgetInfoIssue(WidgetInfoPanel):
   """Locators for Issue Info widgets."""
 
@@ -772,50 +768,6 @@ class WidgetInfoObjective(WidgetSnapshotsInfoPanel):
 
 class WidgetInfoPeople(CommonWidgetInfo):
   """Locators for People Info widgets."""
-
-
-class WidgetInfoVendor(WidgetSnapshotsInfoPanel):
-  """Locators for Vendor Info widgets."""
-
-
-class WidgetInfoAccessGroup(WidgetSnapshotsInfoPanel):
-  """Locators for Access Group Info widgets."""
-
-
-class WidgetInfoAccountBalance(WidgetSnapshotsInfoPanel):
-  """Locators for Account Balance Info widgets."""
-
-
-class WidgetInfoSystem(WidgetSnapshotsInfoPanel):
-  """Locators for System Info widgets."""
-
-
-class WidgetInfoProcess(WidgetSnapshotsInfoPanel):
-  """Locators for Process Info widgets."""
-
-
-class WidgetInfoProduct(WidgetSnapshotsInfoPanel):
-  """Locators for Product Info widgets."""
-
-
-class WidgetInfoFacility(WidgetSnapshotsInfoPanel):
-  """Locators for Facility Info widgets."""
-
-
-class WidgetInfoKeyReport(WidgetSnapshotsInfoPanel):
-  """Locators for Key Report Info widgets."""
-
-
-class WidgetInfoProject(WidgetSnapshotsInfoPanel):
-  """Locators for Project Info widgets."""
-
-
-class WidgetInfoMarket(WidgetSnapshotsInfoPanel):
-  """Locators for Market Info widgets."""
-
-
-class WidgetInfoDataAsset(WidgetSnapshotsInfoPanel):
-  """Locators for Data Asset Info widgets."""
 
 
 class WidgetInfoThreat(WidgetSnapshotsInfoPanel):

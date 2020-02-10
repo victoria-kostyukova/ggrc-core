@@ -1,6 +1,7 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create, description, representation and equal of entities."""
+# pylint: disable=too-many-lines
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 # pylint: disable=inconsistent-return-statements
@@ -835,6 +836,46 @@ class ProjectEntity(Entity):
 
 class KeyReportEntity(Entity):
   """Class that represent model for Key Report entity."""
+
+
+class AccessGroupEntity(Entity):
+  """Class that represent model for Access Group entity."""
+
+
+class AccountBalanceEntity(Entity):
+  """Class that represent model for Account Balance entity."""
+
+
+class DataAssetEntity(Entity):
+  """Class that represent model for Data Asset entity."""
+
+
+class FacilityEntity(Entity):
+  """Class that represent model for Facility entity."""
+
+
+class MarketEntity(Entity):
+  """Class that represent model for Market entity."""
+
+
+class MetricEntity(Entity):
+  """Class that represent model for Metric entity."""
+
+
+class ProcessEntity(Entity):
+  """Class that represent model for Process entity."""
+
+
+class ProductGroupEntity(Entity):
+  """Class that represent model for Product Group entity."""
+
+
+class SystemEntity(Entity):
+  """Class that represent model for System entity."""
+
+
+class VendorEntity(Entity):
+  """Class that represent model for Vendor entity."""
 
 
 class OrgGroupEntity(Entity):

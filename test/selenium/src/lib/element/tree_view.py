@@ -114,3 +114,31 @@ class Standards(CommonDropdownSettings):
 
 class KeyReports(CommonDropdownSettings):
   """Key Reports 3BBS button/dropdown settings on Tree View."""
+
+
+class AccessGroups(CommonDropdownSettings):
+  """Access Groups 3BBS button/dropdown settings on Tree View."""
+
+
+class AccountBalances(CommonDropdownSettings):
+  """Account Balances 3BBS button/dropdown settings on Tree View."""
+
+
+class Facilities(CommonDropdownSettings):
+  """Facilities 3BBS button/dropdown settings on Tree View."""
+
+
+class Markets(CommonDropdownSettings):
+  """Markets 3BBS button/dropdown settings on Tree View."""
+
+
+class Metrics(CommonDropdownSettings):
+  """Metrics 3BBS button/dropdown settings on Tree View."""
+
+
+class ProductGroups(CommonDropdownSettings):
+  """Product Groups 3BBS button/dropdown settings on Tree View."""
+
+
+class Vendors(CommonDropdownSettings):
+  """Vendors 3BBS button/dropdown settings on Tree View."""

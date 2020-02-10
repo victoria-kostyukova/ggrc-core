@@ -3,6 +3,7 @@
 """Disabled objects tests."""
 
 # pylint: disable=redefined-outer-name
+import inflection
 import pytest
 
 from lib import base, browsers, factory, url
@@ -14,13 +15,18 @@ from lib.utils import test_utils
 
 
 class TestDisabledObjects(base.Test):
-  """Tests for disabled objects functionality."""
+  """Tests for disabled objects functionality.
+
+  Test cases are parametrized with the type of objects under test.
+  As there is too much disabled objects to test all of them, in each test case
+  one object of each disabled objects section is used.
+  """
   # pylint: disable=no-self-use
   # pylint: disable=invalid-name
   # pylint: disable=unused-argument
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_edit_or_del_disabled_obj_from_info_page(
       self, obj, selenium, soft_assert
@@ -36,7 +42,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_edit_disabled_object_from_tree_view(self, obj, selenium,):
     """Confirm that user cannot edit disabled object from tree view."""
@@ -45,7 +51,7 @@ class TestDisabledObjects(base.Test):
         "Edit option should not be available for disabled object in tree view")
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_edit_or_del_disabled_obj_from_gl_search(
       self, obj, header_dashboard, soft_assert
@@ -61,7 +67,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_make_and_view_proposals_for_disabled_obj(
       self, obj, soft_assert, selenium
@@ -74,7 +80,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_restore_disabled_object_version(self, obj, soft_assert,
                                                   selenium):
@@ -83,7 +89,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_object_export(self, obj, create_tmp_dir, selenium):
     """Confirm that object can be exported and exported data is correct."""
@@ -95,7 +101,7 @@ class TestDisabledObjects(base.Test):
         *entity.Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_disabled_obj_change_log_tab(self, obj, soft_assert, selenium):
     """Check disabled object's Log tab is valid."""
@@ -106,7 +112,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_user_cannot_add_person_to_custom_role(self, obj, selenium,
                                                  soft_assert):
@@ -117,13 +123,14 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_user_cannot_update_custom_attribute(self, obj, selenium,
                                                soft_assert):
     """Tests that user cannot update custom attribute."""
     cad = rest_facade.create_gcad(
-        definition_type=obj.type.lower(),
+        definition_type=inflection.underscore(obj.type),
         attribute_type=element.AdminWidgetCustomAttributes.RICH_TEXT)
     soft_assert.expect(
         not factory.get_cls_webui_service(objects.get_plural(
@@ -134,7 +141,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize('obj', objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_user_cannot_update_predefined_field(self, obj, selenium,
                                                soft_assert):
@@ -145,7 +152,8 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_OBJS,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   @pytest.mark.parametrize('mapped_obj',
                            [objects.get_singular(objects.STANDARDS),
@@ -163,7 +171,7 @@ class TestDisabledObjects(base.Test):
     assert new_tab.url == expected_url
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_review_details_for_disabled_obj(self, obj, selenium):
     """Check that new browser tab is displayed after clicking Review
@@ -173,7 +181,7 @@ class TestDisabledObjects(base.Test):
     assert webui_facade.are_tabs_urls_equal(), "Tabs urls should be equal."
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_disabled_obj_review_buttons(self, obj, soft_assert, selenium):
     """Check that buttons 'Mark Reviewed' and 'Request Review' are not
@@ -187,7 +195,7 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_add_comment(self, obj, soft_assert, selenium):
     """Check that user can't add a comment: input field is not displayed and
@@ -197,7 +205,7 @@ class TestDisabledObjects(base.Test):
         webui_facade.are_tabs_urls_equal(), "Tabs urls should be equal.")
     soft_assert.assert_expectations()
 
-  @pytest.mark.parametrize("obj", objects.SINGULAR_DISABLED_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
                            indirect=True)
   def test_cannot_upd_disabled_obj_status(self, obj, selenium):
     """Check that user cannot update disabled object status."""
