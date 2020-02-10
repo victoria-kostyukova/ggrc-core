@@ -2,24 +2,27 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tree widgets on workflow tabs."""
 from lib.page.widget import tree_widget, table_with_headers
+from lib.page.widget.tree_widget import TreeWidget
 from lib.page.widget.workflow_tree_rows import (
     WorkflowCycleRow, SetupTaskGroupTreeItem)
 
 
-class WorkflowCycleTreeWidget(object):
+class WorkflowCycleTreeWidget(TreeWidget):
   """Represents tree widget on workflow Active Cycles / History tab."""
   # pylint: disable=too-few-public-methods
 
   def __init__(self, container):
-    super(WorkflowCycleTreeWidget, self).__init__()
-    # Composition is used here it's a tree widget with sub trees.
-    # Subtrees are not implemented in `TreeWidget` class.
-    self._tree_widget = tree_widget.TreeWidget(
+    super(WorkflowCycleTreeWidget, self).__init__(
         container=container, table_row_cls=WorkflowCycleRow)
+
+  @property
+  def create_task_btn(self):
+    return self._root.element(
+        css="[data-original-title='Create Cycle Task for object']")
 
   def workflow_cycle_rows(self):
     """Returns workflow cycle rows."""
-    return self._tree_widget.tree_items()
+    return self.tree_items()
 
   def get_workflow_cycle_row_by(self, **conditions):
     """Returns a workflow cycle row by conditions."""

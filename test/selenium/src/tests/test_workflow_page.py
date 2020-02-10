@@ -318,6 +318,16 @@ class TestActivateWorkflow(base.Test):
     self.check_ggrc_6491(workflow_cycles, [expected_workflow_cycle])
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
+  def test_add_group_and_task_after_wf_activation(self, activated_workflow,
+                                                  selenium, soft_assert):
+    """Test a creating of a task group on the Setup tab and a creating of a
+    task on the Active Cycles tab are available after a workflow activation."""
+    workflow_ui_facade.check_creating_of_task_group(soft_assert,
+                                                    activated_workflow)
+    workflow_ui_facade.check_create_task_modal_appeared(soft_assert,
+                                                        activated_workflow)
+    soft_assert.assert_expectations()
+
 
 class TestActiveCyclesTab(base.Test):
   """Test Active Cycles tab."""

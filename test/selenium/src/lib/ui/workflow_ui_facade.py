@@ -1,7 +1,11 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
+# pylint: disable=invalid-name
+
 from lib import url, users
+from lib.app_entity_factory import (workflow_entity_factory,
+                                    person_entity_factory)
 from lib.constants import object_states
 from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page import dashboard
@@ -20,7 +24,6 @@ def create_workflow(workflow):
 
 def open_create_task_group_task_popup(task_group):
   """Opens task group task popup."""
-  # pylint: disable=invalid-name
   setup_tab = workflow_tabs.SetupTab()
   setup_tab.open_via_url(task_group.workflow)
   setup_tab.open_create_task_group_task_modal(task_group)
@@ -150,3 +153,29 @@ def archive_workflow(workflow):
   workflow.is_archived = True
   workflow.recurrences_started = False
   workflow.modified_by = users.current_person()
+
+
+def check_creating_of_task_group(soft_assert, app_workflow):
+  """Checks a task group is created."""
+  task_group = workflow_entity_factory.TaskGroupFactory().create()
+  add_task_group(app_workflow, task_group)
+  task_group_with_ui_representation = (
+      workflow_entity_factory.TaskGroupFactory().create_empty(
+          title=task_group.title,
+          assignee=person_entity_factory.PersonFactory().create_empty(
+              email=task_group.assignee.email),
+          description=task_group.description))
+  soft_assert.expect(any(
+      actual_task_group == task_group_with_ui_representation
+      for actual_task_group in task_group_objs(app_workflow)),
+      "Task group {} should be present.".format(
+          task_group_with_ui_representation.title))
+
+
+def check_create_task_modal_appeared(soft_assert, activated_workflow):
+  """Checks a create cycle task modal is appeared on the Active Cycles Tab."""
+  active_cycles_tab = workflow_tabs.ActiveCyclesTab()
+  active_cycles_tab.open_via_url(activated_workflow)
+  soft_assert.expect(
+      active_cycles_tab.open_create_cycle_task_modal().is_present,
+      "A Create Cycle modal should be present.")
