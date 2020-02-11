@@ -51,7 +51,8 @@ class TestDisabledObjects(base.Test):
         "Edit option should not be available for disabled object in tree view")
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_edit_or_del_disabled_obj_from_gl_search(
       self, obj, header_dashboard, soft_assert
