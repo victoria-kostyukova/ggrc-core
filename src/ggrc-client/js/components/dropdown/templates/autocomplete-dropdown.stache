@@ -4,7 +4,7 @@
 }}
 
 <div class="autocomplete-dropdown flex-box flex-col">
-  <div class="autocomplete-dropdown__input-container" 
+  <div class="{{#if isDisabled}}disabled-block {{/if}}autocomplete-dropdown__input-container" 
        on:el:click="openDropdown()">
     <input type="text" 
            readonly="readonly"

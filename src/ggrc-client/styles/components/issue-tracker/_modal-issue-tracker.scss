@@ -5,6 +5,24 @@
 
 modal-issue-tracker-fields,
 modal-issue-tracker-config-fields {
+  .ggrc-form-item__multiple-row {
+    .modal-component-id__label {
+      display: flex;
+
+      .ggrc-form-item__label {
+        flex: none;
+      }
+    }
+
+    .modal-component-id__spinner {
+      margin-left: 4px;
+    }
+
+    .autocomplete-dropdown {
+      width: 250px;
+    }
+  }
+
   .people-sync-state {
     display: inline-block;
     background-color: $status-draft;

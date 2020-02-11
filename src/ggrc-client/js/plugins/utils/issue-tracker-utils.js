@@ -4,6 +4,7 @@
  */
 
 import {notifier} from './notifiers-utils';
+import {ggrcGet} from '../ajax_extensions';
 
 const issueTrackerStaticFields = {
   issue_tracker_enable_options: [
@@ -92,6 +93,14 @@ function checkWarnings(instance) {
   }
 }
 
+const loadComponentIds = async () => {
+  const response = await ggrcGet('/api/issuetracker_components');
+  const ids = response.issuetracker_component
+    .map((idItem) => ({value: idItem.component_id}));
+
+  return ids;
+};
+
 export {
   issueTrackerStaticFields,
   isIssueTrackerInitialized,
@@ -101,4 +110,5 @@ export {
   checkWarnings,
   cleanUpWarnings,
   cleanUpBeforeSave,
+  loadComponentIds,
 };

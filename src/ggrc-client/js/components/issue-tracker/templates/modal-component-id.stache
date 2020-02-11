@@ -1,0 +1,33 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="modal-component-id__label">
+  <label class="form-label ggrc-form-item__label">
+    Component ID
+    {{#if isEditMode}}
+      <i class="fa fa-asterisk"></i>
+      <i class="fa fa-question-circle"
+        rel="tooltip"
+        title="To request the addition of a new Component ID into the allowed components list, please raise a ticket at {{createIssueTicketLink}}."
+      ></i>
+    {{/if}}
+  </label>
+  <spinner-component
+    extraCssClass:from="'modal-component-id__spinner'"
+    toggle:from="componentIdsLoading"
+  />
+</div>
+{{#if isEditMode}}
+  <autocomplete-dropdown
+    value:bind="instance.issue_tracker.component_id"
+    isDisabled:from="componentIdsLoading"
+    options:from="componentIds"
+  />
+  {{#validateAttr instance "issue_tracker.component_id"}}
+    <label class="help-inline warning">{{this}}</label>
+  {{/validateAttr}}
+{{else}}
+  {{instance.issue_tracker.component_id}}
+{{/if}}

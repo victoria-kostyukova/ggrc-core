@@ -8,6 +8,8 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../dropdown/dropdown-component';
 import '../numberbox/numberbox-component';
+import './modal-component-id';
+import {loadComponentIds} from '../../plugins/utils/issue-tracker-utils';
 import template from './templates/modal-issue-tracker-fields.stache';
 
 const state = {
@@ -29,16 +31,27 @@ export default canComponent.extend({
             this.attr('currentState') !== state.NOT_SELECTED;
         },
       },
+      isGenerateNewState: {
+        get() {
+          return this.attr('currentState') === state.GENERATE_NEW;
+        },
+      },
     },
     instance: {},
     note: '',
     mandatoryTicketIdNote: '',
     isTicketIdMandatory: false,
+    componentIdsLoading: false,
+    componentIds: [],
     state,
     currentState: state.NOT_SELECTED,
     generateNewTicket() {
       if (this.attr('currentState') === state.GENERATE_NEW) {
         return;
+      }
+
+      if (!this.attr('componentIds').length) {
+        this.loadComponentIds();
       }
 
       this.attr('currentState', state.GENERATE_NEW);
@@ -83,6 +96,15 @@ export default canComponent.extend({
         this.attr('isTicketIdMandatory')) {
         this.linkToExistingTicket();
       }
+    },
+    loadComponentIds() {
+      this.attr('componentIdsLoading', true);
+
+      return loadComponentIds().then((ids) => {
+        this.attr('componentIds', ids);
+      }).finally(() => {
+        this.attr('componentIdsLoading', false);
+      });
     },
   }),
   events: {
