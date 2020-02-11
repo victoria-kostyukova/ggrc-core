@@ -42,7 +42,8 @@ class TestDisabledObjects(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_edit_disabled_object_from_tree_view(self, obj, selenium,):
     """Confirm that user cannot edit disabled object from tree view."""
