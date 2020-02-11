@@ -56,7 +56,7 @@ from ggrc.extensions import get_extension_modules
 
 
 _DEFAULT_COLUMN_HANDLERS_DICT = {
-    "archived": boolean.CheckboxColumnHandler,
+    "archived": boolean.StrictBooleanColumnHandler,
     "assertions": handlers.JsonListColumnHandler,
     "assessment_template": assessment_template.AssessmentTemplateColumnHandler,
     "assignee": handlers.UserColumnHandler,

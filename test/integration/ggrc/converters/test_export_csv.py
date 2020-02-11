@@ -7,14 +7,18 @@
 
 import collections
 import ddt
+
 from flask.json import dumps
+
 from ggrc import utils
 from ggrc.converters import get_exportables
 from ggrc.integrations import constants
 from ggrc.models import inflector, all_models
 from ggrc.models.reflection import AttributeInfo
+
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
+from integration.ggrc.converters import constants as test_constants
 
 
 def define_op_expr(left_expr, opr, right_expr):
@@ -345,20 +349,6 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.VALID_CONCLUSIONS)), response.data)
 
-  @ddt.data("Assessment", "Audit")
-  def test_archived_tip(self, model):
-    """Tests if Archived column has tip message for {}. """
-    data = {
-        "export_to": "csv",
-        "objects": [
-           {"object_name": model, "fields": "all"},
-
-        ],
-    }
-    response = self.client.post("/_service/export_csv",
-                                data=dumps(data), headers=self.headers)
-    self.assertIn("Allowed values are:\nyes\nno", response.data)
-
   def test_assessment_type_tip(self):
     """Tests if Assessment type column has tip message for Assessment."""
     data = {
@@ -477,6 +467,19 @@ class TestExportEmptyTemplate(TestCase):
                                 data=dumps(data), headers=self.headers)
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         constants.AVAILABLE_PRIORITIES)), response.data)
+
+  @ddt.data("Assessment", "Audit", "AssessmentTemplate")
+  def test_archived_attributes(self, model):
+    """Test to check export values for archived objects"""
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": model, "fields": ["archived"]},
+        ]
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nyes\nno", response.data)
 
 
 @ddt.ddt
@@ -1144,3 +1147,17 @@ class TestExportPerformance(TestCase):
       self.assertNotEqual(counter.get, 0)
       self.assertLessEqual(counter.get, query_limit)
     self.assertEqual(len(response[model_name]), 3)
+
+  @ddt.data(*test_constants.FLAG_VALIDATORS)
+  @ddt.unpack
+  def test_import_archived_values(self, import_value, expected_value):
+    """Test to check import values for archived."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+    self.import_data(collections.OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", audit.slug),
+        ("archived", import_value),
+    ]))
+    audit1 = all_models.Audit.query.filter_by(title=audit.title).first()
+    self.assertEqual(audit1.archived, expected_value)
