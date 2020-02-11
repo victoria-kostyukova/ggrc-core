@@ -336,13 +336,17 @@ export default canComponent.extend({
       let query = this.getSnapshotQuery();
       return this.requestQuery(query);
     },
-    loadFiles: function () {
+    loadFiles() {
       let query = this.getEvidenceQuery('FILE');
-      return this.requestQuery(query, 'files');
+      return this.requestQuery(query, 'files').then((files) =>
+        files.map((file) => new Evidence(file))
+      );
     },
-    loadUrls: function () {
+    loadUrls() {
       let query = this.getEvidenceQuery('URL');
-      return this.requestQuery(query, 'urls');
+      return this.requestQuery(query, 'urls').then((urls) =>
+        urls.map((url) => new Evidence(url))
+      );
     },
     updateItems: function () {
       makeArray(arguments).forEach(function (type) {

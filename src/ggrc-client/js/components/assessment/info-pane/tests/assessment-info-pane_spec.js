@@ -649,24 +649,31 @@ describe('assessment-info-pane component', () => {
   });
 
   describe('loadFiles() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'requestQuery');
+    const files = [
+      {id: 15, kind: 'FILE'},
+      {id: 155, kind: 'FILE'},
+    ];
+    beforeEach(() => {
+      spyOn(vm, 'requestQuery').and.returnValue(Promise.resolve(files));
       spyOn(vm, 'getEvidenceQuery');
     });
 
-    it('forms query from "FILE" evidence query', function () {
+    it('forms query from "FILE" evidence query', () => {
       vm.loadFiles();
       expect(vm.getEvidenceQuery).toHaveBeenCalledWith('FILE');
     });
 
-    it('returns result of the files query', function () {
-      const expectedResult = Promise.resolve();
-      vm.requestQuery.and.returnValue(expectedResult);
-      const result = vm.loadFiles();
-      expect(result).toBe(expectedResult);
+    it('returns Evidence instances where kind is FILE', async () => {
+      const evidenceInstances = await vm.loadFiles();
+      expect(evidenceInstances[0] instanceof Evidence).toBe(true);
+      expect(evidenceInstances[1] instanceof Evidence).toBe(true);
+      expect(evidenceInstances[0].id).toBe(15);
+      expect(evidenceInstances[1].id).toBe(155);
+      expect(evidenceInstances[0].kind).toBe('FILE');
+      expect(evidenceInstances[1].kind).toBe('FILE');
     });
 
-    it('uses Evidence query and "files" type', function () {
+    it('uses Evidence query and "files" type', () => {
       const query = {field: 'f1'};
       const type = 'files';
       vm.getEvidenceQuery.and.returnValue(query);
@@ -676,24 +683,31 @@ describe('assessment-info-pane component', () => {
   });
 
   describe('loadUrls() method', () => {
-    beforeEach(function () {
-      spyOn(vm, 'requestQuery');
+    const urls = [
+      {id: 5, kind: 'URL'},
+      {id: 55, kind: 'URL'},
+    ];
+    beforeEach(() => {
+      spyOn(vm, 'requestQuery').and.returnValue(Promise.resolve(urls));
       spyOn(vm, 'getEvidenceQuery');
     });
 
-    it('forms query from "URL" evidence query', function () {
+    it('forms query from "URL" evidence query', () => {
       vm.loadUrls();
       expect(vm.getEvidenceQuery).toHaveBeenCalledWith('URL');
     });
 
-    it('returns result of the urls query', function () {
-      const expectedResult = Promise.resolve();
-      vm.requestQuery.and.returnValue(expectedResult);
-      const result = vm.loadUrls();
-      expect(result).toBe(expectedResult);
+    it('returns Evidence instances where kind is URL', async () => {
+      const evidenceInstances = await vm.loadUrls();
+      expect(evidenceInstances[0] instanceof Evidence).toBe(true);
+      expect(evidenceInstances[1] instanceof Evidence).toBe(true);
+      expect(evidenceInstances[0].id).toBe(5);
+      expect(evidenceInstances[1].id).toBe(55);
+      expect(evidenceInstances[0].kind).toBe('URL');
+      expect(evidenceInstances[1].kind).toBe('URL');
     });
 
-    it('uses Evidence query and "urls" type', function () {
+    it('uses Evidence query and "urls" type', () => {
       const query = {field: 'f1'};
       const type = 'urls';
       vm.getEvidenceQuery.and.returnValue(query);
