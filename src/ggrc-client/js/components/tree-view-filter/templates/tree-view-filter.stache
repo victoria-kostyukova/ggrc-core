@@ -10,7 +10,8 @@
   on:vm:openAdvanced="openAdvancedFilter()"
   on:vm:removeAdvanced="removeAdvancedFilters()"
   showAdvanced:from="statusFilterVisible"
-  disabled:from="advancedSearch.filter"
+  isFiltered:from="advancedSearch.filter"
+  showEmailImport:from="showEmailImport"
 />
 
 {{#if statusFilterVisible}}

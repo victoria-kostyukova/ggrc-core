@@ -24,8 +24,9 @@ let viewModel = canMap.extend({
       value: false,
     },
   },
-  disabled: false,
+  isFiltered: false,
   showAdvanced: false,
+  showEmailImport: false,
   onFilter: function () {
     this.dispatch('submitFilter');
   },
@@ -75,7 +76,7 @@ export default canComponent.extend({
       }
       ev.stopPropagation();
     },
-    '{viewModel} disabled': function () {
+    '{viewModel} isFiltered': function () {
       this.viewModel.attr('filter', '');
     },
   },

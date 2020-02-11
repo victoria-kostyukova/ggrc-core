@@ -341,13 +341,29 @@ tree-filter-input {
       top: 1px;
     }
     .advanced-filter-controls {
+      display: flex;
       position: absolute;
       right: 6px;
       top: 5px;
-      background: #03A9F4;
-      border-radius: 15px;
-      line-height: 18px;
-      padding: 0 5px 0 5px;
+
+      &__item {
+        border-radius: 15px;
+        line-height: 18px;
+        padding: 0 5px 0 5px;
+
+        &.filtered {
+          background: $lightBlueBtn;
+        }
+
+        &.email-import {
+          background: $darkBlueBtn;
+          margin-right: 8px;
+          color: #fff;
+          font-size: 12px;
+          cursor: default;
+        }
+      }
+
       a, i {
         color: #fff;
         font-size: 12px;

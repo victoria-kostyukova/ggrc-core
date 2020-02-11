@@ -7,29 +7,37 @@
   <input type="text"
          class="tree-filter__input width-100"
          el:value:bind="filter"
-         {{#disabled}}disabled{{/disabled}}
+         {{#if isFiltered}}disabled{{/if}}
          placeholder="Type here to search or click the advanced search icon">
   <span class="tree-filter_is-expression {{#if isExpression}}valid{{/if}}">
     <i class="fa fa-check-circle{{#unless isExpression}}-o{{/unless}}"></i>
   </span>
   {{#if showAdvanced}}
-    {{^if disabled}}
-    <a href="javascript://" class="advanced-filter" on:el:click="openAdvancedFilter()">
-      <i class="fa fa-filter"></i>
-    </a>
+    {{^if isFiltered}}
+      <a href="javascript://" class="advanced-filter" on:el:click="openAdvancedFilter()">
+        <i class="fa fa-filter"></i>
+      </a>
     {{else}}
-    <div class="advanced-filter-controls">
-      <a href="javascript://" on:el:click="openAdvancedFilter()">Filtered</a>
-      <a href="javascript://" on:el:click="removeAdvancedFilters()"><i class="fa fa-remove"></i></a>
-    </div>
-    {{/if}}
+      <div class="advanced-filter-controls">
+        {{#if showEmailImport}}
+          <div class="advanced-filter-controls__item email-import">
+            Email Import
+          </div>
+        {{/if}}
+
+        <div class="advanced-filter-controls__item filtered">
+          <a href="javascript://" on:el:click="openAdvancedFilter()">Filtered</a>
+          <a href="javascript://" on:el:click="removeAdvancedFilters()"><i class="fa fa-remove"></i></a>
+        </div>
+      </div>
+      {{/if}}
   {{/if}}
 </div>
 <div class="flex-box tree-filter__actions">
   <button type="submit"
           class="btn btn-small btn-lightBlue"
           on:el:click="onFilter"
-          {{#disabled}}disabled{{/disabled}}>
+          {{#if isFiltered}}disabled{{/if}}>
     Search
   </button>
 

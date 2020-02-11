@@ -81,6 +81,16 @@ export default canComponent.extend({
           return new Set();
         },
       },
+      showEmailImport: {
+        get() {
+          const appliedSavedSearchId =
+            this.attr('advancedSearch.selectedSavedSearch.id') ||
+            this.attr('appliedSavedSearch.id');
+
+          return !!appliedSavedSearchId
+            && this.attr('emailImportSearchId') === appliedSavedSearchId;
+        },
+      },
     },
     pubSub,
     router,
@@ -95,6 +105,7 @@ export default canComponent.extend({
     shouldWaitForFilters: true,
     parentInstance: null,
     savedSearchPermalink: '',
+    emailImportSearchId: null,
     advancedSearch: {
       open: false,
       filter: null,
@@ -182,11 +193,15 @@ export default canComponent.extend({
 
       this.triggerSearchPermalink(false);
     },
-    applyAdvancedFilters(clearSavedSearchParam = true) {
-      if (clearSavedSearchParam) {
-        // clean up url param from previous search
-        this.cleanUpUrl();
+    applyAdvancedFilters(isSavedSearchFromRoute = false) {
+      if (isSavedSearchFromRoute) {
+        this.setEmailImportSearchId(this.attr('router'));
+      } else {
+        // clean up route params from previous search
+        this.cleanUpRoute();
+        this.resetEmailImportSearchId();
       }
+
       const filters = this.attr('advancedSearch.filterItems').serialize();
       const mappings = this.attr('advancedSearch.mappingItems').serialize();
       const parents = this.attr('advancedSearch.parentItems').serialize();
@@ -305,7 +320,7 @@ export default canComponent.extend({
       this.attr('advancedSearch.request', canList());
       this.attr('advancedSearch.filter', null);
       this.attr('advancedSearch.open', false);
-      this.cleanUpUrl();
+      this.cleanUpRoute();
       this.resetAppliedSavedSearch();
       this.onFilter();
     },
@@ -344,8 +359,27 @@ export default canComponent.extend({
         request: advancedSearchRequest,
       });
     },
-    cleanUpUrl() {
+    cleanUpRoute() {
       router.removeAttr('saved_search');
+      router.removeAttr('labels');
+    },
+    resetEmailImportSearchId() {
+      this.attr('emailImportSearchId', null);
+    },
+    setEmailImportSearchId(router) {
+      const searchId = Number(router.attr('saved_search'));
+      const isEmailImportSearch = router.attr('labels') === 'Import Email';
+
+      if (isEmailImportSearch && searchId) {
+        this.attr('emailImportSearchId', searchId);
+        notifier(
+          'info',
+          'The filter query refers to the '
+            + 'report you\'ve received on your email.'
+        );
+      } else {
+        this.attr('emailImportSearchId', null);
+      }
     },
   }),
   events: {
@@ -424,7 +458,7 @@ export const loadSavedSearch = (viewModel) => {
         viewModel.attr('advancedSearch'),
         parsedSavedSearch
       );
-      viewModel.applyAdvancedFilters(false);
+      viewModel.applyAdvancedFilters(true);
     } else {
       // clear filter and apply default
       processNotExistedSearch(viewModel);
