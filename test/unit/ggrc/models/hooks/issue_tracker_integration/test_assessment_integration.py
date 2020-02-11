@@ -24,7 +24,7 @@ class TestUtilityFunctions(unittest.TestCase):
   @ddt.data(
       (
           {
-              'component_id': '1111',
+              'component_id': '188208',
               'hotlist_id': '2222',
               'issue_type': 'PROCESS',
               'issue_priority': 'P2',
@@ -35,7 +35,7 @@ class TestUtilityFunctions(unittest.TestCase):
       ),
       (
           {
-              'component_id': '1111',
+              'component_id': '188208',
               'hotlist_id': '2222',
               'issue_type': 'PROCESS',
               'issue_priority': 'P2',
@@ -46,7 +46,7 @@ class TestUtilityFunctions(unittest.TestCase):
       ),
       (
           {
-              'component_id': '1111',
+              'component_id': '188208',
               'hotlist_id': '2222',
               'issue_type': 'PROCESS',
               'issue_priority': 'P2',
@@ -67,7 +67,7 @@ class TestUtilityFunctions(unittest.TestCase):
           integration_utils.exceptions.ValidationError,),
       (
           {
-              'component_id': '11111',
+              'component_id': '188208',
               'hotlist_id': 'zzz',
               'issue_type': 'PROCESS',
               'issue_priority': 'P2',
@@ -115,11 +115,11 @@ class TestUtilityFunctions(unittest.TestCase):
     self.assertEqual(info, initial_info)
 
   @ddt.data(
-      ({'component_id': '1111', 'hotlist_id': '2222'},
-       {'component_id': 1111, 'hotlist_id': 2222},
+      ({'component_id': '188208', 'hotlist_id': '2222'},
+       {'component_id': 188208, 'hotlist_id': 2222},
        None,),
-      ({'component_id': '1111'},
-       {'component_id': 1111},
+      ({'component_id': '188208'},
+       {'component_id': 188208},
        None,),
       ({'hotlist_id': '2222'},
        {'hotlist_id': 2222},

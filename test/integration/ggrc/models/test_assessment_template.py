@@ -41,7 +41,7 @@ class TestAssessmentTemplate(TestCase):
       audit_id = audit.id
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
-          component_id="some component id",
+          component_id="188208",
           hotlist_id="some host id",
           title="some title",
           issue_id="some issue id"
@@ -64,7 +64,7 @@ class TestAssessmentTemplate(TestCase):
             u"context_id": long(audit.context.id),
             u"issue_tracker": {
                 u'_warnings': [],
-                u"component_id": u"some component id",
+                u"component_id": u"188208",
                 u"enabled": False,
                 u"issue_severity": None,
                 u"hotlist_id": u"some host id",

@@ -57,7 +57,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       "context": None,
       "status": "Draft",
       "enabled": True,
-      "component_id": 1234,
+      "component_id": 188208,
       "hotlist_id": 4321,
       "issue_id": 654321,
       "issue_type": "PROCESS",
@@ -66,7 +66,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   }
 
   DEFAULT_TICKET_ATTRS = {
-      "component_id": 1234,
+      "component_id": 188208,
       "hotlist_id": 4321,
       "issue_id": 654321,
       "status": "new",
@@ -205,7 +205,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
       ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
       ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
-      ({"component_id": 1234}, {"component_id": 4321}),
+      ({"component_id": 188208}, {"component_id": 398781}),
       ({"status": "Draft"}, {"status": "fixed"}),
   )
   @ddt.unpack
@@ -411,7 +411,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       factories.IssueTrackerIssueFactory(
           enabled=True,
           issue_tracked_obj=audit,
-          component_id=213,
+          component_id=188208,
           hotlist_id=333,
           issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
           issue_priority="S0",
@@ -444,7 +444,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       factories.IssueTrackerIssueFactory(
           enabled=True,
           issue_tracked_obj=audit,
-          component_id=213,
+          component_id=188208,
           hotlist_id=333,
           issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
           issue_priority="P0",
@@ -467,7 +467,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         issue_info
     )
     expected_info = {
-        'component_id': 213,
+        'component_id': 188208,
         'severity': u'S0',
         'title': assmt.title,
         'hotlist_ids': [333, ],
@@ -585,7 +585,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     ):
       iti = factories.IssueTrackerIssueFactory(
           enabled=True,
-          component_id="11111",
+          component_id="188208",
           hotlist_id="222222",
           issue_type="PROCESS",
           issue_priority="P2",
@@ -610,7 +610,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         link=tracker_handler._get_assessment_page_url(asmt),
     )
     kwargs = {'status': 'ACCEPTED',
-              'component_id': 11111,
+              'component_id': 188208,
               'severity': "S2",
               'title': iti_title,
               'hotlist_ids': [222222],
@@ -759,7 +759,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     )
 
     get_issue_resp = self.response_payload_builder(
-        {"component_id": 77, "hotlist_id": 44}
+        {"component_id": 188208, "hotlist_id": 44}
     )
 
     get_issue_mock_cm = mock.patch(
@@ -775,7 +775,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assert200(response)
       called_issue_id, call_payload = update_issue_mock.call_args[0]
       self.assertEquals(9999, called_issue_id)
-      self.assertEquals(77, call_payload["component_id"])
+      self.assertEquals(188208, call_payload["component_id"])
       self.assertEquals(44, call_payload["hotlist_ids"][0])
 
       self.assertEquals(
@@ -834,7 +834,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     ):
       issue_params = {
           'enabled': True,
-          'component_id': 123123,
+          'component_id': 188208,
           'hotlist_id': 123123,
           'issue_type': 'PROCESS',
           'issue_priority': 'P2',
@@ -866,7 +866,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         self.api.modify_object(audit, {
             'issue_tracker': {
                 'enabled': True,
-                'component_id': '11111',
+                'component_id': '188208',
                 'hotlist_id': '222222',
             },
         })
@@ -874,7 +874,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         self.api.modify_object(asmt, {
             'issue_tracker': {
                 'enabled': True,
-                'component_id': '11111',
+                'component_id': '188208',
                 'hotlist_id': '222222',
                 'issue_type': 'PROCESS',
                 'issue_priority': 'P2',
@@ -890,7 +890,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         self.api.modify_object(asmt, {
             'issue_tracker': {
                 'enabled': True,
-                'component_id': '11111',
+                'component_id': '188208',
                 'hotlist_id': '222222',
                 'issue_priority': 'P4',
                 'issue_type': 'PROCESS',
@@ -931,7 +931,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'verifier': '',
               'reporter': '',
               'ccs': [],
-              'component_id': 11111
+              'component_id': 188208
           })
 
   # pylint: disable=unused-argument
@@ -950,7 +950,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     iti_issue_id = []
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
-        component_id=12345,
+        component_id=188208,
         issue_type="PROCESS",
         issue_severity="S4",
         issue_priority="P4"
@@ -968,7 +968,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           "access_control_list": acl
       })
       kwargs = {'status': 'ASSIGNED',
-                'component_id': 12345,
+                'component_id': 188208,
                 'severity': "S4",
                 'title': iti.title,
                 'hotlist_ids': [],
@@ -987,7 +987,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       iti_issue_id = []
       iti = factories.IssueTrackerIssueFactory(
           enabled=True,
-          component_id='123123',
+          component_id='188208',
           issue_severity='S2',
           issue_priority='P2'
       )
@@ -1035,7 +1035,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       iti_issue_id = []
       iti = factories.IssueTrackerIssueFactory(
           enabled=True,
-          component_id="123123",
+          component_id="188208",
           issue_type="PROCESS",
           issue_priority="P2",
           issue_severity="S2"
@@ -1054,7 +1054,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           'title': 'title'
       })
       kwargs = {'status': 'ASSIGNED',
-                'component_id': 123123,
+                'component_id': 188208,
                 'severity': "S2",
                 'title': iti.title,
                 'hotlist_ids': [],
@@ -1099,7 +1099,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     iti_issue_id = []
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
-        component_id="123123",
+        component_id="188208",
         issue_type="PROCESS",
         issue_priority="P2",
         issue_severity="S2"
@@ -1118,7 +1118,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               "status": status,
           },
       )
-      kwargs = {'component_id': 123123,
+      kwargs = {'component_id': 188208,
                 'severity': "S2",
                 'title': iti.title,
                 'hotlist_ids': [],
@@ -1193,7 +1193,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
-          component_id="some id",
+          component_id="188208",
           hotlist_id="some host id",
       )
       result = self.api.delete(audit)
@@ -1202,7 +1202,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
-          component_id="some id",
+          component_id="188208",
           hotlist_id="some host id",
       )
       result = self.api.delete(audit)
@@ -1243,7 +1243,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       assessment_issue = factories.IssueTrackerIssueFactory(
           enabled=True,
           issue_tracked_obj=assessment,
-          component_id="11111",
+          component_id="188208",
           hotlist_id="222222",
       )
       assessment_persons = factories.PersonFactory.create_batch(3)
@@ -1259,7 +1259,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           assessment,
           {
               "issue_tracker": {
-                  "component_id": "11111",
+                  "component_id": "188208",
                   "enabled": True,
                   "hotlist_id": "222222",
                   "issue_priority": "P2",
@@ -1329,7 +1329,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'issue_url': integration_utils.build_issue_tracker_url(
                   issue_id
               ),
-              'component_id': '1111',
+              'component_id': '188208',
               'issue_type': 'PROCESS',
               'issue_priority': 'P2',
               'issue_severity': 'S2',
@@ -1364,7 +1364,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       asmt = factories.AssessmentFactory(audit=audit)
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=asmt,
-          component_id=4321,
+          component_id=188208,
           hotlist_id=1234,
           issue_priority="P2",
           issue_severity="S1",
@@ -1538,7 +1538,7 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     })
     issue_tracker_with_defaults = {
         'enabled': True,
-        'component_id': 123123,
+        'component_id': 188208,
         'hotlist_id': 123123,
         'issue_type': 'PROCESS',
         'issue_priority': 'P2',

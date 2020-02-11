@@ -61,6 +61,7 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY_LOGO_TEXT, "Company")
     self.assertEqual(default.CREATE_ISSUE_URL, "")
     self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "")
+    self.assertEqual(default.CREATE_ISSUE_TICKET_LINK, "")
     self.assertEqual(default.CHANGE_REQUEST_URL, "")
 
   @patch.dict(os.environ, {
@@ -68,6 +69,7 @@ class TestSettings(unittest.TestCase):
       "COMPANY_LOGO_TEXT": "TestCompanyLogo",
       "CREATE_ISSUE_URL": "TestRMCCreateIssueURL",
       "CREATE_ISSUE_BUTTON_NAME": "TestCreateButtonName",
+      "CREATE_ISSUE_TICKET_LINK": "TestCreateTicketLink",
       "CHANGE_REQUEST_URL": "TestChangeRequestURL",
   })
   def test_loading_vars_from_env(self):
@@ -77,6 +79,7 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
     self.assertEqual(default.CREATE_ISSUE_URL, "TestRMCCreateIssueURL")
     self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "TestCreateButtonName")
+    self.assertEqual(default.CREATE_ISSUE_TICKET_LINK, "TestCreateTicketLink")
     self.assertEqual(default.CHANGE_REQUEST_URL, "TestChangeRequestURL")
 
 

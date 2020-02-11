@@ -330,7 +330,7 @@ class TestClonable(SnapshotterBaseTestCase):
     issue_payload = {
         "issue_tracker": {
             "enabled": True,
-            "component_id": "11111",
+            "component_id": "188208",
             "hotlist_id": "222222",
         },
     }

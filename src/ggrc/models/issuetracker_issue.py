@@ -4,12 +4,17 @@
 """Module for IssueTracker object."""
 
 # pylint: disable=too-many-instance-attributes
+import flask
+from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import settings
 from ggrc.integrations import constants
+from ggrc.models import exceptions
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import utils
+from ggrc.utils import benchmark
 
 
 class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
@@ -214,3 +219,25 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
         'issue_url': None,
         'people_sync_enabled': True,
     }
+
+  @validates("component_id")
+  def validate_component_id(self, _, value):
+    """Validates that component_id is in allowlist"""
+    # pylint: disable=no-self-use
+    if value and str(value) not in get_allowed_components_ids():
+      raise exceptions.ValidationError(
+          "Field 'Component ID' contains not allowed value. To include this "
+          "Component ID into the list of allowed components please raise "
+          "a ticket at {link}.".format(link=settings.CREATE_ISSUE_TICKET_LINK))
+    return value
+
+
+def get_allowed_components_ids():
+  """Get list of allowed Issue Tracker Components IDs"""
+  with benchmark("Get allowed components ids"):
+    if not hasattr(flask.g, "components_ids_cache"):
+      flask.g.components_ids_cache = [
+          row.component_id for row in db.session.execute(
+              "SELECT component_id FROM issuetracker_components")
+      ]
+    return flask.g.components_ids_cache

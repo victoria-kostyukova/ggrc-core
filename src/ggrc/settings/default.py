@@ -34,6 +34,7 @@ exports = [
     "MAX_INSTANCES",
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
+    "CREATE_ISSUE_TICKET_LINK",
     "ASSESSMENT_SHORT_URL_PREFIX",
     "NOTIFICATION_PREFIX",
     "DAILY_DIGEST_BATCH_SIZE",
@@ -59,7 +60,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "2.20.0-Pumpkin" + BUILD_NUMBER
+VERSION = "2.20.4-Pumpkin" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -245,6 +246,7 @@ else:
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
+CREATE_ISSUE_TICKET_LINK = os.environ.get('CREATE_ISSUE_TICKET_LINK', "")
 
 # Link for change request on my task page
 CHANGE_REQUEST_URL = os.environ.get("CHANGE_REQUEST_URL", "")

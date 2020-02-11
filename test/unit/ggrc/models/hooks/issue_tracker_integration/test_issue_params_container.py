@@ -32,7 +32,7 @@ class TestIssueTrackerParamsContainer(unittest.TestCase):
     self.params.assignee = "assignee@email.com"
     self.params.reporter = "reporter@email.com"
     self.params.cc_list = ["secondary@email.com", ]
-    self.params.component_id = 1234
+    self.params.component_id = 188208
     self.params.hotlist_id = 4321
     self.params.issue_priority = "P2"
     self.params.issue_severity = "S2"
@@ -41,7 +41,7 @@ class TestIssueTrackerParamsContainer(unittest.TestCase):
 
   def test_component_id_property(self):
     """Test 'component_id' property."""
-    test_component_id = 1234
+    test_component_id = 188208
     self.params.component_id = test_component_id
     self.assertEquals(self.params._component_id, test_component_id)
 
@@ -113,7 +113,7 @@ class TestIssueTrackerParamsContainer(unittest.TestCase):
         "assignee": "assignee@email.com",
         "ccs": ["secondary@email.com", ],
         "comment": "Test_comment",
-        "component_id": 1234,
+        "component_id": 188208,
         "hotlist_ids": [4321, ],
         "priority": "P2",
         "reporter": "reporter@email.com",
@@ -132,7 +132,7 @@ class TestIssueTrackerParamsContainer(unittest.TestCase):
     expected_result = {
         "assignee": "assignee@email.com",
         "cc_list": ["secondary@email.com", ],
-        "component_id": 1234,
+        "component_id": 188208,
         "hotlist_id": 4321,
         "enabled": True,
         "issue_priority": "P2",

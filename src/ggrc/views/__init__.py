@@ -24,7 +24,10 @@ from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
 from ggrc.integrations.synchronization_jobs import one_time_back_sync
 from ggrc.integrations.external_app import constants
-from ggrc.models import background_task, reflection, revision
+from ggrc.models import background_task
+from ggrc.models import issuetracker_issue
+from ggrc.models import reflection
+from ggrc.models import revision
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
@@ -1083,6 +1086,20 @@ def init_all_views(app_):
 def user_permissions():
   """Permissions object for the currently logged in user"""
   return get_permissions_json()
+
+
+@app.route("/api/issuetracker_components")
+@login.login_required
+def issuetracker_components():
+  """Route returns list of allowed Issue Tracker Components IDs"""
+  components = []
+  for component_id in issuetracker_issue.get_allowed_components_ids():
+    components.append({"component_id": component_id})
+  body = {"issuetracker_component": components}
+  return app.make_response((
+      json.dumps(body),
+      200,
+      [("Content-Type", "application/json")]))
 
 
 @app.route("/api/document/documents_exist", methods=["POST"])

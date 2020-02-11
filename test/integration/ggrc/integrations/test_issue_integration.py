@@ -40,7 +40,7 @@ class TestIssueIntegration(ggrc.TestCase):
       "context": None,
       "status": "Draft",
       "enabled": True,
-      "component_id": 1234,
+      "component_id": 188208,
       "hotlist_id": 4321,
       "issue_id": TICKET_ID,
       "issue_type": "Default Issue Type",
@@ -50,7 +50,7 @@ class TestIssueIntegration(ggrc.TestCase):
   }
 
   DEFAULT_TICKET_ATTRS = {
-      "component_id": 1234,
+      "component_id": 188208,
       "hotlist_id": 4321,
       "issue_id": TICKET_ID,
       "status": "new",
@@ -167,7 +167,7 @@ class TestIssueIntegration(ggrc.TestCase):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_create_issue_tracker_info(self, mock_create_issue):
     """Test creation issue tracker issue for Issue object."""
-    component_id = "1234"
+    component_id = "188208"
     hotlist_id = "4321"
     issue_type = "Default Issue type"
     issue_priority = "P2"
@@ -220,10 +220,10 @@ class TestIssueIntegration(ggrc.TestCase):
        {"comment": "Issue Description has been updated.\nnew description"}),
       ({"test_plan": "new test plan"},
        {"comment": "Issue Remediation Plan has been updated.\nnew test plan"}),
-      ({"issue_tracker": {"component_id": "123",
+      ({"issue_tracker": {"component_id": "188208",
                           "enabled": True,
                           "issue_id": TICKET_ID}},
-       {"component_id": 123}),
+       {"component_id": 188208}),
       ({"issue_tracker": {"hotlist_id": "321",
                           "enabled": True,
                           "issue_id": TICKET_ID}},
@@ -404,7 +404,7 @@ class TestIssueIntegration(ggrc.TestCase):
           enabled=True,
           issue_tracked_obj=issue,
           title='title',
-          component_id=123,
+          component_id=188208,
           hotlist_id=321,
           issue_type="PROCESS",
           issue_priority="P3",
@@ -415,7 +415,7 @@ class TestIssueIntegration(ggrc.TestCase):
     with_info = issue_integration.prepare_issue_update_json(issue, issue_info)
 
     expected_info = {
-        'component_id': 123,
+        'component_id': 188208,
         'severity': u'S3',
         'title': iti.title,
         'hotlist_ids': [321, ],
@@ -467,7 +467,7 @@ class TestIssueIntegration(ggrc.TestCase):
               "context": None,
               "issue_tracker": {
                   "enabled": True,
-                  "component_id": 1234,
+                  "component_id": 188208,
                   "hotlist_id": 4321,
                   "issue_type": "Default Issue type",
                   "issue_priority": "P2",
@@ -495,7 +495,7 @@ class TestIssueLink(TestIssueIntegration):
       ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
       ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
       ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
-      ({"component_id": 1234}, {"component_id": 4321}),
+      ({"component_id": 188208}, {"component_id": 398781}),
       ({"status": "Draft"}, {"status": "fixed"}),
   )
   @ddt.unpack
@@ -751,7 +751,7 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
       {"test_plan": "new test plan",
        "issue_tracker": {"issue_id": TICKET_ID, "enabled": False}},
       {"issue_tracker": {"issue_id": TICKET_ID,
-                         "component_id": "123",
+                         "component_id": "188208",
                          "enabled": False}},
       {"issue_tracker": {"issue_id": TICKET_ID,
                          "hotlist_id": "321",
@@ -785,7 +785,7 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
   def test_issue_recreation(self, _):
     """Test retrying to turn on integration after failed creation."""
     # Arrange data.
-    component_id = "1234"
+    component_id = "188208"
     hotlist_id = "4321"
     issue_type = "Default Issue type"
     issue_priority = "P2"
@@ -857,7 +857,7 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
     """Test warning message if no permissions to Hotlist."""
     issue_tracker_attrs = {
         "enabled": True,
-        "component_id": 1234,
+        "component_id": 188208,
         "hotlist_id": 4321,
         "issue_type": "Default Issue type",
         "issue_priority": "P2",

@@ -22,19 +22,19 @@ class TestOnetimeBackSync(TestCase):
   def test_update_issuetrackerissues(self, sync_result_mock):
     """Test onetime_back_sync_job"""
     correct_hotlist_id = 999
-    correct_component_id = 888
+    correct_component_id = 188208
 
     with factories.single_commit():
       # Invalid hotlist_id
       issue_1 = factories.IssueTrackerIssueFactory(
           hotlist_id='123',
-          component_id=456,
+          component_id=398781,
           issue_id=111
       )
       # Invalid component_id
       issue_2 = factories.IssueTrackerIssueFactory(
           hotlist_id='123',
-          component_id=456,
+          component_id=398781,
           issue_id=222
       )
       # Valid issue
@@ -52,7 +52,7 @@ class TestOnetimeBackSync(TestCase):
       # Invalid hotlist_id
       issue_5 = factories.IssueTrackerIssueFactory(
           hotlist_id='123',
-          component_id=456,
+          component_id=398781,
           issue_id=555
       )
 

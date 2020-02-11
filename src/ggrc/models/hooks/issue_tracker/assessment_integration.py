@@ -1579,7 +1579,8 @@ class AssessmentTrackerHandler(object):
           error,
       )
       assessment.add_warning(
-          "Ticket tracker ID does not exist or you do not have access to it."
+          "Ticket tracker ID does not exist "
+          "or system does not have access to it."
       )
       issue_payload = {}
     else:
