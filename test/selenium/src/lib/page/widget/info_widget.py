@@ -295,6 +295,11 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     return self.comments_panel.is_present
 
   @property
+  def role_to_edit(self):
+    """Returns a role for trying to edit."""
+    return self._related_people_list(roles.PRIMARY_CONTACTS, self._root)
+
+  @property
   def predefined_field(self):
     """Returns description element as a predefined field for object."""
     return page_elements.SimpleField(
