@@ -26,7 +26,8 @@ class TestDisabledObjects(base.Test):
   # pylint: disable=unused-argument
 
   @pytest.mark.smoke_tests
-  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK,
+  @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
+                           [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_edit_or_del_disabled_obj_from_info_page(
       self, obj, selenium, soft_assert
