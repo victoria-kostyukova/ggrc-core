@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Models for bulk update modals."""
 import re
-from lib import base
+from lib import base, decorator
 from lib.constants import objects, value_aliases
 from lib.element import page_elements
 
@@ -137,26 +137,40 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
     self._root = parent_element.element(
         tag_name="collapsible-panel", text=re.compile("SELECT ASSESSMENTS"))
 
+  @property
+  def tree_view(self):
+    return base.BulkUpdateTreeView(obj_name=objects.ASSESSMENTS)
+
+  @property
+  def pagination(self):
+    return base.Pagination(self._root)
+
   def click_select_all(self):
     """Clicks 'Select All' button to select all assessments."""
     self._root.button(text="All").click()
 
+  @decorator.execute_on_all_pagination_pages
+  def _extend_scopes(self, scopes, with_second_tier_info):
+    """Extends scopes with scopes from current page of tree view."""
+    self.tree_view.wait_loading_after_actions()
+    scopes_from_page = self.tree_view.get_list_members_as_list_scopes()
+    if with_second_tier_info:
+      for scope in scopes_from_page:
+        scope.update(AssessmentTreeViewItem(self._root.element(
+            tag_name="tree-item-attr", text=scope["TITLE"]).parent(
+                tag_name="mapper-results-item")).assessment_info)
+    scopes.extend(scopes_from_page)
+
   def get_objs_scopes(self, with_second_tier_info=False):
     """Get list of scopes (dicts) of assessments which are displayed on
-    Tree View according to current set of visible fields.
+    Tree View on all pages according to current set of visible fields.
 
     Returns:
       list of scopes.
     """
-    tree = base.BulkUpdateTreeView(obj_name=objects.ASSESSMENTS)
-    tree.wait_loading_after_actions()
-    tree.open_set_visible_fields().select_and_set_visible_fields()
-    scopes = tree.get_list_members_as_list_scopes()
-    if with_second_tier_info:
-      for scope in scopes:
-        scope.update(AssessmentTreeViewItem(self._root.element(
-            tag_name="tree-item-attr", text=scope["TITLE"]).parent(
-            tag_name="mapper-results-item")).assessment_info)
+    self.tree_view.open_set_visible_fields().select_and_set_visible_fields()
+    scopes = []
+    self._extend_scopes(scopes, with_second_tier_info)
     return scopes
 
 

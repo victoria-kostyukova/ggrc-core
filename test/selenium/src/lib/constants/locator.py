@@ -287,6 +287,7 @@ class CommonModalUnifiedMapper(object):
                        " button.collapsible-panel-header__toggle-button")
   CLOSE_BTN_CSS = (By.CSS_SELECTOR,
                    MODAL + Common.MODAL_HEADER + " a.modal-dismiss")
+  MODAL_SECTIONS = (By.CLASS_NAME, 'body-inner')
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):

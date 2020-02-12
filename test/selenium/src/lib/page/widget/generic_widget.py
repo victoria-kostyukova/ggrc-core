@@ -6,7 +6,7 @@
 import re
 from selenium.common import exceptions
 
-from lib import base, factory
+from lib import base, factory, decorator
 from lib.constants import locator, regex, element, counters, messages, objects
 from lib.element import three_bbs
 from lib.page import widget_bar
@@ -34,12 +34,32 @@ class Widget(base.Widget):
     super(Widget, self).__init__(driver)
     self._root = self._browser.element(class_name="widget",
                                        id=objects.get_singular(self.obj_name))
-    # Tree View
-    self.tree_view = TreeView(driver, self.info_widget_cls, self.obj_name)
     # Tab count
     self.members_listed = None
     self.member_count = None
     self._set_members_listed()
+
+  @property
+  def pagination(self):
+    """Returns pagination element."""
+    return base.Pagination(self._root)
+
+  @property
+  def tree_view(self):
+    """Returns tree view element."""
+    return TreeView(self._driver, self.info_widget_cls, self.obj_name)
+
+  @decorator.execute_on_all_pagination_pages
+  def _extend_tree_view_items_scopes(self, scopes):
+    """Extends scopes with scopes from current page of tree view."""
+    scopes.extend(self.tree_view.get_list_members_as_list_scopes())
+
+  @property
+  def tree_view_items_scopes(self):
+    """Returns tree view items as scopes (dicts) from all pages."""
+    scopes = []
+    self._extend_tree_view_items_scopes(scopes)
+    return scopes
 
   @property
   def _locators_widget(self):

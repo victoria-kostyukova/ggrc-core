@@ -613,12 +613,16 @@ class TreeView(Component):
       def is_result_ready():
         """Check if the results on mapper is ready."""
         is_results_ready = False
-        if not selenium_utils.is_element_enabled(
-            selenium_utils.get_when_visible(
-                self._driver,
-                constants.locator.CommonModalUnifiedMapper.BUTTON_SEARCH)
-        ):
-          return is_results_ready
+        filter_section = selenium_utils.get_when_all_visible(
+            self._driver,
+            constants.locator.CommonModalUnifiedMapper.MODAL_SECTIONS)[0]
+        if 'is-expanded' in filter_section.get_attribute('class'):
+          if not selenium_utils.is_element_enabled(
+              selenium_utils.get_when_visible(
+                  self._driver,
+                  constants.locator.CommonModalUnifiedMapper.BUTTON_SEARCH)
+          ):
+            return is_results_ready
         if (
             selenium_utils.is_element_exist(
                 self._driver, self._locators.MAPPER_TREE_SPINNER_NO_RESULT) or
@@ -669,6 +673,12 @@ class TreeView(Component):
     if not self._tree_view_headers:
       self._init_tree_view_headers()
     return self._tree_view_headers
+
+  def column_names(self):
+    """Return list of column names"""
+    return [column_name.title() for column_name in
+            self.tree_view_headers()[0].text.splitlines()
+            [:len(self.fields_to_set)]]
 
   def tree_view_items(self, is_updated=False):
     """Return Tree View items as list of TreeViewItem from current widget."""
@@ -849,6 +859,13 @@ class TreeViewItem(Element):
     """Returns True if checkbox is disabled, False otherwise."""
     return selenium_utils.is_element_exist(
         self.element, (By.CSS_SELECTOR, 'input[type="checkbox"]:disabled'))
+
+  @property
+  def is_checkbox_checked(self):
+    """Returns True if checkbox is checked, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element,
+        (By.CSS_SELECTOR, 'input[type="checkbox"][checked="checked"]'))
 
 
 class CommentInput(object):
@@ -1072,8 +1089,21 @@ class MentionEmailDropdown(object):
 class Pagination(object):
   """Represents pagination element."""
 
+  PAGE_SIZES = [10, 25, 50]
+
   def __init__(self, container):
     self._root = container.element(tag_name='tree-pagination')
+
+  @property
+  def exists(self):
+    """Returns whether pagination element exists."""
+    return self._root.exists
+
+  @property
+  def first_page_btn(self):
+    """Returns element of first page button."""
+    return self._root.element(class_name='fa fa-angle-double-left').parent(
+        class_name='pagination-item')
 
   @property
   def next_page_btn(self):
@@ -1094,7 +1124,8 @@ class Pagination(object):
 
   @property
   def page_size_options(self):
-    """Returns possible page size options."""
+    """Returns possible page size options through opening page sizes popover.
+    """
     self._page_size_btn.click()
     page_size_options = [
         int(el.text) for el in self._page_size_popover.elements(

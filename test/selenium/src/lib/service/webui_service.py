@@ -170,7 +170,8 @@ class BaseWebUiService(base.WithBrowser):
   def get_list_objs_from_tree_view(self, src_obj):
     """Get and return list of objects from Tree View."""
     self.set_list_objs_scopes_representation_on_tree_view(src_obj)
-    list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
+    list_objs_scopes = (self.open_widget_of_mapped_objs(src_obj).
+                        tree_view_items_scopes)
     for index in xrange(len(list_objs_scopes)):
       self.add_review_status_if_not_in_control_scope(list_objs_scopes[index])
     return self._create_list_objs(entity_factory=self.entities_factory_cls,
@@ -313,14 +314,6 @@ class BaseWebUiService(base.WithBrowser):
     mapper = self.get_unified_mapper(src_obj)
     mapper.tree_view.open_set_visible_fields().select_and_set_visible_fields()
 
-  def get_list_objs_scopes_from_tree_view(self, src_obj):
-    """Open generic widget of mapped objects and get list of objects scopes as
-    dicts from header (keys) and items (values) that displayed on Tree View.
-    """
-    # pylint: disable=invalid-name
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    return objs_widget.tree_view.get_list_members_as_list_scopes()
-
   def export_objs_via_tree_view(self, path_to_export_dir, widget):
     """Exports objects from tree view on widget and saves csv with them to
     path_to_export_dir.
@@ -401,8 +394,7 @@ class BaseWebUiService(base.WithBrowser):
     """
     dest_objs_titles = [dest_obj.title for dest_obj in dest_objs]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    objs_tree_view_items = (
-        objs_widget.tree_view.get_list_members_as_list_scopes())
+    objs_tree_view_items = objs_widget.tree_view_items_scopes
     for obj in objs_tree_view_items:
       dropdown = objs_widget.tree_view.open_tree_actions_dropdown_by_title(
           title=obj['TITLE'])
@@ -424,8 +416,7 @@ class BaseWebUiService(base.WithBrowser):
     """
     # pylint: disable=invalid-name
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    first_tree_view_item = (
-        objs_widget.tree_view.get_list_members_as_list_scopes()[0])
+    first_tree_view_item = objs_widget.tree_view_items_scopes[0]
     dropdown = objs_widget.tree_view.open_tree_actions_dropdown_by_title(
         title=first_tree_view_item[element.Common.TITLE.upper()])
     return sorted(dropdown.select_map().get_available_to_map_obj_aliases())
