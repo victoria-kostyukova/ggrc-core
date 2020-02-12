@@ -240,6 +240,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
           "mandatory": False,
           "view_only": True,
           "ignore_on_update": True,
+          "description": "Allowed values are:\nyes\nno"
       },
       "issue_priority": {
           "display_name": "Priority",

@@ -13,6 +13,7 @@ from integration.ggrc import TestCase
 from integration.ggrc_workflows import generator as wf_generator
 from integration.ggrc_workflows.models import factories as wf_factories
 from integration.ggrc.models import factories
+from integration.ggrc.converters import constants
 
 from ggrc import db
 from ggrc.converters import errors
@@ -351,23 +352,9 @@ class TestWorkflowObjectsImport(TestCase):
     workflow = Workflow.query.filter(Workflow.title == title).first()
     self.assertEqual(flag, workflow.is_verification_needed)
 
-  @ddt.data(
-      ('FALSE', False),
-      ('False', False),
-      ('false', False),
-      ('TRUE', True),
-      ('True', True),
-      ('true', True),
-      ('yes', True),
-      ('YES', True),
-      ('Yes ', True),
-      ('yEs', True),
-      (' no ', False),
-      ('No ', False),
-      ('nO', False),
-      ('NO', False),
-  )
-  @ddt.unpack  # pylint: disable=invalid-name
+  @ddt.data(*constants.FLAG_VALIDATORS)
+  @ddt.unpack
+  # pylint: disable=invalid-name
   def test_update_verification_true_flag_positive(self, import_value,
                                                   expected_value):
     """Test update of verification flag before activation
@@ -398,23 +385,9 @@ class TestWorkflowObjectsImport(TestCase):
       workflow = Workflow.query.filter(Workflow.id == wf_id).first()
       self.assertEqual(workflow.is_verification_needed, expected_value)
 
-  @ddt.data(
-      ('FALSE', False),
-      ('False', False),
-      ('false', False),
-      ('TRUE', True),
-      ('True', True),
-      ('true', True),
-      ('yes', True),
-      ('YES', True),
-      ('Yes ', True),
-      ('yEs', True),
-      (' no ', False),
-      ('No ', False),
-      ('nO', False),
-      ('NO', False),
-  )
-  @ddt.unpack  # pylint: disable=invalid-name
+  @ddt.data(*constants.FLAG_VALIDATORS)
+  @ddt.unpack
+  # pylint: disable=invalid-name
   def test_update_verification_false_flag_positive(self, import_value,
                                                    expected_value):
     """Test update of verification flag before activation
