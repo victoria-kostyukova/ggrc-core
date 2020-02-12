@@ -170,3 +170,11 @@ class TechnologyEnvironmentInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
 
 class VendorInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Vendor info widget."""
+
+
+class RegulationInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Regulation info widget."""
+
+
+class StandardInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Standard info widget."""
