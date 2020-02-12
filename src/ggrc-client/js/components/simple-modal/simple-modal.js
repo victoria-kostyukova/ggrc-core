@@ -41,9 +41,23 @@ export default canComponent.extend({
     showHideModal(showModal) {
       const $modalWrapper = this.attr('modalWrapper');
       if (showModal) {
-        $modalWrapper.modal().on('hidden.bs.modal', this.hide.bind(this));
+        $modalWrapper
+        // current keyup handler should be hung before modal initialization,
+        // because the handler which close modal by pressing on escape hung during initialization,
+        // and the current handler that blocks modal closing
+        // should be in the queue of calling handlers before the modal closing handler
+          .on('keyup', this.disableEscape.bind(this))
+          .modal()
+          .on('hidden.bs.modal', this.hide.bind(this));
       } else {
         $modalWrapper.modal('hide').off('hidden.bs.modal');
+      }
+    },
+    disableEscape(event) {
+      if (event.code === 'Escape' && this.isDisabled) {
+        // should use "stopImmediatePropagation" because current handler
+        // should prevent calling other handlers hung on this element
+        event.stopImmediatePropagation();
       }
     },
   }),
