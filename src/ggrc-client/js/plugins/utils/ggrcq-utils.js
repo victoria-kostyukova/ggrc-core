@@ -249,7 +249,7 @@ function getMapUrl(instance, destinationModel, statuses) {
  * @return {String} Url to mapping view
  * */
 function getMappingUrl(instance, destinationModel) {
-  const statuses = 'in_progress,not_in_scope,reviewed';
+  const statuses = 'pending_review,not_in_scope,reviewed';
 
   return getMapUrl(instance, destinationModel, statuses);
 }
@@ -261,7 +261,7 @@ function getMappingUrl(instance, destinationModel) {
  * @return {String} Url to unmapping view
  */
 function getUnmappingUrl(instance, destinationModel) {
-  const statuses = 'in_progress,reviewed';
+  const statuses = 'pending_review,reviewed';
 
   return getMapUrl(instance, destinationModel, statuses);
 }
