@@ -18,6 +18,7 @@ export default canComponent.extend({
     isOpen: false,
     canOpen: false,
     isDisabled: false,
+    inputPlaceholder: '',
     define: {
       isEmpty: {
         type: 'boolean',

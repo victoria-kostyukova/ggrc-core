@@ -24,6 +24,7 @@
     value:bind="instance.issue_tracker.component_id"
     isDisabled:from="componentIdsLoading"
     options:from="componentIds"
+    inputPlaceholder:from="'Lookup Component IDs...'"
   />
   {{#validateAttr instance "issue_tracker.component_id"}}
     <label class="help-inline warning">{{this}}</label>

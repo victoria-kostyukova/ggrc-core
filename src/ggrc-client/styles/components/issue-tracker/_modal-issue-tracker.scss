@@ -20,6 +20,12 @@ modal-issue-tracker-config-fields {
 
     .autocomplete-dropdown {
       width: 250px;
+
+      .autocomplete-dropdown__input-container {
+        input {
+          background-color: #f8f8f8;
+        }
+      }
     }
   }
 

@@ -19,7 +19,7 @@
          on:el:click="onBodyClick(scope.event)">
       <input class="autocomplete-dropdown__input"
             type="text"
-            placeholder="Lookup attributes..."
+            placeholder="{{inputPlaceholder}}"
             on:el:input="filterOptions($element)"/>
         <ul class="autocomplete-dropdown__list">
           {{^if isEmpty}}
