@@ -755,3 +755,16 @@ def check_ca_creating(soft_assert, selenium, def_type, ca_type):
       obj_type=expected_ca.definition_type)
   base.Test.general_contain_soft_assert(soft_assert, expected_ca, actual_cas,
                                         "multi_choice_options")
+
+
+def soft_assert_pagination(
+    soft_assert, pagination, exp_page_size, exp_page_sizes
+):
+  """Soft asserts current page size and available page sizes are equal to
+  exp_page_size and exp_page_sizes respectively."""
+  soft_assert.expect(pagination.page_size == exp_page_size,
+                     'There should be {} items per page'.format(exp_page_size))
+  soft_assert.expect(
+      pagination.page_size_options == exp_page_sizes,
+      'Page size options are incorrect. \nActual: {}, \nExpected: {}'.format(
+          pagination.page_size_options, exp_page_sizes))
