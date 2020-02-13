@@ -273,6 +273,9 @@ def background_issues_update(task):
                                                                mail_data)
     update_errors = None
     if update_args.get("objects"):
+      if "notification_messages" in params:
+        update_args["notification_messages"] = params["notification_messages"]
+
       (_, update_errors) = bulk_updater.sync_issuetracker(update_args)
 
     create_args = integration_utils.build_created_objects_args(revision_ids,

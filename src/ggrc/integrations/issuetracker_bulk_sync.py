@@ -76,15 +76,27 @@ class IssueTrackerBulkCreator(object):
         request_data: {
             'objects': [object_type, object_id, hotlist_ids, component_id],
             'mail_data': {user_email: email, filename: filename}
+            'notification_messages': {
+                'success': {
+                    'title': '...',
+                    'body': '...',
+                },
+                'failure': {
+                    'title': '...',
+                    'body': '...',
+                },
+            },
         }
         objects list contains objects to by synchronized,
         mail_data contains information for email notification(file that was
           imported name and recipient email)
+        notification_messages contains text messages for
+        issue tracker tickets update notifications (optional). If not
+        supplied default ones will be used.
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
     objects_data = request_data.get("objects")
-
     filename = request_data.get("mail_data", {}).get("filename", '')
     recipient = request_data.get("mail_data", {}).get("user_email", '')
     recipient = recipient or getattr(login.get_current_user(), "email", "")
@@ -108,11 +120,25 @@ class IssueTrackerBulkCreator(object):
           len(errors),
       )
     except:  # pylint: disable=bare-except
-      self.send_notification(filename, recipient, failed=True)
+      self.send_notification(
+          filename,
+          recipient,
+          failed=True,
+          notification_messages=request_data.get(
+              "notification_messages",
+          )
+      )
       return (None, None)
     else:
       if created or errors:
-        self.send_notification(filename, recipient, errors=errors)
+        self.send_notification(
+            filename,
+            recipient,
+            errors=errors,
+            notification_messages=request_data.get(
+                "notification_messages",
+            )
+        )
     return (created, errors)
 
   @staticmethod
@@ -447,13 +473,17 @@ class IssueTrackerBulkCreator(object):
         [("Content-Type", "application/json")]
     ))
 
-  def send_notification(self, filename, recipient, errors=None, failed=False):
+  # pylint: disable=too-many-arguments
+  def send_notification(self, filename, recipient, errors=None, failed=False,
+                        notification_messages=None):
     """Send mail notification with information about errors."""
+
     data = {}
+
     if failed:
       data["title"] = self.ERROR_TITLE.format(filename=filename)
       data["email_text"] = self.EXCEPTION_TEXT
-      body = settings.EMAIL_BULK_SYNC_EXCEPTION.render(sync_data=data)
+      template = settings.EMAIL_BULK_SYNC_EXCEPTION
     elif errors:
       data["objects"] = [
           {
@@ -464,13 +494,27 @@ class IssueTrackerBulkCreator(object):
       ]
       data["title"] = self.ERROR_TITLE.format(filename=filename)
       data["email_text"] = self.ERROR_TEXT.format(filename=filename)
-      body = settings.EMAIL_BULK_SYNC_FAILED.render(sync_data=data)
+      template = settings.EMAIL_BULK_SYNC_FAILED
     else:
       data["title"] = self.SUCCESS_TITLE.format(filename=filename)
       data["email_text"] = self.SUCCESS_TEXT.format(filename=filename)
-      body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
+      template = settings.EMAIL_BULK_SYNC_SUCCEEDED
 
-    common.send_email(recipient, self.ISSUETRACKER_SYNC_TITLE, body)
+    if notification_messages is not None:
+      if failed or errors:
+        data["title"] = notification_messages["failure"]["title"]
+
+        if errors:
+          data["email_text"] = notification_messages["failure"]["body"]
+      else:
+        data["title"] = notification_messages["success"]["title"]
+        data["email_text"] = notification_messages["success"]["body"]
+
+    common.send_email(
+        recipient,
+        self.ISSUETRACKER_SYNC_TITLE,
+        template.render(sync_data=data),
+    )
 
 
 class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
