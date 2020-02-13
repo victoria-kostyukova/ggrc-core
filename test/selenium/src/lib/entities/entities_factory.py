@@ -369,7 +369,9 @@ class ProgramsFactory(EntitiesFactory):
     super(ProgramsFactory, self).__init__(objects.PROGRAMS)
     self._acl_roles = [
         ("managers", roles.ACLRolesIDs.PROGRAM_MANAGERS,
-         [users.current_user()])
+         [users.current_user()]),
+        ("editors", roles.ACLRolesIDs.PROGRAM_EDITORS, []),
+        ("primary_contacts", roles.ACLRolesIDs.PROGRAM_PRIMARY_CONTACTS, [])
     ]
 
   def obj_inst(self):

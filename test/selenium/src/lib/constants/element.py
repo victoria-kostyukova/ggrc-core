@@ -200,6 +200,8 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   AUDIT_CAPTAINS = "Audit Captains"
   AUDITORS = "Auditors"
   PROGRAM_MANAGERS = "Program Managers"
+  PROGRAM_EDITORS = "Program Editors"
+  PROGRAM_READERS = "Program Readers"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
   REVIEW_STATUS = "Review Status"

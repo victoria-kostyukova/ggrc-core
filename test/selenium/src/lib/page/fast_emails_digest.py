@@ -69,7 +69,8 @@ class ProposalDigestItem(BaseEmailItem):
         author=self.get_proposal_author(),
         obj_type=self.get_proposal_obj_type(),
         changes=self.get_changes(),
-        comment=self.get_comment()
+        comment=self.get_comment(),
+        obj_url=self.open_button.href
     )
 
   def get_proposal_author(self):
@@ -97,9 +98,14 @@ class ProposalDigestItem(BaseEmailItem):
             tag_name="p"))
     return None if comment_str == "" else comment_str
 
+  @property
+  def open_button(self):
+    """Returns "Open" button element."""
+    return self._root_element.link()
+
   def open_btn_click(self):
     """Click on the open button in email."""
-    self._root_element.link().click()
+    self.open_button.click()
 
 
 class ReviewNotificationItem(BaseEmailItem):

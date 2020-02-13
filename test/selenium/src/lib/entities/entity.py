@@ -87,7 +87,11 @@ class Representation(object):
         els.STATE: "status"
     }
     ui_remap_items = {
-        els.PROGRAM_MANAGERS: "managers", els.VERIFIED: "verified",
+        els.PROGRAM_MANAGERS: "managers", els.PROGRAM_EDITORS: "editors",
+        els.PRIMARY_CONTACTS: "primary_contacts",
+        els.PROGRAM_READERS: "readers",
+        els.SECONDARY_CONTACTS: "secondary_contacts",
+        els.VERIFIED: "verified",
         els.STATUS: "status", els.LAUNCH_STATUS: "status",
         els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains",
@@ -110,6 +114,7 @@ class Representation(object):
         "REVIEW_STATUS": "review_status",
         "REVIEW_STATUS_DISPLAY_NAME": "review_status_display_name",
         "PRIMARY_CONTACTS": "primary_contacts",
+        "EDITORS": "editors",
         "CONTROL_OPERATORS": "control_operators",
         "CONTROL_OWNERS": "control_owners",
         "URL": "url",
@@ -781,6 +786,18 @@ class ProgramEntity(Entity, mixin.Reviewable):
     obj.children, obj.parents = [], []
     return obj
 
+  def get_recipients_emails(self):
+    """Returns the emails of all users who are assigned to roles that should
+    receive notifications."""
+    recipients = []
+    if hasattr(self, "recipients"):
+      for role in self.recipients.split(","):
+        users_assigned_to_role = getattr(
+            self, Representation.remap_collection()[role.upper()])
+        if users_assigned_to_role:
+          recipients.extend(users_assigned_to_role)
+    return recipients
+
 
 class ProductEntity(Entity):
   """Class that represent model for Product entity."""
@@ -979,7 +996,8 @@ class ProposalEmailUI(Representation):
   def __init__(self, **attrs):
     super(ProposalEmailUI, self).__init__()
     self.set_attrs(
-        "recipient_email", "author", "obj_type", "changes", "comment", **attrs)
+        "recipient_email", "author", "obj_type", "changes", "comment",
+        "obj_url", **attrs)
 
 
 class ReviewEmailUI(Representation):
