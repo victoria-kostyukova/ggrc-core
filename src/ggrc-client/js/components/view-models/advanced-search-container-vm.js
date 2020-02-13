@@ -4,25 +4,30 @@
  */
 
 import canList from 'can-list';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
+
 /**
  * Advanced Search Container view model.
  * Contains logic used in container components.
  * @constructor
  */
-export default canMap.extend({
+
+export default canDefineMap.extend({
   /**
    * Contains Advanced Search Items.
    * @type {canList}
    */
-  items: canList(),
+  items: {
+    Type: canList,
+    Value: canList,
+  },
   /**
    * Removes Filter Operator and Advanced Search mapping item from the collection.
    * @param {canMap} item - Advanced Search mapping item.
    * @param {boolean} isGroup - Flag indicates that current component is group.
    */
-  removeItem: function (item, isGroup) {
-    let items = this.attr('items');
+  removeItem(item, isGroup) {
+    let items = this.items;
     let index = items.indexOf(item);
     // we have to remove operator in front of each item except the first
     if (index > 0) {
@@ -40,7 +45,7 @@ export default canMap.extend({
   /**
    * Dispatches event meaning that the component should be removed from parent container.
    */
-  remove: function () {
+  remove() {
     this.dispatch('remove');
   },
 });

@@ -6,6 +6,7 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
@@ -15,56 +16,57 @@ import template from './advanced-search-filter-attribute.stache';
  * Contains logic used in Filter Attribute component
  * @constructor
  */
-let viewModel = canMap.extend({
-  define: {
-    isUnary: {
-      get() {
-        let operator = this.attr('attribute.operator');
-        return operator === 'is';
-      },
-    },
-    /**
-     * Contains available attributes for specific model.
-     * Initializes component with first attribute in the list.
-     * @type {canList}
-     */
-    availableAttributes: {
-      type: '*',
-      Value: canList,
-      set: function (attributes) {
-        let attribute = this.attr('attribute');
-        if (attributes.length &&
-          attributes[0].attr_title &&
-          !attribute.attr('field')) {
-          attribute.attr('field', attributes[0].attr_title);
-        }
-        return attributes;
-      },
-    },
-    disabled: {
-      type: 'boolean',
-      value: false,
-    },
-    /**
-     * Indicates that action buttons should be displayed.
-     * @type {boolean}
-     */
-    showActions: {
-      type: 'boolean',
-      value: true,
+const ViewModel = canDefineMap.extend({
+  isUnary: {
+    get() {
+      let operator = this.attribute.attr('operator');
+      return operator === 'is';
     },
   },
   /**
-   * Contains criterion's fields: field, operator, value.
-   * @type {object}
+   * Contains available attributes for specific model.
+   * Initializes component with first attribute in the list.
+   * @type {canList}
    */
-  attribute: {},
+  availableAttributes: {
+    Type: canList,
+    Value: canList,
+    set(attributes) {
+      let attribute = this.attribute;
+      if (attributes.length &&
+        attributes[0].attr_title &&
+        !attribute.attr('field')) {
+        attribute.attr('field', attributes[0].attr_title);
+      }
+      return attributes;
+    },
+  },
+  disabled: {
+    type: 'boolean',
+    value: false,
+  },
+  /**
+   * Indicates that action buttons should be displayed.
+   * @type {boolean}
+   */
+  showActions: {
+    type: 'boolean',
+    value: true,
+  },
+  /**
+   * Contains criterion's fields: field, operator, value.
+   * @type {canMap}
+   */
+  attribute: {
+    Type: canMap,
+    Value: canMap,
+  },
   /**
    * Returns titles of available attributes for specific model.
    * @return {list}
    */
-  attributeTitles: function () {
-    return this.attr('availableAttributes').map((item) => {
+  attributeTitles() {
+    return this.availableAttributes.map((item) => {
       return {value: item.attr_title};
     });
   },
@@ -72,17 +74,20 @@ let viewModel = canMap.extend({
    * Indicates Filter Attribute can be transformed to Filter Group.
    * @type {boolean}
    */
-  extendable: false,
+  extendable: {
+    type: 'boolean',
+    value: false,
+  },
   /**
    * Dispatches event meaning that the component should be removed from parent container.
    */
-  remove: function () {
+  remove() {
     this.dispatch('remove');
   },
   /**
    * Dispatches event meaning that the component should be transformed to Filter Group.
    */
-  createGroup: function () {
+  createGroup() {
     this.dispatch('createGroup');
   },
   /**
@@ -92,8 +97,8 @@ let viewModel = canMap.extend({
    *
    * @param {jQuery} $element the DOM element that triggered event
    */
-  setValue: function ($element) {
-    this.attr('attribute.value', $element.val());
+  setValue($element) {
+    this.attribute.attr('value', $element.val());
   },
 });
 
@@ -106,11 +111,11 @@ export default canComponent.extend({
   tag: 'advanced-search-filter-attribute',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
   events: {
-    '{viewModel} availableAttributes': function (ev, desc, attributes) {
+    '{viewModel} availableAttributes'(ev, desc, attributes) {
       if (attributes[0] && attributes[0].attr_title) {
-        this.viewModel.attr('attribute.field', attributes[0].attr_title);
+        this.viewModel.attribute.attr('field', attributes[0].attr_title);
       }
     },
     '{viewModel.attribute} operator'([attribute], ev, newValue, oldValue) {

@@ -20,45 +20,43 @@ import template from './advanced-search-filter-container.stache';
  * Contains logic used in Filter Container component
  * @constructor
  */
-let viewModel = AdvancedSearchContainer.extend({
-  define: {
-    /**
-     * Contains Filter Attributes, Groups and Operators.
-     * Initializes Items with State Attribute by default.
-     * @type {canList}
-     */
-    items: {
-      type: '*',
-      Value: canList,
-      get: function (items) {
-        if (this.attr('defaultStatusFilter') && items && !items.length &&
-          StateUtils.hasFilter(this.attr('modelName'))) {
-          const stateItem = AdvancedSearch.setDefaultStatusConfig(
-            this.attr('modelName'),
-            this.attr('statesCollectionKey')
-          );
+const ViewModel = AdvancedSearchContainer.extend({
+  /**
+   * Contains Filter Attributes, Groups and Operators.
+   * Initializes Items with State Attribute by default.
+   * @type {canList}
+   */
+  items: {
+    Type: canList,
+    Value: canList,
+    get(items) {
+      if (this.defaultStatusFilter && items && !items.length &&
+        StateUtils.hasFilter(this.modelName)) {
+        const stateItem = AdvancedSearch.setDefaultStatusConfig(
+          this.modelName,
+          this.statesCollectionKey
+        );
 
-          items.push(AdvancedSearch.create.state(stateItem));
-        }
+        items.push(AdvancedSearch.create.state(stateItem));
+      }
 
-        return items;
-      },
+      return items;
     },
-    /**
-     * Indicates whether status filter should be added by default.
-     * @type {boolean}
-     */
-    defaultStatusFilter: {
-      type: 'boolean',
-      value: true,
-    },
-    /**
-     * Indicates whether 'Add' button should be displayed.
-     */
-    showAddButton: {
-      type: 'boolean',
-      value: true,
-    },
+  },
+  /**
+   * Indicates whether status filter should be added by default.
+   * @type {boolean}
+   */
+  defaultStatusFilter: {
+    type: 'boolean',
+    value: true,
+  },
+  /**
+   * Indicates whether 'Add' button should be displayed.
+   */
+  showAddButton: {
+    type: 'boolean',
+    value: true,
   },
   /**
    * Contains specific model name.
@@ -67,33 +65,42 @@ let viewModel = AdvancedSearchContainer.extend({
    * Requirement
    * Regulation
    */
-  modelName: null,
+  modelName: {
+    value: null,
+  },
   /**
    * Contains available attributes for specific model.
    * @type {canList}
    */
-  availableAttributes: canList(),
+  availableAttributes: {
+    Type: canList,
+    Value: canList,
+  },
   /**
    * Contains key of collection which will be used to get list of available
    * statuses for certain model.
    * @type {Symbol|null}
    */
-  statesCollectionKey: null,
+  statesCollectionKey: {
+    value: null,
+  },
   /**
    * Contains list of options for "operator" control. May used, for example,
    * to disable changing of operator (using {disable: true} option).
    * @type {object|null}
    */
-  filterOperatorOptions: null,
+  filterOperatorOptions: {
+    value: null,
+  },
   /**
    * Adds Filter Operator and Filter Attribute to the collection.
    */
-  addFilterCriterion: function () {
-    let items = this.attr('items');
+  addFilterCriterion() {
+    let items = this.items;
     if (items.length) {
       items.push(AdvancedSearch.create.operator(
         'AND',
-        this.attr('filterOperatorOptions'))
+        this.filterOperatorOptions)
       );
     }
     items.push(AdvancedSearch.create.attribute());
@@ -102,8 +109,8 @@ let viewModel = AdvancedSearchContainer.extend({
    * Transforms Filter Attribute to Filter Group.
    * @param {canMap} attribute - Filter Attribute.
    */
-  createGroup: function (attribute) {
-    let items = this.attr('items');
+  createGroup(attribute) {
+    let items = this.items;
     let index = items.indexOf(attribute);
     items.attr(index, AdvancedSearch.create.group([
       attribute,
@@ -123,5 +130,5 @@ export default canComponent.extend({
   tag: 'advanced-search-filter-container',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });

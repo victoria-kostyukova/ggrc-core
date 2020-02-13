@@ -9,22 +9,43 @@ import '../../../components/advanced-search/advanced-search-mapping-container';
 
 import canComponent from 'can-component';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
+import canList from 'can-list';
 import template from './advanced-search-container.stache';
 
-const viewModel = canMap.extend({
-  filterItems: [],
-  defaultFilterItems: [],
-  availableAttributes: [],
-  statesCollectionKey: [],
-  mappingItems: [],
-  modelName: null,
-  mappedToItems: [],
-  filterOperatorOptions: null,
-  disabled: false,
+const ViewModel = canDefineMap.extend({
+  filterItems: {
+    Type: canList,
+    value: () => [],
+  },
+  defaultFilterItems: {
+    value: () => [],
+  },
+  availableAttributes: {
+    value: () => [],
+  },
+  statesCollectionKey: {
+    value: () => [],
+  },
+  mappingItems: {
+    Type: canList,
+    value: () => [],
+  },
+  modelName: {
+    value: null,
+  },
+  mappedToItems: {
+    value: () => [],
+  },
+  filterOperatorOptions: {
+    value: null,
+  },
+  disabled: {
+    value: false,
+  },
   resetFilters() {
-    this.attr('filterItems', this.attr('defaultFilterItems').serialize());
-    this.attr('mappingItems', []);
+    this.filterItems = this.defaultFilterItems.serialize();
+    this.mappingItems = [];
   },
   onSubmit() {
     this.dispatch('onSubmit');
@@ -34,5 +55,5 @@ const viewModel = canMap.extend({
 export default canComponent.extend({
   tag: 'advanced-search-container',
   view: canStache(template),
-  viewModel,
+  ViewModel,
 });

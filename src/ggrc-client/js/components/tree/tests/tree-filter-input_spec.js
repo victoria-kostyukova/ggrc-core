@@ -54,14 +54,14 @@ describe('tree-filter-input component', () => {
     it('sets "filter" field to the string from url\'s "query" param', () => {
       router.attr('query', 'some string');
       viewModel.setupFilterFromUrl();
-      expect(viewModel.attr('filter')).toBe(router.attr('query'));
+      expect(viewModel.filter).toBe(router.attr('query'));
     });
 
     it('sets "filter" field to an empty string if url does not have ' +
     '"query" param', () => {
       router.removeAttr('query');
       viewModel.setupFilterFromUrl();
-      expect(viewModel.attr('filter')).toBe('');
+      expect(viewModel.filter).toBe('');
     });
   });
 });

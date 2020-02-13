@@ -6,6 +6,7 @@
 import loMap from 'lodash/map';
 import canStache from 'can-stache';
 import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -17,66 +18,64 @@ import {isScopeModel} from '../../plugins/utils/models-utils';
  * Contains logic used in Filter State component
  * @constructor
  */
-let viewModel = canMap.extend({
-  define: {
-    label: {
-      get() {
-        return isScopeModel(this.attr('modelName')) ?
-          'Launch Status' : 'State';
-      },
+const ViewModel = canDefineMap.extend({
+  label: {
+    get() {
+      return isScopeModel(this.modelName) ? 'Launch Status' : 'State';
     },
-    /**
-     * Contains available states for specific model.
-     * @type {string}
-     * @example
-     * Active
-     * Draft
-     */
-    filterStates: {
-      get() {
-        let items = this.attr('stateModel.items') || [];
+  },
+  /**
+   * Contains available states for specific model.
+   * @type {string}
+   * @example
+   * Active
+   * Draft
+   */
+  filterStates: {
+    get() {
+      let items = this.stateModel.attr('items') || [];
 
-        let allStates = StateUtils.getStatesForModel(
-          this.attr('modelName'),
-          this.attr('statesCollectionKey')
-        );
+      let allStates = StateUtils.getStatesForModel(
+        this.modelName,
+        this.statesCollectionKey
+      );
 
-        let filterStates = allStates.map((filterState) => {
-          return {
-            value: filterState,
-            checked: (items.indexOf(filterState) > -1),
-          };
-        });
+      let filterStates = allStates.map((filterState) => {
+        return {
+          value: filterState,
+          checked: (items.indexOf(filterState) > -1),
+        };
+      });
 
-        return filterStates;
-      },
+      return filterStates;
     },
-    /**
-     * Indicates whether status tooltip should be displayed
-     * @type {boolean}
-     */
-    statusTooltipVisible: {
-      type: 'boolean',
-      value: false,
-      get: function () {
-        return StateUtils.hasFilterTooltip(this.attr('modelName'));
-      },
+  },
+  /**
+   * Indicates whether status tooltip should be displayed
+   * @type {boolean}
+   */
+  statusTooltipVisible: {
+    get() {
+      return StateUtils.hasFilterTooltip(this.modelName);
     },
-    /**
-     * Indicates whether operator should be displayed.
-     * @type {boolean}
-     */
-    showOperator: {
-      type: 'boolean',
-      value: true,
-    },
+  },
+  /**
+   * Indicates whether operator should be displayed.
+   * @type {boolean}
+   */
+  showOperator: {
+    type: 'boolean',
+    value: true,
   },
   /**
    * Contains criterion's fields: operator, modelName, items.
    * Initializes filterStates.
    * @type {canMap}
   */
-  stateModel: null,
+  stateModel: {
+    Type: canMap,
+    Value: canMap,
+  },
   /**
    * Contains specific model name.
    * @type {string}
@@ -84,18 +83,22 @@ let viewModel = canMap.extend({
    * Requirement
    * Regulation
    */
-  modelName: null,
+  modelName: {
+    value: null,
+  },
   /**
    * Contains key of collection which will be used to get list of available
    * statuses for certain model.
    * @type {Symbol|null}
    */
-  statesCollectionKey: null,
+  statesCollectionKey: {
+    value: null,
+  },
   /**
    * Saves selected states.
    * @param {Array} selectedStates - selected states.
    */
-  saveTreeStates: function (selectedStates) {
+  saveTreeStates(selectedStates) {
     let states;
 
     // in this case we save previous states
@@ -105,7 +108,7 @@ let viewModel = canMap.extend({
 
     states = loMap(selectedStates, 'value');
 
-    this.attr('stateModel.items', states);
+    this.stateModel.attr('items', states);
   },
   /**
    * handler is passed to child component, which is dispatched when items changed
@@ -123,5 +126,5 @@ export default canComponent.extend({
   tag: 'advanced-search-filter-state',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });

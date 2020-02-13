@@ -20,7 +20,7 @@ describe('saved-search-list component', () => {
 
   beforeAll(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('searchType', 'AdvancedSearch');
+    viewModel.searchType = 'AdvancedSearch';
   });
 
   describe('selectSearch() method', () => {
@@ -49,7 +49,7 @@ describe('saved-search-list component', () => {
           ...parsedFilterJson,
           id: 5,
         },
-        searchType: viewModel.attr('searchType'),
+        searchType: viewModel.searchType,
       });
     });
 
@@ -66,7 +66,7 @@ describe('saved-search-list component', () => {
           modelName: controlInstance.constructor.model_singular,
           modelDisplayName: controlInstance.constructor.title_plural,
         },
-        searchType: viewModel.attr('searchType'),
+        searchType: viewModel.searchType,
       });
     });
 
@@ -74,7 +74,7 @@ describe('saved-search-list component', () => {
       const expectedId = 5;
       method({id: expectedId});
 
-      expect(viewModel.attr('selectedSearchId')).toBe(expectedId);
+      expect(viewModel.selectedSearchId).toBe(expectedId);
     });
   });
 
@@ -90,15 +90,15 @@ describe('saved-search-list component', () => {
       const expectedSearches = [{id: 123}, {id: 5}];
       const responseData = {total: 2, values: expectedSearches};
 
-      viewModel.attr('searches', []);
+      viewModel.searches = [];
 
       spyOn(SavedSearch, 'findBy').and.returnValue(dfd);
       method();
 
       dfd.resolve(responseData).then(() => {
-        expect(viewModel.attr('searches').serialize())
+        expect(viewModel.searches.serialize())
           .toEqual(expectedSearches);
-        expect(viewModel.attr('searchesPaging.total')).toBe(2);
+        expect(viewModel.searchesPaging.attr('total')).toBe(2);
         done();
       });
     });
@@ -108,12 +108,12 @@ describe('saved-search-list component', () => {
       const dfd = $.Deferred();
       spyOn(SavedSearch, 'findBy').and.returnValue(dfd);
 
-      expect(viewModel.attr('isLoading')).toBeFalsy();
+      expect(viewModel.isLoading).toBeFalsy();
       method();
-      expect(viewModel.attr('isLoading')).toBeTruthy();
+      expect(viewModel.isLoading).toBeTruthy();
 
       dfd.resolve({total: 0, values: []}).then(() => {
-        expect(viewModel.attr('isLoading')).toBeFalsy();
+        expect(viewModel.isLoading).toBeFalsy();
         done();
       });
     });
@@ -121,16 +121,16 @@ describe('saved-search-list component', () => {
     it('should NOT send objectType for global search', () => {
       const dfd = $.Deferred();
 
-      viewModel.attr('searchType', 'GlobalSearch');
-      viewModel.attr('searchesPaging', {current: 10});
-      viewModel.attr('objectType', 'Control');
+      viewModel.searchType = 'GlobalSearch';
+      viewModel.searchesPaging = {current: 10};
+      viewModel.objectType = 'Control';
 
       spyOn(SavedSearch, 'findBy').and.returnValue(dfd);
 
       method();
       expect(SavedSearch.findBy).toHaveBeenCalledWith(
         'GlobalSearch',
-        viewModel.attr('searchesPaging'),
+        viewModel.searchesPaging,
         null
       );
     });
@@ -139,16 +139,16 @@ describe('saved-search-list component', () => {
       const dfd = $.Deferred();
       const expectedObjectType = 'Control';
 
-      viewModel.attr('searchType', 'AdvancedSearch');
-      viewModel.attr('searchesPaging', {current: 10});
-      viewModel.attr('objectType', expectedObjectType);
+      viewModel.searchType = 'AdvancedSearch';
+      viewModel.searchesPaging = {current: 10};
+      viewModel.objectType = expectedObjectType;
 
       spyOn(SavedSearch, 'findBy').and.returnValue(dfd);
 
       method();
       expect(SavedSearch.findBy).toHaveBeenCalledWith(
         'AdvancedSearch',
-        viewModel.attr('searchesPaging'),
+        viewModel.searchesPaging,
         expectedObjectType,
       );
     });
@@ -179,12 +179,12 @@ describe('saved-search-list component', () => {
       const expectedCurrentPage = 5;
       const searchInstance = makeFakeInstance({model: SavedSearch})({});
 
-      viewModel.attr('searchesPaging', {current: currentPage});
+      viewModel.searchesPaging = {current: currentPage};
       // Only one search on the page
-      viewModel.attr('searches', [{id: 11}]);
+      viewModel.searches = [{id: 11}];
 
       method(searchInstance, {stopPropagation: () => {}}).done(() => {
-        expect(viewModel.attr('searchesPaging.current'))
+        expect(viewModel.searchesPaging.attr('current'))
           .toBe(expectedCurrentPage);
         expect(viewModel.loadSavedSearches).not.toHaveBeenCalled();
         done();
@@ -195,12 +195,12 @@ describe('saved-search-list component', () => {
       const currentPage = 6;
       const searchInstance = makeFakeInstance({model: SavedSearch})({});
 
-      viewModel.attr('searchesPaging', {current: currentPage});
+      viewModel.searchesPaging = {current: currentPage};
       // 2 searches on the page
-      viewModel.attr('searches', [{id: 11}, {id: 22}]);
+      viewModel.searches = [{id: 11}, {id: 22}];
 
       method(searchInstance, {stopPropagation: () => {}}).done(() => {
-        expect(viewModel.attr('searchesPaging.current')).toBe(currentPage);
+        expect(viewModel.searchesPaging.attr('current')).toBe(currentPage);
         expect(viewModel.loadSavedSearches).toHaveBeenCalled();
         done();
       });

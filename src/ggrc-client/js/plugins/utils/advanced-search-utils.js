@@ -243,23 +243,12 @@ export const setDefaultStatusConfig = (
   };
 };
 
-const getSerializedAttribute = (model, parentAttrName, attrName) => {
-  const attribute = parentAttrName ? `${parentAttrName}.${attrName}` : attrName;
-  return model.attr(attribute)
-    && model.attr(attribute).serialize();
-};
-
-export const getFilters = (model, parentAttrName) => {
-  const filterItems =
-  getSerializedAttribute(model, parentAttrName, 'filterItems');
-  const mappingItems =
-  getSerializedAttribute(model, parentAttrName, 'mappingItems');
-  const statusItem =
-  getSerializedAttribute(model, parentAttrName, 'statusItem');
-  const parentInstance =
-   getSerializedAttribute(model, parentAttrName, 'parentInstance');
-  let parentItems =
-  getSerializedAttribute(model, parentAttrName, 'parentItems');
+export const getFilters = (filtersInstance) => {
+  const filterItems = filtersInstance.filterItems;
+  const mappingItems = filtersInstance.mappingItems;
+  const statusItem = filtersInstance.statusItem;
+  const parentInstance = filtersInstance.parentInstance;
+  let parentItems = filtersInstance.parentItems;
 
   /*
   "parentInstance" - current parent instance (when sitting on some object page).

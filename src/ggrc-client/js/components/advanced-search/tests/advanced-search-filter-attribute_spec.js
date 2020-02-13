@@ -6,9 +6,7 @@
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../advanced-search-filter-attribute';
 
-describe('advanced-search-filter-attribute component', function () {
-  'use strict';
-
+describe('advanced-search-filter-attribute component', () => {
   let viewModel;
   let events;
 
@@ -17,29 +15,29 @@ describe('advanced-search-filter-attribute component', function () {
     events = Component.prototype.events;
   });
 
-  describe('availableAttributes set() method', function () {
+  describe('availableAttributes set() method', () => {
     it('initializes "attribute.field" property with first available attribute',
-      function () {
-        viewModel.attr('availableAttributes', [{
+      () => {
+        viewModel.availableAttributes = [{
           attr_title: 'FirstAttr',
-        }]);
+        }];
 
-        expect(viewModel.attr('attribute.field')).toBe('FirstAttr');
+        expect(viewModel.attribute.attr('field')).toBe('FirstAttr');
       });
 
     it('does not intialize "attribute.field" when it is already initialized',
-      function () {
-        viewModel.attr('attribute.field', 'Field');
-        viewModel.attr('availableAttributes', [{
+      () => {
+        viewModel.attribute.attr('field', 'Field');
+        viewModel.availableAttributes = [{
           attr_title: 'FirstAttr',
-        }]);
+        }];
 
-        expect(viewModel.attr('attribute').field).toBe('Field');
+        expect(viewModel.attribute.attr('field')).toBe('Field');
       });
   });
 
-  describe('remove() method', function () {
-    it('dispatches "remove" event', function () {
+  describe('remove() method', () => {
+    it('dispatches "remove" event', () => {
       spyOn(viewModel, 'dispatch');
 
       viewModel.remove();
@@ -48,8 +46,8 @@ describe('advanced-search-filter-attribute component', function () {
     });
   });
 
-  describe('createGroup() method', function () {
-    it('dispatches "createGroup" event', function () {
+  describe('createGroup() method', () => {
+    it('dispatches "createGroup" event', () => {
       spyOn(viewModel, 'dispatch');
 
       viewModel.createGroup();
@@ -58,68 +56,66 @@ describe('advanced-search-filter-attribute component', function () {
     });
   });
 
-  describe('setValue() method', function () {
-    it('updates "attribute value" from $element value', function () {
-      let $element;
+  describe('setValue() method', () => {
+    it('updates "attribute value" from $element value', () => {
+      viewModel.attribute.attr('value', 'old value');
 
-      viewModel.attr('attribute').value = 'old value';
-
-      $element = $('<input type="text"/>');
+      let $element = $('<input type="text"/>');
       $element.val('new value');
       viewModel.setValue($element);
 
-      expect(viewModel.attr('attribute').value).toBe('new value');
+      expect(viewModel.attribute.attr('value')).toBe('new value');
     });
   });
 
-  describe('isUnary get() method', function () {
-    it('returns false if attribute.operator value is not "is"', function () {
-      viewModel.attr('attribute.operator', '!=');
+  describe('isUnary get() method', () => {
+    it('returns false if attribute.operator value is not "is"', () => {
+      viewModel.attribute.attr('operator', '!=');
 
-      let result = viewModel.attr('isUnary');
+      let result = viewModel.isUnary;
 
       expect(result).toBe(false);
     });
 
-    it('returns true if attribute.operator value is "is"', function () {
-      viewModel.attr('attribute.operator', 'is');
+    it('returns true if attribute.operator value is "is"', () => {
+      viewModel.attribute.attr('operator', 'is');
 
-      let result = viewModel.attr('isUnary');
+      let result = viewModel.isUnary;
 
       expect(result).toBe(true);
     });
   });
 
-  describe('"{viewModel.attribute} operator" handler', function () {
+  describe('"{viewModel.attribute} operator" handler', () => {
     let that;
     let handler;
-    beforeEach(function () {
+    beforeEach(() => {
       that = {
-        viewModel: viewModel,
+        viewModel,
       };
       handler = events['{viewModel.attribute} operator'];
     });
 
     it(`sets attribute.value to "empty" if new attribute.operator
     value is "is"`,
-    function () {
-      viewModel.attr('attribute.value', 'value');
+    () => {
+      viewModel.attribute.attr('value', 'value');
 
       handler.call(that, [viewModel.attribute], {}, 'is');
 
-      let result = viewModel.attr('attribute.value');
-      expect(result).toEqual('empty');
+      let result = viewModel.attribute.attr('value');
+      expect(result).toBe('empty');
     });
 
     it(`sets attribute.value to empty string if previous attribute.operator
     value was "is"`,
-    function () {
-      viewModel.attr('attribute.value', 'value');
+    () => {
+      viewModel.attribute.attr('value', 'value');
 
       handler.call(that, [viewModel.attribute], {}, 'val', 'is');
 
-      let result = viewModel.attr('attribute.value');
-      expect(result).toEqual('');
+      let result = viewModel.attribute.attr('value');
+      expect(result).toBe('');
     });
   });
 });

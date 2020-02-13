@@ -15,17 +15,20 @@ import template from './advanced-search-filter-group.stache';
  * Contains logic used in Filter Group component
  * @constructor
  */
-let viewModel = AdvancedSearchContainer.extend({
+const ViewModel = AdvancedSearchContainer.extend({
   /**
    * Contains available attributes for specific model.
    * @type {canList}
    */
-  availableAttributes: canList(),
+  availableAttributes: {
+    Type: canList,
+    Value: canList,
+  },
   /**
    * Adds Filter Operator and Filter Attribute to the collection.
    */
-  addFilterCriterion: function () {
-    let items = this.attr('items');
+  addFilterCriterion() {
+    let items = this.items;
     items.push(AdvancedSearch.create.operator('AND'));
     items.push(AdvancedSearch.create.attribute());
   },
@@ -38,5 +41,5 @@ export default canComponent.extend({
   tag: 'advanced-search-filter-group',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });

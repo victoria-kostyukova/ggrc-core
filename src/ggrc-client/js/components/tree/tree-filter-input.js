@@ -4,39 +4,43 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/tree-filter-input.stache';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc-filter-query-parser';
 
-let viewModel = canMap.extend({
-  define: {
-    filter: {
-      type: 'string',
-      set: function (newValue = '') {
-        this.onFilterChange(newValue);
-        return newValue;
-      },
-    },
-    isExpression: {
-      type: 'boolean',
-      value: false,
+const ViewModel = canDefineMap.extend({
+  filter: {
+    type: 'string',
+    set(newValue = '') {
+      this.onFilterChange(newValue);
+      return newValue;
     },
   },
-  isFiltered: false,
-  showAdvanced: false,
-  showEmailImport: false,
-  onFilter: function () {
+  isExpression: {
+    type: 'boolean',
+    value: false,
+  },
+  isFiltered: {
+    value: false,
+  },
+  showAdvanced: {
+    value: false,
+  },
+  showEmailImport: {
+    value: false,
+  },
+  onFilter() {
     this.dispatch('submitFilter');
   },
-  onFilterChange: function (newValue) {
+  onFilterChange(newValue) {
     let filter = QueryParser.parse(newValue);
     let isExpression =
       !!filter && !!filter.expression.op &&
       filter.expression.op.name !== 'text_search' &&
       filter.expression.op.name !== 'exclude_text_search';
-    this.attr('isExpression', isExpression);
+    this.isExpression = isExpression;
 
     this.dispatch({
       type: 'searchQueryChanged',
@@ -45,12 +49,12 @@ let viewModel = canMap.extend({
     });
   },
   setupFilterFromUrl() {
-    this.attr('filter', router.attr('query'));
+    this.filter = router.attr('query');
   },
-  openAdvancedFilter: function () {
+  openAdvancedFilter() {
     this.dispatch('openAdvanced');
   },
-  removeAdvancedFilters: function () {
+  removeAdvancedFilters() {
     this.dispatch('removeAdvanced');
   },
 });
@@ -59,7 +63,7 @@ export default canComponent.extend({
   tag: 'tree-filter-input',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events: {
     inserted() {
       this.viewModel.setupFilterFromUrl();
@@ -68,7 +72,7 @@ export default canComponent.extend({
         filterName: 'tree-filter-input',
       });
     },
-    'input keyup': function (el, ev) {
+    'input keyup'(el, ev) {
       this.viewModel.onFilterChange(el.val());
 
       if (ev.keyCode === 13) {
@@ -76,8 +80,8 @@ export default canComponent.extend({
       }
       ev.stopPropagation();
     },
-    '{viewModel} isFiltered': function () {
-      this.viewModel.attr('filter', '');
+    '{viewModel} isFiltered'() {
+      this.viewModel.filter = '';
     },
   },
 });

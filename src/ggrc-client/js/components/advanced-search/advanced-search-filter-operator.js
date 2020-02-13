@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './advanced-search-filter-operator.stache';
 
@@ -13,12 +13,10 @@ import template from './advanced-search-filter-operator.stache';
  * Contains logic used in Filter Operator component
  * @constructor
  */
-let viewModel = canMap.extend({
-  define: {
-    disabled: {
-      type: 'boolean',
-      value: false,
-    },
+const ViewModel = canDefineMap.extend({
+  disabled: {
+    type: 'boolean',
+    value: false,
   },
   /**
    * Contains operation name.
@@ -27,7 +25,9 @@ let viewModel = canMap.extend({
    * AND
    * OR
    */
-  operator: '',
+  operator: {
+    value: '',
+  },
 });
 
 /**
@@ -37,5 +37,5 @@ export default canComponent.extend({
   tag: 'advanced-search-filter-operator',
   view: canStache(template),
   leakScope: true,
-  viewModel: viewModel,
+  ViewModel,
 });
