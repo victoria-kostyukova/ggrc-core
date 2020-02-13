@@ -24,10 +24,10 @@ class Vendor(Roleable,
              PublicDocumentable,
              ScopedCommentable,
              mixins.TestPlanned,
+             mixins.CycleTaskable,
              mixins.base.ContextRBAC,
              mixins.ScopeObject,
              mixins.Folderable,
-             mixins.WithWorkflowState,
              Indexed,
              db.Model):
   """Class for Vendor model"""

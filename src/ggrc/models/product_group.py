@@ -23,10 +23,10 @@ class ProductGroup(mixins.CustomAttributable,
                    ScopedCommentable,
                    mixins.TestPlanned,
                    mixins.LastDeprecatedTimeboxed,
+                   mixins.CycleTaskable,
                    mixins.base.ContextRBAC,
                    mixins.ScopeObject,
                    mixins.Folderable,
-                   mixins.WithWorkflowState,
                    db.Model,
                    Indexed):
   """Representation for ProductGroup model."""
