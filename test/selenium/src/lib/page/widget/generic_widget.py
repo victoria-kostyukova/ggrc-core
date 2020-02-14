@@ -160,6 +160,10 @@ class Widget(base.Widget):
     self.filter.advanced_filter_btn.click()
     return search_modal.AdvancedSearch()
 
+  def copy_permalink(self):
+    """Copies a permalink."""
+    self.three_bbs.select_option_by_text("Get permalink")
+
 
 class TreeView(base.TreeView):
   """Genetic Tree Views."""

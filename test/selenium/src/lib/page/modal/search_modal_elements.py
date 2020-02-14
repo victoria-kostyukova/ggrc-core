@@ -81,6 +81,7 @@ class AdvancedSearchFilterArea(SearchFilterArea):
   def __init__(self, container):
     super(AdvancedSearchFilterArea, self).__init__(container)
     self._add_attribute_btn = self._root.button(text="Add Attribute")
+    self._apply_btn = self._root.button(text="Apply")
 
   def set_search_attributes(self, obj=None, filter_value=None,
                             search_attr=element.Common.TITLE,
@@ -91,6 +92,19 @@ class AdvancedSearchFilterArea(SearchFilterArea):
     self._add_attribute_btn.click()
     self._select_search_criteria(search_attr, filter_operator)
     self.set_filter_value(filter_value)
+
+  def search_obj(self, obj, filter_value=None,
+                 search_attr=element.Common.TITLE,
+                 filter_operator=value_aliases.EQUAL_OP):
+    """Searches for object by title. Optionally search by any other
+    specified attribute."""
+    self.set_search_attributes(obj, filter_value, search_attr,
+                               filter_operator)
+    self.click_apply()
+
+  def click_apply(self):
+    """Clicks `Apply` button."""
+    self._apply_btn.click()
 
 
 class SearchResultsArea(object):

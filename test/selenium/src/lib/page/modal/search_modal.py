@@ -77,3 +77,7 @@ class AdvancedSearch(BaseSearch):
   def search_filter_area(self):
     """Returns a search filter area."""
     return search_modal_elements.AdvancedSearchFilterArea(self._root)
+
+  def copy_permalink(self):
+    """Copies a permalink."""
+    self.saved_searches_area.saved_searches[0].permalink.click()

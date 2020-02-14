@@ -2,9 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Search tests."""
 # pylint: disable=no-self-use, invalid-name, unused-argument
-from lib import base, users
+
+from lib import base, users, factory
+from lib.constants import objects
 from lib.entities import entities_factory
-from lib.service import webui_facade, webui_service
+from lib.service import webui_facade
 
 
 class TestGlobalSearch(base.Test):
@@ -44,12 +46,27 @@ class TestAdvancedSearch(base.Test):
                                      control_mapped_to_program):
     """Check saved searches are sorted by descending, saved search can be
     removed, permalink appears near the search and works."""
-    search_modal = webui_service.ControlsService(
-        selenium).open_widget_of_mapped_objs(program).open_advanced_search()
+    search_modal = factory.get_cls_webui_service(objects.get_plural(
+        control_mapped_to_program.type))().open_widget_of_mapped_objs(
+        program).open_advanced_search()
     controls_mapped_to_program.append(control_mapped_to_program)
     webui_facade.check_order_and_removing_of_searches(
         soft_assert, controls_mapped_to_program, search_modal)
-    webui_facade.check_permalink_of_advanced_search_works(
-        soft_assert, selenium, search_modal, [controls_mapped_to_program[1]],
+    webui_facade.check_advanced_search_permalink_works(
+        soft_assert, search_modal, selenium, program,
+        controls_mapped_to_program[1])
+    soft_assert.assert_expectations()
+
+  def test_link_of_search_in_three_dots_menu(self, selenium, program,
+                                             controls_mapped_to_program,
+                                             soft_assert):
+    """Check that a permalink of created and applied search exists
+    in three dots menu and works correctly."""
+    obj_to_search = controls_mapped_to_program[0]
+    page = factory.get_cls_webui_service(objects.get_plural(
+        obj_to_search.type))().open_widget_of_mapped_objs(
         program)
+    webui_facade.create_save_and_apply_advanced_search(page, obj_to_search)
+    webui_facade.check_advanced_search_permalink_works(
+        soft_assert, page, selenium, program, obj_to_search)
     soft_assert.assert_expectations()

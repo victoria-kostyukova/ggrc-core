@@ -712,18 +712,28 @@ def soft_assert_permalink_of_search_works(soft_assert, selenium, permalink,
                            expected.title, actual.title))
 
 
-def check_permalink_of_advanced_search_works(soft_assert, selenium,
-                                             search_modal, filtered_objs,
-                                             src_obj):
-  """Clicks a permalink button near the saved search title. Pastes to
-  input_to_paste_link and value of the input is used like url to open. Verifies
-  if there are only expected items in a tree view on an opened page."""
-  search_modal.saved_searches_area.saved_searches[0].permalink.click()
-  input_to_paste_link = search_modal.search_filter_area.filter_value
+def create_save_and_apply_advanced_search(page, object_to_search):
+  """Creates, saves and applies advanced search on mapped object page."""
+  search_modal = page.open_advanced_search()
+  search_modal.create_and_save_search(object_to_search)
+  search_modal.search_filter_area.click_apply()
+
+
+def check_advanced_search_permalink_works(soft_assert, page_obj, selenium,
+                                          src_obj, object_to_search):
+  """Checks if a copied permalink of search works.
+
+  Copies a permalink. As it is impossible to open url directly from buffer,
+  a copied link is pasted to input_to_paste_link and value of the input is
+  used like url to open. Verifies if there are only expected items in tree
+  view on an opened page."""
+  page_obj.copy_permalink()
+  input_to_paste_link = (open_dashboard(selenium).header.open_global_search().
+                         search_filter_area.filter_value)
   selenium_utils.paste_from_clipboard(input_to_paste_link)
   soft_assert_permalink_of_search_works(soft_assert, selenium,
                                         input_to_paste_link.value,
-                                        filtered_objs, src_obj)
+                                        [object_to_search], src_obj)
 
 
 def start_and_cancel_bulk_verifying(page):
