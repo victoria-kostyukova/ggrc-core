@@ -141,7 +141,7 @@ class TestBulkVerify(base.Test):
     return asmts_not_for_bulk_verify_filter
 
   @pytest.fixture()
-  def asmts_to_include_by_bulk_verify_filter(
+  def asmt_to_include_by_bulk_verify_filter(
       self, control_mapped_to_program, audit, audit_w_auditor, second_creator
   ):
     """Creates assessment with 'In Review' state, map a comment, evidence url
@@ -223,10 +223,12 @@ class TestBulkVerify(base.Test):
   def test_bulk_verify_modal_filter(
       self, second_creator, login_as_creator, control_mapped_to_program,
       audit, asmts_to_exclude_by_bulk_verify_filter,
-      asmts_to_include_by_bulk_verify_filter, login_as_second_creator, page,
+      asmt_to_include_by_bulk_verify_filter, login_as_second_creator, page,
       soft_assert, selenium
   ):
-    """Check filter section of 'Bulk Verify' modal.
+    """Checks filter section of 'Bulk Verify' modal and assessment tree view
+    items on the modal.
+
     Precondition:
     - Audit 1 with mapped assessments in all statuses, 'In review' assessment
     has control snapshot, comment and evidence url.
@@ -235,7 +237,9 @@ class TestBulkVerify(base.Test):
     modal = page.open_bulk_verify_modal()
     webui_facade.soft_assert_bulk_verify_filter_ui_elements(modal, soft_assert)
     webui_facade.soft_assert_bulk_verify_filter_functionality(
-        page, modal, asmts_to_include_by_bulk_verify_filter, soft_assert)
+        page, modal, asmt_to_include_by_bulk_verify_filter, soft_assert)
+    webui_facade.soft_assert_asmt_tree_view_items_on_bulk_verify_modal(
+        soft_assert, modal, asmt_to_include_by_bulk_verify_filter)
     soft_assert.assert_expectations()
 
   @pytest.mark.parametrize('page', [audit_page, my_assessments_page])

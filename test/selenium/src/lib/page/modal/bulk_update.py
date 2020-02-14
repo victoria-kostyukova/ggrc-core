@@ -142,6 +142,21 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
     return base.BulkUpdateTreeView(obj_name=objects.ASSESSMENTS)
 
   @property
+  def tree_view_items(self):
+    """Returns assessment tree view items."""
+    tree_view_items = []
+    for scope in self.get_objs_scopes():
+      tree_view_items.append(
+          self.get_tree_view_item_by_title(title=scope["TITLE"]))
+    return tree_view_items
+
+  def get_tree_view_item_by_title(self, title):
+    """Gets assessment tree view item from tree view by its title."""
+    return AssessmentTreeViewItem(
+        self._root.element(tag_name="tree-item-attr", text=title).parent(
+            tag_name="mapper-results-item"))
+
+  @property
   def pagination(self):
     return base.Pagination(self._root)
 
@@ -156,9 +171,8 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
     scopes_from_page = self.tree_view.get_list_members_as_list_scopes()
     if with_second_tier_info:
       for scope in scopes_from_page:
-        scope.update(AssessmentTreeViewItem(self._root.element(
-            tag_name="tree-item-attr", text=scope["TITLE"]).parent(
-                tag_name="mapper-results-item")).assessment_info)
+        scope.update(self.get_tree_view_item_by_title(
+            title=scope["TITLE"]).assessment_info)
     scopes.extend(scopes_from_page)
 
   def get_objs_scopes(self, with_second_tier_info=False):
@@ -177,6 +191,7 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
 class AssessmentTreeViewItem(object):
   """Class represents Assessment item from Select Assessments section of
   Bulk update modal."""
+  # pylint: disable=invalid-name
 
   def __init__(self, parent_element):
     self._root = parent_element
@@ -187,10 +202,42 @@ class AssessmentTreeViewItem(object):
     self.comments_section = self._root.element(
         tag_name="collapsible-panel", text=re.compile("Comments"))
 
+  @property
+  def is_mapped_controls_section_editable(self):
+    """Returns whether mapped controls section editable through checking
+    existence of mapping icon.
+    """
+    return self.mapped_control_section.element(
+        class_name="fa-code-fork").exists
+
+  @property
+  def is_evidence_section_editable(self):
+    """Returns whether Evidence and custom attributes section editable
+    through checking existence of edit/delete icons and attach/add buttons.
+    """
+    return (
+        self.evidence_urls_section.element(class_name="fa-trash").exists or
+        self.evidence_urls_section.element(
+            class_name=re.compile("fa-pencil")).exists or
+        self.evidence_urls_section.button(text="Add").exists or
+        self.evidence_urls_section.button(text="Attach").exists)
+
+  @property
+  def is_comments_section_editable(self):
+    """Returns whether Comments section editable through checking existence
+    of comment input element.
+    """
+    return (base.CommentInput(self.comments_section).exists or
+            self.comments_section.button(text="Add").exists)
+
   def expand(self):
     """Expands assessment item."""
     if "expanded" not in self._root.div().classes:
       self._root.div(class_name="item-wrapper").click()
+
+  def open(self):
+    """Opens assessment detail page."""
+    self._root.link(text="Open").click()
 
   def _get_mapped_controls_titles(self):
     """Expands 'Mapped Controls' subsection and returns mapped controls

@@ -605,6 +605,46 @@ def soft_assert_bulk_verify_filter_functionality(page, modal, exp_asmt,
       *exp_asmt.bulk_update_modal_tree_view_attrs_to_exclude)
 
 
+def soft_assert_detailed_page_of_asmt_tree_view_item_is_readonly(
+    soft_assert, asmt_tree_view_item
+):
+  """Soft assert detailed page of assessment tree view item is readonly.
+
+  Function checks attributes which matches pattern
+  "is_*section_name*_section_editable" of AssessmentTreeViewItem obj and
+  verifies that it is False.
+  """
+  attrs = [attr for attr in dir(asmt_tree_view_item)
+           if not attr.startswith('__')]
+  for attr in attrs:
+    match = re.search(r"\bis_(.+?)_section_editable\b", attr)
+    if match:
+      soft_assert.expect(
+          getattr(asmt_tree_view_item, attr) is False,
+          '{} section should be not editable'.format(
+              match.group(1).replace('_', ' ').capitalize()))
+
+
+def soft_assert_asmt_tree_view_items_on_bulk_verify_modal(
+    soft_assert, modal, exp_asmt
+):
+  """Checks assessment tree view items from bulk verify modal.
+
+  Firstly checks opening of assessment info page through open button, then
+  checks that mapped controls section and evidence urls section from second
+  tier are read-only."""
+  for asmt_tree_view_item in modal.select_assessments_section.tree_view_items:
+    asmt_tree_view_item.open()
+    _, new_tab = browsers.get_browser().windows()
+    test_utils.wait_for(lambda nt=new_tab: nt.url.endswith(url.Widget.INFO))
+    soft_assert.expect(
+        new_tab.url == exp_asmt.url + url.Widget.INFO,
+        '{} info page should be opened in new tab'.format(exp_asmt.title))
+    new_tab.close()
+    soft_assert_detailed_page_of_asmt_tree_view_item_is_readonly(
+        soft_assert, asmt_tree_view_item)
+
+
 def soft_assert_asmts_list_on_bulk_verify_modal(modal, soft_assert, exp_asmts):
   """Checks that assessments list is displayed on bulk verify modal with
   correct columns by default and that checkboxes are displayed near every
