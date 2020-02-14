@@ -317,7 +317,7 @@ class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
     # for overridable methods
     if (self.__class__ in
         [Programs, Regulations, Objectives, Contracts, Policies, Standards,
-         Threat, Requirements]):
+         Threats, Requirements]):
       if self.is_info_page:
         self.tabs.ensure_tab(self._attributes_tab_name)
     self.inline_edit_controls = self._browser.elements(
@@ -418,13 +418,13 @@ class Programs(InfoWidget, page_mixins.WithProposals):
                  editors=self.program_editors.get_people_emails())
 
 
-class Workflow(InfoWidget):
+class Workflows(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""
   _locators = locator.WidgetInfoWorkflow
   _dropdown_settings_cls = info_widget_three_bbs.WorkflowInfoWidgetThreeBbbs
 
   def __init__(self, _driver=None):
-    super(Workflow, self).__init__()
+    super(Workflows, self).__init__()
 
   def _extend_list_all_scopes_by_review_state(self):
     """Method overriding without action due to Workflows don't have
@@ -471,7 +471,7 @@ class Workflow(InfoWidget):
     return self._simple_field("Repeat Workflow", self._root).text
 
 
-class CycleTask(InfoWidget):
+class CycleTasks(InfoWidget):
   """Model for CycleTask object Info panel."""
   def obj_scope(self):
     """Returns obj scope."""
@@ -874,7 +874,6 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
 
 class Objectives(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Objective object Info pages and Info panels."""
-  _locators = locator.WidgetInfoObjective
 
   def __init__(self, driver):
     super(Objectives, self).__init__(driver)
@@ -998,12 +997,11 @@ class Risks(page_mixins.WithDisabledProposals,
     return self._related_people_list(roles.RISK_OWNERS, self._root)
 
 
-class Threat(InfoWidget):
-  """Model for Threat object Info pages and Info panels."""
-  _locators = locator.WidgetInfoThreat
+class Threats(InfoWidget):
+  """Model for Threats object Info pages and Info panels."""
 
   def __init__(self, driver=None):
-    super(Threat, self).__init__(driver)
+    super(Threats, self).__init__(driver)
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""

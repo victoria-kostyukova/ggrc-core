@@ -609,6 +609,18 @@ def risk():
 
 
 @pytest.fixture()
+def objective(program):
+  """Create an objective within program"""
+  return rest_facade.create_objective(program)
+
+
+@pytest.fixture()
+def threat(program):
+  """Create a threat within program"""
+  return rest_facade.create_threat(program)
+
+
+@pytest.fixture()
 def project():
   """Creates a project."""
   return rest_facade.create_project()

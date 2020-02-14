@@ -393,9 +393,20 @@ class RiskModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED_BY)
 
 
+class ThreatModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Threats.
+ """
+  MODAL_HEADER = objects.get_normal_form(objects.get_singular(objects.THREATS))
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, TransformationSetVisibleFields.ADMIN,
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      TransformationSetVisibleFields.REVIEW_STATE)
+
+
 class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
- fields for Controls.
+ fields for Objectives.
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(

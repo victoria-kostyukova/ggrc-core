@@ -762,16 +762,8 @@ class WidgetInfoControl(WidgetSnapshotsInfoPanel):
   """Locators for Control Info widgets."""
 
 
-class WidgetInfoObjective(WidgetSnapshotsInfoPanel):
-  """Locators for Objective Info widgets."""
-
-
 class WidgetInfoPeople(CommonWidgetInfo):
   """Locators for People Info widgets."""
-
-
-class WidgetInfoThreat(WidgetSnapshotsInfoPanel):
-  """Locators for Threat Info widgets."""
 
 
 class WidgetAdminRoles(object):

@@ -55,6 +55,10 @@ class Objectives(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Objectives TreeViewItem"""
 
 
+class Threats(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Threats TreeViewItem"""
+
+
 class Programs(CommonDropdownTreeViewItem):
   """Class for Dropdown of Programs TreeViewItem"""
 

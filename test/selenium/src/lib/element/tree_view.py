@@ -68,6 +68,10 @@ class Objectives(CommonDropdownSettings):
   """Objectives 3BBS button/dropdown settings on Tree View."""
 
 
+class Threats(CommonDropdownSettings):
+  """Threats 3BBS button/dropdown settings on Tree View."""
+
+
 class Processes(CommonDropdownSettings):
   """Processes 3BBS button/dropdown settings on Tree View."""
 

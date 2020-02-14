@@ -24,9 +24,7 @@ def get_modal_obj(obj_type, _selenium=None):
       "task_group_task": TaskGroupTaskModal,
       "task_group": TaskGroupModal,
       "audit": AuditModal,
-      "regulation": RegulationModal,
-      "project": ProjectModal,
-      "key_report": KeyReportsModal
+      "regulation": RegulationModal
   }
   return mapping.get(obj_type.lower(), BaseObjectModal)()
 
@@ -332,11 +330,3 @@ class AuditModal(BaseObjectModal):
   def set_manually_map_snapshots(self, value):
     """Set "Manually map snapshots" checkbox to specified state."""
     self._root.label(text="Manually map snapshots").checkbox().set(bool(value))
-
-
-class ProjectModal(BaseObjectModal):
-  """Represents project object modal."""
-
-
-class KeyReportsModal(BaseObjectModal):
-  """Represents key report object modal."""

@@ -25,4 +25,5 @@ def build_obj(app_obj):
 
 def info_widget_page(obj):
   """Returns a corresponding page object from info_widget module."""
-  return factory.get_cls_widget(object_name=obj.obj_name(), is_info=True)()
+  return factory.get_cls_widget(object_name=obj.plural_obj_name(),
+                                is_info=True)()

@@ -38,6 +38,12 @@ def create_objective(program=None, **attrs):
       inflection.camelize(objects.OBJECTIVES), program, **attrs)
 
 
+def create_threat(program=None, **attrs):
+  """Create a threat (optionally map to a `program`)."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.THREATS), program, **attrs)
+
+
 def create_standard(program=None, **attrs):
   """Creates a standard (optionally map to a `program`)."""
   return _create_obj_in_program_scope(objects.STANDARDS, program, **attrs)

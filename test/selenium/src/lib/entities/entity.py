@@ -670,7 +670,10 @@ class Entity(Representation):
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
         RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
         ProductEntity, TechnologyEnvironmentEntity, ChangeLogItemEntity,
-        StandardEntity, RegulationEntity
+        ThreatEntity, AccessGroupEntity, AccountBalanceEntity, DataAssetEntity,
+        FacilityEntity, KeyReportEntity, MarketEntity, MetricEntity,
+        ProcessEntity, ProductGroupEntity, ProjectEntity, SystemEntity,
+        VendorEntity, StandardEntity, RegulationEntity
     )
 
   def __lt__(self, other):
@@ -832,6 +835,10 @@ class ControlEntity(Entity):
 
 class ObjectiveEntity(Entity):
   """Class that represent model for Objective entity."""
+
+
+class ThreatEntity(Entity):
+  """Class that represent model for Threat entity."""
 
 
 class RiskEntity(Entity):

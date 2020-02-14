@@ -771,6 +771,13 @@ class ObjectivesService(SnapshotsWebUiService):
         objects.OBJECTIVES, is_versions_widget, driver)
 
 
+class ThreatsService(SnapshotsWebUiService):
+  """Class for Threats business layer's services objects."""
+  def __init__(self, driver=None, is_versions_widget=False):
+    super(ThreatsService, self).__init__(
+        objects.THREATS, is_versions_widget, driver)
+
+
 class RisksService(SnapshotsWebUiService):
   """Class for Risks business layer's services objects."""
   def __init__(self, driver=None, is_versions_widget=False):

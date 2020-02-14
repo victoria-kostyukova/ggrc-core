@@ -226,6 +226,12 @@ class ObjectivesService(BaseRestService):
     super(ObjectivesService, self).__init__(url.OBJECTIVES)
 
 
+class ThreatsService(BaseRestService):
+  """Service for working with Threats entities."""
+  def __init__(self):
+    super(ThreatsService, self).__init__(url.THREATS)
+
+
 class ProgramsService(BaseRestService):
   """Service for working with Programs entities."""
   def __init__(self):

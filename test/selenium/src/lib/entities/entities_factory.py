@@ -449,6 +449,23 @@ class ObjectivesFactory(EntitiesFactory):
     return objective_obj
 
 
+class ThreatsFactory(EntitiesFactory):
+  """Factory class for Threats entities."""
+  def __init__(self):
+    super(ThreatsFactory, self).__init__(objects.THREATS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.THREAT_ADMINS, [users.current_user()])]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create Threat entity with randomly and predictably filled fields."""
+    obj = self.obj_inst().update_attrs(
+        title=self.obj_title,
+        status=unicode(object_states.DRAFT),
+        external_slug=self.generate_slug(),
+        external_id=self.generate_external_id())
+    return obj
+
+
 class RisksFactory(EntitiesFactory):
   """Factory class for Risks entities."""
 
