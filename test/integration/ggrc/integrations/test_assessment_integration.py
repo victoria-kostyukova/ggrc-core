@@ -473,6 +473,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         'hotlist_ids': [333, ],
         'priority': u'P0',
         'type': constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
+        'custom_fields': [{
+            'display_string': 'Due Date',
+            'type': 'DATE',
+            'name': 'Due Date',
+            'value': None}],
     }
     self.assertEqual(expected_info, with_info)
     self.assertEqual(without_info, with_info)
@@ -615,7 +620,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'title': iti_title,
               'hotlist_ids': [222222],
               'priority': "P2",
-              'comment': expected_comment}
+              'comment': expected_comment,
+              'custom_fields': [{
+                  'display_string': 'Due Date',
+                  'type': 'DATE',
+                  'name': 'Due Date',
+                  'value': None,
+              }]}
     mocked_update_issue.assert_called_once_with(iti_issue_id, kwargs)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
@@ -1029,7 +1040,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'severity': "S4",
                 'title': iti.title,
                 'hotlist_ids': [],
-                'priority': "P4"}
+                'priority': "P4",
+                'custom_fields': [{
+                    'display_string': 'Due Date',
+                    'type': 'DATE',
+                    'name': 'Due Date',
+                    'value': None,
+                }]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
@@ -1074,7 +1091,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'severity': iti.issue_severity,
                 'title': new_title,
                 'hotlist_ids': [],
-                'priority': iti.issue_priority}
+                'priority': iti.issue_priority,
+                'custom_fields': [{
+                    'display_string': 'Due Date',
+                    'type': 'DATE',
+                    'name': 'Due Date',
+                    'value': None,
+                }]}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
       issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
@@ -1422,48 +1445,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                       "assessment", {}).get("issue_tracker",
                                             {}).get("_warnings", []))
 
-  @mock.patch('ggrc.integrations.issues.Client.update_issue')
-  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
-  def test_reset_issuetracker_due_date(self, mocked_update_issue):
-    """Test issue due_date is properly reset to None."""
-    initial_date = '2018-09-12'
-    new_due_date = None
-    with mock.patch.object(
-        assessment_integration.AssessmentTrackerHandler,
-        '_is_tracker_enabled',
-        return_value=True
-    ):
-      iti = factories.IssueTrackerIssueFactory(
-          enabled=True,
-          component_id="123123",
-          issue_type="PROCESS",
-          issue_priority="P2",
-          issue_severity="S2",
-          due_date=initial_date
-      )
-      iti_id = iti.issue_id
-      asmt = iti.issue_tracked_obj
-      custom_fields = [{
-          'name': 'Due Date',
-          'value': new_due_date,
-          'type': 'DATE',
-          'display_string': 'Due Date',
-      }]
-      self.api.put(asmt, {
-          'start_date': new_due_date,
-          'title': 'title'
-      })
-      kwargs = {'status': 'ASSIGNED',
-                'component_id': 123123,
-                'severity': "S2",
-                'title': iti.title,
-                'hotlist_ids': [],
-                'priority': "P2",
-                'custom_fields': custom_fields}
-      mocked_update_issue(iti_id, kwargs)
-      issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
-      self.assertIsNone(issue.due_date)
-
 
 @ddt.ddt
 @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
@@ -1566,7 +1547,12 @@ class TestIntegrationAssessmentStatus(SnapshotterBaseTestCase):
         'severity': "S2",
         'title': iti.title,
         'hotlist_ids': [],
-        'priority': "P2"
+        'priority': "P2",
+        'custom_fields': [{
+            'display_string': 'Due Date',
+            'type': 'DATE',
+            'name': 'Due Date',
+            'value': None}]
     }
     asmt_link = self.tracker_handler._get_assessment_page_url(self.asmt)
     if 'comment' in additional_kwargs:
