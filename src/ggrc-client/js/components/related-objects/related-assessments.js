@@ -77,6 +77,7 @@ export default canComponent.extend({
     loading: false,
     needReuse: false,
     relatedAssessments: [],
+    selectedItem: {},
     buildEvidenceModel: function (evidence) {
       const baseData = {
         context: new Context({id: this.attr('instance.context.id') || null}),
