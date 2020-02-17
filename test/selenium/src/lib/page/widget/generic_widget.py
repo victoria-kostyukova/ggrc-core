@@ -373,6 +373,18 @@ class Standards(Widget):
   """Model for Standards generic widgets."""
 
 
+class Requirements(Widget):
+  """Model for Requirements generic widgets."""
+
+
+class Policies(Widget):
+  """Model for Policies generic widgets."""
+
+
+class Contracts(Widget):
+  """Model for Contracts generic widgets."""
+
+
 class KeyReports(Widget):
   """Model for Key Reports generic widgets."""
 

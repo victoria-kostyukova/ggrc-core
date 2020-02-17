@@ -111,6 +111,18 @@ class Standards(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Standards TreeViewItem"""
 
 
+class Requirements(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Requirements TreeViewItem"""
+
+
+class Policies(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Policies TreeViewItem"""
+
+
+class Contracts(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Contracts TreeViewItem"""
+
+
 class KeyReports(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Key Reports TreeViewItem"""
 

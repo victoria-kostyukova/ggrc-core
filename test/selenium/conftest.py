@@ -969,6 +969,24 @@ def regulation():
 
 
 @pytest.fixture()
+def requirement():
+  """Creates a Requirement."""
+  return rest_facade.create_requirement()
+
+
+@pytest.fixture()
+def policy():
+  """Creates a Policy."""
+  return rest_facade.create_policy()
+
+
+@pytest.fixture()
+def contract():
+  """Creates a Contract."""
+  return rest_facade.create_contract()
+
+
+@pytest.fixture()
 def soft_assert():
   """Fixture for soft assertions."""
   return assert_utils.SoftAssert()

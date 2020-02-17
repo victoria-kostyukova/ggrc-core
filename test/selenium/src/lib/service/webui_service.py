@@ -835,6 +835,24 @@ class StandardsService(BaseWebUiService):
     super(StandardsService, self).__init__(objects.STANDARDS, driver)
 
 
+class RequirementsService(BaseWebUiService):
+  """Class for Requirements business layer's services objects."""
+  def __init__(self, driver=None):
+    super(RequirementsService, self).__init__(objects.REQUIREMENTS, driver)
+
+
+class PoliciesService(BaseWebUiService):
+  """Class for Policies business layer's services objects."""
+  def __init__(self, driver=None):
+    super(PoliciesService, self).__init__(objects.POLICIES, driver)
+
+
+class ContractsService(BaseWebUiService):
+  """Class for Contracts business layer's services objects."""
+  def __init__(self, driver=None):
+    super(ContractsService, self).__init__(objects.CONTRACTS, driver)
+
+
 class TechnologyEnvironmentsService(BaseWebUiService):
   """Class for Technology Environments business layer's services objects."""
   def __init__(self, driver=None):

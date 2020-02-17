@@ -27,6 +27,16 @@ def create_requirement(program=None, **attrs):
   return _create_obj_in_program_scope(objects.REQUIREMENTS, program, **attrs)
 
 
+def create_policy(program=None, **attrs):
+  """Create a policy."""
+  return _create_obj_in_program_scope(objects.POLICIES, program, **attrs)
+
+
+def create_contract(program=None, **attrs):
+  """Create a contract."""
+  return _create_obj_in_program_scope(objects.CONTRACTS, program, **attrs)
+
+
 def create_regulation(program=None, **attrs):
   """Create a regulation."""
   return _create_obj_in_program_scope(objects.REGULATIONS, program, **attrs)

@@ -116,6 +116,18 @@ class Standards(CommonDropdownSettings):
   """Standards 3BBS button/dropdown settings on Tree View."""
 
 
+class Requirements(CommonDropdownSettings):
+  """Requirements 3BBS button/dropdown settings on Tree View."""
+
+
+class Policies(CommonDropdownSettings):
+  """Policies 3BBS button/dropdown settings on Tree View."""
+
+
+class Contracts(CommonDropdownSettings):
+  """Contracts 3BBS button/dropdown settings on Tree View."""
+
+
 class KeyReports(CommonDropdownSettings):
   """Key Reports 3BBS button/dropdown settings on Tree View."""
 

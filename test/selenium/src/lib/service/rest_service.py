@@ -539,6 +539,18 @@ class RequirementsService(BaseRestService):
     super(RequirementsService, self).__init__(url.REQUIREMENTS)
 
 
+class PoliciesService(BaseRestService):
+  """Service for working with Policies entities."""
+  def __init__(self):
+    super(PoliciesService, self).__init__(url.POLICIES)
+
+
+class ContractsService(BaseRestService):
+  """Service for working with Contracts entities."""
+  def __init__(self):
+    super(ContractsService, self).__init__(url.CONTRACTS)
+
+
 class CommentsService(BaseRestService):
   """Service for working with Comments entities."""
   def __init__(self):
