@@ -77,7 +77,7 @@ const ViewModel = canDefineMap.extend({
     };
     let types = type ? [type] : getMappingList(instance.type);
     let countQuery = buildCountParams(types, relevant);
-
+    this.isSpinnerVisible = true;
     return Promise.all(
       countQuery.map(batchRequests)
     ).then((counts) => {
