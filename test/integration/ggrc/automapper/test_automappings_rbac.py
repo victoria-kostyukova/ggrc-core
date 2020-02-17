@@ -10,6 +10,8 @@ from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -19,8 +21,47 @@ class TestAutomappings(TestCase):
   def setUp(self):
     super(TestAutomappings, self).setUp()
     self.api = api_helper.Api()
-    # Using import for the setup for forward-compatibility with Assessment ACL
-    self.import_file("issue_automapping_setup.csv")
+    with factories.single_commit():
+      creator_role = all_models.Role.query.filter(
+          all_models.Role.name == "Creator").first()
+      reader_role = all_models.Role.query.filter(
+          all_models.Role.name == "Reader").first()
+      creator_pm = factories.PersonFactory(
+          email="Creator_and_ProgramManager@example.com"
+      )
+      creator_auditor = factories.PersonFactory(
+          email="Creator_and_Auditor@example.com"
+      )
+      reader_pm = factories.PersonFactory(
+          email="Reader_and_ProgramManager@example.com"
+      )
+      reader_auditor = factories.PersonFactory(
+          email="Reader_and_Auditor@example.com"
+      )
+      rbac_factories.UserRoleFactory(
+          role=creator_role, person=creator_pm)
+      rbac_factories.UserRoleFactory(
+          role=creator_role, person=creator_auditor)
+      rbac_factories.UserRoleFactory(
+          role=reader_role, person=reader_pm)
+      rbac_factories.UserRoleFactory(
+          role=reader_role, person=reader_auditor)
+      program = factories.ProgramFactory()
+      audit = factories.AuditFactory(program=program)
+      factories.RelationshipFactory(source=program, destination=audit)
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      program.add_person_with_role_name(creator_pm, "Program Managers")
+      program.add_person_with_role_name(reader_pm, "Program Managers")
+      audit.add_person_with_role_name(creator_pm, "Audit Captains")
+      audit.add_person_with_role_name(creator_auditor, "Auditors")
+      assessment.add_person_with_role_name(creator_pm, "Creators")
+      assessment.add_person_with_role_name(reader_pm, "Creators")
+      assessment.add_person_with_role_name(creator_pm, "Assigness")
+      assessment.add_person_with_role_name(reader_pm, "Assigness")
+      assessment.add_person_with_role_name(creator_auditor, "Assigness")
+      assessment.add_person_with_role_name(reader_auditor, "Assigness")
+
     self.issue_admin_role = all_models.AccessControlRole.query.filter_by(
         name="Admin",
         object_type="Issue",
