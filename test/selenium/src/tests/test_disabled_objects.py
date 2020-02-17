@@ -162,13 +162,14 @@ class TestDisabledObjects(base.Test):
   @pytest.mark.parametrize("obj", objects.SINGULAR_CONTROL_AND_RISK +
                            [next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
-  @pytest.mark.parametrize('mapped_obj',
+  @pytest.mark.parametrize("mapped_obj",
                            [objects.get_singular(objects.STANDARDS),
-                            objects.get_singular(objects.REGULATIONS)],
+                            objects.get_singular(objects.REGULATIONS),
+                            next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)],
                            indirect=True)
   def test_cannot_unmap_disabled_obj(self, obj, mapped_obj, selenium):
-    """Check that user cannot unmap disabled object from Standard/Regulation
-    and new tab opens."""
+    """Check that user cannot unmap disabled object from "mapped_obj" and new
+    tab opens."""
     webui_service.BaseWebUiService(
         objects.get_plural(obj.type)).open_info_panel_of_mapped_obj(
             mapped_obj, obj).three_bbs.select_unmap_in_new_frontend()
