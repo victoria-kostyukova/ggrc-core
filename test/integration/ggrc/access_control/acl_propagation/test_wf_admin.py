@@ -54,7 +54,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           },
           "CycleTaskGroup": {
               "read": True,
-              "update": (False, "unimplemented"),
+              "update": False,
               "delete": True,
           },
           "CycleTask": {
@@ -112,7 +112,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           },
           "CycleTaskGroup": {
               "read": True,
-              "update": (False, "unimplemented"),
+              "update": False,
               "delete": True,
           },
           "CycleTask": {
@@ -170,7 +170,7 @@ class TestWfAdminPropagation(base.TestACLPropagation):
           },
           "CycleTaskGroup": {
               "read": True,
-              "update": (False, "unimplemented"),
+              "update": False,
               "delete": True,
           },
           "CycleTask": {

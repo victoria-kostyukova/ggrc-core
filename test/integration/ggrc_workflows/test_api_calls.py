@@ -121,30 +121,16 @@ class TestStatusApiPost(TestCase):
             u"Finished",
             u"Verified")
   def test_state_verified_group(self, state):
-    """Check state for verification required group."""
+    """Check state for verification required group.
+    API PUT is restricted for all users 403"""
     self.setup_cycle_state(True)
     resp = self.api.put(self.group, data={"status": state})
-    group = all_models.CycleTaskGroup.query.get(
-        resp.json["cycle_task_group"]["id"]
-    )
-    self.assertEqual(state, group.status)
+    self.assert403(resp)
 
-  @ddt.data((u"Assigned", True),
-            (u"In Progress", True),
-            (u"Finished", True),
-            (u"Verified", False))
-  @ddt.unpack
-  def test_state_non_verified_group(self, state, is_valid):
-    """Check state for verification non required group."""
-    self.setup_cycle_state(False)
-    resp = self.api.put(self.group, data={"status": state})
-    if is_valid:
-      group = all_models.CycleTaskGroup.query.get(
-          resp.json["cycle_task_group"]["id"]
-      )
-      self.assertEqual(state, group.status)
-    else:
-      self.assert400(resp)
+  def test_update_titile_of_cycle(self):
+    """Check title updating of Cycle Task Group """
+    resp = self.api.put(self.group, data={"title": "Updated title"})
+    self.assert403(resp)
 
   @ddt.data(u"Assigned",
             u"In Progress",
