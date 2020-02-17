@@ -129,7 +129,7 @@ export default canComponent.extend({
     }) {
       const viewModel = this.viewModel;
 
-      if (viewModel.type === modelType) {
+      if (!viewModel.type || viewModel.type === modelType) {
         viewModel.updateCounter();
       }
     },

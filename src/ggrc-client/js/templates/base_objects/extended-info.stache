@@ -55,18 +55,21 @@
                       type:from="'Control'"
                       isSpinnerVisible:from="true"
                       isTitleVisible:from="false"
+                      on:updateCounter="addPromiseContent(scope.event)"
                       extraCssClass:from="'color'">
       </mapped-counter>
       <mapped-counter instance:from="instance"
                       type:from="'Process'"
                       isSpinnerVisible:from="true"
                       isTitleVisible:from="false"
+                      on:updateCounter="addPromiseContent(scope.event)"
                       extraCssClass:from="'color'">
       </mapped-counter>
       <mapped-counter instance:from="instance"
                       type:from="'System'"
                       isSpinnerVisible:from="true"
                       isTitleVisible:from="false"
+                      on:updateCounter="addPromiseContent(scope.event)"
                       extraCssClass:from="'color'">
       </mapped-counter>
     </div>
