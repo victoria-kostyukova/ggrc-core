@@ -638,3 +638,35 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertFalse(revisions[0].is_empty)
     self.assertFalse(revisions[1].is_empty)
     self.assertTrue(revisions[2].is_empty)
+
+  def test_created_by_in_revision(self):
+    """Test revision for Risk contains created_by attr and its content."""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      risk = factories.RiskFactory(created_by=user)
+
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == risk.id,
+        all_models.Revision.resource_type == risk.type,
+    ).first()
+
+    expected_content = {u'context_id': None,
+                        u'href': u'/api/people/{}'.format(user.id),
+                        u'type': user.type,
+                        u'id': user.id,
+                        u'email': user.email}
+
+    self.assertIn("created_by", revision.content)
+    self.assertEqual(expected_content, revision.content["created_by"])
+
+  def test_created_by_none_in_revision(self):
+    """Test revision for Risk contains created_by attr and contains None."""
+    risk = factories.RiskFactory()
+
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == risk.id,
+        all_models.Revision.resource_type == risk.type,
+    ).first()
+
+    self.assertIn("created_by", revision.content)
+    self.assertEqual(None, revision.content["created_by"])
