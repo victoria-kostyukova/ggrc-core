@@ -245,14 +245,21 @@ def make_response(data):
   return current_app.make_response((response_json, 200, headers))
 
 
-def make_import(csv_data, dry_run, ie_job=None, bulk_import=False):
+def make_import(csv_data, dry_run, ie_job=None, bulk_import=False,
+                custom_messages=None):
+
   """Make import"""
   try:
-    converter = base.ImportConverter(ie_job,
-                                     dry_run=dry_run,
-                                     csv_data=csv_data,
-                                     bulk_import=bulk_import)
+    converter = base.ImportConverter(
+        ie_job,
+        dry_run=dry_run,
+        csv_data=csv_data,
+        bulk_import=bulk_import,
+        custom_messages=custom_messages,
+    )
+
     converter.import_csv_data()
+
     return {"data": converter.get_info(),
             "failed_slugs": converter.failed_slugs}
 

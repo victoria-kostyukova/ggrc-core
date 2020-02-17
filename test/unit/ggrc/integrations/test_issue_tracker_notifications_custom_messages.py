@@ -1,6 +1,6 @@
 # Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# pylint: disable=invalid-name, protected-access
+# pylint: disable=invalid-name, protected-access, no-self-use
 
 """Test custom messages for issue tracker notifications during bulk verify."""
 
@@ -10,6 +10,7 @@ from collections import namedtuple
 import mock
 
 from ggrc import settings
+from ggrc.views import bulk_operations
 from ggrc.integrations.issuetracker_bulk_sync import IssueTrackerBulkUpdater
 
 
@@ -28,6 +29,7 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
         dry_run=True,
         csv_data={},
         bulk_import=False,
+        custom_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
     self._updater = IssueTrackerBulkUpdater()
 
@@ -44,8 +46,30 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
     bui_mock.assert_called_once_with(parameters={
         "revision_ids": [1, 2, 3],
         'mail_data': {'user_email': '', 'filename': ''},
-        "notification_messages":
-            self._converter._TICKET_UPDATE_NOTIFICATION_MESSAGES,
+        "notification_messages": bulk_operations._BULK_VERIFY_MESSAGES,
+    })
+
+  @mock.patch("ggrc.views.background_update_issues")
+  def test_issues_update_without_custom_message(self, bui_mock):
+    """
+        Test that ImportConverter passes custom messages to
+        IssueTrackerBulkUpdater to be used for issue update
+        notifications.
+    """
+    from ggrc.converters import base
+
+    default_converter = base.ImportConverter(
+        ie_job=None,
+        dry_run=True,
+        csv_data={},
+        bulk_import=False,
+    )
+
+    default_converter._start_issuetracker_update([1, 2, 3])
+
+    bui_mock.assert_called_once_with(parameters={
+        "revision_ids": [1, 2, 3],
+        'mail_data': {'user_email': '', 'filename': ''},
     })
 
   @mock.patch(
@@ -70,21 +94,17 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
     his_mock.return_value = True, []
     gobt_mock.return_value = {}
 
-    updater = IssueTrackerBulkUpdater()
-
-    updater.sync_issuetracker({
+    self._updater.sync_issuetracker({
         "objects": [],
         "mail_data": {"user_email": "hello@world.com", "filename": "test.txt"},
-        "notification_messages":
-            self._converter._TICKET_UPDATE_NOTIFICATION_MESSAGES,
+        "notification_messages": bulk_operations._BULK_VERIFY_MESSAGES,
     })
 
     send_mock.assert_called_once_with(
         "test.txt",
         "hello@world.com",
         failed=True,
-        notification_messages=self._converter.
-          _TICKET_UPDATE_NOTIFICATION_MESSAGES,  # noqa
+        notification_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
 
   @mock.patch(
@@ -113,16 +133,14 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
     self._updater.sync_issuetracker({
         "objects": [],
         "mail_data": {"user_email": "hello@world.com", "filename": "test.txt"},
-        "notification_messages":
-            self._converter._TICKET_UPDATE_NOTIFICATION_MESSAGES,
+        "notification_messages": bulk_operations._BULK_VERIFY_MESSAGES,
     })
 
     send_mock.assert_called_once_with(
         "test.txt",
         "hello@world.com",
         errors=[],
-        notification_messages=self._converter.
-            _TICKET_UPDATE_NOTIFICATION_MESSAGES,  # noqa
+        notification_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
 
   @mock.patch("ggrc.notifications.common.send_email")
@@ -134,8 +152,7 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
     self._updater.send_notification(
         "test.txt",
         "hello@world.com",
-        notification_messages=self._converter.
-            _TICKET_UPDATE_NOTIFICATION_MESSAGES,  # noqa
+        notification_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
 
     send_email_mock.assert_called_once_with(
@@ -166,8 +183,7 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
         "test.txt",
         "hello@world.com",
         errors=((namedtuple("Error", "slug title")(1, "Hello World"), False),),
-        notification_messages=self._converter.
-            _TICKET_UPDATE_NOTIFICATION_MESSAGES,  # noqa
+        notification_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
 
     sync_data = {
@@ -207,8 +223,7 @@ class TestImportConverterIssueTrackerUpdate(unittest.TestCase):
         "test.txt",
         "hello@world.com",
         failed=True,
-        notification_messages=self._converter.
-            _TICKET_UPDATE_NOTIFICATION_MESSAGES,  # noqa
+        notification_messages=bulk_operations._BULK_VERIFY_MESSAGES,
     )
 
     send_email_mock.assert_called_once_with(
