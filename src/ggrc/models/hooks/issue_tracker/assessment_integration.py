@@ -2605,7 +2605,7 @@ class AssessmentTrackerHandler(object):
         assessment.add_warning(constants.WarningsDescription.
                                HOTLIST_PERMISSIONS_ERROR)
       else:
-        assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
+        assessment.add_warning(constants.WarningsDescription.CREATE_TICKET)
       logger.error(
           constants.ErrorsDescription.CREATE_ASSESSMENT,
           assessment.id,

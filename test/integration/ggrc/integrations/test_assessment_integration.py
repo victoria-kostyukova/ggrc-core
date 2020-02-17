@@ -1445,6 +1445,36 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                       "assessment", {}).get("issue_tracker",
                                             {}).get("_warnings", []))
 
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              side_effect=[integrations_errors.Error()])
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_invalid_assessment_hotlist(self, _):
+    """Test warning message if invalid or non-existing Hotlist entered."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+
+    issue_data = {"issue_id": None}
+    issue_tracker_attrs = self.post_request_payload_builder(issue_data)
+
+    response = self.api.post(all_models.Assessment, {
+        "assessment": {
+            "title": "asmt",
+            "audit": {"id": audit.id, "type": audit.type},
+            "issue_tracker": issue_tracker_attrs["issue_tracker"],
+        },
+    })
+
+    self.assertIn(
+        constants.WarningsDescription.CREATE_TICKET,
+        response.json.get("assessment", {}).get("issue_tracker", {}).get(
+            "_warnings", []
+        )
+    )
+
   @staticmethod
   def _build_revision_query(resource):
     """Build query for revisions of provided resource."""
