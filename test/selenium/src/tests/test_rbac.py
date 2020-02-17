@@ -188,6 +188,14 @@ class TestAuditorRole(base.Test):
         selenium, expected_asmt)
 
   @pytest.mark.smoke_tests
+  def test_auditor_cant_delete_asmt(self, test_data, selenium):
+    """Test that auditor cannot delete assessment."""
+    users.set_current_user(test_data["creator"])
+    webui_facade.assert_can_delete(
+        selenium, rest_facade.create_asmt(test_data["audit"]),
+        can_delete=False)
+
+  @pytest.mark.smoke_tests
   def test_auditor_can_assign_user_to_asmt(
       self, selenium, test_data
   ):
