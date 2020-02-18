@@ -22,21 +22,64 @@ export default canComponent.extend({
     format: '',
     helptext: '',
     label: '',
+    placeholder: DATE_FORMAT.MOMENT_DISPLAY_FMT,
     setMinDate: null,
     setMaxDate: null,
-    _date: null, // the internal value of the text input field
     define: {
       date: {
-        set(newValue) {
-          const oldValue = this.attr('date');
-          if (newValue === oldValue) {
-            return oldValue;
+        set(newDate) {
+          newDate = this.validateDate(newDate);
+          this.updatePicker('setDate', newDate);
+          return newDate;
+        },
+      },
+      inputDate: {
+      /**
+       * Set date to 'inputDate' in FTM format and to 'date' in ISO format
+       * if date is valid, otherwise set null.
+       * Update "minDate" if new date less than it
+       * and update "maxDate" if new date more than it.
+       *
+       * @param {string} newDate - the new date value.
+       * @return {string|null} - the new date value in FTM format.
+       */
+        set(newDate) {
+          const ISONewDate = this.formatDate(
+            newDate,
+            DATE_FORMAT.MOMENT_ISO_DATE,
+            DATE_FORMAT.MOMENT_DISPLAY_FMT
+          );
+          const FTMNewDate = this.formatDate(
+            newDate,
+            DATE_FORMAT.MOMENT_DISPLAY_FMT,
+            DATE_FORMAT.MOMENT_DISPLAY_FMT
+          );
+          const minDate = this.attr('minDate');
+          const maxDate = this.attr('maxDate');
+
+          if (minDate &&
+            moment.utc(ISONewDate) < moment.utc(minDate)) {
+            this.attr('minDate', ISONewDate);
+          }
+          if (maxDate &&
+            moment.utc(ISONewDate) > moment.utc(maxDate)) {
+            this.attr('maxDate', ISONewDate);
           }
 
-          if (this.attr('picker')) {
-            this.attr('picker').datepicker('setDate', newValue);
-          }
-          return newValue;
+          this.attr('date', ISONewDate);
+          return FTMNewDate;
+        },
+      },
+      minDate: {
+        set(newDate) {
+          this.updatePicker('minDate', newDate);
+          return newDate;
+        },
+      },
+      maxDate: {
+        set(newDate) {
+          this.updatePicker('maxDate', newDate);
+          return newDate;
         },
       },
       readonly: {
@@ -64,11 +107,19 @@ export default canComponent.extend({
         value: false,
       },
     },
-    onSelect: function (val, ev) {
-      this.attr('date', val);
+
+    init() {
+      this.attr('inputDate',
+        this.formatDate(this.attr('date'), DATE_FORMAT.MOMENT_DISPLAY_FMT)
+      );
+    },
+
+    onSelect(newDate, event) {
+      this.attr('date', newDate);
       this.attr('isShown', false);
     },
-    onFocus: function (el, ev) {
+
+    onFocus(element, event) {
       this.attr('showTop', false);
       this.attr('isShown', true);
 
@@ -76,184 +127,117 @@ export default canComponent.extend({
         this.attr('showTop', true);
       }
     },
-    removeValue: function (event) {
+
+    removeValue(event) {
       event.preventDefault();
 
-      this.picker.datepicker('setDate', null);
-      this.attr('date', null);
+      this.attr('inputDate', null);
     },
-    MOMENT_DISPLAY_FMT: DATE_FORMAT.MOMENT_DISPLAY_FMT,
+
+    validateDate(date, format = DATE_FORMAT.MOMENT_ISO_DATE) {
+      return moment(date, format, true).isValid() ?
+        date :
+        null;
+    },
+
+    formatDate(date, newFormat, currentFormat = DATE_FORMAT.MOMENT_ISO_DATE) {
+      return this.validateDate(date, currentFormat) ?
+        moment.utc(date, currentFormat)
+          .format(newFormat) :
+        null;
+    },
+
+    updatePicker(field, date) {
+      const picker = this.attr('picker');
+      if (!picker) {
+        return;
+      }
+
+      if (field === 'setDate') {
+        picker.datepicker(field, date);
+        return;
+      }
+      picker.datepicker('option', field, date);
+    },
+
+    /**
+     * Correct minDate/maxDate relative to the incoming date.
+     *
+     * @param {string} field - the setting to change ("minDate" or "maxDate").
+     *   The value given is automatically adjusted for a day as business
+     *   rules dictate.
+     * @param {string|null} date - the new value of the `date`.
+     *   If given as string, it must be in ISO date format.
+     * @param {string} format - the format of date.
+     * @return {string} - the new validated date value
+     */
+    correctDate(field, date, format = DATE_FORMAT.MOMENT_ISO_DATE) {
+      const correctedDate = moment.utc(date, format);
+
+      switch (field) {
+        case 'minDate':
+          correctedDate.add(1, 'day');
+          break;
+        case 'maxDate':
+          correctedDate.subtract(1, 'day');
+          break;
+      }
+
+      return this.formatDate(correctedDate, format);
+    },
   }),
 
   events: {
-    inserted: function () {
-      let viewModel = this.viewModel;
-      let element = this.element.find('.datepicker__calendar');
-      let minDate;
-      let maxDate;
-      let date;
-      let options = {
+    inserted() {
+      const {viewModel} = this;
+      const {noWeekends, date, setMinDate, setMaxDate} = viewModel.attr();
+      const element = this.element.find('.datepicker__calendar');
+      const options = {
         dateFormat: DATE_FORMAT.PICKER_ISO_DATE,
         altField: this.element.find('.datepicker__input'),
         altFormat: DATE_FORMAT.PICKER_DISPLAY_FMT,
-        onSelect: this.viewModel.onSelect.bind(this.viewModel),
+        onSelect: viewModel.onSelect.bind(viewModel),
       };
 
-      if (viewModel.attr('noWeekends')) {
+      if (noWeekends) {
         options.beforeShowDay = $.datepicker.noWeekends;
       }
 
       element.datepicker(options);
       viewModel.attr('picker', element);
 
-      date = this.getDate(viewModel.attr('date'));
-      viewModel.picker.datepicker('setDate', date);
-
-      // set the boundaries of the dates that user is allowed to select
-      minDate = this.getDate(viewModel.setMinDate);
-      maxDate = this.getDate(viewModel.setMaxDate);
-      viewModel.attr('setMinDate', minDate);
-      viewModel.attr('setMaxDate', maxDate);
-
-      if (viewModel.setMinDate) {
-        this.updateDate('minDate', viewModel.setMinDate);
-      }
-      if (viewModel.setMaxDate) {
-        this.updateDate('maxDate', viewModel.setMaxDate);
-      }
+      viewModel.attr('date', date);
+      viewModel.attr('minDate', viewModel.correctDate('minDate', setMinDate));
+      viewModel.attr('maxDate', viewModel.correctDate('maxDate', setMaxDate));
     },
 
-    /**
-     * Convert given date to an ISO date string.
-     *
-     * @param {Date|string|null} date - the date to convert
-     * @return {string|null} - date in ISO format or null if empty or invalid
-     */
-    getDate: function (date) {
-      if (date instanceof Date) {
-        // NOTE: Not using moment.utc(), because if a Date instance is given,
-        // it is in the browser's local timezone, thus we need to take that
-        // into account to not end up with a different date. Ideally this
-        // should never happen, but that would require refactoring the way
-        // Date objects are created throughout the app.
-        return moment(date).format(DATE_FORMAT.MOMENT_ISO_DATE);
-      } else if (this.isValidDate(date)) {
-        return date;
-      }
-
-      return null;
+    '{viewModel} setMinDate'([viewModel], event, date) {
+      viewModel.attr('minDate',
+        viewModel.correctDate('minDate', date)
+      );
     },
 
-    isValidDate: function (date) {
-      return moment(date, DATE_FORMAT.MOMENT_ISO_DATE, true).isValid();
+    '{viewModel} setMaxDate'([viewModel], event, date) {
+      viewModel.attr('maxDate',
+        viewModel.correctDate('maxDate', date)
+      );
     },
 
-    /**
-     * Change the min/max date allowed to be picked.
-     *
-     * @param {string} type - the setting to change ("minDate" or "maxDate").
-     *   The value given is automatically adjusted for a day as business
-     *   rules dictate.
-     * @param {Date|string|null} date - the new value of the `type` setting.
-     *   If given as string, it must be in ISO date format.
-     * @return {Date|null} - the new date value
-     */
-    updateDate: function (type, date) {
-      let viewModel = this.viewModel;
-
-      let types = {
-        minDate: function () {
-          date.add(1, 'day');
-        },
-        maxDate: function () {
-          date.subtract(1, 'day');
-        },
-      };
-
-      if (!date) {
-        viewModel.picker.datepicker('option', type, null);
-        return null;
-      }
-
-      if (date instanceof Date) {
-        // NOTE: Not using moment.utc(), because if a Date instance is given,
-        // it is in the browser's local timezone, thus we need to take that
-        // into account to not end up with a different date. Ideally this
-        // should never happen, but that would require refactoring the way
-        // Date objects are created throughout the app.
-        date = moment(date).format(DATE_FORMAT.MOMENT_ISO_DATE);
-      }
-      date = moment.utc(date);
-
-      if (types[type]) {
-        types[type]();
-      }
-      date = date.toDate();
-      viewModel.picker.datepicker('option', type, date);
-      return date;
-    },
-
-    /**
-     * Prepeare date to ISO format.
-     *
-     * @param {Object} viewModel - viewModel of the Component
-     * @param {string|null} val - the new value of the date setting.
-     *   If given as string, it must be in ISO date format.
-     * @return {string|null} - the new date value
-     */
-    prepareDate: function (viewModel, val) {
-      let valISO = null;
-      let valF = null;
-
-      if (val) {
-        val = val.trim();
-        valF = moment.utc(val, DATE_FORMAT.MOMENT_DISPLAY_FMT, true);
-        valISO = valF.isValid() ?
-          valF.format(DATE_FORMAT.MOMENT_ISO_DATE) :
-          null;
-      }
-      return valISO;
-    },
-
-    '{viewModel} setMinDate': function ([viewModel], ev, date) {
-      let currentDateObj = null;
-      let updated = this.updateDate('minDate', date);
-
-      if (viewModel.date) {
-        currentDateObj = moment.utc(viewModel.date).toDate();
-        if (currentDateObj < updated) {
-          this.viewModel.attr(
-            '_date',
-            moment.utc(updated).format(DATE_FORMAT.MOMENT_DISPLAY_FMT));
-        }
-      }
-    },
-
-    '{viewModel} setMaxDate': function ([viewModel], ev, date) {
-      this.updateDate('maxDate', date);
-    },
-
-    '{viewModel} _date': function ([viewModel], ev, val) {
-      let valISO = this.prepareDate(viewModel, val);
-      viewModel.attr('date', valISO);
-      viewModel.picker.datepicker('setDate', valISO);
-    },
-
-    '{window} mousedown': function (el, ev) {
-      let isInside;
-
-      if (this.viewModel.attr('persistent')) {
+    '{window} mousedown'(element, event) {
+      const {viewModel} = this;
+      if (viewModel.attr('persistent')) {
         return;
       }
-      isInside = isInnerClick(this.element, ev.target);
+      const isInside = isInnerClick(this.element, event.target);
 
-      if (this.viewModel.isShown && !isInside) {
-        this.viewModel.attr('isShown', false);
+      if (viewModel.isShown && !isInside) {
+        viewModel.attr('isShown', false);
       }
     },
   },
+
   helpers: {
-    isHidden: function (opts) {
+    isHidden(opts) {
       if (this.attr('isShown') || this.attr('persistent')) {
         return opts.inverse();
       }
