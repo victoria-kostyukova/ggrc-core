@@ -309,52 +309,31 @@ function refreshPage() {
 }
 
 function arrangeBackgroundModals(modals, referenceModal) {
-  let $header;
-  let headerHeight;
-  let _top;
   modals = $(modals).not(referenceModal);
   if (modals.length < 1) return;
 
-  $header = referenceModal.find('.modal-header');
-  headerHeight = $header.height() +
-    Number($header.css('padding-top')) +
-    Number($header.css('padding-bottom'));
-  _top = Number($(referenceModal).offset().top);
-
   modals.css({
     overflow: 'hidden',
-    height: function () {
-      return headerHeight;
-    },
-    top: function (i) {
-      return _top - (modals.length - i) * (headerHeight);
-    },
     'margin-top': 0,
     position: 'absolute',
   });
   modals.off('scroll.modalajax');
 }
 
-function arrangeTopModal(modal) {
-  let $header = modal.find('.modal-header:first');
-  let headerHeight = $header.height() +
-    Number($header.css('padding-top')) +
-    Number($header.css('padding-bottom'));
-
+function arrangeTopModal(modal, modalCounts) {
   let offsetParent = modal.offsetParent();
-  let _scrollY = 0;
   let _top = 0;
   let _left = modal.position().left;
+
   if (!offsetParent.length || offsetParent.is('html, body')) {
     offsetParent = $(window);
-    _scrollY = window.scrollY;
+    let _scrollY = window.scrollY;
     _top = _scrollY +
       (offsetParent.height() -
-      modal.height()) / 5 +
-      headerHeight / 5;
+      modal.height()) / 5;
   } else {
     _top = offsetParent.closest('.modal').offset().top -
-      offsetParent.offset().top + headerHeight;
+      offsetParent.offset().top;
     _left = offsetParent.closest('.modal').offset().left +
       offsetParent.closest('.modal').width() / 2 -
       offsetParent.offset().left;
@@ -362,8 +341,11 @@ function arrangeTopModal(modal) {
   if (_top < 0) {
     _top = 0;
   }
+
+  if (modalCounts > 1) {
+    modal.css('top', _top + 'px');
+  }
   modal
-    .css('top', _top + 'px')
     .css({position: 'absolute', 'margin-top': 0, left: _left});
 }
 
@@ -389,7 +371,7 @@ function reconfigureModals() {
   });
   this.$element.css('z-index', 3000 + (modals.length - 1) * 20);
   if (this.$element.length) {
-    arrangeTopModal(this.$element);
+    arrangeTopModal(this.$element, modals.length);
   }
   arrangeBackgroundModals(modals, this.$element);
 }
@@ -506,10 +488,7 @@ $.fn.modal.Constructor.prototype.hide = function (ev) {
 
   modals = $('.modal:visible');
   lastModal = modals.last();
-  lastModal.css({height: '', overflow: '', top: '', 'margin-top': ''});
   if (lastModal.length) {
-    arrangeTopModal(lastModal);
-
     // The app has several types of modals. After
     // closing several of them there are situations when focus is lost
     // (is set to body) and events (for example, press the escape key) don't
