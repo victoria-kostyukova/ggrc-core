@@ -84,7 +84,7 @@ class Commentable(object):
       nullable=True,
       default=u"Assignees,Creators,Verifiers")
 
-  send_by_default = db.Column(db.Boolean, nullable=True, default=True)
+  send_by_default = db.Column(db.Boolean, nullable=False, default=True)
 
   _api_attrs = reflection.ApiAttributes("recipients", "send_by_default")
 

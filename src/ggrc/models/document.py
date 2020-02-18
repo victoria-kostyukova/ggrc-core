@@ -33,9 +33,6 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   _title_uniqueness = False
 
-  # Override from Commentable mixin (can be removed after GGRC-5192)
-  send_by_default = db.Column(db.Boolean, nullable=False, default=True)
-
   link = deferred(db.Column(db.String, nullable=False), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
