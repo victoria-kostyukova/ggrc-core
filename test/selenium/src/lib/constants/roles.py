@@ -22,6 +22,7 @@ ASSIGNEES = "Assignees"
 VERIFIERS = "Verifiers"
 # program roles
 PROGRAM_EDITOR = "Program Editor"
+PROGRAM_EDITORS = PROGRAM_EDITOR + "s"
 PROGRAM_MANAGER = "Program Manager"
 PROGRAM_MANAGERS = PROGRAM_MANAGER + "s"
 PROGRAM_READER = "Program Reader"
@@ -175,6 +176,16 @@ class ACLRolesIDsMetaClass(type):
   def PROGRAM_MANAGERS(cls):
     return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
                           name=PROGRAM_MANAGERS)
+
+  @property
+  def PROGRAM_EDITORS(cls):
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
+                          name=PROGRAM_EDITORS)
+
+  @property
+  def PROGRAM_PRIMARY_CONTACTS(cls):
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
+                          name=PRIMARY_CONTACTS)
 
   @property
   def PRODUCT_MANAGERS(cls):

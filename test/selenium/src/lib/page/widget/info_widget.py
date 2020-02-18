@@ -407,6 +407,16 @@ class Programs(InfoWidget, page_mixins.WithProposals):
             self.comments_panel.add_btn,
             self.reference_urls.add_button] + list(self.inline_edit_controls)
 
+  @property
+  def program_editors(self):
+    """Returns Program Editors page element."""
+    return self._related_people_list(roles.PROGRAM_EDITORS, self._root)
+
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(primary_contacts=self.primary_contacts.get_people_emails(),
+                 editors=self.program_editors.get_people_emails())
+
 
 class Workflow(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""

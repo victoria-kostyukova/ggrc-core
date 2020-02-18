@@ -9,6 +9,7 @@ import pytest
 
 from lib import base, users
 from lib.constants import roles, object_states
+from lib.entities import entities_factory
 from lib.service import rest_facade, proposal_ui_facade, proposal_rest_service
 
 
@@ -25,19 +26,23 @@ class TestProposalsDestructive(base.Test):
 
   @pytest.fixture()
   def test_data(self, obj_reader_role, selenium):
-    """Create 2 GC users.
-    GC 1 creates object and adds GC 2 as a object reader.
+    """Create 3 GC users and 1 GR user.
+    GC 1 creates object and adds GC 2 as program editor, GC 3 as primary
+    contact, GR as a object reader.
     """
     if not self.__class__._data:
       obj_creator = rest_facade.create_user_with_role(roles.CREATOR)
       proposal_creator = rest_facade.create_user_with_role(roles.CREATOR)
       global_reader = rest_facade.create_user_with_role(roles.READER)
+      primary_contact = rest_facade.create_user_with_role(roles.CREATOR)
+      program_editor = rest_facade.create_user_with_role(roles.CREATOR)
       users.set_current_user(obj_creator)
       obj_custom_roles = [
-          (obj_reader_role.name, obj_reader_role.id,
-           [proposal_creator])]
+          (obj_reader_role.name, obj_reader_role.id, [proposal_creator])]
       obj = rest_facade.create_program(
-          custom_roles=obj_custom_roles)
+          custom_roles=obj_custom_roles,
+          primary_contacts=[primary_contact],
+          editors=[program_editor])
       users.set_current_user(proposal_creator)
       proposal_to_apply = proposal_ui_facade.create_proposal(selenium, obj)
       proposal_to_apply.datetime = (
@@ -138,14 +143,17 @@ class TestProposalsDestructive(base.Test):
       [("proposal_to_apply", "proposal_creator"),
        ("proposal_from_gr", "global_reader")]
   )
-  def test_check_proposals_email_connects_to_correct_obj(
-      self, test_data, proposal, proposal_author, selenium
+  def test_check_proposals_emails_connect_to_correct_obj(
+      self, test_data, proposal, proposal_author, soft_assert, selenium
   ):
-    """Check if proposal notification email connects to the correct obj."""
-    users.set_current_user(users.FAKE_SUPER_USER)
-    proposal_ui_facade.assert_proposal_notification_connects_to_obj(
+    """Check if proposal notification emails sent to recipients and lead
+    to the correspondent obj info page."""
+    # pylint: disable=too-many-arguments
+    users.set_current_user(entities_factory.PeopleFactory.superuser)
+    proposal_ui_facade.assert_proposal_notifications_connects_to_obj(
         selenium, test_data["obj"], test_data[proposal],
-        test_data[proposal_author])
+        test_data[proposal_author], soft_assert)
+    soft_assert.assert_expectations()
 
   def test_check_proposals_comparison_window(
       self, test_data, selenium
