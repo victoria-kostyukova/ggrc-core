@@ -16,6 +16,14 @@ describe('assessment-mapped-comments component', () => {
 
   describe('initMappedComments() method', () => {
     it('sets isLoading attr to true before loading comments', () => {
+      const fakeLoadedObjects = {
+        Comment: {
+          values: [],
+          total: 0,
+        },
+      };
+      spyOn(CommentsUtils, 'loadComments')
+        .and.returnValue(fakeLoadedObjects);
       viewModel.attr('isLoading', false);
 
       viewModel.initMappedComments();
@@ -25,7 +33,14 @@ describe('assessment-mapped-comments component', () => {
 
     it('calls loadComments() method', () => {
       viewModel.attr('instance', 'instance');
-      spyOn(CommentsUtils, 'loadComments').and.returnValue(Promise.resolve());
+      const fakeLoadedObjects = {
+        Comment: {
+          values: [],
+          total: 0,
+        },
+      };
+      spyOn(CommentsUtils, 'loadComments')
+        .and.returnValue(fakeLoadedObjects);
 
       viewModel.initMappedComments();
 

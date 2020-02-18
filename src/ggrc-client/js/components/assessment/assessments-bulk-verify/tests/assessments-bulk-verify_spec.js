@@ -48,6 +48,7 @@ describe('assessments-bulk-verify component', () => {
 
   describe('onVerifyClick() method', () => {
     it('sets "isVerifying" attr to true before request', () => {
+      spyOn(RequestUtils, 'request');
       viewModel.attr('isVerifying', false);
       viewModel.onVerifyClick();
 
@@ -79,6 +80,7 @@ describe('assessments-bulk-verify component', () => {
     it('calls closeModal() method', async () => {
       spyOn(RequestUtils, 'request')
         .and.returnValue(Promise.resolve({task: 2456}));
+      spyOn(viewModel, 'trackBackgroundTask');
       spyOn(viewModel, 'closeModal');
       await viewModel.onVerifyClick();
 

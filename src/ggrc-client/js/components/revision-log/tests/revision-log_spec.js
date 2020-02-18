@@ -196,8 +196,10 @@ describe('revision-log component', function () {
     });
 
     it('builds params according to passed params', () => {
+      const revisionsData = {total: 696, values: []};
       spyOn(QueryApiUtils, 'batchRequestsWithPromise')
-        .and.returnValue(Promise.resolve());
+        .and.returnValue(Promise.resolve({Revision: revisionsData}));
+
       const pageInfo = {
         current: 123,
         pageSize: 321,
@@ -225,8 +227,9 @@ describe('revision-log component', function () {
     });
 
     it('batches request with builded params', () => {
+      const revisionsData = {total: 696, values: []};
       spyOn(QueryApiUtils, 'batchRequestsWithPromise')
-        .and.returnValue(Promise.resolve());
+        .and.returnValue(Promise.resolve({Revision: revisionsData}));
 
       viewModel.fetchRevisions();
 

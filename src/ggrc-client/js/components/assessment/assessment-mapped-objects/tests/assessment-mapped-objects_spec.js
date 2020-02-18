@@ -46,6 +46,12 @@ describe('assessment-mapped-objects component', () => {
         id: 123,
       });
       spyOn(QueryApiUtils, 'buildParam');
+      spyOn(QueryApiUtils, 'batchRequests')
+        .and.returnValue(Promise.resolve({
+          Snapshot: {
+            values: [],
+          },
+        }));
 
       viewModel.loadMappedObjects();
 
@@ -94,6 +100,19 @@ describe('assessment-mapped-objects component', () => {
 
   describe('initMappedObjects() method', () => {
     it('sets isLoading attr to true before loading of mapped objects', () => {
+      const fakeLoadedObjects = [
+        {
+          id: 123,
+          revision: {
+            content: {
+              type: 'Control',
+              id: 1,
+            },
+          },
+        },
+      ];
+      spyOn(viewModel, 'loadMappedObjects')
+        .and.returnValue(Promise.resolve(fakeLoadedObjects));
       viewModel.attr('isLoading', false);
 
       viewModel.initMappedObjects();
@@ -102,7 +121,19 @@ describe('assessment-mapped-objects component', () => {
     });
 
     it('calls loadMappedObjects() method', () => {
-      spyOn(viewModel, 'loadMappedObjects');
+      const fakeLoadedObjects = [
+        {
+          id: 123,
+          revision: {
+            content: {
+              type: 'Control',
+              id: 1,
+            },
+          },
+        },
+      ];
+      spyOn(viewModel, 'loadMappedObjects')
+        .and.returnValue(Promise.resolve(fakeLoadedObjects));
 
       viewModel.initMappedObjects();
 

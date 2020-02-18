@@ -41,6 +41,12 @@ describe('assessment-evidence-objects component', () => {
       };
       viewModel.attr('instance', {id: 123});
       spyOn(QueryApiUtils, 'buildParam');
+      spyOn(QueryApiUtils, 'batchRequests')
+        .and.returnValue(Promise.resolve({
+          Evidence: {
+            values: [],
+          },
+        }));
 
       viewModel.loadEvidences();
 
@@ -121,6 +127,7 @@ describe('assessment-evidence-objects component', () => {
 
   describe('initEvidences() method', () => {
     it('sets isLoading attr to true before loading evidences', () => {
+      spyOn(viewModel, 'loadEvidences').and.returnValue([]);
       viewModel.attr('isLoading', false);
 
       viewModel.initEvidences();
@@ -129,7 +136,7 @@ describe('assessment-evidence-objects component', () => {
     });
 
     it('calls loadEvidences() method', () => {
-      spyOn(viewModel, 'loadEvidences');
+      spyOn(viewModel, 'loadEvidences').and.returnValue([]);
 
       viewModel.initEvidences();
 
@@ -232,6 +239,7 @@ describe('assessment-evidence-objects component', () => {
         viewModel.attr('expanded', true);
         viewModel.attr('isInitialized', false);
         spyOn(viewModel, 'initLocalCustomAttributes');
+        spyOn(viewModel, 'initEvidences');
 
         handler();
 

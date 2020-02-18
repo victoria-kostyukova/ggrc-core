@@ -17,6 +17,7 @@ describe('related-comments component', () => {
 
   describe('requestQuery() method', () => {
     it('sets true to "isLoading" attribute', () => {
+      spyOn(QueryAPIUtils, 'batchRequestsWithPromise');
       viewModel.attr('isLoading', false);
 
       viewModel.requestQuery();

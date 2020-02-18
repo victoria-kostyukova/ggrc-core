@@ -265,12 +265,8 @@ describe('ggrc-gdrive-picker-launcher', function () {
       });
 
     it('sets "isUploading" flag to true', () => {
+      spyOn(PickerUtils, 'uploadFiles').and.returnValue(Promise.resolve([]));
       viewModel.attr('isUploading', false);
-      spyOn(PickerUtils, 'uploadFiles')
-        .and.returnValue(Promise.resolve(files));
-      spyOn(viewModel, 'createDocumentModel')
-        .and.returnValue(Promise.resolve());
-
       uploadParentHelper(parentFolderStub, scope);
 
       expect(viewModel.attr('isUploading')).toBe(true);
