@@ -7,7 +7,7 @@ import datetime
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import generator, query_helper
-from integration.ggrc import TestCase, Api
+from integration.ggrc import TestCase, Api, api_helper
 from integration.ggrc.models import factories
 
 
@@ -486,3 +486,48 @@ class TestIssueUnmap(query_helper.WithQueryApi, TestCase):
         audit_id, "Audit", issue_id, "Issue"
     )
     self.assertEqual(audit_issue.count(), 1)
+
+
+class TestIssueMapAssessment(query_helper.WithQueryApi, TestCase):
+  """Test suite to check the rules for Issue-Assessments mappings."""
+
+  def setUp(self):
+    """Setup tests data"""
+    super(TestIssueMapAssessment, self).setUp()
+    self.api = api_helper.Api()
+
+  def test_issue_map_assessment(self):
+    """Test mapping Issue to Assessment"""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      issue = factories.IssueFactory()
+
+    response_relationship = self.api.post(all_models.Relationship, data={
+        "relationship": {
+            "source": {"id": issue.id, "type": issue.type},
+            "destination": {"id": assessment.id, "type": assessment.type},
+            "context": None
+        },
+    })
+    self.assertEqual(response_relationship.status_code, 400)
+    expected_error = u"Issue cannot be mapped to Assessment."
+    self.assertIn(response_relationship.json, expected_error)
+    self.assertEqual(0, db.session.query(all_models.Relationship).count())
+
+  def test_assessment_map_issue(self):
+    """Test mapping Assessment to Issue"""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      issue = factories.IssueFactory()
+
+    response_relationship = self.api.post(all_models.Relationship, data={
+        "relationship": {
+            "source": {"id": assessment.id, "type": assessment.type},
+            "destination": {"id": issue.id, "type": issue.type},
+            "context": None
+        },
+    })
+    self.assertEqual(response_relationship.status_code, 400)
+    expected_error = u"Assessment cannot be mapped to Issue."
+    self.assertIn(response_relationship.json, expected_error)
+    self.assertEqual(0, db.session.query(all_models.Relationship).count())

@@ -57,8 +57,6 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
               ("Assignees", "Creators", "Verifiers"): {
                   "read": True,
                   "read_revisions": True,
-                  "map": False,
-                  "create_and_map": True,
                   "raise_issue": True,
               },
               ("Assignees",): {
@@ -150,8 +148,6 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
               ("Assignees", "Creators", "Verifiers"): {
                   "read": True,
                   "read_revisions": True,
-                  "map": False,
-                  "create_and_map": True,
                   "raise_issue": True,
               },
               ("Assignees",): {
@@ -239,8 +235,6 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
                   "update": True,
                   "delete": True,
                   "read_revisions": True,
-                  "map": True,
-                  "create_and_map": True,
                   "raise_issue": True,
                   "unmap": True,
               },
