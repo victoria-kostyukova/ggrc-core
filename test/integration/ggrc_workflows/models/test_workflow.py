@@ -247,6 +247,16 @@ class TestWorkflow(TestCase):
       workflow = all_models.Workflow.query.get(wf_id)
       self.assertEqual(all_models.Workflow.INACTIVE, workflow.status)
 
+  def test_unarchive_workflow_returns_status_400(self):  # noqa pylint: disable=invalid-name
+    """Archived workflow should prohibit activation"""
+    with freezegun.freeze_time("2017-08-10"):
+      workflow = factories.WorkflowArchivedFactory()
+
+      response, _ = self.generator.modify_workflow(workflow,
+                                                   {'recurrences': True})
+
+      self.assert400(response)
+
   @ddt.data(
       ('One time workflow', None, None),
       ('Daily workflow', all_models.Workflow.DAY_UNIT, 1),

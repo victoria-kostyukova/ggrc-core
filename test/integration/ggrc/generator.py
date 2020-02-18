@@ -75,13 +75,25 @@ class Generator(object):
         response_obj = None
     return response, response_obj
 
+  @staticmethod
+  def get_object_from_response(response, obj_class, obj_name):
+    """Try to get the object from response.
+
+    If response does not contain the object, return None
+    """
+    try:
+      return obj_class.query.get(response.json[obj_name]['id'])
+    except KeyError:
+      return None
+
   def modify(self, obj, obj_name, data):
     """Make a PUT request to modify `obj` with new fields in `data`."""
     obj_class = obj.__class__
     response = self.api.put(obj, data)
     response_obj = None
     if response.status_code == 200 and response.json:
-      response_obj = obj_class.query.get(response.json[obj_name]['id'])
+      response_obj = self.get_object_from_response(response, obj_class,
+                                                   obj_name)
     return response, response_obj
 
   def obj_to_dict(self, obj, model_name=None):

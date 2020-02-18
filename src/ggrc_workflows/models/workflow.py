@@ -298,8 +298,20 @@ class Workflow(roleable.Roleable,
     if value is None:
       return self.is_verification_needed
     if self.status != self.DRAFT and value != self.is_verification_needed:
-      raise ValueError("is_verification_needed value isn't changeble "
+      raise ValueError("is_verification_needed value isn't changeable "
                        "on workflow with '{}' status".format(self.status))
+    return value
+
+  @orm.validates('recurrences')
+  def validate_recurrences(self, _, value):
+    # pylint: disable=unused-argument
+    """Validate recurrences field for Workflow.
+
+    It's not allowed to change recurrences flag for archived workflow.
+    """
+    if self.workflow_archived and value:
+      raise ValueError("recurrences value isn't changeable "
+                       "for archived workflow")
     return value
 
   @property
