@@ -11,7 +11,7 @@ import CycleTaskGroup from './cycle-task-group';
 import Workflow from './workflow';
 import {REFRESH_SUB_TREE} from '../../events/event-types';
 import {getPageType} from '../../plugins/utils/current-page-utils';
-import {getClosestWeekday} from '../../plugins/utils/date-utils';
+import {getClosestWeekday, DATE_FORMAT} from '../../plugins/utils/date-utils';
 import IsOverdue from '../mixins/is-overdue';
 import AccessControlList from '../mixins/access-control-list';
 import CaUpdate from '../mixins/ca-update';
@@ -255,19 +255,19 @@ export default Cacheable.extend({
     }
     populateFromWorkflow(this, workflow);
   },
-  formPreload: function (newObjectForm, objectParams) {
+  formPreload(newObjectForm, objectParams) {
     let form = this;
     let cycle;
-    let startDate;
-    let endDate;
 
     if (newObjectForm) {
       // prepopulate dates with default ones
-      startDate = getClosestWeekday(new Date());
-      endDate = getClosestWeekday(moment().add({month: 3}).toDate());
+      const formattedStartDate = getClosestWeekday(moment())
+        .format(DATE_FORMAT.MOMENT_ISO_DATE);
+      const formattedEndDate = getClosestWeekday(moment().add({month: 3}))
+        .format(DATE_FORMAT.MOMENT_ISO_DATE);
 
-      this.attr('start_date', startDate);
-      this.attr('end_date', endDate);
+      this.attr('start_date', formattedStartDate);
+      this.attr('end_date', formattedEndDate);
 
       // if we are creating a task from the workflow page, the preset
       // workflow should be that one

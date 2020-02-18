@@ -25,18 +25,18 @@ const DATE_FORMAT = {
 /**
  * Adjust date to the closest week day that is less than current.
  *
- * @param {Date} date - date value
+ * @param {Moment|string} date - date value
  *
- * @return {Date} closest week date to provided
+ * @return {Moment} closest week date to provided
  */
 function getClosestWeekday(date) {
-  let momDate = moment(date);
+  const momDate = moment(date);
 
   if (momDate.isoWeekday() > 5) {
-    return momDate.isoWeekday(5).toDate();
+    return momDate.isoWeekday(5);
   }
 
-  return date;
+  return momDate;
 }
 
 /**
