@@ -1,0 +1,54 @@
+{{!
+  Copyright (C) 2020 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{^if hideBlock}}
+  <div class="col-container">
+    <div class="attr-container title">
+      <related-people-access-control
+        includeRoles:from="adminRole"
+        instance:from="instance">
+        <div class="people-groups">
+          {{#groups}}
+            <related-people-access-control-group
+              groupId:from="groupId"
+              title:from="title"
+              people:from="people"
+              instance:from="instance"
+              class="people-group">
+              <deletable-people-group
+                canUnmap:from="deletableAdmin"
+                isLoading:from="isUpdating"
+                groupId:from="groupId"
+                instance:from="instance"
+                people:from="people">
+                <h6>Admin</h6>
+              </deletable-people-group>
+            </related-people-access-control-group>
+          {{/groups}}
+        </div>
+      </related-people-access-control>
+    </div>
+    {{#if hasNotes}}
+      <div class="attr-container notes">
+        <h6>Notes</h6>
+        <read-more
+          class="attr-value"
+          text:from="instance.notes"
+          handleMarkdown:from="instance.constructor.isChangeableExternally">
+        </read-more>
+      </div>
+    {{/if}}
+  </div>
+{{/if}}
+<div class="col-container">
+  <div class="attr-container description">
+    <h6>{{title}}</h6>
+    <read-more
+      class="attr-value"
+      text:from="description"
+      handleMarkdown:from="instance.constructor.isChangeableExternally">
+    </read-more>
+  </div>
+</div>

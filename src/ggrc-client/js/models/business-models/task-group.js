@@ -30,7 +30,7 @@ export default Cacheable.extend({
       {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Assignee', attr_name: 'assignee',
         attr_sort_field: 'contact'},
-      {attr_title: 'Description', attr_name: 'description'},
+      {attr_title: 'Details', attr_name: 'description'},
     ],
     disable_columns_configuration: true,
   },
