@@ -7,7 +7,6 @@ import pytest
 from selenium.webdriver.common import keys
 
 from lib import base, users
-from lib.constants import locator
 from lib.entities import entities_factory
 from lib.page.widget import object_modal
 from lib.service import webui_service, rest_facade
@@ -26,15 +25,13 @@ class TestProgramPage(base.Test):
     assert active_tab_name == "Program Info"
 
   @pytest.mark.smoke_tests
-  def test_permalink(self, selenium, program):
+  def test_permalink(self, selenium, program, soft_assert):
     """Verify url is copied to clipboard."""
     info_page = webui_service.ProgramsService(
         selenium).open_info_page_of_obj(program)
     info_page.three_bbs.select_get_permalink()
-    # test notification alert
-    base.AnimatedComponent(
-        selenium, [locator.WidgetInfoProgram.ALERT_LINK_COPIED],
-        wait_until_visible=True)
+    soft_assert.expect(info_page.permalink_floating_message.exists,
+                       "There should be a notification floating message.")
     # test generated link
     # Doesn't work on Mac as Chromedriver / Devtools emulate keys on browser
     # level (Cmd + V works on OS level).
@@ -43,7 +40,9 @@ class TestProgramPage(base.Test):
     info_page.three_bbs.select_edit()
     modal = object_modal.get_modal_obj("program", selenium)
     modal.title_field.set(keys.Keys.CONTROL, "v")
-    assert modal.title_field.value == program.url
+    soft_assert.expect(modal.title_field.value == program.url,
+                       "Copied permalink is not equal to objects url.")
+    soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
   def test_create_program(self, selenium):
