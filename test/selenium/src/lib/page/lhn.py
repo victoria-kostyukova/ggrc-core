@@ -140,7 +140,7 @@ class _Standards(lhn.AccordionGroup):
 class _Contracts(lhn.AccordionGroup):
   """Contracts dropdown in LHN."""
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CONTRACTS
-  _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
+  _locator_spinny = locator.LhnMenu.SPINNY_CONTRACTS
   _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_CONTRACTS
 
 

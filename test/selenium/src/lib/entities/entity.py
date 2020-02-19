@@ -664,7 +664,8 @@ class Entity(Representation):
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
         RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
-        ProductEntity, TechnologyEnvironmentEntity, ChangeLogItemEntity
+        ProductEntity, TechnologyEnvironmentEntity, ChangeLogItemEntity,
+        StandardEntity, RegulationEntity
     )
 
   def __lt__(self, other):
