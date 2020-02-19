@@ -6,6 +6,7 @@
 import Component from '../related-objects';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import * as QueryAPIUtils from '../../../plugins/utils/query-api-utils';
+import {RELATED_REFRESHED} from '../../../events/event-types';
 
 describe('related-objects component', () => {
   let viewModel;
@@ -18,14 +19,6 @@ describe('related-objects component', () => {
     beforeEach(() => {
       spyOn(viewModel, 'getParams');
       spyOn(QueryAPIUtils, 'batchRequestsWithPromise');
-    });
-
-    it('set "isLoading" attribute to true', () => {
-      viewModel.attr('isLoading', false);
-
-      viewModel.loadRelatedItems();
-
-      expect(viewModel.attr('isLoading')).toBe(true);
     });
 
     it('calls batchRequests() util', () => {
@@ -81,14 +74,6 @@ describe('related-objects component', () => {
           {instance: {id: 3}},
         ]);
       });
-
-      it('sets "isLoading" attribute to false', async () => {
-        viewModel.attr('isLoading', true);
-
-        await viewModel.loadRelatedItems();
-
-        expect(viewModel.attr('isLoading')).toBe(false);
-      });
     });
 
     describe('if batchRequests() was failed', () => {
@@ -97,19 +82,76 @@ describe('related-objects component', () => {
           .and.returnValue(Promise.reject());
       });
 
-      it('sets "isLoading" attribute to false', async () => {
-        viewModel.attr('isLoading', true);
-
-        await viewModel.loadRelatedItems();
-
-        expect(viewModel.attr('isLoading')).toBe(false);
-      });
-
       it('should return empty array', async () => {
         const result = await viewModel.loadRelatedItems();
 
         expect(result).toEqual([]);
       });
+    });
+  });
+
+  describe('setRelatedItems() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'loadRelatedItems');
+    });
+
+    it('set "isLoading" attribute to true', () => {
+      viewModel.attr('isLoading', false);
+
+      viewModel.setRelatedItems();
+
+      expect(viewModel.attr('isLoading')).toBe(true);
+    });
+
+    describe('after loadRelatedItems() success', () => {
+      beforeEach(() => {
+        viewModel.attr('relatedItemsType', 'testType');
+        viewModel.attr('baseInstance', {});
+
+        viewModel.loadRelatedItems.and.returnValue(
+          Promise.resolve(['proposal1', 'proposal2', 'proposal3']));
+      });
+
+      it('replace existing relatedObjects', async () => {
+        viewModel.attr('relatedObjects', []);
+
+        await viewModel.setRelatedItems();
+
+        expect(viewModel.attr('relatedObjects').attr()).toEqual([
+          'proposal1',
+          'proposal2',
+          'proposal3',
+        ]);
+      });
+
+      it('dispatches RELATED_REFRESHED event', async () => {
+        const baseInstance = viewModel.attr('baseInstance');
+        spyOn(baseInstance, 'dispatch');
+
+        await viewModel.setRelatedItems();
+
+        expect(baseInstance.dispatch).toHaveBeenCalledWith({
+          ...RELATED_REFRESHED,
+          model: 'testType',
+        });
+      });
+
+      it('sets "isLoading" attribute to false', async () => {
+        viewModel.attr('isLoading', true);
+
+        await viewModel.setRelatedItems();
+
+        expect(viewModel.attr('isLoading')).toBe(false);
+      });
+    });
+
+    it('sets "isLoading" attribute to false if was failed', async () => {
+      viewModel.attr('isLoading', true);
+      viewModel.loadRelatedItems.and.returnValue(Promise.reject());
+
+      await expectAsync(viewModel.setRelatedItems()).toBeRejected();
+
+      expect(viewModel.attr('isLoading')).toBe(false);
     });
   });
 });
