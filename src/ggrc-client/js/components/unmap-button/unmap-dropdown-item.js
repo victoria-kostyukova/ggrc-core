@@ -59,7 +59,7 @@ export default canComponent.extend({
 
           return allowedToUnmap(source, destination)
             && !(isAllObjects() || isMyWork())
-            && options.attr('isDirectlyRelated')
+            && options.isDirectlyRelated
             && !this.attr('denyIssueUnmap')
             && !this.attr('denySnapshotUnmap')
             && !source._is_sox_restricted

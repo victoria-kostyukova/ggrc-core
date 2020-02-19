@@ -24,39 +24,39 @@ import Cacheable from '../../../models/cacheable';
 import Program from '../../../models/business-models/program';
 import Assessment from '../../../models/business-models/assessment';
 
-describe('tree-widget-container component', function () {
+describe('tree-widget-container component', () => {
   let vm;
 
-  beforeEach(function () {
+  beforeEach(() => {
     vm = getComponentVM(Component);
   });
 
-  describe('onSort() method', function () {
+  describe('onSort() method', () => {
     let onSort;
 
-    beforeEach(function () {
+    beforeEach(() => {
       onSort = vm.onSort.bind(vm);
-      vm.attr('pageInfo.count', 3);
+      vm.pageInfo.attr('count', 3);
 
       spyOn(vm, 'loadItems');
       spyOn(vm, 'closeInfoPane');
     });
 
-    it('sets current order properties', function () {
+    it('sets current order properties', () => {
       onSort({
         field: 'col1',
         sortDirection: 'asc',
       });
 
-      expect(vm.attr('sortingInfo.sortBy')).toEqual('col1');
-      expect(vm.attr('sortingInfo.sortDirection')).toEqual('asc');
-      expect(vm.attr('pageInfo.current')).toEqual(1);
+      expect(vm.sortingInfo.sortBy).toEqual('col1');
+      expect(vm.sortingInfo.sortDirection).toEqual('asc');
+      expect(vm.pageInfo.attr('current')).toEqual(1);
       expect(vm.loadItems).toHaveBeenCalled();
       expect(vm.closeInfoPane).toHaveBeenCalled();
     });
   });
 
-  describe('loadItems() method', function () {
+  describe('loadItems() method', () => {
     let loadItems;
     let modelName;
     let parent;
@@ -65,7 +65,7 @@ describe('tree-widget-container component', function () {
     let request;
     let loadSnapshots;
 
-    beforeEach(function () {
+    beforeEach(() => {
       modelName = 'testModelName';
       parent = new canMap({testParent: true});
       page = {
@@ -79,16 +79,16 @@ describe('tree-widget-container component', function () {
       filter = new canMap({testFilter: true});
       request = new canList([{testRequest: true}]);
 
-      vm.attr('model', {
+      vm.model = {
         model_singular: modelName,
-      });
-      vm.attr('options', {
+      };
+      vm.options = {
         parent_instance: parent,
-      });
-      vm.attr('currentFilter', {
+      };
+      vm.currentFilter = {
         filter,
         request,
-      });
+      };
 
       loadItems = vm.loadItems.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
@@ -97,123 +97,121 @@ describe('tree-widget-container component', function () {
     });
 
     it('should call TreeViewUtils.loadFirstTierItems with specified ' +
-    'arguments if "options.megaRelated" attr is truthy', function (done) {
-      vm.attr('options.megaRelated', true);
+    'arguments if "options.megaRelated" attr is truthy', (done) => {
+      vm.options.megaRelated = true;
       spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue($.Deferred().resolve({
           total: 100,
           values: [],
         }));
-      loadItems().then(function () {
+      loadItems().then(() => {
         expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
           modelName, parent, page, filter, request, loadSnapshots, 'child');
-        expect(vm.attr('pageInfo.total')).toEqual(100);
-        expect(makeArray(vm.attr('showedItems'))).toEqual([]);
+        expect(vm.pageInfo.attr('total')).toEqual(100);
+        expect(makeArray(vm.showedItems)).toEqual([]);
         done();
       });
     });
 
     it('should call TreeViewUtils.loadFirstTierItems with specified ' +
-    'arguments if "options.megaRelated" attr is falsy', function (done) {
-      vm.attr('options.megaRelated', false);
+    'arguments if "options.megaRelated" attr is falsy', (done) => {
+      vm.options.megaRelated = false;
       spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue($.Deferred().resolve({
           total: 100,
           values: [],
         }));
-      loadItems().then(function () {
+      loadItems().then(() => {
         expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
           modelName, parent, page, filter, request, loadSnapshots, null);
-        expect(vm.attr('pageInfo.total')).toEqual(100);
-        expect(makeArray(vm.attr('showedItems'))).toEqual([]);
+        expect(vm.pageInfo.attr('total')).toEqual(100);
+        expect(makeArray(vm.showedItems)).toEqual([]);
         done();
       });
     });
   });
 
-  describe('on widget appearing', function () {
+  describe('on widget appearing', () => {
     let _widgetShown;
 
-    beforeEach(function () {
+    beforeEach(() => {
       _widgetShown = vm._widgetShown.bind(vm);
       spyOn(vm, '_triggerListeners');
       spyOn(vm, 'loadItems');
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       let modelName = 'Model';
       spyOn(WidgetsUtils, 'getCounts').and.returnValue({[modelName]: 123});
-      vm.attr({
-        options: {
-          countsName: modelName,
-        },
-        pageInfo: {
-          total: 123,
-        },
+      vm.options = {
+        countsName: modelName,
+      };
+      vm.pageInfo = new canMap({
+        total: 123,
       });
     });
 
-    it('should add listeners', function () {
+    it('should add listeners', () => {
       _widgetShown();
       expect(vm._triggerListeners).toHaveBeenCalled();
       expect(vm.loadItems).not.toHaveBeenCalled();
     });
 
     it('should load items if refetch flag is true', () => {
-      vm.attr('refetch', true);
+      vm.refetch = true;
       router.attr('refetch', false);
-      vm.attr('options.forceRefetch', false);
+      vm.options.forceRefetch = false;
 
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
     });
 
     it('should load items if url has refetch param', () => {
-      vm.attr('refetch', false);
+      vm.refetch = false;
       router.attr('refetch', true);
-      vm.attr('options.forceRefetch', false);
+      vm.options.forceRefetch = false;
 
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
-      expect(vm.attr('refetch')).toBeFalsy();
+      expect(vm.refetch).toBeFalsy();
     });
 
     it('should load items if widget has forceRefetch option', () => {
-      vm.attr('refetch', false);
+      vm.refetch = false;
       router.attr('refetch', false);
-      vm.attr('options.forceRefetch', true);
+      vm.options.forceRefetch = true;
 
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
     });
 
     it('should load items if count has changed', () => {
-      vm.attr('refetch', false);
+      vm.refetch = false;
       router.attr('refetch', false);
-      vm.attr('options.forceRefetch', false);
-      vm.attr('pageInfo.total', 100); // less than current count
+      vm.options.forceRefetch = false;
+      vm.pageInfo.attr('total', 100); // less than current count
 
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
     });
   });
 
-  describe('getAbsoluteItemNumber() method', function () {
-    beforeEach(function () {
-      vm.attr({
-        pageInfo: {
-          pageSize: 10,
-          count: 5,
-        },
-        showedItems: [{id: 1, type: 'object'},
-          {id: 2, type: 'object'},
-          {id: 3, type: 'object'}],
+  describe('getAbsoluteItemNumber() method', () => {
+    beforeEach(() => {
+      vm.pageInfo = new canMap({
+        pageSize: 10,
+        count: 5,
       });
-      vm.attr('pageInfo.current', 3);
+      vm.showedItems = [
+        {id: 1, type: 'object'},
+        {id: 2, type: 'object'},
+        {id: 3, type: 'object'},
+      ];
+      vm.pageInfo.attr('current', 3);
     });
 
     it('should return correct item number when item is on page',
-      function () {
+      () => {
         let result;
 
         result = vm.getAbsoluteItemNumber({id: 2, type: 'object'});
@@ -222,7 +220,7 @@ describe('tree-widget-container component', function () {
       });
 
     it('should return "-1" when item is not on page',
-      function () {
+      () => {
         let result;
 
         result = vm.getAbsoluteItemNumber({id: 4, type: 'object'});
@@ -230,7 +228,7 @@ describe('tree-widget-container component', function () {
         expect(result).toEqual(-1);
       });
     it('should return "-1" when item is of different type',
-      function () {
+      () => {
         let result;
 
         result = vm.getAbsoluteItemNumber({id: 3, type: 'snapshot'});
@@ -238,7 +236,7 @@ describe('tree-widget-container component', function () {
         expect(result).toEqual(-1);
       });
     it('should return correct item number for first item on non first page',
-      function () {
+      () => {
         let result;
 
         result = vm.getAbsoluteItemNumber({id: 1, type: 'object'});
@@ -247,45 +245,45 @@ describe('tree-widget-container component', function () {
       });
   });
 
-  describe('getRelativeItemNumber() method', function () {
-    it('should return correct item number on page', function () {
+  describe('getRelativeItemNumber() method', () => {
+    it('should return correct item number on page', () => {
       let result = vm.getRelativeItemNumber(12, 5);
 
       expect(result).toEqual(2);
     });
   });
 
-  describe('getNextItemPage() method', function () {
-    beforeEach(function () {
+  describe('getNextItemPage() method', () => {
+    beforeEach(() => {
       spyOn(vm, 'loadItems');
     });
 
     it('should load items for appropriate page when item is not loaded',
-      function () {
+      () => {
         vm.getNextItemPage(10, {current: 2, pageSize: 5});
 
-        expect(vm.attr('loading')).toBeTruthy();
+        expect(vm.loading).toBeTruthy();
         expect(vm.loadItems).toHaveBeenCalled();
       });
 
     it('shouldn\'t load items when current item was already loaded',
-      function () {
+      () => {
         vm.getNextItemPage(10, {current: 3, pageSize: 5});
 
-        expect(vm.attr('loading')).toBeFalsy();
+        expect(vm.loading).toBeFalsy();
         expect(vm.loadItems).not.toHaveBeenCalled();
       });
   });
 
   describe('setSortingConfiguration() method', () => {
     beforeEach(() => {
-      vm.attr('model', {
+      vm.model = {
         model_singular: 'shortModelName',
-      });
+      };
     });
 
     it('sets up default sorting configuration', () => {
-      vm.attr('sortingInfo', {});
+      vm.sortingInfo = {};
       spyOn(TreeViewUtils, 'getSortingForModel')
         .and.returnValue({
           key: 'key',
@@ -294,8 +292,8 @@ describe('tree-widget-container component', function () {
 
       vm.setSortingConfiguration();
 
-      expect(vm.attr('sortingInfo.sortBy')).toEqual('key');
-      expect(vm.attr('sortingInfo.sortDirection')).toEqual('direction');
+      expect(vm.sortingInfo.sortBy).toEqual('key');
+      expect(vm.sortingInfo.sortDirection).toEqual('direction');
     });
   });
 
@@ -303,9 +301,9 @@ describe('tree-widget-container component', function () {
     let method;
 
     beforeEach(() => {
-      vm.attr('model', {
+      vm.model = {
         model_singular: 'shortModelName',
-      });
+      };
       method = Component.prototype.init.bind({viewModel: vm});
       spyOn(vm, 'setSortingConfiguration');
       spyOn(vm, 'setColumnsConfiguration');
@@ -322,10 +320,10 @@ describe('tree-widget-container component', function () {
     });
   });
 
-  describe('getDepthFilter() method', function () {
-    it('returns an empty string if depth is not set for filter', function () {
+  describe('getDepthFilter() method', () => {
+    it('returns an empty string if depth is not set for filter', () => {
       let result;
-      spyOn(vm, 'attr')
+      spyOn(vm, 'get')
         .and.returnValue([{
           query: {
             expression: {
@@ -351,9 +349,9 @@ describe('tree-widget-container component', function () {
       expect(result).toBe(null);
     });
 
-    it('returns filter that applied for depth', function () {
+    it('returns filter that applied for depth', () => {
       let result;
-      spyOn(vm, 'attr')
+      spyOn(vm, 'get')
         .and.returnValue([{
           query: {
             expression: {
@@ -393,42 +391,42 @@ describe('tree-widget-container component', function () {
   describe('_needToRefreshAfterRelRemove() method', () => {
     let relationship;
 
-    beforeEach(function () {
+    beforeEach(() => {
       relationship = {
         source: {},
         destination: {},
       };
-      vm.attr('options.parent_instance', {
+      vm.options.parent_instance = new canMap({
         type: 'Type',
         id: 1,
       });
     });
 
     describe('returns true', () => {
-      it('if source of passed relationship is current instance', function () {
+      it('if source of passed relationship is current instance', () => {
         const source = {
           type: 'SomeType',
           id: 12345,
         };
-        vm.attr('parent_instance').attr(source);
+        vm.parent_instance.attr(source);
         Object.assign(relationship.source, source);
         const result = vm._needToRefreshAfterRelRemove(relationship);
         expect(result).toBe(true);
       });
 
-      it('if source of passed relationship is current instance', function () {
+      it('if source of passed relationship is current instance', () => {
         const destination = {
           type: 'SomeType',
           id: 12345,
         };
-        vm.attr('parent_instance').attr(destination);
+        vm.parent_instance.attr(destination);
         Object.assign(relationship.destination, destination);
         const result = vm._needToRefreshAfterRelRemove(relationship);
         expect(result).toBe(true);
       });
     });
 
-    it('returns false when there are no need to refresh', function () {
+    it('returns false when there are no need to refresh', () => {
       const result = vm._needToRefreshAfterRelRemove(relationship);
       expect(result).toBe(false);
     });
@@ -438,11 +436,11 @@ describe('tree-widget-container component', function () {
     describe('if instance is relationship then', () => {
       let instance;
 
-      beforeEach(function () {
+      beforeEach(() => {
         instance = makeFakeInstance({model: Relationship})();
       });
 
-      it('returns result of the relationship check', function () {
+      it('returns result of the relationship check', () => {
         const expectedResult = true;
         spyOn(vm, '_needToRefreshAfterRelRemove')
           .and.returnValue(expectedResult);
@@ -453,7 +451,7 @@ describe('tree-widget-container component', function () {
       });
     });
 
-    it('returns true by default', function () {
+    it('returns true by default', () => {
       const result = vm._isRefreshNeeded();
       expect(result).toBe(true);
     });
@@ -465,12 +463,12 @@ describe('tree-widget-container component', function () {
 
     it('assigns last page index to pageInfo.current', () => {
       const count = 711;
-      vm.attr('pageInfo.count', count);
-      vm.attr('pageInfo.current', count + 1);
+      vm.pageInfo.attr('count', count);
+      vm.pageInfo.attr('current', count + 1);
 
       vm.showLastPage();
 
-      expect(vm.attr('pageInfo.current')).toBe(count);
+      expect(vm.pageInfo.attr('current')).toBe(count);
     });
   });
 
@@ -491,16 +489,16 @@ describe('tree-widget-container component', function () {
       filter = new canMap({testFilter: true});
       request = new canList([{testRequest: true}]);
 
-      vm.attr('model', {
+      vm.model = {
         model_singular: modelName,
-      });
-      vm.attr('options', {
+      };
+      vm.options = {
         parent_instance: parent,
-      });
-      vm.attr('currentFilter', {
+      };
+      vm.currentFilter = {
         filter,
         request,
-      });
+      };
     });
 
     it('starts export correctly', () => {
@@ -522,9 +520,9 @@ describe('tree-widget-container component', function () {
 
   describe('setColumnsConfiguration() method', () => {
     it('should call addServiceColumns() method', () => {
-      vm.attr('model', {
+      vm.model = {
         model_singular: 'test model',
-      });
+      };
       spyOn(TreeViewUtils, 'getColumnsForModel')
         .and.returnValue([]);
       spyOn(vm, 'addServiceColumns');
@@ -537,9 +535,9 @@ describe('tree-widget-container component', function () {
 
   describe('onUpdateColumns() method', () => {
     it('should call addServiceColumns() method', () => {
-      vm.attr('model', {
+      vm.model = {
         model_singular: 'test model',
-      });
+      };
       spyOn(TreeViewUtils, 'setColumnsForModel')
         .and.returnValue([]);
       spyOn(vm, 'addServiceColumns');
@@ -577,7 +575,7 @@ describe('tree-widget-container component', function () {
         },
       });
 
-      vm.attr('model', fakeModel);
+      vm.model = fakeModel;
     });
 
     it('should work for Persons', () => {
@@ -617,11 +615,11 @@ describe('tree-widget-container component', function () {
         }],
       };
 
-      vm.attr('model', Assessment);
+      vm.model = Assessment;
       vm.addServiceColumns(columns);
       expect(columns).toEqual(expectedOutput);
 
-      vm.attr('model', Program);
+      vm.model = Program;
       vm.addServiceColumns(columns);
       expect(columns).toEqual(expectedOutput);
     });
@@ -640,7 +638,7 @@ describe('tree-widget-container component', function () {
         order: 2,
       }];
 
-      vm.attr('model').tree_view_options.service_attr_list = [{
+      vm.model.tree_view_options.service_attr_list = [{
         name: 'serviceCol1',
         order: 1,
       }];

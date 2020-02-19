@@ -11,6 +11,7 @@ import loIsEmpty from 'lodash/isEmpty';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import './tree-header-selector';
 import './sub-tree-expander';
@@ -69,96 +70,116 @@ import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 import pubSub from '../../pub-sub';
 import {concatFilters} from '../../plugins/utils/query-api-utils';
 
-let viewModel = canMap.extend({
-  define: {
-    modelName: {
-      type: String,
-      get: function () {
-        return this.attr('model').model_singular;
-      },
+const ViewModel = canDefineMap.extend({
+  modelName: {
+    get() {
+      return this.model && this.model.model_singular;
     },
-    statusTooltipVisible: {
-      type: Boolean,
-      get: function () {
-        return StateUtils.hasFilterTooltip(this.attr('modelName'));
-      },
+  },
+  statusTooltipVisible: {
+    get() {
+      return StateUtils.hasFilterTooltip(this.modelName);
     },
-    cssClasses: {
-      type: String,
-      get: function () {
-        let classes = [];
+  },
+  cssClasses: {
+    get() {
+      let classes = [];
 
-        if (this.attr('loading')) {
-          classes.push('loading');
-        }
+      if (this.loading) {
+        classes.push('loading');
+      }
 
-        return classes.join(' ');
-      },
+      return classes.join(' ');
     },
-    parent_instance: {
-      type: '*',
-      get: function () {
-        return this.attr('options').parent_instance;
-      },
+  },
+  parent_instance: {
+    Type: canMap,
+    get() {
+      return this.options && this.options.parent_instance;
     },
-    noResults: {
-      type: Boolean,
-      get: function () {
-        return !this.attr('loading') && !this.attr('showedItems').length;
-      },
+  },
+  noResults: {
+    get() {
+      return !this.loading && !this.showedItems.length;
     },
-    pageInfo: {
-      value: function () {
-        return new Pagination({
-          pageSizeSelect: [10, 25, 50],
-          pageSize: 10});
-      },
+  },
+  pageInfo: {
+    value() {
+      return new Pagination({
+        pageSizeSelect: [10, 25, 50],
+        pageSize: 10});
     },
-    selectedItem: {
-      set(newValue) {
-        this.selectedItemHandler(newValue);
-        return newValue;
-      },
+  },
+  selectedItem: {
+    set(newValue) {
+      this.selectedItemHandler(newValue);
+      return newValue;
     },
   },
   sortingInfo: {
-    sortDirection: null,
-    sortBy: null,
+    value: () => ({
+      sortDirection: null,
+      sortBy: null,
+    }),
   },
-  /**
-   *
-   */
-  model: null,
-  /**
-   *
-   */
-  showedItems: [],
-  /**
-   *
-   */
-  limitDepthTree: 0,
+  model: {
+    value: null,
+  },
+  showedItems: {
+    value: () => [],
+  },
+  limitDepthTree: {
+    value: 0,
+  },
   /**
    * Legacy options which were built for a previous implementation of TreeView based on TreeView controller
    */
-  options: {},
-  router: null,
-  $el: null,
-  loading: false,
-  refetch: false,
-  columns: {
-    selected: [],
-    available: [],
+  options: {
+    value: () => ({}),
   },
-  canOpenInfoPin: true,
-  pubSub,
-  currentFilter: {},
-  loadItems: function () {
-    let modelName = this.attr('modelName');
-    let pageInfo = this.attr('pageInfo');
-    let sortingInfo = this.attr('sortingInfo');
-    let parent = this.attr('parent_instance');
-    let filter = this.attr('currentFilter.filter');
-    let page = {
+  router: {
+    value: null,
+  },
+  $el: {
+    value: null,
+  },
+  loading: {
+    value: false,
+  },
+  refetch: {
+    value: false,
+  },
+  columns: {
+    value: () => ({
+      selected: [],
+      available: [],
+    }),
+  },
+  canOpenInfoPin: {
+    value: true,
+  },
+  pubSub: {
+    value: () => pubSub,
+  },
+  currentFilter: {
+    value: () => ({}),
+  },
+  isSubTreeItem: {
+    value: false,
+  },
+  isDirectlyRelated: {
+    value: false,
+  },
+  filters: {
+    value: () => [],
+  },
+  loadItems() {
+    const modelName = this.modelName;
+    const pageInfo = this.pageInfo;
+    const sortingInfo = this.sortingInfo;
+    const parent = this.parent_instance;
+    const filter = this.currentFilter.filter;
+    const page = {
       current: pageInfo.current,
       pageSize: pageInfo.pageSize,
       sort: [{
@@ -166,17 +187,17 @@ let viewModel = canMap.extend({
         direction: sortingInfo.sortDirection,
       }],
     };
-    let request = this.attr('currentFilter.request');
+    const request = this.currentFilter.request;
     const stopFn = tracker.start(modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
 
     pageInfo.attr('disabled', true);
-    this.attr('loading', true);
+    this.loading = true;
 
-    let loadSnapshots = this.attr('options.objectVersion');
-    const operation = this.attr('options.megaRelated')
-      ? getMegaObjectRelation(this.attr('options.widgetId')).relation
+    const loadSnapshots = this.options.objectVersion;
+    const operation = this.options.megaRelated
+      ? getMegaObjectRelation(this.options.widgetId).relation
       : null;
 
     return TreeViewUtils
@@ -191,38 +212,38 @@ let viewModel = canMap.extend({
       .then((data) => {
         const total = data.total;
 
-        this.attr('showedItems', data.values);
-        this.attr('pageInfo.total', total);
-        this.attr('pageInfo.disabled', false);
-        this.attr('loading', false);
+        this.showedItems = data.values;
+        this.pageInfo.attr('total', total);
+        this.pageInfo.attr('disabled', false);
+        this.loading = false;
       })
       .then(stopFn, stopFn.bind(null, true));
   },
   refresh(destinationType) {
-    if (!destinationType || this.attr('modelName') === destinationType) {
+    if (!destinationType || this.modelName === destinationType) {
       this.closeInfoPane();
       return this.loadItems();
     }
 
     return Promise.resolve();
   },
-  setColumnsConfiguration: function () {
-    let columns = TreeViewUtils.getColumnsForModel(
-      this.attr('model').model_singular,
-      this.attr('options.widgetId')
+  setColumnsConfiguration() {
+    const columns = TreeViewUtils.getColumnsForModel(
+      this.modelName,
+      this.options.widgetId
     );
 
     this.addServiceColumns(columns);
 
-    this.attr('columns.available', columns.available);
-    this.attr('columns.selected', columns.selected);
-    this.attr('columns.mandatory', columns.mandatory);
-    this.attr('columns.disableConfiguration', columns.disableConfiguration);
+    this.columns.available = columns.available;
+    this.columns.selected = columns.selected;
+    this.columns.mandatory = columns.mandatory;
+    this.columns.disableConfiguration = columns.disableConfiguration;
   },
   addServiceColumns(columns) {
-    if (this.attr('modelName') === 'Person') {
+    if (this.modelName === 'Person') {
       const serviceCols =
-        this.attr('model').tree_view_options.service_attr_list;
+        this.model.tree_view_options.service_attr_list;
 
       columns.available = columns.available.concat(serviceCols);
       columns.selected = columns.selected.concat(serviceCols);
@@ -231,69 +252,69 @@ let viewModel = canMap.extend({
       columns.selected = loSortBy(columns.selected, 'order');
     }
   },
-  setSortingConfiguration: function () {
+  setSortingConfiguration() {
     let sortingInfo = TreeViewUtils
-      .getSortingForModel(this.attr('modelName'));
+      .getSortingForModel(this.modelName);
 
-    this.attr('sortingInfo.sortBy', sortingInfo.key);
-    this.attr('sortingInfo.sortDirection', sortingInfo.direction);
+    this.sortingInfo.sortBy = sortingInfo.key;
+    this.sortingInfo.sortDirection = sortingInfo.direction;
   },
-  onUpdateColumns: function (event) {
-    let selectedColumns = event.columns;
-    let columns = TreeViewUtils.setColumnsForModel(
-      this.attr('model').model_singular,
+  onUpdateColumns(event) {
+    const selectedColumns = event.columns;
+    const columns = TreeViewUtils.setColumnsForModel(
+      this.modelName,
       selectedColumns,
-      this.attr('options.widgetId')
+      this.options.widgetId
     );
 
     this.addServiceColumns(columns);
 
-    this.attr('columns.selected', columns.selected);
+    this.columns.selected = columns.selected;
   },
-  onSort: function (event) {
-    this.attr('sortingInfo.sortBy', event.field);
-    this.attr('sortingInfo.sortDirection', event.sortDirection);
+  onSort(event) {
+    this.sortingInfo.sortBy = event.field;
+    this.sortingInfo.sortDirection = event.sortDirection;
 
-    this.attr('pageInfo.current', 1);
+    this.pageInfo.attr('current', 1);
     this.refresh();
   },
-  onFilter: function () {
-    const stopFn = tracker.start(this.attr('modelName'),
+  onFilter() {
+    const stopFn = tracker.start(this.modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.FILTER);
-    this.attr('pageInfo.current', 1);
+    this.pageInfo.attr('current', 1);
     this.refresh().then(stopFn);
   },
-  getDepthFilter: function (deepLevel) {
-    let filters = makeArray(this.attr('filters'));
+  getDepthFilter(deepLevel) {
+    const filters = makeArray(this.get('filters'));
 
-    return filters.filter(function (options) {
+    return filters.filter((options) => {
       return options.query &&
         options.depth &&
         options.filterDeepLimit > deepLevel;
     }).reduce(concatFilters, null);
   },
-  _widgetHidden: function () {
+  _widgetHidden() {
     this._triggerListeners(true);
   },
   _widgetShown() {
-    let countsName = this.attr('options.countsName');
-    let total = this.attr('pageInfo.total');
-    let counts = loGet(getCounts(), countsName);
+    const countsName = this.options.countsName;
+    const total = this.pageInfo.attr('total');
+    const counts = loGet(getCounts(), countsName);
 
     this._triggerListeners();
 
-    if (this.attr('refetch') ||
+    if (this.refetch ||
       router.attr('refetch') ||
-      this.attr('options.forceRefetch') ||
+      this.options.forceRefetch ||
       // this condition is mostly for Issues, Documents and Evidence as they can be created from other object info pane
       (total !== counts)) {
       this.loadItems();
-      this.attr('refetch', false);
+      this.refetch = false;
     }
   },
   _needToRefreshAfterRelRemove(relationship) {
-    const parentInstance = this.attr('parent_instance');
+    const parentInstance = this.parent_instance;
     const {
       source,
       destination,
@@ -342,10 +363,9 @@ let viewModel = canMap.extend({
       if (_verifyRelationship(instance, activeTabModel) ||
         instance instanceof businessModels[activeTabModel] ||
         isSnapshotTab) {
-        if (self.attr('showedItems').length === 1) {
-          const current = self.attr('pageInfo.current');
-          self.attr('pageInfo.current',
-            current > 1 ? current - 1 : 1);
+        if (self.showedItems.length === 1) {
+          const current = self.pageInfo.attr('current');
+          self.pageInfo.attr('current', current > 1 ? current - 1 : 1);
         }
 
         if (self._isRefreshNeeded(instance)) {
@@ -353,7 +373,7 @@ let viewModel = canMap.extend({
 
           // TODO: This is a workaround.We need to update communication between
           //       info-pin and tree views through Observer
-          if (!self.attr('$el').closest('.pin-content').length) {
+          if (!self.$el.closest('.pin-content').length) {
             $('.pin-content').control().unsetInstance();
           }
         } else {
@@ -366,21 +386,21 @@ let viewModel = canMap.extend({
     }
 
     const _refresh = async (sortByUpdatedAt) => {
-      if (self.attr('loading')) {
+      if (self.loading) {
         return;
       }
       if (sortByUpdatedAt) {
-        self.attr('sortingInfo.sortDirection', 'desc');
-        self.attr('sortingInfo.sortBy', 'updated_at');
-        self.attr('pageInfo.current', 1);
+        self.sortingInfo.sortDirection = 'desc';
+        self.sortingInfo.sortBy = 'updated_at';
+        self.pageInfo.attr('current', 1);
       }
       await self.loadItems();
 
       if (!self.isCurrentFilterEmpty()) {
         _refreshCounts();
       } else {
-        const countsName = self.attr('options.countsName');
-        const total = self.attr('pageInfo.total');
+        const countsName = self.options.countsName;
+        const total = self.pageInfo.attr('total');
         getCounts().attr(countsName, total);
       }
       self.closeInfoPane();
@@ -390,7 +410,7 @@ let viewModel = canMap.extend({
     const _refreshCounts = loDebounce(() => {
       // do not refresh counts for Workflow. There are additional filters
       // for history and active tabs which are handled in workflow components
-      if (self.attr('parent_instance').type === 'Workflow') {
+      if (self.parent_instance.type === 'Workflow') {
         return;
       }
 
@@ -449,40 +469,38 @@ let viewModel = canMap.extend({
       }
     };
   })(),
-  closeInfoPane: function () {
-    $('.pin-content')
-      .control()
-      .close();
+  closeInfoPane() {
+    $('.pin-content').control().close();
   },
-  getAbsoluteItemNumber: function (instance) {
-    let showedItems = this.attr('showedItems');
-    let pageInfo = this.attr('pageInfo');
-    let startIndex = pageInfo.pageSize * (pageInfo.current - 1);
-    let relativeItemIndex = loFindIndex(showedItems,
+  getAbsoluteItemNumber(instance) {
+    const showedItems = this.showedItems;
+    const pageInfo = this.pageInfo;
+    const startIndex = pageInfo.pageSize * (pageInfo.current - 1);
+    const relativeItemIndex = loFindIndex(showedItems,
       {id: instance.id, type: instance.type});
     return relativeItemIndex > -1 ?
       startIndex + relativeItemIndex :
       relativeItemIndex;
   },
-  getRelativeItemNumber: function (absoluteNumber, pageSize) {
-    let pageNumber = Math.floor(absoluteNumber / pageSize);
-    let startIndex = pageSize * pageNumber;
+  getRelativeItemNumber(absoluteNumber, pageSize) {
+    const pageNumber = Math.floor(absoluteNumber / pageSize);
+    const startIndex = pageSize * pageNumber;
     return absoluteNumber - startIndex;
   },
-  getNextItemPage: function (absoluteNumber, pageInfo) {
-    let pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
-    let dfd = $.Deferred().resolve();
+  getNextItemPage(absoluteNumber, pageInfo) {
+    const pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
+    let promise = Promise.resolve();
 
     if (pageInfo.current !== pageNumber) {
-      this.attr('loading', true);
-      this.attr('pageInfo.current', pageNumber);
-      dfd = this.loadItems();
+      this.loading = true;
+      this.pageInfo.attr('current', pageNumber);
+      promise = this.loadItems();
     }
 
-    return dfd;
+    return promise;
   },
-  updateActiveItemIndicator: function (index) {
-    let element = this.attr('$el');
+  updateActiveItemIndicator(index) {
+    const element = this.$el;
     element
       .find('.item-active')
       .removeClass('item-active');
@@ -491,19 +509,18 @@ let viewModel = canMap.extend({
         ') .tree-item-content')
       .addClass('item-active');
   },
-  showLastPage: function () {
-    const lastPageIndex = this.attr('pageInfo.count');
-
-    this.attr('pageInfo.current', lastPageIndex);
+  showLastPage() {
+    const lastPageIndex = this.pageInfo.attr('count');
+    this.pageInfo.attr('current', lastPageIndex);
   },
   export() {
-    let modelName = this.attr('modelName');
-    let parent = this.attr('parent_instance');
-    let filter = this.attr('currentFilter.filter');
-    let request = this.attr('currentFilter.request');
-    let loadSnapshots = this.attr('options.objectVersion');
-    const operation = this.attr('options.megaRelated') ?
-      getMegaObjectRelation(this.attr('options.widgetId')).relation :
+    const modelName = this.modelName;
+    const parent = this.parent_instance;
+    const filter = this.currentFilter.filter;
+    const request = this.currentFilter.request;
+    const loadSnapshots = this.options.objectVersion;
+    const operation = this.options.megaRelated ?
+      getMegaObjectRelation(this.options.widgetId).relation :
       null;
 
     TreeViewUtils.startExport(
@@ -518,24 +535,23 @@ let viewModel = canMap.extend({
     notifier('info', exportMessage, {data: true});
   },
   selectedItemHandler(itemIndex) {
-    let componentSelector = 'assessment-info-pane';
-    let pageInfo = this.attr('pageInfo');
+    const componentSelector = 'assessment-info-pane';
+    const pageInfo = this.pageInfo;
 
-    let relativeIndex = this
-      .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
-    let pageLoadDfd = this
-      .getNextItemPage(itemIndex, pageInfo);
-    let pinControl = $('.pin-content').control();
+    const relativeIndex = this
+      .getRelativeItemNumber(itemIndex, pageInfo.attr('pageSize'));
+    const pageLoadPromise = this.getNextItemPage(itemIndex, pageInfo);
+    const pinControl = $('.pin-content').control();
 
-    if (!this.attr('canOpenInfoPin')) {
+    if (!this.canOpenInfoPin) {
       return;
     }
 
     pinControl.setLoadingIndicator(componentSelector, true);
 
-    pageLoadDfd
-      .then(function () {
-        const items = this.attr('showedItems');
+    pageLoadPromise
+      .then(() => {
+        const items = this.showedItems;
         const newInstance = items[relativeIndex];
 
         if (!newInstance) {
@@ -547,8 +563,8 @@ let viewModel = canMap.extend({
 
         return newInstance
           .refresh();
-      }.bind(this))
-      .then(function (newInstance) {
+      })
+      .then((newInstance) => {
         if (!newInstance) {
           return;
         }
@@ -562,63 +578,60 @@ let viewModel = canMap.extend({
         });
 
         this.updateActiveItemIndicator(relativeIndex);
-      }.bind(this))
-      .fail(function () {
+      })
+      .catch(() => {
         notifier('error', 'Failed to fetch an object.');
       })
-      .always(function () {
+      .finally(() => {
         pinControl.setLoadingIndicator(componentSelector, false);
       });
   },
   isCurrentFilterEmpty() {
-    let currentFilter = this.attr('currentFilter').serialize();
+    const currentFilter = this.currentFilter.serialize();
     return !currentFilter.filter && loIsEmpty(currentFilter.request);
   },
 });
 
-/**
- *
- */
 export default canComponent.extend({
   tag: 'tree-widget-container',
   view: canStache(template),
   leakScope: true,
-  viewModel,
-  init: function () {
+  ViewModel,
+  init() {
     this.viewModel.setColumnsConfiguration();
     this.viewModel.setSortingConfiguration();
   },
   events: {
-    '{viewModel.pageInfo} current': function () {
-      if (!this.viewModel.attr('loading')) {
+    '{viewModel.pageInfo} current'() {
+      if (!this.viewModel.loading) {
         this.viewModel.refresh();
       }
     },
-    '{viewModel.pageInfo} pageSize': function () {
+    '{viewModel.pageInfo} pageSize'() {
       this.viewModel.loadItems();
     },
     ' selectTreeItem'(el, ev, selectedEl, instance) {
-      let parent = this.viewModel.attr('parent_instance');
-      let infoPaneOptions = new canMap({
+      const parent = this.viewModel.parent_instance;
+      const infoPaneOptions = new canMap({
         instance: instance,
         parent_instance: parent,
         options: this.viewModel,
       });
-      let itemNumber = this.viewModel.getAbsoluteItemNumber(instance);
-      let isSubTreeItem = itemNumber === -1;
+      const itemNumber = this.viewModel.getAbsoluteItemNumber(instance);
+      const isSubTreeItem = itemNumber === -1;
 
       ev.stopPropagation();
 
-      if (!this.viewModel.attr('canOpenInfoPin')) {
+      if (!this.viewModel.canOpenInfoPin) {
         return;
       }
 
       if (!isSubTreeItem) {
-        this.viewModel.attr('selectedItem', itemNumber);
+        this.viewModel.selectedItem = itemNumber;
       }
 
-      this.viewModel.attr('canOpenInfoPin', false);
-      this.viewModel.attr('isSubTreeItem', isSubTreeItem);
+      this.viewModel.canOpenInfoPin = false;
+      this.viewModel.isSubTreeItem = isSubTreeItem;
       el.find('.item-active').removeClass('item-active');
       selectedEl.addClass('item-active');
 
@@ -626,7 +639,7 @@ export default canComponent.extend({
         .setInstance(infoPaneOptions, selectedEl, true);
 
       setInstancePromise.then(() => {
-        this.viewModel.attr('canOpenInfoPin', true);
+        this.viewModel.canOpenInfoPin = true;
       });
     },
     ' refreshTree'(el, ev) {
@@ -639,9 +652,9 @@ export default canComponent.extend({
       this.viewModel.refresh(destinationType);
     },
     inserted() {
-      let viewModel = this.viewModel;
-      viewModel.attr('$el', this.element);
-      viewModel.attr('router', router);
+      const viewModel = this.viewModel;
+      viewModel.$el = this.element;
+      viewModel.router = router;
 
       this.element.closest('.widget')
         .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
@@ -656,9 +669,9 @@ export default canComponent.extend({
       this.viewModel.loadItems();
     },
     '{pubSub} refetchOnce'(scope, event) {
-      if (event.modelNames.includes(this.viewModel.attr('modelName'))) {
+      if (event.modelNames.includes(this.viewModel.modelNam)) {
         // refresh widget content when tab is opened
-        this.viewModel.attr('refetch', true);
+        this.viewModel.refetch = true;
       }
     },
   },
