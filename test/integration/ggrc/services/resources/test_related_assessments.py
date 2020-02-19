@@ -210,23 +210,24 @@ class TestRelatedAssessments(TestCase):
     )
 
   def test_cav(self):
-    """Test that cav with type "Map:Person" contain attribute_object"""
+    """Test that cav with type "Map:Person" contain attribute_objects"""
 
     with factories.single_commit():
-      person = factories.PersonFactory()
-      person_id = person.id
+      persons = factories.PersonFactory(), factories.PersonFactory()
+      person1_id, person2_id = [person.id for person in persons]
 
       cad = factories.CustomAttributeDefinitionFactory(
           definition_type="assessment",
           definition_id=self.assessment1.id,
           attribute_type="Map:Person"
       )
-      cav = factories.CustomAttributeValueFactory(
-          custom_attribute=cad,
-          attributable=self.assessment1,
-          attribute_value="Person"
-      )
-      cav.attribute_object = person
+      for person in persons:
+        cav = factories.CustomAttributeValueFactory(
+            custom_attribute=cad,
+            attributable=self.assessment1,
+            attribute_value="Person"
+        )
+        cav.attribute_object = person
 
     response_json = self._get_related_assessments(self.assessment2).json
     data_json = response_json["data"]
@@ -236,13 +237,19 @@ class TestRelatedAssessments(TestCase):
     related_assessment_json = data_json[0]
     cavs_json = related_assessment_json["custom_attribute_values"]
 
-    self.assertEqual(len(cavs_json), 1)
+    self.assertEqual(len(cavs_json), 2)
 
     cav_json = cavs_json[0]
+    attribute_object_json = cav_json["attribute_objects"]
+    expected_attribute_objects = [
+        {
+            u"type": u"Person",
+            u"id": person1_id
+        },
+        {
+            u"type": u"Person",
+            u"id": person2_id
+        }
+    ]
 
-    attribute_object_json = cav_json["attribute_object"]
-
-    self.assertEqual(attribute_object_json, {
-        u"type": u"Person",
-        u"id": person_id
-    })
+    self.assertEqual(attribute_object_json, expected_attribute_objects)

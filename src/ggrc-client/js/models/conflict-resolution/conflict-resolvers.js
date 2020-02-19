@@ -79,8 +79,7 @@ export function customAttributeResolver(
       currentValueItem,
       remoteValueItem,
       containerValueItem,
-      'attribute_object.id',
-      'attribute_object');
+      'attribute_objects');
 
     conflict = conflict || hasValueConflict || hasObjectConflict;
   });

@@ -38,7 +38,7 @@
   {{/case}}
   {{#case "dropdown"}}
     <dropdown-form-field value:from="value"
-            isLocalCa:from="isLocalCa"
+      isLocalCa:from="isLocalCa"
 			options:from="options"
 			fieldId:from="fieldId"
 			disabled:from="disabled"
@@ -57,6 +57,7 @@
 		  fieldId:from="fieldId"
 		  disabled:from="disabled"
 		  on:valueChanged="fieldValueChanged(scope.event)"
+      class="inline-input-form-field"
     ></person-form-field>
   {{/case}}
 {{/switch}}

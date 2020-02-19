@@ -5,7 +5,10 @@
 
 <div class="view-wrapper">
   {{#if value}}
-    <person-data personId:from="value"></person-data>
+    <object-list items:bind="value">
+      <person-data person:from="{.}">
+      </person-data>
+    </object-list>
   {{else}}
     <span class="empty-message">No person</span>
   {{/if}}

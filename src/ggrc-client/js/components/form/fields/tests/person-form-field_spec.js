@@ -5,61 +5,88 @@
 
 import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import Component from '../person-form-field';
+import canMap from 'can-map';
 
 describe('person-form-field component', function () {
-  'use strict';
   let viewModel;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
     spyOn(viewModel, 'dispatch');
     viewModel.attr('fieldId', 1);
-  });
-
-  it('does not fire valueChanged event' +
-    ' on first value assignation', function () {
-    viewModel.attr('value', undefined);
-    expect(viewModel.dispatch).not.toHaveBeenCalled();
-  });
-
-  it('sets the value of the input', function () {
-    viewModel.attr('value', 'test');
-    expect(viewModel.attr('inputValue')).toEqual('test');
-  });
-
-  it('does not fire valueChanged event if value wasn\'t changed', function () {
-    viewModel.attr('value', {});
-    viewModel.attr('inputValue', 1);
     viewModel.dispatch.calls.reset();
-    viewModel.attr('inputValue', 1);
-    expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
-  it('fires valueChanged event on input value change', function () {
-    viewModel.attr('value', '');
-    viewModel.attr('inputValue', 1);
-    expect(viewModel.dispatch).toHaveBeenCalledWith({
-      type: 'valueChanged',
-      fieldId: 1,
-      value: viewModel.attr('inputValue'),
+  describe('"addPerson" method', function () {
+    it(`adds a person to value list 
+      if new person is not in the list`, function () {
+      viewModel.attr('value', [{id: 1, context_id: null}]);
+      viewModel.addPerson({selectedItem: {id: 2}});
+
+      const expectResult = [
+        {id: 1, context_id: null},
+        {id: 2, context_id: null},
+      ];
+      expect(viewModel.attr('value').serialize())
+        .toEqual(expectResult);
     });
-    viewModel.attr('inputValue', 2);
-    expect(viewModel.dispatch).toHaveBeenCalledWith({
-      type: 'valueChanged',
-      fieldId: 1,
-      value: viewModel.attr('inputValue'),
+
+    it(`does not add a person to value list 
+      if person is already in the list`, function () {
+      viewModel.attr('value', [{id: 1, context_id: null}]);
+      viewModel.addPerson({selectedItem: {id: 1}});
+
+      const expectResult = [{id: 1, context_id: null}];
+      expect(viewModel.attr('value').serialize())
+        .toEqual(expectResult);
+    });
+
+    it(`fire valueChanged event
+      if new person is not in the list`, function () {
+      viewModel.attr('value', [{id: 1}]);
+      viewModel.addPerson({selectedItem: {id: 2}});
+
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'valueChanged',
+        fieldId: 1,
+        value: viewModel.attr('value'),
+      });
+    });
+
+    it(`does not fire valueChanged event
+      if new person is already in the list`, function () {
+      viewModel.attr('value', [{id: 1}, {id: 2}]);
+      viewModel.addPerson({selectedItem: new canMap({id: 2})});
+
+      expect(viewModel.dispatch).not.toHaveBeenCalled();
     });
   });
 
-  it('unsets a person and fires valueChanged event', function () {
-    viewModel.attr('value', '');
-    viewModel.attr('inputValue', 'newValue');
-    viewModel.dispatch.calls.reset();
-    viewModel.unsetPerson(null, null, new Event('mock'));
-    expect(viewModel.dispatch).toHaveBeenCalledWith({
-      type: 'valueChanged',
-      fieldId: 1,
-      value: null,
+  describe('"removePerson" method', function () {
+    beforeEach(function () {
+      viewModel.attr('value', [
+        new canMap({id: 1}),
+        new canMap({id: 2}),
+      ]);
+    });
+
+    it('removes a person from value list', function () {
+      viewModel.removePerson({person: {id: 2}});
+
+      const expectResult = [{id: 1}];
+      expect(viewModel.attr('value').serialize())
+        .toEqual(expectResult);
+    });
+
+    it('fires valueChanged event', function () {
+      viewModel.removePerson({person: {id: 2}});
+
+      const expectValue = [viewModel.attr('value.0')];
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'valueChanged',
+        fieldId: 1,
+        value: expectValue,
+      });
     });
   });
 });

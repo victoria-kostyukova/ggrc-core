@@ -24,5 +24,15 @@ person-form-field-view {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    .person-name {
+      color: black;
+      font-style: italic;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 196px;
+      margin-right: 5px;
+    }
   }
 }

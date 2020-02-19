@@ -147,25 +147,29 @@ export default canComponent.extend({
         },
       });
     },
-    performValidation: function (field) {
-      if (field.type === 'dropdown') {
-        this.performDropdownValidation(field);
-      } else {
-        let value = field.value;
-        let isMandatory = field.validation.mandatory;
+    performValidation(field) {
+      let {value} = field;
+      const isMandatory = field.validation.mandatory;
 
-        if (field.type === 'text') {
+      switch (field.type) {
+        case 'dropdown':
+          this.performDropdownValidation(field);
+          return;
+        case 'text':
           value = getPlainText(value).trim();
-        }
-
-        field.attr({
-          validation: {
-            show: isMandatory,
-            valid: isMandatory ? !!(value) : true,
-            hasMissingInfo: false,
-          },
-        });
+          break;
+        case 'person':
+          value = value && value.length;
+          break;
       }
+
+      field.attr({
+        validation: {
+          show: isMandatory,
+          valid: isMandatory ? !!(value) : true,
+          hasMissingInfo: false,
+        },
+      });
     },
     save: function (fieldId, fieldValue) {
       const self = this;

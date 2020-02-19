@@ -91,6 +91,7 @@ class TestSnapshotQueryApi(TestCase):
       "modified_by_id",
 
       "attribute_object_id",
+      "attribute_object_id_nn",
       "last_submitted_by_id",
       "last_verified_by_id",
 

@@ -429,6 +429,66 @@ class TestAssessment(TestAssessmentBase):
 
     self.assert201(response)
 
+  def test_assessment_with_multiple_mapped_persons(self):
+    """Test cav on assessment with multiple mapped persons."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      persons = factories.PersonFactory(), factories.PersonFactory()
+      expected_persons_ids = [person.id for person in persons]
+
+      cad = factories.CustomAttributeDefinitionFactory(
+          definition_type="assessment",
+          definition_id=assessment.id,
+          attribute_type="Map:Person",
+      )
+
+      for person in persons:
+        custom_attribute_value = factories.CustomAttributeValueFactory(
+            custom_attribute=cad,
+            attributable=assessment,
+            attribute_value="Person",
+        )
+        custom_attribute_value.attribute_object = person
+
+    get_response_json = self.api.get(all_models.Assessment,
+                                     assessment.id).json["assessment"]
+    persons_ids = [
+        obj["id"] for cav in get_response_json["custom_attribute_values"]
+        for obj in cav["attribute_objects"]
+    ]
+
+    self.assertEquals(persons_ids, expected_persons_ids)
+
+  def test_assessment_after_cav_person_delete(self):
+    """Test cav on assessment after cav delete"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      assessment_id = assessment.id
+      person = factories.PersonFactory()
+
+      cad = factories.CustomAttributeDefinitionFactory(
+          definition_type="assessment",
+          definition_id=assessment.id,
+          attribute_type="Map:Person",
+      )
+
+      cav = factories.CustomAttributeValueFactory(
+          custom_attribute=cad,
+          attributable=assessment,
+          attribute_value="Person",
+      )
+      cav.attribute_object = person
+
+    cav_json = cav.log_json()
+    cav_json["attribute_objects"] = None
+    cav_json["attributeType"] = "person"
+    self.api.put(assessment, {"custom_attribute_values": [cav_json]})
+
+    assessment = all_models.Assessment.query.get(assessment_id)
+    self.assertListEqual(assessment.custom_attribute_values, [])
+
 
 @ddt.ddt
 class TestAssessmentStatus(TestAssessmentBase):

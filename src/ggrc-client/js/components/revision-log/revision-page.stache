@@ -36,7 +36,7 @@
               <p class="instruction">New value</p>
             </div>
           {{#changes}}
-            <div class="clearfix {{#if isRole}}role-row{{/if}}">
+            <div class="clearfix {{#if isCollectionField}}collection-row{{/if}}">
               <div class="third-col revision-log__field-name">
                 {{#isTextLarge fieldName}}
                   <read-more
