@@ -69,16 +69,17 @@ class EntitiesFactory(object):
         is_allow_none=False, **attrs)
 
   @classmethod
-  def generate_string(cls,
-                      first_part,
+  def generate_string(cls, first_part, second_part=None, add_timestamp=False,
                       allowed_chars=StringMethods.ALLOWED_CHARS):
-    """Generate random string in unicode format according to object type.
-    Symbols allowed in random part may be specified by
-    `allowed_chars` argument.
-    """
-    return unicode("{first_part}_{uuid}_{rand_str}".format(
-        first_part=first_part, uuid=StringMethods.random_uuid(),
-        rand_str=StringMethods.random_string(chars=allowed_chars)))
+    """Generate random string in unicode format according to mandatory
+    'first_part' string and optional 'second_part'. 'third part' may be a
+    timestamp in milliseconds if 'add_timestamp' is True, or a random string.
+    Symbols allowed in random part may be specified by `allowed_chars`
+    argument."""
+    second_part = second_part if second_part else StringMethods.random_uuid()
+    third_part = (str(datetime.datetime.now().microsecond) if add_timestamp
+                  else StringMethods.random_string(chars=allowed_chars))
+    return unicode("_".join([first_part, second_part, third_part]))
 
   @classmethod
   def generate_external_id(cls):
@@ -336,10 +337,9 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
       attrs.setdefault("mandatory", False)
     if attrs["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS:
       attrs["id"] = attrs["external_id"] = self.generate_external_id()
-      attrs["external_name"] = "{}_{}_123123".format(
-          attrs["definition_type"].capitalize(),
-          attrs["attribute_type"]
-      )
+      attrs["external_name"] = self.generate_string(
+          attrs["definition_type"].capitalize(), attrs["attribute_type"],
+          add_timestamp=True)
       attrs["external_type"] = objects.get_normal_form(
           objects.get_singular(objects.CUSTOM_ATTRIBUTES)).replace(" ", "")
     obj = self.obj_inst()
