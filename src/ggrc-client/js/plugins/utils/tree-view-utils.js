@@ -77,6 +77,8 @@ let SUB_TREE_FIELDS = Object.freeze([
   'child_id',
   'child_type',
   'is_latest_revision',
+  'revisions',
+  'revision_id',
 
   // edit rights
   'archived',
