@@ -556,6 +556,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     obj_info_panel = (
         objs_widget.tree_view.select_member_by_title(title=obj.title).panel)
     obj_info_panel.get_latest_version()
+    obj_info_panel.success_updating_message.wait_until(lambda e: e.exists)
     objs_widget.tree_view.wait_loading_after_actions()
 
   def is_obj_updateble_via_info_panel(self, src_obj, obj):

@@ -573,10 +573,6 @@ class ModalDeleteObject(ModalCommonConfirmAction):
   BUTTON_DELETE = ModalCommonConfirmAction.BUTTON_CONFIRM
 
 
-class ModalUpdateObject(ModalCommonConfirmAction):
-  """Locators for Update object modals."""
-
-
 class ModalCloneAudit(ModalCommonConfirmAction):
   """Locators for Clone object modals."""
   MODAL = Common.MODAL_CONFIRM
