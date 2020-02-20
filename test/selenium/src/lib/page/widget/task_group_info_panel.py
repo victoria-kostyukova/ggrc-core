@@ -13,7 +13,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def __init__(self):
     super(TaskGroupInfoPanel, self).__init__()
-    self._root = self._browser
+    self._root = self._browser.element(class_name="pin-content")
     self._table = table_with_headers.TableWithHeaders(
         self._root,
         header_elements=self._task_header_elements,
@@ -23,6 +23,8 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def wait_to_be_init(self):
     """Wait for panel to be initialized."""
+    selenium_utils.wait_until_condition(
+        self._driver, lambda e: "loading" not in self._root.classes)
     self._create_task_button.wait_until(lambda e: e.present)
     ui_utils.wait_for_spinner_to_disappear()
     self._create_task_button.wait_until(lambda e: e.enabled)
