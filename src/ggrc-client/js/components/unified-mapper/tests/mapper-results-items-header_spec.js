@@ -4,111 +4,108 @@
 */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../mapper-results-items-header';
 
-describe('mapper-results-items-header component', function () {
-  'use strict';
-
+describe('mapper-results-items-header component', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
   describe('aggregatedColumns()', () => {
     it('should concat columns and serviceColumns attributes', () => {
-      viewModel.attr('columns', [0, 1]);
-      viewModel.attr('serviceColumns', [2]);
+      viewModel.columns = [0, 1];
+      viewModel.serviceColumns = [2];
       const result = viewModel.aggregatedColumns();
       expect(makeArray(result)).toEqual([0, 1, 2]);
     });
   });
 
-  describe('isSorted() method', function () {
-    let attr = new canMap({
+  describe('isSorted() method', () => {
+    let attr = {
       attr_sort_field: 'Title',
-    });
+    };
 
     it('returns true if attr_sort_field equal to viewModel.sortKey',
-      function () {
+      () => {
         let result;
-        viewModel.attr('sortKey', 'Title');
+        viewModel.sortKey = 'Title';
         result = viewModel.isSorted(attr);
         expect(result).toEqual(true);
       });
     it('returns false if attr_sort_field not equal to viewModel.sortKey',
-      function () {
+      () => {
         let result;
-        viewModel.attr('sortKey', 'Date');
+        viewModel.sortKey = 'Date';
         result = viewModel.isSorted(attr);
         expect(result).toEqual(false);
       });
   });
 
-  describe('isSortedAsc() method', function () {
-    it('returns true if sorted by ascending', function () {
+  describe('isSortedAsc() method', () => {
+    it('returns true if sorted by ascending', () => {
       let result;
-      viewModel.attr('sortDirection', 'asc');
+      viewModel.sortDirection = 'asc';
       result = viewModel.isSortedAsc();
       expect(result).toEqual(true);
     });
-    it('returns true if sorted not by ascending', function () {
+    it('returns true if sorted not by ascending', () => {
       let result;
-      viewModel.attr('sortDirection', 'desc');
+      viewModel.sortDirection = 'desc';
       result = viewModel.isSortedAsc();
       expect(result).toEqual(false);
     });
   });
 
-  describe('applySort() method', function () {
-    beforeEach(function () {
-      viewModel.attr('sortKey', 'Title');
-      viewModel.attr('sortDirection', 'asc');
+  describe('applySort() method', () => {
+    beforeEach(() => {
+      viewModel.sortKey = 'Title';
+      viewModel.sortDirection = 'asc';
     });
 
     it('toggles sort direction if sorted by current attribute',
-      function () {
-        let attr = new canMap({
+      () => {
+        let attr = {
           attr_sort_field: 'Title',
-        });
+        };
         viewModel.applySort(attr);
-        expect(viewModel.attr('sortDirection')).toEqual('desc');
+        expect(viewModel.sortDirection).toEqual('desc');
       });
 
     it('changes sortKey if sorted by another attribute',
-      function () {
-        let attr = new canMap({
+      () => {
+        let attr = {
           attr_sort_field: 'State',
-        });
+        };
         viewModel.applySort(attr);
-        expect(viewModel.attr('sortKey')).toEqual('State');
+        expect(viewModel.sortKey).toEqual('State');
       });
 
     it('sets sortDirection to "asc" if sorted by another attribute',
-      function () {
-        let attr = new canMap({
+      () => {
+        let attr = {
           attr_sort_field: 'State',
-        });
+        };
         viewModel.applySort(attr);
-        expect(viewModel.attr('sortDirection')).toEqual('asc');
+        expect(viewModel.sortDirection).toEqual('asc');
       });
   });
 
-  describe('toggleSortDirection() method', function () {
+  describe('toggleSortDirection() method', () => {
     it('sets "sortDirection" to "desc" if sorted by "asc"',
-      function () {
-        viewModel.attr('sortDirection', 'asc');
+      () => {
+        viewModel.sortDirection = 'asc';
         viewModel.toggleSortDirection();
-        expect(viewModel.attr('sortDirection')).toEqual('desc');
+        expect(viewModel.sortDirection).toEqual('desc');
       });
 
     it('sets "sortDirection" to "asc" if sorted by "desc"',
-      function () {
-        viewModel.attr('sortDirection', 'desc');
+      () => {
+        viewModel.sortDirection = 'desc';
         viewModel.toggleSortDirection();
-        expect(viewModel.attr('sortDirection')).toEqual('asc');
+        expect(viewModel.sortDirection).toEqual('asc');
       });
   });
 });

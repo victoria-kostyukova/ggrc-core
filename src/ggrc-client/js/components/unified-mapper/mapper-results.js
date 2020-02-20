@@ -9,6 +9,8 @@ import loFind from 'lodash/find';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
+import canList from 'can-list';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import './mapper-results-item';
 import './mapper-results-items-header';
@@ -41,550 +43,607 @@ import {OBJECT_DESTROYED} from '../../events/event-types';
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export default canComponent.extend({
-  tag: 'mapper-results',
-  view: canStache(template),
-  leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      paging: {
-        value: function () {
-          return new Pagination({pageSizeSelect: [10, 25, 50]});
-        },
-      },
-      isMegaMapping: {
-        get() {
-          return isMegaMappingUtil(this.attr('object'), this.attr('type'));
-        },
-      },
-      serviceColumnsEnabled: {
-        get() {
-          return this.attr('columns.service').length;
-        },
-      },
-      isWorkflowPart: {
-        get() {
-          const workflowParts
-            = ['CycleTaskGroupObjectTask', 'TaskGroup', 'TaskGroupTask'];
-          return workflowParts.includes(this.attr('type'))
-            && this.attr('searchOnly');
-        },
-      },
+const ViewModel = canDefineMap.extend({
+  paging: {
+    value() {
+      return new Pagination({pageSizeSelect: [10, 25, 50]});
     },
-    columns: {
+  },
+  isMegaMapping: {
+    get() {
+      return isMegaMappingUtil(this.object, this.type);
+    },
+  },
+  serviceColumnsEnabled: {
+    get() {
+      return this.columns.service.length;
+    },
+  },
+  isWorkflowPart: {
+    get() {
+      const workflowParts
+        = ['CycleTaskGroupObjectTask', 'TaskGroup', 'TaskGroupTask'];
+      return workflowParts.includes(this.type) && this.searchOnly;
+    },
+  },
+  columns: {
+    value: () => ({
       selected: [],
       available: [],
       service: [],
-    },
-    sort: {
+    }),
+  },
+  sort: {
+    value: () => ({
       key: null,
       direction: null,
-    },
-    isLoading: false,
-    items: [],
-    allItems: [],
-    allSelected: false,
-    baseInstance: null,
-    filterItems: [],
-    mappingItems: [],
-    statusItem: {},
-    selected: [],
-    selectionState: {},
-    disableColumnsConfiguration: false,
-    applyOwnedFilter: false,
-    objectsPlural: false,
-    relatedAssessments: {
+    }),
+  },
+  isLoading: {
+    value: false,
+  },
+  items: {
+    value: () => [],
+  },
+  allItems: {
+    value: () => [],
+  },
+  allSelected: {
+    value: false,
+  },
+  baseInstance: {
+    value: null,
+  },
+  filterItems: {
+    Type: canList,
+    value: () => [],
+  },
+  mappingItems: {
+    Type: canList,
+    value: () => [],
+  },
+  statusItem: {
+    Type: canMap,
+    value: () => ({}),
+  },
+  selected: {
+    value: () => [],
+  },
+  selectionState: {
+    value: () => ({}),
+  },
+  disableColumnsConfiguration: {
+    value: false,
+  },
+  applyOwnedFilter: {
+    value: false,
+  },
+  objectsPlural: {
+    value: false,
+  },
+  relatedAssessments: {
+    value: () => ({
       state: {
         open: false,
       },
       instance: null,
       show: false,
-    },
-    searchOnly: false,
-    useSnapshots: false,
-    relevantTo: [],
-    objectGenerator: false,
-    deferredList: [],
-    disabledIds: [],
-    megaRelationObj: {},
-    itemDetailsViewType: '',
-    setItems: function () {
-      const stopFn = tracker.start(this.attr('type'),
-        tracker.USER_JOURNEY_KEYS.NAVIGATION,
-        tracker.USER_ACTIONS.ADVANCED_SEARCH_FILTER);
+    }),
+  },
+  searchOnly: {
+    value: false,
+  },
+  useSnapshots: {
+    value: false,
+  },
+  relevantTo: {
+    value: () => [],
+  },
+  objectGenerator: {
+    value: false,
+  },
+  deferredList: {
+    value: () => [],
+  },
+  disabledIds: {
+    value: () => [],
+  },
+  megaRelationObj: {
+    value: () => ({}),
+  },
+  itemDetailsViewType: {
+    value: '',
+  },
+  _setItemsTimeout: {
+    value: null,
+  },
+  isBeforeLoad: {
+    value: false,
+  },
+  setItems() {
+    const stopFn = tracker.start(this.type,
+      tracker.USER_JOURNEY_KEYS.NAVIGATION,
+      tracker.USER_ACTIONS.ADVANCED_SEARCH_FILTER);
 
-      this.attr('items').replace([]);
-      this.attr('isLoading', true);
-      return this.load()
-        .then((items) => {
-          this.attr('items', items);
-          this.setColumnsConfiguration();
-          this.setRelatedAssessments();
-          this.attr('isBeforeLoad', false);
-          stopFn();
-        })
-        .finally(() => {
-          this.attr('isLoading', false);
-        });
-    },
-    setColumnsConfiguration: function () {
-      let columns =
-        TreeViewUtils.getColumnsForModel(
-          this.getDisplayModel().model_singular
-        );
-
-      this.attr('columns.available', columns.available);
-      this.attr('columns.selected', columns.selected);
-      this.attr('disableColumnsConfiguration', columns.disableConfiguration);
-
-      if (this.attr('isMegaMapping')) {
-        this.attr('columns.service',
-          this.getDisplayModel().tree_view_options.mega_attr_list);
-      } else {
-        this.attr('columns.service', []);
-      }
-    },
-    setSortingConfiguration: function () {
-      let sortingInfo = TreeViewUtils.getSortingForModel(
+    this.items.replace([]);
+    this.isLoading = true;
+    return this.load()
+      .then((items) => {
+        this.items = items;
+        this.setColumnsConfiguration();
+        this.setRelatedAssessments();
+        this.isBeforeLoad = false;
+        stopFn();
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  },
+  setColumnsConfiguration() {
+    let columns =
+      TreeViewUtils.getColumnsForModel(
         this.getDisplayModel().model_singular
       );
 
-      this.attr('sort.key', sortingInfo.key);
-      this.attr('sort.direction', sortingInfo.direction);
-    },
-    setRelatedAssessments: function () {
-      let Model = this.getDisplayModel();
-      if (this.attr('useSnapshots')) {
-        this.attr('relatedAssessments.show', false);
-        return;
-      }
-      this.attr('relatedAssessments.show',
-        !!Model.tree_view_options.show_related_assessments);
-    },
-    resetSearchParams: function () {
-      this.attr('paging.current', 1);
-      this.attr('paging.pageSize', DEFAULT_PAGE_SIZE);
-      this.setSortingConfiguration();
-    },
-    onSearch: function () {
-      this.resetSearchParams();
-      this.attr('selectionState').dispatch('resetSelection');
-      this.setItemsDebounced();
-    },
-    prepareRelevantQuery: function () {
-      let relevantList = this.attr('relevantTo') || [];
-      let filters = relevantList.map(function (relevant) {
-        return {
-          type: relevant.type,
-          operation: 'relevant',
-          id: relevant.id,
-        };
-      });
-      return filters;
-    },
-    prepareRelatedQuery: function (filter, operation) {
-      if (!this.attr('baseInstance')) {
-        return null;
-      }
+    this.columns.available = columns.available;
+    this.columns.selected = columns.selected;
+    this.disableColumnsConfiguration = columns.disableConfiguration;
 
-      return buildRelevantIdsQuery(this.attr('type'), {}, {
-        type: this.attr('baseInstance.type'),
-        id: this.attr('baseInstance.id'),
-        operation: operation || 'relevant',
-      }, filter);
-    },
-    prepareUnlockedFilter: function () {
-      let filterString = StateUtils.unlockedFilter();
-      return QueryParser.parse(filterString);
-    },
-    prepareOwnedFilter: function () {
-      let userId = GGRC.current_user.id;
+    if (this.isMegaMapping) {
+      this.columns.service =
+        this.getDisplayModel().tree_view_options.mega_attr_list;
+    } else {
+      this.columns.service = [];
+    }
+  },
+  setSortingConfiguration() {
+    let sortingInfo = TreeViewUtils.getSortingForModel(
+      this.getDisplayModel().model_singular
+    );
+
+    this.sort.key = sortingInfo.key;
+    this.sort.direction = sortingInfo.direction;
+  },
+  setRelatedAssessments() {
+    let Model = this.getDisplayModel();
+    if (this.useSnapshots) {
+      this.relatedAssessments.show = false;
+      return;
+    }
+    this.relatedAssessments.show =
+      !!Model.tree_view_options.show_related_assessments;
+  },
+  resetSearchParams() {
+    this.paging.attr('current', 1);
+    this.paging.attr('pageSize', DEFAULT_PAGE_SIZE);
+    this.setSortingConfiguration();
+  },
+  onSearch() {
+    this.resetSearchParams();
+    this.selectionState.dispatch('resetSelection');
+    this.setItemsDebounced();
+  },
+  prepareRelevantQuery() {
+    let relevantList = this.relevantTo || [];
+    let filters = relevantList.map((relevant) => {
       return {
-        expression: {
-          object_name: 'Person',
-          op: {
-            name: 'owned',
-          },
-          ids: [userId],
+        type: relevant.type,
+        operation: 'relevant',
+        id: relevant.id,
+      };
+    });
+    return filters;
+  },
+  prepareRelatedQuery(filter, operation) {
+    if (!this.baseInstance) {
+      return null;
+    }
+
+    return buildRelevantIdsQuery(this.type, {}, {
+      type: this.baseInstance.attr('type'),
+      id: this.baseInstance.attr('id'),
+      operation: operation || 'relevant',
+    }, filter);
+  },
+  prepareUnlockedFilter() {
+    let filterString = StateUtils.unlockedFilter();
+    return QueryParser.parse(filterString);
+  },
+  prepareOwnedFilter() {
+    let userId = GGRC.current_user.id;
+    return {
+      expression: {
+        object_name: 'Person',
+        op: {
+          name: 'owned',
         },
-      };
-    },
-    shouldApplyUnlockedFilter: function (modelName) {
-      return modelName === 'Audit' && !this.attr('searchOnly');
-    },
-    loadAllItems: function () {
-      this.attr('allItems', this.loadAllItemsIds());
-    },
-    getQuery: function (queryType, addPaging, isMegaMapping) {
-      let result = {};
-      let paging = {};
-      let modelName = this.attr('type');
-      let query;
-      let relatedQuery;
+        ids: [userId],
+      },
+    };
+  },
+  shouldApplyUnlockedFilter(modelName) {
+    return modelName === 'Audit' && !this.searchOnly;
+  },
+  loadAllItems() {
+    this.allItems = this.loadAllItemsIds();
+  },
+  getQuery(queryType, addPaging, isMegaMapping) {
+    let result = {};
+    let paging = {};
+    let modelName = this.type;
+    let query;
+    let relatedQuery;
 
-      // prepare QueryAPI data from advanced search
-      let request = [];
-      let status;
-      let filters =
-        AdvancedSearch.buildFilter(this.attr('filterItems').attr(), request);
-      let mappings =
-        AdvancedSearch.buildFilter(this.attr('mappingItems').attr(), request);
-      let advancedFilters = QueryParser.joinQueries(filters, mappings);
+    // prepare QueryAPI data from advanced search
+    let request = [];
+    let status;
+    let filters =
+      AdvancedSearch.buildFilter(this.filterItems.attr(), request);
+    let mappings =
+      AdvancedSearch.buildFilter(this.mappingItems.attr(), request);
+    let advancedFilters = QueryParser.joinQueries(filters, mappings);
 
-      // the edge case caused by stateless objects
-      if (this.attr('statusItem.value.items')) {
-        status =
-          AdvancedSearch.buildFilter([this.attr('statusItem').attr()], request);
-        advancedFilters = QueryParser.joinQueries(advancedFilters, status);
+    // the edge case caused by stateless objects
+    if (this.statusItem.attr('value.items')) {
+      status =
+        AdvancedSearch.buildFilter([this.statusItem.attr()], request);
+      advancedFilters = QueryParser.joinQueries(advancedFilters, status);
+    }
+    result.request = request;
+
+    // prepare pagination
+    if (addPaging) {
+      paging.current = this.paging.attr('current');
+      paging.pageSize = this.paging.attr('pageSize');
+
+      let sort = this.sort;
+      let defaultSort = this.defaultSort;
+
+      if (sort && sort.key) {
+        paging.sort = [sort];
+      } else if (defaultSort && defaultSort.length) {
+        paging.sort = defaultSort;
       }
-      result.request = request;
+    }
+    if (this.shouldApplyUnlockedFilter(modelName)) {
+      advancedFilters = QueryParser.joinQueries(
+        advancedFilters,
+        this.prepareUnlockedFilter());
+    }
 
-      // prepare pagination
-      if (addPaging) {
-        paging.current = this.attr('paging.current');
-        paging.pageSize = this.attr('paging.pageSize');
+    if (this.applyOwnedFilter) {
+      advancedFilters = QueryParser.joinQueries(
+        advancedFilters,
+        this.prepareOwnedFilter());
+    }
 
-        let sort = this.attr('sort');
-        let defaultSort = this.attr('defaultSort');
+    // prepare and add main query to request
+    query = buildParam(
+      modelName,
+      paging,
+      this.prepareRelevantQuery(),
+      null,
+      advancedFilters);
+    if (this.useSnapshots) {
+      // Transform Base Query to Snapshot
+      query = transformQueryToSnapshot(query);
+    }
+    // Add Permission check
+    query.permissions = (modelName === 'Person') ||
+      this.searchOnly ? 'read' : 'update';
+    query.type = queryType || 'values';
+    // we need it to find result in response from backend
+    result.queryIndex = request.push(query) - 1;
 
-        if (sort && sort.key) {
-          paging.sort = [sort];
-        } else if (defaultSort && defaultSort.length) {
-          paging.sort = defaultSort;
+    // mega object needs special query: parent and child op,
+    // instead of 'relevant'
+    if (isMegaMapping) {
+      const relations = ['parent', 'child'];
+
+      relations.forEach((relation) => {
+        relatedQuery = this.prepareRelatedQuery(filters, relation);
+
+        result[`${relation}QueryIndex`] = request.push(relatedQuery) - 1;
+      });
+    } else {
+      // prepare and add related query to request
+      // the query is used to select already mapped items
+      relatedQuery = this.prepareRelatedQuery(filters);
+      if (relatedQuery) {
+        if (this.useSnapshots) {
+          // Transform Related Query to Snapshot
+          relatedQuery = transformQueryToSnapshot(relatedQuery);
         }
+        // we need it to find result in response from backend
+        result.relatedQueryIndex = request.push(relatedQuery) - 1;
       }
-      if (this.shouldApplyUnlockedFilter(modelName)) {
-        advancedFilters = QueryParser.joinQueries(
-          advancedFilters,
-          this.prepareUnlockedFilter());
-      }
+    }
 
-      if (this.attr('applyOwnedFilter')) {
-        advancedFilters = QueryParser.joinQueries(
-          advancedFilters,
-          this.prepareOwnedFilter());
-      }
+    return result;
+  },
+  getModelKey() {
+    return this.useSnapshots ?
+      Snapshot.model_singular :
+      this.type;
+  },
+  getDisplayModel() {
+    return businessModels[this.type];
+  },
+  setDisabledItems(isMegaMapping, allItems, relatedData, type) {
+    if (!this.objectGenerator && relatedData
+      && !this.searchOnly) {
+      let disabledIds;
 
-      // prepare and add main query to request
-      query = buildParam(
-        modelName,
-        paging,
-        this.prepareRelevantQuery(),
-        null,
-        advancedFilters);
-      if (this.attr('useSnapshots')) {
-        // Transform Base Query to Snapshot
-        query = transformQueryToSnapshot(query);
-      }
-      // Add Permission check
-      query.permissions = (modelName === 'Person') ||
-        this.attr('searchOnly') ? 'read' : 'update';
-      query.type = queryType || 'values';
-      // we need it to find result in response from backend
-      result.queryIndex = request.push(query) - 1;
-
-      // mega object needs special query: parent and child op,
-      // instead of 'relevant'
       if (isMegaMapping) {
-        const relations = ['parent', 'child'];
-
-        relations.forEach((relation) => {
-          relatedQuery = this.prepareRelatedQuery(filters, relation);
-
-          result[`${relation}QueryIndex`] = request.push(relatedQuery) - 1;
-        });
+        disabledIds = loReduce(relatedData, (result, val) => {
+          return result.concat(val[type].ids);
+        }, []);
       } else {
-        // prepare and add related query to request
-        // the query is used to select already mapped items
-        relatedQuery = this.prepareRelatedQuery(filters);
-        if (relatedQuery) {
-          if (this.attr('useSnapshots')) {
-            // Transform Related Query to Snapshot
-            relatedQuery = transformQueryToSnapshot(relatedQuery);
-          }
-          // we need it to find result in response from backend
-          result.relatedQueryIndex = request.push(relatedQuery) - 1;
-        }
+        disabledIds = relatedData[type].ids;
       }
 
-      return result;
-    },
-    getModelKey: function () {
-      return this.attr('useSnapshots') ?
-        Snapshot.model_singular :
-        this.attr('type');
-    },
-    getDisplayModel: function () {
-      return businessModels[this.attr('type')];
-    },
-    setDisabledItems: function (isMegaMapping, allItems, relatedData, type) {
-      if (!this.attr('objectGenerator') && relatedData
-        && !this.attr('searchOnly')) {
-        let disabledIds;
-
-        if (isMegaMapping) {
-          disabledIds = loReduce(relatedData, (result, val) => {
-            return result.concat(val[type].ids);
-          }, []);
-        } else {
-          disabledIds = relatedData[type].ids;
-        }
-
-        this.attr('disabledIds', disabledIds);
-        allItems.forEach(function (item) {
-          item.isDisabled = disabledIds.indexOf(item.data.id) !== -1;
-        });
-      }
-    },
-    setSelectedItems: function (allItems) {
-      let selectedItems = makeArray(this.attr('selected'));
-
-      allItems.forEach(function (item) {
-        item.isSelected =
-          selectedItems.some(function (selectedItem) {
-            return selectedItem.id === item.id;
-          });
-        if (item.isSelected) {
-          item.markedSelected = true;
-        }
-      });
-    },
-    setMegaRelations: function (allItems, relatedData, type) {
-      const childIds = relatedData.child[type].ids;
-      const parentIds = relatedData.parent[type].ids;
-      const relationsObj = this.attr('megaRelationObj');
-      const defaultRelation = this.attr('megaRelationObj.defaultValue');
-
+      this.disabledIds = disabledIds;
       allItems.forEach((item) => {
-        if (childIds.indexOf(item.id) > -1) {
-          item.mapAsChild = true;
-        } else if (parentIds.indexOf(item.id) > -1) {
-          item.mapAsChild = false;
-        } else if (relationsObj[item.id]) {
-          item.mapAsChild = relationsObj[item.id] === 'child';
-        } else {
-          item.mapAsChild = defaultRelation === 'child';
-        }
+        item.isDisabled = disabledIds.indexOf(item.data.id) !== -1;
       });
-    },
-    disableItself: function (isMegaMapping, allItems) {
-      const baseInstance = this.attr('baseInstance');
-      // check for baseInstance:
-      // baseInstance is undefined in case of Global Search and some other
-      // use cases (e.g. Assessment Snapshots)
-      if (allItems.length && baseInstance) {
-        if (baseInstance.type === allItems[0].type) {
-          let disabledIds = this.attr('disabledIds');
-          disabledIds.push(baseInstance.id);
-          this.attr('disabledIds', disabledIds);
+    }
+  },
+  setSelectedItems(allItems) {
+    let selectedItems = makeArray(this.selected);
 
-          let self = allItems.find((item) => item.id === baseInstance.id);
-          if (self) {
-            self.isDisabled = true;
-            if (isMegaMapping) {
-              self.mapAsChild = null;
-              self.isSelf = true;
-            }
-          }
-        }
-      }
-    },
-    transformValue: function (value) {
-      let Model = this.getDisplayModel();
-      if (this.attr('useSnapshots')) {
-        value.snapshotObject =
-          toObject(value);
-        value.revision.content =
-          Model.model(value.revision.content);
-        return value;
-      }
-      return Model.model(value);
-    },
-    async load() {
-      try {
-        const modelKey = this.getModelKey();
-        const isMegaMapping = this.attr('isMegaMapping');
-        const query = this.getQuery('values', true, isMegaMapping);
-        const responseArr = await Promise.all(
-          query.request.map((request) => batchRequests(request))
-        );
-        const data = responseArr[query.queryIndex];
-
-        const relatedData = this.getRelatedData(
-          isMegaMapping,
-          responseArr,
-          query,
-          modelKey,
-        );
-
-        let result =
-          data[modelKey].values.map((value) => {
-            return {
-              id: value.id,
-              type: value.type,
-              data: this.transformValue(value),
-            };
-          });
-        this.setSelectedItems(result);
-        this.setDisabledItems(isMegaMapping, result, relatedData, modelKey);
-
-        if (isMegaMapping) {
-          this.setMegaRelations(result, relatedData, modelKey);
-        }
-        this.disableItself(isMegaMapping, result);
-
-        // Update paging object
-        this.paging.attr('total', data[modelKey].total);
-        return result;
-      } catch {
-        return [];
-      } finally {
-        this.dispatch('loaded');
-      }
-    },
-    getRelatedData: function (isMegaMapping, responseArr, query, modelKey) {
-      return isMegaMapping ?
-        this.buildMegaRelatedData(responseArr, query, modelKey) :
-        this.buildRelatedData(responseArr, query, modelKey);
-    },
-    buildRelatedData: function (responseArr, query, type) {
-      const deferredList = this.attr('deferredList');
-      let ids;
-      let empty = {};
-      let relatedData = responseArr[query.relatedQueryIndex];
-
-      if (!deferredList || !deferredList.length) {
-        return relatedData;
-      } else if (!relatedData) {
-        relatedData = {};
-        relatedData[type] = {};
-        ids = deferredList
-          .map(function (item) {
-            return item.id;
-          });
-      } else {
-        ids = deferredList
-          .filter(function (item) {
-            return relatedData[item.type];
-          })
-          .map(function (item) {
-            return item.id;
-          });
-
-        if (!ids.length) {
-          // return empty data
-          empty[type] = {
-            ids: [],
-          };
-          return empty;
-        }
-      }
-
-      relatedData[type].ids = ids;
-      return relatedData;
-    },
-    buildMegaRelatedData: function (responseArr, query, type) {
-      const relatedData = {
-        parent: responseArr[query.parentQueryIndex] || {},
-        child: responseArr[query.childQueryIndex] || {},
-      };
-
-      return relatedData;
-    },
-    loadAllItemsIds: async function () {
-      try {
-        const modelKey = this.getModelKey();
-        const queryType = 'ids';
-        const query = this.getQuery(queryType, false);
-        const responseArr = await Promise.all(
-          query.request.map((request) => batchRequests(request))
-        );
-        const data = responseArr[query.queryIndex];
-        const relatedData = responseArr[query.relatedQueryIndex];
-        const values = data[modelKey][queryType];
-        let result = values.map((item) => {
-          const object = {
-            id: item,
-            type: modelKey,
-          };
-
-          if (this.attr('useSnapshots')) {
-            object.child_type = this.attr('type');
-          }
-
-          return object;
+    allItems.forEach((item) => {
+      item.isSelected =
+        selectedItems.some((selectedItem) => {
+          return selectedItem.id === item.id;
         });
+      if (item.isSelected) {
+        item.markedSelected = true;
+      }
+    });
+  },
+  setMegaRelations(allItems, relatedData, type) {
+    const childIds = relatedData.child[type].ids;
+    const parentIds = relatedData.parent[type].ids;
+    const relationsObj = this.megaRelationObj;
+    const defaultRelation = this.megaRelationObj.defaultValue;
 
-        // Do not perform extra mapping validation in case object generation
-        if (!this.attr('objectGenerator') && relatedData) {
-          result = result.filter((item) => {
-            return relatedData[modelKey].ids.indexOf(item.id) < 0;
-          });
+    allItems.forEach((item) => {
+      if (childIds.indexOf(item.id) > -1) {
+        item.mapAsChild = true;
+      } else if (parentIds.indexOf(item.id) > -1) {
+        item.mapAsChild = false;
+      } else if (relationsObj[item.id]) {
+        item.mapAsChild = relationsObj[item.id] === 'child';
+      } else {
+        item.mapAsChild = defaultRelation === 'child';
+      }
+    });
+  },
+  disableItself(isMegaMapping, allItems) {
+    const baseInstance = this.baseInstance;
+    // check for baseInstance:
+    // baseInstance is undefined in case of Global Search and some other
+    // use cases (e.g. Assessment Snapshots)
+    if (allItems.length && baseInstance) {
+      if (baseInstance.type === allItems[0].type) {
+        let disabledIds = this.disabledIds;
+        disabledIds.push(baseInstance.id);
+        this.disabledIds = disabledIds;
+
+        let self = allItems.find((item) => item.id === baseInstance.id);
+        if (self) {
+          self.isDisabled = true;
+          if (isMegaMapping) {
+            self.mapAsChild = null;
+            self.isSelf = true;
+          }
         }
-        return result;
-      } catch (e) {
-        return [];
       }
-    },
-    setItemsDebounced: function () {
-      clearTimeout(this.attr('_setItemsTimeout'));
-      this.attr('_setItemsTimeout', setTimeout(this.setItems.bind(this)));
-    },
-    showRelatedAssessments: function (ev) {
-      this.attr('relatedAssessments.instance', ev.instance);
-      this.attr('relatedAssessments.state.open', true);
-    },
-    onItemDestroyed({itemId}) {
-      const selectedItems = this.attr('selected');
-      const selectedIndex = loFindIndex(selectedItems,
-        (item) => item.attr('id') === itemId);
-      const selectedObject = loFind(this.attr('items'),
-        (item) => item.attr('id') === itemId);
-      // remove selection of destroyed item
-      // if it was selected before deletion
-      if (selectedIndex !== -1) {
-        selectedItems.splice(selectedIndex, 1);
-      }
+    }
+  },
+  transformValue(value) {
+    let Model = this.getDisplayModel();
+    if (this.useSnapshots) {
+      value.snapshotObject =
+        toObject(value);
+      value.revision.content =
+        Model.model(value.revision.content);
+      return value;
+    }
+    return Model.model(value);
+  },
+  async load() {
+    try {
+      const modelKey = this.getModelKey();
+      const isMegaMapping = this.isMegaMapping;
+      const query = this.getQuery('values', true, isMegaMapping);
+      const responseArr = await Promise.all(
+        query.request.map((request) => batchRequests(request))
+      );
+      const data = responseArr[query.queryIndex];
 
-      const paging = this.attr('paging');
-      const currentPageNumber = paging.attr('current');
-      const needToGoToPrevPage = (
-        currentPageNumber > 1 &&
-        this.attr('items.length') === 1
+      const relatedData = this.getRelatedData(
+        isMegaMapping,
+        responseArr,
+        query,
+        modelKey,
       );
 
-      if (needToGoToPrevPage) {
-        paging.attr('current', currentPageNumber - 1);
-      }
+      let result =
+        data[modelKey].values.map((value) => {
+          return {
+            id: value.id,
+            type: value.type,
+            data: this.transformValue(value),
+            markedSelected: false,
+          };
+        });
+      this.setSelectedItems(result);
+      this.setDisabledItems(isMegaMapping, result, relatedData, modelKey);
 
-      this.setItems();
-      if (this.attr('baseInstance')) {
-        this.attr('baseInstance').dispatch({
-          ...OBJECT_DESTROYED,
-          object: {
-            id: itemId,
-            type: selectedObject && selectedObject.type,
-          },
+      if (isMegaMapping) {
+        this.setMegaRelations(result, relatedData, modelKey);
+      }
+      this.disableItself(isMegaMapping, result);
+
+      // Update paging object
+      this.paging.attr('total', data[modelKey].total);
+      return result;
+    } catch {
+      return [];
+    } finally {
+      this.dispatch('loaded');
+    }
+  },
+  getRelatedData(isMegaMapping, responseArr, query, modelKey) {
+    return isMegaMapping ?
+      this.buildMegaRelatedData(responseArr, query, modelKey) :
+      this.buildRelatedData(responseArr, query, modelKey);
+  },
+  buildRelatedData(responseArr, query, type) {
+    const deferredList = this.deferredList;
+    let ids;
+    let empty = {};
+    let relatedData = responseArr[query.relatedQueryIndex];
+
+    if (!deferredList || !deferredList.length) {
+      return relatedData;
+    } else if (!relatedData) {
+      relatedData = {};
+      relatedData[type] = {};
+      ids = deferredList
+        .map((item) => {
+          return item.id;
+        });
+    } else {
+      ids = deferredList
+        .filter((item) => {
+          return relatedData[item.type];
+        })
+        .map((item) => {
+          return item.id;
+        });
+
+      if (!ids.length) {
+        // return empty data
+        empty[type] = {
+          ids: [],
+        };
+        return empty;
+      }
+    }
+
+    relatedData[type].ids = ids;
+    return relatedData;
+  },
+  buildMegaRelatedData(responseArr, query) {
+    const relatedData = {
+      parent: responseArr[query.parentQueryIndex] || {},
+      child: responseArr[query.childQueryIndex] || {},
+    };
+
+    return relatedData;
+  },
+  async loadAllItemsIds() {
+    try {
+      const modelKey = this.getModelKey();
+      const queryType = 'ids';
+      const query = this.getQuery(queryType, false);
+      const responseArr = await Promise.all(
+        query.request.map((request) => batchRequests(request))
+      );
+      const data = responseArr[query.queryIndex];
+      const relatedData = responseArr[query.relatedQueryIndex];
+      const values = data[modelKey][queryType];
+      let result = values.map((item) => {
+        const object = {
+          id: item,
+          type: modelKey,
+        };
+
+        if (this.useSnapshots) {
+          object.child_type = this.type;
+        }
+
+        return object;
+      });
+
+      // Do not perform extra mapping validation in case object generation
+      if (!this.objectGenerator && relatedData) {
+        result = result.filter((item) => {
+          return relatedData[modelKey].ids.indexOf(item.id) < 0;
         });
       }
-    },
-  }),
+      return result;
+    } catch (e) {
+      return [];
+    }
+  },
+  setItemsDebounced() {
+    clearTimeout(this._setItemsTimeout);
+    this._setItemsTimeout = setTimeout(this.setItems.bind(this));
+  },
+  showRelatedAssessments(ev) {
+    this.relatedAssessments.instance = ev.instance;
+    this.relatedAssessments.state.open = true;
+  },
+  onItemDestroyed({itemId}) {
+    const selectedItems = this.selected;
+    const selectedIndex = loFindIndex(selectedItems,
+      (item) => item.id === itemId);
+    const selectedObject = loFind(this.items,
+      (item) => item.id === itemId);
+    // remove selection of destroyed item
+    // if it was selected before deletion
+    if (selectedIndex !== -1) {
+      selectedItems.splice(selectedIndex, 1);
+    }
+
+    const paging = this.paging;
+    const currentPageNumber = paging.attr('current');
+    const needToGoToPrevPage = (
+      currentPageNumber > 1 &&
+      this.items.length === 1
+    );
+
+    if (needToGoToPrevPage) {
+      paging.attr('current', currentPageNumber - 1);
+    }
+
+    this.setItems();
+    if (this.baseInstance) {
+      this.baseInstance.dispatch({
+        ...OBJECT_DESTROYED,
+        object: {
+          id: itemId,
+          type: selectedObject && selectedObject.type,
+        },
+      });
+    }
+  },
+});
+
+export default canComponent.extend({
+  tag: 'mapper-results',
+  view: canStache(template),
+  leakScope: true,
+  ViewModel,
   events: {
-    '{viewModel} allSelected': function ([scope], ev, allSelected) {
+    '{viewModel} allSelected'([scope], ev, allSelected) {
       if (allSelected) {
         this.viewModel.loadAllItems();
       }
     },
-    '{viewModel.paging} current': function () {
+    '{viewModel.paging} current'() {
       this.viewModel.setItemsDebounced();
     },
-    '{viewModel.paging} pageSize': function () {
+    '{viewModel.paging} pageSize'() {
       this.viewModel.setItemsDebounced();
     },
-    '{viewModel.sort} key': function () {
+    '{viewModel.sort} key'() {
       this.viewModel.setItemsDebounced();
     },
-    '{viewModel.sort} direction': function () {
+    '{viewModel.sort} direction'() {
       this.viewModel.setItemsDebounced();
     },
   },

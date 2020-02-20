@@ -21,15 +21,16 @@ export default canComponent.extend({
   tag: 'assessment-template-clone',
   view: canStache(template),
   leakScope: true,
-  viewModel: function () {
+  viewModel() {
     return ObjectOperationsBaseVM.extend({
       isAuditPage() {
         return getPageInstance().type === 'Audit';
       },
       extendInstanceData(instance) {
         instance = instance().serialize();
-        let audit = loPick(instance, ['id', 'type', 'title', 'issue_tracker']);
-        let context = {
+        const audit =
+          loPick(instance, ['id', 'type', 'title', 'issue_tracker']);
+        const context = {
           id: instance.context.id,
           type: instance.context.type,
         };
@@ -46,23 +47,23 @@ export default canComponent.extend({
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    '{window} preload': function (el, ev) {
-      let modal = $(ev.target).data('modal_form');
-      let options = modal && modal.options;
+    '{window} preload'(el, ev) {
+      const modal = $(ev.target).data('modal_form');
+      const options = modal && modal.options;
 
       if (options && options.inCloner) {
         this.closeModal();
       }
     },
-    '.btn-cancel click': function () {
+    '.btn-cancel click'() {
       this.closeModal();
     },
-    '.btn-clone click': function () {
-      this.viewModel.attr('is_saving', true);
+    '.btn-clone click'() {
+      this.viewModel.is_saving = true;
 
       this.cloneObjects()
         .always(() => {
-          this.viewModel.attr('is_saving', false);
+          this.viewModel.is_saving = false;
         })
         .done(() => {
           this.viewModel.dispatch('refreshTreeView');
@@ -70,8 +71,8 @@ export default canComponent.extend({
         });
     },
     cloneObjects() {
-      let sourceIds = loMap(this.viewModel.attr('selected'), (item) => item.id);
-      let destinationId = this.viewModel.attr('join_object_id');
+      const sourceIds = loMap(this.viewModel.selected, (item) => item.id);
+      const destinationId = this.viewModel.join_object_id;
 
       return ggrcPost('/api/assessment_template/clone', [{
         sourceObjectIds: sourceIds,

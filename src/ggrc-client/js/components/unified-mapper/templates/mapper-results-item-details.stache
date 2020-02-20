@@ -37,7 +37,7 @@
           {{> people/mapper-item-description.stache}}
         </div>
       {{else}}
-        <mapper-results-item-description 
+        <mapper-results-item-description
           instance:from="instance" 
           class="flex-box" />
       {{/is}}

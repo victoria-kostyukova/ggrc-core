@@ -10,7 +10,7 @@ import loForEach from 'lodash/forEach';
 import loFind from 'lodash/find';
 import loIsEqual from 'lodash/isEqual';
 import canBatch from 'can-event/batch/batch';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import {
   getMappingList,
 } from '../../models/mappers/mappings';
@@ -36,7 +36,7 @@ import * as businessModels from '../../models/business-models';
  *  @property {Object} config - Has fields with special values for viewModel.
  */
 
-const ObjectOperationsBaseVM = canMap.extend({
+const ObjectOperationsBaseVM = canDefineMap.extend({
   /**
    * Extract certain config for passed type from config.
    * If there is special config for type then return it else return
@@ -48,60 +48,58 @@ const ObjectOperationsBaseVM = canMap.extend({
    * @param {SpecialConfig[]} config.special - Has array of special configs.
    * @return {Object} - extracted config.
    */
-  extractConfig: function (type, config) {
-    let resultConfig;
-    let special = loResult(
+  extractConfig(type, config) {
+    const special = loResult(
       loFind(
         config.special,
-        function (special) {
+        (special) => {
           return loIncludes(special.types, type);
         }),
       'config'
     );
 
-    resultConfig = !loIsEmpty(special) ? special : config.general;
+    const resultConfig = !loIsEmpty(special) ? special : config.general;
     return resultConfig;
   },
 }, {
-  define: {
-    parentInstance: {
-      get: function () {
-        return getInstance(this.attr('object'), this.attr('join_object_id'));
-      },
+  parentInstance: {
+    get() {
+      return getInstance(this.object, this.join_object_id);
     },
-    model: {
-      get: function () {
-        return businessModels[this.attr('type')];
-      },
+  },
+  model: {
+    get() {
+      return businessModels[this.type];
     },
-    type: {
+  },
+  type: {
+    value: 'Control', // We set default as Control
     /*
-     * When object type is changed it should be needed to change a config.
-     * For example, if not set a special config for type [TYPE] then is used
-     * general config, otherwise special config.
-     */
-      set(mapType) {
-        if (mapType === this.attr('type')) {
-          return mapType;
-        }
-
-        let config = this.attr('config') || {};
-        let resultConfig = ObjectOperationsBaseVM.extractConfig(
-          mapType,
-          config.serialize()
-        );
-
-        // We remove type because update action can make recursion (when we set
-        // type)
-        delete resultConfig.type;
-
-        this.update(resultConfig);
-        this.attr('currConfig', resultConfig);
-        this.attr('resultsRequested', false);
-        this.attr('entriesTotalCount', '');
-
+    * When object type is changed it should be needed to change a config.
+    * For example, if not set a special config for type [TYPE] then is used
+    * general config, otherwise special config.
+    */
+    set(mapType) {
+      if (mapType === this.type) {
         return mapType;
-      },
+      }
+
+      let config = this.config || {};
+      let resultConfig = ObjectOperationsBaseVM.extractConfig(
+        mapType,
+        config.serialize()
+      );
+
+      // We remove type because update action can make recursion (when we set
+      // type)
+      delete resultConfig.type;
+
+      this.update(resultConfig);
+      this.currConfig = resultConfig;
+      this.resultsRequested = false;
+      this.entriesTotalCount = '';
+
+      return mapType;
     },
   },
   /**
@@ -112,44 +110,75 @@ const ObjectOperationsBaseVM = canMap.extend({
    * @property {SpecialConfig[]} special - Has array of special configs.
    */
   config: {
-    general: {},
-    special: [],
+    value: () => ({
+      general: {},
+      special: [],
+    }),
   },
-  currConfig: null,
-  showSearch: true,
-  showResults: true,
-  resultsRequested: false,
-  type: 'Control', // We set default as Control
+  currConfig: {
+    value: null,
+  },
+  showSearch: {
+    value: true,
+  },
+  showResults: {
+    value: true,
+  },
+  resultsRequested: {
+    value: false,
+  },
   availableTypes() {
-    const object = this.attr('object');
+    const object = this.object;
     const list = object !== 'Assessment'
       ? getMappingList(object)
       : GGRC.config.snapshotable_objects;
 
     return groupTypes(list);
   },
-  object: '',
-  is_loading: false,
-  is_saving: false,
-  join_object_id: '',
-  selected: [],
-  entries: [],
-  entriesTotalCount: '',
-  options: [],
-  relevant: [],
-  useSnapshots: false,
-  onSearchCallback: $.noop(),
-  onSubmit: function () {
-    this.attr('is_loading', true);
-    this.attr('entries').replace([]);
-    this.attr('resultsRequested', true);
-    this.attr('showResults', true);
+  object: {
+    value: '',
+  },
+  is_loading: {
+    value: false,
+  },
+  is_saving: {
+    value: false,
+  },
+  join_object_id: {
+    value: '',
+  },
+  selected: {
+    value: () => [],
+  },
+  entries: {
+    value: () => [],
+  },
+  entriesTotalCount: {
+    value: '',
+  },
+  options: {
+    value: () => [],
+  },
+  relevant: {
+    value: () => [],
+  },
+  useSnapshots: {
+    value: false,
+  },
+  onSearchCallback: {
+    value: () => $.noop(),
+  },
+  onSubmit() {
+    this.is_loading = true;
+    this.entries.replace([]);
+    this.resultsRequested = true;
+    this.showResults = true;
 
     if (this.onSearchCallback) {
       this.onSearchCallback();
     }
   },
-  onLoaded(element) {
+  onLoaded() {
     // set focus on the top modal window
     $('.modal:visible')
       .last()
@@ -160,12 +189,12 @@ const ObjectOperationsBaseVM = canMap.extend({
    *
    * @param {Object} config - Plain object with values for updating
    */
-  update: function (config) {
+  update(config) {
     canBatch.start();
 
     // do not update fields with the same values in VM and config
     loForEach(config, (value, key) => {
-      let vmValue = this.attr(key);
+      let vmValue = this.get(key);
       let hasSerialize = Boolean(vmValue && vmValue.serialize);
 
       if (hasSerialize) {
@@ -173,7 +202,7 @@ const ObjectOperationsBaseVM = canMap.extend({
       }
 
       if (!loIsEqual(vmValue, value)) {
-        this.attr(key, value);
+        this.set(key, value);
       }
     });
 

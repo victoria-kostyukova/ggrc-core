@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   uploadFiles,
@@ -23,8 +23,10 @@ import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
 import {ggrcPost} from '../../plugins/ajax-extensions';
 
-const viewModel = canMap.extend({
-  parentInstance: null,
+const ViewModel = canDefineMap.extend({
+  parentInstance: {
+    value: null,
+  },
   openPicker() {
     return uploadFiles()
       .then((files) => {
@@ -54,7 +56,7 @@ const viewModel = canMap.extend({
       })
       .then((documents) => this.refreshPermissionsAndMap(documents))
       .catch(() => {
-        this.attr('parentInstance').dispatch(DOCUMENT_CREATE_FAILED);
+        this.parentInstance.dispatch(DOCUMENT_CREATE_FAILED);
       });
   },
   checkDocumentsExist(files) {
@@ -90,7 +92,7 @@ const viewModel = canMap.extend({
       return Promise.resolve([]);
     }
 
-    this.attr('parentInstance').dispatch(BEFORE_DOCUMENT_CREATE);
+    this.parentInstance.dispatch(BEFORE_DOCUMENT_CREATE);
     return files.map((file) => {
       let instance = new Document({
         title: file.title,
@@ -116,7 +118,7 @@ const viewModel = canMap.extend({
   },
   showConfirm(documents) {
     return new Promise((resolve, reject) => {
-      let parentInstance = this.attr('parentInstance');
+      let parentInstance = this.parentInstance;
       let docsCount = documents.length;
       confirm({
         modal_title: 'Warning',
@@ -136,5 +138,5 @@ export default canComponent.extend({
   tag: 'create-document-button',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
 });

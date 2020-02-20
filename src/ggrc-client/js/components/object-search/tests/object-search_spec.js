@@ -6,24 +6,22 @@
 import canMap from 'can-map';
 import Component from '../object-search';
 
-describe('object-search component', function () {
-  'use strict';
-
+describe('object-search component', () => {
   let viewModel;
   let parentViewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     parentViewModel = new canMap();
-    viewModel = new Component.prototype.viewModel({}, parentViewModel)();
+    viewModel = Component.prototype.viewModel({}, parentViewModel)();
   });
 
-  describe('onSubmit() method', function () {
-    it('sets resultsRequested flag to true', function () {
-      viewModel.attr('resultsRequested', false);
+  describe('onSubmit() method', () => {
+    it('sets resultsRequested flag to true', () => {
+      viewModel.resultsRequested = false;
 
       viewModel.onSubmit();
 
-      expect(viewModel.attr('resultsRequested')).toBe(true);
+      expect(viewModel.resultsRequested).toBe(true);
     });
   });
 });

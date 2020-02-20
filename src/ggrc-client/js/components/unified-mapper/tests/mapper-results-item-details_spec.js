@@ -3,46 +3,45 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../mapper-results-item-details';
 
-describe('mapper-results-item-details component', function () {
-  'use strict';
-
+describe('mapper-results-item-details component', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     let init;
-    init = Component.prototype.viewModel.prototype.init;
-    Component.prototype.viewModel.prototype.init = undefined;
+    init = Component.prototype.ViewModel.prototype.init;
+    Component.prototype.ViewModel.prototype.init = undefined;
     viewModel = getComponentVM(Component);
-    Component.prototype.viewModel.prototype.init = init;
+    Component.prototype.ViewModel.prototype.init = init;
     viewModel.init = init;
   });
 
-  describe('init() method', function () {
+  describe('init() method', () => {
     let instance;
-    beforeEach(function () {
-      instance = {
+    beforeEach(() => {
+      instance = new canMap({
         type: 'Control',
-      };
-      viewModel.attr('instance', instance);
+      });
+      viewModel.instance = instance;
     });
-    it('sets correct instance for Snapshot objects', function () {
+    it('sets correct instance for Snapshot objects', () => {
       let result;
-      let snapshotInstance = {
+      let snapshotInstance = new canMap({
         snapshotObject: 'snapshotObject',
-      };
-      viewModel.attr('instance', snapshotInstance);
+      });
+      viewModel.instance = snapshotInstance;
       viewModel.init();
-      result = viewModel.attr('instance');
+      result = viewModel.instance;
       expect(result).toEqual('snapshotObject');
     });
 
-    it('sets model for non-snapshot objects', function () {
+    it('sets model for non-snapshot objects', () => {
       let result;
       viewModel.init();
-      result = viewModel.attr('model');
+      result = viewModel.model;
       expect(result.model_singular)
         .toEqual('Control');
     });
@@ -50,12 +49,12 @@ describe('mapper-results-item-details component', function () {
 
   describe('assessmentType get() method', () => {
     it('returns plural title for instance.assessment_type', () => {
-      const instance = {
+      const instance = new canMap({
         assessment_type: 'Control',
-      };
-      viewModel.attr('instance', instance);
+      });
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('assessmentType')).toBe('Controls');
+      expect(viewModel.assessmentType).toBe('Controls');
     });
   });
 });

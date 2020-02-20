@@ -10,87 +10,86 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
 import Program from '../../../models/business-models/program';
 
-describe('mapper-results-columns-configuration component', function () {
-  'use strict';
+describe('mapper-results-columns-configuration component', () => {
   let viewModel;
 
-  beforeAll(function () {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('set() of viewModel.selectedColumns', function () {
-    beforeEach(function () {
+  describe('set() of viewModel.selectedColumns', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'initializeColumns');
     });
 
-    it('updates value of viewModel.selectedColumns', function () {
-      viewModel.attr('selectedColumns', 123);
-      expect(viewModel.attr('selectedColumns')).toEqual(123);
+    it('updates value of viewModel.selectedColumns', () => {
+      viewModel.selectedColumns = 123;
+      expect(viewModel.selectedColumns).toEqual(123);
     });
 
-    it('calls viewModel.initializeColumns()', function () {
-      viewModel.attr('selectedColumns', 123);
+    it('calls viewModel.initializeColumns()', () => {
+      viewModel.selectedColumns = 123;
       expect(viewModel.initializeColumns).toHaveBeenCalled();
     });
   });
 
-  describe('set() of viewModel.availableColumns', function () {
-    beforeEach(function () {
+  describe('set() of viewModel.availableColumns', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'initializeColumns');
     });
 
     it('updates value of viewModel.availableColumns',
-      function () {
-        viewModel.attr('availableColumns', 123);
-        expect(viewModel.attr('availableColumns')).toEqual(123);
+      () => {
+        viewModel.availableColumns = 123;
+        expect(viewModel.availableColumns).toEqual(123);
       });
 
     it('calls viewModel.initializeColumns()',
-      function () {
-        viewModel.attr('availableColumns', 123);
+      () => {
+        viewModel.availableColumns = 123;
         expect(viewModel.initializeColumns).toHaveBeenCalled();
       });
   });
 
-  describe('set() of viewModel.serviceColumns', function () {
-    beforeEach(function () {
+  describe('set() of viewModel.serviceColumns', () => {
+    beforeEach(() => {
       spyOn(TreeViewUtils, 'getVisibleColumnsConfig').and.returnValue(456);
     });
 
     it('updates value of viewModel.serviceColumns with the result of ' +
-    'TreeViewUtils.getVisibleColumnsConfig function', function () {
-      viewModel.attr('serviceColumns', 123);
+    'TreeViewUtils.getVisibleColumnsConfig function', () => {
+      viewModel.serviceColumns = 123;
       expect(TreeViewUtils.getVisibleColumnsConfig)
         .toHaveBeenCalledWith(123, 123);
       expect(viewModel.serviceColumns).toEqual(456);
     });
   });
 
-  describe('init() method', function () {
-    beforeEach(function () {
+  describe('init() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'initializeColumns');
     });
 
-    it('calls initializeColumns()', function () {
+    it('calls initializeColumns()', () => {
       viewModel.init();
       expect(viewModel.initializeColumns).toHaveBeenCalled();
     });
   });
 
-  describe('getModel() method', function () {
-    it('returns the current model type constructor', function () {
+  describe('getModel() method', () => {
+    it('returns the current model type constructor', () => {
       let result;
-      viewModel.attr('modelType', 'Program');
+      viewModel.modelType = 'Program';
       result = viewModel.getModel();
       expect(result).toEqual(Program);
     });
   });
 
-  describe('initializeColumns() method', function () {
+  describe('initializeColumns() method', () => {
     let selectedColumns;
     let availableColumns;
 
-    beforeAll(function () {
+    beforeAll(() => {
       selectedColumns = new makeArray([
         new canMap({attr_name: 'title'}),
       ]);
@@ -100,15 +99,15 @@ describe('mapper-results-columns-configuration component', function () {
       ]);
     });
 
-    beforeEach(function () {
-      viewModel.attr('selectedColumns', selectedColumns);
-      viewModel.attr('availableColumns', availableColumns);
+    beforeEach(() => {
+      viewModel.selectedColumns = selectedColumns;
+      viewModel.availableColumns = availableColumns;
     });
 
-    it('updates viewModel.columns', function () {
+    it('updates viewModel.columns', () => {
       let columns;
       viewModel.initializeColumns();
-      columns = viewModel.attr('columns');
+      columns = viewModel.columns;
 
       expect(columns.length).toBe(2);
       expect(columns[0].name).toEqual('title');
@@ -118,19 +117,19 @@ describe('mapper-results-columns-configuration component', function () {
     });
   });
 
-  describe('setColumns() method', function () {
-    beforeEach(function () {
-      viewModel.attr('columns', [
+  describe('setColumns() method', () => {
+    beforeEach(() => {
+      viewModel.columns = [
         {name: 'title', selected: true},
         {name: 'date', selected: false},
-      ]);
+      ];
       spyOn(TreeViewUtils, 'setColumnsForModel')
         .and.returnValue({
           selected: 'selectedColumns',
         });
     });
 
-    it('updates value of viewModel.selectedColumns', function () {
+    it('updates value of viewModel.selectedColumns', () => {
       viewModel.setColumns();
       expect(viewModel.selectedColumns).toEqual('selectedColumns');
     });

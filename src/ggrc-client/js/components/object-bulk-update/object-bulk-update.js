@@ -20,7 +20,7 @@ export default canComponent.extend({
   tag: 'object-bulk-update',
   view: canStache(template),
   leakScope: true,
-  viewModel: function (attrs, parentViewModel) {
+  viewModel(attrs, parentViewModel) {
     let type = attrs.type;
     let targetStates = getBulkStatesForModel(type);
     let targetState = targetStates.length ? targetStates[0] : null;
@@ -40,39 +40,55 @@ export default canComponent.extend({
     ];
 
     return ObjectOperationsBaseVM.extend({
-      type: attrs.type,
-      object: attrs.object,
-      reduceToOwnedItems: true,
-      showTargetState: true,
-      targetStates: targetStates,
-      targetState: targetState,
-      defaultSort: defaultSort,
-      callback: parentViewModel.attr('callback'),
+      type: {
+        value: attrs.type,
+      },
+      object: {
+        value: () => attrs.object,
+      },
+      reduceToOwnedItems: {
+        value: true,
+      },
+      showTargetState: {
+        value: true,
+      },
+      targetStates: {
+        value: () => targetStates,
+      },
+      targetState: {
+        value: targetState,
+      },
+      defaultSort: {
+        value: () => defaultSort,
+      },
+      callback: {
+        value: () => parentViewModel.attr('callback'),
+      },
     });
   },
   events: {
-    inserted: function () {
+    inserted() {
       this.viewModel.onSubmit();
     },
-    closeModal: function () {
+    closeModal() {
       if (this.element) {
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    '.btn-cancel click': function () {
+    '.btn-cancel click'() {
       this.closeModal();
     },
-    '.btn-update click': function () {
+    '.btn-update click'() {
       let callback = this.viewModel.callback;
       const stopFn = tracker.start(
-        this.viewModel.attr('type'),
+        this.viewModel.type,
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CYCLE_TASK.BULK_UPDATE);
 
       callback(this, {
-        selected: this.viewModel.attr('selected'),
+        selected: this.viewModel.selected,
         options: {
-          state: this.viewModel.attr('targetState'),
+          state: this.viewModel.targetState,
         },
       }).then(stopFn, stopFn.bind(null, true));
     },

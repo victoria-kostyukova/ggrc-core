@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
@@ -17,45 +17,59 @@ import './mapper-results-item-description';
 import template from './templates/mapper-results-item-details.stache';
 import * as businessModels from '../../models/business-models';
 
+const ViewModel = canDefineMap.extend({
+  init() {
+    let instance = this.instance;
+    if (instance.snapshotObject) {
+      this.instance = instance.snapshotObject;
+    } else {
+      this.model = businessModels[instance.type];
+    }
+  },
+  assessmentType: {
+    get() {
+      const instance = this.instance;
+      return businessModels[instance.assessment_type].title_plural;
+    },
+  },
+  workflowLink: {
+    get() {
+      const instance = this.instance;
+      let path;
+      if (instance.type === 'TaskGroup') {
+        path = `/workflows/${instance.workflow.id}#!task_group`;
+      } else if (instance.type === 'CycleTaskGroupObjectTask') {
+        path = `/workflows/${instance.workflow.id}#!current`;
+      }
+      return path;
+    },
+  },
+  item: {
+    value: null,
+  },
+  instance: {
+    value: null,
+  },
+  model: {
+    value: null,
+  },
+  isMapperDetails: {
+    value: true,
+  },
+  adminRole: {
+    value: () => ['Admin'],
+  },
+  deletableAdmin: {
+    value: false,
+  },
+  itemDetailsViewType: {
+    value: '',
+  },
+});
+
 export default canComponent.extend({
   tag: 'mapper-results-item-details',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    init() {
-      let instance = this.attr('instance');
-      if (instance.snapshotObject) {
-        this.attr('instance', instance.snapshotObject);
-      } else {
-        this.attr('model', businessModels[instance.type]);
-      }
-    },
-    define: {
-      assessmentType: {
-        get() {
-          const instance = this.attr('instance');
-          return businessModels[instance.assessment_type].title_plural;
-        },
-      },
-      workflowLink: {
-        get() {
-          const instance = this.attr('instance');
-          let path;
-          if (instance.type === 'TaskGroup') {
-            path = `/workflows/${instance.workflow.id}#!task_group`;
-          } else if (instance.type === 'CycleTaskGroupObjectTask') {
-            path = `/workflows/${instance.workflow.id}#!current`;
-          }
-          return path;
-        },
-      },
-    },
-    item: null,
-    instance: null,
-    model: null,
-    isMapperDetails: true,
-    adminRole: ['Admin'],
-    deletableAdmin: false,
-    itemDetailsViewType: '',
-  }),
+  ViewModel,
 });

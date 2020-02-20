@@ -81,7 +81,7 @@ let DEFAULT_OBJECT_MAP = {
   TechnologyEnvironment: 'Product',
 };
 
-let getDefaultType = function (type, object) {
+let getDefaultType = (type, object) => {
   let treeView = TreeViewConfig.attr('sub_tree_for')[object];
   let defaultType =
     (businessModels[type] && type) ||
@@ -98,7 +98,7 @@ export default canComponent.extend({
   tag: 'object-mapper',
   view: canStache(template),
   leakScope: true,
-  viewModel: function (attrs, parentViewModel) {
+  viewModel(attrs, parentViewModel) {
     let config = {
       general: parentViewModel.attr('general'),
       special: parentViewModel.attr('special'),
@@ -110,25 +110,42 @@ export default canComponent.extend({
     );
 
     return ObjectOperationsBaseVM.extend({
-      isRefreshCountsNeeded:
-        (parentViewModel.attr('is_refresh_counts_needed') !== undefined)
-          ? parentViewModel.attr('is_refresh_counts_needed')
+      isRefreshCountsNeeded: {
+        value: (parentViewModel.is_refresh_counts_needed !== undefined)
+          ? parentViewModel.is_refresh_counts_needed
           : true,
-      join_object_id: resolvedConfig.isNew ? null :
-        resolvedConfig['join-object-id'] ||
-        (getPageInstance() && getPageInstance().id),
-      object: resolvedConfig.object,
-      type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
-      config: config,
-      useSnapshots: resolvedConfig.useSnapshots,
-      isLoadingOrSaving: function () {
-        return this.attr('is_saving') ||
+      },
+      join_object_id: {
+        value: resolvedConfig.isNew
+          ? null
+          : resolvedConfig['join-object-id']
+            || (getPageInstance() && getPageInstance().id),
+      },
+      object: {
+        value: resolvedConfig.object,
+      },
+      type: {
+        value: () => getDefaultType(resolvedConfig.type, resolvedConfig.object),
+      },
+      config: {
+        value: () => config,
+      },
+      useSnapshots: {
+        value: resolvedConfig.useSnapshots,
+      },
+      isLoadingOrSaving() {
+        return this.is_saving ||
           //  disable changing of object type while loading
           //  to prevent errors while speedily selecting different types
-          this.attr('is_loading');
+          this.is_loading;
       },
-      deferred_to: parentViewModel.attr('deferred_to'),
-      deferred_list: [],
+      deferred_to: {
+        value: () =>
+          parentViewModel.attr('deferred_to') || {},
+      },
+      deferred_list: {
+        value: () => [],
+      },
       /**
        * This property is needed to work together with deferredSave() method.
        * If it's true then mapped objects shouldn't be mapped immediately to
@@ -137,9 +154,15 @@ export default canComponent.extend({
        * mapped to target object.
        * @property {boolean}
        */
-      deferred: false,
-      isMappableExternally: false,
-      searchModel: null,
+      deferred: {
+        value: false,
+      },
+      isMappableExternally: {
+        value: false,
+      },
+      searchModel: {
+        value: null,
+      },
       /**
        * Stores "id: relation" pairs for mega objects mapping
        * @type {Object}
@@ -151,30 +174,36 @@ export default canComponent.extend({
        * }
        */
       megaRelationObj: {
-        defaultValue: config.general.megaRelation || 'child',
+        value: () => ({
+          defaultValue: config.general.megaRelation || 'child',
+        }),
       },
-      pubSub,
+      pubSub: {
+        value: () => pubSub,
+      },
       /**
        * There is situation when user switch type from one two another.
        * After it current config is changed immediately. It leads to the fact
        * that all things in the templates are rerendered.
-       * But several controls must not be rerenderd till submit action will not be
+       * But several controls must not be rerendered till submit action will not be
        * occurred (for example it's a results in unified mapper - when we switch
        * object type the results should not be painted in another color (if
        * unified mapper operates with a snapshots and usual objects)).
        */
-      freezedConfigTillSubmit: {},
-      showAsSnapshots: function () {
-        if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
-          return true;
-        }
-        return false;
+      freezedConfigTillSubmit: {
+        value: () => ({}),
       },
-      isSnapshotMapping: function () {
-        let isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
-        let isSnapshotParentDst = isSnapshotParent(this.attr('type'));
-        let isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
-        let isSnapshotModelDst = isSnapshotModel(this.attr('type'));
+      showAsSnapshots() {
+        return this.freezedConfigTillSubmit
+          && this.freezedConfigTillSubmit.useSnapshots
+          ? true
+          : false;
+      },
+      isSnapshotMapping() {
+        let isSnapshotParentSrc = isSnapshotParent(this.object);
+        let isSnapshotParentDst = isSnapshotParent(this.type);
+        let isSnapshotModelSrc = isSnapshotModel(this.object);
+        let isSnapshotModelDst = isSnapshotModel(this.type);
 
         let result =
           // Show message if source is snapshotParent and destination is snapshotable.
@@ -184,35 +213,34 @@ export default canComponent.extend({
 
         return result;
       },
-      updateFreezedConfigToLatest: function () {
-        this.attr('freezedConfigTillSubmit', this.attr('currConfig'));
+      updateFreezedConfigToLatest() {
+        this.freezedConfigTillSubmit = this.currConfig;
       },
       onSubmit: function () {
         this.updateFreezedConfigToLatest();
-        this.attr('searchModel', this.attr('model'));
+        this.searchModel = this.model;
 
-        let source = this.attr('object');
-        let destination = this.attr('type');
+        let source = this.object;
+        let destination = this.type;
         if (shouldBeMappedExternally(source, destination)) {
-          this.attr('isMappableExternally', true);
+          this.isMappableExternally = true;
           return;
         } else {
-          this.attr('isMappableExternally', false);
+          this.isMappableExternally = false;
           // calls base version
           this._super(...arguments);
         }
       },
-
-      onDestroyItem: function (item) {
-        if (!this.attr('deferred_to.list')) {
+      onDestroyItem(item) {
+        if (!this.deferred_to.list) {
           return;
         }
-        const source = this.attr('deferred_to').instance;
-        const object = loFind(this.attr('deferred_to.list'),
+        const source = this.deferred_to.instance;
+        const object = loFind(this.deferred_to.list,
           (x) => x.id === item.id);
-        const deferredToList = this.attr('deferred_to.list')
+        const deferredToList = this.deferred_to.list
           .filter((x) => x.id !== item.id);
-        this.attr('deferred_to.list').replace(deferredToList);
+        this.deferred_to.list.replace(deferredToList);
         if (source) {
           if (source.list) {
             const deferredList = deferredToList
@@ -222,7 +250,7 @@ export default canComponent.extend({
                   type: x.type,
                 });
               });
-            this.attr('deferred_to.instance.list').replace(deferredList);
+            this.deferred_to.instance.list.replace(deferredList);
           }
           source.dispatch({
             ...UNMAP_DESTROYED_OBJECT,
@@ -265,26 +293,26 @@ export default canComponent.extend({
       this.element.trigger('showModal');
     },
     '{pubSub} mapAsChild'(el, ev) {
-      this.viewModel.attr('megaRelationObj')[ev.id] = ev.val;
+      this.viewModel.megaRelationObj[ev.id] = ev.val;
     },
     inserted() {
-      this.viewModel.attr('selected').replace([]);
+      this.viewModel.selected.replace([]);
 
-      if (this.viewModel.attr('deferred_to.list')) {
-        let deferredToList = this.viewModel.attr('deferred_to.list')
+      if (this.viewModel.deferred_to.list) {
+        let deferredToList = this.viewModel.deferred_to.list
           .map((item) => {
             return ({
               id: item.id,
               type: item.type,
             });
           });
-        this.viewModel.attr('deferred_list', deferredToList);
+        this.viewModel.deferred_list = deferredToList;
       }
 
       this.viewModel.onSubmit();
     },
     map(objects, options) {
-      if (this.viewModel.attr('deferred')) {
+      if (this.viewModel.deferred) {
         // postpone map operation unless target object is saved
         this.deferredSave(objects);
       } else if (options && options.megaMapping) {
@@ -299,16 +327,16 @@ export default canComponent.extend({
       objects.forEach((obj) => relationsObj[obj.id] = relation);
       this.mapObjects(objects, true, relationsObj);
     },
-    closeModal: function () {
-      this.viewModel.attr('is_saving', false);
+    closeModal() {
+      this.viewModel.is_saving = false;
 
       // TODO: Find proper way to dismiss the modal
       if (this.element) {
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    deferredSave: function (objects) {
-      let source = this.viewModel.attr('deferred_to').instance;
+    deferredSave(objects) {
+      let source = this.viewModel.deferred_to.instance;
       const deferredObjects = objects
         .filter((destination) => allowedToMap(source, destination));
 
@@ -318,22 +346,22 @@ export default canComponent.extend({
       });
       this.closeModal();
     },
-    '.modal-footer .btn-map click': function (el, ev) {
+    '.modal-footer .btn-map click'(el, ev) {
       ev.preventDefault();
       if (el.hasClass('disabled') ||
-        this.viewModel.attr('is_saving')) {
+        this.viewModel.is_saving) {
         return;
       }
 
-      const selectedObjects = this.viewModel.attr('selected');
+      const selectedObjects = this.viewModel.selected;
       // If we need to map object later on (set by 'data-deferred' attribute)
       // TODO: Figure out nicer / proper way to handle deferred save
-      if (this.viewModel.attr('deferred')) {
+      if (this.viewModel.deferred) {
         return this.deferredSave(selectedObjects);
       }
 
-      const megaMapping = isMegaMapping(this.viewModel.attr('object'),
-        this.viewModel.attr('type'));
+      const megaMapping = isMegaMapping(this.viewModel.object,
+        this.viewModel.type);
 
       if (megaMapping) {
         this.proceedWithMegaMapping(selectedObjects);
@@ -350,21 +378,21 @@ export default canComponent.extend({
         modal_confirm: 'Proceed',
         button_view: '/modals/confirm-cancel-buttons.stache',
       }, () => {
-        this.viewModel.attr('is_saving', true);
+        this.viewModel.is_saving = true;
         this.mapObjects(selectedObjects, true,
-          this.viewModel.attr('megaRelationObj'));
+          this.viewModel.megaRelationObj);
       });
     },
     proceedWithRegularMapping(selectedObjects) {
-      this.viewModel.attr('is_saving', true);
+      this.viewModel.is_saving = true;
       this.mapObjects(selectedObjects);
     },
     mapObjects(objects, megaMapping, relationsObj) {
       const viewModel = this.viewModel;
-      const object = viewModel.attr('object');
-      const type = viewModel.attr('type');
+      const object = viewModel.object;
+      const type = viewModel.type;
       const instance = businessModels[object].findInCacheById(
-        viewModel.attr('join_object_id')
+        viewModel.join_object_id
       );
       let stopFn = tracker.start(
         tracker.FOCUS_AREAS.MAPPINGS(instance.type),
@@ -378,7 +406,7 @@ export default canComponent.extend({
       });
 
       mapObjectsUtil(instance, objects, {
-        useSnapshots: viewModel.attr('useSnapshots'),
+        useSnapshots: viewModel.useSnapshots,
         megaMapping,
         relationsObj,
       })
@@ -396,7 +424,7 @@ export default canComponent.extend({
           });
           instance.dispatch(REFRESH_SUB_TREE);
 
-          if (viewModel.attr('isRefreshCountsNeeded')) {
+          if (viewModel.isRefreshCountsNeeded) {
             // This Method should be modified to event
             refreshCounts();
           }
@@ -416,16 +444,16 @@ export default canComponent.extend({
   },
 
   helpers: {
-    get_title: function (options) {
-      let instance = this.attr('parentInstance');
+    get_title() {
+      let instance = this.parentInstance;
       return (
         (instance && instance.title) ?
           instance.title :
-          this.attr('object')
+          this.object
       );
     },
-    get_object: function (options) {
-      let type = businessModels[this.attr('type')];
+    get_object() {
+      let type = businessModels[this.type];
       if (type && type.title_plural) {
         return type.title_plural;
       }

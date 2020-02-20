@@ -44,58 +44,74 @@ const attributesType = {
   dropdown: 'Dropdown',
 };
 
-const viewModel = AssessmentsBulkUpdatable.extend({
-  define: {
-    isSelectButtonDisabled: {
-      get() {
-        return (
-          this.attr('selected.length') === 0 ||
-          this.attr('isAttributesGenerating') ||
-          !this.attr('hasChangedSelection')
-        );
-      },
-    },
-    hasChangedSelection: {
-      get() {
-        return (
-          this.attr('selectedAfterLastSelection.length') > 0 ||
-          this.attr('deselectedAfterLastSelection.length') > 0
-        );
-      },
-    },
-    isCompleteButtonDisabled: {
-      get() {
-        const hasInvalidFields = loSome(this.attr('attributeFields'),
-          (field) => !field.attr('validation.valid'));
-        return this.attr('selected.length') === 0 ||
-          this.attr('hasChangedSelection') ||
-          this.attr('isCompleting') ||
-          hasInvalidFields;
-      },
+const ViewModel = AssessmentsBulkUpdatable.extend({
+  isSelectButtonDisabled: {
+    get() {
+      return (
+        this.selected.length === 0 ||
+        this.isAttributesGenerating ||
+        !this.hasChangedSelection
+      );
     },
   },
-  showFields: false,
-  statesCollectionKey: STATES_KEYS.BULK_COMPLETE,
-  isAttributesGenerating: false,
-  attributeFields: [],
-  isAttributesGenerated: false,
+  hasChangedSelection: {
+    get() {
+      return (
+        this.selectedAfterLastSelection.length > 0 ||
+        this.deselectedAfterLastSelection.length > 0
+      );
+    },
+  },
+  isCompleteButtonDisabled: {
+    get() {
+      const hasInvalidFields = loSome(this.attributeFields,
+        (field) => !field.attr('validation.valid'));
+      return this.selected.length === 0 ||
+        this.hasChangedSelection ||
+        this.isCompleting ||
+        hasInvalidFields;
+    },
+  },
+  showFields: {
+    value: false,
+  },
+  statesCollectionKey: {
+    value: STATES_KEYS.BULK_COMPLETE,
+  },
+  isAttributesGenerating: {
+    value: false,
+  },
+  attributeFields: {
+    value: () => [],
+  },
+  isAttributesGenerated: {
+    value: false,
+  },
   requiredInfoModal: {
-    title: '',
-    state: {open: false},
-    content: {
-      field: null,
-      requiredInfo: null,
-      commentValue: null,
-      urls: [],
-      files: [],
-    },
+    value: () => ({
+      title: '',
+      state: {open: false},
+      content: {
+        field: null,
+        requiredInfo: null,
+        commentValue: null,
+        urls: [],
+        files: [],
+      },
+    }),
   },
-  isCompleting: false,
+  isCompleting: {
+    value: false,
+  },
   /**
    * Contains selected objects (which have id and type properties)
    */
-  selectedAfterLastSelection: [],
-  deselectedAfterLastSelection: [],
+  selectedAfterLastSelection: {
+    value: () => [],
+  },
+  deselectedAfterLastSelection: {
+    value: () => [],
+  },
   /**
    * Util which removes `newItems`'s items from `collectionForRemove` collection
    * and add them to `collectionForAdd` collection if they were removed from
@@ -111,7 +127,7 @@ const viewModel = AssessmentsBulkUpdatable.extend({
 
     items.forEach((item) => {
       const removeItemIndex = loFindIndex(collectionForRemove,
-        (removedItem) => item.attr('id') === removedItem.attr('id'));
+        (removedItem) => item.id === removedItem.id);
 
       if (removeItemIndex !== -1) {
         collectionForRemove.splice(removeItemIndex, 1);
@@ -123,8 +139,8 @@ const viewModel = AssessmentsBulkUpdatable.extend({
     canBatch.stop();
   },
   onSelectClick() {
-    const hasUpdatedAttributes = loSome(this.attr('attributeFields'),
-      (field) => field.attr('value') !== field.attr('defaultValue'));
+    const hasUpdatedAttributes = loSome(this.attributeFields,
+      (field) => field.value !== field.defaultValue);
 
     if (hasUpdatedAttributes) {
       confirm({
@@ -198,23 +214,23 @@ const viewModel = AssessmentsBulkUpdatable.extend({
     };
   },
   async generateAttributes() {
-    this.attr('isAttributesGenerating', true);
+    this.isAttributesGenerating = true;
 
     try {
       const rawAttributesList = await this.loadGeneratedAttributes();
       const attributeFields = rawAttributesList.map((rawAttribute, index) =>
         this.convertToAttributeField(rawAttribute, index));
 
-      this.attr('isAttributesGenerated', true);
-      this.attr('attributeFields', attributeFields);
-      this.attr('showResults', false);
-      this.attr('showFields', true);
-      this.attr('selectedAfterLastSelection', []);
-      this.attr('deselectedAfterLastSelection', []);
+      this.isAttributesGenerated = true;
+      this.attributeFields = attributeFields;
+      this.showResults = false;
+      this.showFields = true;
+      this.selectedAfterLastSelection = [];
+      this.deselectedAfterLastSelection = [];
     } catch (err) {
       notifier('error', getFetchErrorInfo(err).details);
     } finally {
-      this.attr('isAttributesGenerating', false);
+      this.isAttributesGenerating = false;
     }
   },
   loadGeneratedAttributes() {
@@ -324,7 +340,7 @@ const viewModel = AssessmentsBulkUpdatable.extend({
     return ddValidationValueToMap(optionBitmask);
   },
   updateRequiredInfo({fieldId, changes}) {
-    const field = loFind(this.attr('attributeFields'), (field) =>
+    const field = loFind(this.attributeFields, (field) =>
       field.attr('id') === fieldId);
     const attachments = field.attr('attachments');
 
@@ -339,7 +355,7 @@ const viewModel = AssessmentsBulkUpdatable.extend({
   showRequiredInfoModal(field) {
     const requiredInfo = this.getRequiredInfoStates(field);
     const attachments = field.attr('attachments');
-    const requiredInfoModal = this.attr('requiredInfoModal');
+    const requiredInfoModal = this.requiredInfoModal;
     const modalTitle = `Required ${getLCAPopupTitle(requiredInfo)}`;
 
     canBatch.start();
@@ -369,7 +385,7 @@ const viewModel = AssessmentsBulkUpdatable.extend({
     }
   },
   buildBulkCompleteRequest() {
-    const attributes = this.attr('attributeFields')
+    const attributes = this.attributeFields
       .serialize()
       .map((field) => {
         const bulkUpdate = field.relatedAssessments.values
@@ -419,7 +435,7 @@ const viewModel = AssessmentsBulkUpdatable.extend({
     };
   },
   completeAssessments() {
-    this.attr('isCompleting', true);
+    this.isCompleting = true;
     backendGdriveClient.withAuth(
       () => ggrcPost(
         '/api/bulk_operations/complete',
@@ -437,11 +453,11 @@ const viewModel = AssessmentsBulkUpdatable.extend({
         }
       })
       .always(() => {
-        this.attr('isCompleting', false);
+        this.isCompleting = false;
       });
   },
   onCompleteClick() {
-    const hasChangedAnswers = loSome(this.attr('attributeFields'),
+    const hasChangedAnswers = loSome(this.attributeFields,
       (field) => loSome(field.attr('relatedAnswers'),
         (answer) => field.attr('value') !== answer.attr('attribute_value'))
     );
@@ -474,23 +490,23 @@ const viewModel = AssessmentsBulkUpdatable.extend({
 
 const events = {
   inserted() {
-    this.viewModel.attr('element', this.element);
+    this.viewModel.element = this.element;
     this.viewModel.onSubmit();
   },
   // catch selection of objects by inner components
   '{viewModel.selected} add'(el, ev, selected) {
     this.viewModel.updateSelectionCollections(
       selected,
-      this.viewModel.attr('deselectedAfterLastSelection'),
-      this.viewModel.attr('selectedAfterLastSelection')
+      this.viewModel.deselectedAfterLastSelection,
+      this.viewModel.selectedAfterLastSelection
     );
   },
   // catch deselection of objects by inner components
   '{viewModel.selected} remove'(el, ev, deselected) {
     this.viewModel.updateSelectionCollections(
       deselected,
-      this.viewModel.attr('selectedAfterLastSelection'),
-      this.viewModel.attr('deselectedAfterLastSelection')
+      this.viewModel.selectedAfterLastSelection,
+      this.viewModel.deselectedAfterLastSelection
     );
   },
 };
@@ -498,6 +514,6 @@ const events = {
 export default canComponent.extend({
   tag: 'assessments-bulk-complete',
   view: canStache(template),
-  viewModel,
+  ViewModel,
   events,
 });

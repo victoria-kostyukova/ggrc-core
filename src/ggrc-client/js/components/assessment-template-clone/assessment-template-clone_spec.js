@@ -132,9 +132,9 @@ describe('assessment-template-clone component', () => {
       });
 
       it('sets true to viewModel.is_saving attribute', () => {
-        vm.attr('is_saving', false);
+        vm.is_saving = false;
         handler();
-        expect(vm.attr('is_saving')).toBe(true);
+        expect(vm.is_saving).toBe(true);
       });
 
       it('calls cloneObjects()', () => {
@@ -148,11 +148,11 @@ describe('assessment-template-clone component', () => {
         });
 
         it('sets false to viewModel.is_saving attribute', (done) => {
-          that.viewModel.attr('is_saving', true);
+          that.viewModel.is_saving = true;
           handler();
 
           dfd.done(() => {
-            expect(that.viewModel.attr('is_saving')).toBe(false);
+            expect(that.viewModel.is_saving).toBe(false);
             done();
           });
         });
@@ -182,10 +182,10 @@ describe('assessment-template-clone component', () => {
         });
 
         it('sets false to viewModel.is_saving attribute', (done) => {
-          that.viewModel.attr('is_saving', true);
+          that.viewModel.is_saving = true;
           handler();
           dfd.fail(() => {
-            expect(that.viewModel.attr('is_saving')).toBe(false);
+            expect(that.viewModel.is_saving).toBe(false);
             done();
           });
         });
@@ -208,10 +208,10 @@ describe('assessment-template-clone component', () => {
 
       it('returns response of post request for clone', () => {
         let expectedArguments = [{
-          sourceObjectIds: loMap(vm.attr('selected'), (item) => item.id),
+          sourceObjectIds: loMap(vm.selected, (item) => item.id),
           destination: {
             type: 'Audit',
-            id: vm.attr('join_object_id'),
+            id: vm.join_object_id,
           },
         }];
         expect(handler()).toBe(expectedResult);

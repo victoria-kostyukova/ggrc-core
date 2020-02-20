@@ -26,7 +26,7 @@ export default canComponent.extend({
   tag: 'object-generator',
   view: canStache(template),
   leakScope: true,
-  viewModel: function (attrs, parentViewModel) {
+  viewModel(attrs, parentViewModel) {
     return ObjectOperationsBaseVM.extend({
       /**
        * @type {
@@ -38,68 +38,86 @@ export default canComponent.extend({
        * @description Selected assessment template with appropriate type
        * (objectType field) and id.
        */
-      assessmentTemplate: null,
-      object: attrs.object,
-      join_object_id: attrs.joinObjectId,
-      type: attrs.type,
-      relevantTo: parentViewModel.attr('relevantTo'),
-      callback: parentViewModel.attr('callback'),
-      useTemplates: true,
-      useSnapshots: true,
-      isLoadingOrSaving: function () {
-        return this.attr('is_saving') ||
-        this.attr('block_type_change') ||
+      assessmentTemplate: {
+        value: null,
+      },
+      object: {
+        value: attrs.object,
+      },
+      join_object_id: {
+        value: attrs.joinObjectId,
+      },
+      type: {
+        value: attrs.type,
+      },
+      relevantTo: {
+        value: () => parentViewModel.attr('relevantTo'),
+      },
+      callback: {
+        value: () => parentViewModel.attr('callback'),
+      },
+      useTemplates: {
+        value: true,
+      },
+      useSnapshots: {
+        value: true,
+      },
+      block_type_change: {
+        value: false,
+      },
+      isLoadingOrSaving() {
+        return this.is_saving ||
+        this.block_type_change ||
         //  disable changing of object type while loading
         //  to prevent errors while speedily selecting different types
-        this.attr('is_loading');
+        this.is_loading;
       },
       availableTypes() {
         return groupTypes(GGRC.config.snapshotable_objects);
       },
       onAssessmentTemplateChanged({template}) {
         if (!template) {
-          this.attr('block_type_change', false);
+          this.block_type_change = false;
         } else {
-          this.attr('block_type_change', true);
-          this.attr('type', template.objectType);
-          this.attr('assessmentTemplate', template);
+          this.block_type_change = true;
+          this.type = template.objectType;
+          this.assessmentTemplate = template;
         }
       },
     });
   },
 
   events: {
-    inserted: function () {
-      this.viewModel.attr('selected').replace([]);
-      this.viewModel.attr('entries').replace([]);
+    inserted() {
+      this.viewModel.selected.replace([]);
+      this.viewModel.entries.replace([]);
 
       // show loading indicator before actual
       // Assessment Template is loading
-      this.viewModel.attr('is_loading', true);
-      this.viewModel.attr('resultsRequested', true);
+      this.viewModel.is_loading = true;
+      this.viewModel.resultsRequested = true;
     },
-    closeModal: function () {
-      this.viewModel.attr('is_saving', false);
+    closeModal() {
+      this.viewModel.is_saving = false;
       if (this.element) {
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    '.modal-footer .btn-map click': function (el, ev) {
-      let type = this.viewModel.attr('type');
-      let object = this.viewModel.attr('object');
-      let assessmentTemplate =
-        this.viewModel.attr('assessmentTemplate');
+    '.modal-footer .btn-map click'(el, ev) {
+      let type = this.viewModel.type;
+      let object = this.viewModel.object;
+      let assessmentTemplate = this.viewModel.assessmentTemplate;
       let instance = businessModels[object].findInCacheById(
-        this.viewModel.attr('join_object_id'));
+        this.viewModel.join_object_id);
 
       ev.preventDefault();
       if (el.hasClass('disabled') ||
-      this.viewModel.attr('is_saving')) {
+      this.viewModel.is_saving) {
         return;
       }
 
-      this.viewModel.attr('is_saving', true);
-      return this.viewModel.callback(this.viewModel.attr('selected'), {
+      this.viewModel.is_saving = true;
+      return this.viewModel.callback(this.viewModel.selected, {
         type: type,
         target: object,
         instance: instance,
