@@ -785,7 +785,7 @@ class Issues(InfoWidget):
     return self._editable_simple_field("Description", self._root).text
 
 
-class Regulations(InfoWidget):
+class Regulations(ReadOnlyInfoWidget):
   """Model for Assessment object Info pages and Info panels."""
   _locators = locator.WidgetInfoRegulations
 
@@ -801,7 +801,7 @@ class Policies(InfoWidget):
     super(Policies, self).__init__(driver)
 
 
-class Standards(InfoWidget):
+class Standards(ReadOnlyInfoWidget):
   """Model for Standard object Info pages and Info panels."""
   _locators = locator.WidgetInfoStandard
 
