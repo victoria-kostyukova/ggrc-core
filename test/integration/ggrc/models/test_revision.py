@@ -3,7 +3,7 @@
 
 """ Tests for ggrc.models.Revision """
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, too-many-public-methods
 
 from datetime import datetime
 
@@ -671,7 +671,7 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertIn("created_by", revision.content)
     self.assertEqual(None, revision.content["created_by"])
 
-  def test_assessment_template(self):
+  def test_assessment_template_revision(self):
     """Test changes in revision for assessment template with lca"""
     with factories.single_commit():
       audit = factories.AuditFactory()
@@ -737,4 +737,3 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertEqual(len(cad_from_revision), 2)
     self.assertGreaterEqual(cad_from_revision[0], lca_1)
     self.assertGreaterEqual(cad_from_revision[1], lca_2)
->>>>>>> Add LCA to assessment template revision

@@ -561,6 +561,33 @@ class TestCADUpdate(TestCase):
     )
     self.assert200(response)
 
+    cad = models.CustomAttributeDefinition.query.filter(
+        models.CustomAttributeDefinition.title == "test_lca"
+    ).first()
+    self.assertTrue(cad)
+
+  def test_delete_cad_via_put(self):
+    """Test removing CAD via PUT for Assessment Template"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      template = factories.AssessmentTemplateFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          definition_type='assessment_template',
+          title='test_lca',
+          definition_id=template.id,
+      )
+
+    response = self.api.put(
+        template,
+        {'custom_attribute_definitions': []}
+    )
+    self.assert200(response)
+
+    cad = models.CustomAttributeDefinition.query.filter(
+        models.CustomAttributeDefinition.title == "test_lca"
+    ).first()
+    self.assertFalse(cad)
+
   def test_no_changes_cad_id_add(self):
     """Test no changes CAD id when add CAD to Assessment Template"""
     with factories.single_commit():

@@ -500,8 +500,9 @@ class CustomAttributable(CustomAttributableBase):
     """
     Process custom attribute definitions
 
-    At the first stage, all CADs that were deleted from the object are deleted.
-    In the second stage, new CADs are added that have been added to the object.
+    Delete all object's custom attribute definitions that are not present in
+    the `definitions` and create new custom attribute definitions from the
+    `definitions` which are not already present on the object.
 
     Args:
       definitions: Ordered list of (dict) custom attribute definitions
@@ -513,26 +514,31 @@ class CustomAttributable(CustomAttributableBase):
       return
 
     if self.id is not None:
-      cads_id = [cad.id for cad in self.custom_attribute_definitions]   # noqa pylint: disable=not-an-iterable
+      current_cad_ids = {cad.id for cad in self.custom_attribute_definitions}   # noqa pylint: disable=not-an-iterable
     else:
-      cads_id = []
+      current_cad_ids = set()
 
-    definition_cad_ids = [definition.get('id') for definition in definitions]
+    cads_to_remove = (
+        current_cad_ids -
+        {definition['id'] for definition in definitions
+         if definition.get('id')}
+    )
+    cads_to_add = (
+        {definition.get('id') for definition in definitions} -
+        current_cad_ids
+    )
+
     for cad in self.custom_attribute_definitions:   # noqa pylint: disable=not-an-iterable
       # Remove CAD that is not in the definitions
-      if cad.id not in definition_cad_ids:
+      if cad.id in cads_to_remove:
         db.session.query(CADef).filter(CADef.id == cad.id).delete()
         db.session.commit()
 
-    processed_definitions = []
     for definition in definitions:
       # Add new CAD that is not in the object
-      if definition.get("id") not in cads_id:
-        processed_definitions.append(definition)
-
-    for definition in processed_definitions:
-      definition['context'] = getattr(self, "context", None)
-      self.insert_definition(definition)
+      if definition.get("id") in cads_to_add:
+        definition['context'] = getattr(self, "context", None)
+        self.insert_definition(definition)
 
   def _remove_existing_items(self, attr_values):
     """Remove existing CAV and corresponding full text records."""
@@ -742,10 +748,9 @@ class CustomAttributable(CustomAttributableBase):
       if defs:
         res["custom_attribute_definitions"] = [
             definition.log_json() for definition in defs]
-        res["custom_attribute_values"] = []
       else:
         res["custom_attribute_definitions"] = []
-        res["custom_attribute_values"] = []
+      res["custom_attribute_values"] = []
 
     return res
 
