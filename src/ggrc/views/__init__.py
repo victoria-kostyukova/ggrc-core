@@ -705,17 +705,23 @@ def base_context():
 
 @app.route("/")
 def index():
-  """The initial entry point of the app
-  """
+  """The initial entry point of the app."""
+
   if not settings.PRODUCTION:
     flask.flash(
-        u"""This is not the production instance
-        of the GGRC application.<br>
+        u"""This is not the production instance of the GGRC application.<br>
         Company confidential, sensitive or personally identifiable
-        information <b>*MUST NOT*</b> be entered or stored here.
+        information <b>*MUST NOT*</b> be entered or stored here.<br>
         For any questions, please contact your administrator.""",
         "alert alert-warning"
     )
+
+  logged_in_user = login.get_current_user()
+  # for already logged in users redirects to dashboard
+  # to avoid useless login screen
+  if logged_in_user.is_authenticated():
+    return flask.redirect("/dashboard")
+
   about_url = getattr(settings, "ABOUT_URL", None)
   about_text = getattr(settings, "ABOUT_TEXT", "About GGRC")
   return flask.render_template(
@@ -728,8 +734,7 @@ def index():
 @app.route("/dashboard")
 @login.login_required
 def dashboard():
-  """The dashboard page
-  """
+  """The dashboard page."""
   return flask.render_template(
       "dashboard/index.haml",
       page_type="MY_WORK",
@@ -1170,7 +1175,7 @@ def generate_wf_tasks_notifs():
 
 
 class UnmapObjectsView(flask.views.MethodView):
-  """View for unmaping objects by deletion of relationships."""
+  """View for unmapping objects by deletion of relationships."""
 
   # pylint: disable=arguments-differ
   @classmethod

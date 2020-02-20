@@ -26,7 +26,7 @@
             -for category, message in messages
               %div{ 'class': "{{category}}" }
                 %p
-                  {{message}}
+                  {{message|safe}}
                 %a.close{'href': "javascript:void(0)", 'data-dismiss': "alert" }
                   %i.fa.fa-times
       -block main
