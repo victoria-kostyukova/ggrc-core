@@ -92,6 +92,12 @@ class ActiveCyclesTab(object_page.ObjectPage):
     cycle_task_group_row.expand()
     return cycle_task_group_row.get_cycle_task_row_by(title=cycle_task.title)
 
+  def open_create_cycle_task_modal(self):
+    """Clicks a Create Task button.
+    Returns Task modal."""
+    self._tree_widget.create_task_btn.click()
+    return object_modal.get_modal_obj("cycle_task")
+
 
 class SetupTab(object_page.ObjectPage):
   """Setup tab."""

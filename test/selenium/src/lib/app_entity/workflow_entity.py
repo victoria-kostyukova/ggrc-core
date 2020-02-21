@@ -25,6 +25,7 @@ class TaskGroup(_base.Base, _base.WithTitleAndCode):
   assignee = attr.ib()
   workflow = attr.ib()
   task_group_tasks = attr.ib()
+  description = attr.ib()
 
 
 @attr.s
