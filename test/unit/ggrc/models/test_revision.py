@@ -246,6 +246,21 @@ class TestCheckPopulatedContent(unittest.TestCase):
     self.assertEqual(revision.populate_type(), {"type": "Program"})
 
   @ddt.data(
+      [{}, {"created_by": None}],
+      [{"created_by": "test_user"}, {}],
+      [{"created_by": None}, {}]
+  )
+  @ddt.unpack
+  def test_populate_created_by(self, content, expected_content):
+    """Test populate_created_by for Risk object."""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = "Risk"
+
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+    self.assertEqual(revision.populate_created_by(), expected_content)
+
+  @ddt.data(
       [
           {"review_status": "a"},
           {"review_status": "a", "review_status_display_name": "a"},

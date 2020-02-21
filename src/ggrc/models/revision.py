@@ -429,7 +429,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     return {"readonly": False}
 
   def _document_evidence_hack(self):
-    """Update display_name on evideces
+    """Update display_name on evidences.
 
     Evidences have display names from links and titles, and until now they used
     slug property to calculate the display name. This hack is here since we
@@ -437,7 +437,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     differently than everywhere else in the app.
 
     This function only modifies existing evidence entries on any given object.
-    If an object does not have and document evidences then an empty dict is
+    If an object does not have any document evidences then an empty dict is
     returned.
 
     Returns:
@@ -454,7 +454,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
       ).strip()
     return {u"documents_file": document_evidence}
 
-  def populate_categoies(self, key_name):
+  def populate_categories(self, key_name):
     """Return names of categories."""
     if self.resource_type != "Control":
       return {}
@@ -496,7 +496,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
       custom_attribute_id = int(cad["id"])
       cads_ids.add(custom_attribute_id)
       if custom_attribute_id in cavs:
-        # Old revisions can contain falsy values for a Checkbox
+        # Old revisions can contain false values for a Checkbox
         if cad["attribute_type"] == "Checkbox" \
                 and not cavs[custom_attribute_id]["attribute_value"]:
           cavs[custom_attribute_id]["attribute_value"] = cad["default_value"]
@@ -524,7 +524,9 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
 
   def populate_cad_default_values(self):
     """Setup default_value to CADs if it's needed."""
+
     from ggrc.models import all_models
+
     if "custom_attribute_definitions" not in self._content:
       return {}
     cads = []
@@ -541,8 +543,8 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
   def populate_requirements(self, populated_content):  # noqa pylint: disable=too-many-branches
     """Populates revision content for Requirement models and models with fields
 
-    that can contain Requirement old names. This fields would be checked and
-    updated where necessary
+    that can contain Requirement old names. These fields would be checked and
+    updated where necessary.
     """
     # change to add Requirement old names
     requirement_type = ["Section", "Clause"]
@@ -643,14 +645,33 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     return {"automapping": automapping_json}
 
   def populate_type(self):
-    """Add object_types field to content were need it
+    """Add object_types field to content where needed.
+
     Early created revisions didn't have type field
-    in content data, but we should either add it here from
+    in content data, but we should add it here from
     resource_type field.
     """
 
     if "type" not in self._content:
       return {"type": self.resource_type}
+    return {}
+
+  def populate_created_by(self):
+    """Add created_by to content where needed.
+
+    All objects that were deprecated on GGRC and migrated to GGRCQ have
+    created_by attribute that should be showed on Change Log.
+    """
+
+    from ggrc.models import all_models
+    from ggrc.models.mixins import with_external_created_by as wec
+
+    model = getattr(all_models, self.resource_type, None)
+
+    if (issubclass(model, wec.WithExternalCreatedBy) and
+        "created_by" not in self._content):  # noqa
+      return {"created_by": None}
+
     return {}
 
   @builder.simple_property
@@ -667,13 +688,14 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     populated_content.update(self.populate_status())
     populated_content.update(self.populate_review_status())
     populated_content.update(self._document_evidence_hack())
-    populated_content.update(self.populate_categoies("categories"))
-    populated_content.update(self.populate_categoies("assertions"))
+    populated_content.update(self.populate_categories("categories"))
+    populated_content.update(self.populate_categories("assertions"))
     populated_content.update(self.populate_cad_default_values())
     populated_content.update(self.populate_cavs())
     populated_content.update(self.populate_readonly())
     populated_content.update(self.populate_automappings())
     populated_content.update(self.populate_type())
+    populated_content.update(self.populate_created_by())
 
     populated_content["custom_attribute_definitions"] = sorted(
         populated_content["custom_attribute_definitions"],
