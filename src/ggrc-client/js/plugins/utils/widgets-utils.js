@@ -266,6 +266,15 @@ function getWidgetConfig(modelName) {
   return configObject;
 }
 
+const updatePersonWidget = () => {
+  const typesWithoutPersonTab =
+    ['Assessment', 'Document', 'Evidence', 'Workflow', 'Person'];
+  const {type, id} = getPageInstance();
+  if (!typesWithoutPersonTab.includes(type)) {
+    initWidgetCounts(['Person'], type, id);
+  }
+};
+
 export {
   getWidgetList,
   getWidgetModels,
@@ -277,4 +286,5 @@ export {
   initWidgets,
   getWidgetConfig,
   getWidgetConfigs,
+  updatePersonWidget,
 };

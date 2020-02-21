@@ -46,6 +46,7 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/dashboard-workflows/dashboard-workflows';
 import '../../components/questionnaire-link/questionnaire-link';
 
+import '../../components/custom-roles/custom-roles-wrapper';
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
 

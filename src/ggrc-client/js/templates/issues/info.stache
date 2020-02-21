@@ -81,10 +81,12 @@
                       <div>
                         <issue-roles-wrapper
                           disable:from="disableIssueTrackerDependentFields">
-                          <custom-roles
-                            instance:from="instance"
-                            disabledRoles:from="disabledRoles">
-                          </custom-roles>
+                          <custom-roles-wrapper instance:from="instance">
+                            <custom-roles
+                              instance:from="instance"
+                              disabledRoles:from="disabledRoles">
+                            </custom-roles>
+                          </custom-roles-wrapper>
                         </issue-roles-wrapper>
                       </div>
                     </div>

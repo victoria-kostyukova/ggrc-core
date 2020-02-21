@@ -18,14 +18,16 @@
 
   <div class="width-100">
     {{#if infoPaneMode}}
-      <assessment-custom-roles instance:from="instance"
-        deferredSave:from="deferredSave"
-        onStateChangeDfd:from="onStateChangeDfd"
-        setInProgress:from="@setInProgress"
-        orderOfRoles:from="orderOfRoles"
-        includeRoles:from="mainRoles"
-        conflictRoles:from="conflictRoles">
-      </assessment-custom-roles>
+      <custom-roles-wrapper instance:from="instance">
+        <assessment-custom-roles instance:from="instance"
+          deferredSave:from="deferredSave"
+          onStateChangeDfd:from="onStateChangeDfd"
+          setInProgress:from="@setInProgress"
+          orderOfRoles:from="orderOfRoles"
+          includeRoles:from="mainRoles"
+          conflictRoles:from="conflictRoles">
+        </assessment-custom-roles>
+      </custom-roles-wrapper>
     {{else}}
       <custom-roles-modal
         instance:from="instance"
