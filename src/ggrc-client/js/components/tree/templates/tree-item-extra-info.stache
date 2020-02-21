@@ -22,6 +22,7 @@
             <mapped-counter instance:from="instance"
                             type:from="'Requirement'"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
           </section>
         {{/if}}
@@ -31,14 +32,17 @@
             <h3 class="task-list-title">Number of mapped objects</h3>
             <mapped-counter instance:from="instance"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
             <mapped-counter instance:from="instance"
                             type:from="'Objective'"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
             <mapped-counter instance:from="instance"
                             type:from="'Control'"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
           </section>
         {{/if}}
@@ -48,6 +52,7 @@
             <h3 class="task-list-title">Number of mapped objects</h3>
             <mapped-counter instance:from="instance"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
             <mapped-counter instance:from="instance"
                             type:from="'Comment'"
@@ -67,6 +72,7 @@
             <mapped-counter instance:from="instance"
                             type:from="'CycleTaskGroupObjectTask'"
                             addContent:from="@addContent"
+                            on:updateCounter="addPromiseContent(scope.event)"
             ></mapped-counter>
           </section>
         {{/if}}
@@ -75,6 +81,7 @@
           <object-tasks instanceId:from="instance.id"
                         instanceType:from="instance.type"
                         addContent:from="@addContent"
+                        on:updateCounter="addPromiseContent(scope.event)"
           ></object-tasks>
         {{/if}}
       {{/if}}

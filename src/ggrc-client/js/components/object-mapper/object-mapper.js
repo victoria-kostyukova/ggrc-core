@@ -35,6 +35,7 @@ import {
   DEFERRED_MAP_OBJECTS,
   OBJECT_DESTROYED,
   UNMAP_DESTROYED_OBJECT,
+  REFRESH_MAPPED_COUNTER,
 } from '../../events/event-types';
 import {
   allowedToMap,
@@ -399,6 +400,11 @@ export default canComponent.extend({
             // This Method should be modified to event
             refreshCounts();
           }
+
+          instance.dispatch({
+            ...REFRESH_MAPPED_COUNTER,
+            modelType: type,
+          });
         })
         .catch((response, message) => {
           $('body').trigger('ajax:flash', {error: message});
