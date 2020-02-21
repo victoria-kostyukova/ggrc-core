@@ -70,7 +70,7 @@
                         <tr data-row-index="{{rowIndex}}">
                           <td style="color: {{color}}">
                             <i class="fa fa-circle"></i>
-                            <a style="color: {{color}}" href="#assessment&state%5B%5D={{title}}">
+                            <a style="color: {{color}}" href="#assessment&state%5B%5D={{title}}&redirect=true">
                                 {{title}}
                             </a>
                           </td>
@@ -113,7 +113,7 @@
                             <hr>
                         </div>
                         <div class="span12 centered">
-                            <a href="#assessment">View all assessments &raquo;</a>
+                            <a href="#assessment&state%5B%5D={{allStatesUrl}}&redirect=true">View all assessments &raquo;</a>
                         </div>
                     {{else}}
                         {{#if charts.Assessment.isLoaded}}

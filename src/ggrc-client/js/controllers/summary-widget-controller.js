@@ -15,6 +15,7 @@ import {
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {getCounts} from '../plugins/utils/widgets-utils';
+import * as StateUtils from '../plugins/utils/state-utils';
 import router from '../router';
 import {
   getDefaultStatesForModel,
@@ -63,6 +64,8 @@ export default canControl.extend({
       .on('widget_shown', this.widget_shown.bind(this));
     this.element.closest('.widget')
       .on('widget_hidden', this.widget_hidden.bind(this));
+    const states = StateUtils.getStatesForModel('Assessment');
+    const allStatesUrl = states.join('&state%5B%5D=');
     this.options.context = new canMap({
       model: this.options.model,
       instance: this.options.instance,
@@ -73,6 +76,7 @@ export default canControl.extend({
           legend: [],
         },
       },
+      allStatesUrl,
     });
 
     let frag = getFragment(this.get_widget_view(this.element),

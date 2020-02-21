@@ -46,6 +46,7 @@ const ViewModel = canDefineMap.extend({
       type: 'searchQueryChanged',
       name: 'custom',
       query: newValue.length ? filter : null,
+      newValue,
     });
   },
   setupFilterFromUrl() {

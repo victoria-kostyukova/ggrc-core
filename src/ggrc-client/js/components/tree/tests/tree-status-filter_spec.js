@@ -34,6 +34,7 @@ describe('tree-status-filter component', () => {
         type: 'searchQueryChanged',
         name: 'status',
         query: null,
+        triggerFilterOnChange: false,
       });
     });
 
@@ -44,6 +45,7 @@ describe('tree-status-filter component', () => {
         type: 'searchQueryChanged',
         name: 'status',
         query: null,
+        triggerFilterOnChange: false,
       });
     });
 
@@ -54,6 +56,7 @@ describe('tree-status-filter component', () => {
         type: 'searchQueryChanged',
         name: 'status',
         query: FILTER,
+        triggerFilterOnChange: false,
       });
     });
   });
@@ -173,12 +176,12 @@ describe('tree-status-filter component', () => {
     describe('launches search', () => {
       afterEach(() => {
         handler([router], null, newStatuses);
-        expect(viewModel.buildSearchQuery).toHaveBeenCalledWith(newStatuses);
+        expect(viewModel.buildSearchQuery)
+          .toHaveBeenCalledWith(newStatuses, true);
         expect(viewModel.setStatesDropdown).toHaveBeenCalledWith(newStatuses);
-        expect(viewModel.dispatch).toHaveBeenCalledWith('submitFilter');
       });
 
-      it(`when component is enabled,
+      it(`when component is
         launched on current widget and statuses were changed`, () => {
         viewModel.filterStates = [
           {value: 'A', checked: true},
@@ -187,7 +190,29 @@ describe('tree-status-filter component', () => {
         newStatuses = ['C', 'D'];
         viewModel.widgetId = 'test1';
         router.attr('widget', 'test1');
-        viewModel.disabled = false;
+      });
+
+      it('when input filter is not applied', () => {
+        viewModel.filterStates = [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ];
+        newStatuses = ['C', 'D'];
+        viewModel.inputFilter = '';
+        viewModel.widgetId = 'test1';
+        router.attr('widget', 'test1');
+      });
+
+      it(`when component is launched on current widget 
+      and statuses were not changed, input filter is applied`, () => {
+        viewModel.filterStates = [
+          {value: 'A', checked: true},
+          {value: 'B', checked: true},
+        ];
+        newStatuses = ['A', 'B'];
+        viewModel.widgetId = 'test1';
+        router.attr('widget', 'test1');
+        viewModel.inputFilter = 'test';
       });
     });
 
@@ -196,23 +221,10 @@ describe('tree-status-filter component', () => {
         handler([router], null, newStatuses);
         expect(viewModel.buildSearchQuery).not.toHaveBeenCalled();
         expect(viewModel.setStatesDropdown).not.toHaveBeenCalled();
-        expect(viewModel.dispatch).not.toHaveBeenCalled();
       });
 
-      it(`when component is disabled,
-        launched on current widget and statuses were changed`, () => {
-        viewModel.filterStates = [
-          {value: 'A', checked: true},
-          {value: 'B', checked: true},
-        ];
-        newStatuses = ['C', 'D'];
-        viewModel.widgetId = 'test1';
-        router.attr('widget', 'test1');
-        viewModel.disabled = true;
-      });
-
-      it(`when component is enabled,
-        launched on other widget and statuses were changed`, () => {
+      it(`when component is launched on other widget
+       and statuses were changed`, () => {
         viewModel.filterStates = [
           {value: 'A', checked: true},
           {value: 'B', checked: true},
@@ -220,11 +232,11 @@ describe('tree-status-filter component', () => {
         newStatuses = ['C', 'D'];
         viewModel.widgetId = 'test1';
         router.attr('widget', 'test2');
-        viewModel.disabled = false;
+        viewModel.inputFilter = 'test';
       });
 
-      it(`when component is enabled,
-        launched on current widget and statuses were not changed`, () => {
+      it(`when component is launched on current widget
+       and statuses were not changed, input filter is not applied`, () => {
         viewModel.filterStates = [
           {value: 'A', checked: true},
           {value: 'B', checked: true},
@@ -232,7 +244,7 @@ describe('tree-status-filter component', () => {
         newStatuses = ['A', 'B'];
         viewModel.widgetId = 'test1';
         router.attr('widget', 'test1');
-        viewModel.disabled = false;
+        viewModel.inputFilter = '';
       });
 
       it('when newStatuses is not defined', () => {
@@ -242,7 +254,6 @@ describe('tree-status-filter component', () => {
         ];
         newStatuses = null;
         router.attr('widget', 'test1');
-        viewModel.disabled = false;
       });
     });
   });

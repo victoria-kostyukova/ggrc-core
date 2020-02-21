@@ -4,7 +4,6 @@
  */
 
 import loDebounce from 'lodash/debounce';
-import loGet from 'lodash/get';
 import loFindIndex from 'lodash/findIndex';
 import loSortBy from 'lodash/sortBy';
 import loIsEmpty from 'lodash/isEmpty';
@@ -298,17 +297,11 @@ const ViewModel = canDefineMap.extend({
     this._triggerListeners(true);
   },
   _widgetShown() {
-    const countsName = this.options.countsName;
-    const total = this.pageInfo.attr('total');
-    const counts = loGet(getCounts(), countsName);
-
     this._triggerListeners();
 
     if (this.refetch ||
       router.attr('refetch') ||
-      this.options.forceRefetch ||
-      // this condition is mostly for Issues, Documents and Evidence as they can be created from other object info pane
-      (total !== counts)) {
+      this.options.forceRefetch) {
       this.loadItems();
       this.refetch = false;
     }
