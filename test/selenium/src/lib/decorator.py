@@ -8,7 +8,7 @@ import time
 from functools import wraps
 
 from lib import constants, environment, exception, file_ops
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, ui_utils
 
 LOGGER = logging.getLogger(__name__)
 
@@ -109,4 +109,23 @@ def check_that_obj_is_created(fun):
     # need to wait when creation background job is finished
     rest_service.ObjectsInfoService().get_obj(result)
     return result
+  return wrapper
+
+
+def execute_on_all_pagination_pages(fun):
+  """Decorator to execute function on all pages of pagination.
+
+  First argument of decorated function should be element with pagination.
+  """
+  @wraps(fun)
+  def wrapper(el_w_pagination, *args):
+    """Wrapper func."""
+    fun(el_w_pagination, *args)
+    if el_w_pagination.pagination.exists:
+      for _ in xrange(el_w_pagination.pagination.total_pages - 1):
+        el_w_pagination.pagination.next_page_btn.click()
+        ui_utils.wait_for_spinner_to_disappear()
+        fun(el_w_pagination, *args)
+      el_w_pagination.pagination.first_page_btn.click()
+      ui_utils.wait_for_spinner_to_disappear()
   return wrapper

@@ -4,10 +4,10 @@
 # pylint: disable=too-few-public-methods
 import re
 
-from lib import base
+from lib import base, decorator
 from lib.constants import regex
 from lib.entities import entity
-from lib.utils import string_utils, ui_utils
+from lib.utils import string_utils
 
 
 class ChangeLog(base.WithBrowser):
@@ -18,19 +18,18 @@ class ChangeLog(base.WithBrowser):
     self._root = self._browser.element(class_name="tab-pane active")
     self.pagination = base.Pagination(self._root)
 
-  def _get_items_from_page(self):
-    """Returns a list of all entries at current page in changelog."""
-    return [ChangeLogEntry(entry_el).change_log_item for entry_el in
-            self._root.elements(class_name="w-status")]
+  @decorator.execute_on_all_pagination_pages
+  def _extend_change_log_items(self, change_log_items):
+    """Extends change log items with items from current page of change log."""
+    change_log_items.extend(
+        [ChangeLogEntry(entry_el).change_log_item for entry_el in
+         self._root.elements(class_name="w-status")])
 
   def get_changelog_items(self):
     """Returns a list of all entries at all pages in changelog."""
-    changelog_items = self._get_items_from_page()
-    for _ in xrange(self.pagination.total_pages - 1):
-      self.pagination.next_page_btn.click()
-      ui_utils.wait_for_spinner_to_disappear()
-      changelog_items.extend(self._get_items_from_page())
-    return changelog_items
+    change_log_items = []
+    self._extend_change_log_items(change_log_items)
+    return change_log_items
 
   def get_object_creation_entry(self):
     """Return changelog entry that is related to object creation."""

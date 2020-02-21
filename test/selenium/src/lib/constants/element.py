@@ -350,7 +350,12 @@ class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
   CONCLUSION_OPERATION = "Conclusion: Operation"
   FINISHED_DATE = "Finished Date"
   VERIFIED_DATE = "Verified Date"
+  LABEL = "Label"
+  DUE_DATE = "Due Date"
   TYPE = Base.TYPE
+  INITIAL_FIELDS = (
+      Common.TITLE, Common.STATE, LABEL, DUE_DATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, ASSIGNEES, VERIFIERS)
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.STATE,
       VERIFIED, CommonModalSetVisibleFields.CODE, CREATORS, ASSIGNEES,

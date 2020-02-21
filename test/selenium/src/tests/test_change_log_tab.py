@@ -15,7 +15,7 @@ from lib.utils import random_utils
 class TestChangeLobTab(base.Test):
   """Tests for change log tab in object's info page/panel."""
 
-  exp_page_sizes = [10, 25, 50]
+  exp_page_sizes = base.Pagination.PAGE_SIZES
 
   @pytest.fixture
   def change_log_with_changes(self, program, request):

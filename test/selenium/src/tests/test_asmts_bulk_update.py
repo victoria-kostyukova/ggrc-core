@@ -15,26 +15,35 @@ from lib.service import rest_facade, rest_service, webui_facade, webui_service
 
 
 @pytest.fixture()
-def asmts_w_verifier(second_creator, audit_w_auditor):
-  """Creates 7 assessments, set global creator as a verifier.
+def asmts_w_verifier(second_creator, audit_w_auditor, request):
+  """Creates assessments, set global creator as a verifier.
+
+  Number of assessments is equal to total number of assessment statuses by
+  default or it can be passed through indirect parametrization.
 
   Returns:
     List of created assessments.
   """
-  return [rest_facade.create_asmt(
-      audit_w_auditor, verifiers=second_creator) for _ in xrange(7)]
+  num_of_asmts = (request.param if hasattr(request, "param") and request.param
+                  else len(object_states.ALL_ASSESSMENT_STATUSES))
+  return [rest_facade.create_asmt(audit_w_auditor, verifiers=second_creator)
+          for _ in xrange(num_of_asmts)]
 
 
 @pytest.fixture()
 def asmts_w_verifier_in_review(asmts_w_verifier):
-  """Creates 7 assessments, set global creator as a verifier and sets In Review
+  """Creates assessments, set global creator as a verifier and sets In Review
   state for all created assessments.
+
+  asmts_w_verifier fixture can be indirectly parametrized in test for
+  specifying number of assessments we need.
 
     Returns:
       List of created assessments with In Review state.
-    """
-  for asmt in asmts_w_verifier:
-    rest_facade.update_object(asmt, status=object_states.READY_FOR_REVIEW)
+  """
+  return [
+      rest_facade.update_object(asmt, status=object_states.READY_FOR_REVIEW)
+      for asmt in asmts_w_verifier]
 
 
 def audit_page(audit):
@@ -184,13 +193,16 @@ class TestBulkVerify(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "asmts_w_verifier", [base.Pagination.PAGE_SIZES[0] + 1], indirect=True)
   @pytest.mark.parametrize('page', [audit_page, my_assessments_page])
   def test_bulk_verification(
-      self, second_creator, login_as_creator, audit_w_auditor,
-      asmts_w_verifier_in_review, login_as_second_creator, page, soft_assert,
-          selenium):
-    """Check that assessments statuses actually have been updated after
-    bulk verify has been completed."""
+      self, second_creator, login_as_creator, audit_w_auditor, selenium,
+      asmts_w_verifier_in_review, login_as_second_creator, page, soft_assert
+  ):
+    """Check that the list of assessments displays in the "Select Assessments
+    to Verify in bulk" section (with checking of pagination) and statuses
+    actually have been updated after bulk verify has been completed."""
     page = page(audit_w_auditor)
     modal = page.open_bulk_verify_modal()
     soft_assert.expect(
@@ -198,6 +210,8 @@ class TestBulkVerify(base.Test):
         "'Bulk Verify' button should be disabled if no selected assessments.")
     soft_assert.expect(not modal.filter_section.is_expanded,
                        "'Filter' section should be collapsed.")
+    webui_facade.soft_assert_asmts_list_on_bulk_verify_modal(
+        modal, soft_assert, asmts_w_verifier_in_review)
     webui_facade.bulk_verify_all(page)
     webui_facade.soft_assert_statuses_on_tree_view(
         status=object_states.COMPLETED, is_verified=True,

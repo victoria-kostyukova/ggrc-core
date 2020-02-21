@@ -8,7 +8,7 @@ import re
 
 import inflection
 
-from lib import url, users, base, browsers, factory
+from lib import url, users, base, browsers, factory, decorator
 from lib.constants import (objects, element, str_formats, messages,
                            object_states, roles)
 from lib.entities import entities_factory
@@ -603,6 +603,39 @@ def soft_assert_bulk_verify_filter_functionality(page, modal, exp_asmt,
       webui_service.AssessmentsService().get_objs_from_bulk_update_modal(
           modal, with_second_tier_info=True),
       *exp_asmt.bulk_update_modal_tree_view_attrs_to_exclude)
+
+
+def soft_assert_asmts_list_on_bulk_verify_modal(modal, soft_assert, exp_asmts):
+  """Checks that assessments list is displayed on bulk verify modal with
+  correct columns by default and that checkboxes are displayed near every
+  assessment and all of them are unchecked and enabled.
+  """
+  asmt_section = modal.select_assessments_section
+  actual_column_names = tuple(asmt_section.tree_view.column_names())
+  soft_assert.expect(
+      actual_column_names ==
+      element.AssessmentModalSetVisibleFields.INITIAL_FIELDS,
+      'There are wrong default column names. Expected: {}. Actual: {}.'.format(
+          element.AssessmentModalSetVisibleFields.INITIAL_FIELDS,
+          actual_column_names))
+  soft_assert_tree_view_checkboxes(asmt_section, soft_assert)
+  base.Test.general_equal_soft_assert(
+      soft_assert,
+      sorted(exp_asmts),
+      sorted(webui_service.AssessmentsService().
+             get_objs_from_bulk_update_modal(modal)),
+      *exp_asmts[0].bulk_update_modal_tree_view_attrs_to_exclude)
+
+
+@decorator.execute_on_all_pagination_pages
+def soft_assert_tree_view_checkboxes(el_w_tree_view, soft_assert):
+  """Soft asserts that all checkboxes from all items from tree view are
+  unchecked and enabled."""
+  for item in el_w_tree_view.tree_view.tree_view_items():
+    soft_assert.expect(
+        not item.is_checkbox_checked, 'Checkbox should be unchecked')
+    soft_assert.expect(
+        not item.is_checkbox_disabled, 'Checkbox should be enabled')
 
 
 def soft_assert_role_cannot_be_edited(soft_assert, obj):
