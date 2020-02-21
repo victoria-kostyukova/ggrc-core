@@ -15,5 +15,6 @@
   disabledRoles:from="disabledRoles"
   rolesTooltips:from="rolesTooltips"
   readOnly:from="readOnly"
+  isHidable:from="isHidable"
   orderOfRoles:from="orderOfRoles">
 </custom-roles-modal>

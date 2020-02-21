@@ -6,7 +6,7 @@
 <div>
   <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
   <datepicker-component
-      tabindex="20"
+      data-hide-title="{{configStartDate.label}}"
       label:from="configStartDate.label"
       date:bind="instance.start_date"
       setMaxDate:from="instance.end_date"

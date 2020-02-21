@@ -31,7 +31,7 @@
 
     <!-- Description & owner/contact block  -->
     <div class="row-fluid">
-      <div class="span6 hidable">
+      <div class="span6 hidable" data-hide-title="Description">
         <label>
           Description
           <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
@@ -52,6 +52,7 @@
         {{#new_object_form}}
           <access-control-list-roles-helper
             instance:from="instance"
+            isHidable:from="true"
             isNewInstance:from="new_object_form"
             orderOfRoles:from="instance.constructor.orderOfRoles">
           </access-control-list-roles-helper>
@@ -74,7 +75,7 @@
 
     <!-- Notes & Process/Reference url block -->
     <div class="row-fluid">
-      <div class="span6 hidable">
+      <div class="span6 hidable" data-hide-title="Notes">
         <label>
           Notes
           <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
@@ -100,7 +101,7 @@
 
     {{^if isProposal}}
       <div class="row-fluid">
-        <div class="span6 hidable">
+        <div class="span6 hidable" data-hide-title="Attachments">
           <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="7">
           </ggrc-gdrive-folder-picker>
         </div>
@@ -112,7 +113,7 @@
     <div class="row-fluid">
       {{^if isProposal}}
         {{^if new_object_form}}
-          <div class="span4 hidable">
+          <div class="span4 hidable" data-hide-title="Code">
             <label>
               Code
             </label>
@@ -122,13 +123,13 @@
         {{/if}}
       {{/if}}
       <div>
-        <div class="span4 hidable input-block-level">
+        <div class="span4 hidable input-block-level" data-hide-title="Effective Date">
           <effective-dates instance:from="instance"></effective-dates>
         </div>
       </div>
     </div>
     <div class="row-fluid">
-      <div id="state" class="span4 hidable">
+      <div id="state" class="span4 hidable" data-hide-title="State">
         <label>
           State
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
