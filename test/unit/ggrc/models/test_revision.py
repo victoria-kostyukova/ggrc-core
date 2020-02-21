@@ -68,16 +68,24 @@ class TestCheckPopulatedContent(unittest.TestCase):
               "type": "Person",
               "href": "/api/people/{}".format(self.user_id)
           },
+          "ac_role": {
+              "id": role_id,
+              "name": role_name
+          },
           "modified_by": None,
           "id": None,
       })
-      role_dict[role_id] = role_name
+
+      role_dict[role_id] = {
+          "id": role_id,
+          "name": role_name
+      }
+
     obj = mock.Mock()
     obj.id = self.object_id
     obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
-
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value=role_dict) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
       get_roles.assert_called_once_with(object_type)
@@ -87,13 +95,13 @@ class TestCheckPopulatedContent(unittest.TestCase):
     """Test populated content for revision without user id."""
     object_type = "Control"
     content = {"principal_assessor": user_dict}
-    role_dict = {1: "Principal Assignees"}
+    role_dict = {1: {"name": "Principal Assignees"}, }
     expected = {"access_control_list": []}
     obj = mock.Mock()
     obj.id = self.object_id
     obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value=role_dict) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
       get_roles.assert_called_once_with(object_type)
@@ -115,7 +123,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     obj.id = self.object_id
     obj.__class__.__name__ = object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value={}) as get_roles:
       self.assertEqual(revision.populate_acl(), expected)
       get_roles.assert_called_once_with(object_type)
@@ -163,7 +171,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     revision.created_at = datetime.datetime(2017, 11, 12, 13, 14, 15)
     revision.updated_at = datetime.datetime(2018, 11, 12, 13, 14, 15)
 
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value={}):
       self.assertEqual(revision.populate_reference_url()["reference_url"],
                        expected)
@@ -180,7 +188,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
 
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
 
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value={},):
       self.assertEqual(revision.populate_labels()["labels"],
                        expected)
@@ -396,7 +404,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     content = {"access_control_list": acl_entries}
 
     role_dict = mock.MagicMock()
-    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+    with mock.patch("ggrc.access_control.role.get_roles_objects_for",
                     return_value=role_dict):
       revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
 
