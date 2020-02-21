@@ -6,7 +6,7 @@ import re
 from dateutil import parser, tz
 
 from lib import factory, url, base, cache, constants
-from lib.constants import objects, messages, element, regex, locator
+from lib.constants import objects, messages, element, regex
 from lib.element import tab_containers
 from lib.entities import entity
 from lib.page import dashboard, export_page
@@ -670,11 +670,9 @@ class AssessmentsService(BaseWebUiService):
   def verify_assessment(self, obj):
     """Navigate to info page of object according to URL of object then find and
     click 'Verify' button then return info page of object in new state"""
-    from lib.constants.locator import ObjectWidget
-    self.open_info_page_of_obj(obj).click_verify()
-    for elem in [ObjectWidget.HEADER_STATE_COMPLETED,
-                 locator.WidgetInfoAssessment.ICON_VERIFIED]:
-      selenium_utils.wait_until_element_visible(self._driver, elem)
+    info_page = self.open_info_page_of_obj(obj)
+    info_page.click_verify()
+    info_page.verify_icon.wait_until(lambda e: e.exists)
     return self.info_widget_cls(self._driver)
 
   def reject_assessment(self, obj):
@@ -769,6 +767,13 @@ class ObjectivesService(SnapshotsWebUiService):
   def __init__(self, driver=None, is_versions_widget=False):
     super(ObjectivesService, self).__init__(
         objects.OBJECTIVES, is_versions_widget, driver)
+
+
+class ThreatsService(SnapshotsWebUiService):
+  """Class for Threats business layer's services objects."""
+  def __init__(self, driver=None, is_versions_widget=False):
+    super(ThreatsService, self).__init__(
+        objects.THREATS, is_versions_widget, driver)
 
 
 class RisksService(SnapshotsWebUiService):

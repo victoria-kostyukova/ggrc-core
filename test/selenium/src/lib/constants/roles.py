@@ -131,8 +131,11 @@ class ACLRolesIDsMetaClass(type):
 
   @property
   def OBJECTIVE_ADMINS(cls):
-    return cls.id_of_role(objects.get_obj_type(objects.OBJECTIVES),
-                          name=ADMIN)
+    return cls.id_of_role(objects.get_obj_type(objects.OBJECTIVES), name=ADMIN)
+
+  @property
+  def THREAT_ADMINS(cls):
+    return cls.id_of_role(objects.get_obj_type(objects.THREATS), name=ADMIN)
 
   @property
   def RISK_ADMINS(cls):

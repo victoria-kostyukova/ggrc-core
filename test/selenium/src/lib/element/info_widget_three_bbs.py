@@ -178,3 +178,11 @@ class RegulationInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
 
 class StandardInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Standard info widget."""
+
+
+class ObjectiveInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Objective info widget."""
+
+
+class ThreatInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Threat info widget."""

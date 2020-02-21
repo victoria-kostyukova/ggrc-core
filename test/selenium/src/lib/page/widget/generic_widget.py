@@ -294,6 +294,10 @@ class Objectives(Widget):
   """Model for Objectives generic widgets."""
 
 
+class Threats(Widget):
+  """Model for Threats generic widgets."""
+
+
 class Risks(Widget):
   """Model for Risks generic widgets."""
 

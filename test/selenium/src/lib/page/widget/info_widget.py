@@ -27,7 +27,6 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
   which don't have edit elements."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
-  _locators = locator.CommonWidgetInfo
   _elements = element.Common
   _dropdown_settings_cls = info_widget_three_bbs.InfoWidgetThreeBbbs
   locator_headers_and_values = None
@@ -61,13 +60,6 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
   def _active_tab_root(self):
     """Returns a wrapper el for active internal tab."""
     return self._root.element(class_name=["tab-pane", "active"])
-
-  @property
-  def info_widget_elem(self):
-    """Returns info widget elem (obsolete).
-    Use `self._root` or `self._active_tab_root` instead."""
-    return selenium_utils.get_when_visible(
-        self._driver, self._locators.INFO_PAGE_ELEM)
 
   @property
   def panel(self):
@@ -305,6 +297,12 @@ class ReadOnlyInfoWidget(page_mixins.WithPageElements, base.Widget,
     return page_elements.SimpleField(
         self._root, element.Common.DESCRIPTION, with_inline_edit=True)
 
+  @property
+  def permalink_floating_message(self):
+    """Represents floating message about permalink copying to clipboard."""
+    return self._browser.element(
+        text="Link has been copied to your clipboard.")
+
 
 class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
   """Common class for active object's Info pages and Info panels."""
@@ -317,7 +315,7 @@ class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
     # for overridable methods
     if (self.__class__ in
         [Programs, Regulations, Objectives, Contracts, Policies, Standards,
-         Threat, Requirements]):
+         Threats, Requirements]):
       if self.is_info_page:
         self.tabs.ensure_tab(self._attributes_tab_name)
     self.inline_edit_controls = self._browser.elements(
@@ -378,7 +376,6 @@ class InfoWidget(page_mixins.WithObjectReview, ReadOnlyInfoWidget):
 class Programs(InfoWidget, page_mixins.WithProposals):
   """Model for program object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
-  _locators = locator.WidgetInfoProgram
   _elements = element.ProgramInfoWidget
   CHILD_PROGRAMS_TAB_NAME = 'Programs (Child)'
   PARENT_PROGRAMS_TAB_NAME = 'Programs (Parent)'
@@ -418,13 +415,12 @@ class Programs(InfoWidget, page_mixins.WithProposals):
                  editors=self.program_editors.get_people_emails())
 
 
-class Workflow(InfoWidget):
+class Workflows(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""
-  _locators = locator.WidgetInfoWorkflow
   _dropdown_settings_cls = info_widget_three_bbs.WorkflowInfoWidgetThreeBbbs
 
   def __init__(self, _driver=None):
-    super(Workflow, self).__init__()
+    super(Workflows, self).__init__()
 
   def _extend_list_all_scopes_by_review_state(self):
     """Method overriding without action due to Workflows don't have
@@ -471,7 +467,7 @@ class Workflow(InfoWidget):
     return self._simple_field("Repeat Workflow", self._root).text
 
 
-class CycleTask(InfoWidget):
+class CycleTasks(InfoWidget):
   """Model for CycleTask object Info panel."""
   def obj_scope(self):
     """Returns obj scope."""
@@ -527,7 +523,6 @@ class CycleTask(InfoWidget):
 class Audits(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Audit object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
-  _locators = locator.WidgetInfoAudit
   _elements = element.AuditInfoWidget
   _dropdown_settings_cls = info_widget_three_bbs.AuditInfoWidgetThreeBbbs
 
@@ -562,7 +557,6 @@ class Assessments(InfoWidget):
   # pylint: disable=invalid-name
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
-  _locators = locator.WidgetInfoAssessment
   _elements = element.AssessmentInfoWidget
   _dropdown_settings_cls = info_widget_three_bbs.AssessmentInfoWidgetThreeBbbs
 
@@ -588,10 +582,15 @@ class Assessments(InfoWidget):
     )
 
   @property
+  def verify_icon(self):
+    """Returns verify icon element."""
+    return self._browser.element(class_name="verified-icon")
+
+  @property
   def is_verified(self):
     """Returns whether assessment is verified (has verified icon)."""
     self.tabs.ensure_tab(self._assessment_tab_name)
-    return self._browser.element(class_name="verified-icon").exists
+    return self.verify_icon.exists
 
   @property
   def assessment_type(self):
@@ -721,20 +720,32 @@ class Assessments(InfoWidget):
     """
     pass
 
+  @property
+  def complete_button(self):
+    """Returns 'Complete' button element."""
+    return self._root.button(text="Complete")
+
+  @property
+  def verify_button(self):
+    """Returns 'Verify' button element."""
+    return self._root.button(text="Verify")
+
+  @property
+  def needs_rework_button(self):
+    """Returns 'Needs Rework' button element."""
+    return self._root.button(text="Needs Rework")
+
   def click_complete(self):
     """Click on 'Complete' button."""
-    base.Button(self.info_widget_elem,
-                locator.WidgetInfoAssessment.BUTTON_COMPLETE).click()
+    self.complete_button.click()
 
   def click_verify(self):
     """Click on 'Verify' button."""
-    base.Button(self.info_widget_elem,
-                locator.WidgetInfoAssessment.BUTTON_VERIFY).click()
+    self.verify_button.click()
 
   def click_needs_rework(self):
     """Click on 'Needs Rework' button."""
-    base.Button(self.info_widget_elem,
-                locator.WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
+    self.needs_rework_button.click()
 
   def set_value_of_dropdown_w_required_field(self, dropdown):
     """Sets value of Assessment dropdown with required url, file or comment.
@@ -748,8 +759,7 @@ class Assessments(InfoWidget):
     """Choose and fill comment or url for Assessment dropdown."""
     self.set_value_of_dropdown_w_required_field(dropdown).fill_dropdown_lca(
         **kwargs)
-    selenium_utils.get_when_clickable(
-        self._driver, locator.WidgetInfoAssessment.BUTTON_COMPLETE)
+    self.complete_button.wait_until(lambda e: e.enabled)
 
   def edit_answers(self):
     """Click to Edit Answers and Confirm"""
@@ -760,7 +770,6 @@ class Assessments(InfoWidget):
 
 class AssessmentTemplates(InfoWidget):
   """Model for Assessment Template object Info pages and Info panels."""
-  _locators = locator.WidgetInfoAssessmentTemplate
 
   def __init__(self, driver):
     super(AssessmentTemplates, self).__init__(driver)
@@ -775,7 +784,6 @@ class AssessmentTemplates(InfoWidget):
 
 class Issues(InfoWidget):
   """Model for Issue object Info pages and Info panels."""
-  _locators = locator.WidgetInfoIssue
 
   def __init__(self, driver):
     super(Issues, self).__init__(driver)
@@ -787,7 +795,6 @@ class Issues(InfoWidget):
 
 class Regulations(ReadOnlyInfoWidget):
   """Model for Assessment object Info pages and Info panels."""
-  _locators = locator.WidgetInfoRegulations
 
   def __init__(self, driver):
     super(Regulations, self).__init__(driver)
@@ -795,7 +802,6 @@ class Regulations(ReadOnlyInfoWidget):
 
 class Policies(InfoWidget):
   """Model for Policy object Info pages and Info panels."""
-  _locators = locator.WidgetInfoPolicy
 
   def __init__(self, driver):
     super(Policies, self).__init__(driver)
@@ -803,7 +809,6 @@ class Policies(InfoWidget):
 
 class Standards(ReadOnlyInfoWidget):
   """Model for Standard object Info pages and Info panels."""
-  _locators = locator.WidgetInfoStandard
 
   def __init__(self, driver):
     super(Standards, self).__init__(driver)
@@ -811,7 +816,6 @@ class Standards(ReadOnlyInfoWidget):
 
 class Contracts(InfoWidget):
   """Model for Contract object Info pages and Info panels."""
-  _locators = locator.WidgetInfoContract
 
   def __init__(self, driver):
     super(Contracts, self).__init__(driver)
@@ -819,7 +823,6 @@ class Contracts(InfoWidget):
 
 class Requirements(InfoWidget):
   """Model for Requirement object Info pages and Info panels."""
-  _locators = locator.WidgetInfoRequirement
 
   def __init__(self, driver):
     super(Requirements, self).__init__(driver)
@@ -830,7 +833,6 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
                page_mixins.WithDisabledObjectReview, ReadOnlyInfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
-  _locators = locator.WidgetInfoControl
   _elements = element.ControlInfoWidget
 
   def __init__(self, driver):
@@ -874,7 +876,6 @@ class Controls(page_mixins.WithAssignFolder, page_mixins.WithDisabledProposals,
 
 class Objectives(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Objective object Info pages and Info panels."""
-  _locators = locator.WidgetInfoObjective
 
   def __init__(self, driver):
     super(Objectives, self).__init__(driver)
@@ -961,7 +962,6 @@ class Risks(page_mixins.WithDisabledProposals,
             page_mixins.WithDisabledObjectReview,
             page_mixins.WithDisabledVersionHistory, ReadOnlyInfoWidget):
   """Model for Risk object Info pages and Info panels."""
-  _locators = locator.WidgetInfoRisk
 
   def __init__(self, driver, root_elem=None):
     super(Risks, self).__init__(driver)
@@ -998,12 +998,11 @@ class Risks(page_mixins.WithDisabledProposals,
     return self._related_people_list(roles.RISK_OWNERS, self._root)
 
 
-class Threat(InfoWidget):
-  """Model for Threat object Info pages and Info panels."""
-  _locators = locator.WidgetInfoThreat
+class Threats(InfoWidget):
+  """Model for Threats object Info pages and Info panels."""
 
   def __init__(self, driver=None):
-    super(Threat, self).__init__(driver)
+    super(Threats, self).__init__(driver)
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""
