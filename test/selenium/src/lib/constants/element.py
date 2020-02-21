@@ -470,28 +470,40 @@ class ProgramParentModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
 
 
-class RegulationModalSetVisibleFields(CommonModalSetVisibleFields):
+class CommonDirectivesModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
-  fields for Regulations.
-  """
-  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
-  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
-  ADMIN = TransformationSetVisibleFields.ADMIN
+ fields for Directive objects."""
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
-      PRIMARY_CONTACTS, ADMIN)
+      CommonModalSetVisibleFields.STATE, TransformationSetVisibleFields.ADMIN,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY,
+      TransformationSetVisibleFields.REVIEW_STATE,
+      TransformationSetVisibleFields.PRIMARY_CONTACTS)
 
 
-class StandardModalSetVisibleFields(CommonModalSetVisibleFields):
+class RegulationModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
-  fields for Standards.
-  """
-  DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE,
-      CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY)
+  fields for Regulations."""
+
+
+class StandardModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Standards."""
+
+
+class RequirementModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Requirements."""
+
+
+class PolicyModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Policies."""
+
+
+class ContractModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Contracts."""
 
 
 class CommonScopeObjModalSetVisibleFields(CommonModalSetVisibleFields):

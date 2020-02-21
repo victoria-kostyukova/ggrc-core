@@ -172,6 +172,18 @@ class VendorInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Vendor info widget."""
 
 
+class RequirementInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Requirement info widget."""
+
+
+class PolicyInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Policy info widget."""
+
+
+class ContractInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Contract info widget."""
+
+
 class RegulationInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Regulation info widget."""
 

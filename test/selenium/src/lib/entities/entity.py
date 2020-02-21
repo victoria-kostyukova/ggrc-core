@@ -673,7 +673,8 @@ class Entity(Representation):
         ThreatEntity, AccessGroupEntity, AccountBalanceEntity, DataAssetEntity,
         FacilityEntity, KeyReportEntity, MarketEntity, MetricEntity,
         ProcessEntity, ProductGroupEntity, ProjectEntity, SystemEntity,
-        VendorEntity, StandardEntity, RegulationEntity
+        VendorEntity, StandardEntity, RegulationEntity, RequirementEntity,
+        PolicyEntity, ContractEntity
     )
 
   def __lt__(self, other):
@@ -1035,6 +1036,14 @@ class RegulationEntity(Entity):
 
 class RequirementEntity(Entity):
   """Requirement entity."""
+
+
+class PolicyEntity(Entity):
+  """Policy entity."""
+
+
+class ContractEntity(Entity):
+  """Contract entity."""
 
 
 class EvidenceEntity(Representation):

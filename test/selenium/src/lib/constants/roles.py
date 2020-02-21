@@ -222,6 +222,16 @@ class ACLRolesIDsMetaClass(type):
         object_type=objects.get_obj_type(objects.REQUIREMENTS), name=ADMIN)
 
   @property
+  def POLICY_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.POLICIES), name=ADMIN)
+
+  @property
+  def CONTRACT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.CONTRACTS), name=ADMIN)
+
+  @property
   def EVIDENCE_ADMINS(cls):
     return cls.id_of_role(
         object_type=objects.get_obj_type(objects.EVIDENCE), name=ADMIN)

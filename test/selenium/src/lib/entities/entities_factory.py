@@ -899,50 +899,61 @@ class ReviewsFactory(EntitiesFactory):
     return self.create().convert_review_to_dict()
 
 
-class StandardsFactory(EntitiesFactory):
+class DirectivesFactory(EntitiesFactory):
+  """Common factory class for Directive objects entities."""
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Directive entity."""
+    return self.obj_inst().update_attrs(
+        title=self.obj_title,
+        status=unicode(object_states.DRAFT))
+
+
+class StandardsFactory(DirectivesFactory):
   """Factory class for Standard entities."""
 
   def __init__(self):
     super(StandardsFactory, self).__init__(objects.STANDARDS)
     self._acl_roles = [
-        ("admins", roles.ACLRolesIDs.STANDARD_ADMINS, [users.current_user()])
-    ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Creates Standard entity."""
-    return self.obj_inst().update_attrs(title=self.obj_title)
+        ("admins", roles.ACLRolesIDs.STANDARD_ADMINS, [users.current_user()])]
 
 
-class RegulationsFactory(EntitiesFactory):
+class RegulationsFactory(DirectivesFactory):
   """Factory class for regulations."""
 
   def __init__(self):
     super(RegulationsFactory, self).__init__(objects.REGULATIONS)
     self._acl_roles = [
         ("admins", roles.ACLRolesIDs.REGULATION_ADMINS,
-         [users.current_user()])
-    ]
-
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create regulation entity."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title)
+         [users.current_user()])]
 
 
-class RequirementsFactory(EntitiesFactory):
+class RequirementsFactory(DirectivesFactory):
   """Factory class for requirements."""
 
   def __init__(self):
     super(RequirementsFactory, self).__init__(objects.REQUIREMENTS)
     self._acl_roles = [
         ("admins", roles.ACLRolesIDs.REQUIREMENT_ADMINS,
-         [users.current_user()])
-    ]
+         [users.current_user()])]
 
-  def _create_random_obj(self, is_add_rest_attrs):
-    """Create requirement entity."""
-    return self.obj_inst().update_attrs(
-        title=self.obj_title)
+
+class PoliciesFactory(DirectivesFactory):
+  """Factory class for policies."""
+
+  def __init__(self):
+    super(PoliciesFactory, self).__init__(objects.POLICIES)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.POLICY_ADMINS, [users.current_user()])]
+
+
+class ContractsFactory(DirectivesFactory):
+  """Factory class for contracts."""
+
+  def __init__(self):
+    super(ContractsFactory, self).__init__(objects.CONTRACTS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.CONTRACT_ADMINS, [users.current_user()])]
 
 
 class EvidenceFactory(EntitiesFactory):
