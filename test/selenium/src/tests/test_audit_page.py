@@ -14,7 +14,7 @@ from lib.constants.element import objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
-from lib.page import login_page
+from lib.page import dashboard
 from lib.page.widget import object_modal
 from lib.service import rest_facade, webui_service
 from lib.utils import string_utils
@@ -371,12 +371,10 @@ class TestAuditPage(base.Test):
     soft_assert.assert_expectations()
 
   @pytest.mark.smoke_tests
-  def test_page_on_dashboard_gca(self, audit, soft_assert, selenium):
-    """Check that Dashboard Tab displays login page if 'Dashboard' GCA filled
-    with appropriate url."""
+  def test_page_on_dashboard_gca(self, audit, selenium):
+    """Check that Dashboard Tab displays My Dashboard page if 'Dashboard' GCA
+    filled with appropriate url."""
     rest_facade.cas_dashboards(audit, environment.app_url)
-    dashboard_content = login_page.LoginPage(
-        webui_service.AuditsService(selenium).get_dashboard_content(audit))
-    for element in dashboard_content.get_visible_elements():
-      soft_assert.expect(element.exists, "{} is not found".format(element))
-    soft_assert.assert_expectations()
+    assert dashboard.Dashboard(
+        root_element=webui_service.AuditsService(
+            selenium).get_dashboard_content(audit)).is_opened

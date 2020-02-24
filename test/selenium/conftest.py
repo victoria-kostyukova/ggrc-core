@@ -222,7 +222,7 @@ def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and
   return My Work Dashboard page objects model."""
   selenium_utils.open_url(url.Urls().dashboard)
-  return dashboard.Dashboard(selenium)
+  return dashboard.Dashboard()
 
 
 @pytest.fixture(scope="function")
