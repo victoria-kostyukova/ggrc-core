@@ -199,7 +199,7 @@ class TestTaskqueueIndexing(TestCase):
             'expression': {
                 'left': "archived",
                 'op': {'name': "="},
-                'right': "true",
+                'right': "Yes",
             },
         },
         'type': 'ids',

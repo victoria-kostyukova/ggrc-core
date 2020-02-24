@@ -29,6 +29,7 @@ from ggrc.services import signals
 from ggrc.fulltext.mixin import Indexed
 from ggrc.rbac.permissions import permissions_for
 from ggrc.integrations import constants
+from ggrc.fulltext import attributes
 
 
 def _hint_verifier_assignees(actual_people_label, control_people_label,
@@ -162,7 +163,12 @@ class AssessmentTemplate(assessment.AuditRelationship,
   )
 
   _fulltext_attrs = [
-      "archived"
+      attributes.BooleanFullTextAttr(
+          'archived',
+          'archived',
+          true_value="Yes",
+          false_value="No",
+      ),
   ]
 
   _custom_publish = {

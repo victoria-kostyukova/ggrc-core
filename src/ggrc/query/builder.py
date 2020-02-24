@@ -104,6 +104,20 @@ class QueryHelper(object):
           child_type = self._find_child_type(node, child_type)
     return child_type
 
+  def _find_verified_field(self, expr):
+    """Search for "verified" field recursively down the query expression."""
+    left, oper, right = expr.get("left"), expr.get("op", {}), expr.get("right")
+    if oper.get("name") == "=":
+      if left == "verified" and right == "true":
+        expr["right"] = "Yes"
+      if left == "verified" and right == "false":
+        expr["right"] = "No"
+    else:
+      for node in (left, right):
+        if isinstance(node, dict):
+          self._find_verified_field(node)
+    return expr
+
   def _clean_query(self, query):
     """ sanitize the query object """
     for object_query in query:
@@ -329,7 +343,8 @@ class QueryHelper(object):
               revision.id] for revision in revisions]
     return list(itertools.chain.from_iterable(result))
 
-  def _get_filtered_expression(self, expression, object_class, tgt_class, query):
+  def _get_filtered_expression(self, expression, object_class,
+                               tgt_class, query):
     """Filter query according to expression."""
     with benchmark("Parse filter query: _get_ids > _build_expression"):
       filter_expression = custom_operators.build_expression(
@@ -350,7 +365,8 @@ class QueryHelper(object):
       object_class.source_id,
       object_class.resource_id,
     )
-    query = self._get_filtered_expression(expression, object_class, object_class, query)
+    query = self._get_filtered_expression(expression, object_class,
+                                          object_class, query)
     related_objects_ids = self._get_revisions_related_ids(query)
     requested_permissions = object_query.get("permissions", "read")
     with benchmark("Get permissions: _get_ids > _get_type_query"):
@@ -373,6 +389,10 @@ class QueryHelper(object):
     if object_class is None:
       return set()
     tgt_class = object_class
+
+    if object_name == "Assessment":
+      self._find_verified_field(expression)
+
     if object_name == "Revision":
       query = self._get_revision_query(object_class, expression, object_query)
     else:

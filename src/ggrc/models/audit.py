@@ -29,6 +29,7 @@ from ggrc.models.snapshot import Snapshotable
 from ggrc.rbac import SystemWideRoles
 from ggrc.utils import errors
 from ggrc.integrations import constants
+from ggrc.fulltext import attributes
 
 
 class Audit(Snapshotable,
@@ -94,7 +95,12 @@ class Audit(Snapshotable,
   )
 
   _fulltext_attrs = [
-      'archived',
+      attributes.BooleanFullTextAttr(
+          'archived',
+          'archived',
+          true_value="Yes",
+          false_value="No",
+      ),
       'report_start_date',
       'report_end_date',
       'audit_firm',

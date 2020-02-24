@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Assessment object"""
+# pylint: disable=cyclic-import
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
@@ -43,6 +44,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
+from ggrc.fulltext import attributes
 from ggrc.fulltext.mixin import Indexed
 from ggrc.integrations import constants
 
@@ -174,7 +176,12 @@ class Assessment(Assignable,
   )
 
   _fulltext_attrs = [
-      'archived',
+      attributes.BooleanFullTextAttr(
+          'archived',
+          'archived',
+          true_value="Yes",
+          false_value="No",
+      ),
       'design',
       'operationally',
       'folder',
@@ -322,8 +329,8 @@ class Assessment(Assignable,
       "status": {
           "display_name": "State",
           "mandatory": False,
-          "description": "Allowed values are:\n{}".format('\n'.join(
-              VALID_STATES))
+          "description": "Allowed values are:\n{}"
+                         .format('\n'.join(VALID_STATES))
       },
       "issue_tracker": {
           "display_name": "Ticket Tracker",
@@ -400,7 +407,7 @@ class Assessment(Assignable,
     return None
 
   @validates("operationally")
-  def validate_opperationally(self, key, value):
+  def validate_operationally(self, key, value):
     """Validate assessment operationally by validating conclusion"""
     # pylint: disable=unused-argument
     return self.validate_conclusion(value)

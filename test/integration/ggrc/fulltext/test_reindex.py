@@ -32,7 +32,7 @@ class TestReindex(TestCase):
     archived_index = indexer.record_type.query.filter(
         mysql.MysqlRecordProperty.type == "Assessment",
         mysql.MysqlRecordProperty.property == "archived",
-        mysql.MysqlRecordProperty.content == "True"
+        mysql.MysqlRecordProperty.content == "Yes"
     )
     self.assertEqual(archived_index.count(), 0)
 
