@@ -535,6 +535,36 @@ class TestIssueIntegration(ggrc.TestCase):
       self.assertTrue(issue_tracker_issue.enabled)
       self.assertEqual(issue_tracker_issue.assignee, user_a_email)
 
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              side_effect=[integrations_errors.Error()])
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_invalid_issue_hotlist(self, _):
+    """Test warning message if invalid or non-existing Hotlist entered."""
+    issue_tracker_attrs = {
+        "enabled": True,
+        "component_id": 1234,
+        "hotlist_id": 4321,
+        "issue_type": "Default Issue type",
+        "issue_priority": "P2",
+        "issue_severity": "S1",
+    }
+
+    response = self.api.post(all_models.Issue, {
+        "issue": {
+            "title": "test title",
+            "context": None,
+            "issue_tracker": issue_tracker_attrs,
+            "due_date": "10/10/2019"
+        },
+    })
+
+    self.assertIn(
+        constants.WarningsDescription.CREATE_TICKET,
+        response.json.get("issue", {}).get("issue_tracker", {}).get(
+            "_warnings", []
+        )
+    )
+
 
 @ddt.ddt
 class TestIssueLink(TestIssueIntegration):

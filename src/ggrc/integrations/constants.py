@@ -187,8 +187,9 @@ class ErrorsDescription(object):
 class WarningsDescription(object):
   """Constants for warnings description."""
   # pylint: disable=too-few-public-methods
-  CREATE_ASSESSMENT = "Unable to create a ticket."
-  CREATE_ISSUE = "Unable to create a ticket in issue tracker."
+  CREATE_TICKET = "The ticket tracker issue cannot be created. Check if the " \
+                  "Hotlist ID and Component ID are correct and try again " \
+                  "or contact our support service"
   LINK_ASSESSMENT = "Unable to link a ticket."
   UPDATE_ASSESSMENT = "Unable to update a ticket."
   SYNC_ASSESSMENT = "Unable to sync assessment."
