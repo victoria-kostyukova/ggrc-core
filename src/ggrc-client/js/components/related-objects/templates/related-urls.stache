@@ -10,6 +10,7 @@
       {{#is(modelType, "Evidence")}}
         <evidence-item
           evidence:from="{.}"
+          isArchived:from="instance.archived"
           isEditIconDenied:from="isEditDenied"
           on:removeItem="removeUrl({.})"
         />
