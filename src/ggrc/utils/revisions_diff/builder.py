@@ -386,9 +386,6 @@ def prepare_content_full_diff(instance_meta_info, l_content, r_content):
       # already been calculated in `_construct_diff` function call.
       "access_control_list",
       "custom_attribute_values",
-      # `custom_attribute_definitions` is ignored since all possible obj
-      # changes related with any change in CAD would be reflected in CAV.
-      "custom_attribute_definitions",
       # The following fields are ignored cause they may differ but revisions
       # still may represent objects of same state.
       "created_at",
