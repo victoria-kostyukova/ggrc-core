@@ -458,6 +458,14 @@ describe('AdvancedSearch', () => {
       const permaLink = AdvancedSearch.buildSearchPermalink(searchId, widgetId);
       expect(loEndsWith(permaLink, expectedHash)).toBeTruthy();
     });
+    it('should set correct URL hash for Cycle Task Group Tasks', () => {
+      const widgetId = 'cycle_task_group_object_task';
+      const searchId = '12345';
+      const expectedHash = '#!task&saved_search=12345';
+
+      const permaLink = AdvancedSearch.buildSearchPermalink(searchId, widgetId);
+      expect(loEndsWith(permaLink, expectedHash)).toBeTruthy();
+    });
   });
 
   describe('getFilters() method', () => {

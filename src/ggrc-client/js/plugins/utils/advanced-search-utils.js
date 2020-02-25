@@ -306,6 +306,9 @@ export const buildSearchPermalink = (searchId, widgetId) => {
   const origin = window.location.origin;
   const pathName = window.location.pathname;
   const url = `${origin}${pathName}`;
+
+  // Cycle Task Group Tasks Tab has 'task' URL hash
+  widgetId = widgetId === 'cycle_task_group_object_task' ? 'task' : widgetId;
   const hash = `#!${widgetId}&saved_search=${searchId}`;
   const permalink = `${url}${hash}`;
 
