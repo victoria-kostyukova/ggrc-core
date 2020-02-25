@@ -231,12 +231,14 @@ const ViewModel = canDefineMap.extend({
     if (isObjectContextPage() && !advancedSearch.attr('parentInstance')) {
       advancedSearch.attr('parentInstance',
         AdvancedSearch.create.parentInstance(this.parentInstance));
+    }
 
-      // remove duplicates
+    // remove duplicates
+    if (advancedSearch.attr('parentInstance')) {
       const parentItems = filterParentItems(
         advancedSearch.attr('parentInstance'),
-        advancedSearch.attr('parentItems'));
-
+        advancedSearch.attr('parentItems')
+      );
       advancedSearch.attr('parentItems', parentItems);
     }
 
