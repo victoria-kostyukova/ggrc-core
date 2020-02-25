@@ -615,14 +615,16 @@ def soft_assert_detailed_page_of_asmt_tree_view_item_is_readonly(
   verifies that it is False.
   """
   attrs = [attr for attr in dir(asmt_tree_view_item)
-           if not attr.startswith('__')]
-  for attr in attrs:
-    match = re.search(r"\bis_(.+?)_section_editable\b", attr)
-    if match:
+           if attr.endswith("_section_editable")]
+  if attrs:
+    for attr in attrs:
       soft_assert.expect(
           getattr(asmt_tree_view_item, attr) is False,
           '{} section should be not editable'.format(
-              match.group(1).replace('_', ' ').capitalize()))
+              re.search(r"\bis_(.+?)_section_editable\b", attr).group(1).
+              replace('_', ' ').capitalize()))
+  else:
+    raise ValueError("No needed attributes found.")
 
 
 def soft_assert_asmt_tree_view_items_on_bulk_verify_modal(
@@ -633,7 +635,9 @@ def soft_assert_asmt_tree_view_items_on_bulk_verify_modal(
   Firstly checks opening of assessment info page through open button, then
   checks that mapped controls section and evidence urls section from second
   tier are read-only."""
-  for asmt_tree_view_item in modal.select_assessments_section.tree_view_items:
+  for asmt_tree_view_item in (
+      modal.select_assessments_section.tree_view.tree_view_items()
+  ):
     asmt_tree_view_item.open()
     _, new_tab = browsers.get_browser().windows()
     test_utils.wait_for(lambda nt=new_tab: nt.url.endswith(url.Widget.INFO))

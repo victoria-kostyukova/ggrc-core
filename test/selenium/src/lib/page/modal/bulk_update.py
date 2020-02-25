@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Models for bulk update modals."""
 import re
-from lib import base, decorator
+
+from lib import base, decorator, browsers
 from lib.constants import objects, value_aliases
 from lib.element import page_elements
 
@@ -139,16 +140,7 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
 
   @property
   def tree_view(self):
-    return base.BulkUpdateTreeView(obj_name=objects.ASSESSMENTS)
-
-  @property
-  def tree_view_items(self):
-    """Returns assessment tree view items."""
-    tree_view_items = []
-    for scope in self.get_objs_scopes():
-      tree_view_items.append(
-          self.get_tree_view_item_by_title(title=scope["TITLE"]))
-    return tree_view_items
+    return BulkUpdateTreeView(obj_name=objects.ASSESSMENTS)
 
   def get_tree_view_item_by_title(self, title):
     """Gets assessment tree view item from tree view by its title."""
@@ -188,12 +180,37 @@ class SelectAssessmentsToVerifySection(page_elements.CollapsiblePanel):
     return scopes
 
 
-class AssessmentTreeViewItem(object):
+class BulkUpdateTreeView(base.UnifiedMapperTreeView):
+  """Tree-View class for Bulk Update modal."""
+
+  def __init__(self, driver=None, obj_name=None):
+    super(BulkUpdateTreeView, self).__init__(driver, obj_name)
+
+  def _init_tree_view_items(self):
+    """Init Tree View items as list of AssessmentTreeViewItem from current
+    widget.
+
+    Returns:
+      list of AssessmentTreeViewItem entities or empty list if no items found
+      in tree view.
+    """
+    self.wait_loading_after_actions()
+    self._tree_view_items = (
+        [] if self._browser.div(class_name="well well-small").exists else [
+            AssessmentTreeViewItem(element)
+            for element in self._browser.elements(
+                tag_name="mapper-results-item")])
+    return self._tree_view_items
+
+
+class AssessmentTreeViewItem(base.TreeViewItem):
   """Class represents Assessment item from Select Assessments section of
   Bulk update modal."""
   # pylint: disable=invalid-name
 
   def __init__(self, parent_element):
+    super(AssessmentTreeViewItem, self).__init__(
+        browsers.get_driver(), parent_element.wd)
     self._root = parent_element
     self.mapped_control_section = self._root.element(
         tag_name="collapsible-panel", text="Mapped Controls")

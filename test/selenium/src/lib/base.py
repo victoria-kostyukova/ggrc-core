@@ -738,13 +738,6 @@ class UnifiedMapperTreeView(TreeView):
     return MapperSetVisibleFieldsModal(self._driver, self.fields_to_set)
 
 
-class BulkUpdateTreeView(UnifiedMapperTreeView):
-  """Tree-View class for Bulk Update modal."""
-
-  def __init__(self, driver=None, obj_name=None):
-    super(BulkUpdateTreeView, self).__init__(driver, obj_name)
-
-
 class AdminTreeView(TreeView):
   """Class for representing Tree View list in Admin dashboard."""
   _locators = constants.locator.AdminTreeView
