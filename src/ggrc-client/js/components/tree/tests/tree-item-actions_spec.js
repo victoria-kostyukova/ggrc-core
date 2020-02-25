@@ -130,6 +130,14 @@ describe('tree-item-actions component', () => {
         let result = viewModel.isAllowedToEdit;
         expect(result).toBe(false);
       });
+
+      it('if cycle is ended', () => {
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
+        viewModel.instance.attr('is_in_history', true);
+
+        let result = viewModel.isAllowedToEdit;
+        expect(result).toBe(false);
+      });
     });
 
     describe('returns true', () => {
