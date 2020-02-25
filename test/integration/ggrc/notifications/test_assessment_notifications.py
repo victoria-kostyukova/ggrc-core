@@ -3,8 +3,11 @@
 
 """Tests of assessment notifications."""
 import collections
+from datetime import datetime
+
 import ddt
 import mock
+from pytz import timezone
 
 from ggrc import db
 from ggrc.notifications import common
@@ -419,3 +422,32 @@ class TestAssessmentNotification(TestCase):
     ]))
     self._check_csv_response(response, {})
     self.assert_asmnt_notifications()
+
+  def test_notification_create_time(self):
+    """Test for Assessment created date verification"""
+    audit = factories.AuditFactory()
+    time_stamp = datetime.now(timezone('US/Pacific'))
+    date_format = '%m/%d/%Y %H:%M:%S %Z'
+    converted_date = time_stamp.strftime(date_format)
+    assignee_acr = all_models.AccessControlRole.query.filter_by(
+        object_type="Assessment",
+        name="Assignees",).first()
+    self.api.post(Assessment, {
+        "assessment": {
+            "title": "Assessment1",
+            "context": None,
+            "audit": {
+                "id": audit.id,
+                "type": "Audit",
+            },
+            "access_control_list": [
+                acl_helper.get_acl_json(self.primary_role_id, self.auditor.id),
+                acl_helper.get_acl_json(assignee_acr.id, self.auditor.id)],
+            "status": "In Progress",
+        }
+    })
+    notifs, notif_data = common.get_daily_notifications()
+    asmts_data = notif_data["user@example.com"]["assessment_open"].values()
+    obj_created_at = asmts_data[0]["obj_created_at"].values()
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual(obj_created_at, [converted_date])

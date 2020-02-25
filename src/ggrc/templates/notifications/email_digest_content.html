@@ -218,7 +218,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for assessment_id, assessment_data in digest['assessment_open'].iteritems() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
-                        {{ assessment_data['title']|e }}</a>
+                                                {{ assessment_data['title']|e }}
+                        {{ assessment_data['obj_created_at'].values()[0] }}
+                      </a>
                     </li>
                   {% endfor %}
                   </ul>
