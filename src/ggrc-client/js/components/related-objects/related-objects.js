@@ -100,8 +100,6 @@ export default canComponent.extend({
     async loadRelatedItems() {
       try {
         const params = this.getParams();
-        this.attr('isLoading', true);
-
         const data = await batchRequests(params);
 
         const relatedType = this.attr('relatedItemsType');
@@ -115,8 +113,6 @@ export default canComponent.extend({
         return result;
       } catch {
         return [];
-      } finally {
-        this.attr('isLoading', false);
       }
     },
     getSortingInfo: function () {
@@ -134,15 +130,20 @@ export default canComponent.extend({
         name: orderBy.attr('field'),
         desc: orderBy.attr('direction') === 'desc'}];
     },
-    setRelatedItems: async function () {
-      let items = await this.loadRelatedItems();
+    async setRelatedItems() {
+      try {
+        this.attr('isLoading', true);
+        let items = await this.loadRelatedItems();
 
-      this.attr('relatedObjects').replace(items);
+        this.attr('relatedObjects').replace(items);
 
-      this.attr('baseInstance').dispatch({
-        ...RELATED_REFRESHED,
-        model: this.attr('relatedItemsType'),
-      });
+        this.attr('baseInstance').dispatch({
+          ...RELATED_REFRESHED,
+          model: this.attr('relatedItemsType'),
+        });
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
   }),
   init: function () {
