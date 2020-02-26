@@ -175,6 +175,7 @@ class MultiClonable(object):
 
     for source, clonned in clonned_objs.items():
       cls._clone_cads(source, clonned)
+    db.session.flush()
 
     if clonned_objs:
       db.session.add(log_event(db.session, flush=False))
