@@ -458,6 +458,76 @@ describe('revision-page component', function () {
       expect(viewModel._buildPeopleEmails)
         .toHaveBeenCalledWith(values[0].attribute_objects);
     });
+
+    describe('makes correct diff for assessment template CAs', () => {
+      beforeEach(() => {
+        viewModel.instance = {
+          type: 'AssessmentTemplate',
+        };
+      });
+
+      it('if CAs ids has been changed on BE side', () => {
+        const origDefs = [{
+          id: 1,
+          title: 'CA1',
+        }];
+
+        const newDefs = [{
+          id: 11,
+          title: 'CA1',
+        }];
+
+        const result = viewModel._objectCADiff(null, origDefs, null, newDefs);
+
+        expect(result).toEqual([]);
+      });
+
+      it('if CAs has been created', () => {
+        const origDefs = [{
+          id: 1,
+          title: 'CA1',
+        }];
+
+        const newDefs = [{
+          id: 11,
+          title: 'CA1',
+        }, {
+          id: 2,
+          title: 'CA2',
+        }];
+
+        const result = viewModel._objectCADiff(null, origDefs, null, newDefs);
+
+        expect(result).toEqual([{
+          fieldName: 'Custom Attribute: CA2',
+          origVal: '—',
+          newVal: 'Created',
+        }]);
+      });
+
+      it('if CAs has been deleted', () => {
+        const origDefs = [{
+          id: 1,
+          title: 'CA1',
+        }, {
+          id: 2,
+          title: 'CA2',
+        }];
+
+        const newDefs = [{
+          id: 11,
+          title: 'CA1',
+        }];
+
+        const result = viewModel._objectCADiff(null, origDefs, null, newDefs);
+
+        expect(result).toEqual([{
+          fieldName: 'Custom Attribute: CA2',
+          origVal: '—',
+          newVal: 'Deleted',
+        }]);
+      });
+    });
   });
 
   describe('_computeMappingChanges() method', function () {

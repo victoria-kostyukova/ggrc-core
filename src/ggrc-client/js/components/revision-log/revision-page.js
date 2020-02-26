@@ -308,6 +308,46 @@ export default canComponent.extend({
         }
       };
 
+      if (this.instance && this.instance.type === 'AssessmentTemplate') {
+        const origCA = loKeyBy(origDefs, 'id');
+        const newCA = loKeyBy(newDefs, 'id');
+        const uniqIds = loUniq(Object.keys(origCA).concat(Object.keys(newCA)));
+
+
+        const makeDiff = (title, value) => ({
+          fieldName: `Custom Attribute: ${title}`,
+          origVal: EMPTY_DIFF_VALUE,
+          newVal: value,
+        });
+
+        const diff = uniqIds.map((id) => {
+          if (origCA[id] && newCA[id]) {
+            return;
+          } else {
+            const def = newCA[id] || origCA[id];
+            const isExistNew = newDefs
+              ? Object.values(newDefs).some(
+                (item) => item.title === def.title)
+              : false;
+
+            const isExistOrig = origDefs
+              ? Object.values(origDefs).some(
+                (item) => item.title === def.title)
+              : false;
+
+            if (isExistNew && !isExistOrig) {
+              return makeDiff(newCA[id].title, 'Created');
+            } else if (!isExistNew && isExistOrig) {
+              return makeDiff(origCA[id].title, 'Deleted');
+            } else {
+              return;
+            }
+          }
+        });
+
+        return loFilter(diff);
+      }
+
       origValues = loKeyBy(origValues, 'custom_attribute_id');
       origDefs = loKeyBy(origDefs, 'id');
       newValues = loKeyBy(newValues, 'custom_attribute_id');
