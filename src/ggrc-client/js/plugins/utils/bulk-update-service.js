@@ -89,7 +89,7 @@ export const getAsmtCountForComplete = (relevant) => {
           op: {
             name: '=',
           },
-          right: 'false',
+          right: 'No',
         },
       },
     },
@@ -130,7 +130,7 @@ export const getAsmtCountForVerify = (relevant) => {
             op: {
               name: '=',
             },
-            right: 'false',
+            right: 'No',
           },
           op: {
             name: 'AND',

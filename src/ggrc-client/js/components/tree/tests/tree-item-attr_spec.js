@@ -23,6 +23,22 @@ describe('tree-item-attr component', () => {
     expect(result).toEqual('');
   });
 
+  it('returns "Yes" string when boolean attr value is true', () => {
+    viewModel.name = 'archived';
+    viewModel.instance = new canMap({archived: true});
+
+    let result = viewModel.getDefaultValue();
+    expect(result).toEqual('Yes');
+  });
+
+  it('returns "No" string when boolean attr value is false', () => {
+    viewModel.name = 'archived';
+    viewModel.instance = new canMap({archived: false});
+
+    let result = viewModel.getDefaultValue();
+    expect(result).toEqual('No');
+  });
+
   describe('retrieving a "default" (non-date) attribute', () => {
     it('returns a correct value through the .attr() method', () => {
       viewModel.name = 'slug';
@@ -30,22 +46,6 @@ describe('tree-item-attr component', () => {
 
       let result = viewModel.getDefaultValue();
       expect(result).toEqual('DATAASSET-2');
-    });
-
-    it('returns "true" string when boolean attr value is true', () => {
-      viewModel.name = 'archived';
-      viewModel.instance = new canMap({archived: true});
-
-      let result = viewModel.getDefaultValue();
-      expect(result).toEqual('true');
-    });
-
-    it('returns "false" string when boolean attr value is false', () => {
-      viewModel.name = 'archived';
-      viewModel.instance = new canMap({archived: false});
-
-      let result = viewModel.getDefaultValue();
-      expect(result).toEqual('false');
     });
   });
 

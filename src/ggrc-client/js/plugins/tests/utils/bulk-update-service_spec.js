@@ -80,7 +80,7 @@ describe('GGRC BulkUpdateService', function () {
                 op: {
                   name: '=',
                 },
-                right: 'false',
+                right: 'No',
               },
               op: {
                 name: 'AND',
