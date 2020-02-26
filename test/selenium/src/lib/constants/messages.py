@@ -63,6 +63,22 @@ class AssertionMessages(CommonMessages):
     right.diff_info = comparison["other_diff"]
 
   @classmethod
+  def _get_lists_comparison_err_msg(cls, left, right):
+    """Return error message after assert equal comparison of lists."""
+    assertion_error_msg = ""
+    if len(left) != len(right):
+      assertion_error_msg = (
+          "\nThe lengths of lists are not equal. Length of expected list - {}."
+          " Length of actual list - {}\n".format(len(left), len(right)) +
+          cls.err_common.format(left, right))
+    else:
+      for _left, _right in zip(left, right):
+        if not cls.is_entities_have_err_info(_left, _right):
+          cls.set_entities_diff_info(_left, _right)
+        assertion_error_msg += cls.diff_error_msg(_left, _right)
+    return assertion_error_msg
+
+  @classmethod
   def format_err_msg_equal(cls, left, right):
     """Return customized and detailed error message after assert equal
     comparison.
@@ -80,12 +96,7 @@ class AssertionMessages(CommonMessages):
         all(isinstance(_left, Entity.all_entities_classes()) and
         isinstance(_right, Entity.all_entities_classes()) for
             _left, _right in zip(left, right))):
-      assertion_error_msg = ""
-      for _left, _right in zip(sorted(left), sorted(right)):
-        if not cls.is_entities_have_err_info(_left, _right):
-          cls.set_entities_diff_info(_left, _right)
-        assertion_error_msg = (assertion_error_msg +
-                               cls.diff_error_msg(_left, _right))
+      assertion_error_msg = cls._get_lists_comparison_err_msg(left, right)
     return assertion_error_msg
 
   @classmethod

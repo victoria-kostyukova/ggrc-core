@@ -664,10 +664,9 @@ def soft_assert_asmts_list_on_bulk_verify_modal(modal, soft_assert, exp_asmts):
           actual_column_names))
   soft_assert_tree_view_checkboxes(asmt_section, soft_assert)
   base.Test.general_equal_soft_assert(
-      soft_assert,
-      sorted(exp_asmts),
-      sorted(webui_service.AssessmentsService().
-             get_objs_from_bulk_update_modal(modal)),
+      soft_assert, exp_asmts,
+      list(reversed(webui_service.AssessmentsService().
+                    get_objs_from_bulk_update_modal(modal))),
       *exp_asmts[0].bulk_update_modal_tree_view_attrs_to_exclude)
 
 
