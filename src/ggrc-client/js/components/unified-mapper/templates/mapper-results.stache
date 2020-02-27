@@ -19,10 +19,10 @@
                                               serviceColumns:from="columns.service">
         </mapper-results-columns-configuration>
       {{/disableColumnsConfiguration}}
-      <mapper-results-items-header class="{{#useSnapshots}}is-snapshot{{/useSnapshots}}
-                                          {{#isWorkflowPart}}is-task-group{{/isWorkflowPart}}
-                                          {{#searchOnly}}search-only{{/searchOnly}}
-                                          {{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
+      <mapper-results-items-header class="{{#if useSnapshots}}is-snapshot{{/if}}
+                                          {{#if isWorkflowPart}}is-workflow-part{{/if}}
+                                          {{#if searchOnly}}search-only{{/if}}
+                                          {{#if relatedAssessments.show}}has-related-assessments{{/if}}"
                                    modelType:from="type"
                                    columns:from="columns.selected"
                                    serviceColumns:from="columns.service"
