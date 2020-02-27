@@ -16,7 +16,7 @@ describe('comment-data-provider component', () => {
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', makeFakeInstance({model: Cacheable})());
+    viewModel.instance = makeFakeInstance({model: Cacheable})();
   });
 
   describe('init() method', () => {
@@ -35,33 +35,33 @@ describe('comment-data-provider component', () => {
     });
 
     it('turns on/off isLoading flag if loaded successfully', (done) => {
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       CommentsUtils.loadComments
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
 
       method()
         .finally(() => {
-          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(viewModel.isLoading).toBe(false);
           done();
         });
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     it('turns on/off isLoading flag if loading fails', (done) => {
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       CommentsUtils.loadComments
         .and.returnValue(Promise.reject());
 
       method()
         .catch(() => {
-          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(viewModel.isLoading).toBe(false);
           done();
         });
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
   });
 
@@ -73,9 +73,9 @@ describe('comment-data-provider component', () => {
     it('loads default comments count if not defined', () => {
       CommentsUtils.loadComments
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
-      viewModel.attr('pageSize', 20);
+      viewModel.pageSize = 20;
 
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       viewModel.loadFirstComments();
 
@@ -86,7 +86,7 @@ describe('comment-data-provider component', () => {
     it('loads needed comments count', () => {
       CommentsUtils.loadComments
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       viewModel.loadFirstComments(15);
 
@@ -97,9 +97,9 @@ describe('comment-data-provider component', () => {
     it('loads more comments if they are added by current user', () => {
       CommentsUtils.loadComments
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
-      viewModel.attr('newCommentsCount', 20);
+      viewModel.newCommentsCount = 20;
 
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       viewModel.loadFirstComments(5);
 
@@ -108,7 +108,7 @@ describe('comment-data-provider component', () => {
     });
 
     it('sets comments if loaded', async () => {
-      viewModel.attr('comments', []);
+      viewModel.comments = [];
       CommentsUtils.loadComments.and.returnValue(Promise.resolve({
         Comment: {
           total: 3,
@@ -118,14 +118,14 @@ describe('comment-data-provider component', () => {
 
       await viewModel.loadFirstComments();
 
-      expect(viewModel.attr('comments').length).toBe(3);
+      expect(viewModel.comments.length).toBe(3);
     });
 
     it('replaces new comments with loaded', async () => {
-      viewModel.attr('comments', [{id: 3}, {id: 1}]);
-      viewModel.attr('newCommentsCount', 1);
+      viewModel.comments = [{id: 3}, {id: 1}];
+      viewModel.newCommentsCount = 1;
 
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       CommentsUtils.loadComments.and.returnValue(Promise.resolve({
         Comment: {
@@ -139,15 +139,15 @@ describe('comment-data-provider component', () => {
       expect(CommentsUtils.loadComments)
         .toHaveBeenCalledWith(instance, 'Comment', 0, 3);
 
-      expect(viewModel.attr('comments').length).toBe(4);
+      expect(viewModel.comments.length).toBe(4);
 
-      viewModel.attr('comments').forEach((comment, index) => {
+      viewModel.comments.forEach((comment, index) => {
         expect(comment.id).toBe(4 - index);
       });
     });
 
     it('sets totalCount if comments are loaded', async () => {
-      viewModel.attr('totalCount', 0);
+      viewModel.totalCount = 0;
       CommentsUtils.loadComments.and.returnValue(Promise.resolve({
         Comment: {
           total: 3,
@@ -157,7 +157,7 @@ describe('comment-data-provider component', () => {
 
       await viewModel.loadFirstComments();
 
-      expect(viewModel.attr('totalCount')).toBe(3);
+      expect(viewModel.totalCount).toBe(3);
     });
 
     it('resets newCommentsCount', async () => {
@@ -168,11 +168,11 @@ describe('comment-data-provider component', () => {
         },
       }));
 
-      viewModel.attr('newCommentsCount', 20);
+      viewModel.newCommentsCount = 20;
 
       await viewModel.loadFirstComments(5);
 
-      expect(viewModel.attr('newCommentsCount')).toBe(0);
+      expect(viewModel.newCommentsCount).toBe(0);
     });
   });
 
@@ -182,8 +182,8 @@ describe('comment-data-provider component', () => {
     });
 
     it('loads next comments', () => {
-      viewModel.attr('comments', [{}, {}]);
-      viewModel.attr('pageSize', 20);
+      viewModel.comments = [{}, {}];
+      viewModel.pageSize = 20;
 
       CommentsUtils.loadComments.and.returnValue(Promise.resolve({
         Comment: {
@@ -192,7 +192,7 @@ describe('comment-data-provider component', () => {
         },
       }));
 
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       viewModel.loadMoreComments();
 
@@ -201,8 +201,8 @@ describe('comment-data-provider component', () => {
     });
 
     it('loads comments from defined index', () => {
-      viewModel.attr('comments', [{}, {}]);
-      viewModel.attr('pageSize', 20);
+      viewModel.comments = [{}, {}];
+      viewModel.pageSize = 20;
 
       CommentsUtils.loadComments.and.returnValue(Promise.resolve({
         Comment: {
@@ -211,7 +211,7 @@ describe('comment-data-provider component', () => {
         },
       }));
 
-      let instance = viewModel.attr('instance');
+      let instance = viewModel.instance;
 
       viewModel.loadMoreComments(5);
 
@@ -221,8 +221,8 @@ describe('comment-data-provider component', () => {
 
     it('adds loaded comments to collection if there are no new comments',
       async () => {
-        viewModel.attr('totalCount', 2);
-        viewModel.attr('comments', []);
+        viewModel.totalCount = 2;
+        viewModel.comments = [];
 
         CommentsUtils.loadComments.and.returnValue(Promise.resolve({
           Comment: {
@@ -233,13 +233,13 @@ describe('comment-data-provider component', () => {
 
         await viewModel.loadMoreComments();
 
-        expect(viewModel.attr('comments').length).toBe(2);
+        expect(viewModel.comments.length).toBe(2);
       });
 
     it('loads new and next comments if new comments are added by another users',
       async () => {
-        viewModel.attr('totalCount', 20);
-        viewModel.attr('comments', [{}, {}]);
+        viewModel.totalCount = 20;
+        viewModel.comments = [{}, {}];
 
         spyOn(viewModel, 'loadFirstComments');
         spyOn(viewModel, 'loadMoreComments');
@@ -255,13 +255,13 @@ describe('comment-data-provider component', () => {
 
         await viewModel.loadMoreComments();
 
-        expect(viewModel.attr('comments').length).toBe(2);
+        expect(viewModel.comments.length).toBe(2);
         expect(viewModel.loadFirstComments).toHaveBeenCalledWith(5);
         expect(viewModel.loadMoreComments).toHaveBeenCalledWith(7);
       });
 
     it('turns on/off isLoading flag if loaded successfully', (done) => {
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       CommentsUtils.loadComments
         .and.returnValue(Promise.resolve({
@@ -273,49 +273,49 @@ describe('comment-data-provider component', () => {
 
       viewModel.loadMoreComments()
         .finally(() => {
-          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(viewModel.isLoading).toBe(false);
           done();
         });
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     it('turns on/off isLoading flag if loading failed', (done) => {
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       CommentsUtils.loadComments.and.returnValue(Promise.reject());
 
       viewModel.loadMoreComments()
         .catch(() => {
-          expect(viewModel.attr('isLoading')).toBe(false);
+          expect(viewModel.isLoading).toBe(false);
           done();
         });
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
   });
 
   describe('addComment() method', () => {
     it('adds comment to the beginning of the collection', () => {
-      viewModel.attr('comments').replace(['comment2']);
+      viewModel.comments.replace(['comment2']);
       viewModel.addComment({
         items: ['comment1'],
       });
 
-      expect(viewModel.attr('comments')[0]).toBe('comment1');
+      expect(viewModel.comments[0]).toBe('comment1');
     });
   });
 
   describe('removeComment() method', () => {
     it('removes the comment', () => {
-      viewModel.attr('comments').replace([
+      viewModel.comments.replace([
         {title: 'comment1'},
         {title: 'comment2'},
       ]);
-      viewModel.removeComment(viewModel.attr('comments')[0]);
+      viewModel.removeComment(viewModel.comments[0]);
 
-      expect(viewModel.attr('comments').length).toBe(1);
-      expect(viewModel.attr('comments')[0].attr('title')).toBe('comment2');
+      expect(viewModel.comments.length).toBe(1);
+      expect(viewModel.comments[0].attr('title')).toBe('comment2');
     });
   });
 
@@ -324,9 +324,9 @@ describe('comment-data-provider component', () => {
     beforeEach(() => {
       mapDfd = $.Deferred();
       spyOn(viewModel, 'mapToInstance').and.returnValue(mapDfd.promise());
-      viewModel.attr('instance', {
+      viewModel.instance = {
         refresh: jasmine.createSpy(),
-      });
+      };
     });
 
     it('calls mapToInstance if success', () => {
@@ -339,7 +339,7 @@ describe('comment-data-provider component', () => {
       viewModel.processComment({success: true, item: 'item'});
 
       mapDfd.resolve().then(() => {
-        expect(viewModel.attr('instance').refresh).toHaveBeenCalled();
+        expect(viewModel.instance.refresh).toHaveBeenCalled();
         done();
       });
     });

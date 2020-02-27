@@ -4,9 +4,50 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
+
+const ViewModel = canDefineMap.extend({
+  disabled: {
+    get() {
+      return this.isSaving || !this.value.length || this.isDisabled;
+    },
+  },
+  value: {
+    type: 'string',
+    value: '',
+    set(newValue) {
+      return newValue || '';
+    },
+  },
+  isDisabled: {
+    value: false,
+  },
+  isSaving: {
+    value: false,
+  },
+  createComment() {
+    let comment;
+    let description = this.value;
+
+    if (this.disabled) {
+      return;
+    }
+
+    comment = new Comment({
+      description: description,
+      modified_by: {type: 'Person', id: GGRC.current_user.id},
+    });
+    // Erase RichText Field after Comment Creation
+    this.value = '';
+
+    this.dispatch({
+      type: 'commentCreated',
+      comment: comment,
+    });
+  },
+});
 
 export default canComponent.extend({
   tag: 'comment-add-button',
@@ -16,44 +57,5 @@ export default canComponent.extend({
     '<content/></button>'
   ),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      disabled: {
-        get: function () {
-          return this.attr('isSaving') ||
-            !this.attr('value').length ||
-            this.attr('isDisabled');
-        },
-      },
-      value: {
-        type: 'string',
-        value: '',
-        set: function (newValue) {
-          return newValue || '';
-        },
-      },
-    },
-    isDisabled: false,
-    isSaving: false,
-    createComment: function () {
-      let comment;
-      let description = this.attr('value');
-
-      if (this.attr('disabled')) {
-        return;
-      }
-
-      comment = new Comment({
-        description: description,
-        modified_by: {type: 'Person', id: GGRC.current_user.id},
-      });
-      // Erase RichText Field after Comment Creation
-      this.attr('value', '');
-
-      this.dispatch({
-        type: 'commentCreated',
-        comment: comment,
-      });
-    },
-  }),
+  ViewModel,
 });
