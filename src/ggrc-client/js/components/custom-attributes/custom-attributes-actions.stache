@@ -3,15 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#unless formEditMode}}
-<confirm-edit-action
-  on:setInProgress="edit()"
-  instance:from="instance">
-  <button type="button"
-          class="btn btn-small btn-gray custom-attributes-actions__edit-button"
-          {{#if disabled}}disabled{{/if}}
-          on:el:click="confirmEdit()">
-    Edit Answers
-  </button>
-</confirm-edit-action>
+{{#unless hideButton}}
+  <confirm-edit-action
+    on:setInProgress="edit()"
+    instance:from="instance">
+    <button type="button"
+            class="btn btn-small btn-gray custom-attributes-actions__edit-button"
+            {{#if disabled}}disabled{{/if}}
+            on:el:click="confirmEdit()">
+      Edit Answers
+    </button>
+  </confirm-edit-action>
 {{/unless}}
