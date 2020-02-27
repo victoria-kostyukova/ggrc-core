@@ -21,6 +21,18 @@ class WorkflowFactory(TitledFactory):
   context = factory.SubFactory(ContextFactory)
 
 
+class WorkflowArchivedFactory(TitledFactory):
+
+  class Meta:
+    model = models.Workflow
+
+  context = factory.SubFactory(ContextFactory)
+  recurrences = False
+  unit = models.Workflow.WEEK_UNIT
+  repeat_every = 1
+  next_cycle_start_date = date.today()
+
+
 class TaskGroupFactory(TitledFactory):
 
   class Meta:
