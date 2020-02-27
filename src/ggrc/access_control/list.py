@@ -70,6 +70,11 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       cascade='all, delete-orphan',
   )
 
+  access_control_role = db.relationship(
+      "AccessControlRole",
+      uselist=False
+  )
+
   @property
   def people_json(self):
     """Get json representation of people in ACL."""
@@ -185,3 +190,9 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
     self._remove_people(existing_people - new_people)
     self._add_people(new_people - existing_people)
     return existing_people != new_people
+
+  def log_json(self):
+    out_json = super(AccessControlList, self).log_json()
+    if self.access_control_role is not None:
+      out_json["ac_role"] = self.access_control_role.log_json()
+    return out_json
