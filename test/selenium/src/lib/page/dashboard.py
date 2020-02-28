@@ -152,6 +152,10 @@ class Header(GenericHeader):
 class Dashboard(widget_bar.Dashboard):
   """Main dashboard page."""
   # pylint: disable=abstract-method
+  def __init__(self, root_element=None):
+    super(Dashboard, self).__init__()
+    if root_element:
+      self._browser = root_element
 
   @property
   def header(self):
@@ -204,6 +208,24 @@ class Dashboard(widget_bar.Dashboard):
     #   is removed only at end.
     self._browser.element(class_name="internav").\
         wait_until(lambda e: e.present)
+
+  @property
+  def get_started_widget(self):
+    """Returns Get Started Widget element."""
+    widget = self._browser.element(class_name="get-started")
+    widget.wait_until(lambda e: e.exists)
+    return widget
+
+  @property
+  def my_active_workflows_widget(self):
+    """Returns My Active Workflows element."""
+    return self._browser.element(class_name="dashboard-workflows")
+
+  @property
+  def is_opened(self):
+    """Returns True if Dashboard page is opened."""
+    return (self.get_started_widget.exists and
+            self.my_active_workflows_widget.exists)
 
 
 class CreateObjectDropdown(base.Widget):

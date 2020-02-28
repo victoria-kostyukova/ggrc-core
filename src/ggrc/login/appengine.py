@@ -17,8 +17,10 @@ E.g., ``login: required`` must be specified *at least* for the '/login' route.
 import logging
 
 from google.appengine.api import users
+
 import flask
 import flask_login
+
 from ggrc.login import common
 from ggrc.utils.user_generator import find_or_create_user_by_email
 
@@ -56,7 +58,7 @@ def logout():
 
 
 def request_loader(request):
-  """Get the user provided in X-GGRC-user if whitelisted Appid provided."""
+  """Get the user provided in X-GGRC-user if whitelisted App id provided."""
   if not common.check_appengine_appid(request):
     return None
 

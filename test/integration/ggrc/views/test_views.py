@@ -5,8 +5,10 @@
 import json
 
 import ddt
+import mock
 import sqlalchemy as sa
 
+from ggrc import login
 from ggrc.models.relationship import Relationship
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -150,3 +152,37 @@ class TestUnmapObjects(TestCase):
 
     self.assertEqual(None, Relationship.query.get(relationship_1))
     self.assertEqual(None, Relationship.query.get(relationship_2))
+
+
+@mock.patch('ggrc.login._get_current_logged_user')
+class TestRedirectsForLoggedInUser(TestCase):
+  """Test for redirects for authorized user."""
+
+  ENDPOINT_URL = "/"
+  DASHBOARD_URL = "/dashboard"
+
+  def test_redirect_logged_in(self, current_user_mock):
+    """Test that authenticated user get redirected to dashboard."""
+    user_mock = mock.MagicMock()
+    user_mock.is_authenticated.return_value = True
+    current_user_mock.return_value = user_mock
+
+    logged_in_user = login.get_current_user()
+
+    self.assertEqual(logged_in_user.is_authenticated(), True)
+    resp = self.client.get(self.ENDPOINT_URL)
+    self.assertEqual(resp.status_code, 302)
+    self.assertIn(self.DASHBOARD_URL, resp.data)
+
+  def test_redirect_not_logged_in(self, current_user_mock):
+    """Test that not authenticated user not redirected to dashboard."""
+    user_mock = mock.MagicMock()
+    user_mock.is_authenticated.return_value = False
+    current_user_mock.return_value = user_mock
+
+    logged_in_user = login.get_current_user()
+
+    self.assertEqual(logged_in_user.is_authenticated(), False)
+    resp = self.client.get(self.ENDPOINT_URL)
+    self.assertEqual(resp.status_code, 200)
+    self.assertNotIn("Path=/dashboard", resp.data)
