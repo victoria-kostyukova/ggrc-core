@@ -8,6 +8,7 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import template from './multiselect-form-field.stache';
+import '../../dropdown/multiselect-dropdown';
 
 export default canComponent.extend({
   tag: 'multiselect-form-field',
