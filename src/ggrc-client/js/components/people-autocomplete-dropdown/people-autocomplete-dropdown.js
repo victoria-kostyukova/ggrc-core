@@ -31,6 +31,7 @@ export default canComponent.extend({
         value: false,
       },
     },
+    initialEmail: null,
     currentValue: null,
     boundOnWindowClick: null,
     personSelected({item: person}) {

@@ -18,7 +18,8 @@
     <people-autocomplete-dropdown currentValue:from="searchValue"
       showResults:bind="showResults"
       actionKey:from="actionKey"
-      on:vm:personSelected="personSelected(scope.event)">
+      on:vm:personSelected="personSelected(scope.event)"
+      initialEmail:from="personEmail">
     </people-autocomplete-dropdown>
   {{/if}}
 </div>
