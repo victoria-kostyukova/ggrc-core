@@ -33,6 +33,11 @@ export default canComponent.extend({
       },
     },
     getResult(value) {
+      if (!value) {
+        this.attr('showResults', false);
+        return;
+      }
+
       const type = this.attr('modelName');
       const externalServiceUrl = GGRC.config.external_services[type];
 
