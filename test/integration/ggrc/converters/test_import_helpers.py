@@ -747,3 +747,37 @@ class TestGetObjectColumnDefinitions(TestCase):
         "GDrive Folder ID",
     }
     self._test_single_object(model, names, self.COMMON_EXPECTED)
+
+  def test_evidence_definitions(self):
+    """Test default headers for Evidence."""
+    names = {
+        "Title",
+        "Description",
+        "Notes",
+        "Admin",
+        "Code",
+        "Last Deprecated Date",
+        "State",
+        "Recipients",
+        "Send by default",
+        "Comments",
+        "Created Date",
+        "Last Updated Date",
+        "Last Updated By",
+        'Type',
+        'Archived',
+        'Link',
+        'Delete'
+    }
+    expected_fields = {
+        "mandatory": {
+            "Title",
+            "Admin",
+            "Code",
+        },
+        "unique": {
+            "Code",
+        },
+    }
+    self._test_single_object(all_models.Evidence, names, expected_fields,
+                             has_mappings=False)
