@@ -103,6 +103,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
           "display_name": "Archived",
           "mandatory": False
       },
+      "notes": "Notes"
   }
 
   _allowed_parents = {'Assessment', 'Audit'}
