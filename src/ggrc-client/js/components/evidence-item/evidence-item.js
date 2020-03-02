@@ -20,10 +20,12 @@ export default canComponent.extend({
           const isNew = this.attr('evidence').isNew();
           return !this.attr('isEditIconDenied')
             && !this.attr('isLoading')
+            && !this.attr('isArchived')
             && !isNew;
         },
       },
     },
+    isArchived: false,
     editMode: false,
     isEditIconDenied: false,
     isLoading: false,

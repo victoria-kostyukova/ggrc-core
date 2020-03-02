@@ -13,6 +13,14 @@ export default canComponent.extend({
   view: canStache(template),
   leakScope: true,
   viewModel: canMap.extend({
+    define: {
+      hideButton: {
+        get() {
+          return this.instance.attr('status') === 'Deprecated'
+            || this.attr('formEditMode');
+        },
+      },
+    },
     instance: null,
     formEditMode: false,
     disabled: false,
