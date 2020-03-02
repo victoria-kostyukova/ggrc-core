@@ -278,6 +278,8 @@ def _get_assignable_dict(people, notif, ca_cache=None):
                 "url": get_object_url(obj),
                 "notif_created_at": {
                     notif.id: as_user_time(notif.created_at)},
+                "obj_created_at": {
+                    obj.id: as_user_time(obj.created_at)},
                 "notif_updated_at": {
                     notif.id: as_user_time(notif.updated_at)},
                 "updated_data": updated_data,
