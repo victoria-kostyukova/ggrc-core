@@ -49,6 +49,18 @@ export default canComponent.extend({
       },
       type: {
         value: attrs.type,
+        /*
+        * When object type is changed it should be needed to change a config.
+        * For example, if not set a special config for type [TYPE] then is used
+        * general config, otherwise special config.
+        */
+        set(mapType) {
+          if (mapType === this.type) {
+            return mapType;
+          }
+          this.setNewType(mapType);
+          return mapType;
+        },
       },
       relevantTo: {
         value: () => parentViewModel.attr('relevantTo'),

@@ -44,6 +44,18 @@ export default ObjectOperationsBaseVM.extend({
   },
   type: {
     value: 'Assessment',
+    /*
+    * When object type is changed it should be needed to change a config.
+    * For example, if not set a special config for type [TYPE] then is used
+    * general config, otherwise special config.
+    */
+    set(mapType) {
+      if (mapType === this.type) {
+        return mapType;
+      }
+      this.setNewType(mapType);
+      return mapType;
+    },
   },
   element: {
     value: null,

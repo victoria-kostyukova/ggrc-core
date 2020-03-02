@@ -126,6 +126,18 @@ export default canComponent.extend({
       },
       type: {
         value: () => getDefaultType(resolvedConfig.type, resolvedConfig.object),
+        /*
+        * When object type is changed it should be needed to change a config.
+        * For example, if not set a special config for type [TYPE] then is used
+        * general config, otherwise special config.
+        */
+        set(mapType) {
+          if (mapType === this.type) {
+            return mapType;
+          }
+          this.setNewType(mapType);
+          return mapType;
+        },
       },
       config: {
         value: () => config,
@@ -192,6 +204,12 @@ export default canComponent.extend({
        */
       freezedConfigTillSubmit: {
         value: () => ({}),
+      },
+      isMegaObject: {
+        value: false,
+      },
+      megaRelation: {
+        value: '',
       },
       showAsSnapshots() {
         return this.freezedConfigTillSubmit

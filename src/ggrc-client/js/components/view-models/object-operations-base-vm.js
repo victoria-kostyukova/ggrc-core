@@ -83,22 +83,7 @@ const ObjectOperationsBaseVM = canDefineMap.extend({
       if (mapType === this.type) {
         return mapType;
       }
-
-      let config = this.config || {};
-      let resultConfig = ObjectOperationsBaseVM.extractConfig(
-        mapType,
-        config.serialize()
-      );
-
-      // We remove type because update action can make recursion (when we set
-      // type)
-      delete resultConfig.type;
-
-      this.update(resultConfig);
-      this.currConfig = resultConfig;
-      this.resultsRequested = false;
-      this.entriesTotalCount = '';
-
+      this.setNewType(mapType);
       return mapType;
     },
   },
@@ -165,8 +150,30 @@ const ObjectOperationsBaseVM = canDefineMap.extend({
   useSnapshots: {
     value: false,
   },
+  'join-object-id': {
+    value: '',
+  },
+  relevantTo: {
+    value: null,
+  },
   onSearchCallback: {
     value: () => $.noop(),
+  },
+  setNewType(mapType) {
+    let config = this.config || {};
+    let resultConfig = ObjectOperationsBaseVM.extractConfig(
+      mapType,
+      config.serialize()
+    );
+
+    // We remove type because update action can make recursion (when we set
+    // type)
+    delete resultConfig.type;
+
+    this.update(resultConfig);
+    this.currConfig = resultConfig;
+    this.resultsRequested = false;
+    this.entriesTotalCount = '';
   },
   onSubmit() {
     this.is_loading = true;

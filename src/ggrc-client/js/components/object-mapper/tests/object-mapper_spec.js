@@ -123,6 +123,7 @@ describe('object-mapper component', () => {
     describe('onSubmit() method', () => {
       beforeEach(() => {
         viewModel.assign({
+          type: 'Control',
           freezedConfigTillSubmit: null,
           currConfig: {
             a: 1,

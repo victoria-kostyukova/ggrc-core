@@ -26,9 +26,6 @@ export default canComponent.extend({
       object: {
         value: 'MultitypeSearch',
       },
-      type: {
-        value: 'Control',
-      },
     });
   },
 });
