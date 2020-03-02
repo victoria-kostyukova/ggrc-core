@@ -19,4 +19,10 @@
   .completed-percent {
     color: $darkGray;
   }
+
+  .active-workflow-header {
+    background-color: $white;
+    padding: 5px 10px;
+    cursor: default;
+  }
 }
