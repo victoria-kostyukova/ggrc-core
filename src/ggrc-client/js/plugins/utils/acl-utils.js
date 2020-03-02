@@ -126,6 +126,22 @@ function isAuditor(audit, user) {
                  acl.person_id === user.id).length > 0;
 }
 
+/**
+ * Compute a list of role names that a person has.
+ *
+ * @param {Cacheable} instance - a model instance
+ * @param {Object} person - person object
+ *
+ * @return {Array} - list of role names
+ */
+function getPersonRoleNames(instance, person) {
+  const personRoleNames =
+    instance.attr('access_control_list')
+      .filter((item) => item.person_id === person.id)
+      .map((role) => getRoleById(role.ac_role_id).name);
+  return personRoleNames;
+}
+
 export {
   peopleWithRoleName,
   peopleWithRoleId,
@@ -133,4 +149,5 @@ export {
   getRole,
   getRoleById,
   isAuditor,
+  getPersonRoleNames,
 };

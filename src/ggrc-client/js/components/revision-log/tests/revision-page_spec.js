@@ -8,6 +8,7 @@ import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
+import * as ACLUtils from '../../../plugins/utils/acl-utils';
 
 describe('revision-page component', function () {
   let viewModel;
@@ -160,6 +161,7 @@ describe('revision-page component', function () {
 
     beforeEach(function () {
       spyOn(viewModel, '_objectCADiff').and.returnValue({});
+      spyOn(ACLUtils, 'getPersonRoleNames').and.returnValue([]);
     });
 
     beforeEach(function () {
@@ -218,7 +220,7 @@ describe('revision-page component', function () {
         };
 
         let result = viewModel._objectChangeDiff(rev1, rev2);
-        expect(result.role).toEqual('none');
+        expect(result.madeBy).toEqual('User 7');
       });
 
     it('dooes not include author\'s details ' +
@@ -236,7 +238,6 @@ describe('revision-page component', function () {
 
       let result = viewModel._objectChangeDiff(rev1, rev2);
       expect(result.madeBy).toBeNull();
-      expect(result.role).toEqual('none');
     });
 
     describe('with model attributes definitions defined', function () {
@@ -557,6 +558,7 @@ describe('revision-page component', function () {
 
   describe('_mappingChange() method', function () {
     beforeEach(function () {
+      spyOn(ACLUtils, 'getPersonRoleNames').and.returnValue([]);
       viewModel.attr('instance', {
         id: 123,
         type: 'ObjectFoo',
@@ -587,7 +589,7 @@ describe('revision-page component', function () {
 
       expect(result).toEqual({
         madeBy: 'User 17',
-        role: 'none',
+        roles: [],
         updatedAt: new Date('2015-05-17T17:24:01'),
         changes: {
           origVal: '—',
@@ -622,7 +624,7 @@ describe('revision-page component', function () {
 
       expect(result).toEqual({
         madeBy: 'User 17',
-        role: 'none',
+        roles: [],
         updatedAt: new Date('2015-05-17T17:24:01'),
         changes: {
           origVal: 'Created',
@@ -655,7 +657,7 @@ describe('revision-page component', function () {
 
       expect(result).toEqual({
         madeBy: null,
-        role: 'none',
+        roles: [],
         updatedAt: new Date('2015-05-17T17:24:01'),
         changes: {
           origVal: '—',
@@ -702,7 +704,7 @@ describe('revision-page component', function () {
 
       expect(result).toEqual({
         madeBy: 'User 17',
-        role: 'none',
+        roles: [],
         updatedAt: new Date('2015-05-17T17:24:01'),
         changes: {
           origVal: '—',
@@ -749,7 +751,7 @@ describe('revision-page component', function () {
           'DestinationType "DestinationTitle" to SourceType "SourceTitle")',
         },
         updatedAt: new Date('2015-05-17T17:24:01'),
-        role: 'none',
+        roles: [],
         changes: {
           origVal: '—',
           newVal: '',

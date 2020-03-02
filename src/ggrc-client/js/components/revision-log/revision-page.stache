@@ -11,7 +11,7 @@
   {{else}}
     {{#changeHistory}}
       <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
-        <span class="person-label {{lowercase role }}"></span>
+        <role-avatar person:from="madeBy" roles:from="roles"/>
         <div class="w-status">
           <div class="entry-author">
             {{#if automapping}}
