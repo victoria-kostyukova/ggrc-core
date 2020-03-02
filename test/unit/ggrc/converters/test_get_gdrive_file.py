@@ -15,7 +15,7 @@ from ggrc.gdrive import file_actions
 class TestGetGDRiveFile(unittest.TestCase):
   """Test getter info from GDrive."""
 
-  CSV_DATA = ('Object_tyle,Code*,Title*,LIST*\n'
+  CSV_DATA = ('Object type,Code*,Title*,LIST*\n'
               ',OBJ-1185,OBJ_title,"user1\nuser2"')
 
   @ddt.data(
@@ -34,7 +34,7 @@ class TestGetGDRiveFile(unittest.TestCase):
       data_getter = disco_files.export_media.return_value.execute
     data_getter.return_value = self.CSV_DATA
     self.assertEqual(
-        [[u'Object_tyle', u'Code*', u'Title*', u'LIST*'],
+        [[u'Object type', u'Code*', u'Title*', u'LIST*'],
          [u'', u'OBJ-1185', u'OBJ_title', u'user1\nuser2']],
         file_actions.get_gdrive_file(file_data))
     auth_mock.assert_called_once_with()

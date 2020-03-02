@@ -75,6 +75,10 @@ class ReservedNameError(ValueError):
   pass
 
 
+class WrongDelimiterError(ValueError):
+  pass
+
+
 class ExportStoppedException(RuntimeError):
   pass
 

@@ -13,6 +13,8 @@ import unittest
 from ggrc import db
 from ggrc.models import AccessGroup
 from ggrc.models import Program
+from ggrc.gdrive import errors as gdrive_errors
+from ggrc.models import exceptions
 from ggrc.converters import errors
 from ggrc_basic_permissions import Role
 from ggrc_basic_permissions import UserRole
@@ -302,4 +304,42 @@ class TestComprehensiveSheets(TestCase):
             },
         },
     }
+    self._check_csv_response(response, expected_errors)
+
+  def test_import_with_semicolon_delimiter(self):
+    """Test import csv file with ";" delimiter."""
+    # pylint: disable=invalid-name
+    response = self.import_file(
+        "object_with_semicolon_delimiter.csv",
+        safe=False
+    )
+    expected_errors = {}
+    self._check_csv_response(response, expected_errors)
+
+  def test_import_with_nonstandard_delimiter(self):
+    """Test import csv file with "$" delimiter, should raise an error."""
+    # pylint: disable=invalid-name
+    with self.assertRaises(exceptions.WrongDelimiterError) as ex:
+      self.import_file(
+          "object_with_dollar_delimiter.csv",
+          safe=False
+      )
+    self.assertEqual(
+        gdrive_errors.WRONG_DELIMITER_IN_CSV,
+        ex.exception.message
+    )
+
+  def test_import_with_obscure_delimiter(self):
+    """Test import csv file with multiple "Object type" text.
+
+    Test for atypical situation when "Object type" is present in
+    multiple locations in the csv file. It shouldn't affect finding
+    the right delimiter and import of csv file.
+    """
+    # pylint: disable=invalid-name
+    response = self.import_file(
+        "object_with_obscure_delimiter.csv",
+        safe=False
+    )
+    expected_errors = {}
     self._check_csv_response(response, expected_errors)

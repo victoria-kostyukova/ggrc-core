@@ -1,0 +1,16 @@
+Object type$Must be unique. Can be left empty for auto generation. If updating or deleting, code is required$$$$$Automatically provided values$"Allowed values are:
+Draft
+Active
+Deprecated"$$$Automatically provided values$Automatically provided values$New line separated list of Reference URLs.$Automatically provided values$Automatically provided values$Automatically provided values$Add 'GDrive Folder ID' that is part of drive link to a folder 'https://drive.google.com/corp/drive/folders/XXX', where XXX is a 'GDrive Folder ID'$"Multiple values are allowed.
+Delimiter is 'line break'.
+Allowed values are emails"$"Multiple values are allowed.
+Delimiter is 'line break'.
+Allowed values are emails"$"Multiple values are allowed.
+Delimiter is 'line break'.
+Allowed values are emails"$"Multiple values are allowed.
+Delimiter is 'line break'.
+Allowed values are emails"$"Multiple values are allowed.
+Delimiter is 'line break'.
+Allowed values are emails"$"Multiple values are allowed. Delimiter is ""double semi-colon separated values"" ("";;"")"". To mention person at the comment use the following format <a href=""mailto:some_user@example.com"">+some_user@example.com</a>."$$$$$$$$$$$$$$$$$$$$$$$$$$
+Program$Code*$Title*$Description$Notes$Effective Date$Last Deprecated Date$State$Review State$Reviewers$Recipients$Send by default$Reference URL$Last Updated Date$Last Updated By$Created Date$GDrive Folder ID$Primary Contacts$Program Editors$Program Managers*$Program Readers$Secondary Contacts$Comments$map:access group$map:account balance$map:contract$map:control$map:cycle task group object task$map:data asset$map:facility$map:issue$map:key report$map:market$map:metric$map:objective$map:org group$map:policy$map:process$map:product$map:product group$map:project$map:regulation$map:requirement$map:risk$map:standard$map:system$map:technology environment$map:threat$map:vendor
+$PROGRAM-1$test program$$$$$Draft$Unreviewed$$Program Readers,Program Managers,Secondary Contacts,Primary Contacts,Program Editors$yes$$02/14/2020$user@example.com$02/14/2020$$$$user@example.com$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
