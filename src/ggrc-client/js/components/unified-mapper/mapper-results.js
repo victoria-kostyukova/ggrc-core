@@ -66,7 +66,8 @@ export default canComponent.extend({
         get() {
           const workflowParts
             = ['CycleTaskGroupObjectTask', 'TaskGroup', 'TaskGroupTask'];
-          return workflowParts.includes(this.attr('type'));
+          return workflowParts.includes(this.attr('type'))
+            && this.attr('searchOnly');
         },
       },
     },
