@@ -59,6 +59,15 @@ describe('people-autocomplete-wrapper component', () => {
       GGRC.config.external_services = originalValue;
     });
 
+    it('sets false to "showResults" if value is empty', () => {
+      vm.attr('showResults', true);
+      const value = '';
+
+      vm.getResult(value);
+
+      expect(vm.attr('showResults')).toBe(false);
+    });
+
     describe('if externalServiceUrl is defined', () => {
       let getDfd;
       let modelName;
