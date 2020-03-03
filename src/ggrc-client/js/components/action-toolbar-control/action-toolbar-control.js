@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 export default canComponent.extend({
   tag: 'action-toolbar-control',
@@ -12,6 +12,6 @@ export default canComponent.extend({
     '<div class="action-toolbar__controls-item"><content/></div>'
   ),
   leakScope: true,
-  viewModel: canMap.extend({}),
+  ViewModel: canDefineMap.extend({}),
 });
 
