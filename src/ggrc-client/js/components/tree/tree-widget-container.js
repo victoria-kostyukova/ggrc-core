@@ -35,7 +35,7 @@ import '../create-document-button/create-document-button';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
 import '../tree-view-filter/tree-view-filter';
-
+import loGet from 'lodash/get';
 import template from './templates/tree-widget-container.stache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {
@@ -297,11 +297,16 @@ const ViewModel = canDefineMap.extend({
     this._triggerListeners(true);
   },
   _widgetShown() {
+    const countsName = this.options.countsName;
+    const total = this.pageInfo.attr('total');
+    const counts = loGet(getCounts(), countsName);
     this._triggerListeners();
 
     if (this.refetch ||
       router.attr('refetch') ||
-      this.options.forceRefetch) {
+      this.options.forceRefetch ||
+      // this condition is mostly for Issues, Documents and Evidence as they can be created from other object info pane
+      (total !== counts)) {
       this.loadItems();
       this.refetch = false;
     }
