@@ -27,12 +27,14 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import './revision-log-data';
+import '../role-avatar/role-avatar';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import template from './revision-page.stache';
 import Person from '../../models/business-models/person';
 import Stub from '../../models/stub';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {reify} from '../../plugins/utils/reify-utils';
+import {getPersonRoleNames} from '../../plugins/utils/acl-utils';
 
 const EMPTY_DIFF_VALUE = '—';
 
@@ -153,7 +155,7 @@ export default canComponent.extend({
 
       diff.madeBy = rev2.modified_by;
       diff.updatedAt = rev2.updated_at;
-      diff.role = 'none';
+      diff.roles = getPersonRoleNames(this.attr('instance'), rev2.modified_by);
 
       loForEach(rev2.content, function (value, fieldName) {
         let origVal = rev1.content[fieldName];
@@ -430,7 +432,9 @@ export default canComponent.extend({
       let newVal;
       let previous;
       let automapping;
-      let person;
+      const person = revision.modified_by;
+      const personName =
+        person ? person.name || person.email : '"unknown" user';
 
       if (revision.destination_type === this.attr('instance.type') &&
         revision.destination_id === this.attr('instance.id')) {
@@ -473,13 +477,9 @@ export default canComponent.extend({
         if (automapping.source instanceof Stub) {
           automapping.source = reify(automapping.source);
         }
-        if (revision.modified_by) {
-          person = revision.modified_by.name || revision.modified_by.email;
-        } else {
-          person = '"unknown" user';
-        }
+
         const automappingTitle =
-          `(automapping triggered after ${person} mapped ` +
+          `(automapping triggered after ${personName} mapped ` +
           `${automapping.destination.type} "${automapping.destination.title}"` +
           ` to ${automapping.source.type} "${automapping.source.title}")`;
         return {
@@ -487,7 +487,7 @@ export default canComponent.extend({
             title: automappingTitle,
           },
           updatedAt: revision.updated_at,
-          role: 'none',
+          roles: getPersonRoleNames(this.attr('instance'), person),
           changes: {
             origVal: origVal,
             newVal: newVal,
@@ -499,7 +499,7 @@ export default canComponent.extend({
       return {
         madeBy: revision.modified_by,
         updatedAt: revision.updated_at,
-        role: 'none',
+        roles: getPersonRoleNames(this.attr('instance'), person),
         changes: {
           origVal: origVal,
           newVal: newVal,

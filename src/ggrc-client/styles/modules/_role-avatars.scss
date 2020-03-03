@@ -1,0 +1,29 @@
+/*
+ * Copyright (C) 2020 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.assignees-avatar {
+    background: $olive;	
+    &:after {	
+      content: "A";	
+    }
+  }
+  .creators-avatar {
+    background: $orange;
+    &:after {
+      content: "C";
+    }
+  }
+  .verifiers-avatar {
+    background: $orange;
+    &:after {
+      content: "V";
+    }
+  }
+  .none-avatar {
+    background: $lightGray;
+    &:after {
+      content: "N";
+    }
+  }
