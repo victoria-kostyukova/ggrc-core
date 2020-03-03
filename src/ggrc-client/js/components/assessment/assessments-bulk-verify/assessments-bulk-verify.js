@@ -10,22 +10,26 @@ import AssessmentsBulkUpdate from '../view-models/assessments-bulk-updatable-vm'
 import {STATES_KEYS} from '../../../plugins/utils/state-utils';
 import {request} from '../../../plugins/utils/request-utils';
 
-const viewModel = AssessmentsBulkUpdate.extend({
-  define: {
-    isVerifyButtonDisabled: {
-      get() {
-        return (
-          this.attr('selected.length') === 0 ||
-          this.attr('isVerifying')
-        );
-      },
+const ViewModel = AssessmentsBulkUpdate.extend({
+  isVerifyButtonDisabled: {
+    get() {
+      return (
+        this.selected.length === 0 ||
+        this.isVerifying
+      );
     },
   },
-  statesCollectionKey: STATES_KEYS.BULK_VERIFY,
-  isVerifying: false,
-  filterOperatorOptions: null,
+  statesCollectionKey: {
+    value: () => STATES_KEYS.BULK_VERIFY,
+  },
+  isVerifying: {
+    value: false,
+  },
+  filterOperatorOptions: {
+    value: null,
+  },
   async onVerifyClick() {
-    this.attr('isVerifying', true);
+    this.isVerifying = true;
     try {
       const {id} = await request('/api/bulk_operations/verify', {
         assessments_ids: this.getSelectedAssessmentsIds(),
@@ -35,7 +39,7 @@ const viewModel = AssessmentsBulkUpdate.extend({
     } catch (err) {
       this.handleBulkUpdateErrors();
     } finally {
-      this.attr('isVerifying', false);
+      this.isVerifying = false;
     }
   },
   init() {
@@ -55,7 +59,7 @@ const viewModel = AssessmentsBulkUpdate.extend({
 
     // disable ability to change default operator for all of the attributes
     // in advanced search (except in grouped filter)
-    this.attr('filterOperatorOptions', operatorOptions);
+    this.filterOperatorOptions = operatorOptions;
 
     this.initDefaultFilter(attributeFilter, operatorOptions);
     this.initFilterAttributes();
@@ -64,7 +68,7 @@ const viewModel = AssessmentsBulkUpdate.extend({
 
 const events = {
   inserted() {
-    this.viewModel.attr('element', this.element);
+    this.viewModel.element = this.element;
     this.viewModel.onSubmit();
   },
 };
@@ -72,6 +76,6 @@ const events = {
 export default canComponent.extend({
   tag: 'assessments-bulk-verify',
   view: canStache(template),
-  viewModel,
+  ViewModel,
   events,
 });

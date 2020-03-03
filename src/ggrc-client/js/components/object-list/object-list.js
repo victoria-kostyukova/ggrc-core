@@ -98,7 +98,7 @@ export default canComponent.extend({
           item.removeAttr('isSelected', false);
         } else {
           // item is DefineMap
-          delete item.isSelected;
+          item.isSelected = undefined;
         }
       });
       this.attr('selectedItem.el', null);

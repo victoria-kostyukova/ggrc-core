@@ -21,16 +21,16 @@ describe('create-and-map component', () => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('allowedToCreate get prop', function () {
+  describe('allowedToCreate get prop', () => {
     it('returns false if user does not have permissions to create object',
       () => {
         spyOn(Permission, 'isAllowedAny').and.returnValue(false);
 
-        viewModel.attr('source',
-          makeFakeInstance({model: NotSnapshotableModel})());
-        viewModel.attr('destinationModel', SnapshotableModel);
+        viewModel.source =
+          makeFakeInstance({model: NotSnapshotableModel})();
+        viewModel.destinationModel = SnapshotableModel;
 
-        let result = viewModel.attr('allowedToCreate');
+        let result = viewModel.allowedToCreate;
         expect(result).toBeFalsy();
       });
 
@@ -38,11 +38,11 @@ describe('create-and-map component', () => {
       'destination is snapshotable', () => {
       spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-      viewModel.attr('sourceType', AuditScopeModel.model_singular);
-      viewModel.attr('source', makeFakeInstance({model: AuditScopeModel})());
-      viewModel.attr('destinationModel', SnapshotableModel);
+      viewModel.sourceType = AuditScopeModel.model_singular;
+      viewModel.source = makeFakeInstance({model: AuditScopeModel})();
+      viewModel.destinationModel = SnapshotableModel;
 
-      let result = viewModel.attr('allowedToCreate');
+      let result = viewModel.allowedToCreate;
       expect(result).toBeFalsy();
     });
 
@@ -50,10 +50,10 @@ describe('create-and-map component', () => {
       'destination is not snapshotable', () => {
       spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-      viewModel.attr('source', makeFakeInstance({model: AuditScopeModel})());
-      viewModel.attr('destinationModel', NotSnapshotableModel);
+      viewModel.source = makeFakeInstance({model: AuditScopeModel})();
+      viewModel.destinationModel = NotSnapshotableModel;
 
-      let result = viewModel.attr('allowedToCreate');
+      let result = viewModel.allowedToCreate;
       expect(result).toBeTruthy();
     });
 
@@ -61,11 +61,11 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-        viewModel.attr('sourceType', 'Audit');
-        viewModel.attr('source', makeFakeInstance({model: Audit})());
-        viewModel.attr('destinationModel', SnapshotableModel);
+        viewModel.sourceType = 'Audit';
+        viewModel.source = makeFakeInstance({model: Audit})();
+        viewModel.destinationModel = SnapshotableModel;
 
-        let result = viewModel.attr('allowedToCreate');
+        let result = viewModel.allowedToCreate;
         expect(result).toBeFalsy();
       });
 
@@ -73,10 +73,10 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-        viewModel.attr('source', makeFakeInstance({model: Audit})());
-        viewModel.attr('destinationModel', NotSnapshotableModel);
+        viewModel.source = makeFakeInstance({model: Audit})();
+        viewModel.destinationModel = NotSnapshotableModel;
 
-        let result = viewModel.attr('allowedToCreate');
+        let result = viewModel.allowedToCreate;
         expect(result).toBeTruthy();
       });
 
@@ -84,12 +84,12 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-        viewModel.attr('sourceType', SnapshotableModel.model_singular);
-        viewModel.attr('source',
-          makeFakeInstance({model: SnapshotableModel})());
-        viewModel.attr('destinationModel', Audit);
+        viewModel.sourceType = SnapshotableModel.model_singular;
+        viewModel.source =
+          makeFakeInstance({model: SnapshotableModel})();
+        viewModel.destinationModel = Audit;
 
-        let result = viewModel.attr('allowedToCreate');
+        let result = viewModel.allowedToCreate;
         expect(result).toBeFalsy();
       });
 
@@ -97,11 +97,11 @@ describe('create-and-map component', () => {
       () => {
         spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-        viewModel.attr('source',
-          makeFakeInstance({model: NotSnapshotableModel})());
-        viewModel.attr('destinationModel', Audit);
+        viewModel.source =
+          makeFakeInstance({model: NotSnapshotableModel})();
+        viewModel.destinationModel = Audit;
 
-        let result = viewModel.attr('allowedToCreate');
+        let result = viewModel.allowedToCreate;
         expect(result).toBeTruthy();
       });
 
@@ -109,11 +109,11 @@ describe('create-and-map component', () => {
       'neither Audit nor audit-scope model', () => {
       spyOn(Permission, 'isAllowedAny').and.returnValue(true);
 
-      viewModel.attr('source',
-        makeFakeInstance({model: NotSnapshotableModel})());
-      viewModel.attr('destinationModel', SnapshotableModel);
+      viewModel.source =
+        makeFakeInstance({model: NotSnapshotableModel})();
+      viewModel.destinationModel = SnapshotableModel;
 
-      let result = viewModel.attr('allowedToCreate');
+      let result = viewModel.allowedToCreate;
       expect(result).toBeTruthy();
     });
   });
@@ -122,10 +122,8 @@ describe('create-and-map component', () => {
     let handler;
 
     beforeEach(() => {
-      viewModel.attr({
-        source: {id: 123},
-        newEntries: [1],
-      });
+      viewModel.source = {id: 123};
+      viewModel.newEntries = [1];
 
       spyOn(viewModel, 'mapObjects');
       spyOn(viewModel, 'cancel');
@@ -154,7 +152,7 @@ describe('create-and-map component', () => {
       });
 
     it('does not calls mapObjects if there are no newEntries', () => {
-      viewModel.attr('newEntries', []);
+      viewModel.newEntries = [];
       let options = {
         uniqueId: 123,
       };
@@ -167,12 +165,12 @@ describe('create-and-map component', () => {
   describe('megaRelation getter', () => {
     it('should return the last set value', () => {
       const lastValue = 'parent';
-      viewModel.attr('megaRelation', lastValue);
-      expect(viewModel.attr('megaRelation')).toBe(lastValue);
+      viewModel.megaRelation = lastValue;
+      expect(viewModel.megaRelation).toBe(lastValue);
     });
 
     it('should return "child" if the value was not set before', () => {
-      expect(viewModel.attr('megaRelation')).toBe('child');
+      expect(viewModel.megaRelation).toBe('child');
     });
   });
 });

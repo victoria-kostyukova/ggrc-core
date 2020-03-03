@@ -3,119 +3,136 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
+
+const ViewModel = canDefineMap.extend({
+  state: {
+    value: null,
+  },
+  selectedItems: {
+    value: () => [],
+  },
+  items: {
+    value: () => [],
+  },
+  // This is an array by default replace with deferred on actual load
+  allItems: {
+    value: () => [],
+  },
+  disabledIds: {
+    value: () => [],
+  },
+  allSelected: {
+    value: false,
+  },
+  selectAllCheckboxValue: {
+    value: false,
+  },
+  select(item) {
+    let id = item.id;
+    let type = item.type;
+
+    if (this.indexOfSelected(id, type) < 0) {
+      this.selectedItems.push(item);
+      this.markItem(id, type, true);
+    } else {
+      console.warn(`Same Object is Selected Twice! id: ${id} type: ${type}`);
+    }
+  },
+  deselect(item) {
+    let id = item.id;
+    let type = item.type;
+    let list = this.selectedItems;
+    let index = this.indexOfSelected(id, type);
+    if (index >= 0) {
+      list.splice(index, 1);
+      this.markItem(id, type, false);
+      this.allSelected = false;
+    }
+  },
+  indexOfSelected(id, type) {
+    let list = this.selectedItems;
+    let index = -1;
+    list.each(function (item, i) {
+      if (id === item.id && type === item.type) {
+        index = i;
+        return false;
+      }
+    });
+    return index;
+  },
+  markItem(id, type, isSelected) {
+    this.items.each((item) => {
+      if (id === item.id && type === item.type) {
+        item.markedSelected = isSelected;
+        return false;
+      }
+    });
+  },
+  toggleItems(isSelected) {
+    this.items.each((item) => {
+      if (!item.isDisabled) {
+        item.markedSelected = isSelected;
+      }
+    });
+  },
+  markSelectedItems() {
+    this.selectedItems.each((selected) => {
+      this.markItem(selected.id, selected.type, true);
+    });
+  },
+  emptySelection() {
+    this.allSelected = false;
+    // Remove all selected items
+    this.selectedItems.replace([]);
+    // Remove visual selection
+    this.toggleItems(false);
+  },
+  deselectAll() {
+    this.emptySelection();
+  },
+  selectAll() {
+    let selectedItems;
+    let disabledIds = this.disabledIds;
+    this.allSelected = true;
+    // Replace with actual items loaded from Query API
+    this.allItems
+      .then((allItems) => {
+        selectedItems = allItems.filter((item) => {
+          return disabledIds.indexOf(item.id) < 0;
+        });
+        this.selectedItems.replace(selectedItems);
+        // Add visual selection
+        this.toggleItems(true);
+      })
+      .catch(() => {
+        this.clearSelection();
+      });
+  },
+});
+
 /**
  * Object Selection component
  */
 export default canComponent.extend({
   tag: 'object-selection',
   leakScope: true,
-  viewModel: canMap.extend({
-    state: null,
-    selectedItems: [],
-    items: [],
-    // This is an array by default replace with deferred on actual load
-    allItems: [],
-    disabledIds: [],
-    allSelected: false,
-    selectAllCheckboxValue: false,
-    select: function (item) {
-      let id = item.attr('id');
-      let type = item.attr('type');
-
-      if (this.indexOfSelected(id, type) < 0) {
-        this.attr('selectedItems').push(item);
-        this.markItem(id, type, true);
-      } else {
-        console.warn(`Same Object is Selected Twice! id: ${id} type: ${type}`);
-      }
-    },
-    deselect: function (item) {
-      let id = item.attr('id');
-      let type = item.attr('type');
-      let list = this.attr('selectedItems');
-      let index = this.indexOfSelected(id, type);
-      if (index >= 0) {
-        list.splice(index, 1);
-        this.markItem(id, type, false);
-        this.attr('allSelected', false);
-      }
-    },
-    indexOfSelected: function (id, type) {
-      let list = this.attr('selectedItems');
-      let index = -1;
-      list.each(function (item, i) {
-        if (id === item.attr('id') && type === item.attr('type')) {
-          index = i;
-          return false;
-        }
-      });
-      return index;
-    },
-    markItem: function (id, type, isSelected) {
-      this.attr('items').each(function (item) {
-        if (id === item.attr('id') && type === item.attr('type')) {
-          item.attr('markedSelected', isSelected);
-          return false;
-        }
-      });
-    },
-    toggleItems: function (isSelected) {
-      this.attr('items').each(function (item) {
-        if (!item.attr('isDisabled')) {
-          item.attr('markedSelected', isSelected);
-        }
-      });
-    },
-    markSelectedItems: function () {
-      this.attr('selectedItems').each(function (selected) {
-        this.markItem(selected.attr('id'), selected.attr('type'), true);
-      }.bind(this));
-    },
-    emptySelection: function () {
-      this.attr('allSelected', false);
-      // Remove all selected items
-      this.attr('selectedItems').replace([]);
-      // Remove visual selection
-      this.toggleItems(false);
-    },
-    deselectAll: function () {
-      this.emptySelection();
-    },
-    selectAll: function () {
-      let selectedItems;
-      let disabledIds = this.attr('disabledIds');
-      this.attr('allSelected', true);
-      // Replace with actual items loaded from Query API
-      this.attr('allItems')
-        .then((allItems) => {
-          selectedItems = allItems.filter((item) => {
-            return disabledIds.indexOf(item.id) < 0;
-          });
-          this.attr('selectedItems').replace(selectedItems);
-          // Add visual selection
-          this.toggleItems(true);
-        })
-        .catch(() => {
-          this.clearSelection();
-        });
-    },
-  }),
+  ViewModel,
   events: {
     '{viewModel.state} resetSelection'() {
       this.viewModel.emptySelection();
     },
-    '{viewModel.items} add': function () {
+    '{viewModel.items} add'() {
       this.viewModel.markSelectedItems();
     },
-    'object-selection-item selectItem': function (el, ev, item) {
+    'object-selection-item selectItem'(el, ev, item) {
       this.viewModel.select(item);
     },
-    'object-selection-item deselectItem': function (el, ev, item) {
+    'object-selection-item deselectItem'(el, ev, item) {
       this.viewModel.deselect(item);
     },
-    '{viewModel} selectAllCheckboxValue': function ([scope], ev, value) {
+    '{viewModel} selectAllCheckboxValue'([scope], ev, value) {
       if (value) {
         this.viewModel.selectAll();
       } else {

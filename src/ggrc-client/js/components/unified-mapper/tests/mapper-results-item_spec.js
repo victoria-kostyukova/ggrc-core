@@ -8,72 +8,70 @@ import Component from '../mapper-results-item';
 import Snapshot from '../../../models/service-models/snapshot';
 import Program from '../../../models/business-models/program';
 
-describe('mapper-results-item', function () {
-  'use strict';
-
+describe('mapper-results-item', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
   describe('showOpenButton get() method', () => {
     it('returns true if searchOnly attr is true', () => {
-      viewModel.attr('searchOnly', true);
-      expect(viewModel.attr('showOpenButton')).toBe(true);
+      viewModel.searchOnly = true;
+      expect(viewModel.showOpenButton).toBe(true);
     });
 
     it('returns true if it is bulk-update view', () => {
-      viewModel.attr('searchOnly', false);
+      viewModel.searchOnly = false;
       spyOn(viewModel, 'isBulkUpdateView').and.returnValue(true);
-      expect(viewModel.attr('showOpenButton')).toBe(true);
+      expect(viewModel.showOpenButton).toBe(true);
     });
 
     it('returns false if searchOnly attr is false ' +
     'and it is not bulk-update view', () => {
-      viewModel.attr('searchOnly', false);
+      viewModel.searchOnly = false;
       spyOn(viewModel, 'isBulkUpdateView').and.returnValue(false);
-      expect(viewModel.attr('showOpenButton')).toBe(false);
+      expect(viewModel.showOpenButton).toBe(false);
     });
   });
 
   describe('viewClass get() method', () => {
     it('returns "bulk-update-view" if it is bulk-update view', () => {
       spyOn(viewModel, 'isBulkUpdateView').and.returnValue(true);
-      expect(viewModel.attr('viewClass')).toBe('bulk-update-view');
+      expect(viewModel.viewClass).toBe('bulk-update-view');
     });
 
     it('returns "" if it is not bulk-update view', () => {
       spyOn(viewModel, 'isBulkUpdateView').and.returnValue(false);
-      expect(viewModel.attr('viewClass')).toBe('');
+      expect(viewModel.viewClass).toBe('');
     });
   });
 
-  describe('displayItem() method', function () {
+  describe('displayItem() method', () => {
     it('returns content of revesion if itemData.revesion defined',
-      function () {
+      () => {
         let result;
-        viewModel.attr('itemData', {
+        viewModel.itemData = {
           revision: {
             content: 'mockData',
           },
-        });
+        };
         result = viewModel.displayItem();
         expect(result).toEqual('mockData');
       });
 
-    it('returns itemData if itemData.revesion undefined',
-      function () {
+    it('returns itemData if itemData.revision undefined',
+      () => {
         let result;
-        viewModel.attr('itemData', 'mockData');
+        viewModel.itemData = 'mockData';
         result = viewModel.displayItem();
         expect(result).toEqual('mockData');
       });
   });
 
-  describe('title() method', function () {
+  describe('title() method', () => {
     let itemData;
-    beforeEach(function () {
+    beforeEach(() => {
       itemData = {
         title: 'mockTitle',
         name: 'mockName',
@@ -81,79 +79,79 @@ describe('mapper-results-item', function () {
       };
     });
 
-    it('returns item title', function () {
+    it('returns item title', () => {
       let result;
-      viewModel.attr('itemData', itemData);
+      viewModel.itemData = itemData;
       result = viewModel.title();
       expect(result).toEqual('mockTitle');
     });
 
-    it('returns item name if no title', function () {
+    it('returns item name if no title', () => {
       let result;
-      viewModel.attr('itemData', Object.assign(itemData, {
+      viewModel.itemData = Object.assign(itemData, {
         title: undefined,
-      }));
+      });
       result = viewModel.title();
       expect(result).toEqual('mockName');
     });
 
     it('returns item email if no title, name',
-      function () {
+      () => {
         let result;
-        viewModel.attr('itemData', Object.assign(itemData, {
+        viewModel.itemData = Object.assign(itemData, {
           title: undefined,
           name: undefined,
-        }));
+        });
         result = viewModel.title();
         expect(result).toEqual('mockEmail');
       });
   });
 
-  describe('toggleIconCls() method', function () {
-    it('returns fa-caret-down if showDetails is true', function () {
+  describe('toggleIconCls() method', () => {
+    it('returns fa-caret-down if showDetails is true', () => {
       let result;
-      viewModel.attr('showDetails', true);
+      viewModel.showDetails = true;
       result = viewModel.toggleIconCls();
       expect(result).toEqual('fa-caret-down');
     });
 
     it('returns fa-caret-right if showDetails is false',
-      function () {
+      () => {
         let result;
-        viewModel.attr('showDetails', false);
+        viewModel.showDetails = false;
         result = viewModel.toggleIconCls();
         expect(result).toEqual('fa-caret-right');
       });
   });
 
-  describe('toggleDetails() method', function () {
-    it('changes viewModel.showDetails to false if was true', function () {
-      viewModel.attr('showDetails', true);
+  describe('toggleDetails() method', () => {
+    it('changes viewModel.showDetails to false if was true', () => {
+      viewModel.showDetails = true;
       viewModel.toggleDetails();
-      expect(viewModel.attr('showDetails')).toEqual(false);
+      expect(viewModel.showDetails).toEqual(false);
     });
-    it('changes viewModel.showDetails to true if was false', function () {
-      viewModel.attr('showDetails', false);
+    it('changes viewModel.showDetails to true if was false', () => {
+      viewModel.showDetails = false;
       viewModel.toggleDetails();
-      expect(viewModel.attr('showDetails')).toEqual(true);
+      expect(viewModel.showDetails).toEqual(true);
     });
   });
 
-  describe('isSnapshot() method', function () {
-    it('returns true if it is snapshot', function () {
+  describe('isSnapshot() method', () => {
+    it('returns true if it is snapshot', () => {
       let result;
-      viewModel.attr('itemData', {
+      viewModel.itemData = {
         type: Snapshot.model_singular,
-      });
+      };
       result = viewModel.isSnapshot();
       expect(result).toEqual(true);
     });
 
-    it('returns false if it is not snapshot', function () {
+    it('returns false if it is not snapshot', () => {
       let result;
-      viewModel.attr('itemData', {
+      viewModel.itemData = {
         type: 'mockType',
-      });
+      };
       result = viewModel.isSnapshot();
       expect(result).toEqual(false);
     });
@@ -162,57 +160,57 @@ describe('mapper-results-item', function () {
   describe('isBulkUpdateView() method', () => {
     it('returns true if it is bulk-update view', () => {
       let result;
-      viewModel.attr('itemDetailsViewType', 'bulk-update');
+      viewModel.itemDetailsViewType = 'bulk-update';
       result = viewModel.isBulkUpdateView();
       expect(result).toEqual(true);
     });
 
     it('returns false if it is not bulk-update view', () => {
       let result;
-      viewModel.attr('itemDetailsViewType', 'fake-view');
+      viewModel.itemDetailsViewType = 'fake-view';
       result = viewModel.isBulkUpdateView();
       expect(result).toEqual(false);
     });
   });
 
-  describe('objectType() method', function () {
-    it('returns child_type if it is snapshot', function () {
+  describe('objectType() method', () => {
+    it('returns child_type if it is snapshot', () => {
       let result;
-      viewModel.attr('itemData', {
+      viewModel.itemData = {
         type: Snapshot.model_singular,
         child_type: 'mockType',
-      });
+      };
       result = viewModel.objectType();
       expect(result).toEqual('mockType');
     });
 
-    it('returns type if it is not snapshot', function () {
+    it('returns type if it is not snapshot', () => {
       let result;
-      viewModel.attr('itemData', {
+      viewModel.itemData = {
         type: 'mockType',
-      });
+      };
       result = viewModel.objectType();
       expect(result).toEqual('mockType');
     });
   });
 
-  describe('objectTypeIcon() method', function () {
-    it('returns object type icon', function () {
+  describe('objectTypeIcon() method', () => {
+    it('returns object type icon', () => {
       let postfix;
       let result;
-      viewModel.attr('itemData', {
+      viewModel.itemData = {
         type: 'Program',
-      });
+      };
       postfix = Program.table_singular;
       result = viewModel.objectTypeIcon();
       expect(result).toEqual('fa-' + postfix);
     });
   });
 
-  describe('showRelatedAssessments() method', function () {
-    it('dispatches event', function () {
+  describe('showRelatedAssessments() method', () => {
+    it('dispatches event', () => {
       spyOn(viewModel, 'dispatch');
-      viewModel.attr('itemData', 'mockData');
+      viewModel.itemData = 'mockData';
       viewModel.showRelatedAssessments();
       expect(viewModel.dispatch).toHaveBeenCalledWith(
         jasmine.objectContaining({
@@ -234,7 +232,7 @@ describe('mapper-results-item', function () {
 
     it('dispatches "itemDataDestroyed" event with defined "itemId" field',
       () => {
-        viewModel.attr('itemData', {id: 12345});
+        viewModel.itemData = {id: 12345};
 
         handler();
 

@@ -4,39 +4,47 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './mega-relation-selection-item.stache';
 import pubSub from '../../pub-sub';
 
+const ViewModel = canDefineMap.extend({
+  mapAsChild: {
+    value: null,
+  },
+  isDisabled: {
+    value: false,
+  },
+  id: {
+    value: null,
+  },
+  element: {
+    value: null,
+  },
+  switchRelation(event, mapAsChild) {
+    pubSub.dispatch({
+      type: 'mapAsChild',
+      id: this.id,
+      val: mapAsChild ? 'child' : 'parent',
+    });
+
+    event.stopPropagation();
+  },
+  childRelation: {
+    get() {
+      return this.mapAsChild === true;
+    },
+  },
+  parentRelation: {
+    get() {
+      return this.mapAsChild === false;
+    },
+  },
+});
+
 export default canComponent.extend({
   tag: 'mega-relation-selection-item',
   view: canStache(template),
-  viewModel: canMap.extend({
-    mapAsChild: null,
-    isDisabled: false,
-    id: null,
-    element: null,
-    switchRelation(event, mapAsChild) {
-      pubSub.dispatch({
-        type: 'mapAsChild',
-        id: this.attr('id'),
-        val: mapAsChild ? 'child' : 'parent',
-      });
-
-      event.stopPropagation();
-    },
-    define: {
-      childRelation: {
-        get() {
-          return this.attr('mapAsChild') === true;
-        },
-      },
-      parentRelation: {
-        get() {
-          return this.attr('mapAsChild') === false;
-        },
-      },
-    },
-  }),
+  ViewModel,
 });

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import './mapper-results-item-status';
 import './mapper-results-item-details';
@@ -14,26 +14,38 @@ import template from './templates/mapper-results-item.stache';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 
-const viewModel = canMap.extend({
-  define: {
-    showOpenButton: {
-      get() {
-        return this.attr('searchOnly') || this.isBulkUpdateView();
-      },
-    },
-    viewClass: {
-      get() {
-        return this.isBulkUpdateView() ? 'bulk-update-view' : '';
-      },
+const ViewModel = canDefineMap.extend({
+  showOpenButton: {
+    get() {
+      return this.searchOnly || this.isBulkUpdateView();
     },
   },
-  itemData: {},
-  searchOnly: false,
-  drawRelatedAssessments: false,
-  selectedColumns: [],
-  serviceColumns: [],
-  showDetails: false,
-  itemDetailsViewType: '',
+  viewClass: {
+    get() {
+      return this.isBulkUpdateView() ? 'bulk-update-view' : '';
+    },
+  },
+  itemData: {
+    value: () => ({}),
+  },
+  searchOnly: {
+    value: false,
+  },
+  drawRelatedAssessments: {
+    value: false,
+  },
+  selectedColumns: {
+    value: () => [],
+  },
+  serviceColumns: {
+    value: () => [],
+  },
+  showDetails: {
+    value: false,
+  },
+  itemDetailsViewType: {
+    value: '',
+  },
   title() {
     let displayItem = this.displayItem();
     return displayItem.title ||
@@ -41,7 +53,7 @@ const viewModel = canMap.extend({
       displayItem.email;
   },
   displayItem() {
-    let itemData = this.attr('itemData');
+    let itemData = this.itemData;
     return itemData.revision ?
       itemData.revision.content :
       itemData;
@@ -52,22 +64,22 @@ const viewModel = canMap.extend({
     return 'fa-' + Model.table_singular;
   },
   toggleIconCls() {
-    return this.attr('showDetails') ? 'fa-caret-down' : 'fa-caret-right';
+    return this.showDetails ? 'fa-caret-down' : 'fa-caret-right';
   },
   toggleDetails() {
-    this.attr('showDetails', !this.attr('showDetails'));
+    this.showDetails = !this.showDetails;
   },
   isSnapshot() {
-    return this.attr('itemData.type') === Snapshot.model_singular;
+    return this.itemData.type === Snapshot.model_singular;
   },
   isBulkUpdateView() {
-    return this.attr('itemDetailsViewType') === 'bulk-update';
+    return this.itemDetailsViewType === 'bulk-update';
   },
   objectType() {
     if (this.isSnapshot()) {
-      return this.attr('itemData.child_type');
+      return this.itemData.child_type;
     }
-    return this.attr('itemData.type');
+    return this.itemData.type;
   },
   showRelatedAssessments() {
     this.dispatch({
@@ -84,7 +96,7 @@ const events = {
 
     viewModel.dispatch({
       type: 'itemDataDestroyed',
-      itemId: viewModel.attr('itemData.id'),
+      itemId: viewModel.itemData.id,
     });
   },
 };
@@ -93,6 +105,6 @@ export default canComponent.extend({
   tag: 'mapper-results-item',
   view: canStache(template),
   leakScope: true,
-  viewModel,
+  ViewModel,
   events,
 });

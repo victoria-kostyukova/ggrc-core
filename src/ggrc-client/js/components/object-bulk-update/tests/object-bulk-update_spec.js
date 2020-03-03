@@ -114,8 +114,8 @@ describe('object-bulk-update component', () => {
         .and.returnValue({
           then() {},
         });
-      context.viewModel.attr('selected', [1]);
-      context.viewModel.attr('targetState', 'In Progress');
+      context.viewModel.selected = [1];
+      context.viewModel.targetState = 'In Progress';
 
       event();
 

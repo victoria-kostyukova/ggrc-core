@@ -22,7 +22,7 @@ describe('mega-relation-selection-item component', () => {
 
     it('dispatches mapAsChild event', () => {
       spyOn(pubSub, 'dispatch');
-      viewModel.attr('id', 123);
+      viewModel.id = 123;
       viewModel.switchRelation(fakeEvent, true);
 
       expect(pubSub.dispatch).toHaveBeenCalledWith({
@@ -42,35 +42,35 @@ describe('mega-relation-selection-item component', () => {
 
   describe('childRelation getter', () => {
     it('should return false if mapAsChild is equal null', () => {
-      viewModel.attr('mapAsChild', null);
-      expect(viewModel.attr('childRelation')).toBe(false);
+      viewModel.mapAsChild = null;
+      expect(viewModel.childRelation).toBe(false);
     });
 
     it('should return true if mapAsChild is equal true', () => {
-      viewModel.attr('mapAsChild', true);
-      expect(viewModel.attr('childRelation')).toBe(true);
+      viewModel.mapAsChild = true;
+      expect(viewModel.childRelation).toBe(true);
     });
 
     it('should return false if mapAsChild is not equal true', () => {
-      viewModel.attr('mapAsChild', false);
-      expect(viewModel.attr('childRelation')).toBe(false);
+      viewModel.mapAsChild = false;
+      expect(viewModel.childRelation).toBe(false);
     });
   });
 
   describe('parentRelation getter', () => {
     it('should return false if mapAsChild is equal null', () => {
-      viewModel.attr('mapAsChild', null);
-      expect(viewModel.attr('parentRelation')).toBe(false);
+      viewModel.mapAsChild = null;
+      expect(viewModel.parentRelation).toBe(false);
     });
 
     it('should return true if mapAsChild is equal false', () => {
-      viewModel.attr('mapAsChild', false);
-      expect(viewModel.attr('parentRelation')).toBe(true);
+      viewModel.mapAsChild = false;
+      expect(viewModel.parentRelation).toBe(true);
     });
 
     it('should return false if mapAsChild is not equal false', () => {
-      viewModel.attr('mapAsChild', true);
-      expect(viewModel.attr('parentRelation')).toBe(false);
+      viewModel.mapAsChild = true;
+      expect(viewModel.parentRelation).toBe(false);
     });
   });
 });

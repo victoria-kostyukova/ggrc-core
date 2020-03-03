@@ -4,24 +4,23 @@
  */
 
 import loEvery from 'lodash/every';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import * as Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import Control from '../../../models/business-models/control';
 
-describe('object-operations-base viewModel', function () {
-  'use strict';
-
+describe('object-operations-base viewModel', () => {
   let baseVM;
 
-  beforeEach(function () {
+  beforeEach(() => {
+    ObjectOperationsBaseVM.seal = false;
     baseVM = ObjectOperationsBaseVM();
   });
 
   describe('availableTypes() method', () => {
     it('returns grouped types if object is not Assessment', () => {
-      baseVM.attr('object', 'testObject');
+      baseVM.object = 'testObject';
 
       spyOn(Mappings, 'getMappingList').and.returnValue('list');
       spyOn(modelsUtils, 'groupTypes')
@@ -32,7 +31,7 @@ describe('object-operations-base viewModel', function () {
     });
 
     it('returns grouped types if object is Assessment', () => {
-      baseVM.attr('object', 'Assessment');
+      baseVM.object = 'Assessment';
 
       spyOn(modelsUtils, 'groupTypes')
         .withArgs(GGRC.config.snapshotable_objects)
@@ -42,33 +41,32 @@ describe('object-operations-base viewModel', function () {
     });
   });
 
-  describe('get() for baseVM.parentInstance', function () {
-    beforeEach(function () {
+  describe('get() for baseVM.parentInstance', () => {
+    beforeEach(() => {
       spyOn(modelsUtils, 'getInstance')
         .and.returnValue('parentInstance');
     });
 
-    it('returns parentInstance', function () {
-      let result = baseVM.attr('parentInstance');
+    it('returns parentInstance', () => {
+      let result = baseVM.parentInstance;
       expect(result).toEqual('parentInstance');
     });
   });
 
   describe('get() for baseVM.model', () => {
     it('returns model based on type attribute', () => {
-      baseVM.attr('type', 'Control');
+      baseVM.type = 'Control';
 
-      let result = baseVM.attr('model');
+      let result = baseVM.model;
       expect(result).toEqual(Control);
     });
   });
 
-  describe('set() for baseVM.type', function () {
-    let method;
+  describe('set() for baseVM.type', () => {
     let vm;
 
-    beforeEach(function () {
-      vm = new canMap({
+    beforeEach(() => {
+      const ViewModel = ObjectOperationsBaseVM.extend({
         config: {
           general: {},
           special: [
@@ -84,30 +82,27 @@ describe('object-operations-base viewModel', function () {
         },
         update: jasmine.createSpy('update'),
       });
-      method = ObjectOperationsBaseVM
-        .prototype
-        .define
-        .type
-        .set.bind(vm);
+
+      vm = new ViewModel();
     });
 
-    it('sets passed type', function () {
+    it('sets passed type', () => {
       let type = 'Type1';
-      let result = method(type);
-      expect(result).toBe(type);
+      vm.type = type;
+      expect(vm.get('type')).toBe(type);
     });
 
     it('calls update method',
-      function () {
+      () => {
         let type = 'Type1';
-        method(type);
+        vm.type = type;
         expect(vm.update).toHaveBeenCalled();
       });
 
-    it('removes "type" property from config passed in appopriate ' +
-    'config handler', function () {
+    it('removes "type" property from config passed in appropriate ' +
+    'config handler', () => {
       let args;
-      method('Type1');
+      vm.type = 'Type1';
 
       args = vm.update.calls.argsFor(0);
       expect(args[0]).not.toEqual(jasmine.objectContaining({
@@ -116,24 +111,23 @@ describe('object-operations-base viewModel', function () {
     });
   });
 
-  describe('update() method', function () {
+  describe('update() method', () => {
     let baseConfig;
     let method;
     let vm;
 
-    beforeEach(function () {
+    beforeEach(() => {
       baseConfig = {
         a: 'a',
         b: {
           c: 'c',
         },
       };
-      vm = new canMap(baseConfig);
+      vm = new canDefineMap(baseConfig);
       method = baseVM.update.bind(vm);
-      spyOn(vm, 'attr').and.callThrough();
     });
 
-    it('sets new values for VM', function () {
+    it('sets new values for VM', () => {
       let config = {
         a: 'new A',
         b: {
@@ -142,32 +136,32 @@ describe('object-operations-base viewModel', function () {
         c: [],
       };
       method(config);
-
-      expect(vm.attr()).toEqual(config);
+      expect(vm.serialize()).toEqual(config);
     });
 
-    it('does not set values for VM from config if appopriate fields from ' +
-    'VM and config have the same values', function () {
+    it('does not set values for VM from config if appropriate fields from ' +
+    'VM and config have the same values', () => {
       let allArgs;
       method(baseConfig);
 
-      allArgs = vm.attr.calls.allArgs();
+      spyOn(vm, 'set');
+      allArgs = vm.set.calls.allArgs();
 
-      expect(loEvery(allArgs, function (args) {
+      expect(loEvery(allArgs, (args) => {
         return args.length === 1;
       })).toBe(true);
     });
   });
 
-  describe('extractConfig() method', function () {
+  describe('extractConfig() method', () => {
     let method;
     let config;
 
-    beforeAll(function () {
+    beforeAll(() => {
       method = ObjectOperationsBaseVM.extractConfig;
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       config = {
         general: {},
         special: [{
@@ -184,13 +178,13 @@ describe('object-operations-base viewModel', function () {
     });
 
     it('extracts general config if there is no special config for type',
-      function () {
+      () => {
         let result = method('T0', config);
         expect(result).toBe(config.general);
       });
 
     it('extracts special config if there is special config for type',
-      function () {
+      () => {
         let result = method('T2', config);
         expect(result).toEqual(config.special[0].config);
       });

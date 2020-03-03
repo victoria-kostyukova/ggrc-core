@@ -9,55 +9,55 @@ import Component from '../object-generator';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 
-describe('object-generator component', function () {
-  'use strict';
-
+describe('object-generator component', () => {
   let events;
   let viewModel;
   let handler;
 
-  beforeAll(function () {
+  beforeAll(() => {
     events = Component.prototype.events;
   });
 
-  describe('viewModel() method', function () {
+  describe('viewModel() method', () => {
     let parentViewModel;
 
-    beforeEach(function () {
+    beforeEach(() => {
       parentViewModel = new canMap();
     });
 
-    it('returns object with function "isLoadingOrSaving"', function () {
-      let result = new Component.prototype.viewModel({}, parentViewModel)();
+    it('returns object with function "isLoadingOrSaving"', () => {
+      let result = Component.prototype.viewModel({}, parentViewModel)();
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
     describe('methods of extended viewModel', () => {
-      beforeEach(function () {
-        viewModel = new Component.prototype.viewModel({}, parentViewModel)();
+      beforeEach(() => {
+        const ViewModel = Component.prototype.viewModel({}, parentViewModel);
+        ViewModel.seal = false;
+        viewModel = new ViewModel();
       });
 
-      describe('isLoadingOrSaving() method', function () {
-        it('returns true if it is saving', function () {
-          viewModel.attr('is_saving', true);
+      describe('isLoadingOrSaving() method', () => {
+        it('returns true if it is saving', () => {
+          viewModel.is_saving = true;
           expect(viewModel.isLoadingOrSaving()).toEqual(true);
         });
 
-        it('returns true if type change is blocked', function () {
-          viewModel.attr('block_type_change', true);
+        it('returns true if type change is blocked', () => {
+          viewModel.block_type_change = true;
           expect(viewModel.isLoadingOrSaving()).toEqual(true);
         });
 
-        it('returns true if it is loading', function () {
-          viewModel.attr('is_loading', true);
+        it('returns true if it is loading', () => {
+          viewModel.is_loading = true;
           expect(viewModel.isLoadingOrSaving()).toEqual(true);
         });
 
         it('returns false if page is not loading, it is not saving,' +
-        ' type change is not blocked and it is not loading', function () {
-          viewModel.attr('is_saving', false);
-          viewModel.attr('block_type_change', false);
-          viewModel.attr('is_loading', false);
+        ' type change is not blocked and it is not loading', () => {
+          viewModel.is_saving = false;
+          viewModel.block_type_change = false;
+          viewModel.is_loading = false;
           expect(viewModel.isLoadingOrSaving()).toEqual(false);
         });
       });
@@ -86,46 +86,46 @@ describe('object-generator component', function () {
         });
       });
 
-      describe('onAssessmentTemplateChanged() method', function () {
+      describe('onAssessmentTemplateChanged() method', () => {
         it('sets false to block_type_change if template is empty',
-          function () {
-            viewModel.attr('block_type_change', true);
+          () => {
+            viewModel.block_type_change = true;
 
             viewModel.onAssessmentTemplateChanged({});
 
-            expect(viewModel.attr('block_type_change'))
+            expect(viewModel.block_type_change)
               .toEqual(false);
           });
 
         it('sets true to block_type_change if template is not empty',
-          function () {
-            viewModel.attr('block_type_change', false);
+          () => {
+            viewModel.block_type_change = false;
 
             viewModel.onAssessmentTemplateChanged({template: {}});
 
-            expect(viewModel.attr('block_type_change'))
+            expect(viewModel.block_type_change)
               .toEqual(true);
           });
 
         it('sets type to type if template is not empty',
-          function () {
+          () => {
             viewModel.onAssessmentTemplateChanged({
               template: {objectType: 'type'},
             });
-            expect(viewModel.attr('type'))
+            expect(viewModel.type)
               .toEqual('type');
           });
       });
     });
   });
 
-  describe('"inserted" event', function () {
+  describe('"inserted" event', () => {
     let that;
 
-    beforeEach(function () {
-      viewModel.attr({
+    beforeEach(() => {
+      viewModel.assign({
         selected: [1, 2, 3],
-        onSubmit: function () {},
+        onSubmit: () => {},
       });
       that = {
         viewModel: viewModel,
@@ -133,24 +133,23 @@ describe('object-generator component', function () {
       handler = events.inserted;
     });
 
-    it('sets empty array to selected', function () {
+    it('sets empty array to selected', () => {
       handler.call(that);
-      expect(viewModel.attr('selected').length)
-        .toEqual(0);
+      expect(viewModel.selected.length).toEqual(0);
     });
   });
 
-  describe('"closeModal" event', function () {
+  describe('"closeModal" event', () => {
     let element;
     let spyObj;
 
-    beforeEach(function () {
-      viewModel.attr({});
+    beforeEach(() => {
+      viewModel.assign({});
       spyObj = {
-        trigger: function () {},
+        trigger: () => {},
       };
       element = {
-        find: function () {
+        find: () => {
           return spyObj;
         },
       };
@@ -158,15 +157,15 @@ describe('object-generator component', function () {
       handler = events.closeModal;
     });
 
-    it('sets false to is_saving', function () {
-      viewModel.attr('is_saving', true);
+    it('sets false to is_saving', () => {
+      viewModel.is_saving = true;
       handler.call({
         element: element,
         viewModel: viewModel,
       });
-      expect(viewModel.attr('is_saving')).toEqual(false);
+      expect(viewModel.is_saving).toEqual(false);
     });
-    it('dismiss the modal', function () {
+    it('dismiss the modal', () => {
       handler.call({
         element: element,
         viewModel: viewModel,
@@ -175,15 +174,15 @@ describe('object-generator component', function () {
     });
   });
 
-  describe('".modal-footer .btn-map click" handler', function () {
+  describe('".modal-footer .btn-map click" handler', () => {
     let that;
     let event;
     let element;
     let callback;
 
-    beforeEach(function () {
+    beforeEach(() => {
       callback = jasmine.createSpy().and.returnValue('expectedResult');
-      viewModel.attr({
+      viewModel.assign({
         callback: callback,
         type: 'type',
         object: 'Program',
@@ -194,7 +193,7 @@ describe('object-generator component', function () {
       spyOn(Program, 'findInCacheById')
         .and.returnValue('instance');
       event = {
-        preventDefault: function () {},
+        preventDefault: () => {},
       };
       element = $('<div></div>');
       handler = events['.modal-footer .btn-map click'];
@@ -210,17 +209,17 @@ describe('object-generator component', function () {
       spyOn($.prototype, 'trigger');
     });
 
-    it('does nothing if element has class "disabled"', function () {
+    it('does nothing if element has class "disabled"', () => {
       let result;
       element.addClass('disabled');
       result = handler.call(that, element, event);
       expect(result).toEqual(undefined);
     });
 
-    it('sets true to is_saving and returns callback', function () {
+    it('sets true to is_saving and returns callback', () => {
       let result;
       result = handler.call(that, element, event);
-      expect(viewModel.attr('is_saving')).toEqual(true);
+      expect(viewModel.is_saving).toEqual(true);
       expect(result).toEqual('expectedResult');
       expect(callback.calls.argsFor(0)[0].length)
         .toEqual(0);

@@ -17,8 +17,8 @@ describe('mapper-results-item-attrs component', () => {
 
   describe('aggregatedColumns()', () => {
     it('should concat columns and serviceColumns attributes', () => {
-      viewModel.attr('columns', [0, 1]);
-      viewModel.attr('serviceColumns', [5]);
+      viewModel.columns = [0, 1];
+      viewModel.serviceColumns = [5];
       const result = viewModel.aggregatedColumns();
       expect(makeArray(result)).toEqual([0, 1, 5]);
     });

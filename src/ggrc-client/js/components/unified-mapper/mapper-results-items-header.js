@@ -4,43 +4,51 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/mapper-results-items-header.stache';
+
+const ViewModel = canDefineMap.extend({
+  columns: {
+    value: () => [],
+  },
+  serviceColumns: {
+    value: () => [],
+  },
+  sortKey: {
+    value: '',
+  },
+  sortDirection: {
+    value: 'asc',
+  },
+  modelType: {
+    value: '',
+  },
+  aggregatedColumns() {
+    return this.columns.concat(this.serviceColumns);
+  },
+  isSorted(attr) {
+    return attr.attr_sort_field === this.sortKey;
+  },
+  isSortedAsc() {
+    return this.sortDirection === 'asc';
+  },
+  applySort(attr) {
+    if (this.isSorted(attr)) {
+      this.toggleSortDirection();
+      return;
+    }
+    this.sortKey = attr.attr_sort_field;
+    this.sortDirection = 'asc';
+  },
+  toggleSortDirection() {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  },
+});
 
 export default canComponent.extend({
   tag: 'mapper-results-items-header',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    columns: [],
-    serviceColumns: [],
-    sortKey: '',
-    sortDirection: 'asc',
-    modelType: '',
-    aggregatedColumns() {
-      return this.attr('columns').concat(this.attr('serviceColumns'));
-    },
-    isSorted(attr) {
-      return attr.attr('attr_sort_field') === this.attr('sortKey');
-    },
-    isSortedAsc() {
-      return this.attr('sortDirection') === 'asc';
-    },
-    applySort(attr) {
-      if (this.isSorted(attr)) {
-        this.toggleSortDirection();
-        return;
-      }
-      this.attr('sortKey', attr.attr('attr_sort_field'));
-      this.attr('sortDirection', 'asc');
-    },
-    toggleSortDirection() {
-      if (this.attr('sortDirection') === 'asc') {
-        this.attr('sortDirection', 'desc');
-      } else {
-        this.attr('sortDirection', 'asc');
-      }
-    },
-  }),
+  ViewModel,
 });

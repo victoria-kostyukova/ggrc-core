@@ -14,6 +14,7 @@ describe('assessments-bulk-updatable-vm component', () => {
   let viewModel;
 
   beforeEach(() => {
+    ViewModel.seal = false;
     viewModel = new ViewModel();
   });
 
@@ -24,8 +25,8 @@ describe('assessments-bulk-updatable-vm component', () => {
 
     it('calls setDefaultStatusConfig() with type and statesCollectionKey attrs',
       () => {
-        viewModel.attr('type', 'Assessment');
-        viewModel.attr('statesCollectionKey', 'fakeStatesCollectionKey');
+        viewModel.type = 'Assessment';
+        viewModel.statesCollectionKey = 'fakeStatesCollectionKey';
 
         viewModel.initDefaultFilter({
           attribute: 'attr',
@@ -74,7 +75,7 @@ describe('assessments-bulk-updatable-vm component', () => {
 
     it('sets filterItems attr',
       () => {
-        viewModel.attr('filterItems', []);
+        viewModel.filterItems = [];
         spyOn(AdvancedSearchUtils.create, 'state')
           .and.returnValue('fakeState');
         spyOn(AdvancedSearchUtils.create, 'operator')
@@ -86,13 +87,13 @@ describe('assessments-bulk-updatable-vm component', () => {
           options: {},
         });
 
-        expect(viewModel.attr('filterItems').serialize())
+        expect(viewModel.filterItems.serialize())
           .toEqual(['fakeState', 'fakeOperator', 'fakeAttribute']);
       });
 
     it('sets defaultFilterItems attr',
       () => {
-        viewModel.attr('defaultFilterItems', []);
+        viewModel.defaultFilterItems = [];
         spyOn(AdvancedSearchUtils.create, 'state')
           .and.returnValue('fakeState');
         spyOn(AdvancedSearchUtils.create, 'operator')
@@ -104,14 +105,14 @@ describe('assessments-bulk-updatable-vm component', () => {
           options: {},
         });
 
-        expect(viewModel.attr('defaultFilterItems').serialize())
+        expect(viewModel.defaultFilterItems.serialize())
           .toEqual(['fakeState', 'fakeOperator', 'fakeAttribute']);
       });
   });
 
   describe('initFilterAttributes() method', () => {
     it('calls getAvailableAttributes() with type attr', () => {
-      viewModel.attr('type', 'Assessment');
+      viewModel.type = 'Assessment';
       spyOn(TreeViewUtils, 'getAvailableAttributes').and.returnValue([]);
       viewModel.initFilterAttributes();
 
@@ -120,8 +121,8 @@ describe('assessments-bulk-updatable-vm component', () => {
     });
 
     it('sets filtered attributes to filterAttributes attr', () => {
-      viewModel.attr('type', 'Assessment');
-      viewModel.attr('filterAttributes', []);
+      viewModel.type = 'Assessment';
+      viewModel.filterAttributes = [];
       spyOn(TreeViewUtils, 'getAvailableAttributes').and.returnValue([{
         attr_name: 'status',
       }, {
@@ -131,7 +132,7 @@ describe('assessments-bulk-updatable-vm component', () => {
       }]);
       viewModel.initFilterAttributes();
 
-      expect(viewModel.attr('filterAttributes').serialize())
+      expect(viewModel.filterAttributes.serialize())
         .toEqual([{
           attr_name: 'fakeAttrName1',
         }, {
@@ -235,7 +236,7 @@ describe('assessments-bulk-updatable-vm component', () => {
       let el = {
         find: () => modalDismiss,
       };
-      viewModel.attr('element', el);
+      viewModel.element = el;
       viewModel.closeModal();
 
       expect(modalDismiss.trigger).toHaveBeenCalledWith('click');

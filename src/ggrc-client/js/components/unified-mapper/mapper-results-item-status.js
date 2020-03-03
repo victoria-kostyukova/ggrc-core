@@ -4,15 +4,19 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/mapper-results-item-status.stache';
+
+const ViewModel = canDefineMap.extend({
+  itemData: {
+    value: () => ({}),
+  },
+});
 
 export default canComponent.extend({
   tag: 'mapper-results-item-status',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    itemData: {},
-  }),
+  ViewModel,
 });

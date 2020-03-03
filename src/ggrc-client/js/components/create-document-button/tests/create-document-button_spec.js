@@ -16,7 +16,7 @@ describe('create-document-button component', () => {
   let viewModel;
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('parentInstance', {});
+    viewModel.parentInstance = {};
   });
 
   describe('viewModel', () => {
@@ -131,7 +131,7 @@ describe('create-document-button component', () => {
 
       it('should dispatch documentCreateFailed event if save failed',
         (done) => {
-          let parentInstance = viewModel.attr('parentInstance');
+          let parentInstance = viewModel.parentInstance;
           spyOn(parentInstance, 'dispatch');
           spyOn(viewModel, 'checkDocumentsExist')
             .and.returnValue(Promise.resolve([]));
@@ -151,7 +151,7 @@ describe('create-document-button component', () => {
     describe('createDocuments() method', () => {
       it('should dispatch beforeDocumentCreate event before saving document',
         () => {
-          let parentInstance = viewModel.attr('parentInstance');
+          let parentInstance = viewModel.parentInstance;
           spyOn(parentInstance, 'dispatch');
           spyOn(Document.prototype, 'save').and.returnValue({});
 

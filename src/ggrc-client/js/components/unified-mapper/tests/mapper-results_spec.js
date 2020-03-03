@@ -13,63 +13,60 @@ import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../mapper-results';
-import traker from '../../../tracker';
+import tracker from '../../../tracker';
 import * as isMegaMappingUtils from '../../../plugins/utils/mega-object-utils';
 import Program from '../../../models/business-models/program';
 import QueryParser from '../../../generated/ggrc-filter-query-parser';
 
-describe('mapper-results component', function () {
-  'use strict';
-
+describe('mapper-results component', () => {
   let viewModel;
 
-  beforeEach(function () {
-    let init = Component.prototype.viewModel.prototype.init;
-    Component.prototype.viewModel.prototype.init = undefined;
+  beforeEach(() => {
+    let init = Component.prototype.ViewModel.prototype.init;
+    Component.prototype.ViewModel.prototype.init = undefined;
     viewModel = getComponentVM(Component);
-    viewModel.attr('mapper', {
+    viewModel.mapper = {
       type: 'Control',
-    });
-    viewModel.attr('paging',
-      new Pagination({pageSizeSelect: [5, 10, 15]}));
-    Component.prototype.viewModel.prototype.init = init;
+    };
+    viewModel.paging = new Pagination({pageSizeSelect: [5, 10, 15]});
+    Component.prototype.ViewModel.prototype.init = init;
     viewModel.init = init;
   });
 
-  describe('isMegaMapping getter', function () {
-    it('should return true for equal mega object', function () {
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Program');
-      expect(viewModel.attr('isMegaMapping')).toBeTruthy();
+  describe('isMegaMapping getter', () => {
+    it('should return true for equal mega object', () => {
+      viewModel.object = 'Program';
+      viewModel.type = 'Program';
+      expect(viewModel.isMegaMapping).toBeTruthy();
     });
 
-    it('should return false for different object', function () {
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Cotrol');
-      expect(viewModel.attr('isMegaMapping')).toBeFalsy();
-    });
-  });
-
-  describe('serviceColumnsEnabled getter', function () {
-    it('should return length of columns.service attribute', function () {
-      viewModel.attr('columns.service', [1, 2]);
-      expect(viewModel.attr('serviceColumnsEnabled')).toBe(2);
+    it('should return false for different object', () => {
+      viewModel.object = 'Program';
+      viewModel.type = 'Cotrol';
+      expect(viewModel.isMegaMapping).toBeFalsy();
     });
   });
 
-  describe('setItems() method', function () {
+  describe('serviceColumnsEnabled getter', () => {
+    it('should return length of columns.service attribute', () => {
+      viewModel.columns.service = [1, 2];
+      expect(viewModel.serviceColumnsEnabled).toBe(2);
+    });
+  });
+
+  describe('setItems() method', () => {
     let items;
 
-    beforeEach(function () {
+    beforeEach(() => {
       items = [
         {data: 'mockData'},
       ];
-      spyOn(traker, 'start').and.returnValue(jasmine.createSpy());
+      viewModel.assign({});
+      spyOn(tracker, 'start').and.returnValue(jasmine.createSpy());
       spyOn(viewModel, 'load')
         .and.returnValue(Promise.resolve(items));
       spyOn(viewModel, 'setColumnsConfiguration');
       spyOn(viewModel, 'setRelatedAssessments');
-      viewModel.attr({});
     });
 
     it('calls load() method', async () => {
@@ -79,23 +76,23 @@ describe('mapper-results component', function () {
     });
 
     it('sets loaded items to viewModel.items', async () => {
-      viewModel.attr('items', []);
+      viewModel.items = [];
 
       await viewModel.setItems();
 
-      expect(viewModel.attr('items').length).toEqual(1);
-      expect(viewModel.attr('items')[0])
+      expect(viewModel.items.length).toEqual(1);
+      expect(viewModel.items[0])
         .toEqual(jasmine.objectContaining({
           data: 'mockData',
         }));
     });
 
     it('sets true to "isLoading" attribute', () => {
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       viewModel.setItems();
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     it('calls setColumnsConfiguration() method', async () => {
@@ -111,30 +108,30 @@ describe('mapper-results component', function () {
     });
 
     it('sets viewModel.isBeforeLoad to false', async () => {
-      viewModel.attr('isBeforeLoad', true);
+      viewModel.isBeforeLoad = true;
 
       await viewModel.setItems();
 
-      expect(viewModel.attr('isBeforeLoad')).toEqual(false);
+      expect(viewModel.isBeforeLoad).toEqual(false);
     });
 
     it('sets false to "isLoading" attribute after load() success',
       async () => {
-        viewModel.attr('isLoading', true);
+        viewModel.isLoading = true;
 
         await viewModel.setItems();
 
-        expect(viewModel.attr('isLoading')).toBe(false);
+        expect(viewModel.isLoading).toBe(false);
       });
   });
 
-  describe('setColumnsConfiguration() method', function () {
+  describe('setColumnsConfiguration() method', () => {
     let mockColumns;
 
-    beforeEach(function () {
-      viewModel.attr('columns', {});
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Control');
+    beforeEach(() => {
+      viewModel.columns = {};
+      viewModel.object = 'Program';
+      viewModel.type = 'Control';
       mockColumns = {
         available: 'mock1',
         selected: 'mock2',
@@ -151,43 +148,43 @@ describe('mapper-results component', function () {
         });
     });
 
-    it('updates available columns', function () {
-      viewModel.attr('columns.available', 'available');
+    it('updates available columns', () => {
+      viewModel.columns.available = 'available';
       viewModel.setColumnsConfiguration();
-      expect(viewModel.attr('columns.available')).toEqual('mock1');
+      expect(viewModel.columns.available).toEqual('mock1');
     });
 
-    it('updates selected columns', function () {
-      viewModel.attr('columns.selected', 'selected');
+    it('updates selected columns', () => {
+      viewModel.columns.selected = 'selected';
       viewModel.setColumnsConfiguration();
-      expect(viewModel.attr('columns.selected')).toEqual('mock2');
+      expect(viewModel.columns.selected).toEqual('mock2');
     });
 
-    it('updates disableColumnsConfiguration', function () {
-      viewModel.attr('disableColumnsConfiguration', 'configuration');
+    it('updates disableColumnsConfiguration', () => {
+      viewModel.disableColumnsConfiguration = 'configuration';
       viewModel.setColumnsConfiguration();
-      expect(viewModel.attr('disableColumnsConfiguration')).toEqual('mock3');
+      expect(viewModel.disableColumnsConfiguration).toEqual('mock3');
     });
 
-    it('updates service columns if "isMegaMapping" is true', function () {
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Program');
+    it('updates service columns if "isMegaMapping" is true', () => {
+      viewModel.object = 'Program';
+      viewModel.type = 'Program';
       viewModel.setColumnsConfiguration();
-      expect(viewModel.attr('columns.service')).toEqual('mock4');
+      expect(viewModel.columns.service).toEqual('mock4');
     });
 
     it('updates service columns with an empty array ' +
-    'if "isMegaMapping" is false', function () {
-      viewModel.attr('object', 'Program');
-      viewModel.attr('type', 'Control');
+    'if "isMegaMapping" is false', () => {
+      viewModel.object = 'Program';
+      viewModel.type = 'Control';
       viewModel.setColumnsConfiguration();
-      expect(makeArray(viewModel.attr('columns.service'))).toEqual([]);
+      expect(makeArray(viewModel.columns.service)).toEqual([]);
     });
   });
 
   describe('setSortingConfiguration() method', () => {
-    beforeEach(function () {
-      viewModel.attr('columns', {});
+    beforeEach(() => {
+      viewModel.columns = {};
       spyOn(TreeViewUtils, 'getSortingForModel')
         .and.returnValue(
           {
@@ -201,24 +198,24 @@ describe('mapper-results component', function () {
     });
 
     it('updates sort key', () => {
-      viewModel.attr('sort.key', null);
+      viewModel.sort.key = null;
       viewModel.setSortingConfiguration();
 
-      expect(viewModel.attr('sort.key')).toEqual('key');
+      expect(viewModel.sort.key).toEqual('key');
     });
 
     it('updates sort direction', () => {
-      viewModel.attr('sort.direction', null);
+      viewModel.sort.direction = null;
       viewModel.setSortingConfiguration();
 
-      expect(viewModel.attr('sort.direction')).toEqual('direction');
+      expect(viewModel.sort.direction).toEqual('direction');
     });
   });
 
-  describe('setRelatedAssessments() method', function () {
-    beforeEach(function () {
-      viewModel.attr({});
-      viewModel.attr('relatedAssessments', {});
+  describe('setRelatedAssessments() method', () => {
+    beforeEach(() => {
+      viewModel.assign({});
+      viewModel.relatedAssessments = {};
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
           tree_view_options: {
@@ -228,42 +225,42 @@ describe('mapper-results component', function () {
     });
 
     it('sets relatedAssessments.show to false if it is use-snapshots case',
-      function () {
-        viewModel.attr('useSnapshots', true);
+      () => {
+        viewModel.useSnapshots = true;
         viewModel.setRelatedAssessments();
-        expect(viewModel.attr('relatedAssessments.show')).toEqual(false);
+        expect(viewModel.relatedAssessments.show).toEqual(false);
       });
 
     it('updates relatedAssessments.show if it is not use-snapshots case',
-      function () {
-        viewModel.attr('useSnapshots', false);
+      () => {
+        viewModel.useSnapshots = false;
         viewModel.setRelatedAssessments();
-        expect(viewModel.attr('relatedAssessments.show')).toEqual(true);
+        expect(viewModel.relatedAssessments.show).toEqual(true);
       });
   });
 
-  describe('resetSearchParams() method', function () {
+  describe('resetSearchParams() method', () => {
     const DEFAULT_PAGE_SIZE = 10;
 
-    beforeEach(function () {
-      viewModel.attr('paging', {});
-      viewModel.attr('sort', {});
+    beforeEach(() => {
+      viewModel.paging = new canMap({});
+      viewModel.sort = {};
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
           model_singular: '',
         });
     });
 
-    it('sets 1 to current of paging', function () {
-      viewModel.attr('paging.current', 9);
+    it('sets 1 to current of paging', () => {
+      viewModel.paging.attr('current', 9);
       viewModel.resetSearchParams();
-      expect(viewModel.attr('paging.current')).toEqual(1);
+      expect(viewModel.paging.attr('current')).toEqual(1);
     });
 
-    it('sets default size to pageSize of paging', function () {
-      viewModel.attr('paging.pageSize', 11);
+    it('sets default size to pageSize of paging', () => {
+      viewModel.paging.attr('pageSize', 11);
       viewModel.resetSearchParams();
-      expect(viewModel.attr('paging.pageSize')).toEqual(DEFAULT_PAGE_SIZE);
+      expect(viewModel.paging.attr('pageSize')).toEqual(DEFAULT_PAGE_SIZE);
     });
 
     it('sets default sorting', () => {
@@ -274,13 +271,13 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('onSearch() method', function () {
-    beforeEach(function () {
+  describe('onSearch() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'resetSearchParams');
       spyOn(viewModel, 'setItemsDebounced');
     });
 
-    it('calls resetSearchParams()', function () {
+    it('calls resetSearchParams()', () => {
       viewModel.onSearch();
       expect(viewModel.resetSearchParams).toHaveBeenCalled();
     });
@@ -291,7 +288,7 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('prepareRelevantQuery() method', function () {
+  describe('prepareRelevantQuery() method', () => {
     let relevantList = [{
       id: 0,
       type: 'test0',
@@ -308,24 +305,24 @@ describe('mapper-results component', function () {
       type: 'test1',
       operation: 'relevant',
     }];
-    beforeEach(function () {
-      viewModel.attr('relevantTo', relevantList);
+    beforeEach(() => {
+      viewModel.relevantTo = relevantList;
     });
-    it('returns relevant filters', function () {
+    it('returns relevant filters', () => {
       let result = viewModel.prepareRelevantQuery();
-      expect(result.attr()).toEqual(expectedResult);
+      expect(result.serialize()).toEqual(expectedResult);
     });
   });
 
-  describe('prepareRelatedQuery() method', function () {
-    it('returns null if viewModel.baseInstance is undefined', function () {
+  describe('prepareRelatedQuery() method', () => {
+    it('returns null if viewModel.baseInstance is undefined', () => {
       let result = viewModel.prepareRelatedQuery();
       expect(result).toEqual(null);
     });
 
-    it('returns query', function () {
+    it('returns query', () => {
       let result;
-      viewModel.attr('baseInstance', {
+      viewModel.baseInstance = new canMap({
         type: 'mockType',
         id: 123,
       });
@@ -336,23 +333,23 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('loadAllItems() method', function () {
-    beforeEach(function () {
+  describe('loadAllItems() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'loadAllItemsIds')
         .and.returnValue('mockItems');
     });
 
-    it('updates viewModel.allItems', function () {
+    it('updates viewModel.allItems', () => {
       viewModel.loadAllItems();
-      expect(viewModel.attr('allItems')).toEqual('mockItems');
+      expect(viewModel.allItems).toEqual('mockItems');
     });
   });
 
-  describe('getQuery() method', function () {
-    let mockPaging = {
+  describe('getQuery() method', () => {
+    let mockPaging = new canMap({
       current: 'mock1',
       pageSize: 'mock2',
-    };
+    });
     let mockSort = {
       key: 'mock3',
       direction: 'mock4',
@@ -365,13 +362,13 @@ describe('mapper-results component', function () {
       },
     });
 
-    beforeEach(function () {
-      viewModel.attr('type', 'mockName');
-      viewModel.attr('paging', mockPaging);
-      viewModel.attr('sort', mockSort);
-      viewModel.attr('filterItems', mockFilterItems);
-      viewModel.attr('mappingItems', mockMappingItems);
-      viewModel.attr('statusItem', mockStatusItem);
+    beforeEach(() => {
+      viewModel.type = 'mockName';
+      viewModel.paging = mockPaging;
+      viewModel.sort = mockSort;
+      viewModel.filterItems = mockFilterItems;
+      viewModel.mappingItems = mockMappingItems;
+      viewModel.statusItem = mockStatusItem;
 
       spyOn(viewModel, 'prepareRelevantQuery')
         .and.returnValue('relevant');
@@ -385,33 +382,33 @@ describe('mapper-results component', function () {
       spyOn(QueryParser, 'joinQueries');
     });
 
-    it('builds advanced filters', function () {
+    it('builds advanced filters', () => {
       viewModel.getQuery('values', true);
       expect(AdvancedSearch.buildFilter.calls.argsFor(0)[0])
-        .toEqual(mockFilterItems.attr());
+        .toEqual(mockFilterItems.serialize());
     });
 
-    it('builds advanced mappings', function () {
+    it('builds advanced mappings', () => {
       viewModel.getQuery('values', true);
       expect(AdvancedSearch.buildFilter.calls.argsFor(1)[0])
-        .toEqual(mockMappingItems.attr());
+        .toEqual(mockMappingItems.serialize());
     });
 
-    it('builds advanced status', function () {
+    it('builds advanced status', () => {
       viewModel.getQuery('values', true);
       expect(AdvancedSearch.buildFilter.calls.argsFor(2)[0][0])
-        .toEqual(mockStatusItem.attr());
+        .toEqual(mockStatusItem.serialize());
     });
 
     it('does not build advanced status if sttatus items are not provided',
-      function () {
-        viewModel.attr('statusItem', {});
+      () => {
+        viewModel.statusItem = {};
         viewModel.getQuery('values', true);
         expect(AdvancedSearch.buildFilter.calls.count()).toBe(2);
       });
 
-    it('adds paging to query if addPaging is true', function () {
-      viewModel.removeAttr('sort.key');
+    it('adds paging to query if addPaging is true', () => {
+      viewModel.sort.assign({key: undefined});
       viewModel.getQuery('values', true);
       expect(QueryAPI.buildParam.calls.argsFor(0)[1])
         .toEqual({
@@ -420,7 +417,7 @@ describe('mapper-results component', function () {
         });
     });
 
-    it('adds paging with sort to query if sort.key is defined', function () {
+    it('adds paging with sort to query if sort.key is defined', () => {
       viewModel.getQuery('values', true);
       expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key)
         .toBe('mock3');
@@ -428,18 +425,18 @@ describe('mapper-results component', function () {
         .toBe('mock4');
     });
 
-    it('adds defaultSort to paging if no sort', function () {
-      viewModel.removeAttr('sort');
-      viewModel.attr('defaultSort', [{key: 'mock5', direction: 'mock6'}]);
+    it('adds defaultSort to paging if no sort', () => {
+      viewModel.sort = {};
+      viewModel.defaultSort = [{key: 'mock5', direction: 'mock6'}];
       viewModel.getQuery('values', true);
 
       expect(QueryAPI.buildParam.calls.argsFor(0)[1].sort[0].key).toBe('mock5');
     });
 
-    it('sets "read" to permissions if model is person', function () {
+    it('sets "read" to permissions if model is person', () => {
       let result;
-      viewModel.attr('type', 'Person');
-      viewModel.attr('useSnapshots', false);
+      viewModel.type = 'Person';
+      viewModel.useSnapshots = false;
       result = viewModel.getQuery('Person', true);
       expect(result.request[0]).toEqual(jasmine.objectContaining({
         permissions: 'read',
@@ -447,9 +444,9 @@ describe('mapper-results component', function () {
       }));
     });
 
-    it('transform query to snapshot if useSnapshots is true', function () {
+    it('transform query to snapshot if useSnapshots is true', () => {
       let result;
-      viewModel.attr('useSnapshots', true);
+      viewModel.useSnapshots = true;
       spyOn(SnapshotUtils, 'transformQueryToSnapshot')
         .and.returnValue({mockData: 'snapshot'});
       result = viewModel.getQuery();
@@ -463,17 +460,17 @@ describe('mapper-results component', function () {
       }));
     });
 
-    it('set "read" permission if "searchOnly"', function () {
+    it('set "read" permission if "searchOnly"', () => {
       let result;
-      viewModel.attr('searchOnly', true);
+      viewModel.searchOnly = true;
       result = viewModel.getQuery();
       expect(result.request[0]).toEqual(jasmine.objectContaining({
         permissions: 'read',
       }));
     });
 
-    it('prepare request for unlocked items for Audits', function () {
-      viewModel.attr('type', 'Audit');
+    it('prepare request for unlocked items for Audits', () => {
+      viewModel.type = 'Audit';
       spyOn(viewModel, 'prepareUnlockedFilter').and.returnValue('unlocked');
       viewModel.getQuery();
 
@@ -481,14 +478,14 @@ describe('mapper-results component', function () {
         .toBe('unlocked');
     });
 
-    it('prepare request for owned items if flag was set', function () {
+    it('prepare request for owned items if flag was set', () => {
       let mockUser = {
         id: -1,
       };
       let oldUser = GGRC.current_user;
       GGRC.current_user = mockUser;
       spyOn(GGRC.current_user, 'id').and.returnValue(-1);
-      viewModel.attr('applyOwnedFilter', true);
+      viewModel.applyOwnedFilter = true;
 
       viewModel.getQuery();
 
@@ -505,7 +502,7 @@ describe('mapper-results component', function () {
       GGRC.current_user = oldUser;
     });
 
-    it('set result if "isMegaMapping" true', function () {
+    it('set result if "isMegaMapping" true', () => {
       let result = viewModel.getQuery('values', true, true);
       expect(result).toEqual(jasmine.objectContaining({
         parentQueryIndex: 1,
@@ -513,39 +510,39 @@ describe('mapper-results component', function () {
       }));
     });
 
-    it('set result if "isMegaMapping" false', function () {
+    it('set result if "isMegaMapping" false', () => {
       let result = viewModel.getQuery('values', true, false);
       expect(result).toEqual(jasmine.objectContaining({relatedQueryIndex: 1}));
     });
   });
 
-  describe('getModelKey() method', function () {
-    it('returns "Snapshot" if useSnapshots is true', function () {
+  describe('getModelKey() method', () => {
+    it('returns "Snapshot" if useSnapshots is true', () => {
       let result;
-      viewModel.attr('useSnapshots', true);
+      viewModel.useSnapshots = true;
       result = viewModel.getModelKey();
       expect(result).toEqual('Snapshot');
     });
 
-    it('returns type of model if useSnapshots is false', function () {
+    it('returns type of model if useSnapshots is false', () => {
       let result;
-      viewModel.attr('type', 'Mock');
-      viewModel.attr('useSnapshots', false);
+      viewModel.type = 'Mock';
+      viewModel.useSnapshots = false;
       result = viewModel.getModelKey();
       expect(result).toEqual('Mock');
     });
   });
 
-  describe('getDisplayModel() method', function () {
-    it('returns displayModel', function () {
+  describe('getDisplayModel() method', () => {
+    it('returns displayModel', () => {
       let result;
-      viewModel.attr('type', 'Program');
+      viewModel.type = 'Program';
       result = viewModel.getDisplayModel();
       expect(result).toEqual(Program);
     });
   });
 
-  describe('setDisabledItems() method', function () {
+  describe('setDisabledItems() method', () => {
     let allItems = [{
       data: {
         id: 123,
@@ -577,28 +574,27 @@ describe('mapper-results component', function () {
     let isMegaMapping = false;
     let type = 'mockType';
 
-    it('does nothing if viewModel.searchOnly() is true', function () {
-      viewModel.attr('searchOnly', true);
+    it('does nothing if viewModel.searchOnly() is true', () => {
+      viewModel.searchOnly = true;
       viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(allItems);
     });
 
     it('does nothing if it is case of object generation',
-      function () {
-        viewModel.attr({
-          objectGenerator: true,
-        });
+      () => {
+        viewModel.assign({});
+        viewModel.objectGenerator = true;
         viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
         expect(allItems).toEqual(allItems);
       });
 
-    it('updates disabled items', function () {
-      viewModel.attr('searchOnly', false);
+    it('updates disabled items', () => {
+      viewModel.searchOnly = false;
       viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(expectedResult);
     });
 
-    it('updates disabled items if "isMegaMapping" is true', function () {
+    it('updates disabled items if "isMegaMapping" is true', () => {
       isMegaMapping = true;
       relatedData = {
         parent: {
@@ -624,13 +620,13 @@ describe('mapper-results component', function () {
         isDisabled: true,
       }];
 
-      viewModel.attr('searchOnly', false);
+      viewModel.searchOnly = false;
       viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(expectedResult);
     });
   });
 
-  describe('setSelectedItems() method', function () {
+  describe('setSelectedItems() method', () => {
     let allItems = [{
       id: 123,
     }, {
@@ -645,14 +641,14 @@ describe('mapper-results component', function () {
       isSelected: false,
     }];
 
-    it('updates selected items', function () {
-      viewModel.attr('selected', [{id: 123}]);
+    it('updates selected items', () => {
+      viewModel.selected = [{id: 123}];
       viewModel.setSelectedItems(allItems);
       expect(allItems).toEqual(expectedResult);
     });
   });
 
-  describe('setMegaRelations() method', function () {
+  describe('setMegaRelations() method', () => {
     let allItems = [{
       id: 123,
     }, {
@@ -692,17 +688,17 @@ describe('mapper-results component', function () {
 
     let type = 'mockType';
 
-    it('updates mega relations items', function () {
-      viewModel.attr('megaRelationObj', {
+    it('updates mega relations items', () => {
+      viewModel.megaRelationObj = {
         '234': 'parent',
         defaultValue: 'child',
-      });
+      };
       viewModel.setMegaRelations(allItems, relatedData, type);
       expect(allItems).toEqual(expectedResult);
     });
   });
 
-  describe('disableItself() method', function () {
+  describe('disableItself() method', () => {
     let allItems = [{
       type: 'mockType',
       id: 123,
@@ -713,23 +709,23 @@ describe('mapper-results component', function () {
     let isMegaMapping = false;
     let expectedResult;
 
-    it('do nothing if baseInstance is undefined', function () {
+    it('do nothing if baseInstance is undefined', () => {
       viewModel.disableItself(isMegaMapping, allItems);
       expect(allItems).toEqual(allItems);
     });
 
-    it('updates "disabledIds" attr', function () {
-      viewModel.attr('baseInstance', {
+    it('updates "disabledIds" attr', () => {
+      viewModel.baseInstance = new canMap({
         type: 'mockType',
         id: 123,
       });
       viewModel.disableItself(isMegaMapping, allItems);
-      expect(makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
+      expect(makeArray(viewModel.disabledIds)).toEqual([123]);
     });
 
     it('assigns true to "isDisabled" for allItems ' +
-    'if self is true', function () {
-      viewModel.attr('baseInstance', {
+    'if self is true', () => {
+      viewModel.baseInstance = new canMap({
         type: 'mockType',
         id: 123,
       });
@@ -746,9 +742,9 @@ describe('mapper-results component', function () {
     });
 
     it('assigns "mapAsChild" and "isSelf" for allItems ' +
-    'if isMegaMapping is true', function () {
+    'if isMegaMapping is true', () => {
       isMegaMapping = true;
-      viewModel.attr('baseInstance', {
+      viewModel.baseInstance = new canMap({
         type: 'mockType',
         id: 123,
       });
@@ -767,10 +763,10 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('transformValue() method', function () {
+  describe('transformValue() method', () => {
     let Model;
 
-    beforeEach(function () {
+    beforeEach(() => {
       Model = {
         model: jasmine.createSpy().and.returnValue('transformedValue'),
       };
@@ -778,16 +774,16 @@ describe('mapper-results component', function () {
         .and.returnValue(Model);
     });
 
-    it('returns transformed value', function () {
+    it('returns transformed value', () => {
       let result;
       let value = 'mockValue';
-      viewModel.attr('useSnapshots', false);
+      viewModel.useSnapshots = false;
       result = viewModel.transformValue(value);
       expect(result).toEqual('transformedValue');
     });
 
     it('returns snapshot-transformed value if it is use-snapshots case',
-      function () {
+      () => {
         let result;
         let value = {
           revision: {
@@ -802,7 +798,7 @@ describe('mapper-results component', function () {
         };
         spyOn(SnapshotUtils, 'toObject')
           .and.returnValue('snapshot');
-        viewModel.attr('useSnapshots', true);
+        viewModel.useSnapshots = true;
         result = viewModel.transformValue(value);
         expect(result).toEqual(expectedResult);
       });
@@ -925,6 +921,7 @@ describe('mapper-results component', function () {
             id: 1,
             type: 'testType',
             data: 'transformedValue',
+            markedSelected: false,
           }]);
       });
 
@@ -938,6 +935,7 @@ describe('mapper-results component', function () {
               id: 1,
               type: 'testType',
               data: 'transformedValue',
+              markedSelected: false,
             }],
             'relatedData',
             'modelKey'
@@ -954,6 +952,7 @@ describe('mapper-results component', function () {
               id: 1,
               type: 'testType',
               data: 'transformedValue',
+              markedSelected: false,
             }],
             'relatedData',
             'modelKey'
@@ -970,6 +969,7 @@ describe('mapper-results component', function () {
               id: 1,
               type: 'testType',
               data: 'transformedValue',
+              markedSelected: false,
             }]
           );
       });
@@ -990,6 +990,7 @@ describe('mapper-results component', function () {
           id: 1,
           type: 'testType',
           data: 'transformedValue',
+          markedSelected: false,
         }]);
       });
 
@@ -1020,14 +1021,14 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('getRelatedData() method', function () {
+  describe('getRelatedData() method', () => {
     let isMegaMapping;
     let responseArray = [];
     let query = {};
     let modelKey = '';
     let result;
 
-    beforeEach(function () {
+    beforeEach(() => {
       spyOn(viewModel, 'buildMegaRelatedData')
         .withArgs(responseArray, query, modelKey)
         .and.returnValue({mock: 123});
@@ -1037,7 +1038,7 @@ describe('mapper-results component', function () {
     });
 
     it('should return the result of buildMegaRelatedData() call' +
-    'if "isMegaMapping" is true', function () {
+    'if "isMegaMapping" is true', () => {
       isMegaMapping = true;
 
       result = viewModel.getRelatedData(
@@ -1049,7 +1050,7 @@ describe('mapper-results component', function () {
     );
 
     it('should return the result of buildRelatedData() call ' +
-    'if "isMegaMapping" is false', function () {
+    'if "isMegaMapping" is false', () => {
       isMegaMapping = false;
 
       result = viewModel.getRelatedData(
@@ -1061,9 +1062,9 @@ describe('mapper-results component', function () {
     );
   });
 
-  describe('buildRelatedData() method', function () {
+  describe('buildRelatedData() method', () => {
     it('method should return data from "relatedData" array',
-      function () {
+      () => {
         let responseArray = [
           {
             Snapshot: {
@@ -1083,7 +1084,7 @@ describe('mapper-results component', function () {
     );
 
     it('method should return data from "deferred_list" array',
-      function () {
+      () => {
         let responseArray = [
           {
             Snapshot: {
@@ -1096,10 +1097,10 @@ describe('mapper-results component', function () {
         };
         let result;
 
-        viewModel.attr('deferredList', [
+        viewModel.deferredList = [
           {id: 5, type: 'Snapshot'},
           {id: 25, type: 'Snapshot'},
-        ]);
+        ];
 
         result = viewModel
           .buildRelatedData(responseArray, query, 'Snapshot');
@@ -1109,16 +1110,16 @@ describe('mapper-results component', function () {
     );
 
     it('return data from "deferred_list" array. RelatedData is undefined',
-      function () {
+      () => {
         let result;
         let query = {
           relatedQueryIndex: 0,
         };
 
-        viewModel.attr('deferredList', [
+        viewModel.deferredList = [
           {id: 5, type: 'Snapshot'},
           {id: 25, type: 'Snapshot'},
-        ]);
+        ];
 
         result = viewModel
           .buildRelatedData([], query, 'Snapshot');
@@ -1128,13 +1129,13 @@ describe('mapper-results component', function () {
     );
   });
 
-  describe('buildMegaRelatedData() method', function () {
+  describe('buildMegaRelatedData() method', () => {
     let responseArray;
     let query;
     let result;
 
     it('method should return data from "relatedData" array ' +
-    'if "parentQueryIndex" and "childQueryIndex" are defined', function () {
+    'if "parentQueryIndex" and "childQueryIndex" are defined', () => {
       responseArray = [
         {
           Snapshot: {
@@ -1161,7 +1162,7 @@ describe('mapper-results component', function () {
     });
 
     it('method should return data from "relatedData" array ' +
-    'if "parentQueryIndex" and "childQueryIndex" are not defined', function () {
+    'if "parentQueryIndex" and "childQueryIndex" are not defined', () => {
       responseArray = [
         {
           Snapshot: {
@@ -1180,7 +1181,8 @@ describe('mapper-results component', function () {
 
   describe('loadAllItemsIds() method', () => {
     beforeEach(() => {
-      viewModel.attr({});
+      viewModel.assign({});
+
       spyOn(viewModel, 'getQuery')
         .withArgs('ids', false)
         .and.returnValue({
@@ -1256,9 +1258,9 @@ describe('mapper-results component', function () {
 
       it('adds "type" attribute value to all objects' +
         'if "useSnapshots" attribute is true', async () => {
-        viewModel.attr('type', 'testType');
-        viewModel.attr('objectGenerator', true);
-        viewModel.attr('useSnapshots', true);
+        viewModel.type = 'testType';
+        viewModel.objectGenerator = true;
+        viewModel.useSnapshots = true;
 
         const result = await viewModel.loadAllItemsIds();
 
@@ -1269,7 +1271,7 @@ describe('mapper-results component', function () {
 
       it('performs extra mapping validation in case Assessment generation',
         async () => {
-          viewModel.attr('objectGenerator', false);
+          viewModel.objectGenerator = false;
 
           const result = await viewModel.loadAllItemsIds();
 
@@ -1290,48 +1292,48 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('setItemsDebounced() method', function () {
-    beforeEach(function () {
+  describe('setItemsDebounced() method', () => {
+    beforeEach(() => {
       spyOn(window, 'clearTimeout');
       spyOn(window, 'setTimeout')
         .and.returnValue(123);
     });
 
-    it('clears timeout of viewModel._setItemsTimeout', function () {
-      viewModel.attr('_setItemsTimeout', 321);
+    it('clears timeout of viewModel._setItemsTimeout', () => {
+      viewModel._setItemsTimeout = 321;
       viewModel.setItemsDebounced();
       expect(clearTimeout).toHaveBeenCalledWith(321);
     });
 
-    it('sets timeout in viewModel._setItemsTimeout', function () {
+    it('sets timeout in viewModel._setItemsTimeout', () => {
       viewModel.setItemsDebounced();
-      expect(viewModel.attr('_setItemsTimeout'))
+      expect(viewModel._setItemsTimeout)
         .toEqual(123);
     });
   });
 
-  describe('showRelatedAssessments() method', function () {
-    beforeEach(function () {
-      viewModel.attr('relatedAssessments', {
+  describe('showRelatedAssessments() method', () => {
+    beforeEach(() => {
+      viewModel.relatedAssessments = {
         state: {},
-      });
+      };
     });
 
-    it('sets viewModel.relatedAssessments.instance', function () {
-      viewModel.attr('relatedAssessments.instance', 1);
+    it('sets viewModel.relatedAssessments.instance', () => {
+      viewModel.relatedAssessments.instance = 1;
       viewModel.showRelatedAssessments({
         instance: 123,
       });
-      expect(viewModel.attr('relatedAssessments.instance'))
+      expect(viewModel.relatedAssessments.instance)
         .toEqual(123);
     });
 
-    it('sets viewModel.relatedAssessments.state.open to true', function () {
-      viewModel.attr('relatedAssessments.state.open', false);
+    it('sets viewModel.relatedAssessments.state.open to true', () => {
+      viewModel.relatedAssessments.state.open = false;
       viewModel.showRelatedAssessments({
         instance: 123,
       });
-      expect(viewModel.attr('relatedAssessments.state.open'))
+      expect(viewModel.relatedAssessments.state.open)
         .toEqual(true);
     });
   });
@@ -1343,48 +1345,48 @@ describe('mapper-results component', function () {
 
     it('removes selected item based on passed item\'s id from "selected" ' +
     'collection', () => {
-      viewModel.attr('selected', [
+      viewModel.selected = [
         {id: 123},
         {id: 1234},
         {id: 12345},
-      ]);
+      ];
 
       viewModel.onItemDestroyed({itemId: 1234});
 
-      expect(viewModel.attr('selected').serialize()).toEqual([
+      expect(viewModel.selected.serialize()).toEqual([
         {id: 123},
         {id: 12345},
       ]);
     });
 
     it('sets previous page if destroyed item was single on the page', () => {
-      viewModel.attr('items', [{}]);
-      viewModel.attr('paging', {current: 3});
+      viewModel.items = [{}];
+      viewModel.paging = new canMap({current: 3});
 
       viewModel.onItemDestroyed({itemId: 1});
 
-      expect(viewModel.attr('paging.current')).toBe(2);
+      expect(viewModel.paging.attr('current')).toBe(2);
     });
 
     describe('doesn\'t set previous page', () => {
       it('if destroyed item was single on the page and current page is ' +
       'first', () => {
-        viewModel.attr('items', [{}]);
-        viewModel.attr('paging', {current: 1});
+        viewModel.items = [{}];
+        viewModel.paging = new canMap({current: 1});
 
         viewModel.onItemDestroyed({itemId: 1});
 
-        expect(viewModel.attr('paging.current')).toBe(1);
+        expect(viewModel.paging.attr('current')).toBe(1);
       });
 
       it('if count of items placed on the page without destroyed item is ' +
       'more than 1', () => {
-        viewModel.attr('items', [{}, {}]);
-        viewModel.attr('paging', {current: 3});
+        viewModel.items = [{}, {}];
+        viewModel.paging = new canMap({current: 3});
 
         viewModel.onItemDestroyed({itemId: 1});
 
-        expect(viewModel.attr('paging.current')).toBe(3);
+        expect(viewModel.paging.attr('current')).toBe(3);
       });
     });
 
@@ -1395,87 +1397,87 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('events', function () {
+  describe('events', () => {
     let events;
 
-    beforeEach(function () {
+    beforeEach(() => {
       events = Component.prototype.events;
     });
 
-    describe('"{viewModel} allSelected" event', function () {
+    describe('"{viewModel} allSelected" event', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(viewModel, 'loadAllItems');
         handler = events['{viewModel} allSelected'].bind({
           viewModel: viewModel,
         });
       });
-      it('calls loadAllItems() if allSelected is truly', function () {
+      it('calls loadAllItems() if allSelected is truly', () => {
         handler([{}], {}, true);
         expect(viewModel.loadAllItems).toHaveBeenCalled();
       });
-      it('does not call loadAllItems() if allSelected is falsy', function () {
+      it('does not call loadAllItems() if allSelected is falsy', () => {
         handler([{}], {}, false);
         expect(viewModel.loadAllItems).not.toHaveBeenCalled();
       });
     });
 
-    describe('"{viewModel.paging} current" event', function () {
+    describe('"{viewModel.paging} current" event', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(viewModel, 'setItemsDebounced');
         handler = events['{viewModel.paging} current'].bind({
           viewModel: viewModel,
         });
       });
-      it('calls setItemsDebounced()', function () {
+      it('calls setItemsDebounced()', () => {
         handler();
         expect(viewModel.setItemsDebounced).toHaveBeenCalled();
       });
     });
 
-    describe('"{viewModel.paging} pageSize" event', function () {
+    describe('"{viewModel.paging} pageSize" event', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(viewModel, 'setItemsDebounced');
         handler = events['{viewModel.paging} pageSize'].bind({
           viewModel: viewModel,
         });
       });
-      it('calls setItemsDebounced()', function () {
+      it('calls setItemsDebounced()', () => {
         handler();
         expect(viewModel.setItemsDebounced).toHaveBeenCalled();
       });
     });
 
-    describe('"{viewModel.sort} key" event', function () {
+    describe('"{viewModel.sort} key" event', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(viewModel, 'setItemsDebounced');
         handler = events['{viewModel.sort} key'].bind({
           viewModel: viewModel,
         });
       });
-      it('calls setItemsDebounced()', function () {
+      it('calls setItemsDebounced()', () => {
         handler();
         expect(viewModel.setItemsDebounced).toHaveBeenCalled();
       });
     });
 
-    describe('"{viewModel.sort} direction" event', function () {
+    describe('"{viewModel.sort} direction" event', () => {
       let handler;
 
-      beforeEach(function () {
+      beforeEach(() => {
         spyOn(viewModel, 'setItemsDebounced');
         handler = events['{viewModel.sort} direction'].bind({
           viewModel: viewModel,
         });
       });
-      it('calls setItemsDebounced()', function () {
+      it('calls setItemsDebounced()', () => {
         handler();
         expect(viewModel.setItemsDebounced).toHaveBeenCalled();
       });

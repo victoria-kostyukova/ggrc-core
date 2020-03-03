@@ -7,7 +7,6 @@ import Component from '../assessments-bulk-verify';
 import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import * as RequestUtils from '../../../../plugins/utils/request-utils';
 
-
 describe('assessments-bulk-verify component', () => {
   let viewModel;
 
@@ -17,42 +16,42 @@ describe('assessments-bulk-verify component', () => {
 
   describe('isVerifyButtonDisabled get() method', () => {
     it('returns true if "selected" attr is empty', () => {
-      viewModel.attr('selected', []);
-      viewModel.attr('isVerifying', false);
+      viewModel.selected = [];
+      viewModel.isVerifying = false;
 
-      expect(viewModel.attr('isVerifyButtonDisabled')).toBe(true);
+      expect(viewModel.isVerifyButtonDisabled).toBe(true);
     });
 
     it('returns true if "selected" attr is not empty and ' +
     '"isVerifying" attr returns true', () => {
-      viewModel.attr('selected', [{
+      viewModel.selected = [{
         id: 123,
         title: 'asmt1',
-      }]);
-      viewModel.attr('isVerifying', true);
+      }];
+      viewModel.isVerifying = true;
 
-      expect(viewModel.attr('isVerifyButtonDisabled')).toBe(true);
+      expect(viewModel.isVerifyButtonDisabled).toBe(true);
     });
 
     it('returns false if "selected" attr is not empty and ' +
     '"isVerifying" attr returns false', () => {
-      viewModel.attr('selected', [{
+      viewModel.selected = [{
         id: 123,
         title: 'asmt1',
-      }]);
-      viewModel.attr('isVerifying', false);
+      }];
+      viewModel.isVerifying = false;
 
-      expect(viewModel.attr('isVerifyButtonDisabled')).toBe(false);
+      expect(viewModel.isVerifyButtonDisabled).toBe(false);
     });
   });
 
   describe('onVerifyClick() method', () => {
     it('sets "isVerifying" attr to true before request', () => {
       spyOn(RequestUtils, 'request');
-      viewModel.attr('isVerifying', false);
+      viewModel.isVerifying = false;
       viewModel.onVerifyClick();
 
-      expect(viewModel.attr('isVerifying')).toBe(true);
+      expect(viewModel.isVerifying).toBe(true);
     });
 
     it('calls request() method with specified params', () => {
@@ -98,12 +97,12 @@ describe('assessments-bulk-verify component', () => {
       });
 
     it('sets "isVerifying" attr to false after request', async () => {
-      viewModel.attr('isVerifying', true);
+      viewModel.isVerifying = true;
       spyOn(RequestUtils, 'request')
         .and.returnValue(Promise.reject());
       await viewModel.onVerifyClick();
 
-      expect(viewModel.attr('isVerifying')).toBe(false);
+      expect(viewModel.isVerifying).toBe(false);
     });
   });
 
@@ -111,7 +110,7 @@ describe('assessments-bulk-verify component', () => {
     it('sets "filterOperatorOptions" attr', () => {
       viewModel.init();
 
-      expect(viewModel.attr('filterOperatorOptions').serialize()).toEqual({
+      expect(viewModel.filterOperatorOptions.serialize()).toEqual({
         disabled: true,
       });
     });
@@ -162,7 +161,7 @@ describe('assessments-bulk-verify component', () => {
       it('assigns element to "element" attr', () => {
         handler();
 
-        expect(viewModel.attr('element'))
+        expect(viewModel.element)
           .toEqual($('<assessments-bulk-verify></assessments-bulk-verify>'));
       });
 

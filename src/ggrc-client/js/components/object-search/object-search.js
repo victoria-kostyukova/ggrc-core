@@ -21,10 +21,11 @@ export default canComponent.extend({
   tag: 'object-search',
   view: canStache(template),
   leakScope: true,
-  viewModel: function () {
+  viewModel() {
     return ObjectOperationsBaseVM.extend({
-      object: 'MultitypeSearch',
-      type: 'Control',
+      object: {
+        value: 'MultitypeSearch',
+      },
     });
   },
 });
