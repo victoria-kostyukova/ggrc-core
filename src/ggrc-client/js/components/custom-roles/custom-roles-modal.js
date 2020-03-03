@@ -29,5 +29,6 @@ export default canComponent.extend({
     disabledRoles: [],
     rolesTooltips: [],
     readOnly: false,
+    isHidable: false,
   }),
 });

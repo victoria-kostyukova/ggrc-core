@@ -69,7 +69,7 @@
     </div>
 
     <div class="row-fluid">
-      <div class="span8 hidable">
+      <div class="span8 hidable" data-hide-title="Details">
         <div class="form-header-container">
           <label for="task_group_description">
             Details
@@ -89,7 +89,7 @@
     </div>
     {{^if new_object_form}}
       <div class="row-fluid">
-        <div class="span4 hidable">
+        <div class="span4 hidable" data-hide-title="Code">
           <div class="form-header-container">
             <label>
               Code

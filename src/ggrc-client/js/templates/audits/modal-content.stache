@@ -57,7 +57,7 @@
             </label>
           {{/instance.computed_errors.title}}
         </div>
-        <div id="state" class="span3 hidable">
+        <div id="state" class="span3 hidable" data-hide-title="State">
           <label>
             State
           </label>
@@ -74,13 +74,14 @@
         <div class="span12 hide-wrap">
           <access-control-list-roles-helper
             instance:from="{.}"
+            isHidable:from="true"
             isNewInstance:from="new_object_form">
           </access-control-list-roles-helper>
         </div>
       </div>
       <div>
         <div class="row-fluid">
-          <div class="span6 hidable">
+          <div class="span6 hidable" data-hide-title="Description">
             <label>
               Description
               <i class="fa fa-question-circle" rel="tooltip" title="Describe reason and purpose of the Audit."></i>
@@ -97,9 +98,9 @@
 
           </div>
 
-          <div class="span6 hide-wrap hidable">
+          <div class="span6 hide-wrap hidable" data-hide-title="Audit Firm">
             <div class="row-fluid inner-hide">
-              <div class="span12 hidable">
+              <div class="span12 hidable" >
                 <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
                   <object-loader path:from="instance.audit_firm">
                     <label>
@@ -128,20 +129,18 @@
         </div>
       </div>
       <div class="row-fluid">
-        <div class="span3 hidable">
+        <div class="span3 hidable" data-hide-title="Planned Start Date">
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           <datepicker-component date:bind="start_date"
                       label:from="'Planned Start Date'"
-                      setMaxDate:from="end_date"
-                      tabindex="20">
+                      setMaxDate:from="end_date">
           </datepicker-component>
         </div>
-        <div class="span3 hidable">
+        <div class="span3 hidable" data-hide-title="Planned End Date">
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           <datepicker-component date:bind="end_date"
                       setMinDate:from="start_date"
-                      label:from="'Planned End Date'"
-                      tabindex="21">
+                      label:from="'Planned End Date'">
           </datepicker-component>
           <!-- TODO: Remove. Currently added to fix layout -->
           <label></label>
@@ -149,7 +148,7 @@
       </div>
 
       <div class="row-fluid">
-        <div class="span12 hidable">
+        <div class="span12 hidable" data-hide-title="Report Period">
           <div class="row-fluid">
             <div class="span12">
               <div class="span3">
@@ -179,10 +178,10 @@
       </div>
 
       <div class="row-fluid">
-        <div class="span3 hidable top-space">
+        <div class="span3 hidable top-space" data-hide-title="Attachments">
             <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="13"></ggrc-gdrive-folder-picker>
         </div>
-        <div class="span3 hidable top-space bottom-space">
+        <div class="span3 hidable top-space bottom-space" data-hide-title="Evidence Url">
           <deferred-mapper
             instance:from="instance">
             <related-documents
@@ -214,7 +213,7 @@
 
       {{^if new_object_form}}
         <div class="row-fluid">
-          <div class="span4 hidable">
+          <div class="span4 hidable" data-hide-title="Code">
             <label>
               Code
             </label>
@@ -226,7 +225,7 @@
 
       {{#if new_object_form}}
         <div class="row-fluid">
-          <div class="span4 hidable">
+          <div class="span4 hidable" data-hide-title="Snapshots">
             <label class="heavy-label">
               Snapshots
             </label>

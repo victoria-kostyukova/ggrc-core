@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div {{#if hidable}} class="ggrc-form-item hidable" {{/if}}>
+<div {{#if hidable}} class="ggrc-form-item hidable" {{/if}} data-hide-title="{{labelName}}">
   <div class="span6 bottom-spacing">
     <label class="form-label">
       {{labelName}}

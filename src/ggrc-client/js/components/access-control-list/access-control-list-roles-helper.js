@@ -27,6 +27,7 @@ export default canComponent.extend({
     disabledRoles: [],
     rolesTooltips: [],
     readOnly: false,
+    isHidable: false,
     orderOfRoles: [],
     setAutoPopulatedRoles: function () {
       let instance = this.attr('instance');

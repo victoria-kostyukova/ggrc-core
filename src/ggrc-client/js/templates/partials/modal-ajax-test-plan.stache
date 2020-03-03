@@ -4,7 +4,7 @@
 }}
 
 <div class="row-fluid">
-  <div class="span6 hidable">
+  <div class="span6 hidable" data-hide-title="Assessment Procedure">
     <label>
       Assessment Procedure
       <i class="fa fa-question-circle" rel="tooltip" title="Provide an assessment procedure for this {{model.title_singular}}."></i>

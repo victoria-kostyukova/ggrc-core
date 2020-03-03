@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#each items}}
-<div class="ggrc-form-item {{#isHidable .}}hidable{{/isHidable}}">
+<div class="ggrc-form-item {{#isHidable .}}hidable{{/isHidable}}" data-hide-title="CA-{{title}}">
   <div class="ggrc-form-item__row {{#if_helpers '\n #if' validationState.hasGCAErrors '\n and #if' instance.computed_errors.custom_attribute_values}}field-failure{{/if_helpers}}">
     <div class="ggrc-form-item__field-header">
       <tooltip-content
@@ -45,7 +45,6 @@
       will be removed.
     }}
     <custom-attributes-field
-      tabindex="20"
       type:from="attributeType"
       value:bind="value"
       fieldId:from="customAttributeId"

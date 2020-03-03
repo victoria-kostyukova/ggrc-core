@@ -13,15 +13,17 @@
     updatableGroupId:from="updatableGroupId"
     isNewInstance:from="isNewInstance"
     readOnly:from="readOnly"
+    isHidable:from="isHidable"
     instance:from="instance">
       <div class="people-groups">
         {{#groups}}
           <related-people-access-control-group
-            class="people-group"
+            class="people-group {{^if required}}hidable{{/if}}"
             autoUpdate:from="true"
             on:updateRoles="updateRoles(scope.event)"
             isNewInstance:from="isNewInstance"
             required:from="required"
+            isHidable:from="isHidable"
             groupId:from="groupId"
             title:from="title"
             people:from="people"
@@ -29,15 +31,18 @@
             isProposal:from="isProposal"
             updatableGroupId:from="updatableGroupId"
             readOnly:from="readOnly"
+            data-hide-title="CR-{{title}}"
             disabledRoles:from="disabledRoles"
             rolesTooltips:from="rolesTooltips"
             singleUserRole:from="singleUserRole"
             >
               <div
-                {{^required}}class="hidable"{{/required}}
                 data-original-title="{{tooltip}}"
                 rel="tooltip"
                 data-placement="bottom">
+                {{#showHide}}
+                   <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                {{/showHide}}
                 <deletable-people-group
                   showEmptyMessage:from="false"
                   required:from="required"

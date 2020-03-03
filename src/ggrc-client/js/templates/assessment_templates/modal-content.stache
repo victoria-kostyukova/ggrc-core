@@ -84,7 +84,7 @@
       <br />
 
       <div class="row-fluid">
-        <div class="span6 hidable">
+        <div class="span6 hidable" data-hide-title="Default assessment procedure">
           <label>
             Default assessment procedure
             <i class="grcicon-help-black" rel="tooltip"
@@ -130,7 +130,7 @@
 
       <div class="row-fluid">
         {{^if new_object_form}}
-          <div class="span4 hidable">
+          <div class="span4 hidable" data-hide-title="Code">
             <label>
               Code
             </label>
@@ -138,7 +138,7 @@
             <input disabled class="input-block-level" type="text" value="{{instance.slug}}">
           </div>
         {{/if}}
-        <div id="state" class="span4 hidable">
+        <div id="state" class="span4 hidable" data-hide-title="State">
           <label>
             State
             <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
@@ -182,8 +182,9 @@
         {{/if}}
       </div>
 
-      <div class="spacing-top row-fluid hidable">
+      <div class="spacing-top row-fluid hidable" data-hide-title="Custom Attributes">
         <label>Custom Attributes</label>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <div class="row-fluid">
           <div class="span12">
             <assessment-template-attributes

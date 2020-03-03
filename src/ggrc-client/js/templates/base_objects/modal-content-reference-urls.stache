@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="span12">
+<div class="span12 hidable" data-hide-title="Reference URL">
   <deferred-mapper
     instance:from="instance">
     <related-documents
@@ -12,9 +12,8 @@
       autorefresh:from="false"
       on:addMappings="addMappings(scope.event.objects)"
       on:removeMappings="removeMappings(scope.event.object)">
-      <!-- tabindex is necessary to work of 'Hide optional field' function -->
       <related-urls
-        tabindex="20"
+        data-hide-title="Reference URL"
         instance:from="instance"
         allowToRemove:from="new_object_form"
         urls:bind="documents"

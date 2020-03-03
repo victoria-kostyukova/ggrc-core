@@ -37,6 +37,14 @@ const ViewModel = canDefineMap.extend({seal: false}, {
   required: {
     value: false,
   },
+  isHidable: {
+    value: false,
+  },
+  showHide: {
+    get() {
+      return !(this.required || !this.isHidable);
+    },
+  },
   backUpPeople: {
     value: () => [],
   },
