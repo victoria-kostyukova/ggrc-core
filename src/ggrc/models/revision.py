@@ -680,6 +680,11 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
 
     Updated by required values, generated from saved content dict."""
     # pylint: disable=too-many-locals
+
+    cached_content = self.get_cached_content()
+    if cached_content is not None:
+      return cached_content
+
     populated_content = self._content.copy()
     populated_content.update(self.populate_acl())
     populated_content.update(self.populate_reference_url())
@@ -710,12 +715,29 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     # remove attribute_object_id not used by FE anymore
     for item in populated_content["custom_attribute_values"]:
       item.pop("attribute_object_id", None)
+
+    self.set_cached_content(self.id, populated_content)
+
     return populated_content
 
   @content.setter
   def content(self, value):
     """ Setter for content property."""
     self._content = value
+
+  def get_cached_content(self):
+    """Return cached content value if it is present in content cache."""
+    if self.id is not None:
+      if hasattr(flask.g, 'rev_content') and flask.g.rev_content.get(self.id):
+        return flask.g.rev_content[self.id].copy()
+    return None
+
+  @staticmethod
+  def set_cached_content(id_, populated_content):
+    """Set cached content value to populated_content"""
+    if not hasattr(flask.g, 'rev_content'):
+      setattr(flask.g, 'rev_content', {})
+    flask.g.rev_content[id_] = populated_content
 
   def _handle_if_empty(self):
     """Check if revision is empty and update is_empty flag if true."""

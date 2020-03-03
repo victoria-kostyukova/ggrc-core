@@ -504,6 +504,8 @@ class Resource(ModelView):
           err.message = ggrc_errors.INTERNAL_SERVER_ERROR
           raise
         finally:
+          if hasattr(flask.g, 'rev_content'):
+            del flask.g.rev_content
           # When running integration tests, cache sometimes does not clear
           # correctly
           if getattr(settings, 'TESTING', False):
