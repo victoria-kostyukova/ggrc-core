@@ -32,7 +32,22 @@ describe('advanced-search-filter-state component', () => {
     });
   });
 
-  describe('getter for filterStates', () => {
+  describe('saveTreeStates() method', () => {
+    it('updates items collection', () => {
+      let selectedStates = [{value: 'Active'}, {value: 'Draft'}];
+      viewModel.stateModel = new canMap({
+        items: [],
+      });
+
+      viewModel.saveTreeStates(selectedStates);
+
+      let items = viewModel.stateModel.attr('items');
+      expect(items.length).toBe(2);
+      expect(items[0]).toBe('Active');
+      expect(items[1]).toBe('Draft');
+    });
+  });
+  describe('initializeFilterStates() method', () => {
     let states;
 
     beforeEach(() => {
@@ -47,7 +62,7 @@ describe('advanced-search-filter-state component', () => {
       viewModel.stateModel = new canMap({
         items: [],
       });
-
+      viewModel.initializeFilterStates();
       const result = viewModel.filterStates;
       expect(result.length).toBe(states.length);
 
@@ -63,26 +78,11 @@ describe('advanced-search-filter-state component', () => {
           items: ['state1'],
         });
 
+        viewModel.initializeFilterStates();
         const selectedItems = loFilter(viewModel.filterStates,
           (it) => it.checked);
         expect(selectedItems.length).toBe(1);
         expect(selectedItems[0].value).toBe('state1');
       });
-  });
-
-  describe('saveTreeStates() method', () => {
-    it('updates items collection', () => {
-      let selectedStates = [{value: 'Active'}, {value: 'Draft'}];
-      viewModel.stateModel = new canMap({
-        items: [],
-      });
-
-      viewModel.saveTreeStates(selectedStates);
-
-      let items = viewModel.stateModel.attr('items');
-      expect(items.length).toBe(2);
-      expect(items[0]).toBe('Active');
-      expect(items[1]).toBe('Draft');
-    });
   });
 });

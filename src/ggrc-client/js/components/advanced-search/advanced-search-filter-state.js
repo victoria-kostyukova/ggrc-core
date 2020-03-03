@@ -32,23 +32,7 @@ const ViewModel = canDefineMap.extend({
    * Draft
    */
   filterStates: {
-    get() {
-      let items = this.stateModel.attr('items') || [];
-
-      let allStates = StateUtils.getStatesForModel(
-        this.modelName,
-        this.statesCollectionKey
-      );
-
-      let filterStates = allStates.map((filterState) => {
-        return {
-          value: filterState,
-          checked: (items.indexOf(filterState) > -1),
-        };
-      });
-
-      return filterStates;
-    },
+    value: () => [],
   },
   /**
    * Indicates whether status tooltip should be displayed
@@ -117,6 +101,22 @@ const ViewModel = canDefineMap.extend({
   statesChanged(event) {
     this.saveTreeStates(event.selected);
   },
+  initializeFilterStates() {
+    let items = this.stateModel.attr('items') || [];
+
+    let allStates = StateUtils.getStatesForModel(
+      this.modelName,
+      this.statesCollectionKey
+    );
+
+    let filterStates = allStates.map((filterState) => {
+      return {
+        value: filterState,
+        checked: (items.indexOf(filterState) > -1),
+      };
+    });
+    this.filterStates = filterStates;
+  },
 });
 
 /**
@@ -127,4 +127,9 @@ export default canComponent.extend({
   view: canStache(template),
   leakScope: true,
   ViewModel,
+  events: {
+    inserted() {
+      this.viewModel.initializeFilterStates();
+    },
+  },
 });
