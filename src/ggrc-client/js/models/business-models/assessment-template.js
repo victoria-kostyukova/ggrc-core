@@ -46,6 +46,16 @@ export default Cacheable.extend({
       assignees: 'Principal Assignees',
       verifiers: 'Auditors',
     },
+    default_people_map: {
+      assignees: {
+        Control: 'Principal Assignees',
+        Risk: 'Principal Assignees',
+        defaults: 'Audit Lead',
+      },
+      verifiers: {
+        defaults: 'Auditors',
+      },
+    },
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],

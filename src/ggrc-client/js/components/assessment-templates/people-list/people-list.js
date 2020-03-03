@@ -30,13 +30,16 @@ export default canComponent.extend({
     define: {
       peopleValues: {
         value: [],
-        set: function (newValue) {
+        set(newValue) {
           if (this.attr('selectedValue')) {
-            let listName = this.attr('listName');
-            let defaultValue = this.attr('instance')
-              .constructor.defaults.default_people[listName];
-            let currentValue = this.attr('selectedValue');
-            let isPresent = newValue.attr().findIndex((el) => {
+            const listName = this.attr('listName');
+            const templateType = this.attr('instance.template_object_type');
+            const defaultValueMap = this.attr('instance')
+              .constructor.defaults.default_people_map[listName];
+            const defaultValue = defaultValueMap[templateType]
+              || defaultValueMap.defaults;
+            const currentValue = this.attr('selectedValue');
+            const isPresent = newValue.attr().findIndex((el) => {
               return el.value === currentValue;
             }) !== -1;
             if (!isPresent) {
