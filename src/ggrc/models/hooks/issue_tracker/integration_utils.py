@@ -138,6 +138,14 @@ def build_updated_objects_args(revision_ids, mail_data):
   return _create_args(objects, mail_data)
 
 
+def build_status_comments_args(mail_data, issuetracker_status_info):
+  """Build params for bulk Issue Tracker status comments update."""
+  return {
+      "issuetracker_status_info": issuetracker_status_info,
+      "mail_data": mail_data,
+  }
+
+
 def build_comments_args(revision_ids, mail_data):
   """Build params for bulk Issue Tracker comments update."""
   comments = _collect_comments(revision_ids)

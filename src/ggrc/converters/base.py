@@ -24,6 +24,7 @@ from ggrc.models import exceptions
 from ggrc.models import all_models
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+from ggrc.utils import merge_dict
 
 
 logger = logging.getLogger(__name__)
@@ -160,21 +161,30 @@ class ImportConverter(BaseConverter):
     """Process import and post import jobs."""
 
     revision_ids = []
+    issuetracker_status_info = dict()
     for converter in self.initialize_block_converters():
       if not converter.ignore:
         try:
-          converter.import_csv_data()
+          issuetracker_status_info = merge_dict(
+              issuetracker_status_info,
+              converter.import_csv_data()
+          )
         except exceptions.ImportStoppedException:
           raise
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
     self._start_compute_attributes_job(revision_ids)
     if not self.dry_run and settings.ISSUE_TRACKER_ENABLED:
-      self._start_issuetracker_update(revision_ids)
+      self._start_issuetracker_update(revision_ids, issuetracker_status_info)
     self.drop_cache()
 
-  def _start_issuetracker_update(self, revision_ids):
-    """Create or update issuetracker tickets for all imported instances."""
+  def _start_issuetracker_update(
+      self, revision_ids, issuetracker_status_info=None
+  ):
+    """
+    Create or update issuetracker tickets for all imported instances.
+    Add issuetracker_status_info dict to params
+    """
 
     arg_list = {
         "revision_ids": revision_ids,
@@ -189,6 +199,8 @@ class ImportConverter(BaseConverter):
     }
 
     arg_list["mail_data"] = mail_data
+    if issuetracker_status_info:
+      arg_list["issuetracker_status_info"] = issuetracker_status_info
 
     from ggrc import views
     views.background_update_issues(parameters=arg_list)

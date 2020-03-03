@@ -24,6 +24,7 @@ from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
 from ggrc.utils import list_chunks
+from ggrc.utils import merge_dict
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import base_row
@@ -442,6 +443,7 @@ class ImportBlockConverter(people_cache.WithPeopleCache,
   def import_csv_data(self):  # noqa
     """Perform import sequence for the block."""
     try:
+      issuetracker_status_info = dict()
       for row in self.row_converters_from_csv():
         try:
           ie_status = self.converter.get_job_status()
@@ -449,6 +451,10 @@ class ImportBlockConverter(people_cache.WithPeopleCache,
              all_models.ImportExport.STOPPED_STATUS:
             raise exceptions.ImportStoppedException()
           row.process_row()
+          issuetracker_status_info = merge_dict(
+              issuetracker_status_info,
+              row.issuetracker_status_info
+          )
         except exceptions.ImportStoppedException:
           raise
         except ValueError as err:
@@ -462,6 +468,7 @@ class ImportBlockConverter(people_cache.WithPeopleCache,
           logger.exception(errors.UNEXPECTED_ERROR)
         self._update_info(row)
         _app_ctx_stack.top.sqlalchemy_queries = []
+      return issuetracker_status_info
     except exceptions.ImportStoppedException:
       raise
     except Exception:  # pylint: disable=broad-except
