@@ -3,6 +3,8 @@
 
 """Tests for snapshot model."""
 
+from collections import OrderedDict
+
 import ddt
 
 from ggrc.app import app
@@ -110,30 +112,12 @@ class TestSnapshotQueryApi(TestCase):
   def setUp(self):
     """Set up test cases for all tests."""
     super(TestSnapshotQueryApi, self).setUp()
-    self._create_cas()
-    self._create_external_object()
-    self.import_file("all_snapshottable_objects.csv")
+    self.client.get("/login")
 
-  def _create_cas(self):
+  def _create_cas(self):  # pylint: disable=no-self-use
     """Create custom attribute definitions."""
-    self._ca_objects = {}
-    external_ca_model_names = [
-        "control",
-        "risk",
-    ]
-    ca_model_names = [
-        "requirement",
-        "threat",
-    ]
-    external_ca_args = [
-        {"title": "CA text", "attribute_type": "Text"},
-        {"title": "CA rich text", "attribute_type": "Rich Text"},
-        {"title": "CA date", "attribute_type": "Date"},
-        {"title": "CA multiselect", "attribute_type": "Multiselect",
-         "multi_choice_options": "yes,no"},
-        {"title": "CA dropdown", "attribute_type": "Dropdown",
-         "multi_choice_options": "one,two,three,four,five"},
-    ]
+    ca_model_name = "threat"
+
     ca_args = [
         {"title": "CA text", "attribute_type": "Text"},
         {"title": "CA rich text", "attribute_type": "Rich Text"},
@@ -144,34 +128,22 @@ class TestSnapshotQueryApi(TestCase):
         {"title": "CA dropdown", "attribute_type": "Dropdown",
          "multi_choice_options": "one,two,three,four,five"},
     ]
-    for type_ in ca_model_names:
-      with app.app_context():
-        for args in ca_args:
-          factories.CustomAttributeDefinitionFactory(
-              definition_type=type_,
-              **args
-          )
-    for type_ in external_ca_model_names:
-      with app.app_context():
-        for args in external_ca_args:
-          factories.CustomAttributeDefinitionFactory(
-              definition_type=type_,
-              **args
-          )
 
-  @staticmethod
-  def _create_external_object():
+    with app.app_context():
+      for args in ca_args:
+        factories.CustomAttributeDefinitionFactory(
+            definition_type=ca_model_name,
+            **args
+        )
+
+  def _create_external_object(self):  # pylint: disable=no-self-use
     """Populate external model object that could not be imported."""
     with factories.single_commit():
-      objects = [
-          factories.ControlFactory(directive=None),
-          factories.RiskFactory(),
-      ]
+      obj = factories.ThreatFactory()
 
       ca_definitions = {
           cad.title: cad
-          for object in objects
-          for cad in object.get_custom_attribute_definitions([
+          for cad in obj.get_custom_attribute_definitions([
               "CA text",
               "CA rich text",
               "CA date",
@@ -188,16 +160,32 @@ class TestSnapshotQueryApi(TestCase):
       }
 
       for title, value in ca_values.items():
-        for obj in objects:
-          factories.CustomAttributeValueFactory(
-              custom_attribute=ca_definitions[title],
-              attributable=obj,
-              attribute_value=value
-          )
+        factories.CustomAttributeValueFactory(
+            custom_attribute=ca_definitions[title],
+            attributable=obj,
+            attribute_value=value
+        )
 
   def test_revision_content(self):
     """Test that revision contains all content needed."""
 
+    self._create_cas()
+    self._create_external_object()
+    threat = OrderedDict([
+        ("object_type", "Threat"),
+        ("Code*", ""),
+        ("State", "Draft"),
+        ("Title", "Test threat"),
+        ("Admin*", "user@example.com"),
+        ("CA text", "text"),
+        ("CA rich text", "Threat<br><br> rich text"),
+        ("CA date", "2/24/2020"),
+        ("CA checkbox", "no"),
+        ("CA multiselect", "no"),
+        ("CA dropdown", "four")
+    ])
+    response = self.import_data(threat)
+    self._check_csv_response(response, {})
     facility_revision = all_models.Revision.query.filter(
         all_models.Revision.resource_type == "Threat").order_by(
         all_models.Revision.id.desc()).first()
@@ -256,7 +244,18 @@ class TestSnapshotQueryApi(TestCase):
     created from a snapshot on the frontend, it will have all the needed
     fields.
     """
-    self.client.get("/login")
+
+    data = OrderedDict([
+        ("object_type", model.__name__),
+        ("Code*", ""),
+        ("State", "Draft"),
+        ("Title", "Test {model}".format(model=model.__name__)),
+        ("Admin*", "user@example.com")
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
     obj = model.eager_query().first()
     generated_json = self._clean_json(obj.log_json())
     expected_json = self._clean_json(self._get_object(obj))
