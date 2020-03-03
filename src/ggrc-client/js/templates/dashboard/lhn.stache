@@ -48,8 +48,7 @@
         <ul class="top-level">
           <li class="governance accordion-group">
             <a data-test-id="directives_66116337" class="governance list-toggle top" href="javascript:void(0)">
-              <i class="fa fa-caret-right"></i>
-              Directives
+              <i class="fa fa-caret-right"></i>Directives
             </a>
             <div class="content">
               <ul class="mid-level">
@@ -64,8 +63,7 @@
 
           <li class="governance accordion-group">
             <a data-test-id="controls/objectives_66116337" class="governance list-toggle top" href="javascript:void(0)">
-              <i class="fa fa-caret-right"></i>
-              Controls/Objectives
+              <i class="fa fa-caret-right"></i>Controls/Objectives
             </a>
             <div class="content">
               <ul class="mid-level">
@@ -77,8 +75,7 @@
 
           <li class="entities accordion-group">
             <a data-test-id="people/groups_66116337" class="entities list-toggle top" href="javascript:void(0)">
-              <i class="fa fa-caret-right"></i>
-              People/Groups
+              <i class="fa fa-caret-right"></i>People/Groups
             </a>
             <div class="content">
               <ul class="mid-level">
@@ -89,8 +86,7 @@
 
           <li class="business accordion-group">
             <a data-test-id="scope_66116337" class="business list-toggle top" href="javascript:void(0)">
-              <i class="fa fa-caret-right"></i>
-              Scope
+              <i class="fa fa-caret-right"></i>Scope
             </a>
             <div class="content">
               <ul class="mid-level">
