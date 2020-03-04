@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import {
   buildParam,
@@ -30,256 +30,270 @@ let DOCUMENT_KIND_MAP = {
   REFERENCE_URL: 'documents_reference_url',
 };
 
+const ViewModel = canDefineMap.extend({
+  instance: {
+    value: () => ({}),
+  },
+  modelType: {
+    value: 'Document',
+  },
+  kind: {
+    value: '',
+  },
+  documents: {
+    value: () => [],
+  },
+  isLoading: {
+    value: false,
+  },
+  pubSub: {
+    value: () => pubSub,
+  },
+  pendingDestroy: {
+    value: () => [],
+  },
+  autorefresh: {
+    value: true,
+  },
+  isSnapshot: {
+    value: false,
+  },
+  getDocumentsQuery() {
+    let relevantFilters = [{
+      type: this.instance.attr('type'),
+      id: this.instance.attr('id'),
+      operation: 'relevant',
+    }];
+    let additionalFilter = this.kind ?
+      {
+        expression: {
+          left: 'kind',
+          op: {name: '='},
+          right: this.kind,
+        },
+      } :
+      [];
+
+    let modelType = this.modelType;
+    let query =
+      buildParam(modelType, {}, relevantFilters, [], additionalFilter);
+    query.order_by = [{name: 'created_at', desc: true}];
+
+    return query;
+  },
+  loadDocuments() {
+    const query = this.getDocumentsQuery();
+
+    this.isLoading = true;
+    this.refreshTabCounts();
+
+    let modelType = this.modelType;
+    return batchRequests(query).then((response) => {
+      const documents = response[modelType].values;
+
+      this.documents.replace(
+        documents.map((document) => this.getDocumentModel(document))
+      );
+
+      this.isLoading = false;
+    });
+  },
+  setDocuments() {
+    let instance;
+    let kind;
+    let documentPath;
+    let documents;
+
+    // load documents for non-snapshots objects
+    if (!this.isSnapshot) {
+      this.loadDocuments();
+      return;
+    }
+
+    instance = this.instance;
+    kind = this.kind;
+
+    if (kind) {
+      documentPath = DOCUMENT_KIND_MAP[kind];
+      documents = instance[documentPath];
+    } else {
+      // We need to display URL and Evidences together ("Related
+      // Assessments pane")
+      documents = instance.document_url.concat(instance.document_evidence);
+    }
+
+    this.documents.replace(documents);
+  },
+  createDocument(data) {
+    let modelType = this.modelType;
+    let context = modelType === 'Evidence'
+      ? this.instance.context
+      : new Context({id: null});
+
+    let document = new businessModels[modelType]({
+      link: data,
+      title: data,
+      context,
+      kind: this.kind,
+    });
+    return document;
+  },
+  saveDocument(document) {
+    return document.save();
+  },
+  createRelationship(document) {
+    let relationship = new Relationship({
+      source: this.instance,
+      destination: document,
+      context: this.instance.context ||
+        new Context({id: null}),
+    });
+    return relationship.save();
+  },
+  createRelatedDocument(data) {
+    let document = this.createDocument(data);
+
+    this.isLoading = true;
+
+    return this.saveDocument(document)
+      .then((data) => {
+        this.documents.unshift(data);
+        return this.createRelationship(data);
+      })
+      .then(() => this.refreshTabCounts())
+      .fail((err) => {
+        console.error(`Unable to create related document: ${err}`);
+      })
+      .done(() => {
+        this.isLoading = false;
+      });
+  },
+  async removeRelatedDocument(document) {
+    let documents = this.documents.filter((item) =>
+      item.id !== document.id
+    );
+
+    if (documents.length === this.documents.length) {
+      return $.Deferred().resolve();
+    }
+
+    this.documents = documents;
+    this.addPendingDestroy(document);
+
+    let relationship;
+    try {
+      relationship = await Relationship.findRelationship(
+        document, this.instance);
+      if (!relationship) {
+        throw new Error();
+      }
+    } catch (e) {
+      notifier('error', 'Unable to find relationship');
+      this.documents.unshift(document);
+      this.removePendingDestroy(document);
+
+      return $.Deferred().reject({
+        error: 'Unable to find relationship',
+      });
+    }
+
+    return relationship.destroy()
+      .fail(() => {
+        notifier(
+          'error',
+          `Unable to remove related document: ${document.title}`
+        );
+        this.documents.unshift(document);
+        this.removePendingDestroy(document);
+      })
+      .always(() => {
+        this.removePendingDestroy(document);
+      });
+  },
+  addPendingDestroy({id, kind}) {
+    this.isLoading = true;
+    this.pendingDestroy.push({
+      id,
+      kind,
+    });
+  },
+  removePendingDestroy({id, kind}) {
+    const index = this.pendingDestroy
+      .serialize()
+      .findIndex((document) => document.id === id && document.kind === kind);
+
+    if (index !== -1) {
+      this.pendingDestroy.splice(index, 1);
+    }
+
+    if (!this.pendingDestroy.length) {
+      this.isLoading = false;
+    }
+  },
+  markDocumentForDeletion(document) {
+    let documents = this.documents.filter((item) => {
+      return item !== document;
+    });
+
+    this.documents = documents;
+    this.dispatch({
+      type: 'removeMappings',
+      object: document,
+    });
+  },
+  markDocumentForAddition(data) {
+    let document = this.createDocument(data);
+
+    this.documents.unshift(document);
+    this.isLoading = true;
+
+    return this.saveDocument(document)
+      .then(() => {
+        this.dispatch({
+          type: 'addMappings',
+          objects: [document],
+        });
+      })
+      .always(() => this.isLoading = false);
+  },
+  refreshRelatedDocuments() {
+    if (this.autorefresh) {
+      this.loadDocuments();
+    }
+  },
+  refreshTabCounts: function () {
+    let pageInstance = getPageInstance();
+    let modelType = this.modelType;
+    initCounts(
+      [modelType],
+      pageInstance.type,
+      pageInstance.id
+    );
+  },
+  getDocumentModel(document) {
+    const Model = businessModels[this.modelType];
+    return Model.findInCacheById(document.id) || new Model(document);
+  },
+});
+
 export default canComponent.extend({
   tag: 'related-documents',
   leakScope: true,
-  viewModel: canMap.extend({
-    instance: {},
-    modelType: 'Document',
-    kind: '',
-    documents: [],
-    isLoading: false,
-    pubSub,
-    pendingDestroy: [],
-    define: {
-
-      // automatically refresh instance on related document create/remove
-      autorefresh: {
-        type: 'boolean',
-        value: true,
-      },
-    },
-    getDocumentsQuery: function () {
-      let relevantFilters = [{
-        type: this.attr('instance.type'),
-        id: this.attr('instance.id'),
-        operation: 'relevant',
-      }];
-      let additionalFilter = this.attr('kind') ?
-        {
-          expression: {
-            left: 'kind',
-            op: {name: '='},
-            right: this.attr('kind'),
-          },
-        } :
-        [];
-
-      let modelType = this.attr('modelType');
-      let query =
-        buildParam(modelType, {}, relevantFilters, [], additionalFilter);
-      query.order_by = [{name: 'created_at', desc: true}];
-
-      return query;
-    },
-    loadDocuments: function () {
-      const query = this.getDocumentsQuery();
-
-      this.attr('isLoading', true);
-      this.refreshTabCounts();
-
-      let modelType = this.attr('modelType');
-      return batchRequests(query).then((response) => {
-        const documents = response[modelType].values;
-
-        this.attr('documents').replace(
-          documents.map((document) => this.getDocumentModel(document))
-        );
-
-        this.attr('isLoading', false);
-      });
-    },
-    setDocuments: function () {
-      let instance;
-      let kind;
-      let documentPath;
-      let documents;
-
-      // load documents for non-snapshots objects
-      if (!this.attr('isSnapshot')) {
-        this.loadDocuments();
-        return;
-      }
-
-      instance = this.attr('instance');
-      kind = this.attr('kind');
-
-      if (kind) {
-        documentPath = DOCUMENT_KIND_MAP[kind];
-        documents = instance[documentPath];
-      } else {
-        // We need to display URL and Evidences together ("Related
-        // Assessments pane")
-        documents = instance.document_url.concat(instance.document_evidence);
-      }
-
-      this.attr('documents').replace(documents);
-    },
-    createDocument: function (data) {
-      let modelType = this.attr('modelType');
-      let context = modelType === 'Evidence'
-        ? this.instance.context
-        : new Context({id: null});
-
-      let document = new businessModels[modelType]({
-        link: data,
-        title: data,
-        context,
-        kind: this.kind,
-      });
-      return document;
-    },
-    saveDocument: function (document) {
-      return document.save();
-    },
-    createRelationship: function (document) {
-      let relationship = new Relationship({
-        source: this.instance,
-        destination: document,
-        context: this.instance.context ||
-          new Context({id: null}),
-      });
-      return relationship.save();
-    },
-    createRelatedDocument: function (data) {
-      let document = this.createDocument(data);
-
-      this.attr('isLoading', true);
-
-      return this.saveDocument(document)
-        .then((data) => {
-          this.attr('documents').unshift(data);
-          return this.createRelationship(data);
-        })
-        .then(() => this.refreshTabCounts())
-        .fail((err) => {
-          console.error(`Unable to create related document: ${err}`);
-        })
-        .done(() => {
-          this.attr('isLoading', false);
-        });
-    },
-    removeRelatedDocument: async function (document) {
-      let documents = this.attr('documents').filter((item) =>
-        item.id !== document.id
-      );
-
-      if (documents.length === this.attr('documents').length) {
-        return $.Deferred().resolve();
-      }
-
-      this.attr('documents', documents);
-      this.addPendingDestroy(document);
-
-      let relationship;
-      try {
-        relationship = await Relationship.findRelationship(
-          document, this.attr('instance'));
-        if (!relationship) {
-          throw new Error();
-        }
-      } catch (e) {
-        notifier('error', 'Unable to find relationship');
-        this.attr('documents').unshift(document);
-        this.removePendingDestroy(document);
-
-        return $.Deferred().reject({
-          error: 'Unable to find relationship',
-        });
-      }
-
-      return relationship.destroy()
-        .fail(() => {
-          notifier(
-            'error',
-            `Unable to remove related document: ${document.title}`
-          );
-          this.attr('documents').unshift(document);
-          this.removePendingDestroy(document);
-        })
-        .always(() => {
-          this.removePendingDestroy(document);
-        });
-    },
-    addPendingDestroy({id, kind}) {
-      this.attr('isLoading', true);
-      this.attr('pendingDestroy').push({
-        id,
-        kind,
-      });
-    },
-    removePendingDestroy({id, kind}) {
-      const index = this.attr('pendingDestroy')
-        .serialize()
-        .findIndex((document) => document.id === id && document.kind === kind);
-
-      if (index !== -1) {
-        this.attr('pendingDestroy').splice(index, 1);
-      }
-
-      if (!this.attr('pendingDestroy').length) {
-        this.attr('isLoading', false);
-      }
-    },
-    markDocumentForDeletion: function (document) {
-      let documents = this.attr('documents').filter(function (item) {
-        return item !== document;
-      });
-
-      this.attr('documents', documents);
-      this.dispatch({
-        type: 'removeMappings',
-        object: document,
-      });
-    },
-    markDocumentForAddition: function (data) {
-      let document = this.createDocument(data);
-
-      this.attr('documents').unshift(document);
-      this.attr('isLoading', true);
-
-      return this.saveDocument(document)
-        .then(() => {
-          this.dispatch({
-            type: 'addMappings',
-            objects: [document],
-          });
-        })
-        .always(() => this.attr('isLoading', false));
-    },
-    refreshRelatedDocuments: function () {
-      if (this.autorefresh) {
-        this.loadDocuments();
-      }
-    },
-    refreshTabCounts: function () {
-      let pageInstance = getPageInstance();
-      let modelType = this.attr('modelType');
-      initCounts(
-        [modelType],
-        pageInstance.type,
-        pageInstance.id
-      );
-    },
-    getDocumentModel(document) {
-      const Model = businessModels[this.attr('modelType')];
-      return Model.findInCacheById(document.id) || new Model(document);
-    },
-  }),
-  init: function () {
-    let instance = this.viewModel.attr('instance');
+  ViewModel,
+  init() {
+    let instance = this.viewModel.instance;
     let isNew = instance.isNew();
     let isSnapshot = !!(instance.snapshot || instance.isRevision);
 
     // don't need to load documents for unsaved instance
     if (!isNew) {
-      this.viewModel.attr('isSnapshot', isSnapshot);
+      this.viewModel.isSnapshot = isSnapshot;
       this.viewModel.setDocuments();
     }
   },
   events: {
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`]([instance], event) {
-      if (this.viewModel.attr('modelType') === event.destinationType) {
+      if (this.viewModel.modelType === event.destinationType) {
         this.viewModel.refreshRelatedDocuments();
       }
     },
@@ -287,8 +301,8 @@ export default canComponent.extend({
       let item = event.item;
       let viewModel = this.viewModel;
 
-      if (item.attr('type') === viewModel.attr('modelType')
-        && item.attr('kind') === viewModel.attr('kind')) {
+      if (item.type === viewModel.modelType
+        && item.kind === viewModel.kind) {
         viewModel.loadDocuments();
       }
     },

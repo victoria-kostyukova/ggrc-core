@@ -3,32 +3,31 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../related-documents';
 import Relationship from '../../../models/service-models/relationship';
 import * as notifierUtils from '../../../plugins/utils/notifiers-utils';
 
-describe('related-documents component', function () {
-  'use strict';
-
+describe('related-documents component', () => {
   let viewModel;
   let instance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
-    instance = {
+    instance = new canMap({
       id: '5',
       type: 'Assessment',
-    };
+    });
 
-    viewModel.attr('instance', instance);
+    viewModel.instance = instance;
   });
 
-  describe('getDocumentsQuery() method', function () {
+  describe('getDocumentsQuery() method', () => {
     function checkAdditionFilter(kind) {
       let query;
       let additionFilter;
-      viewModel.attr('kind', kind);
+      viewModel.kind = kind;
       query = viewModel.getDocumentsQuery();
 
       expect(query.filters.expression).toBeDefined();
@@ -37,18 +36,18 @@ describe('related-documents component', function () {
       expect(additionFilter.right).toEqual(kind);
     }
 
-    it('should get query for urls', function () {
+    it('should get query for urls', () => {
       checkAdditionFilter('URL');
     });
 
-    it('should get query for evidences', function () {
+    it('should get query for evidences', () => {
       checkAdditionFilter('FILE');
     });
 
-    it('should get query for all documents', function () {
+    it('should get query for all documents', () => {
       let query;
       let expression;
-      viewModel.attr('kind', undefined);
+      viewModel.kind = undefined;
       query = viewModel.getDocumentsQuery();
       expression = query.filters.expression;
       expect(expression).toBeDefined();
@@ -66,8 +65,8 @@ describe('related-documents component', function () {
     };
 
     beforeEach(() => {
-      viewModel.attr('isLoading', false);
-      viewModel.attr('documents', [{id: 1}, {id: 2}, {id: 3}]);
+      viewModel.isLoading = false;
+      viewModel.documents = [{id: 1}, {id: 2}, {id: 3}];
 
       spyOn(viewModel, 'addPendingDestroy');
       spyOn(viewModel, 'removePendingDestroy');
@@ -81,13 +80,13 @@ describe('related-documents component', function () {
 
     it('should remove document from documents list when list ' +
     'contains document', (done) => {
-      expect(viewModel.attr('documents').length).toBe(3);
+      expect(viewModel.documents.length).toBe(3);
 
       spyOn(relationship, 'destroy')
         .and.returnValue($.Deferred().resolve());
 
       method({id: 1}).then(() => {
-        expect(viewModel.attr('documents').length).toBe(2);
+        expect(viewModel.documents.length).toBe(2);
         expect(Relationship.findRelationship).toHaveBeenCalled();
         expect(relationship.destroy).toHaveBeenCalled();
         done();
@@ -96,13 +95,13 @@ describe('related-documents component', function () {
 
     it('should NOT remove document from documents list when list does not ' +
     'contain document', (done) => {
-      expect(viewModel.attr('documents').length).toBe(3);
+      expect(viewModel.documents.length).toBe(3);
 
       spyOn(relationship, 'destroy')
         .and.returnValue($.Deferred().resolve());
 
       method({id: 55}).then(() => {
-        expect(viewModel.attr('documents').length).toBe(3);
+        expect(viewModel.documents.length).toBe(3);
         expect(Relationship.findRelationship).not.toHaveBeenCalled();
         expect(relationship.destroy).not.toHaveBeenCalled();
         done();
@@ -165,39 +164,39 @@ describe('related-documents component', function () {
     let method;
 
     beforeEach(() => {
-      viewModel.attr('pendingDestroy', [
+      viewModel.pendingDestroy = [
         {id: 1, kind: 'file'},
         {id: 1, kind: 'url'},
         {id: 2, kind: 'file'},
         {id: 3, kind: 'url'},
-      ]);
+      ];
 
-      viewModel.attr('isLoading', true);
+      viewModel.isLoading = true;
       method = viewModel.removePendingDestroy.bind(viewModel);
     });
 
     it('should NOT remove document from "pendingDestroy" attr', () => {
       method({id: 2, kind: 'url'});
-      expect(viewModel.attr('pendingDestroy').length).toBe(4);
+      expect(viewModel.pendingDestroy.length).toBe(4);
     });
 
     it('should remove document from "pendingDestroy" attr', () => {
       method({id: 1, kind: 'url'});
-      expect(viewModel.attr('pendingDestroy').length).toBe(3);
+      expect(viewModel.pendingDestroy.length).toBe(3);
     });
 
     it('should NOT set "isLoading" flag to false when ' +
     '"pendingDestroy" is NOT empty', () => {
       method({id: 1, kind: 'url'});
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     it('should set "isLoading" flag to false when ' +
     '"pendingDestroy" is empty', () => {
-      viewModel.attr('pendingDestroy', [{id: 1, kind: 'url'}]);
+      viewModel.pendingDestroy = [{id: 1, kind: 'url'}];
       method({id: 1, kind: 'url'});
 
-      expect(viewModel.attr('isLoading')).toBe(false);
+      expect(viewModel.isLoading).toBe(false);
     });
   });
 });

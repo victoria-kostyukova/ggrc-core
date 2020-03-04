@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../object-list-item/document-object-list-item';
 import template from './editable-document-object-list-item.stache';
@@ -13,7 +13,9 @@ export default canComponent.extend({
   tag: 'editable-document-object-list-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    document: {},
+  viewModel: canDefineMap.extend({
+    document: {
+      value: () => ({}),
+    },
   }),
 });

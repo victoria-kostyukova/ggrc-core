@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../object-list-item/editable-document-object-list-item';
 import {
@@ -16,6 +16,67 @@ import {
 import {isAllowedFor} from '../../permission';
 import template from './folder-attachments-list.stache';
 
+const ViewModel = canDefineMap.extend({
+  showSpinner: {
+    get() {
+      return this.isUnmapping || this.isListLoading || this.isMapping;
+    },
+  },
+  readonly: {
+    value: false,
+    get() {
+      let instance = this.instance;
+
+      if (!instance) {
+        return true;
+      }
+
+      let isSnapshot = this.isSnapshot;
+      return isSnapshot || !isAllowedFor('update', instance);
+    },
+  },
+  showMore: {
+    get() {
+      return !this.isSnapshot;
+    },
+  },
+  tooltip: {
+    value: null,
+    get() {
+      let instance = this.instance;
+      if (instance) {
+        return 'No copy will be created. Original files will be added to ' +
+          'the destination ' + instance.constructor.title_singular +
+          ' folder.';
+      }
+    },
+  },
+  title: {
+    value: null,
+  },
+  instance: {
+    value: null,
+  },
+  isSnapshot: {
+    value: false,
+  },
+  folderError: {
+    value: null,
+  },
+  isAttaching: {
+    value: false,
+  },
+  isUnmapping: {
+    value: false,
+  },
+  isListLoading: {
+    value: false,
+  },
+  isMapping: {
+    value: false,
+  },
+});
+
 /**
  * Wrapper Component for rendering and managing of folder and
  * attachments lists
@@ -24,70 +85,21 @@ export default canComponent.extend({
   tag: 'folder-attachments-list',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      showSpinner: {
-        type: 'boolean',
-        get() {
-          return this.attr('isUnmapping')
-            || this.attr('isListLoading')
-            || this.attr('isMapping');
-        },
-      },
-      readonly: {
-        type: 'boolean',
-        get() {
-          let instance = this.attr('instance');
-
-          if (!instance) {
-            return true;
-          }
-
-          let isSnapshot = this.attr('isSnapshot');
-          return isSnapshot || !isAllowedFor('update', instance);
-        },
-      },
-      showMore: {
-        type: 'boolean',
-        get() {
-          return !this.attr('isSnapshot');
-        },
-      },
-      tooltip: {
-        get() {
-          let instance = this.attr('instance');
-          if (instance) {
-            return 'No copy will be created. Original files will be added to ' +
-              'the destination ' + instance.constructor.title_singular +
-              ' folder.';
-          }
-        },
-      },
-    },
-    readonly: false,
-    title: null,
-    tooltip: null,
-    instance: null,
-    isSnapshot: false,
-    folderError: null,
-    isAttaching: false,
-    isUnmapping: false,
-    isListLoading: false,
-  }),
+  ViewModel,
   events: {
     [`{viewModel.instance} ${BEFORE_DOCUMENT_CREATE.type}`]() {
-      this.viewModel.attr('isMapping', true);
+      this.viewModel.isMapping = true;
     },
     [`{viewModel.instance} ${DOCUMENT_CREATE_FAILED.type}`]() {
-      this.viewModel.attr('isMapping', false);
+      this.viewModel.isMapping = false;
     },
     [`{viewModel.instance} ${BEFORE_MAPPING.type}`](scope, ev) {
       if (ev.destinationType === 'Document') {
-        this.viewModel.attr('isMapping', true);
+        this.viewModel.isMapping = true;
       }
     },
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`]() {
-      this.viewModel.attr('isMapping', false);
+      this.viewModel.isMapping = false;
     },
   },
 });
