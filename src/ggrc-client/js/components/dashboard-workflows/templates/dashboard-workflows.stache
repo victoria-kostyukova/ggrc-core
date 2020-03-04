@@ -9,10 +9,8 @@
       <div class="row-fluid">
         <div class="span12">
           <ul>
-            <li class="active">
-              <a href="javascript://">
-                My Active Workflows ({{workflows.length}})
-              </a>
+            <li class="active-workflow-header">
+              My Active Workflows ({{workflows.length}})
             </li>
           </ul>
         </div>
