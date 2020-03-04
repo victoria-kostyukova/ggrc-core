@@ -8,7 +8,8 @@
     showResults:bind="showResults"
     modelName:from="'Person'"
     queryField:from="'email'"
-    actionKey:from="actionKey">
+    actionKey:from="actionKey"
+    initialEmail:from="initialEmail">
 
   <people-autocomplete-results
       currentValue:bind="currentValue"

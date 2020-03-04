@@ -69,21 +69,21 @@ describe('people-autocomplete-wrapper component', () => {
     });
 
     describe('if externalServiceUrl is defined', () => {
-      let getDfd;
       let modelName;
 
       beforeEach(() => {
         modelName = 'mockName';
         vm.attr('modelName', modelName);
+        vm.attr('_initialEmail', 'jhon@doe.com');
         GGRC.config.external_services[modelName] = 'externalServiceUrlMock';
 
-        getDfd = $.Deferred();
-        spyOn(AjaxUtils, 'ggrcGet').and.returnValue(getDfd);
+        spyOn(AjaxUtils, 'ggrcGet');
         spyOn(vm, 'processItems');
       });
 
       it('calls AjaxUtils.ggrcGet with specified settings', () => {
         const value = 'ara';
+        AjaxUtils.ggrcGet.and.returnValue(Promise.resolve());
 
         vm.getResult(value);
 
@@ -92,22 +92,20 @@ describe('people-autocomplete-wrapper component', () => {
           {
             prefix: value,
             limit: 10,
+            initialEmail: 'jhon@doe.com',
           },
         );
       });
 
       it('calls processItems with passed value and received data after get',
-        (done) => {
+        async () => {
           const value = 'ara';
           const data = {};
-          getDfd.resolve(data);
+          AjaxUtils.ggrcGet.and.returnValue(Promise.resolve(data));
 
-          vm.getResult(value);
+          await vm.getResult(value);
 
-          getDfd.then(() => {
-            expect(vm.processItems).toHaveBeenCalledWith(value, data);
-            done();
-          });
+          expect(vm.processItems).toHaveBeenCalledWith(value, data);
         });
     });
 

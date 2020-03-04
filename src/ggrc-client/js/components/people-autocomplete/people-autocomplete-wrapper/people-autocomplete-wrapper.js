@@ -19,6 +19,8 @@ export default canComponent.extend({
     showResults: false,
     showNewValue: false,
     actionKey: null,
+    initialEmail: null,
+    _initialEmail: null,
     define: {
       currentValue: {
         set(newValue, setValue) {
@@ -40,6 +42,7 @@ export default canComponent.extend({
 
       const type = this.attr('modelName');
       const externalServiceUrl = GGRC.config.external_services[type];
+      const initialEmail = this.attr('_initialEmail');
 
       if (externalServiceUrl) {
         ggrcGet(
@@ -47,6 +50,7 @@ export default canComponent.extend({
           {
             prefix: value,
             limit: 10,
+            initialEmail,
           },
         ).then(this.processItems.bind(this, value));
       } else {
@@ -66,4 +70,10 @@ export default canComponent.extend({
       }
     },
   }),
+  events: {
+    inserted() {
+      const initialEmail = this.viewModel.attr('initialEmail');
+      this.viewModel.attr('_initialEmail', initialEmail);
+    },
+  },
 });
