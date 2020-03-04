@@ -111,8 +111,6 @@ class AssessmentTemplate(assessment.AuditRelationship,
       ("Admin", "Object Admins"),
       ("Audit Lead", "Audit Captain"),
       ("Auditors", "Auditors"),
-      ("Principal Assignees", "Principal Assignees"),
-      ("Secondary Assignees", "Secondary Assignees"),
       ("Primary Contacts", "Primary Contacts"),
       ("Secondary Contacts", "Secondary Contacts"),
   ])
