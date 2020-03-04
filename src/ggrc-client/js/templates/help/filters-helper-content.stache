@@ -113,7 +113,7 @@
       <li>Use parentheses to create more complex searches. For example, <span class="code">(title ~ PCI OR title ~ ISO) AND description ~ “needs to be“</span></li>
       <li>Filters are case insensitive. For example, <span class="code">title</span> is the same as <span class="code">Title</span> or <span class="code">TITLE</span></li>
       <li><span class="code">AND</span> has precedence over <span class="code">OR</span></li>
-      <li>Use quotes every time space (“ “) or any other special character (like % ~ ! @ ( ) - _ = \ ") is part of search phrase or filter expression. For example, <span class="code">“modified date” &gt; 03/03/2015 AND “primary contacts“ = “example@google.com“</span></li>
+      <li>Use quotes every time space (“ “) or any other special character (like % ~ ! @ ( ) - _ = \ ") is part of filter expression. For example, <span class="code">“modified date” &gt; 03/03/2015 AND “primary contacts“ = “example@google.com“</span></li>
       <li>Valid date formats are <span class="code">MM/DD/YYYY</span>, <span class="code">YYYY-MM-DD</span></li>
       <li>Partial dates can be used: <span class="code">date = 2017</span> is the same as <span class="code">date >= 01/01/2017 AND date <= 12/31/2017; date < 06/2017</span> is the same as <span class="code">date < 01/06/2017;</span></li>
       <li>When searching for dates, <span class="code">~</span> and <span class="code">!~</span> are synonymous to <span class="code">=</span> and <span class="code">!=</span> respectively</li>
