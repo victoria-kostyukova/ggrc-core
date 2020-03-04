@@ -23,7 +23,7 @@ export default Cacheable.extend({
     Reviewable,
     ChangeableExternally,
   ],
-  migrationDate: '06/13/2019',
+  migrationDate: '06/18/2019',
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
