@@ -3,210 +3,212 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<cycle-task-modal instance:from="instance"
-                  isNewInstance:from="new_object_form"
-                  preMappedStubs:from="object_params.pre_mapped_objects">
-<form action="javascript://" class="form">
-  <div class="row-fluid">
-    <div class="span12 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label class="form-label">
-          Task Title
-          <i class="fa fa-asterisk"></i>
-      </label>
-      <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
-      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
-      <br>
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span8">
-      {{#is(instance.task_type, "text")}}
-        <label class="form-label">Task Description</label>
-        <div class="rich-text">
-          <rich-text tabindex="2"
-                     hiddenToolbar:from="true"
-                     placeholder:from="'Enter Description'"
-                     content:bind="instance.description">
-          </rich-text>
-        </div>
-      {{else}}
+{{#instance}}
+  <cycle-task-modal instance:from="instance"
+                    isNewInstance:from="new_object_form"
+                    preMappedStubs:from="object_params.pre_mapped_objects">
+  <form action="javascript://" class="form">
+    <div class="row-fluid">
+      <div class="span12 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
         <label class="form-label">
-          Selection Response Options (Comma Separated)
+            Task Title
+            <i class="fa fa-asterisk"></i>
         </label>
-          <textarea-array array:bind="instance.response_options"
-                          className:from="'span12 double'"
-                          placeholder:from="'Enter Description'" tabindex="2">
-          </textarea-array>
-      {{/is}}
-      <br>
-      <select name="task_type">
-        <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
-        <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
-      </select>
-      <deferred-mapper
-          instance:from="instance"
-          preMappedObjects:from="preMappedObjects"
-          on:vm:addMappings="addMappingObjects(scope.event)"
-          on:vm:removeMappings="removeMappingObject(scope.event)"
-        >
-        <div class="action-toolbar">
-          <h6 class="action-toolbar__header">
-            Mapped Objects
-          </h6>
-          <spinner-component class="control-offset" toggle:from="isLoading"></spinner-component>
-        </div>
-        {{#each mappingsList}}
-          <div class="oneline">
-            <a
-              href="javascript://"
-              on:el:click="removeMappings(.)">
-              <i class="fa fa-trash"></i>
-            </a>
-            <a class="url" href="{{viewLink}}" target="_blank">
-              {{title}}
-            </a>
-          </div>
-        {{/each}}
-        {{^if isLoading}}
-        {{^if mappingsList.length}}
-          <span class="gray"><em>No mapped objects</em></span>
-        {{/if}}
-        {{/if}}
-        <div class="objective-selector">
-          <div style="clear:both">
-            <br>
-            {{^if_in instance.status "Finished,Verified"}}
-              <a class="btn btn-small btn-white"
-                href="javascript://"
-                {{initDeferredData instance mappingsList}}
-                data-placement="left"
-                data-toggle="unified-mapper"
-                data-deferred="true"
-                data-join-object-id="{{instance.id}}"
-                data-join-object-type="{{instance.constructor.model_singular}}"
-                tabindex="6">
-                Map Objects
-              </a>
-            {{/if_in}}
-          </div>
-        </div>
-      </deferred-mapper>
+        <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
+        {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
+        <br>
+      </div>
     </div>
-    <div class="span4">
-      <div class="{{#instance.computed_errors.contact}} field-failure {{/instance.computed_errors.contact}}">
-        <access-control-list-roles-helper
-                instance:from="instance"
-                isNewInstance:from="new_object_form">
-        </access-control-list-roles-helper>
-      </div>
-      <br>
-      <div class="{{#instance.computed_errors.workflow}}field-failure{{/instance.computed_errors.workflow}} {{#instance.computed_errors.cycle}}field-failure{{/instance.computed_errors.cycle}}">
-        <object-loader path:from="instance.workflow">
-          <label class="form-label" title="An active workflow should be created in advance">
-            Workflow Title
-            <i class="fa fa-asterisk"></i>
-          </label>
-          {{#if new_object_form}}
-            <modal-autocomplete
-              instance:from="instance"
-              isNewInstance:from="new_object_form"
-              pathToField:from="'workflow.id'"
-              useInstanceInputHandler:from="true"
-            >
-              <input
-                type="text"
-                class="input-block-level required"
-                name="{{pathToField}}"
-                model="Workflow"
-                data-lookup="Workflow"
-                data-params="Workflow:status=Active,frequency=one_time"
-                placeholder="Select a Workflow"
-                value="{{loadedObject.title}}"
-                tabindex="4">
-            </modal-autocomplete>
-            {{#instance.computed_errors.workflow}}
-              <label class="help-inline warning">{{this}}</label>
-            {{/instance.computed_errors.workflow}}
-            {{^instance.computed_errors.workflow}}
-            {{#instance.computed_errors.cycle}}
-              <label class="help-inline warning">No active cycles in this workflow</label>
-            {{/instance.computed_errors.cycle}}
-            {{/instance.computed_errors.workflow}}
-          {{else}}
-            <input disabled type="text" class="input-block-level" value="{{loadedObject.title}}"/>
-          {{/if}}
-        </object-loader>
-      </div>
-      <br>
-      <div class="{{#instance.computed_errors.cycle_task_group}}field-failure{{/instance.computed_errors.cycle_task_group}}">
-        <object-loader path:from="instance.cycle_task_group">
+    <div class="row-fluid">
+      <div class="span8">
+        {{#is(instance.task_type, "text")}}
+          <label class="form-label">Task Description</label>
+          <div class="rich-text">
+            <rich-text tabindex="2"
+                      hiddenToolbar:from="true"
+                      placeholder:from="'Enter Description'"
+                      content:bind="instance.description">
+            </rich-text>
+          </div>
+        {{else}}
           <label class="form-label">
-            Task Group
-            <i class="fa fa-asterisk"></i>
+            Selection Response Options (Comma Separated)
           </label>
-          {{#if new_object_form}}
-            <modal-autocomplete
-              instance:from="instance"
-              isNewInstance:from="new_object_form"
-              isQueryAutocompleteEnabled:from="true"
-              pathToField:from="'cycle_task_group.id'">
-              <input {{^if instance.cycle}}disabled{{/if}}
+            <textarea-array array:bind="instance.response_options"
+                            className:from="'span12 double'"
+                            placeholder:from="'Enter Description'" tabindex="2">
+            </textarea-array>
+        {{/is}}
+        <br>
+        <select name="task_type">
+          <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
+          <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
+        </select>
+        <deferred-mapper
+            instance:from="instance"
+            preMappedObjects:from="preMappedObjects"
+            on:vm:addMappings="addMappingObjects(scope.event)"
+            on:vm:removeMappings="removeMappingObject(scope.event)"
+          >
+          <div class="action-toolbar">
+            <h6 class="action-toolbar__header">
+              Mapped Objects
+            </h6>
+            <spinner-component class="control-offset" toggle:from="isLoading"></spinner-component>
+          </div>
+          {{#each mappingsList}}
+            <div class="oneline">
+              <a
+                href="javascript://"
+                on:el:click="removeMappings(.)">
+                <i class="fa fa-trash"></i>
+              </a>
+              <a class="url" href="{{viewLink}}" target="_blank">
+                {{title}}
+              </a>
+            </div>
+          {{/each}}
+          {{^if isLoading}}
+          {{^if mappingsList.length}}
+            <span class="gray"><em>No mapped objects</em></span>
+          {{/if}}
+          {{/if}}
+          <div class="objective-selector">
+            <div style="clear:both">
+              <br>
+              {{^if_in instance.status "Finished,Verified"}}
+                <a class="btn btn-small btn-white"
+                  href="javascript://"
+                  {{initDeferredData instance mappingsList}}
+                  data-placement="left"
+                  data-toggle="unified-mapper"
+                  data-deferred="true"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.constructor.model_singular}}"
+                  tabindex="6">
+                  Map Objects
+                </a>
+              {{/if_in}}
+            </div>
+          </div>
+        </deferred-mapper>
+      </div>
+      <div class="span4">
+        <div class="{{#instance.computed_errors.contact}} field-failure {{/instance.computed_errors.contact}}">
+          <access-control-list-roles-helper
+                  instance:from="instance"
+                  isNewInstance:from="new_object_form">
+          </access-control-list-roles-helper>
+        </div>
+        <br>
+        <div class="{{#instance.computed_errors.workflow}}field-failure{{/instance.computed_errors.workflow}} {{#instance.computed_errors.cycle}}field-failure{{/instance.computed_errors.cycle}}">
+          <object-loader path:from="instance.workflow">
+            <label class="form-label" title="An active workflow should be created in advance">
+              Workflow Title
+              <i class="fa fa-asterisk"></i>
+            </label>
+            {{#if new_object_form}}
+              <modal-autocomplete
+                instance:from="instance"
+                isNewInstance:from="new_object_form"
+                pathToField:from="'workflow.id'"
+                useInstanceInputHandler:from="true"
+              >
+                <input
+                  type="text"
                   class="input-block-level required"
                   name="{{pathToField}}"
-                  data-lookup="CycleTaskGroup"
-                  data-query-field="group title"
-                  data-query-relevant-type="{{instance.cycle.type}}"
-                  data-query-relevant-id="{{instance.cycle.id}}"
-                  placeholder="Select a Task Group"
-                  type="text"
+                  model="Workflow"
+                  data-lookup="Workflow"
+                  data-params="Workflow:status=Active,frequency=one_time"
+                  placeholder="Select a Workflow"
                   value="{{loadedObject.title}}"
-                  data-template="/cycle_task_groups/autocomplete-result.stache"
-                  tabindex="5">
-            </modal-autocomplete>
-            {{#instance.computed_errors.cycle_task_group}}
-              <label class="help-inline warning">{{this}}</label>
-            {{/instance.computed_errors.cycle_task_group}}
-          {{else}}
-            <input disabled class="input-block-level" type="text" value="{{loadedObject.title}}"/>
-          {{/if}}
-        </object-loader>
-      </div>
-      <div class="{{#instance.computed_errors.start_date}}field-failure{{/instance.computed_errors.start_date}}">
-        <label class="form-label">
-            Task Start Date
-            <i class="fa fa-asterisk"></i>
-        </label>
-        <datepicker-component
-          setMaxDate:from="instance.end_date"
-          date:bind="instance.start_date"
-          required:from="true"
-          noWeekends:from="true"
-          readonly:from="true"/>
-        {{#instance.computed_errors.start_date}}
-        <label class="help-inline warning">{{this}}</label>
-        {{/instance.computed_errors.start_date}}
-      </div>
-      <div class="{{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
-        <label class="form-label form-label__extend">
-            Task Due Date
-            <i class="fa fa-asterisk"></i>
-        </label>
-        <datepicker-component
-          setMinDate:from="instance.start_date"
-          date:bind="instance.end_date"
-          required:from="true"
-          noWeekends:from="true"
-          readonly:from="true"/>
-          {{#instance.computed_errors.end_date}}
+                  tabindex="4">
+              </modal-autocomplete>
+              {{#instance.computed_errors.workflow}}
+                <label class="help-inline warning">{{this}}</label>
+              {{/instance.computed_errors.workflow}}
+              {{^instance.computed_errors.workflow}}
+              {{#instance.computed_errors.cycle}}
+                <label class="help-inline warning">No active cycles in this workflow</label>
+              {{/instance.computed_errors.cycle}}
+              {{/instance.computed_errors.workflow}}
+            {{else}}
+              <input disabled type="text" class="input-block-level" value="{{loadedObject.title}}"/>
+            {{/if}}
+          </object-loader>
+        </div>
+        <br>
+        <div class="{{#instance.computed_errors.cycle_task_group}}field-failure{{/instance.computed_errors.cycle_task_group}}">
+          <object-loader path:from="instance.cycle_task_group">
+            <label class="form-label">
+              Task Group
+              <i class="fa fa-asterisk"></i>
+            </label>
+            {{#if new_object_form}}
+              <modal-autocomplete
+                instance:from="instance"
+                isNewInstance:from="new_object_form"
+                isQueryAutocompleteEnabled:from="true"
+                pathToField:from="'cycle_task_group.id'">
+                <input {{^if instance.cycle}}disabled{{/if}}
+                    class="input-block-level required"
+                    name="{{pathToField}}"
+                    data-lookup="CycleTaskGroup"
+                    data-query-field="group title"
+                    data-query-relevant-type="{{instance.cycle.type}}"
+                    data-query-relevant-id="{{instance.cycle.id}}"
+                    placeholder="Select a Task Group"
+                    type="text"
+                    value="{{loadedObject.title}}"
+                    data-template="/cycle_task_groups/autocomplete-result.stache"
+                    tabindex="5">
+              </modal-autocomplete>
+              {{#instance.computed_errors.cycle_task_group}}
+                <label class="help-inline warning">{{this}}</label>
+              {{/instance.computed_errors.cycle_task_group}}
+            {{else}}
+              <input disabled class="input-block-level" type="text" value="{{loadedObject.title}}"/>
+            {{/if}}
+          </object-loader>
+        </div>
+        <div class="{{#instance.computed_errors.start_date}}field-failure{{/instance.computed_errors.start_date}}">
+          <label class="form-label">
+              Task Start Date
+              <i class="fa fa-asterisk"></i>
+          </label>
+          <datepicker-component
+            setMaxDate:from="instance.end_date"
+            date:bind="instance.start_date"
+            required:from="true"
+            noWeekends:from="true"
+            readonly:from="true"/>
+          {{#instance.computed_errors.start_date}}
           <label class="help-inline warning">{{this}}</label>
-          {{/instance.computed_errors.end_date}}
+          {{/instance.computed_errors.start_date}}
+        </div>
+        <div class="{{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
+          <label class="form-label form-label__extend">
+              Task Due Date
+              <i class="fa fa-asterisk"></i>
+          </label>
+          <datepicker-component
+            setMinDate:from="instance.start_date"
+            date:bind="instance.end_date"
+            required:from="true"
+            noWeekends:from="true"
+            readonly:from="true"/>
+            {{#instance.computed_errors.end_date}}
+            <label class="help-inline warning">{{this}}</label>
+            {{/instance.computed_errors.end_date}}
+        </div>
       </div>
+      <br>
     </div>
-    <br>
-  </div>
-  <div class="row-fluid hidden">
-    <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
-    <input type="hidden" name="status" value="{{firstnonempty instance.status 'Assigned'}}" />
-  </div>
-</form>
-</cycle-task-modal>
+    <div class="row-fluid hidden">
+      <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
+      <input type="hidden" name="status" value="{{firstnonempty instance.status 'Assigned'}}" />
+    </div>
+  </form>
+  </cycle-task-modal>
+{{/instance}}
