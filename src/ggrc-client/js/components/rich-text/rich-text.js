@@ -55,9 +55,23 @@ export default canComponent.extend('richText', {
     showAlert: false,
     length: 0,
     withMentions: false,
-    initEditor(container, toolbarContainer, countContainer) {
+    initEditor(container, toolbarContainer) {
       import(/* webpackChunkName: "quill" */'quill')
-        .then(({'default': Quill}) => {
+        .then(({'default': Quill, imports: {'formats/link': Link}}) => {
+          class LinkFormatter extends Link {
+            static create(value) {
+              value = this.sanitize(value);
+              if (value.startsWith('https://')
+                || value.startsWith('http://')
+                || value.startsWith('mailto:')) {
+                return super.create(value);
+              }
+              value = `https://${value}`;
+              return super.create(value);
+            }
+          }
+          Quill.register(LinkFormatter);
+
           let editor = new Quill(container, {
             theme: 'snow',
             bounds: container,
