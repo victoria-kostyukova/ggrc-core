@@ -167,12 +167,6 @@ def _move_comments_to_ext_comments(connection, comments):
     rel_id = _add_ext_comment_rel(connection, current_id, rel)
     _add_ext_comment_rel_rev(connection, rel_id)
 
-    _remove_comment_rel(connection, rel.id)
-    _remove_comment_rel_rev(connection, rel.id)
-
-    _remove_comment(connection, comment.id)
-    _remove_comment_rev(connection, comment.id)
-
 
 def _add_ext_comment(connection, comment_id, comment):
   """Adds external comment.
