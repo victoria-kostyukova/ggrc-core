@@ -4,20 +4,28 @@
 }}
 
 <div class="action-toolbar editable-people-group__label form-label form-label__extended">
-  <div class="people-group__title-content">
-    <div class="people-group__title">
-      {{#unless editableMode}}
-        <spinner-component class="people-group__title-spinner" toggle:from="isLoading"></spinner-component>
-      {{/unless}}
-      {{title}}
-    </div>
-    <div class="people-group__count">
-      ({{peopleCount}})
-    </div>
-  </div>
-  {{#if required}}
-    <i class="fa fa-asterisk"></i>
-  {{/if}}
+  {{#unless editableMode}}
+    <spinner-component class="people-group__title-spinner" toggle:from="isLoading"></spinner-component>
+  {{/unless}}
+  <tooltip-content
+    placement:from="'bottom'"
+    content:from="title"
+  >
+    <label class="people-group__title-content form-label form-label__extended">
+      <span
+        class="people-group__title"
+        data-trim-target="true"
+      >
+        {{title}}
+      </span>
+      <span class="people-group__count">
+        ({{peopleCount}})
+      </span>
+      {{#if required}}
+        <i class="fa fa-asterisk"></i>
+      {{/if}}
+    </label>
+  </tooltip-content>
   {{#if redirectionEnabled}}
     <div class="action-toolbar__controls">
       <div class="action-toolbar__controls-item">
