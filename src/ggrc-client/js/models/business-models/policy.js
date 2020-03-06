@@ -40,12 +40,16 @@ export default Directive.extend({
   init: function () {
     Object.assign(this.attributes, Directive.attributes);
     Object.assign(this.tree_view_options, Directive.tree_view_options);
-    this.tree_view_options.attr_list.push({
-      attr_title: 'Kind/Type',
-      attr_name: 'kind',
-      attr_sort_field: 'kind',
-      order: 86,
-    });
+    const attrList = this.tree_view_options.attr_list;
+    const attrIsExist = attrList.some((attr) => attr.attr_name === 'kind');
+    if (!attrIsExist) {
+      attrList.push({
+        attr_title: 'Kind/Type',
+        attr_name: 'kind',
+        attr_sort_field: 'kind',
+        order: 86,
+      });
+    }
     this._super(...arguments);
   },
 }, {});
