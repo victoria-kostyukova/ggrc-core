@@ -21,6 +21,7 @@ from ggrc.models.mixins.statusable import Statusable
 from ggrc.models.mixins.with_auto_deprecation import WithAutoDeprecation
 from ggrc.models.relationship import Relatable
 from ggrc.utils import referenced_objects
+from ggrc.fulltext import attributes
 
 from ggrc.services import signals
 
@@ -79,7 +80,12 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       "description",
       "kind",
       "status",
-      "archived",
+      attributes.BooleanFullTextAttr(
+          'archived',
+          'archived',
+          true_value="Yes",
+          false_value="No",
+      ),
       "notes",
   ]
 

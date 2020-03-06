@@ -87,7 +87,7 @@ class FullTextAttr(object):
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
 
-    accorging to the FullTextAttr rules
+    according to the FullTextAttr rules
     """
     return content.get(self.alias, None)
 
@@ -144,7 +144,7 @@ class ValueMapFullTextAttr(FullTextAttr):
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
 
-    accorging to the FullTextAttr rules
+    according to the FullTextAttr rules
     """
     return self.value_map.get(content[self.alias], None)
 
@@ -177,7 +177,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
 
-    accorging to the FullTextAttr rules
+    according to the FullTextAttr rules
     """
     rev_val = content[self.alias]
     if rev_val is None:
@@ -354,7 +354,7 @@ class DatetimeFullTextAttr(TimezonedDatetimeValue, FullTextAttr):
   def get_attribute_revisioned_value(self, content):
     """Get attribute value from the given revision content
 
-    accorging to the FullTextAttr rules
+    according to the FullTextAttr rules
     """
     if self.prop_getter in content and content[self.alias]:
       return content[self.alias].replace("T", " ")

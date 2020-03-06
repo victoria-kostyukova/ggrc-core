@@ -414,6 +414,7 @@ class VerifiedDate(object):
 
   @hybrid_property
   def verified(self):
+    """Returns a boolean whether assessment is verified or not."""
     return self.verified_date != None  # noqa
 
   _api_attrs = reflection.ApiAttributes(
@@ -430,7 +431,12 @@ class VerifiedDate(object):
 
   _fulltext_attrs = [
       attributes.DatetimeFullTextAttr("verified_date", "verified_date"),
-      "verified",
+      attributes.BooleanFullTextAttr(
+          'verified',
+          'verified',
+          true_value="Yes",
+          false_value="No",
+      ),
   ]
 
   @classmethod

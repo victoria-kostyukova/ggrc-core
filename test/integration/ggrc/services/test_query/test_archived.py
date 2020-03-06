@@ -37,7 +37,7 @@ class TestArchived(WithQueryApi, TestCase):
 
     ids = self.simple_query(
         "Audit",
-        expression=["archived", "=", "true"],
+        expression=["archived", "=", "yes"],
         type_="ids",
         field="ids"
     )
@@ -65,7 +65,7 @@ class TestArchived(WithQueryApi, TestCase):
 
     ids = self.simple_query(
         "Assessment",
-        expression=["archived", "=", "true"],
+        expression=["archived", "=", "yes"],
         type_="ids",
         field="ids"
     )
@@ -77,7 +77,7 @@ class TestArchived(WithQueryApi, TestCase):
     self.assert200(response)
     ids = self.simple_query(
         "Evidence",
-        expression=["archived", "=", "true"],
+        expression=["archived", "=", "yes"],
         type_="ids",
         field="ids"
     )

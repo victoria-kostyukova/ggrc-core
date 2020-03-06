@@ -124,12 +124,24 @@ const ViewModel = canDefineMap.extend({
       if (RICH_TEXT_ATTRS.has(attrName)) {
         return this.getConvertedRichTextAttr(result);
       }
+
+      if (typeof result === 'boolean') {
+        return this.getConvertedBoolean(result);
+      }
+
       return String(result);
     }
     return '';
   },
   isMarkdown() {
     return !!this.instance.constructor.isChangeableExternally;
+  },
+  getConvertedBoolean(value) {
+    if (value) {
+      return 'Yes';
+    } else {
+      return 'No';
+    }
   },
 });
 
