@@ -424,12 +424,22 @@ mapper-results-items-header {
       text-transform: uppercase;
 
       &_sortable {
+        display: flex;
         cursor: pointer;
       }
 
       &:first-child {
         flex: 1 1 $first-column-width;
       }
+    }
+
+    .fa {
+      margin-left: 3px;
+    }
+
+    .title-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
