@@ -6,9 +6,99 @@
 import {filteredMap} from '../../plugins/ggrc-utils';
 import loIsString from 'lodash/isString';
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
+
+const ViewModel = canDefineMap.extend({
+  options: {
+    get() {
+      let isGroupedDropdown = this.isGroupedDropdown;
+      let optionsGroups = this.optionsGroups;
+      let noneValue = this.noValueLabel || '--';
+      let none = isGroupedDropdown ?
+        [{
+          group: noneValue,
+          subitems: [{title: noneValue, value: ''}],
+        }] :
+        [{
+          title: noneValue,
+          value: '',
+        }];
+      let list = [];
+      if (!isGroupedDropdown) {
+        list = filteredMap(
+          this.optionsList || [], (option) => {
+            if (loIsString(option)) {
+              return {
+                value: option,
+                title: option,
+              };
+            }
+            return option;
+          }
+        );
+      } else {
+        list = Object.keys(optionsGroups).map((key) => {
+          let group = optionsGroups.get(key);
+          return {
+            group: group.name,
+            subitems: group.items.map((item) => {
+              return {
+                value: item.value,
+                title: item.name,
+              };
+            }),
+          };
+        });
+      }
+      if (this.noValue) {
+        return none.concat(list);
+      }
+      return list;
+    },
+  },
+  name: {
+    value: '',
+  },
+  className: {
+    value: '',
+  },
+  onChange: {
+    value: () => $.noop,
+  },
+  noValue: {
+    value: '',
+  },
+  noValueLabel: {
+    value: '',
+  },
+  controlId: {
+    value: '',
+  },
+  isGroupedDropdown: {
+    value: false,
+  },
+  tabIndex: {
+    value: 0,
+  },
+  /*
+    Options list should be an `array` of object containing `title` and `value`
+    [{
+      title: `title`
+      value: `value`
+    }]
+    */
+  optionsList: {
+    value: () => [],
+  },
+  optionsGroups: {
+    value: () => ({}),
+  },
+  isDisabled: {
+    value: false,
+  },
+});
 
 /*
   Component abstracts <select> dropdown in HTML.
@@ -20,76 +110,8 @@ export default canComponent.extend({
   tag: 'dropdown-component',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      options: {
-        get: function () {
-          let isGroupedDropdown = this.attr('isGroupedDropdown');
-          let optionsGroups = this.attr('optionsGroups');
-          let noneValue = this.attr('noValueLabel') || '--';
-          let none = isGroupedDropdown ?
-            [{
-              group: noneValue,
-              subitems: [{title: noneValue, value: ''}],
-            }] :
-            [{
-              title: noneValue,
-              value: '',
-            }];
-          let list = [];
-          if (!isGroupedDropdown) {
-            list = filteredMap(
-              this.attr('optionsList') || [], (option) => {
-                if (loIsString(option)) {
-                  return {
-                    value: option,
-                    title: option,
-                  };
-                }
-                return option;
-              }
-            );
-          } else {
-            list = canMap.keys(optionsGroups).map(function (key) {
-              let group = optionsGroups.attr(key);
-              return {
-                group: group.attr('name'),
-                subitems: group.attr('items').map(function (item) {
-                  return {
-                    value: item.value,
-                    title: item.name,
-                  };
-                }),
-              };
-            });
-          }
-          if (this.attr('noValue')) {
-            return none.concat(list);
-          }
-          return list;
-        },
-      },
-    },
-    name: '',
-    className: '',
-    onChange: $.noop,
-    noValue: '',
-    noValueLabel: '',
-    controlId: '',
-    isGroupedDropdown: false,
-    tabIndex: 0,
-    /*
-      Options list should be an `array` of object containing `title` and `value`
-      [{
-        title: `title`
-        value: `value`
-      }]
-      */
-    optionsList: [],
-    optionsGroups: {},
-    isDisabled: false,
-  }),
-  init: function (element, options) {
+  ViewModel,
+  init(element) {
     let $el = $(element);
     let attrVal = $el.attr('is-disabled');
     let disable;
@@ -104,9 +126,9 @@ export default canComponent.extend({
     } else if (attrVal === 'true') {
       disable = true;
     } else {
-      disable = Boolean(viewModel.attr('isDisabled'));
+      disable = Boolean(viewModel.isDisabled);
     }
 
-    viewModel.attr('isDisabled', disable);
+    viewModel.isDisabled = disable;
   },
 });

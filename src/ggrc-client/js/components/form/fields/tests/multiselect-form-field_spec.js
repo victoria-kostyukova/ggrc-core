@@ -13,14 +13,14 @@ describe('multiselect-form-field component', () => {
   beforeEach(() => {
     viewModel = getComponentVM(Component);
     spyOn(viewModel, 'dispatch');
-    viewModel.attr('fieldId', 'id');
+    viewModel.fieldId = 'id';
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
     const newValue = new canMap({
       selected: [{value: 'option1', checked: true}],
     });
-    viewModel.attr('value', newValue);
+    viewModel.value = newValue;
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
@@ -29,8 +29,8 @@ describe('multiselect-form-field component', () => {
       selected: [{value: 'option2', checked: true}],
     });
 
-    viewModel.attr('value', newValue);
-    expect(viewModel.attr('inputValue')).toEqual(newValue);
+    viewModel.value = newValue;
+    expect(viewModel.inputValue).toEqual(newValue);
   });
 
   it('fires valueChanged event on input value change', () => {
@@ -39,7 +39,7 @@ describe('multiselect-form-field component', () => {
         {value: 'option1', checked: true},
         {value: 'option2', checked: true},
       ]});
-    viewModel.attr('inputValue', newValue);
+    viewModel.inputValue = newValue;
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',

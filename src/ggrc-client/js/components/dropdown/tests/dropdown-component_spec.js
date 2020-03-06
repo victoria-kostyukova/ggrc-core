@@ -8,18 +8,16 @@ import canStache from 'can-stache';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../dropdown-component';
 
-describe('dropdown component', function () {
-  'use strict';
-
-  describe('rendering option list', function () {
+describe('dropdown component', () => {
+  describe('rendering option list', () => {
     let template;
 
-    beforeAll(function () {
+    beforeAll(() => {
       template = canStache(
         '<dropdown-component optionsList:from="list"></dropdown-component>');
     });
 
-    it('when input is an array of strings', function () {
+    it('when input is an array of strings', () => {
       let list = ['a', 'b', 'c', 'd'];
       let frag = template({
         list: list,
@@ -34,7 +32,7 @@ describe('dropdown component', function () {
       });
     });
 
-    it('when input is an array of values', function () {
+    it('when input is an array of values', () => {
       let list = [{
         title: 'a',
         value: 1,
@@ -62,7 +60,7 @@ describe('dropdown component', function () {
       });
     });
 
-    it('when input is an array of grouped values', function () {
+    it('when input is an array of grouped values', () => {
       let list = [{
         title: 'a',
         value: 1,
@@ -120,7 +118,7 @@ describe('dropdown component', function () {
     });
   });
 
-  describe('build of options', function () {
+  describe('build of options', () => {
     let viewModel;
     let optionsList = [
       {title: 'title 1', value: 'value1'},
@@ -146,39 +144,39 @@ describe('dropdown component', function () {
       },
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       viewModel = getComponentVM(Component);
-      viewModel.attr('noValue', false);
+      viewModel.noValue = false;
     });
 
-    it('should build list from optionsList', function () {
+    it('should build list from optionsList', () => {
       let list;
-      viewModel.attr('optionsList', optionsList);
-      list = viewModel.attr('options');
+      viewModel.optionsList = optionsList;
+      list = viewModel.options;
 
       expect(list.length).toEqual(3);
       expect(list[0].title).toEqual(optionsList[0].title);
       expect(list[2].title).toEqual(optionsList[2].title);
     });
 
-    it('should build list from optionsList with None', function () {
+    it('should build list from optionsList with None', () => {
       let list;
 
-      viewModel.attr('optionsList', optionsList);
-      viewModel.attr('noValue', true);
-      viewModel.attr('noValueLabel', '');
-      list = viewModel.attr('options');
+      viewModel.optionsList = optionsList;
+      viewModel.noValue = true;
+      viewModel.noValueLabel = '';
+      list = viewModel.options;
 
       expect(list.length).toEqual(4);
       expect(list[0].title).toEqual('--');
       expect(list[3].title).toEqual(optionsList[2].title);
     });
 
-    it('should build list from optionsGroups', function () {
+    it('should build list from optionsGroups', () => {
       let list;
-      viewModel.attr('optionsGroups', optionsGroups);
-      viewModel.attr('isGroupedDropdown', true);
-      list = viewModel.attr('options');
+      viewModel.optionsGroups = optionsGroups;
+      viewModel.isGroupedDropdown = true;
+      list = viewModel.options;
 
       expect(list.length).toEqual(2);
       expect(list[0].subitems.length).toEqual(3);
@@ -187,13 +185,13 @@ describe('dropdown component', function () {
       expect(list[1].subitems[0].title).toEqual('gr 2 name 1');
     });
 
-    it('should build list from optionsGroups with None', function () {
+    it('should build list from optionsGroups with None', () => {
       let list;
-      viewModel.attr('optionsGroups', optionsGroups);
-      viewModel.attr('isGroupedDropdown', true);
-      viewModel.attr('noValue', true);
-      viewModel.attr('noValueLabel', '');
-      list = viewModel.attr('options');
+      viewModel.optionsGroups = optionsGroups;
+      viewModel.isGroupedDropdown = true;
+      viewModel.noValue = true;
+      viewModel.noValueLabel = '';
+      list = viewModel.options;
 
       expect(list.length).toEqual(3);
       expect(list[0].subitems.length).toEqual(1);
