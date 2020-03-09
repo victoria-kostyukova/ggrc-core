@@ -545,8 +545,10 @@ p {
 
 .user-string {
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background: $lightGray;
-  display: inline-block;
+  display: block;
   padding: 0 2px 2px 2px;
   .flash & {
     background: transparent;
