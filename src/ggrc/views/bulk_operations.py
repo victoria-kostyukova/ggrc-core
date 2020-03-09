@@ -29,6 +29,23 @@ CAV = all_models.CustomAttributeValue
 
 logger = logging.getLogger(__name__)
 
+_BULK_VERIFY_MESSAGES = {
+    "success": {
+        "title": "Ticket(s) update for your Bulk update action was "
+                 "completed.",
+        "body": "The assessments from the Bulk update action that required "
+                "ticket(s) updates have been successfully updated.",
+    },
+    "failure": {
+        "title": "There were some errors in updating ticket(s) for your "
+                 "Bulk update action.",
+        "body": "There were errors that prevented updates of some ticket(s) "
+                "after the Bulk update action. The error may be due to your "
+                "lack to sufficient access to generate/update the ticket(s)."
+                " Here is the list of assessment(s) that was not updated.",
+    },
+}
+
 
 def _get_bulk_cad_assessment_data(data):
   """Returns CADs and joined assessment data
@@ -227,9 +244,21 @@ def bulk_verify(task):
     update_data = builder.assessments_verify_to_csv()
 
   with benchmark("Verify assessments"):
-    verify_assmts = converters.make_import(csv_data=update_data,
-                                           dry_run=False,
-                                           bulk_import=True)
+    import_arguments = {
+        "csv_data": update_data,
+        "dry_run": False,
+        "bulk_import": True,
+    }
+
+    if "bulk_verify" in task.name:
+      # task name will look like
+      # u'be5d6e58-b8ae-4210-9ceb-30ac66020711_bulk_verify'
+      # when it gets here
+
+      import_arguments["custom_messages"] = _BULK_VERIFY_MESSAGES
+
+    verify_assmts = converters.make_import(**import_arguments)
+
     _log_import(verify_assmts["data"])
 
   verify_errors = set(verify_assmts["failed_slugs"])

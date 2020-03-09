@@ -101,29 +101,15 @@ class ImportConverter(BaseConverter):
       "status",
   ]
 
-  # pylint: disable=invalid-name
-  _TICKET_UPDATE_NOTIFICATION_MESSAGES = {
-      "success": {
-          "title": "Ticket(s) update for your Bulk update action was "
-                   "completed.",
-          "body": "The assessments from the Bulk update action that required "
-                  "ticket(s) updates have been successfully updated.",
-      },
-      "failure": {
-          "title": "There were some errors in updating ticket(s) for your "
-                   "Bulk update action.",
-          "body": "There were errors that prevented updates of some ticket(s) "
-                  "after the Bulk update action. The error may be due to your "
-                  "lack to sufficient access to generate/update the ticket(s)."
-                  " Here is the list of assessment(s) that was not updated.",
-      },
-  }
+  # pylint: disable=too-many-arguments
+  def __init__(self, ie_job, dry_run=True, csv_data=None, bulk_import=False,
+               custom_messages=None):
 
-  def __init__(self, ie_job, dry_run=True, csv_data=None, bulk_import=False):
     self.user = login.get_current_user()
     self.dry_run = dry_run
     self.csv_data = csv_data or []
     self._bulk_import = bulk_import
+    self._custom_messages = custom_messages
     self.indexer = get_indexer()
 
     super(ImportConverter, self).__init__(ie_job)
@@ -188,8 +174,10 @@ class ImportConverter(BaseConverter):
 
     arg_list = {
         "revision_ids": revision_ids,
-        "notification_messages": self._TICKET_UPDATE_NOTIFICATION_MESSAGES,
     }
+
+    if self._custom_messages:
+      arg_list["notification_messages"] = self._custom_messages
 
     filename = getattr(self.ie_job, "title", '')
     user_email = getattr(self.user, "email", '')
