@@ -56,9 +56,9 @@
 
 <div class="links">
   <div class="row-fluid">
-    <div class="span12">
-      <a class="secondary oneline {{instance.constructor.category}}" href="{{instance.program.viewLink}}#audit/audit/{{instance.id}}">
-        View {{instance.title}}
+    <div class="span6">
+      <a class="secondary" href="{{instance.viewLink}}">
+        View {{instance.constructor.title_singular}}
       </a>
     </div>
   </div>
