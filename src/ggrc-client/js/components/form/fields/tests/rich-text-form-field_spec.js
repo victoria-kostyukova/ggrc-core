@@ -7,49 +7,49 @@ import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import Component from '../rich-text-form-field';
 
 describe('rich-text-form-field', () => {
-  'use strict';
   let viewModel;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
     spyOn(viewModel, 'dispatch');
-    viewModel.attr('fieldId', 'id');
+    viewModel.fieldId = 'id';
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
-    viewModel.attr('value', '');
+    viewModel.value = '';
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('sets the value of the input', () => {
-    viewModel.attr('value', 'test');
-    expect(viewModel.attr('inputValue')).toEqual('test');
+    viewModel.value = 'test';
+    expect(viewModel.inputValue).toEqual('test');
   });
 
-  it('fires valueChanged event on input value change', () => {
-    viewModel.attr('value', '');
-    viewModel.attr('inputValue', 'newValue');
-    viewModel.onBlur();
-    expect(viewModel.dispatch).toHaveBeenCalledWith({
-      type: 'valueChanged',
-      fieldId: 'id',
-      value: 'newValue',
-    });
-    viewModel.attr('inputValue', 'newValue2');
-    viewModel.onBlur();
-    expect(viewModel.dispatch).toHaveBeenCalledWith({
-      type: 'valueChanged',
-      fieldId: 'id',
-      value: 'newValue2',
+  describe('updateRichTextValue() method', () => {
+    it('fires valueChanged event', () => {
+      viewModel.updateRichTextValue({newValue: 'newValue'});
+      viewModel.onBlur();
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'valueChanged',
+        fieldId: 'id',
+        value: 'newValue',
+      });
+      viewModel.updateRichTextValue({newValue: 'newValue2'});
+      viewModel.onBlur();
+      expect(viewModel.dispatch).toHaveBeenCalledWith({
+        type: 'valueChanged',
+        fieldId: 'id',
+        value: 'newValue2',
+      });
     });
   });
 
   describe('isAllowToSet() method', () => {
     it('should return TRUE. has focus and values are equal', () => {
       let value = 'myText';
-      viewModel.attr('_value', value);
-      viewModel.attr('_oldValue', value);
-      viewModel.attr('editorHasFocus', true);
+      viewModel._value = value;
+      viewModel._oldValue = value;
+      viewModel.editorHasFocus = true;
 
       let isAllow = viewModel.isAllowToSet();
 
@@ -58,9 +58,9 @@ describe('rich-text-form-field', () => {
 
     it('should return TRUE. doesn\'t have focus and values are equal', () => {
       let value = 'myText';
-      viewModel.attr('_value', value);
-      viewModel.attr('_oldValue', value);
-      viewModel.attr('editorHasFocus', false);
+      viewModel._value = value;
+      viewModel._oldValue = value;
+      viewModel.editorHasFocus = false;
 
       let isAllow = viewModel.isAllowToSet();
 
@@ -70,9 +70,9 @@ describe('rich-text-form-field', () => {
     it('should return TRUE. doesn\'t have focus and values NOT are equal',
       () => {
         let value = 'myText';
-        viewModel.attr('_value', value);
-        viewModel.attr('_oldValue', 'myTex');
-        viewModel.attr('editorHasFocus', false);
+        viewModel._value = value;
+        viewModel._oldValue = 'myTex';
+        viewModel.editorHasFocus = false;
 
         let isAllow = viewModel.isAllowToSet();
 
@@ -82,9 +82,9 @@ describe('rich-text-form-field', () => {
 
     it('should return FALSE. has focus and values are NOT equal', () => {
       let value = 'myText';
-      viewModel.attr('_value', value);
-      viewModel.attr('_oldValue', 'myTex');
-      viewModel.attr('editorHasFocus', true);
+      viewModel._value = value;
+      viewModel._oldValue = 'myTex';
+      viewModel.editorHasFocus = true;
 
       let isAllow = viewModel.isAllowToSet();
 

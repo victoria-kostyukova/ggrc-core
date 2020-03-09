@@ -22,11 +22,11 @@ describe('autocomplete-results component', () => {
         };
       });
       it('correctly maps results when paths are defined', () => {
-        viewModel.attr('titleFieldPath', 'name');
-        viewModel.attr('infoFieldPath', 'email');
+        viewModel.titleFieldPath = 'name';
+        viewModel.infoFieldPath = 'email';
 
-        viewModel.attr('values', [item]);
-        let results = viewModel.attr('results');
+        viewModel.values = [item];
+        let results = viewModel.results;
 
         expect(results.serialize()[0]).toEqual({
           title: item.name,
@@ -36,8 +36,8 @@ describe('autocomplete-results component', () => {
       });
 
       it('correctly maps results when patches are not defined', () => {
-        viewModel.attr('values', [item]);
-        let results = viewModel.attr('results');
+        viewModel.values = [item];
+        let results = viewModel.results;
 
         expect(results.serialize()[0]).toEqual({
           title: '',

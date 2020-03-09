@@ -49,24 +49,24 @@ describe('external-data-provider component', () => {
       });
 
       it('turns on "loading" flag', () => {
-        viewModel.attr('loading', false);
+        viewModel.loading = false;
 
         viewModel.loadData();
 
-        expect(viewModel.attr('loading')).toBe(true);
+        expect(viewModel.loading).toBe(true);
       });
 
       it('increases request number', () => {
-        viewModel.attr('currentRequest', 0);
+        viewModel.currentRequest = 0;
 
         viewModel.loadData();
 
-        expect(viewModel.attr('currentRequest')).toBe(1);
+        expect(viewModel.currentRequest).toBe(1);
       });
 
       it('send correct request', () => {
-        viewModel.attr('searchCriteria', 'someText');
-        viewModel.attr('type', 'Person');
+        viewModel.searchCriteria = 'someText';
+        viewModel.type = 'Person';
 
         viewModel.loadData();
 
@@ -80,19 +80,19 @@ describe('external-data-provider component', () => {
 
       it('sets response to "values" property', (done) => {
         let testResponse = ['res1', 'res2'];
-        viewModel.attr('values', null);
+        viewModel.values = null;
 
         viewModel.loadData();
 
         requestDfd.resolve(testResponse).then(() => {
-          expect(viewModel.attr('values').serialize()).toEqual(testResponse);
+          expect(viewModel.values.serialize()).toEqual(testResponse);
           done();
         });
       });
 
       it('shows message if there was error', (done) => {
         spyOn(NotifiersUtils, 'notifier');
-        viewModel.attr('type', 'TestModel');
+        viewModel.type = 'TestModel';
 
         viewModel.loadData();
 
@@ -106,20 +106,20 @@ describe('external-data-provider component', () => {
       describe('turns off "loading" flag', () => {
         beforeEach(() => {
           spyOn(NotifiersUtils, 'notifier');
-          viewModel.attr('loading', true);
+          viewModel.loading = true;
           viewModel.loadData();
         });
 
         it('when there was success', (done) => {
           requestDfd.resolve().always(() => {
-            expect(viewModel.attr('loading')).toBe(false);
+            expect(viewModel.loading).toBe(false);
             done();
           });
         });
 
         it('when there was error', (done) => {
           requestDfd.reject().always(() => {
-            expect(viewModel.attr('loading')).toBe(false);
+            expect(viewModel.loading).toBe(false);
             done();
           });
         });
@@ -140,7 +140,7 @@ describe('external-data-provider component', () => {
         request1.resolve(response1);
 
         $.when(request1, request2).then(() => {
-          expect(viewModel.attr('values').serialize()).toEqual(response2);
+          expect(viewModel.values.serialize()).toEqual(response2);
           done();
         });
       });

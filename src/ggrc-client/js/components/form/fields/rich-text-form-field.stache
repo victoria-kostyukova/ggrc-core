@@ -4,9 +4,11 @@
 }}
 
 <div class="input-wrapper">
-  <rich-text content:bind="inputValue"
+  <rich-text content:from="inputValue"
              editorHasFocus:to="editorHasFocus"
              disabled:from="disabled"
              hiddenToolbar:from="true"
-             placeholder:from="placeholder"></rich-text>
+             placeholder:from="placeholder"
+             on:updateRichTextValue="updateRichTextValue(scope.event)">
+  </rich-text>
 </div>

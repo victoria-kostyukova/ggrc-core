@@ -4,9 +4,34 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import template from './autocomplete-component.stache';
+
+const ViewModel = canDefineMap.extend({
+  placeholder: {
+    value: '',
+  },
+  searchItemsType: {
+    value: '',
+  },
+  extraCssClass: {
+    value: '',
+  },
+  value: {
+    value: null,
+  },
+
+  // disable automatically mapping the picked item from the live search
+  // results to the instance object of the current context
+  automappingOff: {
+    value: true,
+  },
+  disable: {
+    type: 'boolean',
+    value: false,
+  },
+});
 
 /**
  * A component that renders an autocomplete text input field.
@@ -17,22 +42,7 @@ let component = {
   tag: 'autocomplete-component',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    placeholder: '',
-    searchItemsType: '',
-    extraCssClass: '',
-    value: null,
-
-    // disable automatically mapping the picked item from the live search
-    // results to the instance object of the current context
-    automappingOff: true,
-    define: {
-      disable: {
-        type: 'boolean',
-        value: false,
-      },
-    },
-  }),
+  ViewModel,
 
   _EV_ITEM_SELECTED: 'item-selected',
 

@@ -4,11 +4,78 @@
  */
 
 import canStache from 'can-stache';
-import canList from 'can-list';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
+
+const ViewModel = canDefineMap.extend({
+  /**
+   * Collection containing a list of results.
+   * Each item should contain the following properties:
+   * - title {String} - The property containing title of element.
+   * - info {String} - The property containing additional info.
+   * - value {Object} - The object that should be passed when user picks corresponding element.
+   * @type {canList}
+   */
+  results: {
+    get() {
+      let values = this.values;
+      let titleFieldPath = this.titleFieldPath;
+      let infoFieldPath = this.infoFieldPath;
+
+      let results = values.map((result) => {
+        return {
+          title: titleFieldPath ? result.get(titleFieldPath) : '',
+          info: infoFieldPath ? result.get(infoFieldPath) : '',
+          value: result,
+        };
+      });
+
+      return results;
+    },
+  },
+  /**
+   * Contains path to field that should be displayed as title.
+   * @type {String}
+   */
+  titleFieldPath: {
+    value: null,
+  },
+  /**
+   * Contains path to field that should be displayed as info.
+   */
+  infoFieldPath: {
+    value: null,
+  },
+  /**
+   * Indicates that system is loading results.
+   * It used to toggle spinner.
+   * @type {Boolean}
+   */
+  loading: {
+    value: false,
+  },
+  /**
+   * The list of results which should be displayed.
+   * @type {canList}
+   */
+  values: {
+    value: () => [],
+  },
+  /**
+   * Handles user's click and dispathes the event.
+   * @param {Object} item - The item picked by user.
+   * @param {Object} event - The corresponding event.
+   */
+  pickItem(item, event) {
+    event.stopPropagation();
+    this.dispatch({
+      type: 'itemPicked',
+      data: item,
+    });
+  },
+});
 
 /**
  * The component is used to show autocomplete results and handle user's clicks.
@@ -17,67 +84,5 @@ export default canComponent.extend({
   tag: 'autocomplete-results',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      /**
-       * Collection containing a list of results.
-       * Each item should contain the following properties:
-       * - title {String} - The property containing title of element.
-       * - info {String} - The property containing additional info.
-       * - value {Object} - The object that should be passed when user picks corresponding element.
-       * @type {canList}
-       */
-      results: {
-        Value: canList,
-        get() {
-          let values = this.attr('values');
-          let titleFieldPath = this.attr('titleFieldPath');
-          let infoFieldPath = this.attr('infoFieldPath');
-
-          let results = values.map((result) => {
-            return {
-              title: titleFieldPath ? result.attr(titleFieldPath) : '',
-              info: infoFieldPath ? result.attr(infoFieldPath) : '',
-              value: result,
-            };
-          });
-
-          return results;
-        },
-      },
-    },
-    /**
-     * Contains path to field that should be displayed as title.
-     * @type {String}
-     */
-    titleFieldPath: null,
-    /**
-     * Contains path to field that should be displayed as info.
-     */
-    infoFieldPath: null,
-    /**
-     * Indicates that system is loading results.
-     * It used to toggle spinner.
-     * @type {Boolean}
-     */
-    loading: false,
-
-    /**
-     * The list of results which should be displayed.
-     * @type {canList}
-     */
-    values: [],
-    /**
-     * Handles user's click and dispathes the event.
-     * @param {Object} item - The item picked by user.
-     * @param {Object} event - The corresponding event.
-     */
-    pickItem(item, event) {
-      event.stopPropagation();
-      this.dispatch({
-        type: 'itemPicked',
-        data: item,
-      });
-    },
-  }),
+  ViewModel,
 });

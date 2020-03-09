@@ -7,42 +7,41 @@ import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import Component from '../date-form-field';
 
 describe('date-form-field component', () => {
-  'use strict';
   let viewModel;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
     spyOn(viewModel, 'dispatch');
-    viewModel.attr('fieldId', 'id');
+    viewModel.fieldId = 'id';
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
-    viewModel.attr('value', '');
+    viewModel.value = '';
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('sets the value of the input', () => {
-    viewModel.attr('value', 'test');
-    expect(viewModel.attr('inputValue')).toEqual('test');
+    viewModel.value = 'test';
+    expect(viewModel.inputValue).toEqual('test');
   });
 
   it('does not fire valueChanged event if value wasn\'t changed', () => {
-    viewModel.attr('value', '');
-    viewModel.attr('inputValue', 'newValue');
+    viewModel.value = '';
+    viewModel.inputValue = 'newValue';
     viewModel.dispatch.calls.reset();
-    viewModel.attr('inputValue', 'newValue');
+    viewModel.inputValue = 'newValue';
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('fires valueChanged event on input value change', () => {
-    viewModel.attr('value', '');
-    viewModel.attr('inputValue', 'newValue');
+    viewModel.value = '';
+    viewModel.inputValue = 'newValue';
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: 'newValue',
     });
-    viewModel.attr('inputValue', 'newValue2');
+    viewModel.inputValue = 'newValue2';
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',

@@ -20,11 +20,11 @@ describe('external-data-autocomplete component', () => {
       describe('returns true', () => {
         it(`when "showResults" flag is turned on
             and "searchCriteria" length is greather than "minLength"`, () => {
-          viewModel.attr('showResults', true);
-          viewModel.attr('minLength', 2);
-          viewModel.attr('searchCriteria', 'test');
+          viewModel.showResults = true;
+          viewModel.minLength = 2;
+          viewModel.searchCriteria = 'test';
 
-          let result = viewModel.attr('renderResults');
+          let result = viewModel.renderResults;
 
           expect(result).toBe(true);
         });
@@ -33,33 +33,33 @@ describe('external-data-autocomplete component', () => {
       describe('returns false', () => {
         it(`when "showResults" flag is turned off
             and "searchCriteria" length is greather than "minLength"`, () => {
-          viewModel.attr('showResults', false);
-          viewModel.attr('minLength', 2);
-          viewModel.attr('searchCriteria', 'test');
+          viewModel.showResults = false;
+          viewModel.minLength = 2;
+          viewModel.searchCriteria = 'test';
 
-          let result = viewModel.attr('renderResults');
+          let result = viewModel.renderResults;
 
           expect(result).toBe(false);
         });
 
         it(`when "showResults" flag is turned on
             and "searchCriteria" length is less than "minLength"`, () => {
-          viewModel.attr('showResults', true);
-          viewModel.attr('minLength', 2);
-          viewModel.attr('searchCriteria', '');
+          viewModel.showResults = true;
+          viewModel.minLength = 2;
+          viewModel.searchCriteria = '';
 
-          let result = viewModel.attr('renderResults');
+          let result = viewModel.renderResults;
 
           expect(result).toBe(false);
         });
 
         it(`when "showResults" flag is turned off
             and "searchCriteria" length is less than "minLength"`, () => {
-          viewModel.attr('showResults', false);
-          viewModel.attr('minLength', 2);
-          viewModel.attr('searchCriteria', '');
+          viewModel.showResults = false;
+          viewModel.minLength = 2;
+          viewModel.searchCriteria = '';
 
-          let result = viewModel.attr('renderResults');
+          let result = viewModel.renderResults;
 
           expect(result).toBe(false);
         });
@@ -67,22 +67,22 @@ describe('external-data-autocomplete component', () => {
     });
 
     describe('openResults() method', () => {
-      it('turnes on "showResults" flag', () => {
-        viewModel.attr('showResults', false);
+      it('turns on "showResults" flag', () => {
+        viewModel.showResults = false;
 
         viewModel.openResults();
 
-        expect(viewModel.attr('showResults')).toBe(true);
+        expect(viewModel.showResults).toBe(true);
       });
     });
 
     describe('closeResults() method', () => {
-      it('turnes off "showResults" flag', () => {
-        viewModel.attr('showResults', true);
+      it('turns off "showResults" flag', () => {
+        viewModel.showResults = true;
 
         viewModel.closeResults();
 
-        expect(viewModel.attr('showResults')).toBe(false);
+        expect(viewModel.showResults).toBe(false);
       });
     });
 
@@ -92,12 +92,12 @@ describe('external-data-autocomplete component', () => {
       };
 
       it('updates "searchCriteria" property', (done) => {
-        viewModel.attr('searchCriteria', null);
+        viewModel.searchCriteria = null;
 
         viewModel.setSearchCriteria(element);
 
         setTimeout(() => {
-          expect(viewModel.attr('searchCriteria')).toBe('criteria');
+          expect(viewModel.searchCriteria).toBe('criteria');
           done();
         }, 600);
       });
@@ -130,11 +130,11 @@ describe('external-data-autocomplete component', () => {
       });
 
       it('turns on "saving" flag', () => {
-        viewModel.attr('saving', false);
+        viewModel.saving = false;
 
         viewModel.onItemPicked(item);
 
-        expect(viewModel.attr('saving')).toBe(true);
+        expect(viewModel.saving).toBe(true);
       });
 
       it('call createOrGet() method', () => {
@@ -143,7 +143,7 @@ describe('external-data-autocomplete component', () => {
         expect(viewModel.createOrGet).toHaveBeenCalledWith(item);
       });
 
-      it('dispatches event when istance was saved', (done) => {
+      it('dispatches event when instance was saved', (done) => {
         spyOn(viewModel, 'dispatch');
 
         viewModel.onItemPicked(item);
@@ -158,39 +158,39 @@ describe('external-data-autocomplete component', () => {
       });
 
       it('turns off "saving" flag', (done) => {
-        viewModel.attr('saving', true);
+        viewModel.saving = true;
 
         let onItemPickedChain = viewModel.onItemPicked(item);
 
         saveDfd.resolve().always(() => {
           onItemPickedChain.then(() => {
-            expect(viewModel.attr('saving')).toBe(false);
+            expect(viewModel.saving).toBe(false);
             done();
           });
         });
       });
 
       it('cleans search criteria if "autoClean" is turned on', (done) => {
-        viewModel.attr('searchCriteria', 'someText');
-        viewModel.attr('autoClean', true);
+        viewModel.searchCriteria = 'someText';
+        viewModel.autoClean = true;
 
         viewModel.onItemPicked(item);
 
         saveDfd.resolve().then(() => {
-          expect(viewModel.attr('searchCriteria')).toBe('');
+          expect(viewModel.searchCriteria).toBe('');
           done();
         });
       });
 
       it('does not clean search criteria if "autoClean" is turned on',
         (done) => {
-          viewModel.attr('searchCriteria', 'someText');
-          viewModel.attr('autoClean', false);
+          viewModel.searchCriteria = 'someText';
+          viewModel.autoClean = false;
 
           viewModel.onItemPicked(item);
 
           saveDfd.resolve().then(() => {
-            expect(viewModel.attr('searchCriteria')).toBe('someText');
+            expect(viewModel.searchCriteria).toBe('someText');
             done();
           });
         });
@@ -202,7 +202,7 @@ describe('external-data-autocomplete component', () => {
 
       beforeEach(() => {
         item = new canMap({test: true});
-        viewModel.attr('type', 'TestType');
+        viewModel.type = 'TestType';
         model = {
           id: 'testId',
         };
@@ -231,25 +231,25 @@ describe('external-data-autocomplete component', () => {
       });
 
       it('creates model with empty context', () => {
-        item.attr('context', 'test');
+        item.context = 'test';
         viewModel.createOrGet(item);
 
         let model = businessModels.TestType.create.calls.argsFor(0)[0];
-        expect(model.attr('context')).toBe(null);
+        expect(model.context).toBe(null);
       });
 
       it('creates model with "external" flag', () => {
-        item.attr('external', false);
+        item.external = false;
         viewModel.createOrGet(item);
 
         let model = businessModels.TestType.create.calls.argsFor(0)[0];
-        expect(model.attr('external')).toBe(true);
+        expect(model.external).toBe(true);
       });
 
       it('returns new model if there is no value in cache', (done) => {
         viewModel.createOrGet(item)
           .then((resultModel) => {
-            expect(resultModel.attr('id')).toBe('testId');
+            expect(resultModel.id).toBe('testId');
             expect(resultModel instanceof businessModels.TestType).toBe(true);
             done();
           });
