@@ -20,7 +20,7 @@ class RelatedProposals(base.WithBrowser):
         tag_name="object-list").wait_until(
         lambda e: e.exists).wait_until(
         lambda e: e.browser.execute_script(
-            "return $(arguments[0]).viewModel().attr('isLoading')",
+            "return $(arguments[0]).viewModel().isLoading",
             e) is False)
     elements = obj_list_element.elements(tag_name="related-proposals-item")
     proposal_rows = [ProposalRow(
