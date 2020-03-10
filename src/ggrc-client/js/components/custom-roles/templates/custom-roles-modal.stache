@@ -35,64 +35,77 @@
             disabledRoles:from="disabledRoles"
             rolesTooltips:from="rolesTooltips"
             singleUserRole:from="singleUserRole"
+          >
+            <div
+              data-original-title="{{tooltip}}"
+              rel="tooltip"
+              data-placement="bottom"
             >
-              <div
-                data-original-title="{{tooltip}}"
-                rel="tooltip"
-                data-placement="bottom">
-                {{#showHide}}
-                   <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                {{/showHide}}
-                <deletable-people-group
-                  showEmptyMessage:from="false"
-                  required:from="required"
-                  on:unmap="removePerson(scope.event)"
-                  canUnmap:from="canEdit"
-                  isLoading:from="isLoading"
-                  groupId:from="groupId"
-                  instance:from="instance"
-                  people:from="people">
+              {{#showHide}}
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              {{/showHide}}
+              <deletable-people-group
+                showEmptyMessage:from="false"
+                required:from="required"
+                on:unmap="removePerson(scope.event)"
+                canUnmap:from="canEdit"
+                isLoading:from="isLoading"
+                groupId:from="groupId"
+                instance:from="instance"
+                people:from="people"
+                data-trim-target="true"
+              >
+                <tooltip-content
+                  placement:from="'bottom'"
+                  content:from="title"
+                >
                   <label class="people-group__title-content form-label form-label__extended">
-                    <span class="people-group__title people-group__title--deletable">{{title}}</span>
+                    <span
+                      class="people-group__title people-group__title--deletable"
+                      data-trim-target="true"
+                    >
+                      {{title}}
+                    </span>
                     {{#if required}}
                       <i class="fa fa-asterisk"></i>
                     {{/if}}
                   </label>
-                  {{#if singleUserRole}}
-                    <div class="people-group__title-tooltip">
-                      <small><em>You can add only one person for this role</em></small>
-                    </div>
-                  {{/if}}
-                </deletable-people-group>
-                <div>
-                  {{#if isUpdating}}
-                    <spinner-component toggle:from="isUpdating"></spinner-component>
+                </tooltip-content>
+                {{#if singleUserRole}}
+                  <div class="people-group__title-tooltip">
+                    <small><em>You can add only one person for this role</em></small>
+                  </div>
+                {{/if}}
+              </deletable-people-group>
+            <div>
+              {{#if isUpdating}}
+                <spinner-component toggle:from="isUpdating"></spinner-component>
+              {{else}}
+                {{#if canEdit}}
+                  {{^if_config_exist 'external_services.Person'}}
+                    <autocomplete-component
+                      searchItemsType:from="'Person'"
+                      on:itemSelected="addPerson(scope.event.selectedItem, @groupId)"
+                      placeholder:from="placeholder">
+                    </autocomplete-component>
                   {{else}}
-                    {{#if canEdit}}
-                      {{^if_config_exist 'external_services.Person'}}
-                      <autocomplete-component
-                          searchItemsType:from="'Person'"
-                          on:itemSelected="addPerson(scope.event.selectedItem, @groupId)"
-                          placeholder:from="placeholder">
-                      </autocomplete-component>
-                      {{else}}
-                      <external-data-autocomplete
-                        type:from="'Person'"
-                        placeholder:from="placeholder"
-                        minLength:from="2"
-                        on:itemSelected="addPerson(scope.event.selectedItem, @groupId)">
-                      </external-data-autocomplete>
-                      {{/if_config_exist}}
-                    {{else}}
-                      {{^if people.length}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
-                    {{/if}}
+                    <external-data-autocomplete
+                      type:from="'Person'"
+                      placeholder:from="placeholder"
+                      minLength:from="2"
+                      on:itemSelected="addPerson(scope.event.selectedItem, @groupId)">
+                    </external-data-autocomplete>
+                  {{/if_config_exist}}
+                {{else}}
+                  {{^if people.length}}
+                    <span class="empty-message">None</span>
                   {{/if}}
-                </div>
-              </div>
-          </related-people-access-control-group>
-        {{/groups}}
-      </div>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+        </related-people-access-control-group>
+      {{/groups}}
+    </div>
   </related-people-access-control>
 </div>
