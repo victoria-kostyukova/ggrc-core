@@ -34,6 +34,7 @@ class CycleTaskGroup(roleable.Roleable,
                      relationship.Relatable,
                      mixins.WithContact,
                      wf_mixins.CycleTaskGroupRelatedStatusValidatedMixin,
+                     wf_mixins.WFCustomRestrictions,
                      mixins.Slugged,
                      mixins.Timeboxed,
                      mixins.Described,
@@ -46,6 +47,10 @@ class CycleTaskGroup(roleable.Roleable,
   """
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
+
+  _method_fields_restrictions = {
+      "PUT": []
+  }
 
   @classmethod
   def generate_slug_prefix(cls):  # pylint: disable=unused-argument

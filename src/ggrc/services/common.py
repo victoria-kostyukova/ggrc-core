@@ -648,6 +648,14 @@ class Resource(ModelView):
                       "is dedicated for SOX needs")
 
   @staticmethod
+  def _validate_method_fields_restriction(obj, src):
+    """Validate input data by method, and fields"""
+    if hasattr(obj, "is_method_fields_restricted"):
+      if obj.is_method_fields_restricted(request.method, obj.to_dict(), src):
+        raise Forbidden(
+            description="Some fields in the object is in a read-only")
+
+  @staticmethod
   def _validate_readonly_fields(obj, src):
     if hasattr(obj, "is_updating_readonly_fields"):
       if obj.is_updating_readonly_fields(src):
@@ -695,6 +703,9 @@ class Resource(ModelView):
 
     with benchmark("Validate read-only fields access"):
       self._validate_readonly_fields(obj, src)
+
+    with benchmark("Validate method field restriction"):
+      self._validate_method_fields_restriction(obj, src)
 
     with benchmark("Deserialize object"):
       self.json_update(obj, src)

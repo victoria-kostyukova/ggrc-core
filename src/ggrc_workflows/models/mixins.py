@@ -125,3 +125,34 @@ class WorkflowCommentable(comment.Commentable):
       db.String,
       nullable=True,
       default=u"Task Assignees,Task Secondary Assignees")
+
+
+class WFCustomRestrictions(object):
+  """
+    Mixin for custom restriction on objects
+    Depends on method of request, and fields to updates
+  """
+  _method_fields_restrictions = {}
+
+  @property
+  def method_fields_restrictions(self):
+    return self._method_fields_restrictions
+
+  @method_fields_restrictions.setter
+  def method_fields_restrictions(self, obj):
+    self._method_fields_restrictions = obj
+
+  def is_method_fields_restricted(self, method, obj, upd_obj):
+    """Check the input object with actual object for restricted fields
+      If the returned list of fields for restriction is empty, then whole
+      method is restricted
+    """
+    method_fields_restriction = self._method_fields_restrictions.get(method)
+    if method_fields_restriction is not None:
+      if not method_fields_restriction:
+        return True
+      for field in method_fields_restriction:
+        upd_field = upd_obj.get(field)
+        if upd_field is not None and upd_field != obj.get(field):
+          return True
+    return False
