@@ -141,8 +141,6 @@ def invalidate_acr_caches(mapper, content, target):
     del flask.g.global_role_names
   if hasattr(flask.g, "global_ac_roles"):
     del flask.g.global_ac_roles
-  if hasattr(flask.g, "global_role_objects"):
-    del flask.g.global_role_objects
 
 
 def acr_modified(obj, session):
@@ -223,23 +221,6 @@ def get_custom_roles_for(object_type):
     for type_, id_, name_ in query:
       flask.g.global_role_names[type_][id_] = name_
   return flask.g.global_role_names[object_type]
-
-
-def get_roles_objects_for(object_type):
-  """Get all access control roles for the given object type
-  return the dict off ACRs related to sent object_type,
-  Ids are keys of this dict and objects are values.
-  """
-  if getattr(flask.g, "global_role_objects", None) is None:
-    flask.g.global_role_objects = collections.defaultdict(dict)
-    query = db.session.query(
-        AccessControlRole,
-    ).filter(
-        AccessControlRole.object_type.isnot(None),  # noqa
-    )
-    for obj in query:
-      flask.g.global_role_objects[obj.object_type][obj.id] = obj.to_dict()
-  return flask.g.global_role_objects[object_type]
 
 
 def _merge_roles_if_needed(object_type):

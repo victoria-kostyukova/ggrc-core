@@ -251,17 +251,6 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     ]
 
   @classmethod
-  def _populate_acl_with_acr(cls, access_control_list, roles_dict):
-    """Add acr model to the access control list items"""
-    for acl in access_control_list:
-      ac_role_id = acl.get("ac_role_id")
-      if "ac_role" not in acl:
-        ac_role_dict = roles_dict.get(ac_role_id)
-        if ac_role_dict is not None:
-          acl["ac_role"] = ac_role_dict
-    return access_control_list
-
-  @classmethod
   def _populate_acl_with_people(cls, access_control_list):
     """Add person property with person stub on access control list."""
     for acl in access_control_list:
@@ -272,10 +261,8 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
   def populate_acl(self):
     """Add access_control_list info for older revisions."""
     # pylint: disable=too-many-locals
-    roles_dict_objects = role.get_roles_objects_for(self.resource_type)
-    reverted_roles_dict = {
-        n.get("name"): i for i, n in roles_dict_objects.iteritems()
-    }
+    roles_dict = role.get_custom_roles_for(self.resource_type)
+    reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
     access_control_list = self._content.get("access_control_list") or []
     map_field_to_role = {
         "principal_assessor": reverted_roles_dict.get("Principal Assignees"),
@@ -310,7 +297,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
       person_ids = {fc.get("id") for fc in field_content if fc.get("id")}
       for person_id in person_ids:
         access_control_list.append({
-            "display_name": roles_dict_objects[role_id].get("name"),
+            "display_name": roles_dict[role_id],
             "ac_role_id": role_id,
             "context_id": None,
             "created_at": None,
@@ -319,7 +306,6 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
             "object_id": self.resource_id,
             "modified_by_id": None,
             "person_id": person_id,
-            "ac_role": roles_dict_objects.get(role_id),
             # Frontend require data in such format
             "person": {
                 "id": person_id,
@@ -332,29 +318,12 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
 
     acl_with_people = self._populate_acl_with_people(access_control_list)
     filtered_acl = self._filter_internal_acls(acl_with_people)
-    acl_with_acr = self._populate_acl_with_acr(filtered_acl,
-                                               roles_dict_objects)
-
     result_acl = [
-        acl for acl in acl_with_acr if acl["ac_role_id"] in roles_dict_objects
+        acl for acl in filtered_acl if acl["ac_role_id"] in roles_dict
     ]
     return {
         "access_control_list": result_acl,
     }
-
-  def populate_acr(self):
-    """Add acr model for older revisions of AccessControlList."""
-    if self.resource_type == "AccessControlList":
-      if "ac_role" in self._content:
-        return {}
-      roles_dict_objects = role.get_roles_objects_for(
-          self._content["object_type"]
-      )
-      ac_role_id = self._content.get("ac_role_id")
-      ac_role_dict = roles_dict_objects.get(ac_role_id)
-      if ac_role_dict is not None:
-        return {"ac_role": ac_role_dict}
-    return {}
 
   def populate_folder(self):
     """Add folder info for older revisions."""
@@ -726,7 +695,6 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     populated_content.update(self.populate_readonly())
     populated_content.update(self.populate_automappings())
     populated_content.update(self.populate_type())
-    populated_content.update(self.populate_acr())
     populated_content.update(self.populate_created_by())
 
     populated_content["custom_attribute_definitions"] = sorted(
