@@ -565,6 +565,44 @@ class TestExportWithSOX302(query_helper.WithQueryApi,
         exp_value,
     )
 
+  def test_no_hints_asmt_sox302(self):
+    """Test no hints for Text and Rich Text in exported file"""
+    with ggrc_factories.single_commit():
+      asmt = ggrc_factories.AssessmentFactory(
+          sox_302_enabled=True
+      )
+      ggrc_factories.CustomAttributeDefinitionFactory(
+          title="LCA_TEXT",
+          definition_type="assessment",
+          definition_id=asmt.id,
+          attribute_type="Text",
+          multi_choice_options="Empty, Not empty",
+          multi_choice_mandatory="0,8",
+      )
+      ggrc_factories.CustomAttributeDefinitionFactory(
+          title="LCA_RICH_TEXT",
+          definition_type="assessment",
+          definition_id=asmt.id,
+          attribute_type="Text",
+          multi_choice_options="Empty, Not empty",
+          multi_choice_mandatory="0,8",
+      )
+      asmt_id = asmt.id
+
+    self._login()
+    exported_data = self.export_csv([
+        self._make_query_dict(
+            "Assessment",
+            expression=["id", "=", asmt_id],
+            fields=[
+                "slug",
+                "__object_custom__:LCA_TEXT",
+                "__object_custom__:LCA_RICH_TEXT",
+            ]
+        )
+    ]).data
+    self.assertNotIn("Allowed values are:\nEmpty\nNot Empty", exported_data)
+
 
 @ddt.ddt
 class TestApiWithSOX302(BaseTestWithSOX302):

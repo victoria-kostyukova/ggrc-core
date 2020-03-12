@@ -445,7 +445,7 @@ class AttributeInfo(object):
     ))
     return definitions
 
-  @classmethod
+  @classmethod  # noqa: C901  # ignore flake8 method too complex warning
   def get_custom_attr_definitions(cls, object_class,
                                   ca_cache=None, fields=None):
     """Get column definitions for custom attributes on object_class.
@@ -477,11 +477,12 @@ class AttributeInfo(object):
     for attr in custom_attributes:
       description = attr.helptext or u""
       if attr.multi_choice_options:
-        if description:
-          description += "\n\n"
-        description += u"Allowed values are:\n{}".format(
-            attr.multi_choice_options.replace(",", "\n")
-        )
+        if attr.attribute_type not in ["Text", "Rich Text"]:
+          if description:
+            description += "\n\n"
+          description += u"Allowed values are:\n{}".format(
+              attr.multi_choice_options.replace(",", "\n")
+          )
       elif attr.attribute_type == attr.ValidTypes.CHECKBOX:
         description += u"Allowed values are:\nyes\nno"
       elif attr.ValidTypes.MAP in attr.attribute_type:
