@@ -97,56 +97,6 @@
             </div>
           </div>
 
-          {{#if new_object_form}}
-            <div class="ggrc-form-item">
-              <div class="ggrc-form-item__row">
-                <label class="ggrc-form-item__label assessment-template-dropdown">
-                  Select Assessment Template
-                  <i class="fa fa-question-circle"
-                    rel="tooltip"
-                    title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
-                  </i>
-                </label>
-                <div class="template-select">
-                  <assessment-templates-dropdown
-                    instance:from="instance.audit"
-                    extraClassName:from="'template-select__dropdown'"
-                    on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
-                  <spinner-component
-                    class="template-select__spinner"
-                    toggle:from="isInitialTemplateLoading" />
-                </div>
-              </div>
-            </div>
-            {{#if assessmentTemplate}}
-              {{#if assessmentTemplate.sox_302_enabled}}
-                <div class="ggrc-form-item">
-                  <div class="ggrc-form-item__row alert alert-nomargin">
-                    This assessment template enables “302 assessment workflow”:
-                    <p>
-                      - Assignees will have read only permissions upon assessment completion.
-                    </p>
-                    <p>
-                      - Verification step will be skipped if only positive answers are given for the assessment.
-                    </p>
-                  </div>
-                </div>
-              {{/if}}
-              <div class="ggrc-form-item">
-                <div class="ggrc-form-item__row">
-                    <label class="ggrc-form-item__label">
-                      Custom Attributes
-                    </label>
-                    <assessment-template-attributes
-                      instance:from="assessmentTemplate"
-                      fields:from="assessmentTemplate.custom_attribute_definitions"
-                      isLoading:from="isAttributesLoading"
-                      editMode:from="false" />
-                </div>
-              </div>
-            {{/if}}
-          {{/if}}
-
           <div class="ggrc-form-item">
             <div class="ggrc-form-item__row">
               <deferred-mapper class="width-100"
@@ -206,6 +156,56 @@
               </deferred-mapper>
             </div>
           </div>
+
+          {{#if new_object_form}}
+            <div class="ggrc-form-item">
+              <div class="ggrc-form-item__row">
+                <label class="ggrc-form-item__label assessment-template-dropdown">
+                  Select Assessment Template
+                  <i class="fa fa-question-circle"
+                    rel="tooltip"
+                    title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
+                  </i>
+                </label>
+                <div class="template-select">
+                  <assessment-templates-dropdown
+                    instance:from="instance.audit"
+                    extraClassName:from="'template-select__dropdown'"
+                    on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+                  <spinner-component
+                    class="template-select__spinner"
+                    toggle:from="isInitialTemplateLoading" />
+                </div>
+              </div>
+            </div>
+            {{#if assessmentTemplate}}
+              {{#if assessmentTemplate.sox_302_enabled}}
+                <div class="ggrc-form-item">
+                  <div class="ggrc-form-item__row alert alert-nomargin">
+                    This assessment template enables “302 assessment workflow”:
+                    <p>
+                      - Assignees will have read only permissions upon assessment completion.
+                    </p>
+                    <p>
+                      - Verification step will be skipped if only positive answers are given for the assessment.
+                    </p>
+                  </div>
+                </div>
+              {{/if}}
+              <div class="ggrc-form-item">
+                <div class="ggrc-form-item__row">
+                    <label class="ggrc-form-item__label">
+                      Custom Attributes
+                    </label>
+                    <assessment-template-attributes
+                      instance:from="assessmentTemplate"
+                      fields:from="assessmentTemplate.custom_attribute_definitions"
+                      isLoading:from="isAttributesLoading"
+                      editMode:from="false" />
+                </div>
+              </div>
+            {{/if}}
+          {{/if}}
 
           <div class="additional-fields">
             <div class="expand-link">

@@ -5,7 +5,9 @@
 
 <div class="view-wrapper">
   {{#if value}}
-    {{value}}
+    <read-more
+      text:from="value">
+    </read-more>
   {{else}}
     <span class="empty-message">None</span>
   {{/if}}

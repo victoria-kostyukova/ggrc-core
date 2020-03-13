@@ -183,7 +183,7 @@
     &.ui-disabled {
       @include disabled(0.5);
     }
-    input,
+    input:not(.saved-search-input),
     textarea,
     select {
       @include placeholder($footerBorder);
