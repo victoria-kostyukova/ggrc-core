@@ -41,24 +41,23 @@ import ggrc.builder.json
 import ggrc.models
 from ggrc import db
 from ggrc import gdrive
+from ggrc import settings
 from ggrc import utils
-from ggrc.utils import as_json, benchmark, dump_attrs
-from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
-from ggrc.login import is_external_app_user
+from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.models.cache import Cache
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.rbac import permissions
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
-from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
-from ggrc import settings
 from ggrc.cache import utils as cache_utils
 from ggrc.utils import errors as ggrc_errors
 from ggrc.utils import format_api_error_response
+from ggrc.utils import as_json, benchmark, dump_attrs
+from ggrc.utils.log_event import log_event
 
 
 # pylint: disable=invalid-name
@@ -622,30 +621,18 @@ class Resource(ModelView):
 
   @staticmethod
   def _validate_readonly_access(obj, src):
-    """Ensure that user can perform this request depending on readonly flag
+    """Ensure that user can perform this request.
 
     This method is called for POST, PUT and DELETE requests.
-    It raises 405 NotAllowed if user cannot change object.
+    By default it returns None, so this method should be redefined
+    in other Resource classes where it's needed.
 
     :param obj - object with all attributes set/updated from src (POST, PUT)
                  or existing unmodified object (DELETE)
     :param src - dict from request (POST, PUT) or None (DELETE)
     """
-
-    del src  # unused
-
-    if not isinstance(obj, WithReadOnlyAccess):
-      return
-
-    is_external = is_external_app_user()
-
-    if is_external and request.method in ('PUT', 'POST'):
-      return
-
-    if obj.readonly:
-      raise MethodNotAllowed(
-          description="The object is in a read-only mode and "
-                      "is dedicated for SOX needs")
+    # pylint: disable=unused-argument
+    return
 
   @staticmethod
   def _validate_method_fields_restriction(obj, src):
@@ -1657,6 +1644,7 @@ class Resource(ModelView):
 
 
 class ReadOnlyResource(Resource):
+  # pylint: disable=abstract-method
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -1669,6 +1657,7 @@ class ReadOnlyResource(Resource):
 
 class ExtendedResource(Resource):
   """Extended resource with additional command support."""
+  # pylint: disable=abstract-method
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -1757,6 +1746,32 @@ class ExtendedResource(Resource):
         result = dict(snapshot_counts)
 
     return self.json_success_response(result)
+
+
+class ROAResource(Resource):
+  """Resource handler for WithReadOnlyAccess models."""
+  # pylint: disable=abstract-method
+
+  @staticmethod
+  def _validate_readonly_access(obj, src):
+    """Ensure that user can perform this request.
+
+    This method is called for POST, PUT and DELETE requests.
+    It raises 405 NotAllowed if user cannot change object.
+
+    :param obj - object with all attributes set/updated from src (POST, PUT)
+                 or existing unmodified object (DELETE)
+    :param src - dict from request (POST, PUT) or None (DELETE)
+    """
+    # pylint: disable=unused-variable
+
+    if not isinstance(obj, WithReadOnlyAccess):
+      return
+
+    if obj.readonly:
+      raise MethodNotAllowed(
+          description="The object is in a read-only mode and "
+                      "is dedicated for SOX needs")
 
 
 def filter_resource(resource, depth=0, user_permissions=None):  # noqa
