@@ -105,7 +105,8 @@ const ViewModel = canDefineMap.extend({
             },
           },
         });
-        this.setContentToEditor(editor, this.content);
+        const delta = editor.clipboard.convert(this.content);
+        editor.setContents(delta);
 
         if (this.maxLength) {
           this.restrictPasteOperation(editor);
@@ -121,8 +122,9 @@ const ViewModel = canDefineMap.extend({
       });
   },
   setContentToEditor(editor, content) {
-    if (content !== editor.root.innerHTML) {
-      let delta = editor.clipboard.convert(content);
+    const text = editor.root.innerHTML;
+    if (content !== text && text !== '<p><br></p>') {
+      const delta = editor.clipboard.convert(content);
       editor.setContents(delta);
     }
   },
