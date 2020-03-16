@@ -60,12 +60,14 @@
         {{^new_object_form}}
           <access-control-list-roles-helper
             instance:from="instance"
+            isHidable:from="true"
             isNewInstance:from="new_object_form"
             readOnly:from="instance.readOnlyProgramRoles"
             includeRoles:from="instance.constructor.programRoles">
           </access-control-list-roles-helper>
           <access-control-list-roles-helper
             instance:from="instance"
+            isHidable:from="true"
             isNewInstance:from="new_object_form"
             excludeRoles:from="instance.constructor.programRoles">
           </access-control-list-roles-helper>
