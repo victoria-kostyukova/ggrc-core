@@ -365,10 +365,12 @@ $historyBlockWidth: 350px;
       white-space: nowrap;
       width: 150px;
       margin-right: 5px;
+      display: flex;
+      align-items: center;
     }
 
     input {
-      margin-right: 3px;
+      margin: 0 3px 2px 0;
     }
   }
 

@@ -7,11 +7,11 @@
   {{#each aggregatedColumns}}
     {{#if disable_sorting}}
       <div class="title">
-        {{attr_title}}
+        <span class="title-value">{{attr_title}}</span>
       </div>
     {{else}}
       <div class="title title_sortable" on:el:click="applySort">
-        {{attr_title}}
+        <span class="title-value">{{attr_title}}</span>
         {{#if isSorted}}
           <i class="fa
             {{#if isSortedAsc}}
