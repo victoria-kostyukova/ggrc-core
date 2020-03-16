@@ -167,7 +167,8 @@ const ViewModel = canDefineMap.extend({
     });
   },
   searchQueryChanged({name, query, newValue, triggerFilterOnChange}) {
-    if (router.attr('redirect')) {
+    const redirect = router.attr('redirect');
+    if (redirect) {
       this.inputFilter = '';
       router.removeAttr('redirect');
 
@@ -190,7 +191,7 @@ const ViewModel = canDefineMap.extend({
         this.filters.push(new canMap({name, query}));
       }
     }
-    this.updateCurrentFilter(triggerFilterOnChange);
+    this.updateCurrentFilter(triggerFilterOnChange && redirect);
   },
   treeFilterReady({filterName}) {
     if (!this.shouldWaitForFilters) {
