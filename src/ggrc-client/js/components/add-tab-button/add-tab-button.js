@@ -44,6 +44,17 @@ const viewModel = canMap.extend({
   instance: null,
   widgetList: null,
   addTabTitle: '',
+  setDropdownPosition(ev) {
+    const $dropdown = this.element.find('.dropdown-menu');
+    const leftPos = $(ev.target).offset().left;
+    const winWidth = $(window).width();
+
+    if (winWidth - leftPos < 400) {
+      $dropdown.addClass('right-pos');
+    } else {
+      $dropdown.removeClass('right-pos');
+    }
+  },
 });
 
 export default canComponent.extend({
@@ -52,17 +63,8 @@ export default canComponent.extend({
   leakScope: true,
   viewModel,
   events: {
-    // top nav dropdown position
-    '.dropdown-toggle click'(el) {
-      let $dropdown = this.element.find('.dropdown-menu');
-      let leftPos = el.offset().left;
-      let winWidth = $(window).width();
-
-      if (winWidth - leftPos < 400) {
-        $dropdown.addClass('right-pos');
-      } else {
-        $dropdown.removeClass('right-pos');
-      }
+    inserted() {
+      this.viewModel.attr('element', this.element);
     },
   },
   helpers: {
