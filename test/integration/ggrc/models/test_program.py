@@ -12,6 +12,7 @@ from ggrc.utils import errors
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
+from integration.ggrc.review import generate_review_object
 
 
 class TestProgram(TestCase):
@@ -75,6 +76,33 @@ class TestProgram(TestCase):
         u"Value should be either empty or comma separated list of",
         response.json[0][1]
     )
+
+
+class TestProgramChange(TestCase):
+  """Test cases for program."""
+
+  def setUp(self):
+    self.api = api_helper.Api()
+
+  def test_program_no_change_status(self):
+    """Test keep program status as 'reviewed'
+    even though list of recipients were changed"""
+
+    new_recipients = "Program Managers,Program Editors"
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      program_id = program.id
+    resp, _ = generate_review_object(
+        program, state=all_models.Review.STATES.REVIEWED)
+    self.assert201(resp)
+    review = all_models.Review.query.filter(
+        all_models.Review.reviewable_type == "Program",
+        all_models.Review.reviewable_id == program_id,
+    ).first
+    self.assertEqual(review().status, "Reviewed")
+    resp = self.api.put(program, {"recipients": new_recipients})
+    self.assert200(resp)
+    self.assertEqual(review().status, "Reviewed")
 
 
 @ddt.ddt

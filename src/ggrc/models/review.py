@@ -147,7 +147,7 @@ class Reviewable(rest_handable.WithPutHandable,
     return out_json
 
   ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by", "modified_by_id",
-                     "slug", "_access_control_list", "folder"}
+                     "slug", "_access_control_list", "folder", "recipients"}
 
   SPECIAL_ATTRS_HANDLERS = {
       'recipients': handle_recipients_attr,
