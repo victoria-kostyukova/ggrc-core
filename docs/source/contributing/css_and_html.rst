@@ -96,3 +96,59 @@ Every component should have it's own partial
 
 HTML
 ----
+Based and borrowed from `Google HTML Style Rules  <https://google.github.io/styleguide/htmlcssguide.html#HTML_Style_Rules>`_
+
+- Use HTML5
+- HTML5 (HTML syntax) is preferred for all HTML documents: <!DOCTYPE html>
+- Although fine with HTML, do not close void elements, i.e. write <br>, not <br />
+
+
+HTML Validity:
+~~~~~~~~~~~~~~~
+- Use valid HTML where possible
+- Use valid HTML code unless that is not possible due to otherwise unattainable performance goals regarding file size
+- Use tools such as the `W3C HTML validator <https://validator.w3.org/nu/>`_
+- Using valid HTML is a measurable baseline quality attribute that contributes to learning about technical requirements and constraints, and that ensures proper HTML usage.
+
+..  code-block:: html
+
+    <!-- Not recommended -->
+    <title>Test</title>
+    <article>This is only a test.
+
+..  code-block:: html
+
+    <!-- Recommended -->
+    <!DOCTYPE html>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <article>This is only a test.</article>
+
+HTML Semantics:
+~~~~~~~~~~~~~~~
+- Use HTML according to its purpose.
+- Use elements (sometimes incorrectly called “tags”) for what they have been created for. For example, use heading elements for headings, p elements for paragraphs, a elements for anchors, etc.
+- Using HTML according to its purpose is important for accessibility, reuse, and code efficiency reasons
+
+..  code-block:: html
+
+    <!-- Not recommended -->
+    <div onclick="goToRecommendations();">All recommendations</div>
+
+..  code-block:: html
+
+    <!-- Recommended -->
+    <a href="recommendations/">All recommendations</a>
+
+HTML Separation:
+~~~~~~~~~~~~~~~~~~~
+- Separate structure from presentation from behavior
+- Strictly keep structure (markup), presentation (styling), and behavior (scripting) apart, and try to keep the interaction between the three to an absolute minimum
+- In addition, keep the contact area as small as possible by linking as few style sheets and scripts as possible from documents and templates
+
+HTML Formatting Rules:
+~~~~~~~~~~~~~~~~~~~~~~
+- Use a new line for every block, list, or table element, and indent every such child element
+- When quoting attributes values, use double quotation marks
+- While there is no column limit recommendation for HTML, you may consider wrapping long lines if it significantly improves readability
+- When line-wrapping, each continuation line should be indented at least 4 additional spaces from the original line
