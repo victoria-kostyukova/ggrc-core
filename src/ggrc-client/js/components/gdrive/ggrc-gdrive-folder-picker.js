@@ -134,6 +134,41 @@ const ViewModel = canDefineMap.extend({
       this.setCurrent(folderId);
     }
   },
+  openFolderPicker({currentTarget}) {
+    const el = $(currentTarget);
+    uploadFiles({
+      parentId: el.data('folder-id'),
+      pickFolder: el.data('type') === 'folders',
+    }).then((files) => {
+      el.trigger('picked', {
+        files,
+      });
+    }).catch((err) => {
+      if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
+        el.trigger('rejected');
+      }
+    });
+  },
+  detachFolder() {
+    if (this.deferred) {
+      this.instance.attr('folder', null);
+      this.current_folder = null;
+      return $.when();
+    }
+
+    return this.unlinkFolder();
+  },
+  unsetFocus(event) {
+    const ESCAPE_KEY_CODE = 27;
+    const escapeKeyWasPressed = event.keyCode === ESCAPE_KEY_CODE;
+
+    if (escapeKeyWasPressed) {
+      const $element = $(event.target);
+      event.stopPropagation();
+      // unset focus for attach button
+      $element.blur();
+    }
+  },
 });
 
 export default canComponent.extend({
@@ -143,62 +178,19 @@ export default canComponent.extend({
   ViewModel,
   events: {
     init() {
-      let viewModel = this.viewModel;
-
-      if (!viewModel.readonly) {
+      if (!this.viewModel.readonly) {
         this.element.removeAttr('tabindex');
       }
 
-      viewModel.setRevisionFolder();
+      this.viewModel.setRevisionFolder();
     },
+
     '{viewModel.instance} change'() {
       if (!this.viewModel.folder_error) {
         return;
       }
 
       this.viewModel.setRevisionFolder();
-    },
-    /**
-     * Handle a click on the button for detaching an upload folder from
-     * a model instance (e.g. an Audit).
-     *
-     * @return {Object} - Deferred chain.
-     */
-    'a[data-toggle=gdrive-remover] click'() {
-      const viewModel = this.viewModel;
-      if (viewModel.deferred) {
-        viewModel.instance.attr('folder', null);
-        viewModel.current_folder = null;
-
-        return $.when();
-      }
-
-      return viewModel.unlinkFolder();
-    },
-    'a[data-toggle=gdrive-picker] click'(el) {
-      uploadFiles({
-        parentId: el.data('folder-id'),
-        pickFolder: el.data('type') === 'folders',
-      }).then((files) => {
-        el.trigger('picked', {
-          files,
-        });
-      }).catch((err) => {
-        if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
-          el.trigger('rejected');
-        }
-      });
-    },
-    'a[data-toggle=gdrive-picker] keyup'(element, event) {
-      const ESCAPE_KEY_CODE = 27;
-      const escapeKeyWasPressed = event.keyCode === ESCAPE_KEY_CODE;
-
-      if (escapeKeyWasPressed) {
-        const $element = $(element);
-        event.stopPropagation();
-        // unset focus for attach button
-        $element.blur();
-      }
     },
     /*
       * Handle an event of the user picking a new GDrive upload folder.
