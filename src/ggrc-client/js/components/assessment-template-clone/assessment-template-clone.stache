@@ -111,11 +111,17 @@
             {{selected.length}}
             object(s) selected
           </span>
-          <button type="button" class="btn btn-small btn-white btn-cancel">
+          <button
+            type="button"
+            class="btn btn-small btn-white btn-cancel"
+            on:el:click="closeModal()">
             Cancel
           </button>
-          <button type="button" class="btn-clone btn btn-small btn-green"
-            {{^if selected.length}}disabled="disabled"{{/if}}>
+          <button
+            type="button"
+            class="btn-clone btn btn-small btn-green"
+            {{^if selected.length}}disabled{{/if}}
+            on:el:click="cloneAsmtTempalte()">
             {{#if is_saving}}
               Saving, please wait...
             {{else}}

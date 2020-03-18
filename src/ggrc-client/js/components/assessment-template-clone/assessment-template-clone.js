@@ -21,58 +21,43 @@ export default canComponent.extend({
   tag: 'assessment-template-clone',
   view: canStache(template),
   leakScope: true,
-  viewModel() {
-    return ObjectOperationsBaseVM.extend({
-      isAuditPage() {
-        return getPageInstance().type === 'Audit';
-      },
-      extendInstanceData(instance) {
-        instance = instance().serialize();
-        const audit =
-          loPick(instance, ['id', 'type', 'title', 'issue_tracker']);
-        const context = {
-          id: instance.context.id,
-          type: instance.context.type,
-        };
-        return JSON.stringify({audit, context});
-      },
-    });
-  },
-  events: {
-    inserted() {
-      this.viewModel.onSubmit();
+  ViewModel: ObjectOperationsBaseVM.extend({
+    element: {
+      value: null,
+    },
+    isAuditPage() {
+      return getPageInstance().type === 'Audit';
+    },
+    extendInstanceData(instance) {
+      instance = instance().serialize();
+      const audit =
+        loPick(instance, ['id', 'type', 'title', 'issue_tracker']);
+      const context = {
+        id: instance.context.id,
+        type: instance.context.type,
+      };
+      return JSON.stringify({audit, context});
     },
     closeModal() {
       if (this.element) {
         this.element.find('.modal-dismiss').trigger('click');
       }
     },
-    '{window} preload'(el, ev) {
-      const modal = $(ev.target).data('modal_form');
-      const options = modal && modal.options;
-
-      if (options && options.inCloner) {
-        this.closeModal();
-      }
-    },
-    '.btn-cancel click'() {
-      this.closeModal();
-    },
-    '.btn-clone click'() {
-      this.viewModel.is_saving = true;
+    cloneAsmtTempalte() {
+      this.is_saving = true;
 
       this.cloneObjects()
         .always(() => {
-          this.viewModel.is_saving = false;
+          this.is_saving = false;
         })
         .done(() => {
-          this.viewModel.dispatch('refreshTreeView');
+          this.dispatch('refreshTreeView');
           this.closeModal();
         });
     },
     cloneObjects() {
-      const sourceIds = loMap(this.viewModel.selected, (item) => item.id);
-      const destinationId = this.viewModel.join_object_id;
+      const sourceIds = loMap(this.selected, (item) => item.id);
+      const destinationId = this.join_object_id;
 
       return ggrcPost('/api/assessment_template/clone', [{
         sourceObjectIds: sourceIds,
@@ -81,6 +66,20 @@ export default canComponent.extend({
           id: destinationId,
         },
       }]);
+    },
+  }),
+  events: {
+    inserted() {
+      this.viewModel.element = this.element;
+      this.viewModel.onSubmit();
+    },
+    '{window} preload'(el, ev) {
+      const modal = $(ev.target).data('modal_form');
+      const options = modal && modal.options;
+
+      if (options && options.inCloner) {
+        this.viewModel.closeModal();
+      }
     },
   },
 });
