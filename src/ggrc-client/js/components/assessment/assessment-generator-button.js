@@ -23,6 +23,164 @@ const ViewModel = canDefineMap.extend({
   button: {
     value: '',
   },
+  _results: {
+    value: null,
+  },
+  openMapper(el) {
+    let instance = this.audit || getPageInstance();
+    this._results = null;
+    tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
+
+    import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
+      .then((mapper) => {
+        mapper.ObjectGenerator.launch($(el), {
+          object: 'Audit',
+          type: 'Control',
+          'join-object-id': instance.id,
+          relevantTo: [{
+            readOnly: true,
+            type: instance.type,
+            id: instance.id,
+            title: instance.title,
+          }],
+          callback: this.generateAssessments.bind(this),
+        });
+      });
+  },
+  showFlash(status) {
+    let flash = {};
+    let type;
+    let redirectLink;
+    let messages = {
+      error: 'Assessment generation has failed.',
+      progress: 'Assessment generation is in progress. This may take ' +
+      'several minutes.',
+      success: 'Assessment was generated successfully. {reload_link}',
+    };
+    if (status.Failure) {
+      type = 'error';
+    } else if (status.Pending || status.Running) {
+      type = 'progress';
+    } else {
+      type = 'success';
+      redirectLink = window.location.pathname + '#assessment';
+    }
+
+    flash[type] = messages[type];
+    $('body').trigger('ajax:flash', [flash, redirectLink]);
+  },
+  updateStatus(id, count) {
+    let wait = [2, 4, 8, 16, 32, 64];
+    if (count >= wait.length) {
+      count = wait.length - 1;
+    }
+    BackgroundTask.findOne({id: id})
+      .then((task) => {
+        let status = {[task.status]: true};
+        this.showFlash(status);
+        if (status.Pending || status.Running) {
+          setTimeout(() => {
+            this.updateStatus(id, ++count);
+          }, wait[count] * 1000);
+        }
+      })
+      .catch(() => {
+        setTimeout(() => {
+          this.updateStatus(id, ++count);
+        }, wait[count] * 1000);
+      });
+  },
+  generateAssessments(list, options) {
+    let que = new RefreshQueue();
+
+    this._results = null;
+    que.enqueue(list).trigger().then((items) => {
+      let results = loMap(items, (item) =>
+        this.generateModel(item, options.assessmentTemplate)
+      );
+      this._results = results;
+      $.when(...results)
+        .then((...tasks) => {
+          this.showFlash({Pending: true});
+          options.context.closeModal();
+          if (!tasks.length || tasks[0] instanceof Assessment) {
+            // We did not create a task
+            window.location.reload();
+            return;
+          }
+          const ids = loUniq(loMap(tasks, (task) => task.id));
+          this.updateStatus(ids[0], 0);
+        });
+    });
+  },
+  generateModel(object, template) {
+    let assessmentModel;
+    let audit = this.audit;
+    let title = 'Generated Assessment for ' + audit.title;
+    let data = {
+      _generated: true,
+      audit,
+      // Provide actual Snapshot Object for Assessment
+      object: {
+        id: object.id,
+        type: 'Snapshot',
+        href: object.selfLink,
+      },
+      context: audit.context,
+      title: title,
+      assessment_type: object.child_type,
+    };
+    data.run_in_background = true;
+
+    if (template) {
+      data.template = {
+        id: template.id,
+        type: 'AssessmentTemplate',
+      };
+    }
+    assessmentModel = new Assessment(data);
+
+    // force remove issue_tracker field
+    assessmentModel.removeAttr('issue_tracker');
+
+    return assessmentModel.save();
+  },
+  notify() {
+    let success;
+    let errors;
+    let msg;
+
+    if (!this._results) {
+      return;
+    }
+    success = loFilter(this._results, (assessment) => {
+      return assessment !== null &&
+        !(assessment.state && assessment.state() === 'rejected');
+    }).length;
+    errors = loFilter(this._results, (assessment) => {
+      return assessment.state && assessment.state() === 'rejected';
+    }).length;
+
+    if (errors < 1) {
+      if (success === 0) {
+        msg = {
+          success: 'Every Control already has an Assessment!',
+        };
+      } else {
+        msg = {
+          success: success + ' Assessments successfully created.',
+        };
+      }
+    } else {
+      msg = {
+        error: 'An error occurred when creating Assessments.',
+      };
+    }
+
+    $(document.body).trigger('ajax:flash', msg);
+  },
 });
 
 export default canComponent.extend({
@@ -30,165 +188,4 @@ export default canComponent.extend({
   view: canStache(template),
   leakScope: true,
   ViewModel,
-  events: {
-    'a click'(el) {
-      let instance = this.viewModel.audit || getPageInstance();
-      this._results = null;
-      tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
-        tracker.USER_JOURNEY_KEYS.LOADING,
-        tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
-
-      import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
-        .then((mapper) => {
-          mapper.ObjectGenerator.launch(el, {
-            object: 'Audit',
-            type: 'Control',
-            'join-object-id': instance.id,
-            relevantTo: [{
-              readOnly: true,
-              type: instance.type,
-              id: instance.id,
-              title: instance.title,
-            }],
-            callback: this.generateAssessments.bind(this),
-          });
-        });
-    },
-    showFlash(status) {
-      let flash = {};
-      let type;
-      let redirectLink;
-      let messages = {
-        error: 'Assessment generation has failed.',
-        progress: 'Assessment generation is in progress. This may take ' +
-        'several minutes.',
-        success: 'Assessment was generated successfully. {reload_link}',
-      };
-      if (status.Failure) {
-        type = 'error';
-      } else if (status.Pending || status.Running) {
-        type = 'progress';
-      } else {
-        type = 'success';
-        redirectLink = window.location.pathname + '#assessment';
-      }
-
-      flash[type] = messages[type];
-      $('body').trigger('ajax:flash', [flash, redirectLink]);
-    },
-    updateStatus(id, count) {
-      let wait = [2, 4, 8, 16, 32, 64];
-      if (count >= wait.length) {
-        count = wait.length - 1;
-      }
-      BackgroundTask.findOne({id: id})
-        .then(function (task) {
-          let status = {[task.status]: true};
-          this.showFlash(status);
-          if (status.Pending || status.Running) {
-            setTimeout(function () {
-              this.updateStatus(id, ++count);
-            }.bind(this), wait[count] * 1000);
-          }
-        }.bind(this))
-        .fail(function () {
-          setTimeout(function () {
-            this.updateStatus(id, ++count);
-          }.bind(this), wait[count] * 1000);
-        }.bind(this));
-    },
-    generateAssessments(list, options) {
-      let que = new RefreshQueue();
-
-      this._results = null;
-      que.enqueue(list).trigger().then(function (items) {
-        let results = loMap(items, (item) =>
-          this.generateModel(item, options.assessmentTemplate)
-        );
-        this._results = results;
-        $.when(...results)
-          .then(function () {
-            let tasks = arguments;
-            let ids;
-            this.showFlash({Pending: true});
-            options.context.closeModal();
-            if (!tasks.length || tasks[0] instanceof Assessment) {
-              // We did not create a task
-              window.location.reload();
-              return;
-            }
-            ids = loUniq(loMap(arguments, function (task) {
-              return task.id;
-            }));
-            this.updateStatus(ids[0], 0);
-          }.bind(this));
-      }.bind(this));
-    },
-    generateModel(object, template) {
-      let assessmentModel;
-      let audit = this.viewModel.audit;
-      let title = 'Generated Assessment for ' + audit.title;
-      let data = {
-        _generated: true,
-        audit,
-        // Provide actual Snapshot Object for Assessment
-        object: {
-          id: object.id,
-          type: 'Snapshot',
-          href: object.selfLink,
-        },
-        context: audit.context,
-        title: title,
-        assessment_type: object.child_type,
-      };
-      data.run_in_background = true;
-
-      if (template) {
-        data.template = {
-          id: template.id,
-          type: 'AssessmentTemplate',
-        };
-      }
-      assessmentModel = new Assessment(data);
-
-      // force remove issue_tracker field
-      assessmentModel.removeAttr('issue_tracker');
-
-      return assessmentModel.save();
-    },
-    notify() {
-      let success;
-      let errors;
-      let msg;
-
-      if (!this._results) {
-        return;
-      }
-      success = loFilter(this._results, function (assessment) {
-        return assessment !== null &&
-          !(assessment.state && assessment.state() === 'rejected');
-      }).length;
-      errors = loFilter(this._results, function (assessment) {
-        return assessment.state && assessment.state() === 'rejected';
-      }).length;
-
-      if (errors < 1) {
-        if (success === 0) {
-          msg = {
-            success: 'Every Control already has an Assessment!',
-          };
-        } else {
-          msg = {
-            success: success + ' Assessments successfully created.',
-          };
-        }
-      } else {
-        msg = {
-          error: 'An error occurred when creating Assessments.',
-        };
-      }
-
-      $(document.body).trigger('ajax:flash', msg);
-    },
-  },
 });

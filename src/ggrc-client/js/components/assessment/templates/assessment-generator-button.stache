@@ -11,7 +11,8 @@
       rel="tooltip"
       data-placement="bottom"
       title="Generate Assessments"
-      data-original-title="Generate Assessments">
+      data-original-title="Generate Assessments"
+      on:el:click="openMapper(scope.event.target)">
       Autogenerate
     </a>
   {{else}}
@@ -22,7 +23,8 @@
           rel="tooltip"
           data-placement="bottom"
           title="Generate Assessments"
-          data-original-title="Generate Assessments">
+          data-original-title="Generate Assessments"
+          on:el:click="openMapper(scope.event.target)">
           Autogenerate
         </a>
     {{/is_auditor}}
@@ -33,7 +35,9 @@
       {{^if audit.archived}}
         {{#is_allowed 'update' audit context="for"}}
             <li class="generate-control-assessments">
-              <a href="javascript://">
+              <a  
+                href="javascript://"
+                on:el:click="openMapper(scope.event.target)">
                 <i class="fa fa-fw fa-magic"></i>
                 Generate Assessments
               </a>
@@ -41,7 +45,9 @@
         {{else}}
           {{#is_auditor}}
             <li class="generate-control-assessments">
-              <a href="javascript://">
+              <a
+                href="javascript://"
+                on:el:click="openMapper(scope.event.target)">
                 <i class="fa fa-fw fa-magic"></i>
                 Generate Assessments
               </a>
