@@ -75,7 +75,8 @@ import template from './assessment-info-pane.stache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubSub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
-import {notifier, notifierXHR} from '../../../plugins/utils/notifiers-utils';
+import {notifier, notifierXHR, connectionLostNotifier} from '../../../plugins/utils/notifiers-utils';
+import {isConnectionLost} from '../../../plugins/utils/errors-utils';
 import Evidence from '../../../models/business-models/evidence';
 import * as businessModels from '../../../models/business-models';
 import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
@@ -600,7 +601,12 @@ export default canComponent.extend({
     initializeDeferredSave: function () {
       this.attr('deferredSave', new DeferredTransaction(
         function (resolve, reject) {
-          this.attr('instance').save().done(resolve).fail(reject);
+          this.attr('instance').save().done(resolve).fail(() => {
+            if (isConnectionLost()) {
+              connectionLostNotifier();
+            }
+            reject();
+          });
         }.bind(this), 1000));
     },
     refreshAssessment() {

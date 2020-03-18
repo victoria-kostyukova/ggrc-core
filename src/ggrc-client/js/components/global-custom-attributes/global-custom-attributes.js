@@ -9,7 +9,8 @@ import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import {isAllowedFor} from '../../permission';
-import {notifierXHR} from '../../plugins/utils/notifiers-utils';
+import {connectionLostNotifier, notifierXHR} from '../../plugins/utils/notifiers-utils';
+import {isConnectionLost} from '../../plugins/utils/errors-utils';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
@@ -80,7 +81,11 @@ export default canComponent.extend({
           instance.backup();
         })
         .fail(function (instance, xhr) {
-          notifierXHR('error', xhr);
+          if (isConnectionLost()) {
+            connectionLostNotifier();
+          } else {
+            notifierXHR('error', xhr);
+          }
         })
         .always(function () {
           this.attr('isSaving', false);

@@ -190,7 +190,6 @@ export default canComponent.extend({
 
         self.attr('saving', true);
       })
-      // todo: error handling
         .always(() => {
           this.attr('saving', false);
           this.attr('isDirty', false);
