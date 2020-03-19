@@ -16,6 +16,7 @@
     sourceType:from="object"
     destinationModel:from="model"
     megaRelation:from="config.general.megaRelation"
+    on:el:click="hideObjectMapper()"
   ></create-and-map>
 
 </div>
@@ -95,8 +96,8 @@
             {{/if}}
           </div>
           <div class="object-controls__actions--right">
-            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
-            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
+            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled{{/if}} on:el:click="resetFilters()">Reset</button>
+            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled{{/if}} on:el:click="onSubmit()">Search</button>
           </div>
         </div>
       </div>
@@ -152,7 +153,8 @@
 
             <button type="button"
                     class="btn-map btn btn-small btn-green"
-                    {{^if selected.length}}disabled="disabled"{{/if}}>
+                    {{^if selected.length}}disabled="disabled"{{/if}}
+                    on:el:click="performMap(scope.event)">
               {{#if is_saving}}
                 Saving, please wait...
               {{else}}

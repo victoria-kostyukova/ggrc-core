@@ -211,6 +211,9 @@ export default canComponent.extend({
       megaRelation: {
         value: '',
       },
+      element: {
+        value: null,
+      },
       showAsSnapshots() {
         return this.freezedConfigTillSubmit
           && this.freezedConfigTillSubmit.useSnapshots
@@ -276,6 +279,137 @@ export default canComponent.extend({
           });
         }
       },
+      map(objects, options) {
+        if (this.deferred) {
+          // postpone map operation unless target object is saved
+          this.deferredSave(objects);
+        } else if (options && options.megaMapping) {
+          this.performMegaMap(objects, options.megaRelation);
+        } else {
+          // map objects immediately
+          this.mapObjects(objects);
+        }
+      },
+      performMegaMap(objects, relation) {
+        const relationsObj = {};
+        objects.forEach((obj) => relationsObj[obj.id] = relation);
+        this.mapObjects(objects, true, relationsObj);
+      },
+      closeModal() {
+        this.is_saving = false;
+
+        // TODO: Find proper way to dismiss the modal
+        if (this.element) {
+          this.element.find('.modal-dismiss').trigger('click');
+        }
+      },
+      deferredSave(objects) {
+        let source = this.deferred_to.instance;
+        const deferredObjects = objects
+          .filter((destination) => allowedToMap(source, destination));
+
+        source.dispatch({
+          ...DEFERRED_MAP_OBJECTS,
+          objects: deferredObjects,
+        });
+        this.closeModal();
+      },
+      performMap(ev) {
+        ev.preventDefault();
+        if ($(ev.target).hasClass('disabled') ||
+          this.is_saving) {
+          return;
+        }
+
+        const selectedObjects = this.selected;
+        // If we need to map object later on (set by 'data-deferred' attribute)
+        // TODO: Figure out nicer / proper way to handle deferred save
+        if (this.deferred) {
+          return this.deferredSave(selectedObjects);
+        }
+
+        const megaMapping = isMegaMapping(this.object, this.type);
+
+        if (megaMapping) {
+          this.proceedWithMegaMapping(selectedObjects);
+        } else {
+          this.proceedWithRegularMapping(selectedObjects);
+        }
+      },
+      proceedWithMegaMapping(selectedObjects) {
+        confirm({
+          modal_title: 'Confirmation',
+          modal_description: 'Objects from the child program will' +
+            ' automatically be mapped to parent program. Do you want' +
+            ' to proceed?',
+          modal_confirm: 'Proceed',
+          button_view: '/modals/confirm-cancel-buttons.stache',
+        }, () => {
+          this.is_saving = true;
+          this.mapObjects(selectedObjects, true, this.megaRelationObj);
+        });
+      },
+      proceedWithRegularMapping(selectedObjects) {
+        this.is_saving = true;
+        this.mapObjects(selectedObjects);
+      },
+      mapObjects(objects, megaMapping, relationsObj) {
+        const object = this.object;
+        const type = this.type;
+        const instance = businessModels[object].findInCacheById(
+          this.join_object_id
+        );
+        let stopFn = tracker.start(
+          tracker.FOCUS_AREAS.MAPPINGS(instance.type),
+          tracker.USER_JOURNEY_KEYS.MAP_OBJECTS(type),
+          tracker.USER_ACTIONS.MAPPING_OBJECTS(objects.length)
+        );
+
+        instance.dispatch({
+          ...BEFORE_MAPPING,
+          destinationType: type,
+        });
+
+        mapObjectsUtil(instance, objects, {
+          useSnapshots: this.useSnapshots,
+          megaMapping,
+          relationsObj,
+        })
+          .then(() => {
+            stopFn();
+
+            instance.dispatch({
+              ...OBJECTS_MAPPED_VIA_MAPPER,
+              objects,
+            });
+            instance.dispatch('refreshInstance');
+            instance.dispatch({
+              ...REFRESH_MAPPING,
+              destinationType: type,
+            });
+            instance.dispatch(REFRESH_SUB_TREE);
+
+            if (this.isRefreshCountsNeeded) {
+              // This Method should be modified to event
+              refreshCounts();
+            }
+
+            instance.dispatch({
+              ...REFRESH_MAPPED_COUNTER,
+              modelType: type,
+            });
+          })
+          .catch((response, message) => {
+            $('body').trigger('ajax:flash', {error: message});
+          })
+          .finally(() => {
+            this.closeModal();
+          });
+      },
+      // hide object-mapper modal when create new object button clicked
+      hideObjectMapper() {
+        this.element.trigger('hideModal');
+      },
     });
   },
 
@@ -283,10 +417,10 @@ export default canComponent.extend({
     [`{parentInstance} ${MAP_OBJECTS.type}`]([instance], event) {
       // this event is called when objects just created and should be mapped
       // so object-mapper modal should be closed and removed from DOM
-      this.closeModal();
+      this.viewModel.closeModal();
 
       if (event.objects.length) {
-        this.map(event.objects, event.options);
+        this.viewModel.map(event.objects, event.options);
       }
     },
 
@@ -297,14 +431,9 @@ export default canComponent.extend({
         this.viewModel.onDestroyItem(object);
       }
     },
-
-    // hide object-mapper modal when create new object button clicked
-    'create-and-map click'() {
-      this.element.trigger('hideModal');
-    },
     // close mapper as mapping will be handled externally
     'create-and-map mapExternally'() {
-      this.closeModal();
+      this.viewModel.closeModal();
     },
     // reopen object-mapper if creating was canceled
     'create-and-map canceled'() {
@@ -315,6 +444,7 @@ export default canComponent.extend({
     },
     inserted() {
       this.viewModel.selected.replace([]);
+      this.viewModel.element = this.element;
 
       if (this.viewModel.deferred_to.list) {
         let deferredToList = this.viewModel.deferred_to.list
@@ -328,136 +458,6 @@ export default canComponent.extend({
       }
 
       this.viewModel.onSubmit();
-    },
-    map(objects, options) {
-      if (this.viewModel.deferred) {
-        // postpone map operation unless target object is saved
-        this.deferredSave(objects);
-      } else if (options && options.megaMapping) {
-        this.performMegaMap(objects, options.megaRelation);
-      } else {
-        // map objects immediately
-        this.mapObjects(objects);
-      }
-    },
-    performMegaMap(objects, relation) {
-      const relationsObj = {};
-      objects.forEach((obj) => relationsObj[obj.id] = relation);
-      this.mapObjects(objects, true, relationsObj);
-    },
-    closeModal() {
-      this.viewModel.is_saving = false;
-
-      // TODO: Find proper way to dismiss the modal
-      if (this.element) {
-        this.element.find('.modal-dismiss').trigger('click');
-      }
-    },
-    deferredSave(objects) {
-      let source = this.viewModel.deferred_to.instance;
-      const deferredObjects = objects
-        .filter((destination) => allowedToMap(source, destination));
-
-      source.dispatch({
-        ...DEFERRED_MAP_OBJECTS,
-        objects: deferredObjects,
-      });
-      this.closeModal();
-    },
-    '.modal-footer .btn-map click'(el, ev) {
-      ev.preventDefault();
-      if (el.hasClass('disabled') ||
-        this.viewModel.is_saving) {
-        return;
-      }
-
-      const selectedObjects = this.viewModel.selected;
-      // If we need to map object later on (set by 'data-deferred' attribute)
-      // TODO: Figure out nicer / proper way to handle deferred save
-      if (this.viewModel.deferred) {
-        return this.deferredSave(selectedObjects);
-      }
-
-      const megaMapping = isMegaMapping(this.viewModel.object,
-        this.viewModel.type);
-
-      if (megaMapping) {
-        this.proceedWithMegaMapping(selectedObjects);
-      } else {
-        this.proceedWithRegularMapping(selectedObjects);
-      }
-    },
-    proceedWithMegaMapping(selectedObjects) {
-      confirm({
-        modal_title: 'Confirmation',
-        modal_description: 'Objects from the child program will' +
-          ' automatically be mapped to parent program. Do you want' +
-          ' to proceed?',
-        modal_confirm: 'Proceed',
-        button_view: '/modals/confirm-cancel-buttons.stache',
-      }, () => {
-        this.viewModel.is_saving = true;
-        this.mapObjects(selectedObjects, true,
-          this.viewModel.megaRelationObj);
-      });
-    },
-    proceedWithRegularMapping(selectedObjects) {
-      this.viewModel.is_saving = true;
-      this.mapObjects(selectedObjects);
-    },
-    mapObjects(objects, megaMapping, relationsObj) {
-      const viewModel = this.viewModel;
-      const object = viewModel.object;
-      const type = viewModel.type;
-      const instance = businessModels[object].findInCacheById(
-        viewModel.join_object_id
-      );
-      let stopFn = tracker.start(
-        tracker.FOCUS_AREAS.MAPPINGS(instance.type),
-        tracker.USER_JOURNEY_KEYS.MAP_OBJECTS(type),
-        tracker.USER_ACTIONS.MAPPING_OBJECTS(objects.length)
-      );
-
-      instance.dispatch({
-        ...BEFORE_MAPPING,
-        destinationType: type,
-      });
-
-      mapObjectsUtil(instance, objects, {
-        useSnapshots: viewModel.useSnapshots,
-        megaMapping,
-        relationsObj,
-      })
-        .then(() => {
-          stopFn();
-
-          instance.dispatch({
-            ...OBJECTS_MAPPED_VIA_MAPPER,
-            objects,
-          });
-          instance.dispatch('refreshInstance');
-          instance.dispatch({
-            ...REFRESH_MAPPING,
-            destinationType: type,
-          });
-          instance.dispatch(REFRESH_SUB_TREE);
-
-          if (viewModel.isRefreshCountsNeeded) {
-            // This Method should be modified to event
-            refreshCounts();
-          }
-
-          instance.dispatch({
-            ...REFRESH_MAPPED_COUNTER,
-            modelType: type,
-          });
-        })
-        .catch((response, message) => {
-          $('body').trigger('ajax:flash', {error: message});
-        })
-        .finally(() => {
-          this.closeModal();
-        });
     },
   },
 
