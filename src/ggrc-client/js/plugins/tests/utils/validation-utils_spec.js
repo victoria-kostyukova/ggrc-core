@@ -7,7 +7,7 @@ import canMap from 'can-map/can-map';
 import canList from 'can-list/can-list';
 import canModel from 'can-model/src/can-model';
 
-import {isValidAttr, validateAttr} from '../../utils/validation-utils';
+import {isValidAttr, validateAttr, validateInputValue} from '../../utils/validation-utils';
 
 describe('validation utils', () => {
   describe('validateAttr util', () => {
@@ -156,5 +156,51 @@ describe('validation utils', () => {
         expect(result).toBeFalsy();
       }
     );
+  });
+
+  describe('validateInputValue() util', () => {
+    let instance;
+    let field;
+
+    beforeEach(() => {
+      instance = new canModel();
+      field = 'testField';
+    });
+
+    it('returns FALSE if instance doesn\'t have field', () => {
+      instance.attr(field, null);
+
+      const result = validateInputValue(field, instance);
+
+      expect(result).toBe(false);
+    });
+
+    it('returns FALSE if instance doesn\'t have transient field', () => {
+      instance.attr(`_transient.${field}`, null);
+
+      const result = validateInputValue(field, instance);
+
+      expect(result).toBe(false);
+    });
+
+    it('returns FALSE if title of field equals title of transient field',
+      () => {
+        instance.attr(`_transient.${field}`, {title: 'test_title'});
+        instance.attr(field, {title: 'test_title'});
+
+        const result = validateInputValue(field, instance);
+
+        expect(result).toBe(false);
+      });
+
+    it('returns TRUE if title of field doesn\'t equal' +
+      'title of transient field', () => {
+      instance.attr(`_transient.${field}`, {title: 'test_title'});
+      instance.attr(field, {title: 'test_title2'});
+
+      const result = validateInputValue(field, instance);
+
+      expect(result).toBe(true);
+    });
   });
 });

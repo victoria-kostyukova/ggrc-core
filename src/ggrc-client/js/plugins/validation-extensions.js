@@ -100,6 +100,10 @@ validatejs.validators.validateUniqueTitle = (value,
   }
 };
 
+validatejs.validators.validateAutosuggestFieldValue = () => {
+  // Symbol ^ helps to discard attribute title in error message
+  return '^Invalid value. Please select a valid value from autosuggest.';
+};
 /*
  * Validate a comma-separated list of possible values defined by the
  * custom attribute definition.

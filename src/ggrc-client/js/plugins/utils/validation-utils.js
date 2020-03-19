@@ -80,7 +80,27 @@ const validateAttr = (instance, attribute) => {
   return propertyErrors;
 };
 
+/**
+ * A check that current value of validation field
+ * should be equal to the value from autocomplete input
+ * @param {String} fieldName - name of field for validation
+ * @param {canMap} instance - instance under validation
+ *
+ * @return {Boolean} return condition for displaying error
+ */
+const validateInputValue = (fieldName, instance) => {
+  const currentField = instance[fieldName];
+  const transientField = instance.attr(`_transient.${fieldName}`);
+
+  if (currentField && transientField) {
+    return currentField.title !== transientField.title;
+  } else {
+    return false;
+  }
+};
+
 export {
   isValidAttr,
   validateAttr,
+  validateInputValue,
 };
