@@ -52,6 +52,7 @@ const ViewModel = canDefineMap.extend({
   pendingDestroy: {
     value: () => [],
   },
+  // automatically refresh instance on related document create/remove
   autorefresh: {
     value: true,
   },

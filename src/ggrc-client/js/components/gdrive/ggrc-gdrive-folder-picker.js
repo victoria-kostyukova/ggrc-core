@@ -31,7 +31,9 @@ const ViewModel = canDefineMap.extend({
   },
   folderId: {
     get() {
-      return getGDriveItemId(this.folder_error.message);
+      if (this.folder_error && this.folder_error.message) {
+        return getGDriveItemId(this.folder_error.message);
+      }
     },
   },
   _folder_change_pending: {

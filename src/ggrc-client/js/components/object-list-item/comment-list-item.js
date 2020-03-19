@@ -74,8 +74,8 @@ const ViewModel = canDefineMap.extend({
   },
   customAttributeData: {
     get() {
-      return this.commentRevision.custom_attribute.title +
-      ':' + this.commentRevision.custom_attribute_stored_value;
+      return this.commentRevision.attr('custom_attribute.title') +
+      ':' + this.commentRevision.attr('custom_attribute_stored_value');
     },
   },
   isProposalHeaderLink: {
