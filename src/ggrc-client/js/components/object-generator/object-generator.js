@@ -77,6 +77,9 @@ export default canComponent.extend({
       block_type_change: {
         value: false,
       },
+      element: {
+        value: null,
+      },
       isLoadingOrSaving() {
         return this.is_saving ||
         this.block_type_change ||
@@ -96,6 +99,32 @@ export default canComponent.extend({
           this.assessmentTemplate = template;
         }
       },
+      performGenerateAssessment(event) {
+        const instance = businessModels[this.object].findInCacheById(
+          this.join_object_id);
+
+        event.preventDefault();
+
+        if ($(event.target).hasClass('disabled') || this.is_saving) {
+          return;
+        }
+
+        this.is_saving = true;
+
+        return this.callback(this.selected, {
+          type: this.type,
+          target: this.object,
+          instance: instance,
+          assessmentTemplate: this.assessmentTemplate,
+          context: this,
+        });
+      },
+      closeModal() {
+        this.is_saving = false;
+        if (this.element) {
+          this.element.find('.modal-dismiss').trigger('click');
+        }
+      },
     });
   },
 
@@ -103,39 +132,12 @@ export default canComponent.extend({
     inserted() {
       this.viewModel.selected.replace([]);
       this.viewModel.entries.replace([]);
+      this.viewModel.element = this.element;
 
       // show loading indicator before actual
       // Assessment Template is loading
       this.viewModel.is_loading = true;
       this.viewModel.resultsRequested = true;
-    },
-    closeModal() {
-      this.viewModel.is_saving = false;
-      if (this.element) {
-        this.element.find('.modal-dismiss').trigger('click');
-      }
-    },
-    '.modal-footer .btn-map click'(el, ev) {
-      let type = this.viewModel.type;
-      let object = this.viewModel.object;
-      let assessmentTemplate = this.viewModel.assessmentTemplate;
-      let instance = businessModels[object].findInCacheById(
-        this.viewModel.join_object_id);
-
-      ev.preventDefault();
-      if (el.hasClass('disabled') ||
-      this.viewModel.is_saving) {
-        return;
-      }
-
-      this.viewModel.is_saving = true;
-      return this.viewModel.callback(this.viewModel.selected, {
-        type: type,
-        target: object,
-        instance: instance,
-        assessmentTemplate,
-        context: this,
-      });
     },
   },
 });
