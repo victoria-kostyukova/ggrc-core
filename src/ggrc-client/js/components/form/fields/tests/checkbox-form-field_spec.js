@@ -7,34 +7,33 @@ import {getComponentVM} from '../../../../../js_specs/spec-helpers';
 import Component from '../checkbox-form-field';
 
 describe('checkbox-form-field component', () => {
-  'use strict';
   let viewModel;
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
     spyOn(viewModel, 'dispatch');
-    viewModel.attr('fieldId', 'id');
+    viewModel.fieldId = 'id';
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
-    viewModel.attr('value', true);
+    viewModel.value = true;
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
   it('sets the value of the input', () => {
-    viewModel.attr('value', true);
-    expect(viewModel.attr('inputValue')).toEqual(true);
+    viewModel.value = true;
+    expect(viewModel.inputValue).toEqual(true);
   });
 
   it('fires valueChanged event on input value change', () => {
-    viewModel.attr('value', false);
-    viewModel.attr('inputValue', true);
+    viewModel.value = false;
+    viewModel.inputValue = true;
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
       value: true,
     });
-    viewModel.attr('inputValue', false);
+    viewModel.inputValue = false;
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',

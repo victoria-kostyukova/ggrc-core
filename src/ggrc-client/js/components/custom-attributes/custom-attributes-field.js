@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
@@ -15,29 +15,41 @@ import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
 import template from './custom-attributes-field.stache';
 
+const ViewModel = canDefineMap.extend({
+  disabled: {
+    type: 'htmlbool',
+  },
+  type: {
+    value: null,
+  },
+  value: {
+    value: null,
+  },
+  fieldId: {
+    value: null,
+  },
+  placeholder: {
+    value: '',
+  },
+  options: {
+    value: () => [],
+  },
+  isLocalCa: {
+    value: false,
+  },
+  fieldValueChanged(e, scope) {
+    this.dispatch({
+      type: 'valueChanged',
+      fieldId: e.fieldId,
+      value: e.value,
+      field: scope,
+    });
+  },
+});
+
 export default canComponent.extend({
   tag: 'custom-attributes-field',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      disabled: {
-        type: 'htmlbool',
-      },
-    },
-    type: null,
-    value: null,
-    fieldId: null,
-    placeholder: '',
-    options: [],
-    isLocalCa: false,
-    fieldValueChanged: function (e, scope) {
-      this.dispatch({
-        type: 'valueChanged',
-        fieldId: e.fieldId,
-        value: e.value,
-        field: scope,
-      });
-    },
-  }),
+  ViewModel,
 });

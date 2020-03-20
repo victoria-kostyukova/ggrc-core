@@ -4,50 +4,56 @@
  */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
+import canDefineMap from 'can-define/map/map';
 import canComponent from 'can-component';
 import '../../datepicker/datepicker-component';
 import template from './date-form-field.stache';
+
+const ViewModel = canDefineMap.extend({
+  inputValue: {
+    set(newValue) {
+      let oldValue = this._value;
+
+      if (newValue === oldValue) {
+        return;
+      }
+
+      this._value = newValue;
+      this.valueChanged(newValue);
+    },
+    get() {
+      return this._value;
+    },
+  },
+  value: {
+    set(newValue) {
+      this._value = newValue;
+    },
+    get() {
+      return this._value;
+    },
+  },
+  _value: {
+    value: null,
+  },
+  fieldId: {
+    value: null,
+  },
+  readonly: {
+    value: true,
+  },
+  valueChanged(newValue) {
+    this.dispatch({
+      type: 'valueChanged',
+      fieldId: this.fieldId,
+      value: newValue,
+    });
+  },
+});
 
 export default canComponent.extend({
   tag: 'date-form-field',
   view: canStache(template),
   leakScope: true,
-  viewModel: canMap.extend({
-    define: {
-      inputValue: {
-        set(newValue) {
-          let oldValue = this.attr('_value');
-
-          if (newValue === oldValue) {
-            return;
-          }
-
-          this.attr('_value', newValue);
-          this.valueChanged(newValue);
-        },
-        get() {
-          return this.attr('_value');
-        },
-      },
-      value: {
-        set(newValue) {
-          this.attr('_value', newValue);
-        },
-        get() {
-          return this.attr('_value');
-        },
-      },
-    },
-    _value: null,
-    fieldId: null,
-    readonly: true,
-    valueChanged: function (newValue) {
-      this.dispatch({
-        type: 'valueChanged',
-        fieldId: this.fieldId,
-        value: newValue,
-      });
-    },
-  }),
+  ViewModel,
 });

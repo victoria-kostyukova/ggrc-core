@@ -7,16 +7,14 @@ import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../assessment-object-type-dropdown';
 
-describe('assessment-object-type-dropdown component', function () {
-  'use strict';
-
+describe('assessment-object-type-dropdown component', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
-  it('returns the grouped types', function () {
+  it('returns the grouped types', () => {
     let result;
 
     let objectTypes = {
@@ -31,7 +29,7 @@ describe('assessment-object-type-dropdown component', function () {
     };
 
     spyOn(modelsUtils, 'groupTypes').and.returnValue(objectTypes);
-    result = viewModel.attr('objectTypes');
+    result = viewModel.objectTypes;
     expect(result).toEqual(objectTypes);
   });
 });

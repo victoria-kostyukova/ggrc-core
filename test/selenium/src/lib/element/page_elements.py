@@ -292,7 +292,7 @@ class CustomAttribute(object):
     else:
       js_el = self._root.element(class_name="form-field__content")
     js_type = js_el.browser.execute_script(
-        "return $(arguments[0]).viewModel().attr('type')", js_el)
+        "return $(arguments[0]).viewModel().type", js_el)
     return {
         "input": AdminWidgetCustomAttributes.TEXT,
         "text": AdminWidgetCustomAttributes.RICH_TEXT,

@@ -129,7 +129,7 @@ describe('rich-text component', () => {
 
         it(`should not call history.undo() if current
           length is less than max length`, () => {
-          viewModel.attr('maxLength', 10);
+          viewModel.maxLength = 10;
           spyOn(viewModel, 'getLength').and.returnValue(9);
           viewModel.restrictMaxLength(editor);
 
@@ -140,7 +140,7 @@ describe('rich-text component', () => {
 
         it(`should call history.undo() if current
           length is greather than max length`, () => {
-          viewModel.attr('maxLength', 9);
+          viewModel.maxLength = 9;
           spyOn(viewModel, 'getLength').and.returnValue(10);
           viewModel.restrictMaxLength(editor);
 
@@ -186,8 +186,8 @@ describe('rich-text component', () => {
         describe('if pasted text length is less than allowed', () => {
           beforeEach(() => {
             event.clipboardData.getData.and.returnValue('0123456789');
-            viewModel.attr('maxLength', 20);
-            viewModel.attr('length', 5);
+            viewModel.maxLength = 20;
+            viewModel.length = 5;
             viewModel.restrictPasteOperation(editor);
           });
 
@@ -207,8 +207,8 @@ describe('rich-text component', () => {
         describe('if pasted text length is greather than allowed', () => {
           beforeEach(() => {
             event.clipboardData.getData.and.returnValue('0123456789');
-            viewModel.attr('maxLength', 10);
-            viewModel.attr('length', 5);
+            viewModel.maxLength = 10;
+            viewModel.length = 5;
             viewModel.restrictPasteOperation(editor);
           });
 
@@ -242,11 +242,11 @@ describe('rich-text component', () => {
           });
 
           it('should show alert', () => {
-            viewModel.attr('showAlert', false);
+            viewModel.showAlert = false;
 
             callback(event);
 
-            expect(viewModel.attr('showAlert')).toBe(true);
+            expect(viewModel.showAlert).toBe(true);
           });
         });
       });
@@ -254,16 +254,16 @@ describe('rich-text component', () => {
 
     describe('onChange() method', () => {
       it('should reset "showAlert" flag if length is less than allowed', () => {
-        viewModel.attr('showAlert', true);
+        viewModel.showAlert = true;
         spyOn(viewModel, 'getLength').and.returnValue(99);
-        viewModel.attr('maxLength', 100);
-        viewModel.attr('editor', {
+        viewModel.maxLength = 100;
+        viewModel.editor = {
           root: {},
-        });
+        };
 
         viewModel.onChange({ops: []});
 
-        expect(viewModel.attr('showAlert')).toBe(false);
+        expect(viewModel.showAlert).toBe(false);
       });
     });
 
