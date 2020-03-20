@@ -11,31 +11,25 @@ import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 
 describe('bulk-update-button component', function () {
   let viewModel;
-  let events;
 
-  beforeAll(function () {
+  beforeAll(() => {
     viewModel = getComponentVM(Component);
-    events = Component.prototype.events;
   });
 
-  describe('button click event', function () {
-    let event;
-    beforeAll(function () {
-      event = events['a click'].bind({viewModel});
+  describe('performBulkUpdate() method', () => {
+    beforeEach(() => {
       spyOn(viewModel, 'openBulkUpdateModal');
     });
 
-    it('should open ObjectBulkUpdate modal', function () {
-      let type = 'some model';
-      let element = {};
+    it('calls ObjectBulkUpdate() method', () => {
       viewModel.model = {
-        model_singular: type,
+        model_singular: 'model_singular',
       };
 
-      event(element);
+      viewModel.performBulkUpdate({target: {}});
 
       expect(viewModel.openBulkUpdateModal)
-        .toHaveBeenCalledWith(jasmine.any(Object), type);
+        .toHaveBeenCalledWith(jasmine.any(Object), 'model_singular');
     });
   });
 
