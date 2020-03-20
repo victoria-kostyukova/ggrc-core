@@ -24,6 +24,10 @@ const ViewModel = canDefineMap.extend({
     type: 'boolean',
     value: false,
   },
+  shouldUpdateFolder: {
+    type: 'boolean',
+    value: false,
+  },
   canEdit: {
     get() {
       return !this.readonly && !this._folder_change_pending;
@@ -57,6 +61,9 @@ const ViewModel = canDefineMap.extend({
   current_folder: {
     value: null,
   },
+  folderToRemove: {
+    value: null,
+  },
   folder_error: {
     value: null,
   },
@@ -64,12 +71,13 @@ const ViewModel = canDefineMap.extend({
    * Helper method for unlinking folder currently linked to the
    * given instance.
    *
+   * @param {Object} currentFolder - Current Folder object
    * @return {Object} - a deferred object that is resolved when the instance's
    *   folder has been successfully unlinked from it
    */
-  unlinkFolder() {
+  unlinkFolder(currentFolder) {
     const instance = this.instance;
-    const backUpFolder = this.current_folder.serialize();
+    const backUpFolder = currentFolder.serialize();
 
     this._folder_change_pending = true;
     this.current_folder = null;
@@ -151,12 +159,13 @@ const ViewModel = canDefineMap.extend({
   },
   detachFolder() {
     if (this.deferred) {
+      this.folderToRemove = this.current_folder;
       this.instance.attr('folder', null);
       this.current_folder = null;
       return $.when();
     }
 
-    return this.unlinkFolder();
+    return this.unlinkFolder(this.current_folder);
   },
   unsetFocus(event) {
     const ESCAPE_KEY_CODE = 27;
@@ -184,7 +193,27 @@ export default canComponent.extend({
 
       this.viewModel.setRevisionFolder();
     },
-
+    '{viewModel.instance} modelAfterSave'() {
+      const folder = this.viewModel.instance.attr('_transient.folder');
+      if (folder) {
+        this.viewModel.instance.attr('_transient.folder', null);
+        this.viewModel.linkFolder(folder.id);
+        this.viewModel.shouldUpdateFolder = true;
+      }
+      if (this.viewModel.folderToRemove) {
+        this.viewModel.unlinkFolder(this.viewModel.folderToRemove);
+        this.viewModel.folderToRemove = null;
+      }
+    },
+    '{viewModel.instance} folder'() {
+      if (!this.viewModel.instance.attr('folder') ) {
+        this.viewModel.current_folder = null;
+      }
+      if (this.viewModel.shouldUpdateFolder) {
+        this.viewModel.setRevisionFolder();
+        this.viewModel.shouldUpdateFolder = false;
+      }
+    },
     '{viewModel.instance} change'() {
       if (!this.viewModel.folder_error) {
         return;
