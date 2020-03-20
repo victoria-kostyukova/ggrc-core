@@ -19,7 +19,7 @@ describe('related-urls component', () => {
     instance = {
       isNew: jasmine.createSpy('isNew'),
     };
-    viewModel.attr('instance', instance);
+    viewModel.instance = instance;
   });
 
   describe('canAddUrl get() method', () => {
@@ -29,9 +29,9 @@ describe('related-urls component', () => {
 
     it('returns false if user can not update instance', () => {
       Permission.isAllowedFor.and.returnValue(false);
-      viewModel.attr('instance').isNew.and.returnValue(false);
+      viewModel.instance.isNew.and.returnValue(false);
 
-      let result = viewModel.attr('canAddUrl');
+      let result = viewModel.canAddUrl;
 
       expect(result).toBe(false);
     });
@@ -39,10 +39,10 @@ describe('related-urls component', () => {
     it(`returns false if user can update instance
         but edit is disabled in the component`, () => {
       Permission.isAllowedFor.and.returnValue(true);
-      viewModel.attr('instance').isNew.and.returnValue(false);
-      viewModel.attr('isNotEditable', true);
+      viewModel.instance.isNew.and.returnValue(false);
+      viewModel.isNotEditable = true;
 
-      let result = viewModel.attr('canAddUrl');
+      let result = viewModel.canAddUrl;
 
       expect(result).toBe(false);
     });
@@ -50,19 +50,19 @@ describe('related-urls component', () => {
     it('returns true if user can update instance and edit is not denied',
       () => {
         Permission.isAllowedFor.and.returnValue(true);
-        viewModel.attr('instance').isNew.and.returnValue(false);
-        viewModel.attr('isNotEditable', false);
+        viewModel.instance.isNew.and.returnValue(false);
+        viewModel.isNotEditable = false;
 
-        let result = viewModel.attr('canAddUrl');
+        let result = viewModel.canAddUrl;
 
         expect(result).toBe(true);
       });
 
     it('returns true if user creates new instance', () => {
       Permission.isAllowedFor.and.returnValue(false);
-      viewModel.attr('instance').isNew.and.returnValue(true);
+      viewModel.instance.isNew.and.returnValue(true);
 
-      let result = viewModel.attr('canAddUrl');
+      let result = viewModel.canAddUrl;
 
       expect(result).toBe(true);
     });
@@ -75,9 +75,9 @@ describe('related-urls component', () => {
 
     it('returns false if user can not update instance', () => {
       Permission.isAllowedFor.and.returnValue(false);
-      viewModel.attr('instance').isNew.and.returnValue(false);
+      viewModel.instance.isNew.and.returnValue(false);
 
-      let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.canRemoveUrl;
 
       expect(result).toBe(false);
     });
@@ -85,10 +85,10 @@ describe('related-urls component', () => {
     it(`returns false if user can update instance
         but edit is disabled in the component`, () => {
       Permission.isAllowedFor.and.returnValue(true);
-      viewModel.attr('instance').isNew.and.returnValue(false);
-      viewModel.attr('isNotEditable', true);
+      viewModel.instance.isNew.and.returnValue(false);
+      viewModel.isNotEditable = true;
 
-      let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.canRemoveUrl;
 
       expect(result).toBe(false);
     });
@@ -96,11 +96,11 @@ describe('related-urls component', () => {
     it(`returns false if user can update instance, edit is is not denied,
         but removal is disabled by flag`, () => {
       Permission.isAllowedFor.and.returnValue(true);
-      viewModel.attr('instance').isNew.and.returnValue(false);
-      viewModel.attr('isNotEditable', false);
-      viewModel.attr('allowToRemove', false);
+      viewModel.instance.isNew.and.returnValue(false);
+      viewModel.isNotEditable = false;
+      viewModel.allowToRemove = false;
 
-      let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.canRemoveUrl;
 
       expect(result).toBe(false);
     });
@@ -108,20 +108,20 @@ describe('related-urls component', () => {
     it(`returns true if user can update instance, edit is not denied,
         and removal is not disabled`, () => {
       Permission.isAllowedFor.and.returnValue(true);
-      viewModel.attr('instance').isNew.and.returnValue(false);
-      viewModel.attr('isNotEditable', false);
-      viewModel.attr('allowToRemove', true);
+      viewModel.instance.isNew.and.returnValue(false);
+      viewModel.isNotEditable = false;
+      viewModel.allowToRemove = true;
 
-      let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.canRemoveUrl;
 
       expect(result).toBe(true);
     });
 
     it('returns true if user creates instance', () => {
       Permission.isAllowedFor.and.returnValue(false);
-      viewModel.attr('instance').isNew.and.returnValue(true);
+      viewModel.instance.isNew.and.returnValue(true);
 
-      let result = viewModel.attr('canRemoveUrl');
+      let result = viewModel.canRemoveUrl;
 
       expect(result).toBe(true);
     });
@@ -176,25 +176,25 @@ describe('related-urls component', () => {
     });
 
     it('should set new value for form visibility', () => {
-      viewModel.attr('isFormVisible', true);
+      viewModel.isFormVisible = true;
       method(false);
-      expect(viewModel.attr('isFormVisible')).toEqual(false);
+      expect(viewModel.isFormVisible).toEqual(false);
     });
 
     it('should clear create url form input by default', () => {
-      viewModel.attr('value', 'foobar');
+      viewModel.value = 'foobar';
       method(true);
-      expect(viewModel.attr('value')).toEqual('');
+      expect(viewModel.value).toEqual('');
     });
 
     it('does not clear input field value if instructed to do so', () => {
-      viewModel.attr('value', 'foobar');
+      viewModel.value = 'foobar';
       method(true, true);
-      expect(viewModel.attr('value')).toEqual('foobar');
+      expect(viewModel.value).toEqual('foobar');
     });
 
     it('should set focus to form input field if visible', () => {
-      viewModel.attr('isFormVisible', false);
+      viewModel.isFormVisible = false;
       method(true);
       expect(viewModel.moveFocusToInput).toHaveBeenCalled();
     });
@@ -214,27 +214,27 @@ describe('related-urls component', () => {
       let url = 'www.test.url';
 
       beforeEach(() => {
-        viewModel.attr('urls', []);
+        viewModel.urls = [];
         spyOn(UrlUtils, 'sanitizer').and.returnValue({
           isValid: true, value: url,
         });
       });
 
       it('prevents adding duplicate URLs', () => {
-        viewModel.attr('urls', [
+        viewModel.urls = [
           new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
           new canMap({link: 'www.test.url', title: 'www.test.url'}),
-        ]);
+        ];
 
         method(url);
         expect(viewModel.createUrl).not.toHaveBeenCalled();
       });
 
       it('issues error notification when adding duplicate URLs', () => {
-        viewModel.attr('urls', [
+        viewModel.urls = [
           new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
           new canMap({link: 'www.test.url', title: 'www.test.url'}),
-        ]);
+        ];
 
         method(url);
         expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
@@ -264,10 +264,10 @@ describe('related-urls component', () => {
 
       it('in case of duplicate url', () => {
         let url = 'www.test.url';
-        viewModel.attr('urls', [
+        viewModel.urls = [
           new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
           new canMap({link: 'www.test.url', title: 'www.test.url'}),
-        ]);
+        ];
 
         spyOn(UrlUtils, 'sanitizer').and.returnValue({
           isValid: false, value: url,

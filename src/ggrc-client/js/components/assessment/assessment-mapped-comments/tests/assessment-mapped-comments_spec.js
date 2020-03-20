@@ -24,15 +24,15 @@ describe('assessment-mapped-comments component', () => {
       };
       spyOn(CommentsUtils, 'loadComments')
         .and.returnValue(fakeLoadedObjects);
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       viewModel.initMappedComments();
 
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     it('calls loadComments() method', () => {
-      viewModel.attr('instance', 'instance');
+      viewModel.instance = 'instance';
       const fakeLoadedObjects = {
         Comment: {
           values: [],
@@ -50,7 +50,7 @@ describe('assessment-mapped-comments component', () => {
 
     it('assigns loaded comments to mappedComments attr ' +
     'after loading comments', async () => {
-      viewModel.attr('mappedComments', []);
+      viewModel.mappedComments = [];
       const fakeLoadedObjects = {
         Comment: {
           values: ['Comment1', 'Comment2'],
@@ -62,13 +62,13 @@ describe('assessment-mapped-comments component', () => {
 
       await viewModel.initMappedComments();
 
-      expect(viewModel.attr('mappedComments').serialize())
+      expect(viewModel.mappedComments.serialize())
         .toEqual(['Comment1', 'Comment2']);
     });
 
     it('sets showMore attr to true if total comments count more ' +
     'then loaded comments count', async () => {
-      viewModel.attr('mappedComments', []);
+      viewModel.mappedComments = [];
       const fakeLoadedObjects = {
         Comment: {
           values: ['Comment1', 'Comment2'],
@@ -80,12 +80,12 @@ describe('assessment-mapped-comments component', () => {
 
       await viewModel.initMappedComments();
 
-      expect(viewModel.attr('showMore')).toBe(true);
+      expect(viewModel.showMore).toBe(true);
     });
 
     it('sets showMore attr to false if total comments count less or ' +
     'equal to loaded comments count', async () => {
-      viewModel.attr('mappedComments', []);
+      viewModel.mappedComments = [];
       const fakeLoadedObjects = {
         Comment: {
           values: ['Comment1', 'Comment2'],
@@ -97,27 +97,27 @@ describe('assessment-mapped-comments component', () => {
 
       await viewModel.initMappedComments();
 
-      expect(viewModel.attr('showMore')).toBe(false);
+      expect(viewModel.showMore).toBe(false);
     });
 
     it('sets isInitialized attr to true after loading comments', async () => {
-      viewModel.attr('isInitialized', false);
+      viewModel.isInitialized = false;
       spyOn(CommentsUtils, 'loadComments')
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
 
       await viewModel.initMappedComments();
 
-      expect(viewModel.attr('isInitialized')).toBe(true);
+      expect(viewModel.isInitialized).toBe(true);
     });
 
     it('sets isLoading attr to false after loading comments', async () => {
-      viewModel.attr('isLoading', true);
+      viewModel.isLoading = true;
       spyOn(CommentsUtils, 'loadComments')
         .and.returnValue(Promise.resolve({Comment: {values: []}}));
 
       await viewModel.initMappedComments();
 
-      expect(viewModel.attr('isLoading')).toBe(false);
+      expect(viewModel.isLoading).toBe(false);
     });
   });
 
@@ -136,8 +136,8 @@ describe('assessment-mapped-comments component', () => {
 
       it('calls initMappedComments if subtree is expanded ' +
       'and it is not initialized', () => {
-        viewModel.attr('expanded', true);
-        viewModel.attr('isInitialized', false);
+        viewModel.expanded = true;
+        viewModel.isInitialized = false;
         spyOn(viewModel, 'initMappedComments');
 
         handler();
@@ -147,8 +147,8 @@ describe('assessment-mapped-comments component', () => {
 
       it('does not call initMappedComments if subtree is not expanded',
         () => {
-          viewModel.attr('expanded', false);
-          viewModel.attr('isInitialized', true);
+          viewModel.expanded = false;
+          viewModel.isInitialized = true;
           spyOn(viewModel, 'initMappedComments');
 
           handler();
@@ -158,8 +158,8 @@ describe('assessment-mapped-comments component', () => {
 
       it('does not call initMappedObjects if subtree is initialized',
         () => {
-          viewModel.attr('expanded', true);
-          viewModel.attr('isInitialized', true);
+          viewModel.expanded = true;
+          viewModel.isInitialized = true;
           spyOn(viewModel, 'initMappedComments');
 
           handler();

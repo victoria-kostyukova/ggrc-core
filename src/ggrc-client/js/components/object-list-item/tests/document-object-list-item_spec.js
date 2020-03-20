@@ -19,9 +19,9 @@ describe('document-object-list-item component', () => {
       const instance = new canMap({
         kind: 'listItem',
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('itemData')).toEqual(instance);
+      expect(viewModel.itemData).toEqual(instance);
     });
 
     it('itemTitle returns "instance.title" if defined', () => {
@@ -29,9 +29,9 @@ describe('document-object-list-item component', () => {
         title: 'Some Title',
         link: 'Some Link',
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('itemTitle')).toEqual(instance.title);
+      expect(viewModel.itemTitle).toEqual(instance.title);
     });
 
     it('itemTitle returns "instance.link" if title not defined', () => {
@@ -39,36 +39,36 @@ describe('document-object-list-item component', () => {
         title: null,
         link: 'Some Link',
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('itemTitle')).toEqual(instance.link);
+      expect(viewModel.itemTitle).toEqual(instance.link);
     });
 
     it('itemCreationDate returns "instance.created_at"', () => {
       const instance = new canMap({
         created_at: Date.now(),
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('itemCreationDate')).toEqual(instance.created_at);
+      expect(viewModel.itemCreationDate).toEqual(instance.created_at);
     });
 
     it('itemStatus returns "instance.status"', () => {
       const instance = new canMap({
         status: 'SomeState',
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('itemStatus')).toEqual(instance.status);
+      expect(viewModel.itemStatus).toEqual(instance.status);
     });
 
     it('isItemValid returns false if "instance.status" is "Deprecated"', () => {
       const instance = new canMap({
         status: 'DepRecAted',
       });
-      viewModel.attr('instance', instance);
+      viewModel.instance = instance;
 
-      expect(viewModel.attr('isItemValid')).toBeFalsy();
+      expect(viewModel.isItemValid).toBeFalsy();
     });
 
     it('isItemValid returns true if "instance.status" is not "Deprecated"',
@@ -76,9 +76,9 @@ describe('document-object-list-item component', () => {
         const instance = new canMap({
           status: 'Active',
         });
-        viewModel.attr('instance', instance);
+        viewModel.instance = instance;
 
-        expect(viewModel.attr('isItemValid')).toBeTruthy();
+        expect(viewModel.isItemValid).toBeTruthy();
       });
   });
 });

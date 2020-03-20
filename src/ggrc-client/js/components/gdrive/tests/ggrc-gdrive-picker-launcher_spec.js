@@ -3,27 +3,26 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import * as PickerUtils from '../../../plugins/utils/gdrive-picker-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../ggrc-gdrive-picker-launcher';
 
-describe('ggrc-gdrive-picker-launcher', function () {
-  'use strict';
-
+describe('ggrc-gdrive-picker-launcher', () => {
   let viewModel;
   let eventStub = {
-    preventDefault: function () {},
+    preventDefault: () => {},
   };
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
     spyOn(tracker, 'start').and.returnValue(() => {});
   });
 
-  describe('onClickHandler() method', function () {
-    it('call confirmationCallback() if it is provided', function () {
+  describe('onClickHandler() method', () => {
+    it('call confirmationCallback() if it is provided', () => {
       spyOn(viewModel, 'confirmationCallback');
 
       viewModel.onClickHandler(null, null, eventStub);
@@ -31,7 +30,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
       expect(viewModel.confirmationCallback).toHaveBeenCalled();
     });
 
-    it('pass callbackResult to $.when()', function () {
+    it('pass callbackResult to $.when()', () => {
       let dfd = $.Deferred();
       let thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
@@ -45,7 +44,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
       expect(thenSpy).toHaveBeenCalled();
     });
 
-    it('pass null to $.when() when callback is not provided', function () {
+    it('pass null to $.when() when callback is not provided', () => {
       let thenSpy = jasmine.createSpy('then');
       spyOn($, 'when').and.returnValue({
         then: thenSpy,
@@ -58,12 +57,12 @@ describe('ggrc-gdrive-picker-launcher', function () {
     });
   });
 
-  describe('onKeyup() method', function () {
-    describe('if escape key was clicked', function () {
+  describe('onKeyup() method', () => {
+    describe('if escape key was clicked', () => {
       let event;
       let element;
 
-      beforeEach(function () {
+      beforeEach(() => {
         const ESCAPE_KEY_CODE = 27;
         event = {
           keyCode: ESCAPE_KEY_CODE,
@@ -72,13 +71,13 @@ describe('ggrc-gdrive-picker-launcher', function () {
         element = $('<div></div>');
       });
 
-      it('calls stopPropagation for passed event', function () {
+      it('calls stopPropagation for passed event', () => {
         viewModel.onKeyup(element, event);
         expect(event.stopPropagation).toHaveBeenCalled();
       });
 
-      it('unsets focus for element', function (done) {
-        const blur = function () {
+      it('unsets focus for element', (done) => {
+        const blur = () => {
           done();
           element.off('blur', blur);
         };
@@ -100,10 +99,10 @@ describe('ggrc-gdrive-picker-launcher', function () {
     it('sets "isUploading" flag to true', () => {
       spyOn(PickerUtils, 'uploadFiles').and.returnValue(Promise.resolve([]));
 
-      viewModel.attr('isUploading', false);
+      viewModel.isUploading = false;
 
       viewModel.trigger_upload(viewModel, el);
-      expect(viewModel.attr('isUploading')).toBe(true);
+      expect(viewModel.isUploading).toBe(true);
     });
 
     it('calls createDocumentModel() method after uploadFiles() success',
@@ -136,7 +135,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
     describe('sets "isUploading" flag to false', () => {
       beforeEach(() => {
-        viewModel.attr('isUploading', true);
+        viewModel.isUploading = true;
       });
 
       it('when uploadFiles() was failed', async () => {
@@ -146,7 +145,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await viewModel.trigger_upload(viewModel, el);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
         expect(viewModel.createDocumentModel).not.toHaveBeenCalled();
       });
 
@@ -158,7 +157,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await viewModel.trigger_upload(viewModel, el);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
       });
 
       it('when createDocumentModel() was failed', async () => {
@@ -169,7 +168,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await viewModel.trigger_upload(viewModel, el);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
       });
     });
   });
@@ -180,6 +179,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
     beforeEach(() => {
       parentFolder = {id: 'id'};
+      viewModel.instance = new canMap({});
 
       spyOn(viewModel, 'uploadParentHelper').and.returnValue(Promise.resolve());
       spyOn($.fn, 'trigger').and.callThrough();
@@ -244,9 +244,9 @@ describe('ggrc-gdrive-picker-launcher', function () {
       files = ['file', 'file'];
 
       scope = {
-        instance: {
+        instance: new canMap({
           type: 'type',
-        },
+        }),
       };
 
       spyOn(NotifiersUtils, 'notifier');
@@ -266,10 +266,10 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
     it('sets "isUploading" flag to true', () => {
       spyOn(PickerUtils, 'uploadFiles').and.returnValue(Promise.resolve([]));
-      viewModel.attr('isUploading', false);
+      viewModel.isUploading = false;
       uploadParentHelper(parentFolderStub, scope);
 
-      expect(viewModel.attr('isUploading')).toBe(true);
+      expect(viewModel.isUploading).toBe(true);
     });
 
 
@@ -287,7 +287,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
     it('sets "isUploading" flag to false after uploadFiles() success',
       async () => {
-        viewModel.attr('isUploading', true);
+        viewModel.isUploading = true;
 
         spyOn(PickerUtils, 'uploadFiles')
           .and.returnValue(Promise.resolve(files));
@@ -296,12 +296,12 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await uploadParentHelper(parentFolderStub, scope);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
       });
 
     it('sets "isUploading" flag to false when uploadFiles() was failed',
       async () => {
-        viewModel.attr('isUploading', true);
+        viewModel.isUploading = true;
 
         spyOn(PickerUtils, 'uploadFiles')
           .and.returnValue(Promise.reject());
@@ -309,13 +309,13 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await uploadParentHelper(parentFolderStub, scope);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
         expect(viewModel.createDocumentModel).not.toHaveBeenCalled();
       });
 
     it('sets "isUploading" flag to false when createDocumentModel() was failed',
       async () => {
-        viewModel.attr('isUploading', true);
+        viewModel.isUploading = true;
 
         spyOn(PickerUtils, 'uploadFiles')
           .and.returnValue(Promise.resolve(files));
@@ -324,7 +324,7 @@ describe('ggrc-gdrive-picker-launcher', function () {
 
         await uploadParentHelper(parentFolderStub, scope);
 
-        expect(viewModel.attr('isUploading')).toBe(false);
+        expect(viewModel.isUploading).toBe(false);
       });
 
     it('calls notifier() if error type not equal GDRIVE_PICKER_ERR_CANCEL',

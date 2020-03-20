@@ -27,7 +27,7 @@ describe('evidence-item component', () => {
     beforeEach(() => {
       const evidence = getFakeEvidence();
 
-      viewModel.attr('evidence', evidence);
+      viewModel.evidence = evidence;
       method = viewModel.updateItem.bind(viewModel);
 
       spyOn(notifierUtils, 'notifier');
@@ -35,10 +35,10 @@ describe('evidence-item component', () => {
 
     it('should set "isLoading" to true before save evidence', () => {
       spyOn(Evidence, 'findOne').and.returnValue(Promise.reject());
-      viewModel.attr('isLoading', false);
+      viewModel.isLoading = false;
 
       method();
-      expect(viewModel.attr('isLoading')).toBe(true);
+      expect(viewModel.isLoading).toBe(true);
     });
 
     describe('when "findOne()" is failed', () => {
@@ -53,15 +53,15 @@ describe('evidence-item component', () => {
       });
 
       it('should set "isLoading" to false', async () => {
-        viewModel.attr('isLoading', true);
+        viewModel.isLoading = true;
         await method();
-        expect(viewModel.attr('isLoading')).toBe(false);
+        expect(viewModel.isLoading).toBe(false);
       });
 
       it('should not change "notes" attribute', async () => {
-        viewModel.attr('evidence.notes', 'oldValue');
+        viewModel.evidence.attr('notes', 'oldValue');
         await method('newValue');
-        expect(viewModel.attr('evidence.notes')).toEqual('oldValue');
+        expect(viewModel.evidence.attr('notes')).toEqual('oldValue');
       });
     });
 
@@ -82,9 +82,9 @@ describe('evidence-item component', () => {
       });
 
       it('should set "isLoading" to false', async () => {
-        viewModel.attr('isLoading', true);
+        viewModel.isLoading = true;
         await method();
-        expect(viewModel.attr('isLoading')).toBe(false);
+        expect(viewModel.isLoading).toBe(false);
       });
     });
 
@@ -116,9 +116,9 @@ describe('evidence-item component', () => {
       });
 
       it('should set "isLoading" to false', async () => {
-        viewModel.attr('isLoading', true);
+        viewModel.isLoading = true;
         await method();
-        expect(viewModel.attr('isLoading')).toBe(false);
+        expect(viewModel.isLoading).toBe(false);
       });
     });
   });

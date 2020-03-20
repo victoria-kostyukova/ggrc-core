@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec-helpers';
 import Component from '../comment-list-item';
 
@@ -15,64 +16,65 @@ describe('comment-list-item component', () => {
 
   describe('should have some default values', () => {
     it('and they should be correct', () => {
-      expect(viewModel.attr('showIcon')).toBeFalsy();
-      expect(viewModel.attr('commentAuthor')).toBeFalsy();
-      expect(viewModel.attr('hasRevision')).toBeFalsy();
+      viewModel.instance = new canMap({});
+      expect(viewModel.showIcon).toBe(false);
+      expect(viewModel.commentAuthor).toBe(false);
+      expect(viewModel.hasRevision).toBe(false);
     });
   });
 
   describe('expected assignee type with a capital letter in brackets, ' +
     'when the input:', () => {
     it('type in lower case', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: 'foo',
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('(Foo)');
+      expect(viewModel.commentAuthorType).toEqual('(Foo)');
     });
 
     it('type in upper case', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: 'BAR',
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('(Bar)');
+      expect(viewModel.commentAuthorType).toEqual('(Bar)');
     });
 
     it('type\'s letters in different cases', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: 'bAz',
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('(Baz)');
+      expect(viewModel.commentAuthorType).toEqual('(Baz)');
     });
   });
 
   describe('expected first assignee type is selected', () => {
     it('if multiple types specified', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: 'foo, bar',
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('(Foo)');
+      expect(viewModel.commentAuthorType).toEqual('(Foo)');
     });
   });
 
   describe('expected empty string ', () => {
     it('if input empty string', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: '',
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('');
+      expect(viewModel.commentAuthorType).toEqual('');
     });
 
     it('if input null', () => {
-      viewModel.attr('instance', {
+      viewModel.instance = new canMap({
         assignee_type: null,
       });
 
-      expect(viewModel.attr('commentAuthorType')).toEqual('');
+      expect(viewModel.commentAuthorType).toEqual('');
     });
   });
 });
