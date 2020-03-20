@@ -61,6 +61,10 @@ const ViewModel = canDefineMap.extend({
       `${namePluralLowerCase} were `) +
       'updated successfully.';
   },
+  performBulkUpdate({target}) {
+    const type = this.model.model_singular;
+    this.openBulkUpdateModal($(target), type);
+  },
 });
 
 export default canComponent.extend({
@@ -68,12 +72,4 @@ export default canComponent.extend({
   view: canStache(template),
   leakScope: true,
   ViewModel,
-  events: {
-    'a click': function (el) {
-      let model = this.viewModel.model;
-      let type = model.model_singular;
-
-      this.viewModel.openBulkUpdateModal(el, type);
-    },
-  },
 });
