@@ -36,14 +36,18 @@
                             {{^if new_object_form}}isDisabled:from="true"{{/if}}>
         </dropdown-component>
     </div>
-    {{^is(instance.definition_type, "assessment")}}
-      <div class="span2">
-        <label>
-          Mandatory
-        </label>
-        <input tabindex="3" type="checkbox" class="input-block-level" placeholder="Enter Placeholder" name="mandatory" {{#if mandatory}}checked="checked"{{/if}}>
-      </div>
-    {{/is}}
+    {{#if instance.definition_type}} {{! 'definition_type' is applied after
+    drawing of component, thus below condition is initially truthy when
+    'definition_type === undefined'}}
+      {{^is(instance.definition_type, "assessment")}}
+        <div class="span2">
+          <label>
+            Mandatory
+          </label>
+          <input tabindex="3" type="checkbox" class="input-block-level" placeholder="Enter Placeholder" name="mandatory" {{#if mandatory}}checked="checked"{{/if}}>
+        </div>
+      {{/is}}
+    {{/if}}
   </div>
   {{#switch attribute_type}}
   {{#case "Text"}}
