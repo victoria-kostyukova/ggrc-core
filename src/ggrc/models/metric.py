@@ -4,7 +4,6 @@
 """Metric model."""
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models import mixins
@@ -15,7 +14,7 @@ from ggrc.models.relationship import Relatable
 
 
 class Metric(Personable,
-             Roleable,
+             synchronizable.RoleableSynchronizable,
              Relatable,
              synchronizable.Synchronizable,
              PublicDocumentable,

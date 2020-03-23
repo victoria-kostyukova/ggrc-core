@@ -4,7 +4,6 @@
 """Module for AccessGroup object"""
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models.mixins import base
 from ggrc.models import mixins
@@ -15,7 +14,7 @@ from ggrc.models.relationship import Relatable
 from ggrc.fulltext.mixin import Indexed
 
 
-class AccessGroup(Roleable,
+class AccessGroup(synchronizable.RoleableSynchronizable,
                   PublicDocumentable,
                   ScopedCommentable,
                   synchronizable.Synchronizable,

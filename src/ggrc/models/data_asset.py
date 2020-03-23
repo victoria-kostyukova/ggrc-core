@@ -3,7 +3,6 @@
 
 """Module for DataAsset object"""
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models import mixins
 from ggrc.models.mixins import synchronizable
@@ -13,7 +12,7 @@ from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 
 
-class DataAsset(Roleable,
+class DataAsset(synchronizable.RoleableSynchronizable,
                 PublicDocumentable,
                 synchronizable.Synchronizable,
                 mixins.CustomAttributable,
