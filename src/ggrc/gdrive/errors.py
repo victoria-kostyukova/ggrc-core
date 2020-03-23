@@ -32,3 +32,7 @@ GOOGLE_API_V3_404_MESSAGE = (u"You have no access to the file and/or "
 WRONG_DELIMITER_IN_CSV = (u"Incorrect delimiter is used in the file. "
                           u"Please change delimiter to comma or semicolon "
                           u"and try again.")
+
+FILE_TOO_LARGE = u"Your file could not be imported as it contains too many " \
+                 u"objects. Please reduce the number of objects and " \
+                 u"try importing again."

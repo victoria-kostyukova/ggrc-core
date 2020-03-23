@@ -28,6 +28,7 @@ from ggrc import db
 from ggrc.app import app
 from ggrc import settings
 from ggrc.converters.import_helper import read_csv_file
+from ggrc.gdrive.file_actions import check_file_size
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
 from ggrc.utils import user_generator
@@ -90,7 +91,9 @@ MAPPING_STANDARD_PAIRS = list(
 
 
 def read_imported_file(file_data):  # pylint: disable=unused-argument
+  """Check imported file and return its full string representation"""
   csv_file = check_import_file()
+  check_file_size(csv_file)
   return read_csv_file(csv_file)
 
 

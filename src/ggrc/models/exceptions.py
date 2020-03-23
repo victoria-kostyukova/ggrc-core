@@ -8,6 +8,7 @@ from logging import getLogger
 
 from sqlalchemy.exc import IntegrityError
 
+from ggrc.gdrive import errors
 from ggrc.utils.errors import INTERNAL_SERVER_ERROR
 
 logger = getLogger(__name__)
@@ -79,6 +80,17 @@ class ReservedNameError(ValueError):
 
 class WrongDelimiterError(ValueError):
   pass
+
+
+class FileTooLargeExeption(ValueError):
+  """Exception if file size exceeds maximum file size"""
+  def __init__(self):
+    super(FileTooLargeExeption, self).__init__()
+    self._message = errors.FILE_TOO_LARGE
+
+  @property
+  def message(self):
+    return self._message
 
 
 class ExportStoppedException(RuntimeError):

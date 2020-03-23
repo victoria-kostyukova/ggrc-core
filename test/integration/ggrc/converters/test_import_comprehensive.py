@@ -329,6 +329,13 @@ class TestComprehensiveSheets(TestCase):
         ex.exception.message
     )
 
+  def test_large_csv_import(self):
+    """Test limitation for big imports"""
+    filename = "large_csv_4000_assessments.csv"
+
+    with self.assertRaises(exceptions.FileTooLargeExeption):
+      self.import_file(filename, safe=False)
+
   def test_import_with_obscure_delimiter(self):
     """Test import csv file with multiple "Object type" text.
 
