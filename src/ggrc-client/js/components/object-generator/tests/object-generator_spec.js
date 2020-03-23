@@ -4,8 +4,8 @@
 */
 
 import canMap from 'can-map';
-import RefreshQueue from '../../../models/refresh-queue';
 import Component from '../object-generator';
+import canDefineList from 'can-define/list/list';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 
@@ -116,6 +116,95 @@ describe('object-generator component', () => {
               .toEqual('type');
           });
       });
+
+      describe('closeModal() method', () => {
+        it('sets false to is_saving', () => {
+          viewModel.is_saving = true;
+
+          viewModel.closeModal();
+
+          viewModel.is_saving = false;
+        });
+
+        it('closes modal if element defined', () => {
+          const fakeBtn = {
+            trigger: jasmine.createSpy(),
+          };
+          viewModel.element = {
+            find: () => fakeBtn,
+          };
+
+          viewModel.closeModal();
+
+          expect(fakeBtn.trigger).toHaveBeenCalledWith('click');
+        });
+      });
+
+      describe('performGenerateAssessment() method', () => {
+        let event;
+
+        beforeEach(() => {
+          spyOn(Program, 'findInCacheById').and.returnValue('instance');
+          event = {
+            preventDefault: jasmine.createSpy(),
+            target: $('<div></div>'),
+          };
+          viewModel.object = 'Program';
+          viewModel.callback = jasmine.createSpy();
+        });
+
+        it('calls preventDefault() for event', () => {
+          viewModel.performGenerateAssessment(event);
+
+          expect(event.preventDefault).toHaveBeenCalled();
+        });
+
+        it('sets true to is_saving', () => {
+          viewModel.is_saving = false;
+
+          viewModel.performGenerateAssessment(event);
+
+          expect(viewModel.is_saving).toBe(true);
+        });
+
+        it('calls callback with correct parameters', () => {
+          viewModel.selected = ['selected'];
+          viewModel.type = 'fake_type';
+          viewModel.assessmentTemplate = 'assessmentTemplate';
+
+          viewModel.performGenerateAssessment(event);
+
+          expect(viewModel.callback).toHaveBeenCalledWith(
+            new canDefineList(['selected']),
+            {
+              type: 'fake_type',
+              target: 'Program',
+              instance: 'instance',
+              assessmentTemplate: 'assessmentTemplate',
+              context: jasmine.anything(),
+            }
+          );
+        });
+
+        describe('doesn\'t call callback()', () => {
+          it('if is_saving equals true', () => {
+            viewModel.is_saving = true;
+
+            viewModel.performGenerateAssessment(event);
+
+            expect(viewModel.callback).not.toHaveBeenCalled();
+          });
+
+          it('if event target has "disabled" class', () => {
+            event.target.addClass('disabled');
+            viewModel.is_saving = false;
+
+            viewModel.performGenerateAssessment(event);
+
+            expect(viewModel.callback).not.toHaveBeenCalled();
+          });
+        });
+      });
     });
   });
 
@@ -136,100 +225,6 @@ describe('object-generator component', () => {
     it('sets empty array to selected', () => {
       handler.call(that);
       expect(viewModel.selected.length).toEqual(0);
-    });
-  });
-
-  describe('"closeModal" event', () => {
-    let element;
-    let spyObj;
-
-    beforeEach(() => {
-      viewModel.assign({});
-      spyObj = {
-        trigger: () => {},
-      };
-      element = {
-        find: () => {
-          return spyObj;
-        },
-      };
-      spyOn(spyObj, 'trigger');
-      handler = events.closeModal;
-    });
-
-    it('sets false to is_saving', () => {
-      viewModel.is_saving = true;
-      handler.call({
-        element: element,
-        viewModel: viewModel,
-      });
-      expect(viewModel.is_saving).toEqual(false);
-    });
-    it('dismiss the modal', () => {
-      handler.call({
-        element: element,
-        viewModel: viewModel,
-      });
-      expect(spyObj.trigger).toHaveBeenCalledWith('click');
-    });
-  });
-
-  describe('".modal-footer .btn-map click" handler', () => {
-    let that;
-    let event;
-    let element;
-    let callback;
-
-    beforeEach(() => {
-      callback = jasmine.createSpy().and.returnValue('expectedResult');
-      viewModel.assign({
-        callback: callback,
-        type: 'type',
-        object: 'Program',
-        assessmentTemplate: 'template',
-        join_object_id: '123',
-        selected: [],
-      });
-      spyOn(Program, 'findInCacheById')
-        .and.returnValue('instance');
-      event = {
-        preventDefault: () => {},
-      };
-      element = $('<div></div>');
-      handler = events['.modal-footer .btn-map click'];
-      that = {
-        viewModel: viewModel,
-        closeModal: jasmine.createSpy(),
-      };
-      spyOn(RefreshQueue.prototype, 'enqueue')
-        .and.returnValue({
-          trigger: jasmine.createSpy()
-            .and.returnValue($.Deferred().resolve()),
-        });
-      spyOn($.prototype, 'trigger');
-    });
-
-    it('does nothing if element has class "disabled"', () => {
-      let result;
-      element.addClass('disabled');
-      result = handler.call(that, element, event);
-      expect(result).toEqual(undefined);
-    });
-
-    it('sets true to is_saving and returns callback', () => {
-      let result;
-      result = handler.call(that, element, event);
-      expect(viewModel.is_saving).toEqual(true);
-      expect(result).toEqual('expectedResult');
-      expect(callback.calls.argsFor(0)[0].length)
-        .toEqual(0);
-      expect(callback.calls.argsFor(0)[1]).toEqual({
-        type: 'type',
-        target: 'Program',
-        instance: 'instance',
-        assessmentTemplate: 'template',
-        context: that,
-      });
     });
   });
 });
