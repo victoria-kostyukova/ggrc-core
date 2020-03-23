@@ -7,6 +7,7 @@ import random
 import json
 
 import ddt
+import mock
 import sqlalchemy as sa
 
 from ggrc.models import all_models
@@ -116,6 +117,28 @@ class TestRevisionHistory(TestCase):
     self.assertEqual(
         ids,
         [i["id"] for i in resp.json["revisions_collection"]["revisions"]])
+
+  def test_content_property_get(self):
+    """Test content property calculated once for one revision
+
+    Revision.count has set_cached_content
+    we should call it once for the same revision
+    """
+    program = factories.ProgramFactory()
+    program_id = program.id
+    get_data = "/api/revisions?resource_type=Program&resource_id={}".format(
+        program_id
+    )
+    side_effect = all_models.Revision.set_cached_content
+
+    with mock.patch(
+        'ggrc.models.revision.Revision.set_cached_content'
+    ) as set_content_mock:
+      set_content_mock.side_effect = side_effect
+      response = self.api.client.get(get_data)
+
+    self.assert200(response)
+    self.assertEqual(1, set_content_mock.call_count)
 
   def update_revisions(self, obj):
     """Assert revision diff between api and calculated in test.."""

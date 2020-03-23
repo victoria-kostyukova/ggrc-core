@@ -385,7 +385,9 @@ class TestCheckPopulatedContent(unittest.TestCase):
       [{"parent_id": None}, {"parent_id": 1}, {}],
       [{"parent_id": None}, {"parent_id": 1}, {"parent_id": 2}],
   )
-  def test_internal_acl_filter(self, acl_entries):
+  @mock.patch('flask.g')
+  # pylint: disable=unused-argument
+  def test_internal_acl_filter(self, acl_entries, g):
     """Test filtering of internal roles for {}."""
     obj = mock.Mock()
     obj.id = self.object_id
