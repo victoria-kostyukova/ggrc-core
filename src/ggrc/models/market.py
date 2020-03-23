@@ -3,7 +3,6 @@
 """Module contains Market model."""
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models import mixins
@@ -13,7 +12,7 @@ from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 
 
-class Market(Roleable,
+class Market(synchronizable.RoleableSynchronizable,
              synchronizable.Synchronizable,
              mixins.CustomAttributable,
              Personable,
