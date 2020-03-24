@@ -44,10 +44,12 @@ def translate_message(exception):
       matches = pattern.search(message)
       if matches:
         logger.exception(exception)
+        key = field_lookup(matches.group(2))
         return (u"The value {value} is already used for another {key}. "
-                u"{key} values must be unique."
+                u"{capitalized_key} values must be unique."
                 .format(value=matches.group(1),
-                        key=field_lookup(matches.group(2))))
+                        key=key,
+                        capitalized_key=key.capitalize()))
     elif code == 1452:  # cannod set child row: a foreign key constraint fails
       pattern = re.compile(
           r"foreign key constraint fails \(`.+`.`(.+)`, CONSTRAINT `.+` "

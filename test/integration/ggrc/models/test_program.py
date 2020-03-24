@@ -77,6 +77,19 @@ class TestProgram(TestCase):
         response.json[0][1]
     )
 
+  def test_program_error(self):
+    """Test rise error if program already exist"""
+    title1 = "Title 1"
+    with factories.single_commit():
+      factories.ProgramFactory(title=title1)
+    error = (u"The value 'Title 1' is already used for another title. "
+             u"Title values must be unique.")
+    response = self.api.post(
+        all_models.Program,
+        {"program": {"title": title1}}
+    )
+    self.assertEqual(error, response.json)
+
 
 class TestProgramChange(TestCase):
   """Test cases for program."""
