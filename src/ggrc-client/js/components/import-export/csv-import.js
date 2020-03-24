@@ -96,6 +96,15 @@ export default canComponent.extend({
           return getImportUrl();
         },
       },
+      isShowCancel: {
+        get() {
+          return [
+            jobStatuses.NOT_STARTED,
+            jobStatuses.ANALYSIS_FAILED,
+            jobStatuses.FAILED,
+          ].includes(this.attr('state'));
+        },
+      },
     },
     quickTips,
     importedObjectsCount: 0,
@@ -422,6 +431,19 @@ export default canComponent.extend({
             this.attr(`removeInProgressItems.${id}`, false);
           });
       }
+    },
+    onCancel() {
+      deleteImportJob(this.jobId)
+        .then(() => {
+          this.resetFile();
+        })
+        .catch((error) => {
+          if (error.status === 404) {
+            this.resetFile();
+            return;
+          }
+          handleAjaxError(error);
+        });
     },
   }),
   events: {

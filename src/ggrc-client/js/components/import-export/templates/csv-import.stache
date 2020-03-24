@@ -126,6 +126,16 @@
       {{/switch}}
 
       <download-template></download-template>
+
+      {{#if isShowCancel}}
+        <button
+          type="button"
+          class="btn btn-small btn-white"
+          on:el:click="onCancel()"
+        >
+          Cancel
+        </button>
+      {{/if}}
     </div>
 
     {{#isImportStopped}}
