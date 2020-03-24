@@ -5,7 +5,6 @@ from sqlalchemy import orm
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models.deferred import deferred
@@ -104,7 +103,7 @@ class System(WithReadOnlyAccess,
 
 class Process(mixins.CustomAttributable,
               Personable,
-              Roleable,
+              synchronizable.RoleableSynchronizable,
               Relatable,
               PublicDocumentable,
               SystemOrProcess,

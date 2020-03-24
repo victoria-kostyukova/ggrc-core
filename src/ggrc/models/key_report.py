@@ -4,7 +4,6 @@
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.access_control import roleable
 from ggrc.fulltext import mixin as fulltext_mixin
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models.deferred import deferred
@@ -19,7 +18,7 @@ from ggrc.models import relationship
 class KeyReport(synchronizable.Synchronizable,
                 mixins.CustomAttributable,
                 object_person.Personable,
-                roleable.Roleable,
+                synchronizable.RoleableSynchronizable,
                 relationship.Relatable,
                 object_document.PublicDocumentable,
                 ScopedCommentable,

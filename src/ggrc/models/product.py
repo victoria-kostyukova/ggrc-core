@@ -6,7 +6,6 @@
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import ScopedCommentable
 from ggrc.models.deferred import deferred
@@ -20,7 +19,7 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 
 
-class Product(Roleable,
+class Product(synchronizable.RoleableSynchronizable,
               synchronizable.Synchronizable,
               mixins.CustomAttributable,
               Personable,
