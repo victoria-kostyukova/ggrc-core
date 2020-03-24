@@ -42,7 +42,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
     """Test 'handle_issue_tracker_info' method."""
     mock_object = mock.MagicMock()
     issue_tracker_info = {
-        "component_id": "123",
+        "component_id": "188208",
         "hotlist_id": 321,
         "title": "test_title",
         "issue_type": "test_type",
@@ -50,7 +50,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
         "issue_severity": "S2",
     }
     expected_result = {
-        "component_id": 123,
+        "component_id": 188208,
         "hotlist_ids": [321, ],
         "title": "test_title",
         "type": "test_type",
@@ -100,7 +100,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
     # Arrange test data.
     current_issue_tracker_info = {
         "enabled": True,
-        "component_id": "123",
+        "component_id": "188208",
         "hotlist_id": 321,
         "title": "test_title",
         "issue_type": "test_type",
@@ -110,7 +110,7 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
 
     new_issue_tracker_info = {
         "enabled": False,
-        "component_id": "12345",
+        "component_id": "398781",
         "hotlist_id": 54321,
         "title": "new_test_title",
         "issue_type": "new_test_type",
@@ -323,7 +323,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
 
     issue_tracker_info = {
         "enabled": True,
-        "component_id": "1234",
+        "component_id": "188208",
         "hotlist_id": "4321",
         "issue_type": "PROCESS",
         "issue_priority": "P2",
@@ -338,7 +338,7 @@ class TestIssueQueryBuilder(unittest.TestCase):
                    "description\n\n"
                    "Following is the issue Remediation Plan from GGRC: "
                    "test plan",
-        "component_id": 1234,
+        "component_id": 188208,
         "hotlist_ids": [4321, ],
         "priority": "P2",
         "reporter": "reporter@email.com",

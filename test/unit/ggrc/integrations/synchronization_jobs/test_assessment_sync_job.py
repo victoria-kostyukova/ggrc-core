@@ -24,7 +24,7 @@ class BaseClientTest(unittest.TestCase):
     assessment1_mock = mock.MagicMock(id=1, status='In Review')
     issue1_mock = mock.MagicMock(
         issue_tracked_obj=assessment1_mock,
-        component_id='1',
+        component_id='188208',
         issue_id='t1',
         issue_type='bug1',
         issue_priority='P1',
@@ -57,7 +57,7 @@ class BaseClientTest(unittest.TestCase):
               'object_id': 1,
               'object': assessment1_mock,
               'state': {
-                  'component_id': '1',
+                  'component_id': '188208',
                   'status': 'In Review',
                   'type': 'bug1',
                   'priority': 'P1',
@@ -256,7 +256,7 @@ class BaseClientTest(unittest.TestCase):
             'object_id': 1,
             'object': assessment_in_review,
             'state': {
-                'component_id': '1111',
+                'component_id': '188208',
                 'status': 'In Review',
                 'type': 'BUG1',
                 'priority': 'P1',
@@ -270,7 +270,7 @@ class BaseClientTest(unittest.TestCase):
             'object_id': 2,
             'object': assessment_not_started,
             'state': {
-                'component_id': '1111',
+                'component_id': '188208',
                 'status': 'Not Started',
                 'type': 'BUG2',
                 'priority': 'P2',
@@ -284,7 +284,7 @@ class BaseClientTest(unittest.TestCase):
     batches = [
         {
             1: {
-                'component_id': '1111',
+                'component_id': '188208',
                 'status': 'FIXED',
                 'type': 'BUG1',
                 'priority': 'P1',
@@ -297,7 +297,7 @@ class BaseClientTest(unittest.TestCase):
         },
         {
             2: {
-                'component_id': '1111',
+                'component_id': '188208',
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
@@ -308,7 +308,7 @@ class BaseClientTest(unittest.TestCase):
                 'ccs': []
             },
             3: {
-                'component_id': '1111',
+                'component_id': '188208',
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
@@ -344,7 +344,7 @@ class BaseClientTest(unittest.TestCase):
             'priority': 'P2',
             'severity': 'S2',
             'ccs': [],
-            'component_id': 1111,
+            'component_id': 188208,
             'reporter': 'reporter@example.com',
             'assignee': 'assignee@example.com',
             'verifier': 'assignee@example.com'

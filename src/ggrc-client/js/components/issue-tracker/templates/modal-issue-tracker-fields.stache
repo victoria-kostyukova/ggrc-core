@@ -116,24 +116,12 @@
         {{/eq}}
       </div>
       <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.component_id"}}field-failure{{/isValidAttr}}">
-        <label class="form-label ggrc-form-item__label">
-          Component ID
-          {{#eq(currentState, state.GENERATE_NEW)}}
-            <i class="fa fa-asterisk"></i>
-          {{/eq}}
-        </label>
-        {{#eq currentState state.GENERATE_NEW}}
-          <numberbox-component
-            additionalClass:from="'input-block-level'"
-            placeholder:from="'Enter Component ID'"
-            value:bind="instance.issue_tracker.component_id">
-          </numberbox-component>
-          {{#validateAttr instance "issue_tracker.component_id"}}
-            <label class="help-inline warning">{{this}}</label>
-          {{/validateAttr}}
-        {{else}}
-          {{instance.issue_tracker.component_id}}
-        {{/eq}}
+        <modal-component-id
+          isEditMode:from="isGenerateNewState"
+          componentIdsLoading:from="componentIdsLoading"
+          componentIds:from="componentIds"
+          instance:from="instance"
+        />
       </div>
       <div class="ggrc-form-item__multiple-row">
         <label class="ggrc-form-item__label">

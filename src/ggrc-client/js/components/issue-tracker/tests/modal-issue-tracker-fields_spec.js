@@ -9,6 +9,7 @@ import {
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';
 import Cacheable from '../../../models/cacheable';
+import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 
 describe('modal-issue-tracker-fields component', () => {
   let viewModel;
@@ -57,6 +58,43 @@ describe('modal-issue-tracker-fields component', () => {
     describe('generateNewTicket() method', () => {
       beforeEach(() => {
         spyOn(viewModel, 'setValidationFlags');
+        spyOn(viewModel, 'loadComponentIds');
+      });
+
+      describe('should call "loadComponentIds()"', () => {
+        it('when currentState is NOT GENERATE_NEW and "componentIds" is empty',
+          () => {
+            // LINK_TO_EXISTING state
+            viewModel.attr('currentState', 2);
+            viewModel.attr('componentIds', []);
+            viewModel.generateNewTicket();
+
+            expect(viewModel.loadComponentIds).toHaveBeenCalled();
+          }
+        );
+      });
+
+      describe('should NOT call "loadComponentIds()"', () => {
+        it('when currentState is GENERATE_NEW and "componentIds" is NOT empty',
+          () => {
+            // GENERATE_NEW state
+            viewModel.attr('currentState', 1);
+            viewModel.attr('componentIds', [1, 2, 3]);
+            viewModel.generateNewTicket();
+
+            expect(viewModel.loadComponentIds).not.toHaveBeenCalled();
+          }
+        );
+
+        it('when currentState is NOT GENERATE_NEW and ' +
+        '"componentIds" is NOT empty', () => {
+          // LINK_TO_EXISTING state
+          viewModel.attr('currentState', 2);
+          viewModel.attr('componentIds', [1, 2, 3]);
+          viewModel.generateNewTicket();
+
+          expect(viewModel.loadComponentIds).not.toHaveBeenCalled();
+        });
       });
 
       it('should do nothing if view is already in GENERATE_NEW state', () => {
@@ -196,6 +234,47 @@ describe('modal-issue-tracker-fields component', () => {
 
         viewModel.statusChanged();
         expect(viewModel.linkToExistingTicket).toHaveBeenCalled();
+      });
+    });
+
+    describe('loadComponentIds() method', () => {
+      let method;
+      let loadComponentIdsResult = [1, 3, 5, 7];
+      beforeEach(() => {
+        spyOn(issueTrackerUtils, 'loadComponentIds')
+          .and.returnValue(Promise.resolve(loadComponentIdsResult));
+
+        viewModel.attr('componentIds', []);
+        method = viewModel.loadComponentIds.bind(viewModel);
+      });
+
+      describe('when "loadComponentIds" util has NOT returned result yet',
+        () => {
+          it('should call "loadComponentIds" util', () => {
+            method();
+            expect(issueTrackerUtils.loadComponentIds).toHaveBeenCalled();
+          });
+
+          it('should set "componentIdsLoading" to TRUE', () => {
+            viewModel.attr('componentIdsLoading', false);
+            method();
+            expect(viewModel.attr('componentIdsLoading')).toBe(true);
+          });
+        }
+      );
+
+      describe('when "loadComponentIds" util has returned result', () => {
+        it('should set "componentIds" attr', async () => {
+          await method();
+          expect(viewModel.attr('componentIds').serialize())
+            .toEqual([1, 3, 5, 7]);
+        });
+
+        it('should set "componentIdsLoading" to FALSE', async () => {
+          viewModel.attr('componentIdsLoading', true);
+          await method();
+          expect(viewModel.attr('componentIdsLoading')).toBe(false);
+        });
       });
     });
   });

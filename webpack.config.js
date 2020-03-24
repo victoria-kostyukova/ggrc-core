@@ -136,6 +136,7 @@ module.exports = function (env) {
         RELEASE_NOTES_DATE: JSON.stringify(
           getReleaseNotesDate(`${contextDir}/js/components/release-notes-list/release-notes.md`)
         ),
+        CREATE_ISSUE_TICKET_LINK: JSON.stringify(ENV.CREATE_ISSUE_TICKET_LINK),
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({

@@ -42,7 +42,7 @@ class TestTicketTrackerExport(TestCase):
       self.api.modify_object(audit, {
           "issue_tracker": {
               "enabled": True,
-              "component_id": "11111",
+              "component_id": "188208",
               "hotlist_id": "222222",
               "issue_type": "PROCESS",
               "issue_priority": "P2",
@@ -53,7 +53,7 @@ class TestTicketTrackerExport(TestCase):
       self.api.modify_object(asmt, {
           "issue_tracker": {
               "enabled": True,
-              "component_id": "11111",
+              "component_id": "188208",
               "hotlist_id": "222222",
               "issue_type": "PROCESS",
               "issue_priority": "P2",
@@ -64,7 +64,7 @@ class TestTicketTrackerExport(TestCase):
       self.api.modify_object(asmt, {
           "issue_tracker": {
               "enabled": True,
-              "component_id": "11111",
+              "component_id": "188208",
               "hotlist_id": "222222",
               "issue_type": "PROCESS",
               "issue_priority": "P2",
@@ -114,7 +114,7 @@ class TestTicketTrackerExport(TestCase):
     with factories.single_commit():
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=factory(),
-          component_id=12345,
+          component_id="188208",
           hotlist_id=54321,
           issue_type="PROCESS",
           issue_severity="S4",
@@ -129,7 +129,7 @@ class TestTicketTrackerExport(TestCase):
     self.assertEqual(response.status_code, 200)
 
     self.assertIn("Component ID", response.data)
-    self.assertIn("12345", response.data)
+    self.assertIn("188208", response.data)
     self.assertIn("Hotlist ID", response.data)
     self.assertIn("54321", response.data)
     self.assertIn("Issue Type", response.data)

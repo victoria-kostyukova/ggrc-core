@@ -17,6 +17,8 @@ export default canComponent.extend({
     filteredOptions: [],
     isOpen: false,
     canOpen: false,
+    isDisabled: false,
+    inputPlaceholder: '',
     define: {
       isEmpty: {
         type: 'boolean',
@@ -36,6 +38,10 @@ export default canComponent.extend({
       this.attr('filteredOptions', filteredOptions);
     },
     openDropdown() {
+      if (this.attr('isDisabled')) {
+        return;
+      }
+
       this.attr('canOpen', true);
     },
     closeDropdown() {

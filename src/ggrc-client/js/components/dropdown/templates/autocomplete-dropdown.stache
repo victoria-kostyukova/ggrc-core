@@ -4,7 +4,7 @@
 }}
 
 <div class="autocomplete-dropdown flex-box flex-col">
-  <div class="autocomplete-dropdown__input-container" 
+  <div class="{{#if isDisabled}}disabled-block {{/if}}autocomplete-dropdown__input-container" 
        on:el:click="openDropdown()">
     <input type="text" 
            readonly="readonly"
@@ -19,7 +19,7 @@
          on:el:click="onBodyClick(scope.event)">
       <input class="autocomplete-dropdown__input"
             type="text"
-            placeholder="Lookup attributes..."
+            placeholder="{{inputPlaceholder}}"
             on:el:input="filterOptions($element)"/>
         <ul class="autocomplete-dropdown__list">
           {{^if isEmpty}}

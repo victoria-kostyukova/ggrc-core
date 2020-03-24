@@ -64,8 +64,8 @@ class TestBulkIssuesSync(TestCase):
           issue_tracked_obj=audit,
           issue_id=issue_id,
           issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
-          component_id=12345,
-          hotlist_id=12345,
+          component_id=188208,
+          hotlist_id=188208,
           issue_priority="P2",
           issue_severity="S2",
       )
@@ -352,7 +352,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
             issue_tracked_obj=issue,
             issue_id=None,
             title='',
-            component_id=12345,
+            component_id=188208,
             hotlist_id=54321,
             issue_priority="P2",
             issue_severity="S2",
@@ -374,7 +374,7 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       parent_obj = issue.Issue_issue_tracked
       self.assertEqual(issue.enabled, 1)
       self.assertEqual(issue.title, parent_obj.title)
-      self.assertEqual(issue.component_id, "12345")
+      self.assertEqual(issue.component_id, "188208")
       self.assertEqual(issue.hotlist_id, "54321")
       self.assertEqual(issue.issue_priority, "P2")
       self.assertEqual(issue.issue_severity, "S2")
@@ -556,7 +556,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     """Test generation of issues if '{}' error raised."""
     audit_id, assessment_ids = self.setup_assessments(3)
 
-    error = error.format("12345")
+    error = error.format("188208")
     with mock.patch("ggrc.notifications.common.send_email"):
       with mock.patch(
           "ggrc.integrations.issues.Client.create_issue",
@@ -588,7 +588,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
           issue_id=None,
-          component_id=12345,
+          component_id=188208,
           hotlist_id=54321,
           issue_priority="P2",
           issue_severity="S2",
@@ -600,7 +600,7 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=assess2,
           issue_id=None,
-          component_id=9999,
+          component_id=398781,
           hotlist_id=7777,
           issue_priority="P1",
           issue_severity="S1",
@@ -621,13 +621,13 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
             assess1.id
         )
     )
-    self.assertEqual("12345", assess1.issuetracker_issue.component_id)
+    self.assertEqual("188208", assess1.issuetracker_issue.component_id)
     self.assertEqual("54321", assess1.issuetracker_issue.hotlist_id)
     self.assertEqual("P2", assess1.issuetracker_issue.issue_priority)
     self.assertEqual("S2", assess1.issuetracker_issue.issue_severity)
     assess2 = all_models.Assessment.query.get(assess2_id)
 
-    self.assertEqual("9999", assess2.issuetracker_issue.component_id)
+    self.assertEqual("398781", assess2.issuetracker_issue.component_id)
     self.assertEqual("7777", assess2.issuetracker_issue.hotlist_id)
     self.assertEqual("P1", assess2.issuetracker_issue.issue_priority)
     self.assertEqual("S1", assess2.issuetracker_issue.issue_severity)
@@ -818,7 +818,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     for issue in issues:
       issue.enabled = 1
       issue.title = ""
-      issue.component_id = "1"
+      issue.component_id = "188208"
       issue.hotlist_id = "1"
       issue.issue_type = constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
       issue.issue_priority = "P2"
@@ -848,7 +848,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
             issue_tracked_obj=issue,
             issue_id=self.issue_id,
             title="",
-            component_id=12345,
+            component_id=188208,
             hotlist_id=54321,
             issue_priority="P2",
             issue_severity="S2",
@@ -931,14 +931,14 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
           enabled=True,
           issue_tracked_obj=obj,
           title='title',
-          component_id=111,
+          component_id=188208,
           hotlist_id=222,
           issue_type="PROCESS",
           issue_priority="P2",
           issue_severity="S2",
       )
     expected_result = {
-        'component_id': 111,
+        'component_id': 188208,
         'severity': u'S2',
         'title': u'title',
         'hotlist_ids': [222],
