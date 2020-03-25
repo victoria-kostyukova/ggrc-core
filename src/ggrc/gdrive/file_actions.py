@@ -123,6 +123,7 @@ def check_file_size(string_file):
   file_size = string_file.tell()
   if file_size > MAX_FILE_SIZE:
     raise exceptions.FileTooLargeExeption
+  string_file.seek(0)
 
 
 def copy_file_request(drive_service, file_id, body):
