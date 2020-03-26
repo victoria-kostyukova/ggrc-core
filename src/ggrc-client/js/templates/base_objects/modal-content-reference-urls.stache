@@ -20,12 +20,20 @@
         isDisabled:from="isLoading"
         on:createUrl="markDocumentForAddition(scope.event.payload)"
         on:removeUrl="markDocumentForDeletion(scope.event.payload)">
-        <label>
-          Reference URL
-          <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
-          <spinner-component toggle:from="isDisabled"></spinner-component>
-        </label>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <div class="attachment-block__header">
+          <label>
+            Reference URL
+            <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
+            <spinner-component toggle:from="isDisabled"></spinner-component>
+          </label>
+          <a 
+            href="javascript://"
+            class="attachment-block__hide field-hide"
+            tabindex="-1"
+          >
+            hide
+          </a>
+        </div>
       </related-urls>
     </related-documents>
   </deferred-mapper>
