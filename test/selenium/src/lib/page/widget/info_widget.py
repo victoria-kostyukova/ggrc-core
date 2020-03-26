@@ -383,14 +383,24 @@ class Programs(InfoWidget, page_mixins.WithProposals):
   CHILD_PROGRAMS_TAB_NAME = 'Programs (Child)'
   PARENT_PROGRAMS_TAB_NAME = 'Programs (Parent)'
 
-  def __init__(self, driver=None):
+  def __init__(self, driver=None, root_elem=None):
     super(Programs, self).__init__(driver)
+    self.root_element = root_elem if root_elem else self._browser
     self.manager, self.manager_entered = (
         self.get_header_and_value_txt_from_people_scopes(
             self._elements.PROGRAM_MANAGERS.upper()))
     self._extend_list_all_scopes(
         self.manager, self.manager_entered)
     self.reference_urls = self._related_urls(self._reference_url_label)
+
+  @property
+  def _root(self):
+    """Returns root element (including title, 3bbs)."""
+    if self.is_info_page:
+      return self._browser.element(class_name="widget", id="info")
+    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
+      return self.root_element
+    return self._browser.element(class_name="sticky-info-panel")
 
   @property
   def mega_program_icon(self):
@@ -953,18 +963,8 @@ class Risks(page_mixins.WithDisabledProposals,
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 
-  def __init__(self, driver, root_elem=None):
+  def __init__(self, driver):
     super(Risks, self).__init__(driver)
-    self.root_element = root_elem if root_elem else self._browser
-
-  @property
-  def _root(self):
-    """Returns root element (including title, 3bbs)."""
-    if self.is_info_page:
-      return self._browser.element(class_name="widget", id="info")
-    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
-      return self.root_element
-    return self._browser.element(class_name="sticky-info-panel")
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""

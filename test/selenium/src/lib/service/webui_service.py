@@ -108,7 +108,7 @@ class BaseWebUiService(base.WithBrowser):
     """Builds obj from opened page."""
     info_page = (
         self.info_widget_cls(self._driver, root_elem) if
-        self.info_widget_cls.__name__ == objects.RISKS.title() else
+        self.info_widget_cls.__name__ == objects.PROGRAMS.title() else
         self.info_widget_cls(self._driver))
     scope = info_page.get_info_widget_obj_scope()
     return self._create_list_objs(

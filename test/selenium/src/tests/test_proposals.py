@@ -62,15 +62,6 @@ class TestProposalsDestructive(base.Test):
                               "proposal_from_gr": proposal_from_gr}
     return self.__class__._data
 
-  @classmethod
-  def check_ggrc_6592_7562(cls, login_user, condition):
-    """Check if it is xfail because of GGRC-6591(about proposal_creator) or
-    GGRC-7562(about obj_creator) or fail."""
-    if login_user in ["proposal_creator", "obj_creator"]:
-      base.Test().check_xfail_or_fail(
-          condition, "Issue GGRC-6592\n",
-          "There are no proposals in the list from ui.")
-
   @pytest.mark.parametrize(
       "login_user",
       ["obj_creator", "global_reader", "proposal_creator"]
@@ -85,7 +76,6 @@ class TestProposalsDestructive(base.Test):
         test_data["proposal_to_apply"]]
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(login_user, actual_proposals == exp_proposals)
     assert exp_proposals == actual_proposals
 
   @pytest.fixture()
@@ -93,10 +83,6 @@ class TestProposalsDestructive(base.Test):
     """Apply proposal."""
     if test_data["proposal_to_apply"].status == object_states.PROPOSED:
       users.set_current_user(test_data["obj_creator"])
-      self.check_ggrc_6592_7562(
-          "obj_creator",
-          test_data["proposal_to_apply"] in
-          proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
       proposal_ui_facade.apply_proposal(
           selenium, test_data["obj"], test_data["proposal_to_apply"],
           [test_data["proposal_from_gr"], test_data["proposal_to_decline"]])
@@ -106,10 +92,6 @@ class TestProposalsDestructive(base.Test):
     """Decline proposal."""
     if test_data["proposal_to_decline"].status == object_states.PROPOSED:
       users.set_current_user(test_data["obj_creator"])
-      self.check_ggrc_6592_7562(
-          "obj_creator",
-          test_data["proposal_to_decline"] in
-          proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
       proposal_ui_facade.decline_proposal(
           selenium, test_data["obj"], test_data["proposal_to_decline"])
 
@@ -127,9 +109,6 @@ class TestProposalsDestructive(base.Test):
     exp_proposals = [
         test_data["proposal_from_gr"], test_data["proposal_to_decline"],
         test_data["proposal_to_apply"]]
-    actual_proposals = proposal_ui_facade.get_related_proposals(
-        selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(login_user, actual_proposals == exp_proposals)
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], exp_proposals, apply_btns_exist)
 
@@ -152,10 +131,6 @@ class TestProposalsDestructive(base.Test):
   ):
     """Check if proposal comparison window has correct info."""
     users.set_current_user(test_data["obj_creator"])
-    self.check_ggrc_6592_7562(
-        "obj_creator",
-        test_data["proposal_to_apply"] in
-        proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
     proposal_ui_facade.assert_proposal_comparison_window_has_correct_info(
         selenium, test_data["obj"], test_data["proposal_to_apply"])
 
@@ -170,8 +145,6 @@ class TestProposalsDestructive(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(
-        login_user, test_data["proposal_to_apply"] in actual_proposals)
     assert test_data["proposal_to_apply"] in actual_proposals
 
   def test_check_proposals_apply_btn_after_applying(
@@ -179,12 +152,6 @@ class TestProposalsDestructive(base.Test):
   ):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["obj_creator"])
-    self.check_ggrc_6592_7562(
-        "obj_creator",
-        (proposal_ui_facade.get_related_proposals(
-            selenium, test_data["obj"]) ==
-         [test_data["proposal_from_gr"], test_data["proposal_to_decline"],
-          test_data["proposal_to_apply"]]))
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], [test_data["proposal_to_apply"]],
         apply_btn_exists=False)
@@ -200,9 +167,6 @@ class TestProposalsDestructive(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(
-        login_user,
-        test_data["proposal_to_decline"] in actual_proposals)
     assert test_data["proposal_to_decline"] in actual_proposals
 
   def test_check_proposals_apply_btn_after_declining(
@@ -210,10 +174,6 @@ class TestProposalsDestructive(base.Test):
   ):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["obj_creator"])
-    self.check_ggrc_6592_7562(
-        "obj_creator",
-        test_data["proposal_to_decline"] in
-        proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], [test_data["proposal_to_decline"]],
         True)
