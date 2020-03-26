@@ -6,6 +6,7 @@
 from StringIO import StringIO
 from logging import getLogger
 from os import path
+from os import SEEK_END
 
 from apiclient import discovery
 from apiclient import http
@@ -29,6 +30,8 @@ API_SERVICE_NAME = 'drive'
 API_VERSION = 'v3'
 
 ALLOWED_FILENAME_CHARS = "_ ()-'"
+
+MAX_FILE_SIZE = 550000  # in bytes
 
 logger = getLogger(__name__)
 
@@ -93,7 +96,9 @@ def get_gdrive_file_data(file_data):
     else:
       file_data = drive_service.files().export_media(
           fileId=file_data['id'], mimeType='text/csv').execute()
-    csv_data = read_csv_file(StringIO(file_data))
+    string_file = StringIO(file_data)
+    check_file_size(string_file)
+    csv_data = read_csv_file(string_file)
   except AttributeError:
     # when file_data has no splitlines() method
     raise BadRequest(errors.WRONG_FILE_FORMAT)
@@ -101,6 +106,8 @@ def get_gdrive_file_data(file_data):
     handle_token_error('Try to reload /import page')
   except HttpError as ex:
     handle_http_error(ex)
+  except exceptions.FileTooLargeExeption as ex:
+    raise BadRequest(ex.message)
   except exceptions.WrongDelimiterError as ex:
     logger.error(ex.message)
     raise BadRequest(errors.WRONG_DELIMITER_IN_CSV)
@@ -108,6 +115,15 @@ def get_gdrive_file_data(file_data):
     logger.error(ex.message)
     raise InternalServerError(errors.INTERNAL_SERVER_ERROR)
   return csv_data, file_data, file_meta.get('name')
+
+
+def check_file_size(string_file):
+  """Check that size of string_file object is lower than MAX_FILE_SIZE"""
+  string_file.seek(0, SEEK_END)
+  file_size = string_file.tell()
+  if file_size > MAX_FILE_SIZE:
+    raise exceptions.FileTooLargeExeption
+  string_file.seek(0)
 
 
 def copy_file_request(drive_service, file_id, body):
