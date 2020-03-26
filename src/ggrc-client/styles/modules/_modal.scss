@@ -403,6 +403,17 @@
       }
     }
 
+    .attachment-block {
+      &__header {
+        display: flex;
+      }
+
+      &__hide {
+        margin-top: 0;
+        margin-left: 5px;
+      }
+    }
+
     .custom-roles-modal {
       display: block;
       outline: none;

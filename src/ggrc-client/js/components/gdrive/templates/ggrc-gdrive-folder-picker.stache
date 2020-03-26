@@ -3,13 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div>
+<div class="attachment-block__header">
   {{#unless hideLabel}}
     <label class="multi-type-label">
       Attachment
       <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.constructor.title_singular}} attachments go here."></i>
     </label>
-    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+    <a
+      href="javascript://"
+      class="attachment-block__hide field-hide"
+      tabindex="-1"
+    >
+      hide
+    </a>
   {{/unless}}
 </div>
 <div class="mapped-folder">

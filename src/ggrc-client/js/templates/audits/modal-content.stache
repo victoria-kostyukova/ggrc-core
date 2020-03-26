@@ -100,7 +100,7 @@
 
           <div class="span6 hide-wrap hidable" data-hide-title="Audit Firm">
             <div class="row-fluid inner-hide">
-              <div class="span12 hidable" >
+              <div class="span7 hidable" >
                 <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
                   <object-loader path:from="instance.audit_firm">
                     <label>
@@ -113,12 +113,13 @@
                       pathToField:from="'audit_firm.title'">
                       <input
                         type="text"
-                        class="span8 search-icon"
+                        class="span12 search-icon"
                         name="{{pathToField}}"
                         value="{{loadedObject.title}}"
                         data-lookup="OrgGroup"
                         placeholder="Enter text to search for Audit Firm"
-                        tabindex="12">
+                        tabindex="12"
+                      />
                     </modal-autocomplete>
                   </object-loader>
                   {{#instance.computed_errors.audit_firm}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.audit_firm}}
@@ -199,12 +200,20 @@
                 isDisabled:from="isLoading"
                 on:createUrl="markDocumentForAddition(scope.event.payload)"
                 on:removeUrl="markDocumentForDeletion(scope.event.payload)">
-                <label>
-                  Evidence URL
-                  <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
-                  <spinner-component toggle:from="isDisabled"></spinner-component>
-                </label>
-                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                <div class="attachment-block__header">
+                  <label>
+                    Evidence URL
+                    <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
+                    <spinner-component toggle:from="isDisabled"></spinner-component>
+                  </label>
+                  <a 
+                    href="javascript://"
+                    class="attachment-block__hide field-hide"
+                    tabindex="-1"
+                  >
+                    hide
+                  </a>
+                </div>
               </related-urls>
             </related-documents>
           </deferred-mapper>
