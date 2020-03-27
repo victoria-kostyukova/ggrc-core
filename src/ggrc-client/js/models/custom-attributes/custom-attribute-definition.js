@@ -50,4 +50,17 @@ export default Cacheable.extend({
       value: '*',
     },
   },
+  init() {
+    this._super(...arguments);
+
+    this.bind('created', (event) => {
+      GGRC.custom_attr_defs.push(event.target.serialize());
+    });
+
+    this.bind('destroyed', (event) => {
+      const cads = GGRC.custom_attr_defs;
+      const index = cads.findIndex((cad) => cad.id === event.target.id);
+      cads.splice(index, 1);
+    });
+  },
 });
