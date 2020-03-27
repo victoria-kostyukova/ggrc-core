@@ -55,7 +55,9 @@
           </div>
           <div class="row-fluid wrap-row">
             <div>
-              <custom-roles instance:from="instance"></custom-roles>
+              <custom-roles-wrapper instance:from="instance">
+                <custom-roles instance:from="instance"></custom-roles>
+              </custom-roles-wrapper>
             </div>
           </div>
 

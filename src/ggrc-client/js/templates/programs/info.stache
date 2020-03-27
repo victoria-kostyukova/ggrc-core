@@ -58,13 +58,15 @@
 
                   <div class="row-fluid wrap-row">
                     <div>
-                      <custom-roles readOnly:from="instance.readOnlyProgramRoles"
-                                    includeRoles:from="instance.constructor.programRoles"
-                                    instance:from="instance">
-                      </custom-roles>
-                      <custom-roles excludeRoles:from="instance.constructor.programRoles"
-                                    instance:from="instance">
-                      </custom-roles>
+                      <custom-roles-wrapper instance:from="instance">
+                        <custom-roles readOnly:from="instance.readOnlyProgramRoles"
+                                      includeRoles:from="instance.constructor.programRoles"
+                                      instance:from="instance">
+                        </custom-roles>
+                        <custom-roles excludeRoles:from="instance.constructor.programRoles"
+                                      instance:from="instance">
+                        </custom-roles>
+                      </custom-roles-wrapper>
                     </div>
                   </div>
                   {{> base_objects/reference-urls.stache}}

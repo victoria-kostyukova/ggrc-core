@@ -4,10 +4,12 @@
 }}
 
 {{#instance}}
-<div class="row-fluid wrap-row">
-  <div>
-    <custom-roles instance:from="{.}"
-      orderOfRoles:from="instance.constructor.orderOfRoles"></custom-roles>
+  <div class="row-fluid wrap-row">
+    <div>
+      <custom-roles-wrapper instance:from="{.}">
+        <custom-roles instance:from="instance"
+          orderOfRoles:from="instance.constructor.orderOfRoles" />
+      </custom-roles-wrapper>
+    </div>
   </div>
-</div>
 {{/instance}}

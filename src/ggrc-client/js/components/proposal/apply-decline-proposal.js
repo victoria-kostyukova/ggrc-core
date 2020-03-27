@@ -11,6 +11,7 @@ import {REFRESH_RELATED} from '../../events/event-types';
 import {formatDate} from '../../plugins/utils/date-utils';
 import Proposal from '../../models/service-models/proposal';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
+import {updatePersonWidget} from '../../plugins/utils/widgets-utils';
 
 export default canComponent.extend({
   tag: 'apply-decline-proposal',
@@ -87,11 +88,16 @@ export default canComponent.extend({
     },
     refreshPage() {
       const instance = this.attr('instance');
+      const oldPersonsCount = instance.attr('access_control_list.length');
       instance.refresh().then(() => {
         instance.dispatch({
           ...REFRESH_RELATED,
           model: 'Proposal',
         });
+        const newPersonsCount = instance.attr('access_control_list.length');
+        if (oldPersonsCount !== newPersonsCount) {
+          updatePersonWidget();
+        }
       });
     },
   }),

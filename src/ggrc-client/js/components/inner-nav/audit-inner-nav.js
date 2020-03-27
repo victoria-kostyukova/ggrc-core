@@ -11,6 +11,7 @@ import './inner-nav-collapse';
 import '../add-tab-button/add-tab-button';
 import InnerNavVM from './inner-nav-vm';
 import {isDashboardEnabled} from '../../plugins/utils/dashboards-utils';
+import {updatePersonWidget} from '../../plugins/utils/widgets-utils';
 
 export default canComponent.extend({
   tag: 'audit-inner-nav',
@@ -37,6 +38,9 @@ export default canComponent.extend({
     },
     '{counts} change'(counts, event, name, action, count) {
       this.viewModel.setWidgetCount(name, count);
+      if (name === 'Assessment') {
+        updatePersonWidget();
+      }
     },
   },
 });
