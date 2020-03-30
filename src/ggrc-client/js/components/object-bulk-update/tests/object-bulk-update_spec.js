@@ -5,6 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
+import canDefineList from 'can-define/list/list';
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
@@ -59,76 +60,64 @@ describe('object-bulk-update component', () => {
     });
   });
 
-  describe('closeModal event', function () {
-    let event;
-    let element;
+  describe('methods of extended viewModel', () => {
+    let viewModel;
 
-    beforeAll(function () {
-      let scope;
-      element = {
-        trigger: jasmine.createSpy(),
-      };
-      element.find = jasmine.createSpy().and.returnValue(element);
-      scope = {
-        element: element,
-      };
-
-      event = events.closeModal.bind(scope);
+    beforeEach(() => {
+      spyOn(stateUtils, 'getBulkStatesForModel')
+        .and.returnValue([]);
+      const ViewModel = Component.prototype.viewModel({}, new canMap());
+      ViewModel.seal = false;
+      viewModel = new ViewModel();
     });
 
-    it('closes modal if element defined', function () {
-      event();
+    describe('closeModal() method', () => {
+      it('closes modal if element defined', () => {
+        const fakeCloseBtn = {
+          trigger: jasmine.createSpy(),
+        };
 
-      expect(element.trigger).toHaveBeenCalledWith('click');
-    });
-  });
+        viewModel.element = {
+          find: () => fakeCloseBtn,
+        };
 
-  describe('.btn-cancel click event', function () {
-    it('closes modal', function () {
-      let context = {
-        closeModal: jasmine.createSpy(),
-      };
-      let event = events['.btn-cancel click'].bind(context);
+        viewModel.closeModal();
 
-      event();
-
-      expect(context.closeModal).toHaveBeenCalled();
-    });
-  });
-
-  describe('.btn-update click event', function () {
-    let event;
-    let context;
-
-    beforeEach(function () {
-      context = {
-        viewModel: new canMap(),
-      };
-      event = events['.btn-update click'].bind(context);
-
-      spyOn(tracker, 'start').and.returnValue(() => {});
+        expect(fakeCloseBtn.trigger).toHaveBeenCalledWith('click');
+      });
     });
 
-    it('invokes update callback', function () {
-      context.viewModel.callback = jasmine.createSpy()
-        .and.returnValue({
-          then() {},
-        });
-      context.viewModel.selected = [1];
-      context.viewModel.targetState = 'In Progress';
+    describe('performUpdate() method', () => {
+      beforeEach(() => {
+        spyOn(tracker, 'start')
+          .and.returnValue(() => {});
+        viewModel.callback = jasmine.createSpy()
+          .and.returnValue(Promise.resolve());
+      });
 
-      event();
+      it('calls callback() method', async () => {
+        viewModel.selected = ['selected'];
+        viewModel.targetState = ['fake_state'];
 
-      expect(context.viewModel.callback)
-        .toHaveBeenCalled();
+        await viewModel.performUpdate();
+
+        expect(viewModel.callback).toHaveBeenCalledWith(
+          jasmine.anything(), {
+            selected: new canDefineList(['selected']),
+            options: {
+              state: new canDefineList(['fake_state']),
+            },
+          },
+        );
+      });
     });
   });
 
-  describe('"inserted" event handler', function () {
+  describe('"inserted" event handler', () => {
     let event;
     let context;
 
-    beforeEach(function () {
+    beforeEach(() => {
       context = {
         viewModel: new canMap({
           onSubmit: jasmine.createSpy(),
@@ -137,7 +126,7 @@ describe('object-bulk-update component', () => {
       event = events.inserted.bind(context);
     });
 
-    it('calls onSubmit()', function () {
+    it('calls onSubmit()', () => {
       event();
 
       expect(context.viewModel.onSubmit).toHaveBeenCalled();

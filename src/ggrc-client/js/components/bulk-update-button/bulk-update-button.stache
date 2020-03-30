@@ -3,7 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<a class="bulk-update-button">
+<a
+  class="bulk-update-button"
+  on:el:click="performBulkUpdate(scope.event)">
   <i class="fa fa-fw fa-refresh"></i>
   Bulk Update
 </a>

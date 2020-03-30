@@ -4,53 +4,34 @@
 */
 
 import loMap from 'lodash/map';
-import canMap from 'can-map';
 import Component from './assessment-template-clone';
+import {getComponentVM} from '../../../js_specs/spec-helpers';
 import * as AjaxUtils from '../../plugins/ajax-extensions';
 
 describe('assessment-template-clone component', () => {
   let events;
+  let viewModel;
 
   beforeAll(() => {
     events = Component.prototype.events;
   });
 
+  beforeEach(() => {
+    viewModel = getComponentVM(Component);
+  });
+
   describe('events', () => {
     let handler;
-    let vm;
 
     describe('inserted handler', () => {
       beforeEach(() => {
-        vm = new canMap({
-          onSubmit: jasmine.createSpy(),
-        });
-        handler = events.inserted.bind({viewModel: vm});
+        spyOn(viewModel, 'onSubmit');
+        handler = events.inserted.bind({viewModel});
       });
 
       it('calls onSubmit()', () => {
         handler();
-        expect(vm.onSubmit).toHaveBeenCalled();
-      });
-    });
-
-    describe('closeModal handler', () => {
-      let el;
-      let modalDismiss;
-
-      beforeEach(() => {
-        modalDismiss = {
-          trigger: jasmine.createSpy(),
-        };
-        el = {
-          find: () => modalDismiss,
-        };
-
-        handler = events.closeModal.bind({element: el});
-      });
-
-      it('triggers click event on element with "modal-dismiss" class', () => {
-        handler();
-        expect(modalDismiss.trigger).toHaveBeenCalledWith('click');
+        expect(viewModel.onSubmit).toHaveBeenCalled();
       });
     });
 
@@ -65,11 +46,12 @@ describe('assessment-template-clone component', () => {
         $('body').append($target);
 
         spy = spyOn($.fn, 'data');
+        spyOn(viewModel, 'closeModal');
         that = {
           closeModal: jasmine.createSpy(),
+          viewModel,
         };
         ev = {target: $target};
-
         handler = events['{window} preload'].bind(that);
       });
 
@@ -77,149 +59,122 @@ describe('assessment-template-clone component', () => {
         $target.remove();
       });
 
-      it('calls closeModal handler if modal is in cloner', () => {
+      it('calls closeModal() if modal is in cloner', () => {
         spy.and.returnValue({
           options: {
             inCloner: true,
           },
         });
         handler({}, ev);
-        expect(that.closeModal).toHaveBeenCalled();
+        expect(viewModel.closeModal).toHaveBeenCalled();
       });
 
-      it('does not call closeModal handler if modal is not in cloner', () => {
+      it('does not call closeModal() if modal is not in cloner', () => {
         spy.and.returnValue({
           options: {},
         });
         handler({}, ev);
-        expect(that.closeModal).not.toHaveBeenCalled();
+        expect(viewModel.closeModal).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('cloneObjects() method', () => {
+    it('returns response of post request for clone', () => {
+      viewModel.selected = [{id: 1}, {id: 2}, {id: 3}];
+      viewModel.join_object_id = 321;
+
+      const expectedArguments = [{
+        sourceObjectIds: loMap(viewModel.selected, (item) => item.id),
+        destination: {
+          type: 'Audit',
+          id: viewModel.join_object_id,
+        },
+      }];
+
+      spyOn(AjaxUtils, 'ggrcPost').and.returnValue('expectedResult');
+
+      const result = viewModel.cloneObjects();
+
+      expect(result).toBe('expectedResult');
+      expect(AjaxUtils.ggrcPost).toHaveBeenCalledWith(
+        '/api/assessment_template/clone',
+        expectedArguments
+      );
+    });
+  });
+
+  describe('cloneAsmtTempalte() method', () => {
+    let dfdClone;
+
+    beforeEach(() => {
+      dfdClone = $.Deferred();
+      spyOn(viewModel, 'cloneObjects').and.returnValue(dfdClone);
+    });
+
+    it('sets true to is_saving field', () => {
+      viewModel.is_saving = false;
+
+      viewModel.cloneAsmtTempalte();
+
+      expect(viewModel.is_saving).toBe(true);
+    });
+
+    describe('after cloneObjects success', () => {
+      beforeEach(() => {
+        dfdClone.resolve();
+        spyOn(viewModel, 'dispatch');
+        spyOn(viewModel, 'closeModal');
+      });
+
+      it('sets false to is_saving field', async () => {
+        viewModel.is_saving = true;
+
+        await viewModel.cloneAsmtTempalte();
+
+        expect(viewModel.is_saving).toBe(false);
+      });
+
+      it('calls dispatch "refreshTreeView" event', async () => {
+        await viewModel.cloneAsmtTempalte();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith('refreshTreeView');
+      });
+
+      it('calls closeModal()', async () => {
+        await viewModel.cloneAsmtTempalte();
+
+        expect(viewModel.closeModal).toHaveBeenCalled();
       });
     });
 
-    describe('".btn-cancel click" handler', () => {
-      let that;
-
+    describe('if cloneObjects was failed', () => {
       beforeEach(() => {
-        that = {
-          closeModal: jasmine.createSpy(),
-        };
-
-        handler = events['.btn-cancel click'].bind(that);
+        dfdClone.reject();
       });
 
-      it('calls closeModal()', () => {
-        handler();
-        expect(that.closeModal).toHaveBeenCalled();
+      it('sets false to is_saving field', async () => {
+        viewModel.is_saving = true;
+
+        await viewModel.cloneAsmtTempalte();
+
+        expect(viewModel.is_saving).toBe(false);
       });
     });
+  });
 
-    describe('".btn-clone click" handler', () => {
-      let that;
-      let vm;
-      let dfd;
+  describe('closeModal() method', () => {
+    it('triggers click event on modal-dismiss button', () => {
+      const targetElem = {
+        trigger: jasmine.createSpy(),
+      };
+      viewModel.element = {
+        find: () => targetElem,
+      };
 
-      beforeEach(() => {
-        vm = new canMap();
-        spyOn(vm, 'dispatch');
-        dfd = new $.Deferred();
-        that = {
-          viewModel: vm,
-          closeModal: jasmine.createSpy(),
-          cloneObjects: jasmine.createSpy().and.returnValue(dfd),
-        };
+      viewModel.closeModal();
 
-        handler = events['.btn-clone click'].bind(that);
-      });
-
-      it('sets true to viewModel.is_saving attribute', () => {
-        vm.is_saving = false;
-        handler();
-        expect(vm.is_saving).toBe(true);
-      });
-
-      it('calls cloneObjects()', () => {
-        handler();
-        expect(that.cloneObjects).toHaveBeenCalled();
-      });
-
-      describe('in case of success', () => {
-        beforeEach(() => {
-          dfd.resolve();
-        });
-
-        it('sets false to viewModel.is_saving attribute', (done) => {
-          that.viewModel.is_saving = true;
-          handler();
-
-          dfd.done(() => {
-            expect(that.viewModel.is_saving).toBe(false);
-            done();
-          });
-        });
-
-        it('calls closeModal()', (done) => {
-          handler();
-
-          dfd.done(() => {
-            expect(that.closeModal).toHaveBeenCalled();
-            done();
-          });
-        });
-
-        it('dispatches "refreshTreeView" event', (done) => {
-          handler();
-
-          dfd.done(() => {
-            expect(vm.dispatch).toHaveBeenCalledWith('refreshTreeView');
-            done();
-          });
-        });
-      });
-
-      describe('in case of fail', () => {
-        beforeEach(() => {
-          dfd.reject();
-        });
-
-        it('sets false to viewModel.is_saving attribute', (done) => {
-          that.viewModel.is_saving = true;
-          handler();
-          dfd.fail(() => {
-            expect(that.viewModel.is_saving).toBe(false);
-            done();
-          });
-        });
-      });
-    });
-
-    describe('cloneObjects handler', () => {
-      let vm;
-      let expectedResult;
-
-      beforeEach(() => {
-        vm = new canMap({
-          selected: [{id: 1}, {id: 2}, {id: 3}],
-          join_object_id: 321,
-        });
-        expectedResult = 'mockDfd';
-        spyOn(AjaxUtils, 'ggrcPost').and.returnValue(expectedResult);
-        handler = events.cloneObjects.bind({viewModel: vm});
-      });
-
-      it('returns response of post request for clone', () => {
-        let expectedArguments = [{
-          sourceObjectIds: loMap(vm.selected, (item) => item.id),
-          destination: {
-            type: 'Audit',
-            id: vm.join_object_id,
-          },
-        }];
-        expect(handler()).toBe(expectedResult);
-        expect(AjaxUtils.ggrcPost).toHaveBeenCalledWith(
-          '/api/assessment_template/clone',
-          expectedArguments
-        );
-      });
+      expect(targetElem.trigger).toHaveBeenCalledWith('click');
     });
   });
 });

@@ -76,33 +76,33 @@ export default canComponent.extend({
       callback: {
         value: () => parentViewModel.attr('callback'),
       },
+      element: {
+        value: null,
+      },
+      closeModal() {
+        if (this.element) {
+          this.element.find('.modal-dismiss').trigger('click');
+        }
+      },
+      performUpdate() {
+        const stopFn = tracker.start(
+          this.type,
+          tracker.USER_JOURNEY_KEYS.LOADING,
+          tracker.USER_ACTIONS.CYCLE_TASK.BULK_UPDATE);
+
+        this.callback(this, {
+          selected: this.selected,
+          options: {
+            state: this.targetState,
+          },
+        }).then(stopFn, stopFn.bind(null, true));
+      },
     });
   },
   events: {
     inserted() {
+      this.viewModel.element = this.element;
       this.viewModel.onSubmit();
-    },
-    closeModal() {
-      if (this.element) {
-        this.element.find('.modal-dismiss').trigger('click');
-      }
-    },
-    '.btn-cancel click'() {
-      this.closeModal();
-    },
-    '.btn-update click'() {
-      let callback = this.viewModel.callback;
-      const stopFn = tracker.start(
-        this.viewModel.type,
-        tracker.USER_JOURNEY_KEYS.LOADING,
-        tracker.USER_ACTIONS.CYCLE_TASK.BULK_UPDATE);
-
-      callback(this, {
-        selected: this.viewModel.selected,
-        options: {
-          state: this.viewModel.targetState,
-        },
-      }).then(stopFn, stopFn.bind(null, true));
     },
   },
 });

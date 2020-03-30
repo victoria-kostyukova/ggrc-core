@@ -5,13 +5,12 @@
 
 import canMap from 'can-map';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
-import RefreshQueue from '../../../models/refresh-queue';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Component from '../object-mapper';
-import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {DEFERRED_MAP_OBJECTS, UNMAP_DESTROYED_OBJECT} from '../../../events/event-types';
 import * as Mappings from '../../../models/mappers/mappings';
+import * as MegaObjectUtils from '../../../plugins/utils/mega-object-utils';
 
 describe('object-mapper component', () => {
   let events;
@@ -218,58 +217,51 @@ describe('object-mapper component', () => {
   });
 
   describe('map() method', () => {
-    let spyObj;
-
-    beforeEach(() => {
-      handler = events['map'];
-      spyObj = jasmine.createSpy();
-    });
-
     it('calls mapObjects to map results', () => {
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-      }, []);
-      expect(spyObj).toHaveBeenCalledWith([]);
+      spyOn(viewModel, 'mapObjects');
+      viewModel.deferred = null;
+
+      viewModel.map('objects', null);
+
+      expect(viewModel.mapObjects).toHaveBeenCalledWith('objects');
     });
 
     it('calls deferredSave to map results and mapper is deferred', () => {
+      spyOn(viewModel, 'deferredSave');
       viewModel.deferred = true;
-      handler.call({
-        viewModel: viewModel,
-        deferredSave: spyObj,
-      }, []);
-      expect(spyObj).toHaveBeenCalledWith([]);
+
+      viewModel.map('objects', null);
+
+      expect(viewModel.deferredSave).toHaveBeenCalledWith('objects');
     });
 
     it('calls performMegaMap to map results for mega-objects ' +
       'if "options" and "options.megaMapping" are truthy values', () => {
-      const objects = jasmine.any(Object);
+      spyOn(viewModel, 'performMegaMap');
       const options = {
         megaMapping: true,
         megaRelation: 'child',
       };
       viewModel.deferred = false;
-      handler.call({
-        viewModel: viewModel,
-        performMegaMap: spyObj,
-      }, objects, options);
-      expect(spyObj).toHaveBeenCalledWith(objects, options.megaRelation);
+
+      viewModel.map('objects', options);
+
+      expect(viewModel.performMegaMap).toHaveBeenCalledWith(
+        'objects',
+        'child',
+      );
     });
   });
 
-  describe('"create-and-map click" event', () => {
-    let element = {};
+  describe('hideObjectMapper() method', () => {
+    it('trigger hideModal event', () => {
+      viewModel.element = {
+        trigger: jasmine.createSpy(),
+      };
 
-    beforeEach(() => {
-      viewModel.assign({});
-      handler = events['create-and-map click'];
-      element.trigger = jasmine.createSpy();
-    });
+      viewModel.hideObjectMapper();
 
-    it('triggers "hideModal" event', () => {
-      handler.call({viewModel: viewModel, element: element});
-      expect(element.trigger).toHaveBeenCalledWith('hideModal');
+      expect(viewModel.element.trigger).toHaveBeenCalledWith('hideModal');
     });
   });
 
@@ -334,189 +326,144 @@ describe('object-mapper component', () => {
   });
 
   describe('"performMegaMap" event', () => {
-    let spyObj;
-
-    beforeEach(() => {
-      handler = events['performMegaMap'];
-      spyObj = jasmine.createSpy();
-    });
-
     it('calls mapObjects to map results for mega-objects', () => {
+      spyOn(viewModel, 'mapObjects');
       const objects = [
         {id: 101},
-        {id: 102},
       ];
-      const relation = 'child';
-      const relationsObj = {
-        '101': relation,
-        '102': relation,
-      };
 
-      handler.call({
-        mapObjects: spyObj,
-      }, objects, relation);
-      expect(spyObj).toHaveBeenCalledWith(objects, true, relationsObj);
-    });
-  });
+      viewModel.performMegaMap(objects, 'child');
 
-  describe('"closeModal" event', () => {
-    let element;
-    let spyObj;
-
-    beforeEach(() => {
-      viewModel.assign({});
-      spyObj = {
-        trigger: () => {},
-      };
-      element = {
-        find: () => {
-          return spyObj;
-        },
-      };
-      spyOn(spyObj, 'trigger');
-      handler = events.closeModal;
-    });
-
-    it('sets false to is_saving', () => {
-      viewModel.is_saving = true;
-      handler.call({
-        element: element,
-        viewModel: viewModel,
-      });
-      expect(viewModel.is_saving).toEqual(false);
-    });
-    it('dismiss the modal', () => {
-      handler.call({
-        element: element,
-        viewModel: viewModel,
-      });
-      expect(spyObj.trigger).toHaveBeenCalledWith('click');
+      expect(viewModel.mapObjects).toHaveBeenCalledWith(
+        [{id: 101}],
+        true,
+        {
+          '101': 'child',
+        }
+      );
     });
   });
 
   describe('"deferredSave" event', () => {
-    let that;
+    let dispatchSpy;
 
     beforeEach(() => {
-      viewModel.assign({
-        deferred_to: {
-          instance: {},
+      dispatchSpy = jasmine.createSpy();
+      viewModel.deferred_to = {
+        instance: {
+          dispatch: dispatchSpy,
         },
-      });
-      that = {
-        viewModel,
-        closeModal: jasmine.createSpy('closeModal'),
       };
       spyOn(Mappings, 'allowedToMap').and.returnValue(false);
-      handler = events.deferredSave.bind(that);
+      spyOn(viewModel, 'closeModal');
     });
 
     it('dispatches DEFERRED_MAP_OBJECTS for source with objects, ' +
     'which are allowed to map', () => {
       const objects = [{type: 'Type1'}];
-      const dispatch = jasmine.createSpy('dispatch');
-      viewModel.deferred_to.instance.dispatch = dispatch;
       Mappings.allowedToMap.and.returnValue(true);
-      handler(objects);
 
-      expect(dispatch).toHaveBeenCalledWith({
+      viewModel.deferredSave(objects);
+
+      expect(dispatchSpy).toHaveBeenCalledWith({
         ...DEFERRED_MAP_OBJECTS,
         objects,
       });
     });
+
     it('calls closeModal', () => {
-      handler([]);
-      expect(that.closeModal).toHaveBeenCalled();
+      viewModel.deferredSave([]);
+
+      expect(viewModel.closeModal).toHaveBeenCalled();
     });
   });
 
-  describe('".modal-footer .btn-map click" handler', () => {
-    let that;
+  describe('performMap() method', () => {
     let event;
-    let element;
-    let instance;
-
     beforeEach(() => {
-      viewModel.assign({
-        type: 'type',
-        object: 'Program',
-        join_object_id: '123',
-        selected: [],
-      });
-      viewModel.deferred = false;
-
-      instance = new canMap({
-        refresh: $.noop,
-      });
-      spyOn(Program, 'findInCacheById')
-        .and.returnValue(instance);
       event = {
-        preventDefault: () => {},
+        preventDefault: jasmine.createSpy(),
+        target: $('<div></div>'),
       };
-      element = $('<div></div>');
-      handler = events['.modal-footer .btn-map click'];
-      that = {
-        viewModel: viewModel,
-        deferredSave: jasmine.createSpy().and.returnValue('deferredSave'),
-        proceedWithRegularMapping: events.proceedWithRegularMapping,
-        proceedWithMegaMapping: events.proceedWithMegaMapping,
-      };
-      spyOn(RefreshQueue.prototype, 'enqueue')
-        .and.returnValue({
-          trigger: jasmine.createSpy()
-            .and.returnValue($.Deferred().resolve()),
-        });
-      spyOn($.prototype, 'trigger');
     });
 
-    it('does nothing if element has class "disabled"', () => {
-      let result;
-      element.addClass('disabled');
-      result = handler.call(that, element, event);
-      expect(result).toEqual(undefined);
+    it('calls preventDefault() for event', () => {
+      viewModel.is_saving = true;
+
+      viewModel.performMap(event);
+
+      expect(event.preventDefault).toHaveBeenCalled();
     });
 
-    it('calls deferredSave if it is deferred', () => {
-      let result;
+    describe('does nothing', () => {
+      it('if event target has class "disabled', () => {
+        viewModel.is_saving = false;
+        event.target.addClass('disabled');
+
+        const result = viewModel.performMap(event);
+
+        expect(result).toBe(undefined);
+      });
+
+      it('if event target has class "disabled', () => {
+        viewModel.is_saving = true;
+
+        const result = viewModel.performMap(event);
+
+        expect(result).toBe(undefined);
+      });
+    });
+
+    it('calls deferredSave() if deferred is true', () => {
+      viewModel.selected = 'selected';
       viewModel.deferred = true;
-      result = handler.call(that, element, event);
-      expect(result).toEqual('deferredSave');
+      spyOn(viewModel, 'deferredSave');
+
+      viewModel.performMap(event);
+
+      expect(viewModel.deferredSave).toHaveBeenCalledWith('selected');
     });
 
-    it('calls proceedWithRegularMapping', () => {
-      viewModel.object = 'Program';
-      viewModel.type = 'Control';
+    it('calls proceedWithMegaMapping() if isMegaMapping() return true',
+      () => {
+        spyOn(MegaObjectUtils, 'isMegaMapping')
+          .and.returnValue(true);
+        spyOn(viewModel, 'proceedWithMegaMapping');
 
-      spyOn(that, 'proceedWithRegularMapping');
-      handler.call(that, element, event);
-      expect(that.proceedWithRegularMapping).toHaveBeenCalled();
-    });
+        viewModel.performMap(event);
 
-    it('calls proceedWithMegaMapping', () => {
-      viewModel.object = 'Program';
-      viewModel.type = 'Program';
+        expect(viewModel.proceedWithMegaMapping).toHaveBeenCalled();
+      });
 
-      spyOn(that, 'proceedWithMegaMapping');
-      handler.call(that, element, event);
-      expect(that.proceedWithMegaMapping).toHaveBeenCalled();
-    });
+    it('calls proceedWithRegularMapping() if isMegaMapping() return false',
+      () => {
+        spyOn(MegaObjectUtils, 'isMegaMapping')
+          .and.returnValue(false);
+        spyOn(viewModel, 'proceedWithRegularMapping');
+
+        viewModel.performMap(event);
+
+        expect(viewModel.proceedWithRegularMapping).toHaveBeenCalled();
+      });
   });
 
-  describe('proceedWithRegularMapping method', () => {
-    let that;
-
+  describe('proceedWithRegularMapping() method', () => {
     beforeEach(() => {
-      that = {
-        viewModel,
-        mapObjects: events.mapObjects,
-      };
-      handler = events.proceedWithRegularMapping.bind(that);
+      spyOn(viewModel, 'mapObjects');
+    });
+
+    it('sets true to is_saving', () => {
+      viewModel.is_saving = false;
+
+      viewModel.proceedWithRegularMapping();
+
+      expect(viewModel.is_saving).toBe(true);
     });
 
     it('calls mapObjects', () => {
-      spyOn(that, 'mapObjects');
-      handler([]);
-      expect(that.mapObjects).toHaveBeenCalledWith([]);
+      viewModel.proceedWithRegularMapping([]);
+
+      expect(viewModel.mapObjects).toHaveBeenCalledWith([]);
     });
   });
 

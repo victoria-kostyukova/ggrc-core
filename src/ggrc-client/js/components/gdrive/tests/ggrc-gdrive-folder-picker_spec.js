@@ -9,13 +9,8 @@ import Component from '../ggrc-gdrive-folder-picker';
 import * as ajaxExtensions from '../../../plugins/ajax-extensions';
 
 describe('ggrc-gdrive-folder-picker component', () => {
-  let events;
   let viewModel;
   let folderId = 'folder id';
-
-  beforeAll(() => {
-    events = Component.prototype.events;
-  });
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
@@ -137,14 +132,81 @@ describe('ggrc-gdrive-folder-picker component', () => {
         }
       );
     });
+
+    describe('detachFolder() method', () => {
+      beforeEach(() => {
+        viewModel.deferred = true;
+        viewModel.instance = new canMap({
+          folder: 123,
+        });
+        spyOn(viewModel, 'unlinkFolder');
+      });
+
+      it('unsets current_folder', () => {
+        viewModel.current_folder = 123;
+
+        viewModel.detachFolder();
+
+        expect(viewModel.current_folder).toBe(null);
+      });
+
+      it('unsets instace.folder', () => {
+        viewModel.detachFolder();
+
+        expect(viewModel.instance.attr('folder')).toBe(null);
+      });
+
+      it('calls unlinkFolder() method', () => {
+        viewModel.deferred = false;
+
+        viewModel.detachFolder();
+
+        expect(viewModel.unlinkFolder).toHaveBeenCalled();
+      });
+    });
+
+    describe('unsetFocus() method', () => {
+      let event;
+      let element;
+      beforeEach(() => {
+        const ESCAPE_KEY_CODE = 27;
+        element = $('<div></div>');
+        event = {
+          keyCode: ESCAPE_KEY_CODE,
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          target: element,
+        };
+      });
+
+      it('calls stopPropagation for passed event', () => {
+        viewModel.unsetFocus(event);
+
+        expect(event.stopPropagation).toHaveBeenCalled();
+      });
+
+      it('unsets focus for element', function (done) {
+        const blur = () => {
+          done();
+          element.off('blur', blur);
+        };
+        element.on('blur', blur);
+        viewModel.unsetFocus(event);
+      });
+    });
   });
 
   describe('events', () => {
-    describe('"init" handler', () => {
+    let events;
+
+    beforeAll(() => {
+      events = Component.prototype.events;
+    });
+
+    describe('"init" handler', function () {
       let method;
       let that;
 
-      beforeEach(() => {
+      beforeEach(function () {
         that = {
           viewModel: viewModel,
           element: $('<div></div>'),
@@ -161,91 +223,6 @@ describe('ggrc-gdrive-folder-picker component', () => {
 
         method();
         expect(viewModel.setRevisionFolder).toHaveBeenCalled();
-      });
-    });
-
-    describe('"a[data-toggle=gdrive-remover] click" handler', () => {
-      let method;
-      let that;
-
-      beforeEach(() => {
-        viewModel.instance = new canMap({
-          folder: folderId,
-        });
-
-        that = {
-          viewModel: viewModel,
-          element: $('<div></div>'),
-        };
-        method = events['a[data-toggle=gdrive-remover] click'].bind(that);
-      });
-
-      it('unsets current_folder', (done) => {
-        viewModel.deferred = true;
-
-        method().then(() => {
-          expect(viewModel.current_folder).toBeNull();
-          done();
-        });
-      });
-
-      it('unsets folder id for deferred instance', (done) => {
-        viewModel.deferred = true;
-
-        method().then(() => {
-          expect(viewModel.instance.attr('folder')).toBeNull();
-          done();
-        });
-      });
-
-      it('calls unlinkFolder() for existing instance', (done) => {
-        viewModel.deferred = false;
-
-        spyOn(viewModel, 'unlinkFolder')
-          .and.returnValue($.Deferred().resolve());
-
-        method().then(() => {
-          expect(viewModel.unlinkFolder).toHaveBeenCalled();
-          done();
-        });
-      });
-    });
-
-    describe('a[data-toggle=gdrive-picker] keyup', () => {
-      let method;
-      let that;
-
-      beforeEach(() => {
-        that = {};
-        method = events['a[data-toggle=gdrive-picker] keyup'].bind(that);
-      });
-
-      describe('if escape key was clicked', () => {
-        let event;
-        let element;
-
-        beforeEach(() => {
-          const ESCAPE_KEY_CODE = 27;
-          event = {
-            keyCode: ESCAPE_KEY_CODE,
-            stopPropagation: jasmine.createSpy('stopPropagation'),
-          };
-          element = $('<div></div>');
-        });
-
-        it('calls stopPropagation for passed event', () => {
-          method(element, event);
-          expect(event.stopPropagation).toHaveBeenCalled();
-        });
-
-        it('unsets focus for element', (done) => {
-          const blur = () => {
-            done();
-            element.off('blur', blur);
-          };
-          element.on('blur', blur);
-          method(element, event);
-        });
       });
     });
 

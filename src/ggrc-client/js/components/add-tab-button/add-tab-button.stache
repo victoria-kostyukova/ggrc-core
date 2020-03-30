@@ -11,7 +11,8 @@
       data-toggle="dropdown"
       rel="tooltip"
       data-placement="bottom"
-      title="{{addTabTitle}}">
+      title="{{addTabTitle}}"
+      on:el:click="setDropdownPosition(scope.event)">
       <i class="fa fa-plus-circle"></i>
       {{addTabTitle}}
     </a>

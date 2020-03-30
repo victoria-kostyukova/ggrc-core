@@ -34,29 +34,31 @@
         </div>
         <div class="action-toolbar__controls">
           {{#if canEdit}}
-            <a class="icon-link entry-attachment mapped-folder__action-button"
+            <a
+              class="icon-link entry-attachment mapped-folder__action-button"
               href="javascript://"
               rel="tooltip"
               data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}"
-              data-toggle="gdrive-picker"
               data-model="{{instance.constructor.model_singular}}"
               data-id="{{instance.id}}"
               data-type="folders"
-              data-replace="true">
-                <action-toolbar-control>
-                  <i class="fa fa-pencil"></i>
-                </action-toolbar-control>
+              data-replace="true"
+              on:el:click="openFolderPicker(scope.event)"
+              on:el:keyup="unsetFocus(scope.event)">
+              <action-toolbar-control>
+                <i class="fa fa-pencil"></i>
+              </action-toolbar-control>
             </a>
             {{^if no_detach}}
               <a class="icon-link mapped-folder__action-button"
                 href="javascript://" rel="tooltip"
                 data-original-title="Detach folder from {{instance.constructor.title_singular}}"
-                data-toggle="gdrive-remover"
                 data-model="{{instance.constructor.model_singular}}"
-                data-id="{{instance.id}}">
-                  <action-toolbar-control>
-                    <i class="fa fa-trash"></i>
-                  </action-toolbar-control>
+                data-id="{{instance.id}}"
+                on:el:click="detachFolder()">
+                <action-toolbar-control>
+                  <i class="fa fa-trash"></i>
+                </action-toolbar-control>
               </a>
             {{/if}}
           {{/if}}
@@ -78,14 +80,30 @@
         </small>
         <div class="action-toolbar__controls">
           {{^if canEdit}}
-            <a class="icon-link entry-attachment" href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true">
+            <a
+              class="icon-link entry-attachment"
+              href="javascript://"
+              rel="tooltip"
+              data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}"
+              data-model="{{instance.constructor.model_singular}}"
+              data-id="{{instance.id}}"
+              data-type="folders"
+              data-replace="true"
+              on:el:click="openFolderPicker(scope.event)"
+              on:el:keyup="unsetFocus(scope.event)">
               <action-toolbar-control>
                 <i class="fa fa-pencil"></i>
               </action-toolbar-control>
             </a>
             {{^if no_detach}}
-              <a class="icon-link" href="javascript://" rel="tooltip" data-original-title="Detach folder from {{instance.constructor.title_singular}}" data-toggle="gdrive-remover"
-                data-model="{{instance.constructor.model_singular}}" data-id="{{instance.id}}">
+              <a
+                class="icon-link"
+                href="javascript://"
+                rel="tooltip"
+                data-original-title="Detach folder from {{instance.constructor.title_singular}}"
+                data-model="{{instance.constructor.model_singular}}"
+                data-id="{{instance.id}}"
+                on:el:click="detachFolder()">
                 <action-toolbar-control>
                   <i class="fa fa-trash"></i>
                 </action-toolbar-control>
@@ -99,11 +117,12 @@
         <a href="javascript://"
           tabindex="{{firstnonempty tabindex '0'}}"
           class="btn btn-white entry-attachment  tree-item-add mapped-folder__add-button"
-          data-toggle="gdrive-picker"
           data-model="{{instance.constructor.model_singular}}"
           data-type="folders"
-          data-id="{{instance.id}}">
-            Assign folder
+          data-id="{{instance.id}}"
+          on:el:click="openFolderPicker(scope.event)"
+          on:el:keyup="unsetFocus(scope.event)">
+          Assign folder
         </a>
       {{/if}}
     {{/if}}
