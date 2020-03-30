@@ -116,6 +116,29 @@ describe('add-template-field component', () => {
     });
   });
 
+  describe('isInvalidTitleLength() method', () => {
+    it('returns error message if title contain more than 255 symbols', () => {
+      const longTitle = 'veryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle';
+
+      const result = Validations.isInvalidTitleLength(longTitle);
+
+      expect(result).toBe(
+        'A custom attribute title cannot contain more than 255 symbols');
+    });
+
+    it('doesn\'t return error message' +
+    'if title contain less than 255 symbols', () => {
+      const selectedTitle = 'my title';
+      const result = Validations.isInvalidTitleLength(selectedTitle);
+
+      expect(result).toBe('');
+    });
+  });
+
   describe('isDublicateTitle() method', () => {
     let isDublicateTitle; // the method under test
 
@@ -266,6 +289,11 @@ describe('add-template-field component', () => {
           'invalid val message' :
           '');
 
+      spyOn(Validations, 'isInvalidTitleLength').and
+        .callFake((title) => title.length > 255 ?
+          'invalid length message' :
+          '');
+
       spyOn(Validations, 'isDublicateTitle').and
         .callFake((fields, title) => {
           return fields.includes(title) ?
@@ -283,6 +311,7 @@ describe('add-template-field component', () => {
           return [
             Validations.isEmptyTitle.bind(null, title),
             Validations.isInvalidTitle.bind(null, title),
+            Validations.isInvalidTitleLength.bind(null, title),
             Validations.isDublicateTitle.bind(null, fields, title),
             Validations.isReservedByCustomAttr.bind(null, title),
             Validations.isReservedByModelAttr.bind(null, title),
@@ -299,6 +328,7 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe('');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).toHaveBeenCalled();
@@ -313,6 +343,7 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe('empty val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).not.toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).not.toHaveBeenCalled();
       expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -327,6 +358,26 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe('invalid val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).not.toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
+    });
+
+    it('should set "invalid length" error message', () => {
+      setupSpies('', '');
+      const longTitle = 'veryLongTitleveryLongTitleveryLongTitleveryLongTi' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle' +
+        'veryLongTitleveryLongTitleveryLongTitleveryLongTitleveryLongTitle';
+      let validators = viewModel.getValidators(longTitle, []);
+      viewModel.validateTitle(validators);
+
+      expect(getTitleError()).toBe('invalid length message');
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -341,6 +392,7 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe('duplicates val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -356,6 +408,7 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -371,6 +424,7 @@ describe('add-template-field component', () => {
       expect(getTitleError()).toBe(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
       expect(Validations.isInvalidTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitleLength).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).toHaveBeenCalled();
