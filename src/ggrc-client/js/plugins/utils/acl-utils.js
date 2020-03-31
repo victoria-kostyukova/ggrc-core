@@ -6,20 +6,22 @@
 import loFilter from 'lodash/filter';
 import canList from 'can-list';
 
-const ACL = GGRC.access_control_roles.reduce((aclMap, role) => {
-  if (!aclMap[role.object_type]) {
-    aclMap[role.object_type] = {};
-  }
+const getACL = () => {
+  return GGRC.access_control_roles.reduce((aclMap, role) => {
+    if (!aclMap[role.object_type]) {
+      aclMap[role.object_type] = {};
+    }
 
-  aclMap[role.object_type][role.name] = role;
+    aclMap[role.object_type][role.name] = role;
 
-  // Hash by Ids
-  aclMap.ids[role.id] = role;
+    // Hash by Ids
+    aclMap.ids[role.id] = role;
 
-  return aclMap;
-}, {
-  ids: {},
-});
+    return aclMap;
+  }, {
+    ids: {},
+  });
+};
 
 /**
  * Returns list of roles for specific type.
@@ -28,6 +30,7 @@ const ACL = GGRC.access_control_roles.reduce((aclMap, role) => {
  * @return {Array}
  */
 const getRolesForType = (type) => {
+  const ACL = getACL();
   let roles = ACL[type] ? ACL[type] : {};
 
   return Object.values(roles);
@@ -41,6 +44,7 @@ const getRolesForType = (type) => {
  * @return {object|null}
  */
 const getRole = (type, name) => {
+  const ACL = getACL();
   return ACL[type] && ACL[type][name] ? ACL[type][name] : null;
 };
 
@@ -51,6 +55,7 @@ const getRole = (type, name) => {
  * @return {object|null}
  */
 const getRoleById = (id) => {
+  const ACL = getACL();
   return ACL.ids[id];
 };
 
