@@ -52,13 +52,18 @@ export default Cacheable.extend({
   },
   init() {
     this._super(...arguments);
+    const cads = GGRC.custom_attr_defs;
 
     this.bind('created', (event) => {
-      GGRC.custom_attr_defs.push(event.target.serialize());
+      cads.push(event.target.serialize());
+    });
+
+    this.bind('updated', (event) => {
+      const index = cads.findIndex((cad) => cad.id === event.target.id);
+      cads.splice(index, 1, event.target.serialize());
     });
 
     this.bind('destroyed', (event) => {
-      const cads = GGRC.custom_attr_defs;
       const index = cads.findIndex((cad) => cad.id === event.target.id);
       cads.splice(index, 1);
     });
