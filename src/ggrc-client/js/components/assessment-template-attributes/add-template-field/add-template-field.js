@@ -96,6 +96,7 @@ export default canComponent.extend({
       return [
         isEmptyTitle.bind(null, title),
         isInvalidTitle.bind(null, title),
+        isInvalidTitleLength.bind(null, title),
         isDublicateTitle.bind(null, fields, title),
         isReservedByCustomAttr.bind(null, title),
         isReservedByModelAttr.bind(null, title),
@@ -157,6 +158,13 @@ const isInvalidTitle = (title) => {
   return '';
 };
 
+const isInvalidTitleLength = (title) => {
+  if (title.length > 255) {
+    return 'A custom attribute title cannot contain more than 255 symbols';
+  }
+  return '';
+};
+
 const isReservedByCustomAttr = (title) => {
   const customAttrs = GGRC.custom_attr_defs
     .filter((attr) =>
@@ -184,6 +192,7 @@ export {
   isDublicateTitle,
   isEmptyTitle,
   isInvalidTitle,
+  isInvalidTitleLength,
   isReservedByCustomAttr,
   isReservedByModelAttr,
 };
