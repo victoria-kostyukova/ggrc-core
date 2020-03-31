@@ -64,14 +64,14 @@ describe('ggrc-gdrive-folder-picker component', () => {
       it('should set "_folder_change_pending" to true', () => {
         ggrcAjaxSpy.and.returnValue($.Deferred().resolve());
 
-        method();
+        method(viewModel.current_folder);
         expect(viewModel._folder_change_pending).toBe(true);
       });
 
       it('should set "current_folder" to NULL', () => {
         ggrcAjaxSpy.and.returnValue($.Deferred().resolve());
 
-        method();
+        method(viewModel.current_folder);
         expect(viewModel.current_folder).toBeNull();
       });
 
@@ -80,7 +80,7 @@ describe('ggrc-gdrive-folder-picker component', () => {
           const dfd = $.Deferred();
           ggrcAjaxSpy.and.returnValue(dfd);
 
-          method().then(() => {
+          method(viewModel.current_folder).then(() => {
             expect(viewModel.folder_error).toBeNull();
             done();
           });
@@ -94,7 +94,7 @@ describe('ggrc-gdrive-folder-picker component', () => {
           const dfd = $.Deferred();
           ggrcAjaxSpy.and.returnValue(dfd);
 
-          method().fail(() => {
+          method(viewModel.current_folder).fail(() => {
             expect(viewModel.folder_error).toEqual(defaultFolderError);
             done();
           });
@@ -108,7 +108,7 @@ describe('ggrc-gdrive-folder-picker component', () => {
           const dfd = $.Deferred();
           ggrcAjaxSpy.and.returnValue(dfd);
 
-          method().then(() => {
+          method(viewModel.current_folder).then(() => {
             expect(viewModel.instance.refresh).toHaveBeenCalled();
             done();
           });
@@ -122,7 +122,7 @@ describe('ggrc-gdrive-folder-picker component', () => {
           const dfd = $.Deferred();
           ggrcAjaxSpy.and.returnValue(dfd);
 
-          method().fail(() => {
+          method(viewModel.current_folder).fail(() => {
             expect(viewModel.current_folder.serialize())
               .toEqual(defaultFolder);
             done();
@@ -150,7 +150,7 @@ describe('ggrc-gdrive-folder-picker component', () => {
         expect(viewModel.current_folder).toBe(null);
       });
 
-      it('unsets instace.folder', () => {
+      it('unsets instance.folder', () => {
         viewModel.detachFolder();
 
         expect(viewModel.instance.attr('folder')).toBe(null);
@@ -162,6 +162,13 @@ describe('ggrc-gdrive-folder-picker component', () => {
         viewModel.detachFolder();
 
         expect(viewModel.unlinkFolder).toHaveBeenCalled();
+      });
+      it('sets folderToRemove', () => {
+        viewModel.current_folder = 123;
+
+        viewModel.detachFolder();
+
+        expect(viewModel.folderToRemove).toBe(123);
       });
     });
 
