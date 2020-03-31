@@ -34,4 +34,22 @@ export default Cacheable.extend({
       },
     },
   },
+  init() {
+    this._super(...arguments);
+    const acrs = GGRC.access_control_roles;
+
+    this.bind('created', (event) => {
+      acrs.push(event.target.serialize());
+    });
+
+    this.bind('updated', (event) => {
+      const index = acrs.findIndex((acr) => acr.id === event.target.id);
+      acrs.splice(index, 1, event.target.serialize());
+    });
+
+    this.bind('destroyed', (event) => {
+      const index = acrs.findIndex((acr) => acr.id === event.target.id);
+      acrs.splice(index, 1);
+    });
+  },
 });
