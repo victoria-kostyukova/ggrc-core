@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 "Factory for modules, classes, methods, functions."
 
@@ -47,8 +47,8 @@ def get_method_lhn_select(object_name):
  Args:
     object_name (basestring)
  """
-  return constants.method.SELECT_PREFIX \
-      + cache.LHN_SECTION_MEMBERS[object_name]
+  return (constants.method.SELECT_PREFIX +
+          cache.LHN_SECTION_MEMBERS[object_name])
 
 
 def get_method_select(object_name):
@@ -65,7 +65,8 @@ def get_fields_to_set(object_name):
   """
   cls_name = objects.get_singular(object_name) + "ModalSetVisibleFields"
   base_cls = element.CommonModalSetVisibleFields
-  set_fields_modal_cls = _factory(cls_name=cls_name, parent_cls=base_cls)
+  set_fields_modal_cls = _factory(cls_name=cls_name, parent_cls=base_cls,
+                                  search_nested_subclasses=True)
   return set_fields_modal_cls().DEFAULT_SET_FIELDS
 
 
@@ -76,19 +77,14 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
   """
   from lib.page import dashboard
   from lib.page.widget import generic_widget, info_widget
-  base_cls = None
   if is_info:
-    if object_name not in objects.ALL_SNAPSHOTABLE_OBJS:
-      base_cls = info_widget.InfoWidget
-    elif object_name in objects.ALL_SNAPSHOTABLE_OBJS:
-      base_cls = info_widget.InfoWidget
-    elif object_name == objects.PEOPLE:
-      base_cls = info_widget.base.Widget
+    base_cls = info_widget.ReadOnlyInfoWidget
   elif is_admin:
     base_cls = dashboard.AdminDashboard
   else:
     base_cls = generic_widget.Widget
-  return _factory(cls_name=object_name, parent_cls=base_cls)
+  return _factory(cls_name=object_name, parent_cls=base_cls,
+                  search_nested_subclasses=True)
 
 
 def get_cls_entity_factory(object_name):

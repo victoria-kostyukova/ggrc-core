@@ -1,8 +1,9 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Contains Info Widget functionality specific to info panels
 (split done as `info_widget` module is too large.
 """
+from lib import browsers
 from lib.page.modal import update_object
 
 
@@ -77,3 +78,8 @@ class SnapshotInfoPanel(InfoPanel):
   def get_latest_version(self):
     """Get latest version."""
     self.open_link_to_get_latest_version().confirm_update()
+
+  @property
+  def success_updating_message(self):
+    """Represents floating message about object update to latest version."""
+    return browsers.get_browser().element(class_name="alert alert-success")

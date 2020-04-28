@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Object review workflow tests."""
 # pylint: disable=no-self-use
@@ -16,7 +16,7 @@ from lib import base, users, factory
 from lib.constants import objects, element
 from lib.entities import entities_factory, entity
 from lib.service import (webui_facade, rest_facade, webui_service,
-                         emails_digest_service)
+                         emails_digest_service, change_log_ui_service)
 
 
 class TestObjectsReview(base.Test):
@@ -97,15 +97,18 @@ class TestObjectsReview(base.Test):
   def test_obj_history_is_updated(self, program_with_approved_review,
                                   selenium):
     """Confirm Review history is updated in Change Log."""
-    expected_entry = {
-        "author": users.current_user().email,
-        "Review State": {"original_value": element.ReviewStates.UNREVIEWED,
-                         "new_value": element.ReviewStates.REVIEWED}}
-    actual_entries = (webui_service.ProgramsService(selenium).
-                      open_info_page_of_obj(program_with_approved_review).
-                      get_changelog_entries())
-    assert (expected_entry == actual_entries.pop(0) and
-            expected_entry not in actual_entries)
+    actual_changelog = (change_log_ui_service.ChangeLogService().
+                        get_obj_changelog(program_with_approved_review))
+    expected_entry = entity.ChangeLogItemEntity(
+        author=users.current_user().email,
+        changes=[{"attribute_name":
+                  (element.TransformationSetVisibleFields.REVIEW_STATUS.
+                   replace(" ", "_").lower()),
+                  "original_value": element.ReviewStates.UNREVIEWED,
+                  "new_value": element.ReviewStates.REVIEWED}])
+    assert (expected_entry == actual_changelog.pop(0) and
+            expected_entry not in actual_changelog), (
+        "Review history was not properly updated in Change Log.")
 
   @pytest.mark.smoke_tests
   def test_undo_obj_review_approval(self, program_w_approved_via_ui_review,

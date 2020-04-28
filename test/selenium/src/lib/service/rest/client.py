@@ -1,10 +1,11 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST API client."""
 
 import json
 import urlparse
 
+import inflection
 import requests
 
 from lib import environment, url as url_module, users
@@ -37,14 +38,21 @@ class RestClient(object):
 
   def is_endpoint_external(self):
     """Checks if endpoint is external."""
-    return self.endpoint in objects.EXTERNAL_END_POINTS
+    return self.endpoint in objects.ALL_SINGULAR_DISABLED_OBJS
 
   def is_relationship_types_external(self, obj_dict):
     """Check if source or destination objects type is external."""
     return (self.endpoint == objects.get_singular(objects.RELATIONSHIPS) and
-            (any(x for x in objects.SINGULAR_TITLE_EXTERNAL_OBJS
-                 if x in (obj_dict["source"]["type"],
-                          obj_dict["destination"]["type"]))))
+            (any(x for x in objects.ALL_SINGULAR_DISABLED_OBJS
+                 if inflection.camelize(x)
+                 in (obj_dict["source"]["type"],
+                     obj_dict["destination"]["type"]))))
+
+  def is_ca_external(self, obj_dict):
+    """Check if custom attribute is external."""
+    return (self.endpoint == objects.get_singular(
+            objects.CUSTOM_ATTRIBUTES) and
+            obj_dict["definition_type"] in objects.ALL_SINGULAR_DISABLED_OBJS)
 
   def is_external_user_needed(self, obj_dict):
     """Return True if request related to controls or GCAs for controls."""
@@ -56,6 +64,7 @@ class RestClient(object):
         obj_dict, list) else obj_dict[obj_dict.keys()[0]]
 
     return (self.is_endpoint_external() or
+            self.is_ca_external(obj_dict) or
             self.is_relationship_types_external(obj_dict))
 
   def send_get(self, url, **kwargs):

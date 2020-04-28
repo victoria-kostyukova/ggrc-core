@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow top tabs."""
 from lib.page.modal import object_mapper
@@ -91,6 +91,12 @@ class ActiveCyclesTab(object_page.ObjectPage):
         title=cycle_task_group.title)
     cycle_task_group_row.expand()
     return cycle_task_group_row.get_cycle_task_row_by(title=cycle_task.title)
+
+  def open_create_cycle_task_modal(self):
+    """Clicks a Create Task button.
+    Returns Task modal."""
+    self._tree_widget.create_task_btn.click()
+    return object_modal.get_modal_obj("cycle_task")
 
 
 class SetupTab(object_page.ObjectPage):

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for map objects."""
 from lib import base, decorator
@@ -37,8 +37,6 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
     self.tree_view = base.UnifiedMapperTreeView(
         self._driver, obj_name=obj_name)
     self._add_attr_btn = None
-    self.search_result_toggle = base.Toggle(
-        self.modal_elem, self._locators.RESULT_TOGGLE_CSS)
     self.open_in_new_frontend_btn = self._browser.link(
         class_name=["btn", "btn-small", "btn-white"],
         text="Open in new frontend")
@@ -104,8 +102,10 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
 
   def _select_search_dest_objs(self):
     """Click Search button to search objects according set filters."""
-    base.Button(self.modal_elem, self._locators.BUTTON_SEARCH).click()
-    selenium_utils.wait_for_js_to_load(self._driver)
+    search_button = base.Button(self.modal_elem, self._locators.BUTTON_SEARCH)
+    search_button.click()
+    selenium_utils.wait_until_condition(
+        self._driver, lambda x: search_button.element.is_enabled())
 
   def _select_dest_objs_to_map(self, objs_titles):
     """Select checkboxes regarding to titles from list of checkboxes
@@ -160,7 +160,7 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
         self.add_filter_attr(self._elements.ATTRIBUTE_TITLE, title,
                              operator=operator)
     self._select_search_dest_objs()
-    # Return items or check nothin is returned.
+    # Return items or check nothing is returned.
     if return_tree_items:
       return self.tree_view.get_list_members_as_list_scopes()
     else:
@@ -192,6 +192,17 @@ class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
 
 class MapObjectsModal(CommonUnifiedMapperModal):
   """Modal for map objects."""
+
+
+class MapProgramsToProgramModal(MapObjectsModal):
+  """Modal for map child or parent programs to program."""
+
+  def _confirm_map_selected(self):
+    """Selects Map Selected button.
+
+    This method is overrided because method from base class does not work in
+    situation when confirmation popup appears."""
+    self._root.button(text='Map Selected').click()
 
 
 class SearchObjectsModal(CommonUnifiedMapperModal):

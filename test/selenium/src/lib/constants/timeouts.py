@@ -1,6 +1,6 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Common timeouts for selenium_utils."""
+"""Timeout constants."""
 
 MAX_USER_WAIT_SECONDS = 60
 TWO_MIN_USER_WAIT = 120

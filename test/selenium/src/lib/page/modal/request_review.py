@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modal for requesting review."""
 
@@ -13,8 +13,11 @@ class RequestReviewModal(base.Modal):
     super(RequestReviewModal, self).__init__(driver)
     self._root = self._browser.element(class_name="request-review-modal")
     self.assignee_field = self._root.text_field(placeholder="Add person")
-    self.comments_elem = self._root.element(class_name="ql-editor")
     self.request_button = self._root.button(text="Request")
+
+  @property
+  def comment_input(self):
+    return base.CommentInput(self._root)
 
   def select_assignee_user(self, user_email):
     """Select assignee user from dropdown on submit for review popup."""
@@ -23,7 +26,7 @@ class RequestReviewModal(base.Modal):
 
   def leave_request_review_comment(self, comment_msg):
     """Leave request review comment."""
-    self.comments_elem.send_keys(comment_msg)
+    self.comment_input.fill(comment_msg)
 
   def click_request(self):
     """Click Request button."""
@@ -35,3 +38,7 @@ class RequestReviewModal(base.Modal):
     self.select_assignee_user(user_email)
     self.leave_request_review_comment(comment_msg)
     self.click_request()
+
+  def wait_until_present(self):
+    """Waits until present."""
+    return self._root.wait_until(lambda e: e.exists)

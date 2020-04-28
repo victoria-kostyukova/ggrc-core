@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base widget models."""
 # pylint: disable=not-callable
@@ -6,7 +6,7 @@
 # pylint: disable=too-few-public-methods
 
 from lib import base
-from lib.constants import locator
+from lib.constants import locator, objects
 from lib.element import info_widget_three_bbs
 from lib.entities import entities_factory
 from lib.utils import selenium_utils
@@ -39,7 +39,9 @@ class CustomAttributesItemContent(base.Component):
       self.custom_attributes_list.append(
           entities_factory.CustomAttributeDefinitionsFactory().create(
               title=attrs[0], attribute_type=attrs[1],
-              mandatory=StringMethods.get_bool_value_from_arg(attrs[2]),
+              mandatory=(StringMethods.get_bool_value_from_arg(attrs[2])
+                         if self._item_name != objects.ASSESSMENTS.title()
+                         else None),
               definition_type=self._item_name, multi_choice_options=None))
 
   def get_ca_list_from_group(self):
@@ -55,7 +57,7 @@ class CustomAttributesItemContent(base.Component):
     selenium_utils.wait_until_not_present(
         self._driver, self._locators.TREE_SPINNER_CSS)
     self.add_btn.click()
-    return CustomAttributeModal(self._driver)
+    return AddCustomAttributeModal(self._driver)
 
   def open_edit_ca_modal(self, index):
     """Click 'Edit' button to open edit modal for Custom Attribute from list
@@ -68,24 +70,25 @@ class CustomAttributesItemContent(base.Component):
     """
     self._browser.links(text="Edit")[index].click()
     selenium_utils.wait_for_js_to_load(self._driver)
-    return CustomAttributeModal()
+    return EditCustomAttributeModal()
 
 
-class CustomAttributeModal(object_modal.BaseFormModal):
-  """Custom attribute modal."""
+class EditCustomAttributeModal(object_modal.BaseFormModal):
+  """Custom attribute edit modal."""
 
   def __init__(self, driver=None):
-    super(CustomAttributeModal, self).__init__(driver)
-    self._fields = ["title", "attribute_type", "mandatory", "helptext",
-                    "placeholder", "multi_choice_options"]
+    super(EditCustomAttributeModal, self).__init__(driver)
+    self.title_field = self._root.text_field(name="title")
+    self.attribute_type_field = self._root.element(
+        tag_name="dropdown-component").select()
+    self.multi_choice_options_field = self._root.text_field(
+        name="multi_choice_options")
+    self._fields = ["mandatory", "helptext", "placeholder"]
 
-  def set_attribute_type(self, value):
-    """Sets attribute type dropdown with value."""
-    self._root.element(tag_name="dropdown-component").select().select(value)
-
-  def set_title(self, title):
-    """Sets title field with value."""
-    self._root.text_field(name="title").set(title)
+  @property
+  def mandatory_checkbox(self):
+    """Return mandatory checkbox."""
+    return self._root.checkbox(name="mandatory")
 
   def set_helptext(self, value):
     """Sets helptext field with value."""
@@ -95,13 +98,9 @@ class CustomAttributeModal(object_modal.BaseFormModal):
     """Sets placeholder field with value."""
     self._root.text_field(name="placeholder").set(value)
 
-  def set_multi_choice_options(self, value):
-    """Sets multi choice options field with value."""
-    self._root.text_field(name="multi_choice_options").set(value)
-
   def set_mandatory(self, value):
     """Sets mandatory checkbox according to the value."""
-    self._root.checkbox(name="mandatory").set(bool(value))
+    self.mandatory_checkbox.set(bool(value))
 
   def get_custom_attribute_dict(self):
     """Return dict with custom attribute parameters according to visible fields
@@ -110,6 +109,27 @@ class CustomAttributeModal(object_modal.BaseFormModal):
     data.update({"attribute_type": self._root.select().value,
                  "mandatory": self._root.checkbox().is_set})
     return data
+
+
+class AddCustomAttributeModal(EditCustomAttributeModal):
+  """Custom attribute creation modal."""
+
+  def __init__(self, driver=None):
+    super(AddCustomAttributeModal, self).__init__(driver)
+    self._fields = ["title", "attribute_type", "mandatory", "helptext",
+                    "placeholder", "multi_choice_options"]
+
+  def set_attribute_type(self, value):
+    """Sets attribute type dropdown with value."""
+    self.attribute_type_field.select(value)
+
+  def set_title(self, title):
+    """Sets title field with value."""
+    self.title_field.set(title)
+
+  def set_multi_choice_options(self, value):
+    """Sets multi choice options field with value."""
+    self.multi_choice_options_field.set(value)
 
 
 class DynamicTreeToggle(base.Toggle):

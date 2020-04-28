@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Locators for all elements."""
 # pylint: disable=too-few-public-methods
@@ -106,10 +106,11 @@ class PageHeader(object):
       By.CSS_SELECTOR, _CONTENT + ' [href="/export"]')
   # dropdown toggle
   USER_MENU = ".menu " + Common.DROPDOWN_MENU
-  BUTTON_HELP = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' #page-help')
+  BUTTON_HELP = (By.CSS_SELECTOR, Common.DROPDOWN_MENU +
+                 ' [href="#set_GGRC_EXTERNAL_HELP_URL_env_var"]')
   BUTTON_LOGOUT = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' [href="/logout"]')
-  NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' .notify-wrap')
-  EMAIL = (By.CSS_SELECTOR, USER_MENU + ' .user-email')
+  NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' notifications-menu-item')
+  EMAIL = (By.CSS_SELECTOR, USER_MENU + ' .dropdown-menu__user-name')
   BUTTON_ADMIN_DASHBOARD = (
       By.CSS_SELECTOR,
       Common.DROPDOWN_MENU + ' [href="/admin#!people_list"]')
@@ -286,6 +287,7 @@ class CommonModalUnifiedMapper(object):
                        " button.collapsible-panel-header__toggle-button")
   CLOSE_BTN_CSS = (By.CSS_SELECTOR,
                    MODAL + Common.MODAL_HEADER + " a.modal-dismiss")
+  MODAL_SECTIONS = (By.CLASS_NAME, 'body-inner')
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):
@@ -309,91 +311,6 @@ class ModalCloneOrCreateAssessmentTemplates(CommonModalUnifiedMapper):
   """Locators for clone or create Assessment Templates modal."""
   MODAL = Common.MODAL_MAPPER
   CREATE_ASMT_TMPL_BTN_CSS = (By.CSS_SELECTOR, MODAL + " .create-control")
-
-
-class BaseModalCreateNew(object):
-  """Locators for Create new object modals."""
-  MODAL = Common.MODAL_CREATE
-  MODAL_CSS = (By.CSS_SELECTOR, MODAL)
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " .ui-draggable-handle>h2")
-  TITLE = (By.CSS_SELECTOR,
-           MODAL + " .modal-body form>div:nth-child(2) .span6>label")
-  # user input elements
-  UI_TITLE = (By.CSS_SELECTOR,
-              MODAL + " .modal-body form>div:nth-child(2) .span6>input")
-
-
-class ModalCreateNewPerson(BaseModalCreateNew):
-  """Locators for Create new person modal."""
-  MODAL = Common.MODAL_CREATE
-  # user input elements
-  NAME = (By.CSS_SELECTOR, MODAL + ' #person_name')
-  EMAIL = (By.CSS_SELECTOR, MODAL + ' #person_email')
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
-                           MODAL + ' [data-toggle="modal-submit"]')
-
-
-class ModalCreateNewObject(BaseModalCreateNew):
-  """Locators for Create new object modals."""
-
-
-class ModalCreateNewProgram(BaseModalCreateNew):
-  """Locators for Create new Program modals."""
-
-
-class ModalCreateNewOrgGroup(BaseModalCreateNew):
-  """Locators for Create new Org Group modals."""
-
-
-class ModalCreateNewRisk(BaseModalCreateNew):
-  """Locators for Create new Risk modals."""
-
-
-class ModalCreateNewDataAsset(BaseModalCreateNew):
-  """Locators for Create new Data Asset modals."""
-
-
-class ModalCreateNewProcess(BaseModalCreateNew):
-  """Locators for Create new Process modals."""
-
-
-class ModalCreateNewProject(BaseModalCreateNew):
-  """Locators for Create new Project modals."""
-
-
-class ModalCreateNewSystem(BaseModalCreateNew):
-  """Locators for Create new System modals."""
-
-
-class ModalCreateNewProduct(BaseModalCreateNew):
-  """Locators for Create new Product modals."""
-
-
-class ModalCreateNewControl(BaseModalCreateNew):
-  """Locators for Create new Control modals."""
-
-
-class ModalCreateNewObjective(BaseModalCreateNew):
-  """Locators for Create new Objective modals."""
-
-
-class ModalCreateNewIssue(BaseModalCreateNew):
-  """Locators for Create new Issue modals."""
-
-
-class ModalCreateNewAsmt(BaseModalCreateNew, CommonAssessment):
-  """Locators for Create new Assessment modals."""
-  MAPPED_SNAPSHOTS_CSS = (By.CSS_SELECTOR, BaseModalCreateNew.MODAL +
-                          CommonAssessment.MAPPED_SNAPSHOTS)
-  MAP_OBJS_BTN_CSS = (By.CSS_SELECTOR,
-                      BaseModalCreateNew.MODAL + CommonAssessment.MAP_OBJS_BTN)
-
-
-class ModalEditObject(BaseModalCreateNew):
-  """Locators for Edit object modals."""
-  BUTTON_DELETE = (
-      By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
 
 
 class ModalCustomAttribute(object):
@@ -548,8 +465,8 @@ class ObjectWidget(object):
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
       By.CSS_SELECTOR,
-      '.object-area .tree-item-element .selectable-attrs '
-      '.attr-cell:first-child .attr-content')
+      '.object-area .widget.treeview:not(.hidden) .tree-item-element '
+      '.selectable-attrs .attr-cell:first-child .attr-content')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 
@@ -572,10 +489,6 @@ class ModalDeleteObject(ModalCommonConfirmAction):
   BUTTON_DELETE = ModalCommonConfirmAction.BUTTON_CONFIRM
 
 
-class ModalUpdateObject(ModalCommonConfirmAction):
-  """Locators for Update object modals."""
-
-
 class ModalCloneAudit(ModalCommonConfirmAction):
   """Locators for Clone object modals."""
   MODAL = Common.MODAL_CONFIRM
@@ -583,242 +496,9 @@ class ModalCloneAudit(ModalCommonConfirmAction):
       By.CSS_SELECTOR, '{} .modal-body input[type="checkbox"]'.format(MODAL))
 
 
-class CommonWidgetInfo(object):
-  """Common locators for Info widgets and Info panels."""
-  _NOT_HIDDEN = Common.XPATH_NOT_HIDDEN
-  _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH
-  _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
-  _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
-                         '//div[starts-with(./@class, "span")]//h6/..')
-  WIDGET = Common.INFO
-  _FOOTER = Common.INFO_WIDGET_ID + " .info-widget-footer em"
-  INFO_PANEL_ELEM = (By.XPATH, Common.INFO_WIDGET_XPATH)
-  INFO_PAGE_ELEM = (By.XPATH, Common.INFO_PAGE_XPATH)
-  HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
-  LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
-  CAS_HEADERS_AND_VALUES = (By.XPATH,
-                            _INFO_WIDGET_XPATH + "//inline-edit-control/div")
-  CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH +
-                    "//inline-edit-control//input[""@type='checkbox']")
-  # labels
-  TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
-  STATE = (By.XPATH, _MAIN_HEADER_XPATH +
-           "//*[contains(normalize-space(./@class), 'state-value state')]")
-  TXT_FOOTER_CSS = (By.CSS_SELECTOR, _FOOTER)
-  TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR, _FOOTER + " .person-name")
-  TXT_OBJECT_REVIEWED = (
-      By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
-
-  # buttons
-  SHOW_RELATED_ASSESSMENTS = (
-      By.XPATH, _INFO_WIDGET_XPATH + "//a[@title='Show Related Assessments']")
-  # people section
-  _PEOPLE_ITEM = ".editable-people-group"
-  PEOPLE_HEADERS_AND_VALUES_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM)
-  PEOPLE_HEADER_CSS = (
-      By.CSS_SELECTOR, _PEOPLE_ITEM + " editable-people-group-header")
-  PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
-  # user input elements
-  BUTTON_3BBS_XPATH = _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']"
-  BUTTON_3BBS = (By.XPATH, BUTTON_3BBS_XPATH)
-  # controllers
-  TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
-
-
-class WidgetInfoPanel(CommonWidgetInfo):
-  """Locators specific for Info panels."""
-  _PIN_ACTION = ' .pin-action'
-  # user input elements
-  BUTTON_MAXIMIZE_MINIMIZE = (By.CSS_SELECTOR,
-                              _PIN_ACTION + ' [can-click="toggleSize"]')
-  BUTTON_CLOSE = (By.CSS_SELECTOR,
-                  _PIN_ACTION + ' [can-click="close"]')
-  # People section
-  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".editable-people-group")
-
-  # Local custom attributes section
-  DATE_CA_INPUT = (By.CSS_SELECTOR, '.datepicker__input.date')
-  DATE_CA_FIELDS = (By.CSS_SELECTOR, '[data-handler="selectDay"]')
-  DROPDOWN_CA_ITEM = (By.CSS_SELECTOR, "dropdown-form-field select")
-  TEXT_CA_INPUT = (By.CSS_SELECTOR, "text-form-field input")
-  RICH_TEXT_CA_INPUT = (By.CSS_SELECTOR, "rich-text-form-field p")
-  PERSON_CA = (By.CSS_SELECTOR, "person-form-field input")
-  CA_SAVED_STATUS = (
-      By.CSS_SELECTOR, "custom-attributes-status loading-status")
-
-
-class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
-  """Locators specific for Info panels of snapshotable objects."""
-  LINK_GET_LAST_VER = (
-      By.CSS_SELECTOR, ".pane-header__snapshot-info [can-click='compareIt']")
-  SNAPSHOT_OBJ_VER = (By.CSS_SELECTOR, "span.snapshot")
-
-  SAVE_AND_CLOSE_BTN = (
-      By.XPATH,
-      "//*[contains(@class,'confirm-buttons')]//*[contains(text(), 'Close')]")
-  DATE_PICKER_LOCATOR = (By.XPATH, "//*[@name='end_date']")
-  DATE_PICKER_FIELD = (By.XPATH, "//*[@data-handler='selectDay']")
-
-
-class WidgetInfoProgram(WidgetInfoPanel):
-  """Locators for Program Info widgets."""
-  # pylint: disable=too-many-format-args
-  WIDGET = Common.INFO
-  TOGGLE_SHOW_ADVANCED = (
-      By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
-  TOGGLE_SHOW_ADVANCED_ACTIVATED = (
-      By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  PRIVATE_PROGRAM = (By.CSS_SELECTOR,
-                     '[data-test-id="title_private_ec758af9"] h6')
-  ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
-  ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-info")
-  MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
-  MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
-
-
-class WidgetInfoRisk(WidgetSnapshotsInfoPanel):
-  """Locators for Risk Info widgets."""
-
-
-class WidgetInfoOrgGroup(WidgetSnapshotsInfoPanel):
-  """Locators for Org Group Info widgets."""
-
-
-class WidgetInfoIssue(WidgetInfoPanel):
-  """Locators for Issue Info widgets."""
-
-
-class WidgetInfoRegulations(WidgetSnapshotsInfoPanel):
-  """Locators for Regulation Info widgets."""
-
-
-class WidgetInfoWorkflow(WidgetInfoPanel):
-  """Locators for Workflow Info widgets."""
-
-
-class WidgetInfoAudit(WidgetInfoPanel):
-  """Locators for Audit Info widgets."""
-
-
-class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
-  """Locators for Assessment Info widgets."""
-  # pylint: disable=invalid-name
-  WIDGET = Common.INFO
-  TOGGLE = ' [class*="fa-caret"]'
-  HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".ggrc-form-item__multiple-row")
-  # Base
-  LCAS_HEADERS_AND_VALUES = (
-      By.CSS_SELECTOR, "custom-attributes div[class*='custom-attribute']")
-  CAS_HEADERS_AND_VALUES = (
-      By.CSS_SELECTOR,
-      WIDGET + " assessment-custom-attributes inline-edit-control")
-  CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
-  # Assessment Attributes tab
-  # comments section
-  COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
-  # asmt tab container
-  ASMT_CONTROLLER_SECTION_CSS = (By.CSS_SELECTOR, "assessment-controls")
-  _ASMT_PANEL = ".tab-pane"
-  ASMT_LOG_PANEL_CSS = (By.CSS_SELECTOR,
-                        " ".join([_ASMT_PANEL, "ul.entry-list"]))
-  RELATED_ASMTS_CSS = (By.CSS_SELECTOR, " ".join(
-      [_ASMT_PANEL, "related-objects[related-items-type='Assessment']"]))
-  RELATED_ISSUES_CSS = (By.CSS_SELECTOR, " ".join(
-      [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
-  ASMT_TYPE_CSS = (By.CSS_SELECTOR, ".action-toolbar__content-item")
-  # state section
-  _PNL_STATE = ".pane-header__toolbar"
-  BUTTON_COMPLETE = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-darkBlue")
-  BUTTON_VERIFY = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-green")
-  BUTTON_NEEDS_REWORK = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
-  ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
-  EVIDENCE_URLS_CSS = (By.CSS_SELECTOR,
-                       ".action-toolbar document-object-list-item a")
-
-
 class TabContainer(object):
   TAB_CONTROLLER_CSS = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
   TAB_CONTENT_CSS = (By.CSS_SELECTOR, '.tab-pane.active')
-
-
-class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
-  """Locators for assessment template info widget."""
-
-
-class WidgetInfoPolicy(WidgetSnapshotsInfoPanel):
-  """Locators for Policy Info widgets."""
-
-
-class WidgetInfoStandard(WidgetSnapshotsInfoPanel):
-  """Locators for Standard Info widgets."""
-
-
-class WidgetInfoContract(WidgetSnapshotsInfoPanel):
-  """Locators for Contract Info widgets."""
-
-
-class WidgetInfoRequirement(WidgetSnapshotsInfoPanel):
-  """Locators for Requirement Info widgets."""
-
-
-class WidgetInfoControl(WidgetSnapshotsInfoPanel):
-  """Locators for Control Info widgets."""
-
-
-class WidgetInfoObjective(WidgetSnapshotsInfoPanel):
-  """Locators for Objective Info widgets."""
-
-
-class WidgetInfoPeople(CommonWidgetInfo):
-  """Locators for People Info widgets."""
-
-
-class WidgetInfoVendor(WidgetSnapshotsInfoPanel):
-  """Locators for Vendor Info widgets."""
-
-
-class WidgetInfoAccessGroup(WidgetSnapshotsInfoPanel):
-  """Locators for Access Group Info widgets."""
-
-
-class WidgetInfoAccountBalance(WidgetSnapshotsInfoPanel):
-  """Locators for Account Balance Info widgets."""
-
-
-class WidgetInfoSystem(WidgetSnapshotsInfoPanel):
-  """Locators for System Info widgets."""
-
-
-class WidgetInfoProcess(WidgetSnapshotsInfoPanel):
-  """Locators for Process Info widgets."""
-
-
-class WidgetInfoProduct(WidgetSnapshotsInfoPanel):
-  """Locators for Product Info widgets."""
-
-
-class WidgetInfoFacility(WidgetSnapshotsInfoPanel):
-  """Locators for Facility Info widgets."""
-
-
-class WidgetInfoKeyReport(WidgetSnapshotsInfoPanel):
-  """Locators for Key Report Info widgets."""
-
-
-class WidgetInfoProject(WidgetSnapshotsInfoPanel):
-  """Locators for Project Info widgets."""
-
-
-class WidgetInfoMarket(WidgetSnapshotsInfoPanel):
-  """Locators for Market Info widgets."""
-
-
-class WidgetInfoDataAsset(WidgetSnapshotsInfoPanel):
-  """Locators for Data Asset Info widgets."""
-
-
-class WidgetInfoThreat(WidgetSnapshotsInfoPanel):
-  """Locators for Threat Info widgets."""
 
 
 class WidgetAdminRoles(object):
@@ -922,12 +602,6 @@ class TreeView(object):
       By.CSS_SELECTOR, Common.WDG_NOT_HIDDEN + ITEM_EXPAND_BTN)
 
 
-class TreeViewItem(object):
-  """Locators for Tree View Item element"""
-  CELL = (By.CSS_SELECTOR,
-          "div[class*='attr']:not(.attr-content):not(.selectable-attrs)")
-
-
 class AdminTreeView(object):
   """Locators for Tree View components in Admin dashboard."""
   # common
@@ -955,7 +629,8 @@ class UnifiedMapperTreeView(TreeView):
   HEADER = MODAL + " .list-header"
   ITEMS = MODAL + " mapper-results-item"
   SHOW_FIELDS_BTN_CSS = (By.CSS_SELECTOR, HEADER + " .fa-bars")
-  NO_RESULTS_MSG_CSS = (By.CSS_SELECTOR, ".well-small:not(.hidden)")
+  NO_RESULTS_MSG_CSS = (By.CSS_SELECTOR,
+                        "object-selection .well-small:not(.hidden)")
   MAPPER_TREE_SPINNER_NO_RESULT = (
       By.CSS_SELECTOR, ".no-items-spinner-wrapper spinner-component")
   MAPPER_TREE_SPINNER_ITEMS = (
@@ -1073,14 +748,6 @@ class CommentItem(object):
   AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
   DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__header-author-info")
   CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")
-
-
-class AssessmentLogTab(object):
-  """Locators for Log Tab elements on Assessment InfoWidget."""
-  CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
-  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-holder')
-  PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
-  LOG_LIST_CSS = (By.CSS_SELECTOR, ' .w-status')
 
 
 class AssessmentRelatedTable(object):

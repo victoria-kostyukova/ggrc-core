@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """A facade for RestService.
 Reasons for a facade:
@@ -6,6 +6,8 @@ Reasons for a facade:
 * More high level functions are often needed
 """
 import re
+
+import inflection
 
 from lib import factory, decorator, users
 from lib.constants import roles, objects, element, value_aliases
@@ -25,6 +27,16 @@ def create_requirement(program=None, **attrs):
   return _create_obj_in_program_scope(objects.REQUIREMENTS, program, **attrs)
 
 
+def create_policy(program=None, **attrs):
+  """Create a policy."""
+  return _create_obj_in_program_scope(objects.POLICIES, program, **attrs)
+
+
+def create_contract(program=None, **attrs):
+  """Create a contract."""
+  return _create_obj_in_program_scope(objects.CONTRACTS, program, **attrs)
+
+
 def create_regulation(program=None, **attrs):
   """Create a regulation."""
   return _create_obj_in_program_scope(objects.REGULATIONS, program, **attrs)
@@ -32,7 +44,14 @@ def create_regulation(program=None, **attrs):
 
 def create_objective(program=None, **attrs):
   """Create an objective (optionally map to a `program`)."""
-  return _create_obj_in_program_scope("Objectives", program, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.OBJECTIVES), program, **attrs)
+
+
+def create_threat(program=None, **attrs):
+  """Create a threat (optionally map to a `program`)."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.THREATS), program, **attrs)
 
 
 def create_standard(program=None, **attrs):
@@ -42,17 +61,20 @@ def create_standard(program=None, **attrs):
 
 def create_control(**attrs):
   """Create an control."""
-  return _create_obj_in_program_scope("Controls", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.CONTROLS), None, **attrs)
 
 
 def create_technology_environment(**attrs):
   """Create a technology environment."""
-  return _create_obj_in_program_scope("TechnologyEnvironments", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.TECHNOLOGY_ENVIRONMENTS), None, **attrs)
 
 
 def create_product(**attrs):
   """Create a product."""
-  return _create_obj_in_program_scope("Products", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PRODUCTS), None, **attrs)
 
 
 def create_control_mapped_to_program(program, **attrs):
@@ -116,9 +138,7 @@ def create_asmts_from_template(audit, asmt_template, objs_to_map):
 
 def create_gcad(**attrs):
   """Creates global CADs for all types."""
-  return rest_service.CustomAttributeDefinitionsService(
-      is_external=True if (objects.get_plural(attrs["definition_type"])
-                           in objects.EXTERNAL_OBJECTS) else False).create_obj(
+  return rest_service.CustomAttributeDefinitionsService().create_obj(
       factory_params=attrs)
 
 
@@ -140,7 +160,86 @@ def create_issue(obj=None):
 
 def create_risk(**attrs):
   """Create an risk."""
-  return _create_obj_in_program_scope("Risks", None, **attrs)
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.RISKS), None, **attrs)
+
+
+def create_project(**attrs):
+  """Create an project."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PROJECTS), None, **attrs)
+
+
+def create_key_report(**attrs):
+  """Create a key report."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.KEY_REPORTS), None, **attrs)
+
+
+def create_account_balance(**attrs):
+  """Create an account balance."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ACCOUNT_BALANCES), None, **attrs)
+
+
+def create_access_group(**attrs):
+  """Create an access group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ACCESS_GROUPS), None, **attrs)
+
+
+def create_data_asset(**attrs):
+  """Create a data asset."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.DATA_ASSETS), None, **attrs)
+
+
+def create_facility(**attrs):
+  """Create a facility."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.FACILITIES), None, **attrs)
+
+
+def create_market(**attrs):
+  """Create a market."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.MARKETS), None, **attrs)
+
+
+def create_metric(**attrs):
+  """Create a metric."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.METRICS), None, **attrs)
+
+
+def create_org_group(**attrs):
+  """Create an org group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.ORG_GROUPS), None, **attrs)
+
+
+def create_process(**attrs):
+  """Create a process."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PROCESSES), None, **attrs)
+
+
+def create_product_group(**attrs):
+  """Create a product group."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.PRODUCT_GROUPS), None, **attrs)
+
+
+def create_system(**attrs):
+  """Create a system."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.SYSTEMS), None, **attrs)
+
+
+def create_vendor(**attrs):
+  """Create a vendor."""
+  return _create_obj_in_program_scope(
+      inflection.camelize(objects.VENDORS), None, **attrs)
 
 
 @decorator.check_that_obj_is_created
@@ -170,8 +269,8 @@ def map_objs(src_obj, dest_obj):
 
   def _is_external(src_obj, dest_obj):
     """Check if one of objects to map is external."""
-    singular_title_external_objs = [
-        objects.get_singular(x, title=True) for x in objects.EXTERNAL_OBJECTS]
+    singular_title_external_objs = [objects.get_singular(x, title=True)
+                                    for x in objects.ALL_DISABLED_OBJECTS]
     objects_list = [src_obj, ]
     dest_ojbect_list = dest_obj if isinstance(dest_obj,
                                               (tuple, list)) else [dest_obj, ]
@@ -283,3 +382,23 @@ def cas_dashboards(obj, *urls):
   valid_urls = [i for i in urls if re.match(valid_dashboard_url_pattern, i)]
   return dict(zip([gca_def.title.replace(value_aliases.DASHBOARD + "_", "")
                    for gca_def in gca_defs], valid_urls))
+
+
+def update_acl(objs, people, rewrite_acl=False, **kwargs):
+  """Updates or rewrites access control list of objects.
+
+  Args:
+    objs: A list of objects to update.
+    people: Person or list of persons who will be assigned with role
+    rewrite_acl: Boolean indicating whether the object ACL will be updated or
+        rewritten.
+    **kwargs:
+      role_name: Name of access control role.
+      role_id: Id of access control role.
+
+  Returns: list of updated objects."""
+  return [
+      factory.get_cls_rest_service(objects.get_plural(obj.type))().
+      update_acl(obj=obj, people=people, rewrite_acl=rewrite_acl,
+                 role_name=kwargs["role_name"], role_id=kwargs["role_id"])
+      for obj in objs]

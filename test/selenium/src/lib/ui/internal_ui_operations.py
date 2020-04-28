@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
 from lib import factory, users
@@ -25,4 +25,5 @@ def build_obj(app_obj):
 
 def info_widget_page(obj):
   """Returns a corresponding page object from info_widget module."""
-  return factory.get_cls_widget(object_name=obj.obj_name(), is_info=True)()
+  return factory.get_cls_widget(object_name=obj.plural_obj_name(),
+                                is_info=True)()

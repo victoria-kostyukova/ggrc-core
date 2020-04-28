@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Admin dashboard page smoke tests."""
 # pylint: disable=no-self-use
@@ -14,7 +14,7 @@ import pytest
 
 from lib import base, constants, url, users
 from lib.constants import element, messages, objects, roles
-from lib.entities import entities_factory
+from lib.entities import entities_factory, entity
 from lib.page import dashboard
 from lib.service import admin_webui_service, rest_facade, webui_facade
 from lib.utils import date_utils, selenium_utils, string_utils
@@ -332,39 +332,29 @@ class TestCAAdministration(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "ca_type",
-      element.AdminWidgetCustomAttributes.ALL_GCA_TYPES
-  )
-  def test_add_global_ca(self, selenium, ca_type):
-    """Create different types of Custom Attribute on Admin Dashboard."""
-    def_type = objects.get_normal_form(random.choice(objects.EDITABLE_CA_OBJS))
-    expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
-        attribute_type=ca_type, definition_type=def_type)
-    ca_admin_service = admin_webui_service.CustomAttributeWebUiService(
-        selenium)
-    ca_admin_service.create_custom_attribute(new_ca=expected_ca)
-    actual_cas = ca_admin_service.ca_widget.get_custom_attributes_list(
-        obj_type=expected_ca.definition_type)
-    self.general_contain_assert(expected_ca, actual_cas,
-                                "multi_choice_options")
+      element.AdminWidgetCustomAttributes.ALL_GCA_TYPES)
+  @pytest.mark.parametrize("is_assessment", [True, False])
+  def test_add_global_ca(self, selenium, ca_type, is_assessment, soft_assert):
+    """Create different types of Custom Attribute on Admin Dashboard.
+    Check a Mandatory checkbox is visible for all the objects except
+    assessments."""
+    webui_facade.check_ca_creating(
+        soft_assert=soft_assert, selenium=selenium,
+        def_type=objects.get_normal_form(
+            objects.ASSESSMENTS if is_assessment
+            else random.choice(objects.OBJS_SUPPORTING_MANDATORY_CA)),
+        ca_type=ca_type)
+    soft_assert.assert_expectations()
 
   @pytest.mark.parametrize(
-      'old_ca_type, new_ca_type',
-      [(element.AdminWidgetCustomAttributes.TEXT,
-        element.AdminWidgetCustomAttributes.RICH_TEXT),
-       (element.AdminWidgetCustomAttributes.TEXT,
-        element.AdminWidgetCustomAttributes.DATE),
-       (element.AdminWidgetCustomAttributes.TEXT,
-        element.AdminWidgetCustomAttributes.CHECKBOX),
-       (element.AdminWidgetCustomAttributes.TEXT,
-        element.AdminWidgetCustomAttributes.MULTISELECT),
-       (element.AdminWidgetCustomAttributes.TEXT,
-        element.AdminWidgetCustomAttributes.DROPDOWN),
-       (element.AdminWidgetCustomAttributes.RICH_TEXT,
-        element.AdminWidgetCustomAttributes.TEXT)]
-  )
-  def test_destructive_edit_global_ca(
-      self, old_ca_type, new_ca_type, selenium
-  ):
-    """Check that Global Custom Attributes can be edited."""
-    ca_data = webui_facade.edit_gca(selenium, old_ca_type, new_ca_type)
-    self.general_equal_assert(ca_data["expected_ca"], ca_data["actual_ca"])
+      'ca_type', element.AdminWidgetCustomAttributes.ALL_GCA_TYPES)
+  def test_destructive_edit_global_ca(self, ca_type, soft_assert, selenium):
+    """Check that Global Custom Attributes can be edited and 'Title',
+    'Attribute type' and 'Possible values' are disabled for editing."""
+    ca_data = webui_facade.edit_gca(selenium, ca_type)
+    webui_facade.soft_assert_gca_fields_disabled_for_editing(soft_assert,
+                                                             ca_type)
+    soft_assert.assert_expectations()
+    self.general_equal_assert(
+        ca_data["expected_ca"], ca_data["actual_ca"], 'modified_by',
+        *entity.Representation.tree_view_attrs_to_exclude)

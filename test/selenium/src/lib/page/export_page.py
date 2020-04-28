@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Export page with Export Panels."""
 
@@ -58,4 +58,5 @@ class ExportPage(base.Component):
         if not filename.endswith("crdownload"):  # file is not fully downloaded
           return os.path.join(path_to_export_dir, filename)
       return None
+
     return test_utils.wait_for(path_to_downloaded_file)

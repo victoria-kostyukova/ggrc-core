@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Counters constants."""
 
@@ -10,3 +10,6 @@ BATCH_COUNT = 2
 
 # number of try operations
 TRY_COUNT = 2
+
+# max number of items in emails dropdown
+MAX_EMAILS_IN_DROPDOWN = 10

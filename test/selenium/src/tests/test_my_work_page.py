@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """My Work page smoke tests."""
 # pylint: disable=no-self-use
@@ -10,7 +10,7 @@ import re
 
 import pytest  # pylint: disable=import-error
 
-from lib import base, url
+from lib import base, url, factory
 from lib.constants import objects
 from lib.page import dashboard, lhn
 from lib.page.widget import generic_widget, object_modal
@@ -205,9 +205,27 @@ class TestMyWorkPage(base.Test):
       )
     assert hnb_objects.issubset(lhn_objects) is True
 
-  def test_user_cannot_create_control_from_lhn(self, lhn_menu, soft_assert):
-    """Tests that `New Control` modal object cannot be opened from lhn."""
-    lhn_menu.select_controls_or_objectives().select_controls().create_new()
-    webui_facade.soft_assert_no_modals_present(object_modal.ControlModal(),
+  @pytest.mark.parametrize(
+      "obj_name", objects.CONTROLS_AND_RISKS +
+      (objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)),))
+  def test_cannot_create_disabled_obj_from_lhn(self, obj_name,
+                                               soft_assert, selenium):
+    """Tests that 'New object' modal for disabled object cannot be opened
+    from LHN."""
+    factory.get_cls_webui_service(obj_name)().get_lhn_accordion(
+        obj_name).create_new()
+    webui_facade.soft_assert_no_modals_present(object_modal.BaseObjectModal(),
                                                soft_assert)
+    soft_assert.assert_expectations()
+
+  @pytest.mark.parametrize(
+      "obj_name", objects.CONTROLS_AND_RISKS +
+      (objects.get_plural(next(objects.SINGULAR_SCOPE_OBJS_ITERATOR)),))
+  def test_cannot_create_disabled_obj_from_dashboard(self, obj_name,
+                                                     soft_assert, selenium):
+    """Confirm that no modal present after starting disabled object
+    creation from dashboard."""
+    obj_modal = webui_facade.open_create_obj_modal(
+        obj_type=objects.get_singular(obj_name, titleize=True))
+    webui_facade.soft_assert_no_modals_present(obj_modal, soft_assert)
     soft_assert.assert_expectations()

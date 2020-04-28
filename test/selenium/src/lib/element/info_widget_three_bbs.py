@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """3bbs element for info widget."""
 from lib.element import three_bbs
@@ -100,9 +100,101 @@ class ControlInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Control info widget."""
 
 
+class RiskInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Risk info widget."""
+
+
 class PersonTreeItemThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Person tree item widget."""
 
   def select_edit_authorizations(self):
     """Selects `Edit Authorizations` option."""
     self._three_bbs.option_by_text("Edit System Authorizations").click()
+
+
+class AccessGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Access Group info widget."""
+
+
+class AccountBalanceInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Account Balance info widget."""
+
+
+class DataAssetInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Data Asset info widget."""
+
+
+class FacilityInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Facility info widget."""
+
+
+class KeyReportInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Key Report info widget."""
+
+
+class MarketInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Market info widget."""
+
+
+class MetricInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Metric info widget."""
+
+
+class OrgGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Org Group info widget."""
+
+
+class ProcessInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Process info widget."""
+
+
+class ProductInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Product info widget."""
+
+
+class ProductGroupInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Product Group info widget."""
+
+
+class ProjectInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Project info widget."""
+
+
+class SystemInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for System info widget."""
+
+
+class TechnologyEnvironmentInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Technology Environment info widget."""
+
+
+class VendorInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Vendor info widget."""
+
+
+class RequirementInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Requirement info widget."""
+
+
+class PolicyInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Policy info widget."""
+
+
+class ContractInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Contract info widget."""
+
+
+class RegulationInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Regulation info widget."""
+
+
+class StandardInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Standard info widget."""
+
+
+class ObjectiveInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Objective info widget."""
+
+
+class ThreatInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Threat info widget."""

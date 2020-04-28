@@ -1,6 +1,7 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create, description, representation and equal of entities."""
+# pylint: disable=too-many-lines
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 # pylint: disable=inconsistent-return-statements
@@ -49,7 +50,7 @@ class Representation(object):
     """All possible entities' attributes names include REST."""
     return list(set(cls.get_attrs_names() + [
         "access_control_list", "recipients", "default_people",
-        "modal_title", "assignee_type", "user_roles"]))
+        "modal_title", "assignee_type", "user_roles", "link", "kind"]))
 
   @classmethod
   def get_attrs_names(cls, entity=None):
@@ -77,25 +78,32 @@ class Representation(object):
     """
     from lib.constants import element, files
     els = element.TransformationElements
-    csv = files.TransformationCSVFields
+    csv = files.CSVFields
     # common for UI and CSV
     result_remap_items = {
         els.TITLE: "title", els.ADMIN: "admins",
-        els.CODE: "slug", els.REVIEW_STATE: "os_state",
+        els.CODE: "slug", els.REVIEW_STATE: "review_status",
         els.OBJECT_REVIEW: "os_state",
         els.STATE: "status"
     }
     ui_remap_items = {
-        els.PROGRAM_MANAGERS: "managers", els.VERIFIED: "verified",
+        els.PROGRAM_MANAGERS: "managers", els.PROGRAM_EDITORS: "editors",
+        els.PRIMARY_CONTACTS: "primary_contacts",
+        els.PROGRAM_READERS: "readers",
+        els.SECONDARY_CONTACTS: "secondary_contacts",
+        els.VERIFIED: "verified",
         els.STATUS: "status", els.LAUNCH_STATUS: "status",
         els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains",
         els.AUDITORS: "auditors",
+        els.CREATED_AT: "created_at",
         "MAPPED_OBJECTS": "mapped_objects", els.ASSIGNEES: "assignees",
         els.CREATORS: "creators", "VERIFIERS": "verifiers",
         "COMMENTS": "comments", "CREATED_AT": "created_at",
         els.MODIFIED_BY: "modified_by", "LAST_UPDATED_BY": "modified_by",
         "UPDATED_AT": "updated_at", "ASSESSMENT_TYPE": "assessment_type",
+        els.ASMT_TYPE: "assessment_type",
+        els.RECIPIENTS: "recipients",
         "IS_VERIFIED": "verified",
         "CUSTOM_ATTRIBUTES": "custom_attributes",
         "DESCRIPTION": "description",
@@ -106,10 +114,11 @@ class Representation(object):
         "REVIEW_STATUS": "review_status",
         "REVIEW_STATUS_DISPLAY_NAME": "review_status_display_name",
         "PRIMARY_CONTACTS": "primary_contacts",
+        "EDITORS": "editors",
         "CONTROL_OPERATORS": "control_operators",
         "CONTROL_OWNERS": "control_owners",
         "URL": "url",
-        "ID": "id", "RISK_TYPE": "risk_type",
+        "ID": "id", "Risk Type": "risk_type",
         "REVIEW": "review"
     }
     csv_remap_items = {
@@ -660,7 +669,12 @@ class Entity(Representation):
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
         RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
-        ProductEntity, TechnologyEnvironmentEntity
+        ProductEntity, TechnologyEnvironmentEntity, ChangeLogItemEntity,
+        ThreatEntity, AccessGroupEntity, AccountBalanceEntity, DataAssetEntity,
+        FacilityEntity, KeyReportEntity, MarketEntity, MetricEntity,
+        ProcessEntity, ProductGroupEntity, ProjectEntity, SystemEntity,
+        VendorEntity, StandardEntity, RegulationEntity, RequirementEntity,
+        PolicyEntity, ContractEntity
     )
 
   def __lt__(self, other):
@@ -745,7 +759,7 @@ class CustomAttributeDefinitionEntity(Representation):
         "title", "id", "href", "type", "definition_type", "attribute_type",
         "helptext", "placeholder", "mandatory", "multi_choice_options",
         "created_at", "updated_at", "modified_by", "multi_choice_mandatory",
-        **attrs)
+        "external_name", "external_type", **attrs)
 
   def __lt__(self, other):
     return self.title < other.title
@@ -769,7 +783,25 @@ class ProgramEntity(Entity, mixin.Reviewable):
     self.delete_attrs("admins")
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
-        "secondary_contacts", "review", **attrs)
+        "secondary_contacts", "review", "parents", "children", **attrs)
+
+  def tree_item_representation(self):
+    """Make program's copy and convert it to the view of tree item."""
+    obj = super(ProgramEntity, self).tree_item_representation()
+    obj.children, obj.parents = [], []
+    return obj
+
+  def get_recipients_emails(self):
+    """Returns the emails of all users who are assigned to roles that should
+    receive notifications."""
+    recipients = []
+    if hasattr(self, "recipients"):
+      for role in self.recipients.split(","):
+        users_assigned_to_role = getattr(
+            self, Representation.remap_collection()[role.upper()])
+        if users_assigned_to_role:
+          recipients.extend(users_assigned_to_role)
+    return recipients
 
 
 class ProductEntity(Entity):
@@ -806,6 +838,10 @@ class ObjectiveEntity(Entity):
   """Class that represent model for Objective entity."""
 
 
+class ThreatEntity(Entity):
+  """Class that represent model for Threat entity."""
+
+
 class RiskEntity(Entity):
   """Class that represent model for Risk entity."""
 
@@ -813,6 +849,59 @@ class RiskEntity(Entity):
     super(RiskEntity, self).__init__()
     self.set_attrs(
         "risk_type", "threat_source", "threat_event", "vulnerability", **attrs)
+
+
+class ProjectEntity(Entity):
+  """Class that represent model for Project entity."""
+
+  def __init__(self, **attrs):
+    super(ProjectEntity, self).__init__()
+    self.set_attrs(
+        "assignees", "verifiers", **attrs)
+
+
+class KeyReportEntity(Entity):
+  """Class that represent model for Key Report entity."""
+
+
+class AccessGroupEntity(Entity):
+  """Class that represent model for Access Group entity."""
+
+
+class AccountBalanceEntity(Entity):
+  """Class that represent model for Account Balance entity."""
+
+
+class DataAssetEntity(Entity):
+  """Class that represent model for Data Asset entity."""
+
+
+class FacilityEntity(Entity):
+  """Class that represent model for Facility entity."""
+
+
+class MarketEntity(Entity):
+  """Class that represent model for Market entity."""
+
+
+class MetricEntity(Entity):
+  """Class that represent model for Metric entity."""
+
+
+class ProcessEntity(Entity):
+  """Class that represent model for Process entity."""
+
+
+class ProductGroupEntity(Entity):
+  """Class that represent model for Product Group entity."""
+
+
+class SystemEntity(Entity):
+  """Class that represent model for System entity."""
+
+
+class VendorEntity(Entity):
+  """Class that represent model for Vendor entity."""
 
 
 class OrgGroupEntity(Entity):
@@ -846,6 +935,8 @@ class AssessmentEntity(Entity):
 
   def __init__(self, **attrs):
     super(AssessmentEntity, self).__init__()
+    self.bulk_update_modal_tree_view_attrs_to_exclude = (
+        'audit', 'assessment_type', 'modified_by', 'created_at', 'updated_at')
     self.delete_attrs("admins")
     self.set_attrs(
         "creators", "assignees", "verifiers", "assessment_type", "verified",
@@ -889,6 +980,14 @@ class ReviewEntity(Entity):
         self.last_reviewed_by and self.last_reviewed_at else None}
 
 
+class ChangeLogItemEntity(Representation):
+  """Change log item entity from UI."""
+
+  def __init__(self, **attrs):
+    super(ChangeLogItemEntity, self).__init__()
+    self.set_attrs("author", "changes", "additional_info", **attrs)
+
+
 class ProposalEntity(Representation):
   """Proposal entity from UI.
 
@@ -906,7 +1005,8 @@ class ProposalEmailUI(Representation):
   def __init__(self, **attrs):
     super(ProposalEmailUI, self).__init__()
     self.set_attrs(
-        "recipient_email", "author", "obj_type", "changes", "comment", **attrs)
+        "recipient_email", "author", "obj_type", "changes", "comment",
+        "obj_url", **attrs)
 
 
 class ReviewEmailUI(Representation):
@@ -936,3 +1036,15 @@ class RegulationEntity(Entity):
 
 class RequirementEntity(Entity):
   """Requirement entity."""
+
+
+class PolicyEntity(Entity):
+  """Policy entity."""
+
+
+class ContractEntity(Entity):
+  """Contract entity."""
+
+
+class EvidenceEntity(Representation):
+  """Class that represent model for Evidence entity."""

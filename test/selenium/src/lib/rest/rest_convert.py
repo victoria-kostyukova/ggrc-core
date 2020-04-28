@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Conversions from App entity to REST."""
 from lib.app_entity import person_entity
@@ -69,3 +69,10 @@ def to_basic_rest_obj(obj):
 def default_context():
   """Returns default value for `context`."""
   return {"id": None}
+
+
+def administrator_context():
+  """Returns `context` value for `Administrator` role."""
+  # Passing context with id:0 is necessary for the proper permissions
+  # assignment for 'Administrator' role.
+  return {"id": 0}

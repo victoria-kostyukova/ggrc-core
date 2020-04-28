@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Assessments Workflow smoke tests."""
 # pylint: disable=no-self-use
@@ -23,7 +23,8 @@ from lib.entities.entities_factory import (
     CustomAttributeDefinitionsFactory, PeopleFactory)
 from lib.entities.entity import Representation
 from lib.page.widget import object_modal
-from lib.service import rest_facade, rest_service, webui_service
+from lib.service import (rest_facade, rest_service, webui_service,
+                         change_log_ui_service)
 from lib.utils import string_utils
 from lib.utils.filter_utils import FilterUtils
 from lib.utils.string_utils import StringMethods
@@ -72,7 +73,7 @@ class TestAssessmentsWorkflow(base.Test):
     asmt_comments_panel = asmts_ui_service.add_comments(
         src_obj=audit, obj=expected_asmt,
         comment_objs=expected_asmt_comments)
-    assert asmt_comments_panel.is_input_empty is True
+    assert asmt_comments_panel.comment_input.is_empty is True
     # 'expected_asmt_comments': created_at (None) *factory
     expected_asmt_comments = [expected_comment.update_attrs(
         created_at=self.info_service().get_comment_obj(
@@ -89,19 +90,14 @@ class TestAssessmentsWorkflow(base.Test):
     self.general_equal_assert(expected_asmt, actual_asmt, "audit")
 
   @pytest.mark.smoke_tests
-  def test_asmt_logs(
-      self, program, audit, assessment, selenium
-  ):
-    """Test for validation of Assessment log pane.
-    Acceptance criteria:
-      1) 3 log items at the log pane
-      2) all items return 'True' for all attrs.
-    """
-    log_items_validation = webui_service.AssessmentsService(
-        selenium).get_log_pane_validation_result(obj=assessment)
-    log_validation_results = [all(item_result.values()) for item_result in
-                              log_items_validation]
-    assert ([True] * 2) == log_validation_results, str(log_items_validation)
+  def test_asmt_logs(self, program, audit, assessment, selenium):
+    """Test for validation of Assessment log pane."""
+    log_items_factory = entities_factory.ChangeLogItemsFactory()
+    exp_log = [log_items_factory.generate_log_entity_for_mapping(audit),
+               log_items_factory.generate_obj_creation_entity(assessment)]
+    actual_log = (change_log_ui_service.ChangeLogService().
+                  get_obj_changelog(assessment))
+    assert exp_log == actual_log, "Actual change log differs from expected."
 
   @pytest.mark.smoke_tests
   def test_raise_issue(
@@ -244,14 +240,14 @@ class TestAssessmentsWorkflow(base.Test):
     unchecked_asmt = assessments[0]
     checked_asmt = assessments[1]
 
-    checkbox_value = random.choice([True, False])
-    print "Checkbox value: {}".format(checkbox_value)
+    checkbox_values = ["yes", "no"]
+    random.shuffle(checkbox_values)
     self._set_values_for_assessment(
         unchecked_asmt, gcads_for_asmt,
-        only_checkbox=True, checkbox_value=checkbox_value)
+        only_checkbox=True, checkbox_value=checkbox_values[0])
     cavs = self._set_values_for_assessment(
         checked_asmt, gcads_for_asmt,
-        only_checkbox=False, checkbox_value=not checkbox_value)
+        only_checkbox=False, checkbox_value=checkbox_values[1])
 
     self._check_assessments_filtration(checked_asmt, cavs,
                                        operator, audit, selenium)
@@ -284,12 +280,12 @@ class TestAssessmentsWorkflow(base.Test):
     unchecked_asmt = assessments_from_template[0]
     checked_asmt = assessments_from_template[1]
 
-    checkbox_value = random.choice([True, False])
-    print "Checkbox value: {}".format(checkbox_value)
+    checkbox_values = ["yes", "no"]
+    random.shuffle(checkbox_values)
     set_values_for_assessment(
-        unchecked_asmt, only_checkbox=True, checkbox_value=checkbox_value)
+        unchecked_asmt, only_checkbox=True, checkbox_value=checkbox_values[0])
     set_attr_values = set_values_for_assessment(
-        checked_asmt, only_checkbox=False, checkbox_value=not checkbox_value)
+        checked_asmt, only_checkbox=False, checkbox_value=checkbox_values[1])
 
     self._check_assessments_filtration(checked_asmt,
                                        set_attr_values,

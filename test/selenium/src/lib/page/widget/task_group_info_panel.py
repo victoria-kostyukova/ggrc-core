@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Task Group info panel."""
 from lib import base
@@ -13,7 +13,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def __init__(self):
     super(TaskGroupInfoPanel, self).__init__()
-    self._root = self._browser
+    self._root = self._browser.element(class_name="pin-content")
     self._table = table_with_headers.TableWithHeaders(
         self._root,
         header_elements=self._task_header_elements,
@@ -23,6 +23,8 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def wait_to_be_init(self):
     """Wait for panel to be initialized."""
+    selenium_utils.wait_until_condition(
+        self._driver, lambda e: "loading" not in self._root.classes)
     self._create_task_button.wait_until(lambda e: e.present)
     ui_utils.wait_for_spinner_to_disappear()
     self._create_task_button.wait_until(lambda e: e.enabled)
@@ -63,7 +65,9 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def _task_header_elements(self):
     """Returns task header elements."""
-    return self._root.elements(class_name="task_group_tasks__header-item")
+    return self._root.element(
+        class_name="related-objects-list__header").elements(
+        class_name="flex-size-6")
 
   def task_rows(self):
     """Returns task rows."""
@@ -82,7 +86,7 @@ class TaskRow(object):
     self._table_row = table_with_headers.TableRow(
         container=row_el,
         table_header_names=header_names,
-        cell_locator={"class_name": "task_group_tasks__list-item-column"}
+        cell_locator={"class_name": "flex-size-6"}
     )
 
   @property

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """App entities related to workflow."""
 import attr
@@ -25,6 +25,7 @@ class TaskGroup(_base.Base, _base.WithTitleAndCode):
   assignee = attr.ib()
   workflow = attr.ib()
   task_group_tasks = attr.ib()
+  description = attr.ib()
 
 
 @attr.s

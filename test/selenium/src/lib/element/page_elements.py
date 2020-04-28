@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Page objects for child elements of pages"""
 # pylint: disable=too-few-public-methods
@@ -64,15 +64,38 @@ class SimpleField(object):
   (with h6 header and a text within the same element).
   """
 
-  def __init__(self, container, label):
+  def __init__(self, container, label, with_inline_edit=False):
     self._label_text = label
-    self._root = container.h6(text=label).parent()
-    if "action-toolbar" in self._root.classes:
-      self._root = self._root.parent()
+    self._container = container
+    if with_inline_edit:
+      self.inline_edit = InlineEdit(self.root)
+      self.input = self.root.input()
+
+  @property
+  def root(self):
+    """Returns root element."""
+    root = self._container.h6(text=self._label_text).parent()
+    if "action-toolbar" in root.classes:
+      root = root.parent()
+    return root
 
   @property
   def text(self):
-    return self._root.text[len(self._label_text):].strip()
+    """Returns text of element."""
+    return self.root.text[len(self._label_text):].strip()
+
+
+class EditableSimpleField(SimpleField):
+  """Represents an editable simple field
+  (with header and text within the same element).
+  """
+
+  @property
+  def root(self):
+    """Returns root element."""
+    return self._container.element(
+        tag_name="base-inline-control-title", text=self._label_text).parent(
+        tag_name="inline-edit-control")
 
 
 class Datepicker(object):
@@ -117,12 +140,8 @@ class AssertionsDropdown(object):
     self._root = container.element(
         class_name="custom-attr-wrap").element(text=self.text)
     self.assertions_values = self._root.parent().text.splitlines()[1:]
-    self._inline_edit = InlineEdit(self._root)
+    self.inline_edit = InlineEdit(self._root)
     self.input = self._root.select(class_name="input-block-level")
-
-  def open_inline_edit(self):
-    """Open element for editing."""
-    self._inline_edit.open()
 
 
 class RelatedPeopleList(object):
@@ -187,27 +206,8 @@ class AssessmentEvidenceUrls(object):
 
   def get_urls(self):
     """Get urls"""
-    return [el.text for el in self._root.elements(class_name="link")]
-
-
-class CommentArea(object):
-  """Represents comment area (form and mapped comments) on info widget"""
-
-  def __init__(self, container):
-    self._container = container
-    self.comments_section = container.element(text="Responses/Comments")
-    self.add_section = self.comments_section.parent().button(text="Add")
-
-  @property
-  def exists(self):
-    """Returns whether comment area exists."""
-    return self.comments_section.exists
-
-  @property
-  def control_add_section(self):
-    """Returns controls Add Comment button."""
-    return self._container.element(tag_name="comments-section").element(
-        tag_name="questionnaire-link").link(class_name="questionnaire-link")
+    return [el.text for el in self._root.elements(
+        class_name="editable-evidence-item__content__link")]
 
 
 class CustomAttributeManager(object):
@@ -468,28 +468,23 @@ class MultiselectCAActionsStrategy(CAActionsStrategy):
 
   def __init__(self, *args):
     super(MultiselectCAActionsStrategy, self).__init__(*args)
-    self._dropdown = self._root.element(class_name="multiselect-dropdown")
+    self._dropdown = MultiselectDropdown(self._root)
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    return self._dropdown.input().value
+    return self._dropdown.value
 
   def set_lcas_from_inline(self, value):
     """Sets value of inline LCA field."""
-    self._set_value(value)
+    self._dropdown.set_option_status(value)
 
   def set_gcas_from_popup(self, value):
     """Sets value of GCA field."""
-    self._set_value(value)
-
-  def _set_value(self, value):
-    """Sets value of CA field."""
-    self._dropdown.click()
-    self._fill_input_field(value)
+    self._dropdown.set_option_status(value)
 
   def _fill_input_field(self, value):
     """Fills input field."""
-    self._dropdown.label(text=value).click()
+    self._dropdown.set_option_status(value, is_inline=True)
 
 
 class DropdownCAActionsStrategy(CAActionsStrategy):
@@ -539,9 +534,7 @@ class PersonCAActionsStrategy(CAActionsStrategy):
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    if self._input.exists:  # editable
-      return self._input.text
-    elif self._chosen_person_el.exists:  # readonly
+    if self._chosen_person_el.exists:
       return self._chosen_person_el.text
     return None
 
@@ -557,3 +550,78 @@ class PersonCAActionsStrategy(CAActionsStrategy):
     """Chooses user."""
     self._input.send_keys(value)
     ui_utils.select_user(self._root, value)
+
+
+class MultiselectDropdown(object):
+  """Class for multi select dropdown item."""
+
+  def __init__(self, container):
+    self._root = container.element(class_name="multiselect-dropdown")
+
+  @property
+  def is_expanded(self):
+    """Returns whether dropdown is expanded."""
+    return self._root.element(
+        class_name="multiselect-dropdown__body-wrapper").exists
+
+  def expand(self):
+    """Expands dropdown if it is not expanded."""
+    if not self.is_expanded:
+      self._root.click()
+
+  def collapse(self):
+    """Collapses dropdown if it is expanded."""
+    if self.is_expanded:
+      self._root.click()
+
+  def set_option_status(self, option, status=True, is_inline=False):
+    """Selects or deselects option according to status value. Skip collapse
+    action if parameter is_inline is set to True."""
+    self.expand()
+    self._root.element(text=option).checkbox().set(status)
+    if not is_inline:
+      self.collapse()
+
+  def select_all(self):
+    """Selects all options by selecting 'Select all' option."""
+    self.set_option_status("Select All")
+
+  @property
+  def value(self):
+    """Returns dropdown value."""
+    return self._root.input().value
+
+
+class CollapsiblePanel(object):
+  """Base class for collapsible panels."""
+
+  def __init__(self, root):
+    self._root = root
+
+  @property
+  def is_expanded(self):
+    """Returns whether section is expanded or not."""
+    return "is-expanded" in self._root.div(class_name="body-inner").classes
+
+  def expand(self):
+    """Expand section if it is not expanded already.
+    Returns: CollapsiblePanel instance."""
+    if not self.is_expanded:
+      self._root.span().click()
+      self._root.wait_until(lambda x: self.is_expanded)
+    return self
+
+
+class StatusLabel(object):
+  """Represents status label element."""
+
+  def __init__(self, root, with_inline_edit=False):
+    self._root = root
+    self.text_content = root.text_content
+    self._inline_edit = InlineEdit(self._root.parent(
+        class_name="action-toolbar")) if with_inline_edit else None
+
+  def click_edit(self):
+    """Click on 'Edit' icon to edit element's value on new frontend."""
+    if self._inline_edit:
+      self._inline_edit.open()

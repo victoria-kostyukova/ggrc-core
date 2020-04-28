@@ -1,9 +1,9 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base classes."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
-
+import math
 import random
 import re
 
@@ -14,11 +14,11 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
-from lib import constants, exception, mixin, environment, browsers
+from lib import constants, exception, mixin, environment, browsers, users
 from lib.constants import messages
 from lib.decorator import lazy_property
 from lib.entities import entity
-from lib.utils import selenium_utils, help_utils
+from lib.utils import selenium_utils, help_utils, ui_utils
 
 
 class InstanceRepresentation(object):
@@ -66,20 +66,52 @@ class Test(InstanceRepresentation):
             expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
 
   @staticmethod
+  def general_equal_soft_assert(soft_assert, expected_objs, actual_objs,
+                                *exclude_attrs):
+    """Perform general equal SOFT assert for deepcopy converted to list
+    expected and actual objects according to '*exclude_attrs' tuple of
+    excluding attributes' names (compare objects' collections w/ attributes'
+    values set to None).
+    """
+    expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        entity.Representation.extract_objs(
+            help_utils.convert_to_list(expected_objs),
+            help_utils.convert_to_list(actual_objs), *exclude_attrs))
+    soft_assert.expect(
+        expected_objs_wo_excluded_attrs == actual_objs_wo_excluded_attrs,
+        messages.AssertionMessages.format_err_msg_equal(
+            expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
+
+  @staticmethod
   def general_contain_assert(expected_obj, actual_objs, *exclude_attrs):
     """Perform general contain assert for deepcopy converted expected object
     and actual objects according to '*exclude_attrs' tuple of excluding
     attributes' names
     (compare objects' collections w/ attributes' values set to None).
     """
-    expected_obj_wo_excluded_attrs = (
-        entity.Representation.extract_objs_wo_excluded_attrs(
-            help_utils.convert_to_list(expected_obj), *exclude_attrs)[0])
-    actual_objs_wo_excluded_attrs = (
-        entity.Representation.extract_objs_wo_excluded_attrs(
+    expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        entity.Representation.extract_objs(
+            help_utils.convert_to_list(expected_obj),
             help_utils.convert_to_list(actual_objs), *exclude_attrs))
-    assert (expected_obj_wo_excluded_attrs in
+    assert (expected_obj_wo_excluded_attrs[0] in
             actual_objs_wo_excluded_attrs), (
+        messages.AssertionMessages.format_err_msg_contains(
+            expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
+
+  @staticmethod
+  def general_contain_soft_assert(soft_assert, expected_obj, actual_objs,
+                                  *exclude_attrs):
+    """Perform general soft contain assert for deepcopy converted expected
+    object and actual objects according to '*exclude_attrs' tuple of excluding
+    attributes' names
+    (compare objects' collections w/ attributes' values set to None).
+    """
+    expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        entity.Representation.extract_objs(
+            help_utils.convert_to_list(expected_obj),
+            help_utils.convert_to_list(actual_objs), *exclude_attrs))
+    soft_assert.expect(
+        expected_obj_wo_excluded_attrs[0] in actual_objs_wo_excluded_attrs,
         messages.AssertionMessages.format_err_msg_contains(
             expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
 
@@ -421,6 +453,11 @@ class FilterCommon(Component):
     self.text_box = TextInputField(driver, text_box_locator)
     self.button_submit = Button(driver, bt_submit_locator)
 
+  @property
+  def advanced_filter_btn(self):
+    """Returns Advanced filter button."""
+    return self._browser.element(class_name="advanced-filter")
+
   def enter_query(self, query):
     """Enter query to field."""
     self.text_box.enter_text(query)
@@ -552,7 +589,7 @@ class TreeView(Component):
   # pylint: disable=too-many-instance-attributes
   _locators = constants.locator.TreeView
 
-  def __init__(self, driver, obj_name=None):
+  def __init__(self, driver=None, obj_name=None):
     super(TreeView, self).__init__(driver)
     self._tree_view_headers = []
     self._tree_view_items = []
@@ -576,12 +613,16 @@ class TreeView(Component):
       def is_result_ready():
         """Check if the results on mapper is ready."""
         is_results_ready = False
-        if not selenium_utils.is_element_enabled(
-            selenium_utils.get_when_visible(
-                self._driver,
-                constants.locator.CommonModalUnifiedMapper.BUTTON_SEARCH)
-        ):
-          return is_results_ready
+        filter_section = selenium_utils.get_when_all_visible(
+            self._driver,
+            constants.locator.CommonModalUnifiedMapper.MODAL_SECTIONS)[0]
+        if 'is-expanded' in filter_section.get_attribute('class'):
+          if not selenium_utils.is_element_enabled(
+              selenium_utils.get_when_visible(
+                  self._driver,
+                  constants.locator.CommonModalUnifiedMapper.BUTTON_SEARCH)
+          ):
+            return is_results_ready
         if (
             selenium_utils.is_element_exist(
                 self._driver, self._locators.MAPPER_TREE_SPINNER_NO_RESULT) or
@@ -633,6 +674,12 @@ class TreeView(Component):
       self._init_tree_view_headers()
     return self._tree_view_headers
 
+  def column_names(self):
+    """Return list of column names"""
+    return [column_name.title() for column_name in
+            self.tree_view_headers()[0].text.splitlines()
+            [:len(self.fields_to_set)]]
+
   def tree_view_items(self, is_updated=False):
     """Return Tree View items as list of TreeViewItem from current widget."""
     if is_updated or not self._tree_view_items:
@@ -666,6 +713,11 @@ class TreeView(Component):
         scope.update(url=tree_view_item.url(), id=tree_view_item.obj_id())
         list_scopes.append(scope)
     return list_scopes
+
+  def get_item_by_obj_name(self, obj_name):
+    """Returns item by object name."""
+    return next(
+        item for item in self.tree_view_items() if obj_name in item.text)
 
 
 class UnifiedMapperTreeView(TreeView):
@@ -741,8 +793,6 @@ class MapperSetVisibleFieldsModal(SetVisibleFieldsModal):
 
 class TreeViewItem(Element):
   """Class for describing single item on Tree View."""
-  _locators = constants.locator.TreeViewItem
-
   def __init__(self, driver, locator_or_element, item_btn_locator=None):
     super(TreeViewItem, self).__init__(driver, locator_or_element)
     self.item_btn = (
@@ -786,56 +836,108 @@ class TreeViewItem(Element):
   @property
   def cell_values(self):
     """Return list of text from each cell"""
-    return [cell.text for
-            cell in selenium_utils.get_when_all_visible(
-                self.element, self._locators.CELL)]
-
-
-class CommentsPanel(Element):
-  """Representing comments panel witch contains input part and items."""
-  _locators = constants.locator.CommentsPanel
-
-  def __init__(self, driver, locator_or_element):
-    super(CommentsPanel, self).__init__(driver, locator_or_element)
-    self._items = []
-    self._root = self._browser.div(text="Responses/Comments").parent()
+    return [cell.text for cell in selenium_utils.get_when_all_visible(
+            self.element, (By.CSS_SELECTOR, "div[class*='attr']"
+                                            ":not(.attr-content)"
+                                            ":not(.selectable-attrs)"))]
 
   @property
-  def input_txt(self):
-    return self._root.element(class_name="ql-editor")
+  def has_mega_program_icon(self):
+    """Returns True if item has mega program icon, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element, (By.CSS_SELECTOR, ".mega-object-tree-view-icon"))
+
+  @property
+  def is_checkbox_disabled(self):
+    """Returns True if checkbox is disabled, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element, (By.CSS_SELECTOR, 'input[type="checkbox"]:disabled'))
+
+  @property
+  def is_checkbox_checked(self):
+    """Returns True if checkbox is checked, False otherwise."""
+    return selenium_utils.is_element_exist(
+        self.element,
+        (By.CSS_SELECTOR, 'input[type="checkbox"][checked="checked"]'))
+
+
+class CommentInput(object):
+  """Represents comment input field. Contains input field and email dropdown.
+  """
+
+  def __init__(self, container):
+    self._root = container.element(tag_name="people-mention").parent()
+    self._input_field = self._root.element(class_name="ql-editor")
+
+  @property
+  def emails_dropdown(self):
+    """Represents mention email dropdown."""
+    return MentionEmailDropdown(self._root)
+
+  @property
+  def is_empty(self):
+    """Checks whether field is empty."""
+    return not self._input_field.text
+
+  @property
+  def text(self):
+    """Returns text for input field."""
+    return self._input_field.text
+
+  def clear(self):
+    """Clears textfield."""
+    self._input_field.clear()
+
+  def fill(self, text):
+    """Type text to input field"""
+    self._input_field.send_keys(text)
+
+  def call_email_dropdown(self, first_symbol,
+                          match_str=users.DEFAULT_EMAIL_DOMAIN[0]):
+    """Types mention first_symbol with match_str and waits for dropdown with
+    emails to appear."""
+    self.fill("{}{}".format(first_symbol, match_str))
+    self.emails_dropdown.wait_until_appears()
+
+  @property
+  def exists(self):
+    """Returns whether comment input field exists."""
+    return self._input_field.exists
+
+
+class ReadOnlyCommentsPanel(WithBrowser):
+  """Represents comments panel for disabled objects info page that doesn't
+  allow new comments adding."""
+
+  def __init__(self, container=None):
+    super(ReadOnlyCommentsPanel, self).__init__()
+    self._root = self._browser.div(text="Responses/Comments").parent()
+    self._container = container or self._root
+
+  @property
+  def comment_input(self):
+    """Returns comment input field."""
+    return CommentInput(self._root)
 
   @property
   def add_btn(self):
-    return self._root.button(text="Add")
+    """Returns Add Comment button."""
+    return self._root.element(tag_name="comments-section").element(
+        tag_name="questionnaire-link").link(class_name="questionnaire-link")
 
-  @property
-  def send_cb(self):
-    return self._root.element(class_name="comment-add-form__toolbar-item")
+  def click_add_button(self):
+    """Clicks Add button"""
+    self.add_btn.click()
 
   @property
   def scopes(self):
     """Return list of text comments in dictionary format where each of them
     contains items:
-    {'modified_by': person, 'created_at': datetime, 'description': text}.
+    {'modified_by': person, 'created_at': datetime, 'description': text,
+    'links': list}.
     """
-    self._items = [
-        CommentItem(self._driver, element) for element in
-        self.element.find_elements(*self._locators.ITEMS_CSS)]
-    comments = []
-    for item in self._items:
-      description = item.content.text
-      # reviewers emails in review comment message need to be sorted as they
-      # are displayed in UI in random order
-      if (re.compile(constants.element.Common.REVIEW_COMMENT_REGEXP).
-         match(description)):
-        splited_description = description.split('\n')
-        splited_description[1] = ', '.join(
-            sorted(splited_description[1].split(', ')))
-        description = '\n'.join(splited_description)
-      comments.append({"modified_by": item.author.text,
-                       "created_at": item.datetime,
-                       "description": description})
-    return comments
+    return [CommentItem(el).scope for el in self._container.elements(
+        class_name="comment-object-item")]
 
   @property
   def count(self):
@@ -843,15 +945,24 @@ class CommentsPanel(Element):
     return len(self.scopes)
 
   @property
-  def is_input_empty(self):
-    """Return 'True' if comments input field is empty, else 'False'."""
-    return not self.input_txt.text
+  def is_present(self):
+    """Returns whether comments panel is presented on info page."""
+    return self._root.exists
+
+
+class CommentsPanel(ReadOnlyCommentsPanel):
+  """Represents comments panel which contains input part and items."""
+
+  @property
+  def add_btn(self):
+    """Returns Add button."""
+    return self._root.button(text="Add")
 
   def add_comment(self, text):
     """Clear text from element and enter new text."""
-    self.input_txt.clear()
-    self.input_txt.send_keys(text)
-    self.add_btn.click()
+    self.comment_input.clear()
+    self.comment_input.fill(text)
+    self.click_add_button()
 
   def add_comments(self, comments):
     """Add text comments to input field."""
@@ -870,19 +981,22 @@ class CommentsPanel(Element):
     return self
 
 
-class CommentItem(Element):
+class CommentItem(object):
   """Representing single comment item in comments' panel."""
-  _locators = constants.locator.CommentItem
+
+  def __init__(self, container):
+    self.container = container
 
   @property
   def author(self):
     """Return author element of comment from comments item."""
-    return Element(self.element, self._locators.AUTHOR_CSS)
+    return self.container.element(class_name="person-holder")
 
   @property
   def datetime(self):
     """Return datetime of comment from comments item."""
-    text = self.element.find_element(*self._locators.DATETIME_CSS).text
+    text = self.container.element(
+        class_name="comment-object-item__header-author-info").text
     match = re.search(r"\(.+\) (.+)", text)
     if match:
       return match.group(1)
@@ -891,7 +1005,153 @@ class CommentItem(Element):
   @property
   def content(self):
     """Return content element of comment from comments item."""
-    return Label(self.element, self._locators.CONTENT_CSS)
+    return self.container.element(class_name="comment-object-item__text")
+
+  @property
+  def scope(self):
+    """Returns comment in dictionary format:
+    {'modified_by': person, 'created_at': datetime, 'description': text}.
+    """
+    description = self.content.text
+    # reviewers emails in review comment message need to be sorted as they
+    # are displayed in UI in random order
+    if (re.compile(constants.element.Common.REVIEW_COMMENT_REGEXP).
+       match(description)):
+      splited_description = description.split('\n')
+      splited_description[1] = ', '.join(
+          sorted(splited_description[1].split(', ')))
+      description = '\n'.join(splited_description)
+    return {"modified_by": self.author.text,
+            "created_at": self.datetime,
+            "description": description,
+            "links": self.link_values_from_text}
+
+  @property
+  def link_values_from_text(self):
+    """Returns link's href attribute values form the comment content."""
+    try:
+      return [el.get_attribute("href") for el in self.content.links()]
+    except exceptions.NoSuchElementException:
+      return []
+
+
+class MentionEmailDropdown(object):
+  """Represents Email dropdown in comments panel"""
+  def __init__(self, comment_panel_root):
+    self._root = comment_panel_root.element(
+        tag_name='people-autocomplete-dropdown')
+
+  @property
+  def dropdown_presence_marker(self):
+    """Marker which exists when dropdown is present on the page."""
+    return self._root.element(class_name='shown')
+
+  @property
+  def is_present(self):
+    """Checks whether dropdown is present on the page."""
+    return self.dropdown_presence_marker.exist
+
+  @property
+  def items(self):
+    """Returns the list of items from dropdown."""
+    return self._root.lis()
+
+  @property
+  def number_of_items(self):
+    """Returns number of items in dropdown."""
+    return len(self.items) if self.is_present else 0
+
+  def wait_until_appears(self):
+    """Waits until dropdown appears."""
+    return self.dropdown_presence_marker.wait_until(
+        lambda marker: marker.exist)
+
+  def wait_until_disappears(self):
+    """Waits until dropdown disappears."""
+    return self.dropdown_presence_marker.wait_until(
+        lambda marker: not marker.exist)
+
+  def select_first_email(self):
+    """Selects first email from opened dropdown."""
+    item_to_choose = self.items[0]
+    email = item_to_choose.text
+    item_to_choose.click()
+    return email
+
+
+class Pagination(object):
+  """Represents pagination element."""
+
+  PAGE_SIZES = [10, 25, 50]
+
+  def __init__(self, container):
+    self._root = container.element(tag_name='tree-pagination')
+
+  @property
+  def exists(self):
+    """Returns whether pagination element exists."""
+    return self._root.exists
+
+  @property
+  def first_page_btn(self):
+    """Returns element of first page button."""
+    return self._root.element(class_name='fa fa-angle-double-left').parent(
+        class_name='pagination-item')
+
+  @property
+  def next_page_btn(self):
+    """Returns element of next page button."""
+    return self._root.element(class_name='fa fa-angle-right').parent(
+        class_name='pagination-item')
+
+  @property
+  def total_items(self):
+    """Returns number of items."""
+    return int(self._root.element(class_name='pagination-item_list').text.
+               split("of ")[1])
+
+  @property
+  def total_pages(self):
+    """Returns number of pages."""
+    return int(math.ceil(self.total_items / float(self.page_size)))
+
+  @property
+  def page_size_options(self):
+    """Returns possible page size options through opening page sizes popover.
+    """
+    self._page_size_btn.click()
+    page_size_options = [
+        int(el.text) for el in self._page_size_popover.elements(
+            class_name='dropdown-container__item')]
+    self._page_size_btn.click()
+    return page_size_options
+
+  @property
+  def _page_size_btn(self):
+    """Returns element of page size button."""
+    return self._root.element(class_name='simple-popover__button')
+
+  @property
+  def _page_size_popover(self):
+    """Returns element of page sizes popover."""
+    return self._root.element(text='Items per page:').parent()
+
+  @property
+  def page_size(self):
+    """Return current page size."""
+    return int(self._page_size_btn.text)
+
+  def change_page_size(self, page_size):
+    """Changes page size.
+
+    Raises: ValueError if wrong page_size is given."""
+    page_size_options = self.page_size_options
+    if page_size not in page_size_options:
+      raise ValueError(
+          'Invalid page size. Possible sizes: {}'.format(page_size_options))
+    self._page_size_btn.click()
+    self._page_size_popover.element(text=str(page_size)).click()
+    ui_utils.wait_for_spinner_to_disappear()
 
 
 class ListCheckboxes(Component):

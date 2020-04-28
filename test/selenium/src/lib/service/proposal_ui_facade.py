@@ -1,10 +1,9 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Proposal UI services"""
 # pylint: disable=invalid-name
 import copy
 
-from lib import base
 from lib.entities import entity
 from lib.page import fast_emails_digest
 from lib.service import proposal_ui_service, emails_digest_service
@@ -39,18 +38,17 @@ def get_related_proposals(selenium, obj):
       selenium).get_related_proposals(obj)
 
 
-def get_expected_proposal_email(obj, proposal, proposal_author):
-  """Get proposal email."""
+def get_expected_proposal_emails(obj, proposal, proposal_author):
+  """Get proposal emails."""
   proposal_copy = copy.deepcopy(proposal)
   for change in proposal_copy.changes:
     change.pop("cur_value", None)
   person_name = proposal_author.name
-  expected_email = entity.ProposalEmailUI(
-      # program obj has managers instead of admins
-      recipient_email=obj.managers[0], author=person_name,
+  return [entity.ProposalEmailUI(
+      recipient_email=recipient, author=person_name, obj_url=obj.url,
       obj_type=obj.type.lower(), changes=proposal_copy.changes,
       comment=proposal_copy.comment)
-  return expected_email
+      for recipient in obj.get_recipients_emails()]
 
 
 def assert_proposal_apply_btns_exist(
@@ -65,23 +63,26 @@ def assert_proposal_apply_btns_exist(
   assert exp_apply_btns_existence == actual_apply_btns_existence
 
 
-def assert_proposal_notification_connects_to_obj(
-    selenium, obj, proposal, proposal_author
+def assert_proposal_notifications_connects_to_obj(
+    selenium, obj, proposal, proposal_author, soft_assert
 ):
-  """Check if proposal notification email exists and lead to the
-  correspondent obj info page."""
+  """Check if proposal notification emails sent to recipients and lead
+  to the correspondent obj info page."""
   proposal_digest_service = (
       emails_digest_service.ProposalDigestService(selenium))
   proposal_digest_service.open_emails_digest()
-  proposal_email = get_expected_proposal_email(obj, proposal, proposal_author)
-  assert (proposal_email in
-          fast_emails_digest.FastEmailsDigest().get_proposal_emails())
-  actual_obj = proposal_digest_service.opened_obj(obj, proposal_email)
+  proposal_emails = get_expected_proposal_emails(
+      obj, proposal, proposal_author)
+  actual_emails = fast_emails_digest.FastEmailsDigest().get_proposal_emails()
+  for email in proposal_emails:
+    soft_assert.expect(email in actual_emails,
+                       ("Expected email notification was not sent to {}."
+                        .format(email.recipient_email)))
+  actual_obj = proposal_digest_service.opened_obj(obj, proposal_emails[0])
   # when proposals are added, comments for them are not added to `obj`
   actual_obj.comments = None
-  base.Test.general_equal_assert(
-      copy.deepcopy(obj).repr_ui(), actual_obj,
-      "modified_by", *entity.Representation.tree_view_attrs_to_exclude)
+  soft_assert.expect(copy.deepcopy(obj).repr_ui() == actual_obj,
+                     "Notification link does not lead to corresponded object.")
 
 
 def assert_proposal_comparison_window_has_correct_info(

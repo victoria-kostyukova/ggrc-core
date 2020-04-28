@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants and procedures to make formatted messages."""
 import copy
@@ -17,6 +17,16 @@ class AssertionMessages(CommonMessages):
   """Class contains constants and methods to make messages after assertion
   procedures.
   """
+  # pylint: disable=invalid-name
+  AUTOMAPPING_IN_CHANGE_LOG = ("Automapping of {obj_name} should be tracked in"
+                               " the 'Change log' tab")
+  OBJS_SHOULD_BE_MAPPED_TO_OBJ = ("{mapped_objs_names} should be mapped to"
+                                  " {src_obj_name}")
+  TAB_WITH_NUM_SHOULD_EXIST = "{tab_name} tab with number {num} should exist."
+  MEGA_PROGRAM_ICON = "Blue flag icon should appear near the {title} title"
+  ITEM_CHECKBOX_SHOULD_BE_DISABLED = ("{obj_name} item checkbox should be "
+                                      "disabled.")
+
   _line = "\n-----\n"
   _double_diff = "\nExpected:\n{}\nActual:\n{}\n"
   _triple_diff = "\nExpected:\n{}\nActual First:\n{}\nActual Second:\n{}\n"
@@ -53,6 +63,22 @@ class AssertionMessages(CommonMessages):
     right.diff_info = comparison["other_diff"]
 
   @classmethod
+  def _get_lists_comparison_err_msg(cls, left, right):
+    """Return error message after assert equal comparison of lists."""
+    assertion_error_msg = ""
+    if len(left) != len(right):
+      assertion_error_msg = (
+          "\nThe lengths of lists are not equal. Length of expected list - {}."
+          " Length of actual list - {}\n".format(len(left), len(right)) +
+          cls.err_common.format(left, right))
+    else:
+      for _left, _right in zip(left, right):
+        if not cls.is_entities_have_err_info(_left, _right):
+          cls.set_entities_diff_info(_left, _right)
+        assertion_error_msg += cls.diff_error_msg(_left, _right)
+    return assertion_error_msg
+
+  @classmethod
   def format_err_msg_equal(cls, left, right):
     """Return customized and detailed error message after assert equal
     comparison.
@@ -70,12 +96,7 @@ class AssertionMessages(CommonMessages):
         all(isinstance(_left, Entity.all_entities_classes()) and
         isinstance(_right, Entity.all_entities_classes()) for
             _left, _right in zip(left, right))):
-      assertion_error_msg = ""
-      for _left, _right in zip(sorted(left), sorted(right)):
-        if not cls.is_entities_have_err_info(_left, _right):
-          cls.set_entities_diff_info(_left, _right)
-        assertion_error_msg = (assertion_error_msg +
-                               cls.diff_error_msg(_left, _right))
+      assertion_error_msg = cls._get_lists_comparison_err_msg(left, right)
     return assertion_error_msg
 
   @classmethod

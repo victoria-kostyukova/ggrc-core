@@ -1,10 +1,11 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants for roles."""
+# pylint: disable=too-many-public-methods
 from lib import url
 from lib.constants import objects
 from lib.decorator import lazy_property, memoize
-from lib.service.rest.client import RestClient
+from lib.service.rest import client
 
 
 # global roles
@@ -21,6 +22,7 @@ ASSIGNEES = "Assignees"
 VERIFIERS = "Verifiers"
 # program roles
 PROGRAM_EDITOR = "Program Editor"
+PROGRAM_EDITORS = PROGRAM_EDITOR + "s"
 PROGRAM_MANAGER = "Program Manager"
 PROGRAM_MANAGERS = PROGRAM_MANAGER + "s"
 PROGRAM_READER = "Program Reader"
@@ -45,6 +47,7 @@ TECHNICAL_PMS = "Technical / Program Managers"
 LEGAL_COUNSELS = "Legal Counsels"
 SYSTEM_OWNERS = "System Owners"
 REVIEWERS = "Reviewers"
+RISK_OWNERS = "Risk Owners"
 
 # Some Smoke ACL tests check functionality under this set of roles
 IMPORTANT_ASMT_ROLES = [
@@ -65,7 +68,7 @@ NO_ACCESS = "No Access"
 def global_roles():
   """Get global roles as array of dicts"""
   global_roles_url = "/".join([url.API, url.GLOBAL_ROLES])
-  return RestClient().send_get(global_roles_url)[
+  return client.RestClient().send_get(global_roles_url)[
       "{}_collection".format(url.GLOBAL_ROLES)][url.GLOBAL_ROLES]
 
 
@@ -80,7 +83,7 @@ class ACLRolesIDsMetaClass(type):
   def roles(cls):
     """Return ACL roles."""
     acr_url = "/".join([url.API, url.ACCESS_CONTROL_ROLES])
-    return RestClient("").get_object(acr_url).json()[
+    return client.RestClient("").get_object(acr_url).json()[
         "{}_collection".format(url.ACCESS_CONTROL_ROLES)][
         url.ACCESS_CONTROL_ROLES]
 
@@ -91,6 +94,7 @@ class ACLRolesIDsMetaClass(type):
 
   def _role_id_from_list(cls, roles, object_type, name):
     """Get id of the role by `object_type` and `name` from roles."""
+    role_id = None
     for role in roles:
       if role["object_type"] == object_type and role["name"] == name:
         role_id = role["id"]
@@ -127,8 +131,11 @@ class ACLRolesIDsMetaClass(type):
 
   @property
   def OBJECTIVE_ADMINS(cls):
-    return cls.id_of_role(objects.get_obj_type(objects.OBJECTIVES),
-                          name=ADMIN)
+    return cls.id_of_role(objects.get_obj_type(objects.OBJECTIVES), name=ADMIN)
+
+  @property
+  def THREAT_ADMINS(cls):
+    return cls.id_of_role(objects.get_obj_type(objects.THREATS), name=ADMIN)
 
   @property
   def RISK_ADMINS(cls):
@@ -174,6 +181,16 @@ class ACLRolesIDsMetaClass(type):
                           name=PROGRAM_MANAGERS)
 
   @property
+  def PROGRAM_EDITORS(cls):
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
+                          name=PROGRAM_EDITORS)
+
+  @property
+  def PROGRAM_PRIMARY_CONTACTS(cls):
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
+                          name=PRIMARY_CONTACTS)
+
+  @property
   def PRODUCT_MANAGERS(cls):
     return cls.id_of_role(object_type=objects.get_obj_type(objects.PRODUCTS),
                           name=PRODUCT_MANAGERS)
@@ -203,6 +220,93 @@ class ACLRolesIDsMetaClass(type):
   def REQUIREMENT_ADMINS(cls):
     return cls.id_of_role(
         object_type=objects.get_obj_type(objects.REQUIREMENTS), name=ADMIN)
+
+  @property
+  def POLICY_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.POLICIES), name=ADMIN)
+
+  @property
+  def CONTRACT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.CONTRACTS), name=ADMIN)
+
+  @property
+  def EVIDENCE_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.EVIDENCE), name=ADMIN)
+
+  @property
+  def PROJECT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS), name=ADMIN)
+
+  @property
+  def PROJECT_ASSIGNEES(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS),
+        name=objects.get_singular(ASSIGNEES, title=True))
+
+  @property
+  def PROJECT_VERIFIERS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROJECTS),
+        name=objects.get_singular(VERIFIERS, title=True))
+
+  @property
+  def KEY_REPORT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.KEY_REPORTS), name=ADMIN)
+
+  @property
+  def ACCOUNT_BALANCE_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ACCOUNT_BALANCES), name=ADMIN)
+
+  @property
+  def ACCESS_GROUP_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ACCESS_GROUPS), name=ADMIN)
+
+  @property
+  def DATA_ASSET_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.DATA_ASSETS), name=ADMIN)
+
+  @property
+  def FACILITY_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.FACILITIES), name=ADMIN)
+
+  @property
+  def MARKET_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.MARKETS), name=ADMIN)
+
+  @property
+  def METRIC_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.METRICS), name=ADMIN)
+
+  @property
+  def PROCESS_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PROCESSES), name=ADMIN)
+
+  @property
+  def PRODUCT_GROUP_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.PRODUCT_GROUPS), name=ADMIN)
+
+  @property
+  def SYSTEM_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.SYSTEMS), name=ADMIN)
+
+  @property
+  def VENDOR_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.VENDORS), name=ADMIN)
 
 
 class ACLRolesIDs(object):

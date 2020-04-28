@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Rows of tree widgets on workflow tabs."""
 from lib.app_entity_factory import workflow_entity_factory
@@ -160,7 +160,7 @@ class SetupTaskGroupTreeItem(tree_widget.TreeItem):
 
   def obj_dict(self):
     """Returns an obj dict."""
-    dict_keys = ["title", "assignee", "description"]
+    dict_keys = ["title", "assignee", "details"]
     return self._table_row.obj_dict(self, dict_keys=dict_keys)
 
   @property

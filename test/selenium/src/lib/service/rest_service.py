@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create and manipulate objects via REST API."""
 # pylint: disable=too-few-public-methods
@@ -9,10 +9,10 @@ import json
 import requests
 
 from lib import environment, factory, url, constants
-from lib.constants import objects, messages, roles
+from lib.constants import objects, messages
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
-    PeopleFactory, CustomAttributeDefinitionsFactory, AssessmentsFactory,
+    PeopleFactory, CustomAttributeDefinitionsFactory,
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
@@ -24,9 +24,7 @@ class BaseRestService(object):
   def __init__(self, endpoint):
     self.endpoint = endpoint
     self.client = client.RestClient(self.endpoint)
-    self.entities_factory_cls = factory.get_cls_entity_factory(
-        object_name=objects.CUSTOM_ATTRIBUTES
-        if endpoint == objects.EXTERNAL_CUSTOM_ATTRIBUTES else self.endpoint)
+    self.entities_factory_cls = factory.get_cls_entity_factory(self.endpoint)
 
   def create_list_objs(self, entity_factory, count, attrs_to_factory=None,
                        **attrs_for_template):
@@ -79,7 +77,8 @@ class BaseRestService(object):
         self.client.update_object(href=obj.href, **attrs)), **obj.__dict__)
 
   @staticmethod  # noqa: ignore=C901
-  def get_items_from_resp(resp, timeout=constants.ux.MAX_USER_WAIT_SECONDS):
+  def get_items_from_resp(resp,
+                          timeout=constants.timeouts.MAX_USER_WAIT_SECONDS):
     """Check response (waiting object of requests library) from server and get
     items {key: value} from it."""
     def get_items_from_resp():
@@ -190,6 +189,16 @@ class BaseRestService(object):
     return [self.client.delete_object(href=obj.href) for
             obj in help_utils.convert_to_list(objs)]
 
+  def update_acl(self, obj, role_name, role_id, people, rewrite_acl=False):
+    """Update or rewrite access control list of existing object via REST API.
+     Returns: updated object."""
+    # pylint: disable=too-many-arguments
+    factory.get_cls_entity_factory(objects.get_plural(obj.type)).set_acl(
+        obj, role_name, people, role_id, is_add_rest_attrs=True,
+        rewrite_acl=rewrite_acl)
+    self.update_obj(obj, access_control_list=obj.access_control_list)
+    return obj
+
 
 class HelpRestService(object):
   """Help class for interaction with business layer's services objects."""
@@ -215,6 +224,12 @@ class ObjectivesService(BaseRestService):
   """Service for working with Objectives entities."""
   def __init__(self):
     super(ObjectivesService, self).__init__(url.OBJECTIVES)
+
+
+class ThreatsService(BaseRestService):
+  """Service for working with Threats entities."""
+  def __init__(self):
+    super(ThreatsService, self).__init__(url.THREATS)
 
 
 class ProgramsService(BaseRestService):
@@ -259,12 +274,89 @@ class RisksService(BaseRestService):
     super(RisksService, self).__init__(url.RISKS)
 
 
+class ProjectsService(BaseRestService):
+  """Service for working with Projects entities."""
+  def __init__(self):
+    super(ProjectsService, self).__init__(url.PROJECTS)
+
+
+class KeyReportsService(BaseRestService):
+  """Service for working with Key Reports entities."""
+  def __init__(self):
+    super(KeyReportsService, self).__init__(url.KEY_REPORTS)
+
+
+class AccountBalancesService(BaseRestService):
+  """Service for working with Account Balances entities."""
+  def __init__(self):
+    super(AccountBalancesService, self).__init__(url.ACCOUNT_BALANCES)
+
+
+class AccessGroupsService(BaseRestService):
+  """Service for working with Access Groups entities."""
+  def __init__(self):
+    super(AccessGroupsService, self).__init__(url.ACCESS_GROUPS)
+
+
+class DataAssetsService(BaseRestService):
+  """Service for working with Data Assets entities."""
+  def __init__(self):
+    super(DataAssetsService, self).__init__(url.DATA_ASSETS)
+
+
+class FacilitiesService(BaseRestService):
+  """Service for working with Facilities entities."""
+  def __init__(self):
+    super(FacilitiesService, self).__init__(url.FACILITIES)
+
+
+class MarketsService(BaseRestService):
+  """Service for working with Markets entities."""
+  def __init__(self):
+    super(MarketsService, self).__init__(url.MARKETS)
+
+
+class MetricsService(BaseRestService):
+  """Service for working with Metrics entities."""
+  def __init__(self):
+    super(MetricsService, self).__init__(url.METRICS)
+
+
+class OrgGroupsService(BaseRestService):
+  """Service for working with Org Groups entities."""
+  def __init__(self):
+    super(OrgGroupsService, self).__init__(url.ORG_GROUPS)
+
+
+class ProcessesService(BaseRestService):
+  """Service for working with Processes entities."""
+  def __init__(self):
+    super(ProcessesService, self).__init__(url.PROCESSES)
+
+
+class ProductGroupsService(BaseRestService):
+  """Service for working with Product Groups entities."""
+  def __init__(self):
+    super(ProductGroupsService, self).__init__(url.PRODUCT_GROUPS)
+
+
+class SystemsService(BaseRestService):
+  """Service for working with Systems entities."""
+  def __init__(self):
+    super(SystemsService, self).__init__(url.SYSTEMS)
+
+
+class VendorsService(BaseRestService):
+  """Service for working with Vendors entities."""
+  def __init__(self):
+    super(VendorsService, self).__init__(url.VENDORS)
+
+
 class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
-  def __init__(self, is_external=False):
+  def __init__(self):
     super(CustomAttributeDefinitionsService, self).__init__(
-        url.EXTERNAL_CUSTOM_ATTRIBUTES if is_external
-        else url.CUSTOM_ATTRIBUTES)
+        url.CUSTOM_ATTRIBUTES)
 
   def create_dashboard_gcas(self, obj_type, count=1):
     """Create 'Dashboard' CAs via rest according to passed obj_type and count.
@@ -328,30 +420,22 @@ class AssessmentsFromTemplateService(HelpRestService):
   """Service for creating assessments from templates."""
   def __init__(self):
     super(AssessmentsFromTemplateService, self).__init__(url.ASSESSMENTS)
+    self.entities_factory_cls = entities_factory.AssessmentsFactory()
 
   def create_assessments(self, audit, template, snapshots):
     """Create assessments from template."""
     assessments = []
     for snapshot in snapshots:
-      assessment = entities_factory.AssessmentsFactory().create()
+      assessment = self.entities_factory_cls.create()
       assessment.update_attrs(audit=audit, template=template, object=snapshot)
       response = self.client.create_object(**assessment.__dict__)
       attrs = BaseRestService.get_items_from_resp(response)
-      assessment = AssessmentsFactory().create()
+      assessment = self.entities_factory_cls.create()
       assessment.__dict__.update({k: v for k, v in attrs.iteritems()
                                   if v and k not in ["type", ]})
-      for acr_name in ("assignees", "verifiers"):
-        people = getattr(template, acr_name)
-        if people == roles.PRINCIPAL_ASSIGNEES:
-          people = snapshot.principal_assignees
-        elif people == roles.AUDITORS:
-          people = audit.auditors
-        elif people == "Audit Captain":
-          people = audit.audit_captains
-        # handle other roles if needed
-        if not people:
-          people = audit.audit_captains
-        setattr(assessment, acr_name, people)
+      assessment.__dict__.update(
+          self.entities_factory_cls.acl_roles_from_template(audit, template,
+                                                            snapshot))
       assessments.append(assessment)
     return assessments
 
@@ -453,3 +537,27 @@ class RequirementsService(BaseRestService):
   """Service for working with Requirements entities."""
   def __init__(self):
     super(RequirementsService, self).__init__(url.REQUIREMENTS)
+
+
+class PoliciesService(BaseRestService):
+  """Service for working with Policies entities."""
+  def __init__(self):
+    super(PoliciesService, self).__init__(url.POLICIES)
+
+
+class ContractsService(BaseRestService):
+  """Service for working with Contracts entities."""
+  def __init__(self):
+    super(ContractsService, self).__init__(url.CONTRACTS)
+
+
+class CommentsService(BaseRestService):
+  """Service for working with Comments entities."""
+  def __init__(self):
+    super(CommentsService, self).__init__(url.COMMENTS)
+
+
+class EvidencesService(BaseRestService):
+  """Service for working with Evidences entities."""
+  def __init__(self):
+    super(EvidencesService, self).__init__(url.EVIDENCE)

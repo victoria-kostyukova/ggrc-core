@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Elements' labels and properties for objects."""
 # pylint: disable=too-few-public-methods
@@ -150,7 +150,7 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   MODIFIED_BY = "Last updated by"
-  CREATED_AT = "Created date"
+  CREATED_AT = "Created Date"
   UPDATED_AT = "Updated at"
   # roles
   OBJECT_ADMINS = "Object Admins"
@@ -200,8 +200,11 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   AUDIT_CAPTAINS = "Audit Captains"
   AUDITORS = "Auditors"
   PROGRAM_MANAGERS = "Program Managers"
+  PROGRAM_EDITORS = "Program Editors"
+  PROGRAM_READERS = "Program Readers"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
+  REVIEW_STATUS = "Review Status"
   CREATORS = roles.CREATORS
   ASSIGNEES = roles.ASSIGNEES
   VERIFIERS = roles.VERIFIERS
@@ -270,6 +273,7 @@ class CommonAssessment(Common):
   VERIFIERS = roles.VERIFIERS
   MAPPED_OBJECTS = TransformationSetVisibleFields.MAPPED_OBJECTS
   ASMT_TYPE = "Assessment Type"
+  RECIPIENTS = "Recipients"
   VERIFIED = TransformationSetVisibleFields.VERIFIED
 
 
@@ -346,7 +350,12 @@ class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
   CONCLUSION_OPERATION = "Conclusion: Operation"
   FINISHED_DATE = "Finished Date"
   VERIFIED_DATE = "Verified Date"
+  LABEL = "Label"
+  DUE_DATE = "Due Date"
   TYPE = Base.TYPE
+  INITIAL_FIELDS = (
+      Common.TITLE, Common.STATE, LABEL, DUE_DATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, ASSIGNEES, VERIFIERS)
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.STATE,
       VERIFIED, CommonModalSetVisibleFields.CODE, CREATORS, ASSIGNEES,
@@ -379,9 +388,30 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
       CONTROL_OPERATORS, ADMIN)
 
 
+class RiskModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Risks.
+ """
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY)
+
+
+class ThreatModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Threats.
+ """
+  MODAL_HEADER = objects.get_normal_form(objects.get_singular(objects.THREATS))
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, TransformationSetVisibleFields.ADMIN,
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      TransformationSetVisibleFields.REVIEW_STATE)
+
+
 class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
- fields for Controls.
+ fields for Objectives.
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
@@ -412,24 +442,6 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
       PRIMARY_CONTACTS, ADMIN)
 
 
-class TechnologyEnvironmentModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for Modal to Set visible
- fields for Technology Environments.
- """
-  # pylint: disable=too-many-instance-attributes
-  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      objects.get_normal_form(objects.get_singular(
-          objects.TECHNOLOGY_ENVIRONMENTS)))
-  ADMIN = TransformationSetVisibleFields.ADMIN
-  ASSIGNEE = objects.get_singular(roles.ASSIGNEES)
-  VERIFIER = objects.get_singular(roles.VERIFIERS)
-  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
-  DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS,
-      ADMIN, ASSIGNEE, VERIFIER)
-
-
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Programs.
@@ -447,6 +459,149 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE, MANAGER,
       PRIMARY_CONTACTS)
+
+
+class ProgramChildModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+   fields for Child Programs.
+   """
+  DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
+
+
+class ProgramParentModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+   fields for Parent Programs.
+   """
+  DEFAULT_SET_FIELDS = ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
+
+
+class CommonDirectivesModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Directive objects."""
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE, TransformationSetVisibleFields.ADMIN,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY,
+      TransformationSetVisibleFields.REVIEW_STATE,
+      TransformationSetVisibleFields.PRIMARY_CONTACTS)
+
+
+class RegulationModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Regulations."""
+
+
+class StandardModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Standards."""
+
+
+class RequirementModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Requirements."""
+
+
+class PolicyModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Policies."""
+
+
+class ContractModalSetVisibleFields(CommonDirectivesModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Contracts."""
+
+
+class CommonScopeObjModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Scope objects."""
+  ADMIN = TransformationSetVisibleFields.ADMIN
+  ASSIGNEE = objects.get_singular(roles.ASSIGNEES)
+  VERIFIER = objects.get_singular(roles.VERIFIERS)
+  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS,
+      ADMIN, ASSIGNEE, VERIFIER)
+
+
+class TechnologyEnvironmentModalSetVisibleFields(
+    CommonScopeObjModalSetVisibleFields
+):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Technology Environments."""
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      objects.get_normal_form(objects.get_singular(
+          objects.TECHNOLOGY_ENVIRONMENTS)))
+
+
+class ProductModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Products."""
+
+
+class ProductGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Product Groups."""
+
+
+class ProjectModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Projects."""
+
+
+class KeyReportModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Key Reports."""
+
+
+class AccountBalanceModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Account Balances."""
+
+
+class AccessGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Access Groups."""
+
+
+class DataAssetModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Data Assets."""
+
+
+class FacilityModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Facilities."""
+
+
+class MarketModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Markets."""
+
+
+class MetricModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Metrics."""
+
+
+class OrgGroupModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Org Groups."""
+
+
+class ProcessModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Processes."""
+
+
+class SystemModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Systems."""
+
+
+class VendorModalSetVisibleFields(CommonScopeObjModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+  fields for Vendors."""
 
 
 class AuditModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -508,16 +663,6 @@ class AsmtAttrsTab(object):
   """Common elements' labels of Assessment Attributes Tab on Assessment Info
   Widget."""
   TAB_NAME = AssessmentTabContainer.OTHER_ATTRS_TAB
-
-
-class AsmtLogTab(object):
-  """Common elements' labels of Assessment Log Tab on Assessment Info
-   Widget."""
-  TAB_NAME = AssessmentTabContainer.CHANGE_LOG_TAB
-  FIELD = "Field"
-  ORIGINAL_VALUE = "Original value"
-  NEW_VALUE = "New value"
-  EMPTY_STATEMENT = u"\u2014"  # em-dash
 
 
 class RelatedAsmtsTab(object):

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for selenium."""
 # pylint: disable=inconsistent-return-statements
@@ -8,7 +8,7 @@ import time
 
 from selenium.common import exceptions
 from selenium.common.exceptions import UnexpectedAlertPresentException
-from selenium.webdriver.common import action_chains
+from selenium.webdriver.common import action_chains, keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -21,8 +21,8 @@ LOGGER = logging.getLogger(__name__)
 
 def _webdriver_wait(driver):
   """Common WebDriverWait logic with poll frequency."""
-  return WebDriverWait(driver, constants.ux.MAX_USER_WAIT_SECONDS,
-                       poll_frequency=constants.ux.POLL_FREQUENCY)
+  return WebDriverWait(driver, constants.timeouts.MAX_USER_WAIT_SECONDS,
+                       poll_frequency=constants.timeouts.POLL_FREQUENCY)
 
 
 def hover_over_element(driver, element):
@@ -90,7 +90,7 @@ def wait_until_stops_moving(element):
   while prev_location != element.location:
     prev_location = element.location
     time.sleep(0.1)
-    if time.time() - timer_begin > constants.ux.ELEMENT_MOVING_TIMEOUT:
+    if time.time() - timer_begin > constants.timeouts.ELEMENT_MOVING_TIMEOUT:
       raise exception.ElementMovingTimeout
 
 
@@ -184,7 +184,7 @@ def wait_until_alert_is_present(driver):
  Args: driver (base.CustomDriver)
  Return: selenium.webdriver.common.alert.Alert
  """
-  return (WebDriverWait(driver, constants.ux.MAX_ALERT_WAIT).
+  return (WebDriverWait(driver, constants.timeouts.MAX_ALERT_WAIT).
           until(EC.alert_is_present()))
 
 
@@ -205,7 +205,7 @@ def click_on_staleable_element(driver, el_locator):
   """Click element that can be modified between time we find it and when
  we click on it."""
   time_start = time.time()
-  while time.time() - time_start < constants.ux.MAX_USER_WAIT_SECONDS:
+  while time.time() - time_start < constants.timeouts.MAX_USER_WAIT_SECONDS:
     try:
       driver.find_element(*el_locator).click()
       break
@@ -383,5 +383,18 @@ def filter_by_text(elements, text):
   #   browser.elements(cls=cls, text=text)
   # has O(N) complexity where N is the number of elements with class `cls`
   for element in elements:
-    if element.text.upper() == text or element.text == text:
+    if element.text.lower() == text.lower():
       return element
+
+
+def paste_from_clipboard(element):
+  """Pastes from clipboard."""
+  element.clear()
+  element.send_keys(keys.Keys.LEFT_SHIFT, keys.Keys.INSERT)
+
+
+def open_url_in_new_tab(url):
+  """Opens url in a new tab. Switches webdriver to the new tab."""
+  browsers.get_driver().execute_script("window.open('{}', '_blank')".format(
+      url))
+  browsers.get_browser().windows()[1].use()

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for creating / making changes to objects:
 * New object
@@ -6,7 +6,6 @@
 * Proposal for object
 """
 from lib import base
-from lib.constants import objects, locator
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
@@ -20,13 +19,15 @@ def get_modal_obj(obj_type, _selenium=None):
   mapping = {
       "assessment": AssessmentModal,
       "issue": IssueModal,
-      "control": ControlModal,
       "threat": ThreatModal,
       "workflow": WorkflowModal,
       "task_group_task": TaskGroupTaskModal,
       "task_group": TaskGroupModal,
       "audit": AuditModal,
-      "regulation": RegulationModal
+      "regulation": RegulationModal,
+      "project": ProjectModal,
+      "key_report": KeyReportsModal,
+      "cycle_task": CycleTaskModal
   }
   return mapping.get(obj_type.lower(), BaseObjectModal)()
 
@@ -123,6 +124,10 @@ class BaseObjectModal(BaseFormModal):
     self.state_select = self._root.element(id="state").select()
     self._fields = ["title", "description", "status"]
 
+  @property
+  def comment_input(self):
+    return base.CommentInput(self._root)
+
   def delete(self):
     """Clicks Delete button, confirms deletion in new popup
     and waits for changes to happen.
@@ -149,6 +154,10 @@ class BaseObjectModal(BaseFormModal):
     self._root.link(text="Propose").click()
     self._wait_for_submit_changes()
 
+  def wait_until_present(self):
+    """Waits until present."""
+    return self._root.wait_until(lambda e: e.exists)
+
 
 class DiscardChangesModal(base.Modal):
   """Represents discard changes modal."""
@@ -166,27 +175,6 @@ class DiscardChangesModal(base.Modal):
     """Clicks Discard button and wait for modal is closed."""
     self.wait_until_present()
     self._root.link(text="Discard").click()
-
-
-class ControlModal(BaseObjectModal):
-  """Represents control object modal."""
-
-  def __init__(self, _driver=None):
-    super(ControlModal, self).__init__()
-    self._root = self._browser.element(
-        class_name="modal-header", text="New {}".format(
-            objects.get_singular(objects.CONTROLS, title=True))).parent(
-                class_name="modal-wide")
-    self._fields = ["title", "description", "status", "assertions"]
-
-  def select_assertions(self, assertions):
-    """Selects assertions."""
-    multi_select_root = self._root.element(data_id="assertions_dd")
-    # Chromedriver's `click` isn't able to work with these elements
-    multi_select_root.element(
-        class_name="multiselect-dropdown__input").js_click()
-    for assertion in assertions:
-      multi_select_root.checkbox(id=str(assertion["id"])).js_click()
 
 
 class ThreatModal(BaseObjectModal):
@@ -210,7 +198,7 @@ class AssessmentModal(BaseObjectModal):
     objs = [entity.Representation.repr_dict_to_obj(obj)
             if isinstance(obj, dict) else obj for obj in objs]
     # Ordinary `click()` doesn't work in headless Chrome in this case
-    self._root.element(class_name="assessment-map-btn").js_click()
+    self._root.link(text="Map Objects").js_click()
     mapper = unified_mapper.AssessmentCreationMapperModal(self._driver)
     mapper.map_dest_objs(
         dest_objs_type=objs[0].type,
@@ -218,6 +206,8 @@ class AssessmentModal(BaseObjectModal):
 
   def get_mapped_snapshots_titles(self):
     """Gets titles of mapped snapshots."""
+    self._root.element(class_name="modal-mapped-objects").wait_until(
+        lambda e: e.text != "")
     els = self._root.elements(class_name="modal-mapped-objects-item")
     return [el.element(class_name="title").text for el in els]
 
@@ -318,25 +308,18 @@ class CommonConfirmModal(base.Modal):
   def __init__(self):
     super(CommonConfirmModal, self).__init__()
     self._root = self._browser.element(
-        css="{}[style*='display: block']".format(locator.Common.MODAL_CONFIRM))
-    self.confirm_btn = self._browser.element(
-        css="{} .modal-footer .btn-small".format(locator.Common.MODAL_CONFIRM))
+        css=".modal.hide.undefined.in[style*='display: block']")
+    self.confirm_btn = self._root.element(data_toggle="confirm")
+
+  @property
+  def exists(self):
+    """Returns whether the modal exists."""
+    return self._root.exists
 
   def confirm(self):
     """Clicks confirmation button on modal object."""
+    self.confirm_btn.wait_until_present()
     self.confirm_btn.click()
-
-
-class WarningModal(CommonConfirmModal):
-  """Represents warning object modal."""
-  def __init__(self):
-    super(WarningModal, self).__init__()
-    self.proceed_in_new_tab_btn = self.confirm_btn
-
-  def proceed_in_new_tab(self):
-    """Clicks 'Proceed in new tab' button on modal object."""
-    self.proceed_in_new_tab_btn.wait_until_present()
-    self.proceed_in_new_tab_btn.click()
 
 
 class AuditModal(BaseObjectModal):
@@ -350,3 +333,15 @@ class AuditModal(BaseObjectModal):
   def set_manually_map_snapshots(self, value):
     """Set "Manually map snapshots" checkbox to specified state."""
     self._root.label(text="Manually map snapshots").checkbox().set(bool(value))
+
+
+class ProjectModal(BaseObjectModal):
+  """Represents project object modal."""
+
+
+class KeyReportsModal(BaseObjectModal):
+  """Represents key report object modal."""
+
+
+class CycleTaskModal(BaseObjectModal):
+  """Represents cycle task object modal."""

@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utils for manipulation with directories and files."""
 
@@ -12,8 +12,8 @@ from lib import constants
 
 def wait_file_downloaded(
     path_to_csv,
-    timeout=constants.ux.MAX_USER_WAIT_SECONDS,
-    poll_frequency=constants.ux.POLL_FREQUENCY
+    timeout=constants.timeouts.MAX_USER_WAIT_SECONDS,
+    poll_frequency=constants.timeouts.POLL_FREQUENCY
 ):
   """Wait until file is exist or IOError is raised."""
   end_time = time.time() + timeout

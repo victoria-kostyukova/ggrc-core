@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants for URLs construction."""
 # pylint: disable=wildcard-import
@@ -27,6 +27,8 @@ QUERY = "query"
 ACCESS_CONTROL_ROLES = "access_control_roles"
 REVIEWS = "reviews"
 NOTIFICATIONS = "_notifications"
+COMMENTS = "comments"
+EVIDENCE = "evidence"
 
 
 class Widget(object):
@@ -42,6 +44,7 @@ class Widget(object):
   AUDITS = "#!audit"
   SUMMARY = "#!summary"  # audits
   ASSESSMENTS = "#!assessment"
+  MY_ASSESSMENTS = "assessments_view" + ASSESSMENTS
   ASSESSMENT_TEMPLATES = "#!assessment_template"
   CONTROLS = "#!control"
   ISSUES = "#!issue"

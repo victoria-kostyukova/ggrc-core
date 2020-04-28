@@ -1,10 +1,13 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Mixins for info page objects"""
 # pylint: disable=too-few-public-methods
+import re
 
 from lib import base
 from lib.element import page_elements
+from lib.page.widget import related_proposals
+from lib.page.modal import bulk_update
 from lib.utils import selenium_utils
 
 
@@ -25,13 +28,14 @@ class WithPageElements(base.WithBrowser):
     """Return AssessmentEvidenceUrls page element"""
     return page_elements.AssessmentEvidenceUrls(self._browser)
 
-  def _comment_area(self):
-    """Return CommentArea page element"""
-    return page_elements.CommentArea(self._browser)
-
   def _simple_field(self, label, root_elem=None):
     """Returns SimpleField page element."""
     return page_elements.SimpleField(
+        root_elem if root_elem else self._browser, label)
+
+  def _editable_simple_field(self, label, root_elem=None):
+    """Returns EditableSimpleField page element."""
+    return page_elements.EditableSimpleField(
         root_elem if root_elem else self._browser, label)
 
   def _info_pane_form_field(self, label):
@@ -56,11 +60,11 @@ class WithAssignFolder(base.WithBrowser):
         class_name="mapped-folder__add-button")
 
 
-class WithObjectReview(base.WithBrowser):
-  """A mixin for object reviews"""
+class _BaseWithObjectReview(base.WithBrowser):
+  """Base mixin class for objects reviews."""
 
   def __init__(self, driver=None):
-    super(WithObjectReview, self).__init__(driver)
+    super(_BaseWithObjectReview, self).__init__(driver)
 
   @property
   def _review_root(self):
@@ -83,10 +87,6 @@ class WithObjectReview(base.WithBrowser):
     return self._browser.element(class_name="object-review__revert")
 
   @property
-  def review_status(self):
-    return self._review_root.element(class_name="state-value")
-
-  @property
   def object_review_txt(self):
     """Return page element with review message."""
     return self._review_root.element(
@@ -96,6 +96,47 @@ class WithObjectReview(base.WithBrowser):
   def reviewers(self):
     """Return page element with reviewers emails."""
     return self._related_people_list("Reviewers", self._review_root)
+
+  def get_object_review_txt(self):
+    """Return review message on info pane."""
+    return (self.object_review_txt.text if self.object_review_txt.exists
+            else None)
+
+  def get_reviewers_emails(self):
+    """Return reviewers emails if reviewers assigned."""
+    return (self.reviewers.get_people_emails()
+            if self.reviewers.exists() else None)
+
+  def get_review_dict(self):
+    """Return Review as dict."""
+    return {"status": self.review_status.capitalize(),
+            "reviewers": self.get_reviewers_emails(),
+            # Last 7 symbols are the UTC offset. Can not convert to UI
+            # format date due to %z directive doesn't work in Python 2.7.
+            "last_reviewed_by": self.get_object_review_txt()[:-7] if
+            self.get_object_review_txt() else None}
+
+  def has_review(self):
+    """Check if review section exists."""
+    return self._review_root.exists
+
+  @property
+  def review_status(self):
+    """Returns disabled object review status."""
+    return self._root.element(
+        class_name="state-value-dot review-status").text.title()
+
+
+class WithDisabledObjectReview(_BaseWithObjectReview):
+  """A mixin for disabled objects reviews."""
+
+  def click_review_details_btn(self):
+    """Click 'Review Details' button."""
+    self._root.link(text=re.compile("Review Details")).click()
+
+
+class WithObjectReview(_BaseWithObjectReview):
+  """A mixin for active objects reviews."""
 
   def open_submit_for_review_popup(self):
     """Open submit for control popup by clicking on corresponding button."""
@@ -110,32 +151,10 @@ class WithObjectReview(base.WithBrowser):
     """Click 'Undo' button on floating message."""
     self.undo_button.click()
 
-  def get_object_review_txt(self):
-    """Return review message on info pane."""
-    return (self.object_review_txt.text if self.object_review_txt.exists
-            else None)
-
-  def get_reviewers_emails(self):
-    """Return reviewers emails if reviewers assigned."""
-    return (self.reviewers.get_people_emails()
-            if self.reviewers.exists() else None)
-
-  def get_review_dict(self):
-    """Return Review as dict."""
-    return {"status": self.get_review_state_txt(),
-            "reviewers": self.get_reviewers_emails(),
-            # Last 7 symbols are the UTC offset. Can not convert to UI
-            # format date due to %z directive doesn't work in Python 2.7.
-            "last_reviewed_by": self.get_object_review_txt()[:-7] if
-            self.get_object_review_txt() else None}
-
-  def has_review(self):
-    """Check if review section exists."""
-    return self._review_root.exists
-
-  def get_review_status(self):
-    """Get review status."""
-    return self.review_status.text.title()
+  @property
+  def review_status(self):
+    """Returns object review status."""
+    return self._review_root.element(class_name="state-value").text.title()
 
 
 class WithDisabledProposals(base.WithBrowser):
@@ -167,6 +186,13 @@ class WithProposals(WithDisabledProposals):
   def click_propose_changes(self):
     """Click on Propose Changes button."""
     self.propose_changes_btn.click()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
+  def related_proposals(self):
+    """Open related proposals tab."""
+    self.tabs.ensure_tab(self.proposals_tab_or_link_name)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return related_proposals.RelatedProposals()
 
 
 class WithDisabledVersionHistory(base.WithBrowser):
@@ -182,3 +208,78 @@ class WithDisabledVersionHistory(base.WithBrowser):
   def click_version_history(self):
     """Click 'Version History' link or tab."""
     self._browser.element(text=self.version_history_tab_or_link_name).click()
+
+
+class WithBulkUpdate(base.WithBrowser):
+  """Contains bulk update elements."""
+
+  @property
+  def finish_message(self):
+    """Returns floating message that appears after bulk update process is
+    completed successfully."""
+    return self._browser.element(text="Bulk update is finished successfully.")
+
+  @property
+  def submit_message(self):
+    """Returns floating message that appears after bulk update process is
+    started."""
+    return self._browser.element(
+        text="Your bulk update is submitted. Once it is done you will get a "
+        "notification. You can continue working with the app.")
+
+
+class WithBulkUpdateButtons(WithBulkUpdate):
+  """Contains bulk update elements presented as buttons on page."""
+
+  @property
+  def bulk_complete_button(self):
+    """Represents 'Bulk complete' button."""
+    return self._browser.button(text="Bulk Complete")
+
+  def is_bulk_complete_displayed(self):
+    """Returns whether 'Bulk complete' button is displayed."""
+    return self.bulk_complete_button.exists
+
+  @property
+  def bulk_verify_button(self):
+    """Returns 'Bulk Verify' button element."""
+    return self._browser.button(text="Bulk Verify")
+
+  def is_bulk_verify_displayed(self):
+    """Returns whether 'Bulk Verify' button is displayed."""
+    return self.bulk_verify_button.exists
+
+  def open_bulk_verify_modal(self):
+    """Clicks bulk verify button.
+    Returns: Bulk Verify modal."""
+    self.bulk_verify_button.click()
+    return bulk_update.BulkVerifyModal()
+
+
+class WithBulkUpdateOptions(WithBulkUpdate):
+  """Contains bulk update elements presented as 3bbs menu options."""
+
+  @property
+  def bulk_complete_option(self):
+    """Returns 'Bulk complete' option from 3bbs menu."""
+    return self.three_bbs.option_by_text("Bulk Complete")
+
+  def is_bulk_complete_displayed(self):
+    """Returns whether 'Bulk complete' option is displayed in 3bbs menu."""
+    return self.bulk_complete_option.exists
+
+  @property
+  def bulk_verify_option(self):
+    """Returns 'Bulk Verify' option from 3bbs menu."""
+    return self.three_bbs.option_by_text("Bulk Verify")
+
+  def is_bulk_verify_displayed(self):
+    """Returns whether 'Bulk Verify' option is displayed in 3bbs menu."""
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return self.bulk_verify_option.exists
+
+  def open_bulk_verify_modal(self):
+    """Clicks bulk verify option in 3bbs menu.
+    Returns: Bulk Verify modal."""
+    self.bulk_verify_option.click()
+    return bulk_update.BulkVerifyModal()

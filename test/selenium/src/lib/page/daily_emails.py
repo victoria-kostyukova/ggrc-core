@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Daily emails."""
 
@@ -19,7 +19,7 @@ class DailyEmails(base.WithBrowser):
     selenium_utils.open_url(self.daily_emails_url)
     selenium_utils.wait_for_doc_is_ready(self._driver)
     self._browser.element(xpath="//h1[contains(text(),'digest')]").wait_until(
-        lambda e: e.present, timeout=constants.ux.MAX_USER_WAIT_SECONDS)
+        lambda e: e.present, timeout=constants.timeouts.MAX_USER_WAIT_SECONDS)
 
   def user_email_element(self, user_name):
     """Get user's email element."""

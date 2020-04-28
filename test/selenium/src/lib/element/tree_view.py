@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tree View dropdown elements."""
 # pylint: disable=too-few-public-methods
@@ -52,12 +52,24 @@ class Programs(CommonDropdownSettings):
   """Programs 3BBS button/dropdown settings on Tree View."""
 
 
+class ProgramChilds(CommonDropdownSettings):
+  """ProgramChilds 3BBS button/dropdown settings on Tree View."""
+
+
+class ProgramParents(CommonDropdownSettings):
+  """ProgramParents 3BBS button/dropdown settings on Tree View."""
+
+
 class Controls(CommonDropdownSettings):
   """Controls 3BBS button/dropdown settings on Tree View."""
 
 
 class Objectives(CommonDropdownSettings):
   """Objectives 3BBS button/dropdown settings on Tree View."""
+
+
+class Threats(CommonDropdownSettings):
+  """Threats 3BBS button/dropdown settings on Tree View."""
 
 
 class Processes(CommonDropdownSettings):
@@ -90,3 +102,59 @@ class OrgGroups(CommonDropdownSettings):
 
 class Issues(CommonDropdownSettings):
   """Issues 3BBS button/dropdown settings on Tree View."""
+
+
+class Risks(CommonDropdownSettings):
+  """Risks 3BBS button/dropdown settings on Tree View."""
+
+
+class Regulations(CommonDropdownSettings):
+  """Regulations 3BBS button/dropdown settings on Tree View."""
+
+
+class Standards(CommonDropdownSettings):
+  """Standards 3BBS button/dropdown settings on Tree View."""
+
+
+class Requirements(CommonDropdownSettings):
+  """Requirements 3BBS button/dropdown settings on Tree View."""
+
+
+class Policies(CommonDropdownSettings):
+  """Policies 3BBS button/dropdown settings on Tree View."""
+
+
+class Contracts(CommonDropdownSettings):
+  """Contracts 3BBS button/dropdown settings on Tree View."""
+
+
+class KeyReports(CommonDropdownSettings):
+  """Key Reports 3BBS button/dropdown settings on Tree View."""
+
+
+class AccessGroups(CommonDropdownSettings):
+  """Access Groups 3BBS button/dropdown settings on Tree View."""
+
+
+class AccountBalances(CommonDropdownSettings):
+  """Account Balances 3BBS button/dropdown settings on Tree View."""
+
+
+class Facilities(CommonDropdownSettings):
+  """Facilities 3BBS button/dropdown settings on Tree View."""
+
+
+class Markets(CommonDropdownSettings):
+  """Markets 3BBS button/dropdown settings on Tree View."""
+
+
+class Metrics(CommonDropdownSettings):
+  """Metrics 3BBS button/dropdown settings on Tree View."""
+
+
+class ProductGroups(CommonDropdownSettings):
+  """Product Groups 3BBS button/dropdown settings on Tree View."""
+
+
+class Vendors(CommonDropdownSettings):
+  """Vendors 3BBS button/dropdown settings on Tree View."""

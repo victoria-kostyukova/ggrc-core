@@ -1,8 +1,9 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST service for people."""
 from lib import decorator
 from lib.app_entity import person_entity
+from lib.constants import roles
 from lib.rest import base_rest_service, rest_convert
 
 
@@ -64,5 +65,7 @@ class UserRoleRestService(base_rest_service.ObjectRestService):
     return dict(
         person=rest_convert.to_basic_rest_obj(obj.person),
         role=rest_convert.to_basic_rest_obj(obj.role),
-        context=rest_convert.default_context()
+        context=(rest_convert.administrator_context()
+                 if obj.role.name == roles.ADMINISTRATOR
+                 else rest_convert.default_context())
     )

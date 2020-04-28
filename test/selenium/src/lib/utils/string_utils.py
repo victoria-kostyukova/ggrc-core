@@ -1,4 +1,5 @@
-# Copyright (C) 2019 Google Inc.
+# coding=utf-8
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for string operations."""
 import cgi
@@ -23,6 +24,9 @@ class Symbols(object):
   BACK_QUOTE = "`"
   BACKSLASH = "\\"
   PIPE = "|"
+  AT_SIGN = "@"
+  PLUS = "+"
+  EM_DASH = u"—"
 
   def __init__(self, additional_exclude=''):
     """Create symbols sets.
@@ -199,11 +203,6 @@ class StringMethods(object):
     return all(item in dest_dict.iteritems() for item in src_dict.iteritems())
 
   @staticmethod
-  def get_first_word_from_str(line):
-    """Get first word from string."""
-    return line.split(None, 1)[0]
-
-  @staticmethod
   def dict_keys_to_upper_case(dictionary):
     """Convert keys of dictionary to upper case."""
     return {k.upper(): v for k, v in dictionary.iteritems()}
@@ -230,12 +229,22 @@ def escape_html(str_to_escape):
   return cgi.escape(str_to_escape)
 
 
-def remove_from_end(the_str, str_to_remove):
-  """Removes `str_to_remove` from the end of `the_str`."""
+def remove_from_end(the_str, str_to_remove, strict=True):
+  """Tries to remove `str_to_remove` from the end of `the_str`.
+
+  If `the_str` ends with `str_to_remove` then removes it from the end of
+  `the_str`. Otherwise if 'strict' then raises Value Error else leaves string
+  without changes.
+
+  Returns:
+    Result string."""
   if the_str.endswith(str_to_remove):
     return the_str[:-len(str_to_remove)]
-  raise ValueError("String `{}` doesn't end with `{}`".format(
-      the_str, str_to_remove))
+  elif strict:
+    raise ValueError("String `{}` doesn't end with `{}`".format(
+        the_str, str_to_remove))
+  else:
+    return the_str
 
 
 def parse_str_by_reg_exp(str_to_parse, reg_exp, return_as_dict):
@@ -255,3 +264,8 @@ def extract_items(list_of_dicts, *keys_to_keep):
   return ([item[keys_to_keep[0]] for item in list_of_dicts]
           if len(keys_to_keep) == 1 else
           [{key: item[key] for key in keys_to_keep} for item in list_of_dicts])
+
+
+def convert_list_to_str(list_of_items, separator='\n '):
+  """Converts list of any objects to string with separator between items."""
+  return separator.join([str(item) for item in list_of_items])

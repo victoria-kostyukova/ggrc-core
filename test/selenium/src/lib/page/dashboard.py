@@ -1,16 +1,16 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """List dashboard."""
 # pylint: disable=too-many-instance-attributes
-
+import inflection
 from selenium.common import exceptions
 
-from lib import base, decorator, url
+from lib import base, decorator, environment, url
 from lib.constants import locator
-from lib.element import tab_element
+from lib.element import tab_element, page_elements
 from lib.page import widget_bar, lhn
-from lib.page.modal import global_search
-from lib.page.widget import object_modal
+from lib.page.modal import search_modal
+from lib.page.widget import object_modal, page_mixins
 from lib.utils import selenium_utils
 
 
@@ -138,7 +138,7 @@ class GenericHeader(base.Component):
   def open_global_search(self):
     """Clicks 'Global Search' button."""
     self.button_search.click()
-    return global_search.GlobalSearch()
+    return search_modal.GlobalSearch()
 
 
 class Header(GenericHeader):
@@ -152,6 +152,10 @@ class Header(GenericHeader):
 class Dashboard(widget_bar.Dashboard):
   """Main dashboard page."""
   # pylint: disable=abstract-method
+  def __init__(self, root_element=None):
+    super(Dashboard, self).__init__()
+    if root_element:
+      self._browser = root_element
 
   @property
   def header(self):
@@ -166,7 +170,8 @@ class Dashboard(widget_bar.Dashboard):
   def open_objs_tab_via_url(self, obj_type):
     """Opens objects dashboard tab via url according to specified object
     type."""
-    selenium_utils.open_url(self.dashboard_url + "#!" + obj_type.lower())
+    selenium_utils.open_url(
+        self.dashboard_url + "#!" + inflection.underscore(obj_type))
 
   def start_workflow(self):
     """Clicks "Start new Workflow" button."""
@@ -204,6 +209,24 @@ class Dashboard(widget_bar.Dashboard):
     self._browser.element(class_name="internav").\
         wait_until(lambda e: e.present)
 
+  @property
+  def get_started_widget(self):
+    """Returns Get Started Widget element."""
+    widget = self._browser.element(class_name="get-started")
+    widget.wait_until(lambda e: e.exists)
+    return widget
+
+  @property
+  def my_active_workflows_widget(self):
+    """Returns My Active Workflows element."""
+    return self._browser.element(class_name="dashboard-workflows")
+
+  @property
+  def is_opened(self):
+    """Returns True if Dashboard page is opened."""
+    return (self.get_started_widget.exists and
+            self.my_active_workflows_widget.exists)
+
 
 class CreateObjectDropdown(base.Widget):
   """Create object dropdown."""
@@ -229,3 +252,22 @@ class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):
 class AllObjectsDashboard(widget_bar.AllObjectsDashboard, GenericHeader):
   """All Objects Dashboard"""
   # pylint: disable=abstract-method
+
+
+class MyAssessments(page_mixins.WithBulkUpdateButtons):
+  """Model for 'My Assessments' page."""
+
+  def __init__(self, driver=None):
+    super(MyAssessments, self).__init__(driver)
+
+  @property
+  def my_assessments_url(self):
+    """Returns 'My Assessments' page url."""
+    return environment.app_url + url.Widget.MY_ASSESSMENTS
+
+  @property
+  def status_filter_dropdown(self):
+    """Returns multi select dropdown for filtering Assessments by their
+    status."""
+    return page_elements.MultiselectDropdown(
+        self._browser.element(tag_name="multiselect-dropdown"))

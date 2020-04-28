@@ -1,7 +1,7 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants and methods for work with objects."""
-
+import itertools
 import sys
 
 import inflection
@@ -10,6 +10,8 @@ import inflection
 # objects
 RELATIONSHIPS = "relationships"
 PROGRAMS = "programs"
+PROGRAM_PARENTS = "program_parents"
+PROGRAM_CHILDS = "program_childs"
 WORKFLOWS = "workflows"
 AUDITS = "audits"
 ASSESSMENTS = "assessments"
@@ -41,7 +43,6 @@ MARKETS = "markets"
 RISKS = "risks"
 THREATS = "threats"
 CUSTOM_ATTRIBUTES = "custom_attribute_definitions"
-EXTERNAL_CUSTOM_ATTRIBUTES = "external_" + CUSTOM_ATTRIBUTES
 COMMENTS = "comments"
 SNAPSHOTS = "snapshots"
 TASK_GROUPS = "task_groups"
@@ -55,30 +56,39 @@ PRODUCT_GROUPS = "product_groups"
 PROPOSALS = "proposals"
 EVIDENCE = 'evidence'
 REVIEWS = "reviews"
+CHANGE_LOG_ITEMS = "change_log_items"
 
-EDITABLE_GGRC_OBJ = (
-    ACCESS_GROUPS, CONTRACTS, DATA_ASSETS, FACILITIES,
-    METRICS, MARKETS, OBJECTIVES, ORG_GROUPS, POLICIES, PROCESSES, PRODUCTS,
-    PROJECTS, REGULATIONS, REQUIREMENTS, STANDARDS, SYSTEMS, VENDORS, THREATS,
-    TECHNOLOGY_ENVIRONMENTS, PRODUCT_GROUPS, KEY_REPORTS, ACCOUNT_BALANCES,
-)
+EDITABLE_GGRC_OBJS = (CONTRACTS, OBJECTIVES, POLICIES, REGULATIONS,
+                      REQUIREMENTS, STANDARDS, THREATS,)
 
-EXTERNAL_OBJECTS = (CONTROLS, RISKS)
+# disabled
+SCOPE_OBJECTS = (ACCESS_GROUPS, ACCOUNT_BALANCES, DATA_ASSETS, FACILITIES,
+                 KEY_REPORTS, MARKETS, METRICS, ORG_GROUPS, PROCESSES,
+                 PRODUCTS, PRODUCT_GROUPS, PROJECTS, SYSTEMS,
+                 TECHNOLOGY_ENVIRONMENTS, VENDORS)
 
-ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJ + EXTERNAL_OBJECTS
+# disabled
+STANDARDS_AND_REGULATIONS = (REGULATIONS, STANDARDS)
 
-EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJ + (
+# disabled
+CONTROLS_AND_RISKS = (CONTROLS, RISKS)
+
+ALL_DISABLED_OBJECTS = CONTROLS_AND_RISKS + SCOPE_OBJECTS
+
+ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJS + ALL_DISABLED_OBJECTS
+
+EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJS + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
 
-ALL_CA_OBJS = EDITABLE_CA_OBJS + EXTERNAL_OBJECTS
+OBJS_SUPPORTING_MANDATORY_CA = EDITABLE_GGRC_OBJS + (
+    WORKFLOWS, PROGRAMS, AUDITS, ISSUES, PEOPLE)
 
-ALL_OBJS_WO_STATE_FILTERING = (
-    PEOPLE, WORKFLOWS, TASK_GROUPS, CYCLES, CYCLE_TASK_GROUP_OBJECT_TASKS)
+ALL_CA_OBJS = EDITABLE_CA_OBJS + ALL_DISABLED_OBJECTS
 
-EDITABLE_OBJS_W_CUSTOM_ROLES = EDITABLE_GGRC_OBJ + (
-    PROJECTS, ASSESSMENTS, DOCUMENTS, EVIDENCE, ISSUES, AUDITS, PROGRAMS)
+EDITABLE_OBJS_W_CUSTOM_ROLES = EDITABLE_GGRC_OBJS + (
+    ASSESSMENTS, DOCUMENTS, EVIDENCE, ISSUES, AUDITS, PROGRAMS)
 
-ALL_OBJS_W_CUSTOM_ROLES = EDITABLE_OBJS_W_CUSTOM_ROLES + EXTERNAL_OBJECTS
+ALL_OBJS_W_CUSTOM_ROLES = EDITABLE_OBJS_W_CUSTOM_ROLES + ALL_DISABLED_OBJECTS
 
 IMPORTABLE_OBJECTS = EDITABLE_CA_OBJS + (
     ASSESSMENT_TEMPLATES, TASK_GROUPS, TASK_GROUP_TASKS)
@@ -99,6 +109,8 @@ def _get_singular(plurals):
       singular = "process"
     elif name == FACILITIES:
       singular = "facility"
+    elif name == EVIDENCE:
+      singular = EVIDENCE
     else:
       singular = name[:-1]
     singulars.append(singular.upper())
@@ -126,15 +138,15 @@ def _get_plural(singulars):
   return plurals
 
 
-def get_singular(plural, title=False):
+def get_singular(plural, title=False, titleize=False):
   """Transform object name to singular and lower or title form.
  Example: product_groups -> product_group
  """
   _singular = _get_singular([plural])[0]
-  if title:
-    _singular = inflection.camelize(_singular.lower())
-  else:
-    _singular = _singular.lower()
+  _singular = (inflection.camelize(_singular.lower()) if title
+               else _singular.lower())
+  if titleize:
+    _singular = inflection.titleize(_singular)
   return _singular
 
 
@@ -150,11 +162,14 @@ def get_plural(singular, title=False):
   return _plural
 
 
-def get_normal_form(obj_name):
-  """Transforms object name to title form
+def get_normal_form(obj_name, title=True):
+  """Replaces underscores with spaces.
+
+  Transforms to title form if title is True.
   (product_groups -> Product Groups).
   """
-  return obj_name.replace("_", " ").title()
+  obj_name_wo_spaces = obj_name.replace("_", " ")
+  return obj_name_wo_spaces.title() if title else obj_name_wo_spaces
 
 
 ALL_PLURAL = [k for k in globals().keys() if
@@ -171,8 +186,12 @@ def get_obj_type(obj_name):
   return get_singular(obj_name, title=obj_name != CUSTOM_ATTRIBUTES)
 
 
-EXTERNAL_END_POINTS = [get_singular(x) for x
-                       in EXTERNAL_OBJECTS + (EXTERNAL_CUSTOM_ATTRIBUTES,)]
+SINGULAR_CONTROL_AND_RISK = [get_singular(x) for x in CONTROLS_AND_RISKS]
 
-SINGULAR_TITLE_EXTERNAL_OBJS = [
-    get_singular(x, title=True) for x in EXTERNAL_OBJECTS]
+SINGULAR_SCOPE_OBJS_ITERATOR = itertools.cycle([get_singular(x)
+                                                for x in SCOPE_OBJECTS])
+
+SINGULAR_STANDARDS_AND_REGULATIONS_ITERATOR = itertools.cycle(
+    [get_singular(x) for x in STANDARDS_AND_REGULATIONS])
+
+ALL_SINGULAR_DISABLED_OBJS = [get_singular(x) for x in ALL_DISABLED_OBJECTS]

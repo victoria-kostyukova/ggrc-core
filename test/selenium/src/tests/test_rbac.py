@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tests for RBAC"""
 # pylint: disable=no-self-use
@@ -33,15 +33,10 @@ class TestRBAC(base.Test):
     """
     user = rest_facade.create_user_with_role(role_name=role)
     users.set_current_user(user)
-    objs = [rest_facade.create_program(), rest_facade.create_control(
-        admins=[users.current_user()])]
+    objs = [rest_facade.create_program(), rest_facade.create_objective()]
     for obj in objs:
-      if obj.type == "Control":
-        webui_facade.assert_can_edit_control(selenium, obj, can_edit=True)
-        webui_facade.assert_cannot_delete_control(selenium, obj)
-      else:
-        webui_facade.assert_can_edit(selenium, obj, can_edit=True)
-        webui_facade.assert_can_delete(selenium, obj, can_delete=True)
+      webui_facade.assert_can_edit(selenium, obj, can_edit=True)
+      webui_facade.assert_can_delete(selenium, obj, can_delete=True)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -63,18 +58,14 @@ class TestRBAC(base.Test):
     for role in other_roles:
       users.set_current_user(users_with_all_roles[role])
       program = rest_facade.create_program()
-      control = rest_facade.create_control_mapped_to_program(program)
-      objs.extend([program, control])
+      objective = rest_facade.create_objective()
+      objs.extend([program, objective])
     users.set_current_user(users_with_all_roles[login_role])
     for obj in objs:
       if can_view:
         webui_facade.assert_can_view(selenium, obj)
-        if obj.type == "Control":
-          webui_facade.assert_can_edit_control(selenium, obj, can_edit)
-          webui_facade.assert_cannot_delete_control(selenium, obj)
-        else:
-          webui_facade.assert_can_edit(selenium, obj, can_edit=can_edit)
-          webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
+        webui_facade.assert_can_edit(selenium, obj, can_edit=can_edit)
+        webui_facade.assert_can_delete(selenium, obj, can_delete=can_edit)
       else:
         webui_facade.assert_cannot_view(obj)
 
@@ -195,6 +186,14 @@ class TestAuditorRole(base.Test):
     expected_asmt = rest_facade.create_asmt(audit)
     webui_facade.assert_can_edit_asmt(
         selenium, expected_asmt)
+
+  @pytest.mark.smoke_tests
+  def test_auditor_cant_delete_asmt(self, test_data, selenium):
+    """Test that auditor cannot delete assessment."""
+    users.set_current_user(test_data["creator"])
+    webui_facade.assert_can_delete(
+        selenium, rest_facade.create_asmt(test_data["audit"]),
+        can_delete=False)
 
   @pytest.mark.smoke_tests
   def test_auditor_can_assign_user_to_asmt(

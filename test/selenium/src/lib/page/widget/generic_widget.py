@@ -1,52 +1,76 @@
 # coding=utf-8
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2020 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Widgets other than Info widget."""
 
 import re
 from selenium.common import exceptions
 
-from lib import base, factory
+from lib import base, factory, decorator
 from lib.constants import locator, regex, element, counters, messages, objects
 from lib.element import three_bbs
 from lib.page import widget_bar
-from lib.page.modal import unified_mapper
-from lib.utils import selenium_utils
+from lib.page.modal import unified_mapper, search_modal
+from lib.page.widget import page_mixins
+from lib.utils import selenium_utils, test_utils
 
 
 class Widget(base.Widget):
   """All widgets with Tree View and Filters."""
   # pylint: disable=too-many-instance-attributes
-  def __init__(self, driver, obj_name, is_versions_widget=False):
+  def __init__(self, driver, obj_name, is_versions_widget=False,
+               actual_name=None):
+    self.actual_name = obj_name if not actual_name else actual_name
     self.obj_name = obj_name
     self._locators_filter = locator.BaseWidgetGeneric
-    self._locators_widget = factory.get_locator_widget(
-        self.obj_name.upper())
-    if is_versions_widget:
-      locator_parts = self._locators_widget[1].split("\"")
-      locator_parts[1] += "_version"
-      self._locators_widget = (self._locators_widget[0], "\"".join(
-          locator_parts))
+    self.is_versions_widget = is_versions_widget
     self.info_widget_cls = factory.get_cls_widget(
-        object_name=obj_name, is_info=True)
+        object_name=self.actual_name, is_info=True)
     # Filter
     self.button_help = base.Button(driver, self._locators_filter.HELP_BTN_CSS)
     self.filter = base.FilterCommon(
         driver, text_box_locator=self._locators_filter.TXTFIELD_TO_FILTER_CSS,
         bt_submit_locator=self._locators_filter.FILTER_BTN_CSS)
-    if self.obj_name not in objects.ALL_OBJS_WO_STATE_FILTERING:
-      self.dropdown_states = base.DropdownStatic(
-          driver, self._locators_filter.DD_CSS)
     super(Widget, self).__init__(driver)
-    self._root = self._browser.element(
-        class_name="widget governance treeview",
-        id=objects.get_singular(self.obj_name))
-    # Tree View
-    self.tree_view = TreeView(driver, self.info_widget_cls, self.obj_name)
+    self._root = self._browser.element(class_name="widget",
+                                       id=objects.get_singular(self.obj_name))
     # Tab count
     self.members_listed = None
     self.member_count = None
     self._set_members_listed()
+
+  @property
+  def pagination(self):
+    """Returns pagination element."""
+    return base.Pagination(self._root)
+
+  @property
+  def tree_view(self):
+    """Returns tree view element."""
+    return TreeView(self._driver, self.info_widget_cls, self.obj_name)
+
+  @decorator.execute_on_all_pagination_pages
+  def _extend_tree_view_items_scopes(self, scopes):
+    """Extends scopes with scopes from current page of tree view."""
+    scopes.extend(self.tree_view.get_list_members_as_list_scopes())
+
+  @property
+  def tree_view_items_scopes(self):
+    """Returns tree view items as scopes (dicts) from all pages."""
+    scopes = []
+    self._extend_tree_view_items_scopes(scopes)
+    return scopes
+
+  @property
+  def _locators_widget(self):
+    """Property. Returns locator of widget."""
+    locators_widget = factory.get_locator_widget(self.obj_name.upper())
+    if self.is_versions_widget:
+      locator_parts = locators_widget[1].split("\"")
+      locator_parts[1] += "_version"
+      locators_widget = (locators_widget[0], "\"".join(
+          locator_parts))
+    return locators_widget
 
   def _set_member_count(self):
     """Parses widget name and number of items from widget tab title."""
@@ -150,6 +174,16 @@ class Widget(base.Widget):
     """ThreeBbs objcect on widget."""
     return three_bbs.ThreeBbs(self._root)
 
+  def open_advanced_search(self):
+    """Clicks the Advanced Filter button.
+    Return: Advanced Search modal."""
+    self.filter.advanced_filter_btn.click()
+    return search_modal.AdvancedSearch()
+
+  def copy_permalink(self):
+    """Copies a permalink."""
+    self.three_bbs.select_option_by_text("Get permalink")
+
 
 class TreeView(base.TreeView):
   """Genetic Tree Views."""
@@ -198,7 +232,7 @@ class TreeView(base.TreeView):
     Return: lib.page.widget.info_widget."obj_name"
     """
     item_num = self._get_item_num_by_title(title)
-    return (Widget(self._driver, self.obj_name).
+    return (factory.get_cls_widget(self.obj_name)(self._driver, self.obj_name).
             select_member_by_num(item_num))
 
   def _get_item_num_by_title(self, title):
@@ -216,7 +250,9 @@ class TreeView(base.TreeView):
     """
     search_field = self._browser.element(class_name="tree-filter__input")
     search_field.send_keys(obj_str)
-    search_button = self._browser.element(text="Search")
+    test_utils.wait_for(lambda: self._browser.element(
+        class_name="tree-filter_is-expression valid").exists)
+    search_button = self._browser.button(text="Search")
     search_button.click()
     self.wait_loading_after_actions()
     if len(self.tree_view_items(is_updated=True)) > 1:
@@ -230,7 +266,7 @@ class TreeView(base.TreeView):
     Return: lib.element.tree_view."dropdown_obj"
     """
     # pylint: disable=invalid-name
-    obj = self.find_row(title)
+    obj = self.find_row("title = \"" + title + "\"")
     item_dropdown_button = obj.item_btn
     selenium_utils.hover_over_element(
         self._driver, obj.element)
@@ -258,7 +294,7 @@ class AssessmentTemplates(Widget):
   """Model for Assessment Templates generic widgets."""
 
 
-class Assessments(Widget):
+class Assessments(page_mixins.WithBulkUpdateOptions, Widget):
   """Model for Assessments generic widgets."""
   _locators = locator.Assessments
 
@@ -278,6 +314,10 @@ class Objectives(Widget):
   """Model for Objectives generic widgets."""
 
 
+class Threats(Widget):
+  """Model for Threats generic widgets."""
+
+
 class Risks(Widget):
   """Model for Risks generic widgets."""
 
@@ -292,6 +332,20 @@ class Issues(Widget):
 
 class Programs(Widget):
   """Model for Programs generic widgets"""
+
+
+class ProgramChilds(Widget):
+  """Model for ProgramChilds generic widgets"""
+  def __init__(self, driver, obj_name):
+    super(ProgramChilds, self).__init__(
+        driver, obj_name, actual_name=objects.PROGRAMS)
+
+
+class ProgramParents(Widget):
+  """Model for ProgramChilds generic widgets"""
+  def __init__(self, driver, obj_name):
+    super(ProgramParents, self).__init__(
+        driver, obj_name, actual_name=objects.PROGRAMS)
 
 
 class TechnologyEnvironments(Widget):
@@ -329,3 +383,55 @@ class CADashboard(widget_bar.Dashboard):
   def active_dashboard_tab_elem(self):
     """Returns iframe content of selected CA dashboard tab."""
     return self._browser.iframe()
+
+
+class Regulations(Widget):
+  """Model for Regulations generic widgets."""
+
+
+class Standards(Widget):
+  """Model for Standards generic widgets."""
+
+
+class Requirements(Widget):
+  """Model for Requirements generic widgets."""
+
+
+class Policies(Widget):
+  """Model for Policies generic widgets."""
+
+
+class Contracts(Widget):
+  """Model for Contracts generic widgets."""
+
+
+class KeyReports(Widget):
+  """Model for Key Reports generic widgets."""
+
+
+class AccessGroups(Widget):
+  """Model for Access Groups generic widgets."""
+
+
+class AccountBalances(Widget):
+  """Model for Account Balances generic widgets."""
+
+
+class Facilities(Widget):
+  """Model for Facilities generic widgets."""
+
+
+class Markets(Widget):
+  """Model for Markets generic widgets."""
+
+
+class Metrics(Widget):
+  """Model for Metrics generic widgets."""
+
+
+class ProductGroups(Widget):
+  """Model for Product Groups generic widgets."""
+
+
+class Vendors(Widget):
+  """Model for Vendors generic widgets."""
